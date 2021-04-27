@@ -1,0 +1,30 @@
+{
+    "configurations": [
+        {
+            "name": "3DS",
+            "includePath": [
+                "C:/devkitPro/devkitARM/arm-none-eabi/include/c++/10.2.0",
+                "C:/devkitPro/devkitARM/arm-none-eabi/include/c++/10.2.0/arm-none-eabi/thumb",
+                "C:/devkitPro/libctru/include",
+                "C:/devkitPro/devkitARM/arm-none-eabi/include",
+                "C:/devkitPro/devkitARM/lib/gcc/arm-none-eabi/10.2.0/include",
+                "${workspaceFolder}/src/game"
+            ],
+            "defines": [
+                "ARM7"
+            ],
+            "intelliSenseMode": "gcc-arm",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/src",
+                    "${workspaceFolder}/build"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            },
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}

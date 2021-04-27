@@ -1,0 +1,86 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        { 
+            "label": "stop emulation",
+            "type":"shell",
+            "command":"taskkill /im citra-qt.exe /F" 
+        },
+        // {
+        //     "label": "make",
+        //     "type": "shell",
+        //     "command": "make",
+        //     "args": ["DEBUG=1"],
+        //     "group": {
+        //         "kind": "build",
+        //         "isDefault": true
+        //     }
+        // },
+        {
+            "label": "rebuild debug",
+            "dependsOn":["clean"],
+            "type": "process",
+            "command": "make",
+            "args": ["DEBUG=1"]
+        },
+        {
+            "label": "rebuild release",
+            "dependsOn":["clean"],
+            "type": "process",
+            "command": "make",
+            "args": ["DEBUG=0"]
+        },
+        {
+            "label": "make debug",
+            "type": "process",
+            "command": "make",
+            "args": ["DEBUG=1"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "make release",
+            "type": "process",
+            "command": "make",
+            "args": ["DEBUG=0"],
+        },
+        {
+            //"dependsOn":"stop emulation",
+            "label": "clean",
+            "type": "shell",
+            "command": "make clean"
+        },
+        {
+            "label": "gdb-debug",
+            "type": "shell",
+            "dependsOn": ["make debug"],
+            "isBackground": false,
+      
+            "command": "F:/citra/nightly-mingw-debug/citra-qt.exe ${workspaceFolder}/${workspaceFolderBasename}.3dsx",
+          
+            "presentation": {
+                "clear": true,
+                "reveal": "always",
+                "panel": "new"
+            },
+            // "problemMatcher": {
+            //     "background": {
+            //         "activeOnStart": true,
+            //         "beginsPattern": "^.*debuggerReady.*$",
+            //         "endsPattern": "^.*debuggerReady.*$"
+            //     },
+            // }
+        },
+        {
+            "label": "run",
+            "type": "shell",
+            "group": "test",
+            "command": "F:/citra/nightly-mingw/citra-qt.exe ${workspaceFolder}/${workspaceFolderBasename}.3dsx",
+            "isBackground": true
+        },
+    ]
+}

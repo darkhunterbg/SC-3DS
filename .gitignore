@@ -362,7 +362,6 @@ MigrationBackup/
 FodyWeavers.xsd
 
 build/
-.vscode/
 tmp/
 gfxbuild/
 bin/

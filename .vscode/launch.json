@@ -1,0 +1,67 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "2.0.0",
+    "configurations": [
+        {
+            "name": "Run",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "F:/citra/nightly-mingw/citra-qt.exe",
+            "args": [ "${workspaceFolder}/${workspaceFolderBasename}.3dsx"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "preLaunchTask": "make release"
+        },
+      
+        {
+            "name": "(gdb) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "preLaunchTask": "gdb-debug", 
+            "postDebugTask": "stop emulation",
+            "serverLaunchTimeout": 10000,
+            "stopAtEntry": true,
+            "program": "${workspaceFolder}/${workspaceFolderBasename}.elf",
+            "MIMode": "gdb",
+            "externalConsole": true,
+            "cwd": "${workspaceFolder}",
+            "targetArchitecture": "arm",
+            "miDebuggerServerAddress": "localhost:24689",
+            "windows": {
+                "miDebuggerPath": "C:/devkitPro/devkitARM/bin/arm-none-eabi-gdb.exe",
+                "setupCommands": [
+                    {
+                    "description": "Enable pretty-printing for gdb",
+                    "ignoreFailures": true,
+                        "text": "file ${workspaceFolder}/${workspaceFolderBasename}.elf -enable-pretty-printing"
+                    }]
+            },
+        },
+
+        {
+            "name": "(gdb) Attach",
+            "type": "cppdbg",
+            "request": "launch",
+            "serverLaunchTimeout": 10000,
+            "stopAtEntry": true,
+            "program": "${workspaceFolder}/${workspaceFolderBasename}.elf",
+            "MIMode": "lldb",
+            "externalConsole": true,
+            "cwd": "${workspaceFolder}",
+            "targetArchitecture": "arm",
+            "miDebuggerServerAddress": "localhost:24689",
+            "windows": {
+                "miDebuggerPath": "C:/devkitPro/devkitARM/bin/arm-none-eabi-gdb.exe",
+                "setupCommands": [
+                    {
+                    "description": "Enable pretty-printing for gdb",
+                    "ignoreFailures": true,
+                        "text": "file ${workspaceFolder}/${workspaceFolderBasename}.elf -enable-pretty-printing"
+                    }]
+            },
+        }
+    ]
+}
