@@ -1,0 +1,1 @@
+C:\devkitPro\tools\bin\3dslink SC.3dsx -a 10.65.106.142 17491 

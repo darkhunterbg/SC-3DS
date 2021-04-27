@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Scenes">
+      <UniqueIdentifier>{0e2292cd-4aac-4c45-ac2c-3f5208810757}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Map">
+      <UniqueIdentifier>{343beabe-3f3d-4e0c-9922-418a5a5b552f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\GameScene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\stb_sprintf.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\StringLib.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Map\MapDef.h">
+      <Filter>Map</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Map\MapSystem.h">
+      <Filter>Map</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Camera.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Input.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Assets.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Color.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Game.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\MathLib.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Platform.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Span.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\GameScene.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\StringLib.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Map\MapSystem.cpp">
+      <Filter>Map</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Camera.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Assets.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Game.cpp" />
+  </ItemGroup>
+</Project>

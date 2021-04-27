@@ -1,0 +1,5 @@
+--atlas -f rgba8888 -z auto
+unit\neutral\min01\0.png
+unit\neutral\min01\1.png
+unit\neutral\min01\2.png
+unit\neutral\min01\3.png
