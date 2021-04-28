@@ -6,6 +6,9 @@
 #include "Input.h"
 
 
+struct AudioChannelState;
+typedef int AudioChannelHandle;
+
 
 enum class ScreenId
 {
@@ -30,11 +33,17 @@ public:
 	static void DrawLine(Vector2Int src, Vector2Int dst, Color color);
 	static void DrawRectangle(Rectangle rect, Color color);
 	static Texture NewTexture(Vector2Int size);
+	static FILE* OpenAsset(const char* path);
 
 	static double ElaspedTime();
 
 	static void UpdateGamepadState(GamepadState& state);
 	static void UpdatePointerState(PointerState& state);
+
+	static void CreateChannel(AudioChannelState& channel);
+	static void EnableChannel(const AudioChannelState& channel, bool enabled);
+
+	static AudioClip LoadAudioClip(const char* path);
 };
 
 

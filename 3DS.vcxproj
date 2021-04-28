@@ -25,6 +25,9 @@
     <ClCompile Include="src\3ds\Main.cpp" />
     <ClCompile Include="src\3ds\Platform.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\3ds\NDSAudioChannel.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

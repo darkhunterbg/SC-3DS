@@ -8,18 +8,24 @@
 #include <fstream>
 
 #include "StringLib.h"
+#include "Audio.h"
+#include "NDSAudioChannel.h"
 
 struct RenderTarget {
 	C3D_RenderTarget* rt;
 	C3D_Tex* tex;
 };
 
+
+
+
 extern C3D_RenderTarget* screens[2];
 extern std::string assetDir;
 extern C2D_TextBuf textBuffer;
 extern u64 mainTimer;
-C3D_RenderTarget* currentScreen = nullptr;
-std::vector< RenderTarget> createdRenderTargets;
+extern std::vector<NDSAudioChannel*> audioChannels;
+static C3D_RenderTarget* currentScreen = nullptr;
+static std::vector< RenderTarget> createdRenderTargets;
 
 const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 	std::string assetPath = assetDir + path;
@@ -179,4 +185,45 @@ void Platform::UpdatePointerState(PointerState& state) {
 	u32 kDown = hidKeysHeld();
 	state.Touch = kDown && KEY_TOUCH;
 	state.Position = { touchPos.px, touchPos.py };
+}
+
+FILE* Platform::OpenAsset(const char* path) {
+	std::string f = assetDir + path;
+
+	return fopen(f.data(), "rb");
+}
+
+void Platform::CreateChannel(AudioChannelState& channel) {
+	if (audioChannels.size() == 24)
+		EXCEPTION("Reached max number of channels!");
+
+	int channelId = audioChannels.size();
+
+	ndspChnReset(channelId);
+	ndspChnSetInterp(channelId, NDSP_INTERP_LINEAR);
+	ndspChnSetRate(channelId, 22050);
+	ndspChnSetFormat(channelId, NDSP_FORMAT_STEREO_PCM16);
+	float volume[12];
+	for (int i = 0; i < 12; ++i)
+		volume[i] = 0.8f;
+	ndspChnSetMix(channelId, volume);
+	NDSAudioChannel* platformChannel = new NDSAudioChannel();
+	platformChannel->state = &channel;
+	platformChannel->enabled = false;
+
+	memset(&platformChannel->waveBuff[0], 0, sizeof(platformChannel->waveBuff));
+
+	for (int i = 0; i < 2; ++i) {
+		platformChannel->waveBuff[i].data_vaddr = linearAlloc(channel.bufferSize);
+		platformChannel->waveBuff[i].nsamples = channel.bufferSize / 4;
+	}
+
+	audioChannels.push_back(platformChannel);
+
+	channel.handle = channelId;
+}
+void Platform::EnableChannel(const AudioChannelState& channel, bool enabled) {
+
+	audioChannels[channel.handle]->enabled = enabled;
+	ndspChnSetPaused(channel.handle, !enabled);
 }

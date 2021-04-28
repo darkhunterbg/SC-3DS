@@ -10,6 +10,8 @@
 #include "StringLib.h"
 #include "SDL_FontCache.h"
 #include "MathLib.h"
+#include "Audio.h"
+#include <stdio.h>
 
 #include <SDL_ttf.h>
 
@@ -25,6 +27,9 @@ static SDL_Texture* target = nullptr;
 constexpr Uint8 SDL_FloatToUint8(float x) {
 	return (Uint8)(255.0f * ClampF(x, 0.0f, 1.0f) + 0.5f);
 }
+
+
+static 	void AudioCallback(void* userdata, Uint8* stream, int len);
 
 SDL_Texture* LoadTexture(const std::string& path, Vector2Int& size) {
 	std::vector<unsigned char> buffer, image;
@@ -103,6 +108,13 @@ Font Platform::LoadFont(const char* path) {
 	return { font };
 }
 
+FILE* Platform::OpenAsset(const char* path) {
+	std::filesystem::path f = assetDir;
+	f.append(path);
+
+	return fopen(f.generic_string().data(), "rb");
+}
+
 void Platform::DrawOnScreen(ScreenId screen) {
 	currentScreen = screen;
 }
@@ -114,7 +126,7 @@ void Platform::DrawOnTexture(Texture texture) {
 	SDL_RenderSetClipRect(renderer, &r);
 }
 Texture Platform::NewTexture(Vector2Int size) {
-	SDL_Texture* tex= SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
+	SDL_Texture* tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
 
 	return tex;
 }
@@ -278,4 +290,57 @@ void Platform::UpdatePointerState(PointerState& state) {
 	pos.y = (pos.y * 240) / touchScreenLocation.size.y;
 
 	state.Position = pos;
+}
+
+
+void Platform::CreateChannel(AudioChannelState& channel) {
+
+	SDL_AudioSpec wavSpec = {};
+	wavSpec.channels = 2;
+	wavSpec.format = AUDIO_S16LSB;
+	wavSpec.freq = 22050;
+	wavSpec.samples = channel.bufferSize / 4;
+	SDL_AudioSpec got;
+	wavSpec.callback = AudioCallback;
+	wavSpec.userdata = &channel;
+
+	SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(nullptr, 0, &wavSpec, &got, 0);
+	if (deviceId == 0) {
+		channel.handle = deviceId;
+		EXCEPTION("Failed to create audio channel!");
+	}
+
+	channel.bufferSize = got.samples * 4;
+	channel.handle = deviceId;
+
+	SDL_PauseAudioDevice(deviceId, 1);
+}
+void Platform::EnableChannel(const AudioChannelState& channel, bool enabled) {
+
+	SDL_PauseAudioDevice(channel.handle, enabled ? 0 : 1);
+}
+
+
+static 	void AudioCallback(void* userdata, Uint8* stream, int len) {
+	AudioChannelState* state = (AudioChannelState*)userdata;
+
+	SDL_memset(stream, 0, len);
+
+	AudioChannelClip* clip = state->CurrentClip();
+
+	unsigned size = clip != nullptr ? clip->Remaining() : 0;
+	if (size == 0) {
+		printf("Voice starvation at channel %i", state->handle);
+		return;
+	}
+
+	len = (len > size ? size : len);
+
+	SDL_MixAudioFormat(stream, clip->PlayFrom(), AUDIO_S16LSB, len, SDL_MIX_MAXVOLUME / 2);
+
+	clip->playPos += len;
+
+	if (clip->Done()) {
+		state->DequeueClip();
+	}
 }

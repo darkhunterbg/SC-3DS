@@ -38,3 +38,47 @@ struct Font {
 
 	inline bool IsValid() { return fontId != nullptr; }
 };
+
+struct AudioInfo {
+	int channels;
+	int sampleRate;
+	int sampleChannelSize;
+	int samplesCount;
+
+	inline int GetTotalSize() const {
+		return GetSampleSize() * samplesCount;
+	}
+
+	inline int GetSampleSize() const {
+		return channels * sampleChannelSize;
+	}
+
+	inline int GetBytesPerSec() const {
+		return GetSampleSize() * sampleRate;
+	}
+
+	inline float GetDurationSeconds() const {
+		return GetTotalSize() / (float)GetBytesPerSec();
+	}
+};
+
+
+struct AudioClip {
+	AudioInfo info;
+	uint8_t* data;
+
+	Span< uint8_t> GetData() const {
+		return { data, (unsigned)info.GetTotalSize() };
+	}
+	unsigned GetSize() const {
+		return (unsigned)info.GetTotalSize();
+	}
+	float GetDuration() const {
+		return  info.GetDurationSeconds();
+	}
+
+
+};
+class AudioStream {
+
+};

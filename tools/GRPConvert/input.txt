@@ -7,3 +7,6 @@ StarDat\tileset\*.grp
 
 palette Units
 StarDat\unit\*.grp
+
+palette Icons
+StarDat\unit\cmdbtns\*.grp

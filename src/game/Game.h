@@ -4,6 +4,7 @@
 #include "Input.h"
 
 class Scene;
+class AudioSystem;
 
 class Game {
 
@@ -15,15 +16,16 @@ public:
 	static Font SystemFont;
 	static GamepadState Gamepad;
 	static PointerState Pointer;
+	static AudioSystem* Audio;
 
-	static float FrameTime;
+	static float DeltaTime;
 
 	static void Start();
 	static void FrameStart();
+	static void FrameEnd();
 	static bool Update();
 	static void Draw();
 	static void End();
-
 
 	static void SetCurrentScene(Scene* scene);
 };

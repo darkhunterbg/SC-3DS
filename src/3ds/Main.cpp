@@ -10,6 +10,8 @@
 #include "Game.h"
 #include "StringLib.h"
 
+#include "NDSAudioChannel.h"
+#include "Audio.h"
 
 C3D_RenderTarget* top;
 C3D_RenderTarget* bottom;
@@ -17,12 +19,19 @@ C3D_RenderTarget* screens[2];
 std::string assetDir;
 C2D_TextBuf textBuffer;
 u64 mainTimer;
+std::vector<NDSAudioChannel*> audioChannels;
 
 void Init();
 void Uninit();
+void UpdateAudioChannel(NDSAudioChannel& channel);
 
-void FatalError(const char* error,...) {
+void FatalError(const char* error, ...) {
 	consoleInit(GFX_BOTTOM, nullptr);
+
+	int i = 0;
+	for (auto channel : audioChannels) {
+		ndspChnSetPaused(i++, true);
+	}
 
 	va_list args;
 	va_start(args, error);
@@ -56,13 +65,20 @@ int main()
 
 	while (aptMainLoop())
 	{
-		Game::FrameStart();
+		Game::FrameEnd();
 
 		hidScanInput();
 
 		u32 kDown = hidKeysDown();
 		if (kDown & KEY_START)
 			break;
+		
+		for (auto channel : audioChannels) {
+			if (!channel->enabled)
+				continue;
+
+			UpdateAudioChannel(*channel);
+		}
 
 		bool done = !Game::Update();
 
@@ -71,14 +87,17 @@ int main()
 
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
+		Game::FrameStart();
+
 		u32 color = C2D_Color32f(Colors::CornflowerBlue.r, Colors::CornflowerBlue.g, Colors::CornflowerBlue.b, Colors::CornflowerBlue.a);
 		C2D_TargetClear(top, color);
 		C2D_TargetClear(bottom, color);
 
 		C2D_Prepare();
 		Game::Draw();
-		C3D_FrameEnd(0);
+	
 
+		C3D_FrameEnd(0);
 	}
 
 	Game::End();
@@ -125,4 +144,46 @@ void Uninit() {
 	C3D_Fini();
 	gfxExit();
 	romfsExit();
+}
+
+
+void UpdateAudioChannel(NDSAudioChannel& channel) {
+
+	auto state = channel.state;
+
+	ndspWaveBuf& usedBuff = *channel.freeBuff;
+	ndspWaveBuf& freeBuff = *channel.freeBuff;
+
+	// Wait for playing buffer to finish
+	if (usedBuff.status == NDSP_WBUF_QUEUED || usedBuff.status == NDSP_WBUF_PLAYING)
+		return;
+
+	AudioChannelClip* clip = state->CurrentClip();
+	unsigned size = clip != nullptr ? clip->Remaining() : 0;
+	if (size == 0) {
+		//EngineLogWarning("Voice starvation at channel %i", state->handle);
+		return;
+	}
+
+	auto _audioBuffer = (u32*)freeBuff.data_vaddr;
+	unsigned len = state->bufferSize;
+	len = (len > size ? size : len);
+
+	memcpy(_audioBuffer, clip->PlayFrom(), len);
+
+	if (len < state->bufferSize) {
+		unsigned silenceSize = state->bufferSize - size;
+		memset(_audioBuffer + len, 0, silenceSize);
+	}
+
+	DSP_FlushDataCache(_audioBuffer, state->bufferSize);
+	ndspChnWaveBufAdd(state->handle, &freeBuff);
+
+	clip->playPos += len;
+
+	if (clip->Done()) {
+		state->DequeueClip();
+	}
+
+	channel.SwapBuffers();
 }

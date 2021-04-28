@@ -4,6 +4,7 @@
 #include "../Game.h"
 #include "../GUI/GameHUD.h"
 #include "../GUI/Cursor.h"
+#include "../Audio.h"
 
 GameScene::GameScene() {
 	
@@ -31,6 +32,9 @@ void GameScene::Start() {
 	camera.Position = { 0,0 };
 	camera.Size = { 400,240 };
 	camera.Limits = mapSystem->GetMapBounds();
+
+	AudioClip c = Platform::LoadAudioClip("music/terran1.wav");
+	Game::Audio->PlayClip(c);
 }
 
 int t = 0;

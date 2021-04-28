@@ -10,6 +10,9 @@
     <Filter Include="GUI">
       <UniqueIdentifier>{a1c47caf-9f70-4c29-a597-79e7d9fe539a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Loader">
+      <UniqueIdentifier>{c5cb7a38-2cb7-4189-a555-b0ada5d2861a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.h">
@@ -40,6 +43,10 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.h">
       <Filter>GUI</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\Wave.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Audio.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -61,5 +68,10 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\Wave.cpp">
+      <Filter>Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GenericPlatform.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Audio.cpp" />
   </ItemGroup>
 </Project>

@@ -59,7 +59,7 @@ namespace GRPConvert
 
 					foreach (var fr in img.Frames) {
 
-						string s = Path.Combine(dst, i.ToString("D2") + ".png");
+						string s = Path.Combine(dst, i.ToString("D3") + ".png");
 						++i;
 						fr.ToBitmap(pal).Save(s, ImageFormat.Png);
 					}

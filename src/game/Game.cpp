@@ -4,11 +4,15 @@
 #include "Scenes/Scene.h"
 #include "Scenes/GameScene.h"
 #include "StringLib.h"
+#include "Audio.h"
 
 static Scene* currentScene;
 
 static double updateTime;
 static double drawTime;
+static double frameTime;
+
+
 static const SpriteAtlas* title;
 static bool startup;
 static std::string error;
@@ -17,7 +21,8 @@ static double frameStartTime = 0;
 Font Game::SystemFont;
 GamepadState Game::Gamepad;
 PointerState Game::Pointer;
-float Game::FrameTime = 0;
+AudioSystem* Game::Audio = nullptr;
+float Game::DeltaTime = 0;
 
 
 static void ShowPerformance() {
@@ -26,10 +31,15 @@ static void ShowPerformance() {
 	char data[128];
 	stbsp_snprintf(data, sizeof(data), "Update %.2f ms", updateTime);
 	Platform::DrawText(Game::SystemFont, { 1,0 }, data, Colors::White, 0.4f);
+
 	stbsp_snprintf(data, sizeof(data), "Draw %.2f ms", drawTime);
 	Platform::DrawText(Game::SystemFont, { 1,15 }, data, Colors::White, 0.4f);
-	stbsp_snprintf(data, sizeof(data), "Time %i s", (int)Platform::ElaspedTime());
+
+	stbsp_snprintf(data, sizeof(data), "Frame %.2f ms", frameTime);
 	Platform::DrawText(Game::SystemFont, { 1,30 }, data, Colors::White, 0.4f);
+
+	stbsp_snprintf(data, sizeof(data), "Time %i s", (int)Platform::ElaspedTime());
+	Platform::DrawText(Game::SystemFont, { 1,45 }, data, Colors::White, 0.4f);
 }
 static void ShowTitleScreen() {
 	Platform::DrawOnScreen(ScreenId::Top);
@@ -41,8 +51,12 @@ static void InitialScene() {
 
 void Game::FrameStart() {
 	auto now = Platform::ElaspedTime();
-	FrameTime = now - frameStartTime;
+	DeltaTime = now - frameStartTime;
 	frameStartTime = now;
+}
+void Game::FrameEnd() {
+	auto now = Platform::ElaspedTime();
+	frameTime = (now - frameStartTime) * 1000;
 }
 
 void Game::Start() {
@@ -50,6 +64,7 @@ void Game::Start() {
 	title = Platform::LoadAtlas("glue_title.t3x");
 	startup = true;
 	frameStartTime = Platform::ElaspedTime();
+	Audio = new AudioSystem();
 }
 bool Game::Update() {
 
@@ -57,6 +72,7 @@ bool Game::Update() {
 
 	Platform::UpdateGamepadState(Gamepad);
 	Platform::UpdatePointerState(Pointer);
+	Audio->UpdateAudio();
 
 	if (startup) {
 	

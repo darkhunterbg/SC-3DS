@@ -15,12 +15,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Assets.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Audio.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Camera.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Color.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Game.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUD.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Input.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\Wave.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Map\MapDef.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Map\MapSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\MathLib.h" />
@@ -33,11 +35,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Assets.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Audio.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Camera.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Game.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUD.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\Wave.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Map\MapSystem.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GenericPlatform.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\GameScene.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\StringLib.cpp" />

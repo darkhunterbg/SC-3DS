@@ -67,6 +67,8 @@ int main(int argc, char** argv) {
 		SDL_GetWindowSize(window, &clip.w, &clip.h);
 		SDL_RenderSetClipRect(renderer, &clip);
 	
+		Game::FrameEnd();
+
 		SDL_RenderPresent(renderer);
 	}
 
