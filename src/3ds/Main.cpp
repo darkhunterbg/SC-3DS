@@ -56,6 +56,8 @@ int main()
 
 	while (aptMainLoop())
 	{
+		Game::FrameStart();
+
 		hidScanInput();
 
 		u32 kDown = hidKeysDown();

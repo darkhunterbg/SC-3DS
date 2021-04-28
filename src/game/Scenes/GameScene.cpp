@@ -16,6 +16,11 @@ GameScene::~GameScene() {
 void GameScene::Start() {
 	hud = new GameHUD();
 
+	hud->SetMinerals(50);
+	hud->SetGas(0);
+	hud->SetMaxSupply(10);
+	hud->SetUsedSupply(4);
+
 	MapDef mapDef;
 	mapDef.size = { 32,32 };
 
@@ -24,8 +29,18 @@ void GameScene::Start() {
 	camera.Size = { 400,240 };
 	camera.Limits = mapSystem->GetMapBounds();
 }
+
+int t = 0;
+
 void GameScene::Update() {
-	
+	++t;
+
+	if (t % 60 == 0) {
+		hud->AddMinerals(8);
+		hud->AddGas(8);
+		
+	}
+
 	hud->ApplyInput(camera);
 
 	camera.Update();

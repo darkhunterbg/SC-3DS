@@ -16,7 +16,10 @@ public:
 	static GamepadState Gamepad;
 	static PointerState Pointer;
 
+	static float FrameTime;
+
 	static void Start();
+	static void FrameStart();
 	static bool Update();
 	static void Draw();
 	static void End();

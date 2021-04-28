@@ -365,3 +365,7 @@ build/
 tmp/
 gfxbuild/
 bin/
+
+*.3dsx
+*.elf
+*.smdh

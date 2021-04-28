@@ -12,10 +12,12 @@ static double drawTime;
 static const SpriteAtlas* title;
 static bool startup;
 static std::string error;
+static double frameStartTime = 0;
 
 Font Game::SystemFont;
 GamepadState Game::Gamepad;
 PointerState Game::Pointer;
+float Game::FrameTime = 0;
 
 
 static void ShowPerformance() {
@@ -37,11 +39,17 @@ static void InitialScene() {
 	Game::SetCurrentScene(new GameScene());
 }
 
+void Game::FrameStart() {
+	auto now = Platform::ElaspedTime();
+	FrameTime = now - frameStartTime;
+	frameStartTime = now;
+}
 
 void Game::Start() {
 	SystemFont = Platform::LoadFont("font.bcfnt");
 	title = Platform::LoadAtlas("glue_title.t3x");
 	startup = true;
+	frameStartTime = Platform::ElaspedTime();
 }
 bool Game::Update() {
 

@@ -4,17 +4,15 @@
 #include "../StringLib.h"
 #include "../Camera.h"
 #include "../Map/MapSystem.h"
+#include "../MathLib.h"
 
 static constexpr const Color resourceTextColor = { 0x10fc18ff };
 //static Rectangle minimapDst = { {7,108},{128,128} };
 static Rectangle minimapDst = { {6,123},{113,113} };
 static constexpr const int MinimapTextureSize = 256;
 
-GameHUD::GameHUD() {
 
-	minerals = 50;
-	gas = 0;
-	supply = { 4,10 };
+GameHUD::GameHUD() {
 
 	font = Game::SystemFont;
 	iconsAtlas = Platform::LoadAtlas("game_icons.t3x");
@@ -33,13 +31,34 @@ void GameHUD::DrawResource(Sprite icon, Vector2Int pos, const char* fmt, ...) {
 	Platform::DrawText(font, pos, textBuffer, resourceTextColor, 0.4f);
 }
 
+static const  int GetResourceUpdate(int change) {
+	return std::max(1, (int)std::ceil(std::sqrt(change))/2 );
+}
+
+void GameHUD::UpdateResourceDiff(GameHUD::Resource& r) {
+	int diff = r.target - r.shown;
+	if (diff == 0)
+		return;
+
+	int update = GetResourceUpdate(diff);
+
+	int mod = diff < 0 ? -update : update;
+	if (std::abs(diff - mod) < update)
+		mod = diff;
+	r.shown += mod;
+}
+
 void GameHUD::UpperScreenGUI() {
+
+	UpdateResourceDiff(minerals);
+	UpdateResourceDiff(gas);
+
 	// Supply
 	DrawResource(iconsAtlas->GetSprite(5), { 320,2 }, "%i/%i", supply.current, supply.max);
 	// Gas
-	DrawResource(iconsAtlas->GetSprite(2), { 240, 2 }, "%i", gas);
+	DrawResource(iconsAtlas->GetSprite(2), { 240, 2 }, "%i", gas.shown);
 	// Minerals
-	DrawResource(iconsAtlas->GetSprite(0), { 160, 2 }, "%i", minerals);
+	DrawResource(iconsAtlas->GetSprite(0), { 160, 2 }, "%i", minerals.shown);
 }
 
 void GameHUD::LowerScreenGUI(const Camera& camera, const MapSystem& mapSystem) {
@@ -79,7 +98,7 @@ void GameHUD::DrawMinimap(const Camera& camera, const MapSystem& mapSystem) {
 	Platform::DrawLine(min, min + Vector2(s.x, 0), Colors::White);
 	Platform::DrawLine(max, max - Vector2(s.x, 0), Colors::White);
 	Platform::DrawLine(min, min + Vector2(0, s.y), Colors::White);
-	Platform::DrawLine(max,  max - Vector2(0, s.y), Colors::White);
+	Platform::DrawLine(max, max - Vector2(0, s.y), Colors::White);
 }
 
 void GameHUD::RenderMinimapTexture(const MapSystem& mapSystem) {
