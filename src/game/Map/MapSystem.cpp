@@ -5,7 +5,7 @@ static const SpriteAtlas* minerals;
 
 
 MapSystem::MapSystem(const MapDef& map) {
-	auto tile = Platform::LoadAtlas("tileset_tiles.t3x")->GetSprite(0);
+	auto tile = Platform::LoadAtlas("tileset_tile.t3x")->GetSprite(0);
 	minerals = Platform::LoadAtlas("unit_neutral_min01.t3x");
 
 	Vector2Int size = { 6,6 };

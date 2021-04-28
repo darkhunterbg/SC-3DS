@@ -1,2 +1,2 @@
---atlas -f rgba8888 -z auto
+--atlas -f auto-etc1 -z auto -q high
 game\tconsole.png

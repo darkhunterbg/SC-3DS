@@ -1,4 +1,4 @@
---atlas -f rgba8888 -z auto
+--atlas -f auto-etc1 -z auto -q high
 unit\neutral\min01\0.png
 unit\neutral\min01\1.png
 unit\neutral\min01\2.png

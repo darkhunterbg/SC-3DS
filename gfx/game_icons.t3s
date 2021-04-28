@@ -1,4 +1,4 @@
---atlas -f rgba8888 -z auto
+--atlas -f auto-etc1 -z auto -q high
 game\icons\0.png
 game\icons\1.png
 game\icons\2.png
