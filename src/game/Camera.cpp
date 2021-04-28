@@ -6,14 +6,17 @@ static constexpr const int CameraSpeed = 10;
 
 void Camera::Update() {
 
-	Scale = Game::Gamepad.L ? 2 : 1;
+	Scale = Game::Gamepad.R ? 2 : 1;
 
-	Vector2 move = Game::Gamepad.CPad;
-	//if (move.LengthSquared() == 0)
-	//	return;
+	if (Game::Gamepad.L)
+	{
+		Vector2 move = Game::Gamepad.CPad;
+		move *= (int)(CameraSpeed * Scale);
+		Position += move;
+	}
 
+	Vector2 move = Game::Gamepad.CStick;
 	move *= (int)(CameraSpeed * Scale);
-
 	Position += move;
 
 	Vector2Int ScaledSize = (Size * Scale) / 2;

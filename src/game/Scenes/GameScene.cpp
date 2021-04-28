@@ -3,7 +3,7 @@
 #include "../Map/MapSystem.h"
 #include "../Game.h"
 #include "../GUI/GameHUD.h"
-
+#include "../GUI/Cursor.h"
 
 GameScene::GameScene() {
 	
@@ -20,6 +20,9 @@ void GameScene::Start() {
 	hud->SetGas(0);
 	hud->SetMaxSupply(10);
 	hud->SetUsedSupply(4);
+
+	cursor = new Cursor();
+	cursor->Position = { 200,120 };
 
 	MapDef mapDef;
 	mapDef.size = { 32,32 };
@@ -43,6 +46,8 @@ void GameScene::Update() {
 
 	hud->ApplyInput(camera);
 
+	cursor->Update();
+
 	camera.Update();
 
 }
@@ -54,7 +59,7 @@ void GameScene::Draw() {
 
 	hud->UpperScreenGUI();
 
-
+	cursor->Draw();
 
 	Platform::DrawOnScreen(ScreenId::Bottom);
 

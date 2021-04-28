@@ -5,6 +5,7 @@
 
 class MapSystem;
 class GameHUD;
+class Cursor;
 
 class GameScene : public Scene {
 
@@ -20,4 +21,5 @@ private:
 	MapSystem* mapSystem;
 	Camera camera;
 	GameHUD* hud;
+	Cursor* cursor;
 };

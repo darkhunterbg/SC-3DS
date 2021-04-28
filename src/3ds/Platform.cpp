@@ -170,7 +170,7 @@ void Platform::UpdateGamepadState(GamepadState& state) {
 	circlePosition cstickPos;
 	hidCstickRead(&cstickPos);
 
-	state.CStick = Vector2(cstickPos.dx, cstickPos.dy) / 154.0f;
+	state.CStick = Vector2(cstickPos.dx, -cstickPos.dy) / 154.0f;
 }
 void Platform::UpdatePointerState(PointerState& state) {
 	touchPosition touchPos;

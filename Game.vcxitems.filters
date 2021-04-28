@@ -37,6 +37,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUD.h">
       <Filter>GUI</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -53,6 +56,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Assets.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Game.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUD.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
   </ItemGroup>
