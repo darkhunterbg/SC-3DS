@@ -75,7 +75,7 @@
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>$(SolutionDIr)Libs\SDL\lib;$(SolutionDIr)Libs\SDL_ttf\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\</OutDir>
-    <IntDir>$(SolutionDir)tmp\$(Configuration)\</IntDir>
+    <IntDir>$(SolutionDir)tmp\$(ProjectName)\$(Configuration)\</IntDir>
     <IncludePath>$(SolutionDIr)Libs\SDL_ttf\include;$(SolutionDIr)Libs\SDL\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
