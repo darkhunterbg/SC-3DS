@@ -48,6 +48,8 @@ namespace GRPConvert
 
 		public List<GRPFrame> Frames = new List<GRPFrame>();
 
+		// https://sourceforge.net/p/stratlas/wiki/GRP/
+
 		public GRPImage(string path)
 		{
 			byte[] data = File.ReadAllBytes(path);
@@ -88,6 +90,7 @@ namespace GRPConvert
 				int rowOffset = BitConverter.ToUInt16(data.AsSpan(offset + i * 2, 2));
 				imagRowOffsets.Add(rowOffset);
 			}
+
 
 			for (int y = 0; y < frame.Height; ++y) {
 				offset = frame.DataOffset + imagRowOffsets[y];

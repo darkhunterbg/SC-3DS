@@ -1,0 +1,9 @@
+﻿palette Icons
+#StarDat\game\icons.grp
+StarDat\cursor\*.grp
+
+palette Terrain
+StarDat\tileset\*.grp
+
+palette Units
+StarDat\unit\*.grp

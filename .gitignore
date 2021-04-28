@@ -369,3 +369,6 @@ bin/
 *.3dsx
 *.elf
 *.smdh
+
+data/
+data_out/

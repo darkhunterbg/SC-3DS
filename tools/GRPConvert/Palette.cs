@@ -13,9 +13,11 @@ namespace GRPConvert
 	{
 		public List<Color> Colors { get; private set; } = new List<Color>();
 
-		public void LoadPalette(string path)
+		public string Name;
+
+		public Palette(string path)
 		{
-			ClearAllTables();
+			Name = Path.GetFileNameWithoutExtension(path);
 
 			byte[] data = File.ReadAllBytes(path);
 			if (data.Length != 768 && data.Length != 1024)
@@ -27,11 +29,6 @@ namespace GRPConvert
 				Color c = Color.FromArgb(255, data[i * 3], data[i * 3 + 1], data[i * 3 + 2]);
 				Colors.Add(c);
 			}
-		}
-
-		private void ClearAllTables()
-		{
-			//throw new NotImplementedException();
 		}
 	}
 }

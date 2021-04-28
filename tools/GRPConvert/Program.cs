@@ -1,27 +1,70 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 
 namespace GRPConvert
 {
 	class Program
 	{
+		static Dictionary<string, Palette> palettes = new Dictionary<string, Palette>();
+
 		static void Main(string[] args)
 		{
-			string palettePath = Path.GetFullPath("..\\..\\palettes\\Icons.pal");
+			foreach (var file in Directory.EnumerateFiles("..\\..\\palettes\\", "*.pal", SearchOption.AllDirectories)) {
+				palettes.Add(Path.GetFileNameWithoutExtension(file), new Palette(file));
+			}
 
-			Palette pal = new Palette();
-			pal.LoadPalette(palettePath);
+			string[] lines = File.ReadAllLines("input.txt");
 
-			string grpPath = Path.GetFullPath("..\\..\\palettes\\arrow.grp");
-			GRPImage img = new GRPImage(grpPath);
+			Palette pal = null;
 
-			int i = 0;
-			foreach(var f in img.Frames) {
-				
-				string path = Path.GetFullPath("..\\..\\palettes\\");
-				path += "arrow_" + i++ + ".png";
-				f.ToBitmap(pal).Save(path, ImageFormat.Png);
+			string dataDir = Path.GetFullPath("..\\..\\data\\");
+			string dataOutDir = Path.GetFullPath("..\\..\\data_out\\");
+
+			if (Directory.Exists(dataOutDir))
+				Directory.Delete(dataOutDir, true);
+
+			foreach (var l in lines) {
+				if (l.StartsWith("#"))
+					continue;
+				if (string.IsNullOrWhiteSpace(l))
+					continue;
+
+				if (l.StartsWith("palette")) {
+					pal = palettes[l.Trim().Split(' ').Last()];
+					Console.WriteLine($"Using palette '{pal.Name}'");
+					continue;
+				}
+
+				List<string> files = new List<string>();
+
+				if (l.EndsWith("\\*.grp")) {
+					string s = Path.Combine(dataDir, l);
+
+					files = Directory.EnumerateFiles(s.Substring(0, s.Length - 6), "*.grp", SearchOption.AllDirectories)
+						.Select(s => s.Substring(dataDir.Length)).ToList();
+				} else {
+					files.Add(l) ;
+				}
+
+				foreach (var f in files) {
+					GRPImage img = new GRPImage(Path.Combine(dataDir, f));
+					int i = 0;
+					string dst = Path.Combine(dataOutDir, Path.GetDirectoryName(f), Path.GetFileNameWithoutExtension(f));
+					Directory.CreateDirectory(dst);
+
+					string name = Path.GetFileNameWithoutExtension(f);
+
+					foreach (var fr in img.Frames) {
+
+						string s = Path.Combine(dst, i.ToString("D2") + ".png");
+						++i;
+						fr.ToBitmap(pal).Save(s, ImageFormat.Png);
+					}
+					Console.WriteLine(f);
+				}
 			}
 		}
 	}
