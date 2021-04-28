@@ -5,8 +5,7 @@
 #include "Color.h"
 #include "Input.h"
 
-typedef void* Texture;
-typedef 
+
 
 enum class ScreenId
 {

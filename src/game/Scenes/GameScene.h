@@ -4,11 +4,12 @@
 #include "../Camera.h"
 
 class MapSystem;
-
+class GameHUD;
 
 class GameScene : public Scene {
 
 public:
+	GameScene();
 	virtual ~GameScene() override;
 
 	virtual void Start() override;
@@ -18,4 +19,5 @@ public:
 private:
 	MapSystem* mapSystem;
 	Camera camera;
+	GameHUD* hud;
 };

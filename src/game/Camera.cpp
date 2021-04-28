@@ -12,7 +12,7 @@ void Camera::Update() {
 	//if (move.LengthSquared() == 0)
 	//	return;
 
-	move *= CameraSpeed;
+	move *= (int)(CameraSpeed * Scale);
 
 	Position += move;
 

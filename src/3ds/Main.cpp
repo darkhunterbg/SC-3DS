@@ -28,6 +28,7 @@ void FatalError(const char* error,...) {
 	va_start(args, error);
 	char buffer[1024];
 	stbsp_vsnprintf(buffer, 1024, error, args);
+	va_end(args);
 
 	std::cout << CONSOLE_RED << buffer << CONSOLE_RESET << std::endl;
 	std::cout << "Press START to exit";

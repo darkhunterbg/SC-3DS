@@ -7,6 +7,9 @@
     <Filter Include="Map">
       <UniqueIdentifier>{343beabe-3f3d-4e0c-9922-418a5a5b552f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI">
+      <UniqueIdentifier>{a1c47caf-9f70-4c29-a597-79e7d9fe539a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.h">
@@ -31,6 +34,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\MathLib.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Platform.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Span.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUD.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -46,5 +52,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Camera.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Assets.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Game.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUD.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

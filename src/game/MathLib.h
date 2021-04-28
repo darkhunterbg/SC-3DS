@@ -1,6 +1,6 @@
 #pragma once
 
-#include <math.h>
+#include <cmath>
 
 static const constexpr float PI = 3.14159265359f;
 
@@ -251,3 +251,8 @@ struct Rectangle
 			v.y <= position.y + size.y && v.y >= position.y;
 	}
 };
+
+
+inline Vector2Int Vector2Int_Ceil(const Vector2& v) {
+	return { (int)ceil(v.x), (int)ceilf(v.y) };
+}

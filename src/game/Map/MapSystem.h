@@ -5,16 +5,19 @@
 #include <vector>
 #include "../Assets.h"
 #include "../Camera.h"
+#include "../Span.h"
+
+
+struct MapTile {
+	Vector2Int position;
+	Sprite sprite;
+	static constexpr const int TileSize = 32;
+};
 
 class MapSystem {
 
-	struct Tile {
-		Vector2Int position;
-		Sprite sprite;
-	};
-
 private:
-	std::vector<Tile> tiles;
+	std::vector<MapTile> tiles;
 	Rectangle mapBounds;
 public:
 	MapSystem(const MapDef& map);
@@ -24,4 +27,8 @@ public:
 
 	void DrawTiles(const Camera& camera);
 	void DrawMiniMapTiles(Vector2Int offset, const Camera& camera);
+
+	inline Span<MapTile> GetTiles() const {
+		return { tiles.data(),tiles.size() };
+	}
 };

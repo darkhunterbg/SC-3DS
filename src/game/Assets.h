@@ -7,8 +7,10 @@
 #include <string>
 #include <array>
 
+typedef void* Texture;
+
 struct Sprite {
-	void* textureId;
+	Texture textureId;
 	Rectangle rect;
 
 	template <class TTextureType>
