@@ -1,12 +1,12 @@
 ﻿palette Icons
-#StarDat\game\icons.grp
-StarDat\cursor\*.grp
+#game\icons.grp
+cursor\*.grp
 
 palette Terrain
-StarDat\tileset\*.grp
+tileset\*.grp
 
 palette Units
-StarDat\unit\*.grp
+unit\*.grp
 
 palette Icons
-StarDat\unit\cmdbtns\*.grp
+unit\cmdbtns\*.grp

@@ -370,6 +370,6 @@ bin/
 *.elf
 *.smdh
 
-data/
+mpq/
 data_out/
 music/

@@ -20,7 +20,7 @@ namespace GRPConvert
 
 			Palette pal = null;
 
-			string dataDir = Path.GetFullPath("..\\..\\data\\");
+			string dataDir = Path.GetFullPath("..\\..\\mpq\\");
 			string dataOutDir = Path.GetFullPath("..\\..\\data_out\\");
 
 			if (Directory.Exists(dataOutDir))
