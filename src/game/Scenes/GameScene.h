@@ -2,10 +2,12 @@
 
 #include "Scene.h"
 #include "../Camera.h"
+#include "../Entity/RenderSystem.h"
 
 class MapSystem;
 class GameHUD;
 class Cursor;
+class EntityManager;
 
 class GameScene : public Scene {
 
@@ -22,4 +24,6 @@ private:
 	Camera camera;
 	GameHUD* hud;
 	Cursor* cursor;
+	EntityManager* entityManager;
+	RenderSystem renderSystem;
 };

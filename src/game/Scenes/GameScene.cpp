@@ -1,10 +1,15 @@
 #include "GameScene.h"
-#include "Platform.h"
+#include "../Platform.h"
 #include "../Map/MapSystem.h"
 #include "../Game.h"
 #include "../GUI/GameHUD.h"
 #include "../GUI/Cursor.h"
 #include "../Audio.h"
+#include "../Entity/EntityManager.h"
+
+const SpriteAtlas* marine;
+
+
 
 GameScene::GameScene() {
 	
@@ -33,8 +38,22 @@ void GameScene::Start() {
 	camera.Size = { 400,240 };
 	camera.Limits = mapSystem->GetMapBounds();
 
-	AudioStream* c = Platform::LoadAudioStream("music/terran1.wav");
-	Game::Audio->PlayStream(c);
+	AudioStream* stream = Platform::LoadAudioStream("music/terran1.wav");
+	Game::Audio->PlayStream(stream);
+	marine = Platform::LoadAtlas("marine.t3x");
+
+	entityManager = new EntityManager();
+
+	for (int x = 0; x < 100; ++x) {
+		for (int y = 0; y < 100; ++y) {
+			auto e = entityManager->NewEntity({ x*32,y*32 });
+			auto c = renderSystem.NewComponent(e);
+			entityManager->SetRenderComponent(e, c);
+			c->sprite = marine->GetSprite(100);
+			
+		}
+	}
+
 }
 
 int t = 0;
@@ -45,7 +64,6 @@ void GameScene::Update() {
 	if (t % 60 == 0) {
 		hud->AddMinerals(8);
 		hud->AddGas(8);
-		
 	}
 
 	hud->ApplyInput(camera);
@@ -54,12 +72,16 @@ void GameScene::Update() {
 
 	camera.Update();
 
+	
 }
 
 void GameScene::Draw() {
 	Platform::DrawOnScreen(ScreenId::Top);
 
 	mapSystem->DrawTiles(camera);
+
+	entityManager->UpdateEntities(renderSystem);
+	renderSystem.Draw(camera);
 
 	hud->UpperScreenGUI();
 

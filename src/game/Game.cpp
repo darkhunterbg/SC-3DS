@@ -101,9 +101,9 @@ void Game::FrameEnd() {
 	if (avgFrame.frameTime == 0.0)
 		avgFrame = currentFrame;
 	else {
-		avgFrame.drawTime = avgFrame.drawTime * 0.95 + currentFrame.drawTime * 0.05;
-		avgFrame.updateTime = avgFrame.updateTime * 0.95 + currentFrame.updateTime * 0.05;
-		avgFrame.frameTime = avgFrame.frameTime * 0.95 + currentFrame.frameTime * 0.05;
+		avgFrame.drawTime = avgFrame.drawTime * 0.80 + currentFrame.drawTime * 0.20;
+		avgFrame.updateTime = avgFrame.updateTime * 0.80 + currentFrame.updateTime * 0.20;
+		avgFrame.frameTime = avgFrame.frameTime * 0.80 + currentFrame.frameTime * 0.20;
 	}
 
 	currentFrame = { 0.0,0.0,0.0 };

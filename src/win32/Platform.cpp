@@ -21,6 +21,8 @@ extern std::filesystem::path assetDir;
 extern std::vector<SDLDrawCommand> commandBuffers[2];
 extern uint64_t mainTimer;
 extern Rectangle touchScreenLocation;
+extern bool mute;
+
 static ScreenId currentScreen;
 static SDL_Texture* target = nullptr;
 
@@ -317,7 +319,8 @@ void Platform::CreateChannel(AudioChannelState& channel) {
 }
 void Platform::EnableChannel(const AudioChannelState& channel, bool enabled) {
 
-	SDL_PauseAudioDevice(channel.handle, enabled ? 0 : 1);
+	if (!mute)
+		SDL_PauseAudioDevice(channel.handle, enabled ? 0 : 1);
 }
 
 

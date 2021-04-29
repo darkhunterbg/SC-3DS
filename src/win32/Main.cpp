@@ -14,6 +14,7 @@ std::filesystem::path assetDir;
 std::vector<SDLDrawCommand> commandBuffers[2];
 uint64_t mainTimer;
 Rectangle touchScreenLocation;
+bool mute = false;
 
 void Init();
 void Uninit();
@@ -36,6 +37,13 @@ int main(int argc, char** argv) {
 
 	Game::Start();
 
+	if (argc > 1) {
+		std::string a = argv[1];
+		if (a == "-mute")
+		{
+			mute = true;
+		}
+	}
 
 	while (!done) {
 		Game::FrameStart();
@@ -59,6 +67,8 @@ int main(int argc, char** argv) {
 
 		if (done)
 			break;
+
+	
 
 		Game::Draw();
 		Draw();

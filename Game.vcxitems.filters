@@ -13,6 +13,9 @@
     <Filter Include="Loader">
       <UniqueIdentifier>{c5cb7a38-2cb7-4189-a555-b0ada5d2861a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Entity">
+      <UniqueIdentifier>{6b5fdc87-6da2-4895-a4cd-c5ee3015a3c5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.h">
@@ -47,6 +50,15 @@
       <Filter>Loader</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Audio.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\EntityManager.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\RenderSystem.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\Entity.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -73,5 +85,11 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GenericPlatform.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Audio.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\EntityManager.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\RenderSystem.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
