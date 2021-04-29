@@ -9,7 +9,7 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "F:/citra/nightly-mingw/citra-qt.exe",
-            "args": [ "${workspaceFolder}/${workspaceFolderBasename}.3dsx"],
+            "args": [ "${workspaceFolder}/SC.3dsx"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
@@ -24,7 +24,7 @@
             "postDebugTask": "stop emulation",
             "serverLaunchTimeout": 10000,
             "stopAtEntry": true,
-            "program": "${workspaceFolder}/${workspaceFolderBasename}.elf",
+            "program": "${workspaceFolder}/SC.elf",
             "MIMode": "gdb",
             "externalConsole": true,
             "cwd": "${workspaceFolder}",
@@ -36,7 +36,7 @@
                     {
                     "description": "Enable pretty-printing for gdb",
                     "ignoreFailures": true,
-                        "text": "file ${workspaceFolder}/${workspaceFolderBasename}.elf -enable-pretty-printing"
+                        "text": "file ${workspaceFolder}/SC.elf -enable-pretty-printing"
                     }]
             },
         },

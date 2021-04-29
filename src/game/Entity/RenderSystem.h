@@ -7,10 +7,10 @@
 #include "../Span.h"
 
 
-struct RenderComponent {
 
-	int id;
-	EntityId _entityId;
+struct RenderComponent {
+	static constexpr const int ComponentId = 0;
+
 	Rectangle _dst;
 	Sprite sprite;
 };
@@ -18,14 +18,19 @@ struct RenderComponent {
 class RenderSystem {
 
 public:
-	RenderSystem();
+	RenderSystem(int maxEntities);
+	~RenderSystem();
 
 	void Draw(const Camera& camera);
 
-	RenderComponent* NewComponent(EntityId entity);
+	RenderComponent& NewComponent(EntityId id, const Sprite& sprite);
+	void RemoveComponent(EntityId id);
 
 	void UpdateEntities(const Span<Entity> entity);
 private:
 	std::vector<RenderComponent> renderComponents;
-
+	int maxComponents = 0;
+	
+	int* entityToComponentMap;
+	std::vector<EntityId> componentToEntityMap;
 };

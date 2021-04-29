@@ -36,6 +36,8 @@ struct AudioChannelState {
 
 	static constexpr const int QueueSize = 2;
 
+	bool mono = false;
+
 	AudioChannelHandle handle = -1;
 	unsigned bufferSize = 0;
 
@@ -80,9 +82,9 @@ class AudioSystem {
 
 public:
 	AudioSystem();
-	void PlayClip(AudioClip clip);
-	void PlayStream(AudioStream* stream);
+	void PlayClip(AudioClip clip, int channel);
+	void PlayStream(AudioStream* stream, int channel);
 	void UpdateAudio();
 private:
-	AudioChannelState channel;
+	std::array< AudioChannelState,2> channels;
 };

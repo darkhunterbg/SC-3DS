@@ -14,6 +14,9 @@ public:
 		return { Position - (Size * Scale)/2, Size * Scale };
 	}
 
+	inline Vector2Int ScreenToWorld(Vector2Int p) {
+		return p * Scale + Position - (Size * Scale) / 2;
+	}
 
 	void Update();
 };

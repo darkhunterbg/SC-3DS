@@ -298,8 +298,8 @@ void Platform::UpdatePointerState(PointerState& state) {
 void Platform::CreateChannel(AudioChannelState& channel) {
 
 	SDL_AudioSpec wavSpec = {};
-	wavSpec.channels = 2;
-	wavSpec.format = AUDIO_S16LSB;
+	wavSpec.channels = channel.mono ? 1 : 2;
+	wavSpec.format = AUDIO_S16;
 	wavSpec.freq = 22050;
 	wavSpec.samples = channel.bufferSize / 4;
 	SDL_AudioSpec got;
@@ -333,7 +333,7 @@ static 	void AudioCallback(void* userdata, Uint8* stream, int len) {
 
 	unsigned size = clip != nullptr ? clip->Remaining() : 0;
 	if (size == 0) {
-		printf("Voice starvation at channel %i", state->handle);
+		printf("Voice starvation at channel %i\n", state->handle);
 		return;
 	}
 

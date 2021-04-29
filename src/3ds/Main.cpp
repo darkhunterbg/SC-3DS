@@ -117,7 +117,7 @@ void Init() {
 	//osSetSpeedupEnable(true);
 
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
-	C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
+	C2D_Init(C2D_DEFAULT_MAX_OBJECTS*4);
 	C2D_Prepare();
 
 	screens[0] = top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
@@ -149,6 +149,8 @@ void Uninit() {
 
 void UpdateAudioChannel(NDSAudioChannel& channel) {
 
+	// TODO: on update check if clip has changed and if so, clear chain and start over 
+
 	auto state = channel.state;
 
 	ndspWaveBuf& usedBuff = *channel.freeBuff;
@@ -165,14 +167,14 @@ void UpdateAudioChannel(NDSAudioChannel& channel) {
 		return;
 	}
 
-	auto _audioBuffer = (u32*)freeBuff.data_vaddr;
+	auto _audioBuffer = (u8*)freeBuff.data_vaddr;
 	unsigned len = state->bufferSize;
 	len = (len > size ? size : len);
 
 	memcpy(_audioBuffer, clip->PlayFrom(), len);
 
 	if (len < state->bufferSize) {
-		unsigned silenceSize = state->bufferSize - size;
+		unsigned silenceSize = state->bufferSize - len;
 		memset(_audioBuffer + len, 0, silenceSize);
 	}
 

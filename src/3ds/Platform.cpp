@@ -80,6 +80,7 @@ void Platform::DrawOnTexture(Texture texture) {
 	EXCEPTION("Render target for texture 0x%X not found", texture);
 }
 void Platform::DrawOnScreen(ScreenId screen) {
+
 	currentScreen = screens[(int)screen];
 	C2D_SceneBegin(currentScreen);
 }
@@ -202,7 +203,7 @@ void Platform::CreateChannel(AudioChannelState& channel) {
 	ndspChnReset(channelId);
 	ndspChnSetInterp(channelId, NDSP_INTERP_LINEAR);
 	ndspChnSetRate(channelId, 22050);
-	ndspChnSetFormat(channelId, NDSP_FORMAT_STEREO_PCM16);
+	ndspChnSetFormat(channelId, channel.mono ? NDSP_FORMAT_MONO_PCM16 : NDSP_FORMAT_STEREO_PCM16);
 	float volume[12];
 	for (int i = 0; i < 12; ++i)
 		volume[i] = 0.8f;
@@ -215,7 +216,7 @@ void Platform::CreateChannel(AudioChannelState& channel) {
 
 	for (int i = 0; i < 2; ++i) {
 		platformChannel->waveBuff[i].data_vaddr = linearAlloc(channel.bufferSize);
-		platformChannel->waveBuff[i].nsamples = channel.bufferSize / 4;
+		platformChannel->waveBuff[i].nsamples = channel.bufferSize / (2* (channel.mono ? 1 : 2));
 	}
 
 	audioChannels.push_back(platformChannel);
@@ -226,4 +227,8 @@ void Platform::EnableChannel(const AudioChannelState& channel, bool enabled) {
 
 	audioChannels[channel.handle]->enabled = enabled;
 	ndspChnSetPaused(channel.handle, !enabled);
+	if (!enabled)
+	{
+		ndspChnWaveBufClear(channel.handle);
+	}
 }

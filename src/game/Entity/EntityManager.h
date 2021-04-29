@@ -3,23 +3,43 @@
 #include <vector>
 #include "Entity.h"
 #include "../Span.h"
+#include <array>
+#include <vector>
 #include "RenderSystem.h"
-
+#include "../Camera.h"
 
 class EntityManager {
-
+	static constexpr const int MaxEntities = 5000;
 private:
-	std::vector<Entity> entities;
-	unsigned idCounter = 0;
+	std::array<Entity, MaxEntities> entityBuffer;
+	std::vector<Entity*> entities;
+	std::vector<Entity> collection;
+	std::vector<EntityId> deleted;
+	unsigned nextFreePos = 0;
 
+	RenderSystem* renderSystem;
+
+	inline Entity& GetEntity(EntityId id) { return entityBuffer[id - 1]; }
 
 public:
-	EntityManager(int capacity = 5000);
+	EntityManager();
+	~EntityManager();
+
 	EntityId NewEntity(Vector2Int position);
+	void DeleteEntity(EntityId id);
 
-	void UpdateEntities(RenderSystem& r);
+	void UpdateEntities();
+	void DrawEntites(const Camera& camera);
 
-	void SetRenderComponent(EntityId id, RenderComponent* cmp) {
-		entities[id - 1].renderComponent = cmp->id;
+	RenderComponent& AddRenderComponent(EntityId id, const Sprite& sprite);
+
+	bool HasEntity(EntityId id) {
+		return entityBuffer[id-1].id != 0;
+	}
+
+	void SetPosition(EntityId id, Vector2Int position) {
+		Entity& e = GetEntity(id);
+		e.position = position;
+		e.changed = true;
 	}
 };

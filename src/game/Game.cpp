@@ -5,18 +5,9 @@
 #include "Scenes/GameScene.h"
 #include "StringLib.h"
 #include "Audio.h"
-#include <vector>
-#include <algorithm>
+#include "Profiler.h"
 
 static Scene* currentScene;
-
-struct FrameProfileData {
-
-	double updateTime;
-	double drawTime;
-	double frameTime;
-};
-
 
 
 
@@ -31,52 +22,8 @@ PointerState Game::Pointer;
 AudioSystem* Game::Audio = nullptr;
 float Game::DeltaTime = 0;
 
-static FrameProfileData avgFrame = { 0,0,0 }, currentFrame = { 0,0,0 };
-static std::vector<double> frameLoad;
-
-static void ShowPerformance() {
-	Platform::DrawOnScreen(ScreenId::Top);
-
-	FrameProfileData data = avgFrame;
-
-	char text[128];
-	stbsp_snprintf(text, sizeof(text), "Update %.2f ms", data.updateTime);
-	Platform::DrawText(Game::SystemFont, { 1,0 }, text, Colors::White, 0.4f);
-
-	stbsp_snprintf(text, sizeof(text), "Draw %.2f ms", data.drawTime);
-	Platform::DrawText(Game::SystemFont, { 1,15 }, text, Colors::White, 0.4f);
-
-	stbsp_snprintf(text, sizeof(text), "Frame %0.2f ms", data.frameTime);
-	Platform::DrawText(Game::SystemFont, { 1,30 }, text, Colors::White, 0.4f);
-
-	stbsp_snprintf(text, sizeof(text), "Time %i s", (int)Platform::ElaspedTime());
-	Platform::DrawText(Game::SystemFont, { 1,45 }, text, Colors::White, 0.4f);
 
 
-	Vector2Int offset = { 1,110 };
-
-	float scale = 1;
-	float max = *std::max_element(frameLoad.begin(), frameLoad.end());
-	while (max > scale) {
-		scale += 1;
-	}
-
-	for (int i = 0; i < frameLoad.size(); ++i) {
-		int y = std::fmax(1, ((frameLoad[i]) * 50 / (int)scale));
-		Color c = Colors::LightGreen;
-		if (frameLoad[i] > 1)
-			c = Colors::Orange;
-		if (frameLoad[i] > 2)
-			c = Colors::Red;
-		Platform::DrawLine(offset, offset + Vector2Int(0, -y), c);
-		offset.x++;
-	}
-	offset = { 1,60 };
-
-	Platform::DrawLine(offset, offset + Vector2Int(60,0 ), Colors::White);
-	offset.y += 50;
-	Platform::DrawLine(offset, offset + Vector2Int(60,0), Colors::White);
-}
 static void ShowTitleScreen() {
 	Platform::DrawOnScreen(ScreenId::Top);
 	Platform::Draw(title->GetSprite(0), { {0,0},{400,240} }, Colors::White);
@@ -90,23 +37,11 @@ void Game::FrameStart() {
 	DeltaTime = now - frameStartTime;
 	frameStartTime = now;
 
+	Profiler::FrameStart();
+
 }
 void Game::FrameEnd() {
-	auto now = Platform::ElaspedTime();
-	currentFrame.frameTime = (now - frameStartTime) * 1000;
-	frameLoad.push_back(currentFrame.frameTime / 16.66);
-	if (frameLoad.size() >= 60)
-		frameLoad.erase(frameLoad.begin());
-
-	if (avgFrame.frameTime == 0.0)
-		avgFrame = currentFrame;
-	else {
-		avgFrame.drawTime = avgFrame.drawTime * 0.80 + currentFrame.drawTime * 0.20;
-		avgFrame.updateTime = avgFrame.updateTime * 0.80 + currentFrame.updateTime * 0.20;
-		avgFrame.frameTime = avgFrame.frameTime * 0.80 + currentFrame.frameTime * 0.20;
-	}
-
-	currentFrame = { 0.0,0.0,0.0 };
+	Profiler::FrameEnd();
 }
 
 void Game::Start() {
@@ -116,11 +51,11 @@ void Game::Start() {
 	startup = true;
 	frameStartTime = Platform::ElaspedTime();
 	Audio = new AudioSystem();
-	frameLoad.push_back(0);
+	//frameLoad.push_back(0);
 }
 bool Game::Update() {
 
-	double start = Platform::ElaspedTime();
+	SectionProfiler p("Update");
 
 	Platform::UpdateGamepadState(Gamepad);
 	Platform::UpdatePointerState(Pointer);
@@ -136,13 +71,13 @@ bool Game::Update() {
 			InitialScene();
 	}
 
-	currentFrame.updateTime = (Platform::ElaspedTime() - start) * 1000.0;
+	p.Submit();
 
 	return true;
 }
 
 void Game::Draw() {
-	double start = Platform::ElaspedTime();
+	SectionProfiler p("Draw");
 
 	if (startup) {
 		ShowTitleScreen();
@@ -152,10 +87,9 @@ void Game::Draw() {
 		if (currentScene)
 			currentScene->Draw();
 	}
+	p.Submit();
 
-	currentFrame.drawTime = (Platform::ElaspedTime() - start) * 1000.0;
-
-	ShowPerformance();
+	Profiler::ShowPerformance();
 }
 
 void Game::End() {

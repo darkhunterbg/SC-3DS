@@ -60,7 +60,7 @@
             "dependsOn": ["make debug"],
             "isBackground": false,
       
-            "command": "F:/citra/nightly-mingw-debug/citra-qt.exe ${workspaceFolder}/${workspaceFolderBasename}.3dsx",
+            "command": "F:/citra/nightly-mingw-debug/citra-qt.exe ${workspaceFolder}/SC.3dsx",
           
             "presentation": {
                 "clear": true,
@@ -79,7 +79,7 @@
             "label": "run",
             "type": "shell",
             "group": "test",
-            "command": "F:/citra/nightly-mingw/citra-qt.exe ${workspaceFolder}/${workspaceFolderBasename}.3dsx",
+            "command": "F:/citra/nightly-mingw/citra-qt.exe ${workspaceFolder}/SC.3dsx",
             "isBackground": true
         },
     ]

@@ -6,13 +6,14 @@
 #include "../GUI/Cursor.h"
 #include "../Audio.h"
 #include "../Entity/EntityManager.h"
+#include "../Profiler.h"
 
 const SpriteAtlas* marine;
 
-
+std::array<AudioClip, 2> death;
 
 GameScene::GameScene() {
-	
+
 }
 
 GameScene::~GameScene() {
@@ -39,26 +40,63 @@ void GameScene::Start() {
 	camera.Limits = mapSystem->GetMapBounds();
 
 	AudioStream* stream = Platform::LoadAudioStream("music/terran1.wav");
-	Game::Audio->PlayStream(stream);
+	death[0] = Platform::LoadAudioClip("music/tmadth00.wav");
+	death[1] = Platform::LoadAudioClip("music/tmadth01.wav");
+	Game::Audio->PlayStream(stream, 0);
 	marine = Platform::LoadAtlas("marine.t3x");
 
 	entityManager = new EntityManager();
 
-	for (int x = 0; x < 100; ++x) {
+	for (int x = 0; x < 50; ++x) {
 		for (int y = 0; y < 100; ++y) {
-			auto e = entityManager->NewEntity({ x*32,y*32 });
-			auto c = renderSystem.NewComponent(e);
-			entityManager->SetRenderComponent(e, c);
-			c->sprite = marine->GetSprite(100);
-			
+			auto e = entityManager->NewEntity({ x * 32,y * 32 });
+			entityManager->AddRenderComponent(e, marine->GetSprite(100));
 		}
 	}
 
+	//int id = 3542;
+	//entityManager->DeleteEntity(id);
 }
 
 int t = 0;
 
 void GameScene::Update() {
+	/*for (int x = 0; x < 50; ++x) {
+		for (int y = 0; y < 100; ++y) {
+			entityManager->SetPosition(x * 100 + y + 1, { x * 32,y * 32 });
+		}
+	}*/
+	//SectionProfiler p("Entity");
+
+	//for (int i = 0; i < 1000; i++) {
+	//	auto e = entityManager->NewEntity({ 0,0 });
+	//	entityManager->DeleteEntity(e);
+	//}
+
+	//p.Submit();
+
+	if (Game::Gamepad.A) {
+		auto p = camera.ScreenToWorld(cursor->Position);
+
+		for (int x = 0; x < 50; ++x) {
+			for (int y = 0; y < 100; ++y) {
+				Rectangle rect = { {x * 32,y * 32},{25,25} };
+
+				if (rect.Contains(p)) {
+					int id = x * 100 + y + 1;
+					if (entityManager->HasEntity(id)) {
+						entityManager->DeleteEntity(id);
+
+						int i = std::rand() % 2;
+						Game::Audio->PlayClip(death[i], 1);
+					}
+				}
+			}
+		}
+	}
+
+	entityManager->UpdateEntities();
+
 	++t;
 
 	if (t % 60 == 0) {
@@ -72,7 +110,7 @@ void GameScene::Update() {
 
 	camera.Update();
 
-	
+
 }
 
 void GameScene::Draw() {
@@ -80,8 +118,7 @@ void GameScene::Draw() {
 
 	mapSystem->DrawTiles(camera);
 
-	entityManager->UpdateEntities(renderSystem);
-	renderSystem.Draw(camera);
+	entityManager->DrawEntites(camera);
 
 	hud->UpperScreenGUI();
 
