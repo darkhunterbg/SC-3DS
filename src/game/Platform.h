@@ -44,6 +44,7 @@ public:
 	static void EnableChannel(const AudioChannelState& channel, bool enabled);
 
 	static AudioClip LoadAudioClip(const char* path);
+	static AudioStream* LoadAudioStream(const char* path);
 };
 
 

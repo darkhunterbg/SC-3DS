@@ -42,7 +42,7 @@ struct AudioChannelState {
 	std::array< AudioChannelClip, QueueSize> clipQueue;
 	int queueSize = 0;
 
-	//AudioTrack* track = nullptr;
+	AudioStream* stream = nullptr;
 
 	AudioChannelClip* CurrentClip() {
 		return queueSize > 0 ? &clipQueue[0] : nullptr;
@@ -51,6 +51,8 @@ struct AudioChannelState {
 	void ClearQueue() {
 		queueSize = 0;
 	}
+
+	bool IsQueueFull() { return queueSize == QueueSize; }
 
 	bool QueueClip(AudioChannelClip clip) {
 		if (queueSize == QueueSize)
@@ -79,6 +81,7 @@ class AudioSystem {
 public:
 	AudioSystem();
 	void PlayClip(AudioClip clip);
+	void PlayStream(AudioStream* stream);
 	void UpdateAudio();
 private:
 	AudioChannelState channel;

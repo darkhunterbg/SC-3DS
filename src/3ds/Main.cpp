@@ -65,8 +65,6 @@ int main()
 
 	while (aptMainLoop())
 	{
-		Game::FrameEnd();
-
 		hidScanInput();
 
 		u32 kDown = hidKeysDown();
@@ -84,6 +82,8 @@ int main()
 
 		if (done)
 			break;
+
+		Game::FrameEnd();
 
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 

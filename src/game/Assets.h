@@ -9,6 +9,8 @@
 
 typedef void* Texture;
 
+
+
 struct Sprite {
 	Texture textureId;
 	Rectangle rect;
@@ -80,5 +82,34 @@ struct AudioClip {
 
 };
 class AudioStream {
+public:
+	Span<uint8_t> GetData() const {
+		return { buffers[activeBufferIndex].Data(), (unsigned)activeBufferSize };
+	}
+	int GetSize() const {
+		return info.GetTotalSize();
+	}
+	float GetDuration() const {
+		return info.GetDurationSeconds();
+	}
+	bool IsAtEnd() const {
+		return GetRemaining() == 0;
+	}
 
+	int GetRemaining() const;
+	bool FillNextBuffer();
+	bool Restart();
+
+	AudioStream(AudioInfo info, unsigned bufferSize, FILE* stream);
+	~AudioStream();
+private:
+	AudioInfo info;
+
+	static constexpr const int BufferCount = 2;
+
+	std::array< Span<uint8_t>, BufferCount> buffers;
+	int activeBufferSize = 0;
+	FILE* stream;
+	int activeBufferIndex = 1;
+	int streamPos = 0;
 };

@@ -1,6 +1,8 @@
 #include "Platform.h"
 #include "Loader/Wave.h"
 
+static constexpr const int AudioStreamBufferSize = 4096;
+
 AudioClip Platform::LoadAudioClip(const char* path) {
 	FILE* f = Platform::OpenAsset(path);
 
@@ -23,3 +25,19 @@ AudioClip Platform::LoadAudioClip(const char* path) {
 
 	return clip;
 }
+
+AudioStream* Platform::LoadAudioStream(const char* path) {
+	FILE* f = Platform::OpenAsset(path);
+
+	if (f == nullptr)
+		EXCEPTION("Failed to open asset '%s'!", path);
+
+	AudioInfo info;
+
+	if (!WaveLoader::ReadWAVHeader(f, &info))
+		EXCEPTION("Failed to read WAV header in '%s'!", path);
+
+	AudioStream* stream = new AudioStream(info, AudioStreamBufferSize, f);
+
+	return stream;
+ }

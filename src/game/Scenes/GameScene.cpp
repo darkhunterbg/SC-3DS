@@ -33,8 +33,8 @@ void GameScene::Start() {
 	camera.Size = { 400,240 };
 	camera.Limits = mapSystem->GetMapBounds();
 
-	AudioClip c = Platform::LoadAudioClip("music/terran1.wav");
-	Game::Audio->PlayClip(c);
+	AudioStream* c = Platform::LoadAudioStream("music/terran1.wav");
+	Game::Audio->PlayStream(c);
 }
 
 int t = 0;

@@ -33,7 +33,9 @@ int main(int argc, char** argv) {
 
 	mainTimer = SDL_GetPerformanceCounter();
 
+
 	Game::Start();
+
 
 	while (!done) {
 		Game::FrameStart();
@@ -66,7 +68,7 @@ int main(int argc, char** argv) {
 		SDL_Rect clip = { 0 };
 		SDL_GetWindowSize(window, &clip.w, &clip.h);
 		SDL_RenderSetClipRect(renderer, &clip);
-	
+
 		Game::FrameEnd();
 
 		SDL_RenderPresent(renderer);
@@ -167,16 +169,28 @@ void ExecDrawCommand(const SDLDrawCommand& cmd, SDL_Rect& clip, const int& w, co
 	case SDLDrawCommandType::Line: {
 
 		Vector2Int src = { cmd.src.x, cmd.src.y };
-		src.x= (clip.w * src.x) / w;
+		src.x = (clip.w * src.x) / w;
 		src.y = (clip.h * src.y) / h;
 
 		Vector2Int dst = { cmd.dst.x, cmd.dst.y };
 		dst.x = (clip.w * dst.x) / w;
 		dst.y = (clip.h * dst.y) / h;
 
-		SDL_SetRenderDrawColor(renderer, cmd.r, cmd.g, cmd.b, 255);
-		SDL_RenderDrawLine(renderer, src.x, src.y, dst.x, dst.y);
+		int thickness = std::max(1, (clip.w) / w);
 
+
+		SDL_SetRenderDrawColor(renderer, cmd.r, cmd.g, cmd.b, 255);
+		SDL_RenderDrawLine(renderer, src.x , src.y , dst.x , dst.y );
+		for (int i = 1; i < thickness; ++i) {
+			//  -
+			//	_
+			//	|
+			//		|
+			SDL_RenderDrawLine(renderer, src.x - i, src.y - i, dst.x + i, dst.y - i); 
+			SDL_RenderDrawLine(renderer, src.x - i, src.y + i, dst.x + i, dst.y + i);
+			SDL_RenderDrawLine(renderer, src.x - i, src.y - i, dst.x - i, dst.y + i);
+			SDL_RenderDrawLine(renderer, src.x + i, src.y - i, dst.x + i, dst.y + i);
+		}
 		break;
 	}
 	case SDLDrawCommandType::Rectangle: {
