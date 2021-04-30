@@ -50,19 +50,25 @@ namespace GRPConvert
 				}
 
 				foreach (var f in files) {
+
+					List<string> info = new List<string>();
 					GRPImage img = new GRPImage(Path.Combine(dataDir, f));
 					int i = 0;
 					string dst = Path.Combine(dataOutDir, Path.GetDirectoryName(f), Path.GetFileNameWithoutExtension(f));
 					Directory.CreateDirectory(dst);
+					info.Add($"{img.MaxWidth} {img.MaxHeight}");
 
 					string name = Path.GetFileNameWithoutExtension(f);
 
 					foreach (var fr in img.Frames) {
 
-						string s = Path.Combine(dst, i.ToString("D3") + ".png");
+						string frName = i.ToString("D3") + ".png";
+						string s = Path.Combine(dst, frName);
 						++i;
 						fr.ToBitmap(pal).Save(s, ImageFormat.Png);
+						info.Add($"{frName} {fr.XOffset} {fr.YOffset} {fr.Width} {fr.Height}");
 					}
+					File.WriteAllLines(Path.Combine(dst,$"info.txt"),info);
 					Console.WriteLine(f);
 				}
 			}

@@ -128,7 +128,7 @@ void GameScene::Update() {
 
 	hud->ApplyInput(camera);
 
-	cursor->Update();
+	cursor->Update(camera);
 
 	camera.Update();
 }

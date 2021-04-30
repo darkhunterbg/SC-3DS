@@ -2,6 +2,8 @@
 
 #include "../Assets.h"
 
+class Camera;
+
 class Cursor {
 public:
 	Cursor();
@@ -9,8 +11,11 @@ public:
 	Rectangle Limits = { {0,0},{400,240} };
 private:
 	const SpriteAtlas* atlas;
+	const AnimationClip* currentClip;
+	int clipFrame;
+	int clipCountdown;
 
 public:
 	void Draw();
-	void Update();
+	void Update(Camera& camera);
 };

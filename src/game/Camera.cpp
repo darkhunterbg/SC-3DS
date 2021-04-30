@@ -2,7 +2,7 @@
 
 #include "Game.h"
 
-static constexpr const int CameraSpeed = 10;
+
 
 void Camera::Update() {
 
@@ -11,12 +11,12 @@ void Camera::Update() {
 	if (Game::Gamepad.L)
 	{
 		Vector2 move = Game::Gamepad.CPad;
-		move *= (int)(CameraSpeed * Scale);
+		move *= (int)(GetCameraSpeed());
 		Position += move;
 	}
 
 	Vector2 move = Game::Gamepad.CStick;
-	move *= (int)(CameraSpeed * Scale);
+	move *= (int)(GetCameraSpeed());
 	Position += move;
 
 	Vector2Int ScaledSize = (Size * Scale) / 2;

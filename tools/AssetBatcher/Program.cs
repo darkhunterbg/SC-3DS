@@ -15,9 +15,27 @@ namespace AssetBatcher
 			string path = Path.Combine(rootDir, "data_out", "unit", "terran");
 			var dir = Path.Combine(rootDir, "gfx");
 
-			GenerateT3S(path);
+			T3SCursor();
 		}
 
+		static void T3SCursor()
+		{
+			string path = Path.GetFullPath("../../data_out/cursor");
+			string root = Path.GetFullPath("../../data_out");
+
+			string header = $"--atlas -f {format} -z {compression} -q high";
+
+			string fileName = Path.GetFullPath("../../gfx/cursor.t3s");
+
+			using (StreamWriter s = new StreamWriter(fileName)) {
+				s.WriteLine(header);
+				foreach (var dir in Directory.GetDirectories(path)) {
+					foreach (var f in Directory.GetFiles(dir, "*.png")) {
+						s.WriteLine(f.Substring(root.Length + 1));
+					}
+				}
+			}
+		}
 
 		static void GenerateT3S(string dir)
 		{

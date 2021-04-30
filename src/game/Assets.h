@@ -117,11 +117,13 @@ private:
 
 class AnimationClip {
 private:
-	std::array< Sprite, 8> sprites;
+	std::array< Sprite, 16> sprites;
 	unsigned spriteCount = 0;
 public:
 	bool looping = false;
 	int frameDuration = 2;
+
+	void AddSpritesFromAtlas(const SpriteAtlas* atlas, int start, int count);
 
 	inline void AddSprite(const Sprite& sprite) {
 		sprites[spriteCount++] = sprite;
