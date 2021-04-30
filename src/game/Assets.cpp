@@ -64,9 +64,9 @@ int AudioStream::GetRemaining() const {
 	return info.GetTotalSize() - streamPos;
 }
 
-void AnimationClip::AddSpritesFromAtlas(const SpriteAtlas* atlas, int start, int count)
+void AnimationClip::AddSpritesFromAtlas(const SpriteAtlas* atlas, int start, int count, Vector2Int offset)
 {
 	for (int i = 0; i < count; ++i) {
-		AddSprite(atlas->GetSprite(start + i));
+		AddFrame({ atlas->GetSprite(start + i), offset });
 	}
 }

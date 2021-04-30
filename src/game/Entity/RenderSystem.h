@@ -13,13 +13,14 @@ struct RenderComponent {
 
 	Rectangle _dst;
 	Sprite sprite;
+	Vector2Int offset = { 0,0 };
 };
 
 class RenderSystem {
 
 public:
 	RenderSystem(int maxEntities);
-	~RenderSystem();
+	~RenderSystem();		
 
 	void Draw(const Camera& camera);
 

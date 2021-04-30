@@ -115,25 +115,36 @@ private:
 };
 
 
+struct SpriteFrame {
+	Sprite sprite;
+	Vector2Int offset;
+};
+
 class AnimationClip {
 private:
-	std::array< Sprite, 16> sprites;
-	unsigned spriteCount = 0;
+	std::array< SpriteFrame, 16> frames;
+	unsigned frameCount = 0;
 public:
 	bool looping = false;
 	int frameDuration = 2;
 
-	void AddSpritesFromAtlas(const SpriteAtlas* atlas, int start, int count);
+	void AddSpritesFromAtlas(const SpriteAtlas* atlas, int start, int count, Vector2Int offset = { 0,0 });
 
-	inline void AddSprite(const Sprite& sprite) {
-		sprites[spriteCount++] = sprite;
+	inline void AddFrame(const SpriteFrame& frame) {
+		frames[frameCount++] = frame;
 	}
-	inline Span<Sprite> GetSprites() const {
-		return { sprites.data(), spriteCount };
+	inline void SetFrameOffset(int frame, Vector2Int offset) {
+		frames[frame].offset = offset;
 	}
-	inline unsigned GetSpriteCount() const { return spriteCount; }
-	inline const Sprite& GetSprite(unsigned index) const {
-		return sprites[index];
+	inline void AddSprite(const Sprite& sprite, Vector2Int offset = { 0,0 }) {
+		frames[frameCount++] = { sprite, offset };
+	}
+	inline Span<SpriteFrame> GetFrame() const {
+		return { frames.data(), frameCount };
+	}
+	inline unsigned GetFrameCount() const { return frameCount; }
+	inline const SpriteFrame& GetFrame(unsigned index) const {
+		return frames[index];
 	}
 };
 

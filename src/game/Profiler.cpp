@@ -46,12 +46,12 @@ void Profiler::ShowPerformance() {
 	if (frameTime > 33.4)
 		c = Colors::Red;
 
-	stbsp_snprintf(text, sizeof(text), "Frame %0.2f ms", frameTime);
+	stbsp_snprintf(text, sizeof(text), "Frame %0.1f ms", frameTime);
 	Platform::DrawText(Game::SystemFont, { 1,0 }, text, c, 0.4f);
 
 	int y = 15;
 	for (const auto& profile : profileData) {
-		stbsp_snprintf(text, sizeof(text), "%s %0.2f ms", profile.first.data(), profile.second);
+		stbsp_snprintf(text, sizeof(text), "%s %0.1f ms", profile.first.data(), profile.second);
 		Platform::DrawText(Game::SystemFont, { 1,y }, text, Colors::White, 0.4f);
 		y += 15;
 	}
@@ -97,13 +97,13 @@ void Profiler::FrameStart() {
 void Profiler::FrameEnd() {
 	auto now = Platform::ElaspedTime();
 	double thisFrameTime = (now - frameStartTime) * 1000;
-	frameTime = thisFrameTime;
-	frameLoad.insert(frameLoad.begin(), thisFrameTime / 16.66);
+	frameTime = std::roundf((frameTime * 0.9 + thisFrameTime * 0.1) * 10.0) / 10.0;;
+	frameLoad.insert(frameLoad.begin(), thisFrameTime / 16.67);
 	if (frameLoad.size() >= 60)
 		frameLoad.erase(frameLoad.end() - 1);
 
 }
 void Profiler::AddStat(const char* name, double timeMs) {
 	double r = profileData[name];
-	profileData[name] = r * 0.95 + timeMs * 0.05;
+	profileData[name] = std::roundf((r * 0.9 + timeMs * 0.1) * 10.0) / 10.0;
 }

@@ -43,5 +43,5 @@ public:
 			return &animationComponents[cid];
 		return nullptr;
 	}
-	void UpdateAnimations(RenderSystem& renderSystem);
+	void UpdateAnimations( RenderSystem& renderSystem);
 };

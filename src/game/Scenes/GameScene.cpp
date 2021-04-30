@@ -49,26 +49,26 @@ void GameScene::Start() {
 	marine = Platform::LoadAtlas("marine.t3x");
 
 	clip.looping = true;
-	clip.AddSprite(marine->GetSprite(13));
-	clip.AddSprite(marine->GetSprite(30));
-	clip.AddSprite(marine->GetSprite(47));
-	clip.AddSprite(marine->GetSprite(30));
+	clip.AddSprite(marine->GetSprite(13), { 23,19 });
+	clip.AddSprite(marine->GetSprite(30), { 23,19 });
+	clip.AddSprite(marine->GetSprite(47), { 23,19 });
+	clip.AddSprite(marine->GetSprite(30), { 23,19 });
 
-	deathClip.AddSprite(marine->GetSprite(221));
-	deathClip.AddSprite(marine->GetSprite(222));
-	deathClip.AddSprite(marine->GetSprite(223));
-	deathClip.AddSprite(marine->GetSprite(224));
-	deathClip.AddSprite(marine->GetSprite(225));
-	deathClip.AddSprite(marine->GetSprite(226));
-	deathClip.AddSprite(marine->GetSprite(227));
-	deathClip.AddSprite(marine->GetSprite(228));
+	deathClip.AddSprite(marine->GetSprite(221), { 22,19 });
+	deathClip.AddSprite(marine->GetSprite(222), { 23,19 });
+	deathClip.AddSprite(marine->GetSprite(223), { 17,17 });
+	deathClip.AddSprite(marine->GetSprite(224), { 12,14 });
+	deathClip.AddSprite(marine->GetSprite(225), { 7,15 });
+	deathClip.AddSprite(marine->GetSprite(226), { 2,17 });
+	deathClip.AddSprite(marine->GetSprite(227), { 0,19 });
+	deathClip.AddSprite(marine->GetSprite(228), { 0,20 });
 
 	entityManager = new EntityManager();
 
 	for (int x = 0; x < 50; ++x) {
 		for (int y = 0; y < 100; ++y) {
-			auto e = entityManager->NewEntity({ x * 32,y * 32 });
-			entityManager->AddRenderComponent(e, clip.GetSprites()[0]);
+			auto e = entityManager->NewEntity({ x * 32 - 16,y * 32 - 16 });
+			entityManager->AddRenderComponent(e, clip.GetFrame()[0].sprite);
 			entityManager->AddAnimationComponent(e, &clip);
 		}
 	}
@@ -101,29 +101,35 @@ void GameScene::Update() {
 		LogicalUpdate();
 	}
 
-	if (Game::Gamepad.A) {
-		auto p = camera.ScreenToWorld(cursor->Position);
+	auto p = camera.ScreenToWorld(cursor->Position);
+	EntityId hover = 0;
+	for (int x = 0; x < 50; ++x) {
+		for (int y = 0; y < 100; ++y) {
+			Rectangle rect = { {x * 32,y * 32},{25,25} };
 
-		for (int x = 0; x < 50; ++x) {
-			for (int y = 0; y < 100; ++y) {
-				Rectangle rect = { {x * 32,y * 32},{25,25} };
-
-				if (rect.Contains(p)) {
-					int id = x * 100 + y + 1;
-					if (entityManager->HasEntity(id)) {
-						//entityManager->DeleteEntity(id);
-						auto* cmp = entityManager->GetAnimationComponent(id);
-						if (cmp->clip == &deathClip)
-							continue;
-						entityManager->GetAnimationComponent(id)->PlayClip(&deathClip);
-
-						int i = std::rand() % 2;
-						Game::Audio->PlayClip(death[i], 1);
-						
-					}
+			if (rect.Contains(p)) {
+				int id = x * 100 + y + 1;
+				if (entityManager->HasEntity(id)) {
+					auto* cmp = entityManager->GetAnimationComponent(id);
+					if (cmp->clip == &deathClip)
+						continue;
+					hover = id;
+					break;
 				}
 			}
 		}
+	}
+
+	cursor->isHoverState = hover != 0;
+
+	if (Game::Gamepad.A && hover) {
+
+
+		entityManager->GetAnimationComponent(hover)->PlayClip(&deathClip);
+
+		int i = std::rand() % 2;
+		Game::Audio->PlayClip(death[i], 1);
+
 	}
 
 	hud->ApplyInput(camera);

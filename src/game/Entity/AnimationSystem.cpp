@@ -37,7 +37,7 @@ void AnimationSystem::RemoveComponent(EntityId id) {
 }
 
 
-void AnimationSystem::UpdateAnimations(RenderSystem& renderSystem) {
+void AnimationSystem::UpdateAnimations( RenderSystem& renderSystem) {
 	animationUpdates.clear();
 	int cid = 0;
 	for (AnimationComponent& cmp : animationComponents) {
@@ -46,7 +46,7 @@ void AnimationSystem::UpdateAnimations(RenderSystem& renderSystem) {
 			cmp.clipFrame++;
 	
 			cmp.frameCountdown = cmp.clip->frameDuration;
-			int framesCount = cmp.clip->GetSpriteCount();
+			int framesCount = cmp.clip->GetFrameCount();
 			if (cmp.clip->looping)
 				cmp.clipFrame %= framesCount;
 
@@ -55,8 +55,14 @@ void AnimationSystem::UpdateAnimations(RenderSystem& renderSystem) {
 				EntityId eid = componentToEntityMap[cid];
 				AnimationComponent& cmp = animationComponents[cid];
 				RenderComponent* rcomp = renderSystem.GetComponent(eid);
-				rcomp->sprite = cmp.clip->GetSprite(cmp.clipFrame);
-				rcomp->_dst.size = rcomp->sprite.rect.size;
+				const SpriteFrame& frame = cmp.clip->GetFrame(cmp.clipFrame);
+				rcomp->sprite = frame.sprite;
+				Vector2Int oldOffset = rcomp->offset;
+
+				rcomp->offset = frame.offset;
+				// TODO: offload to render system?
+				rcomp->_dst.position += frame.offset - oldOffset;
+				rcomp->_dst.size = rcomp->sprite.rect.size ;
 			}
 		}
 		++cid;

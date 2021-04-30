@@ -30,19 +30,15 @@ void RenderSystem::Draw(const Camera& camera) {
 }
 
 void RenderSystem::UpdateEntities(const Span<Entity> entities) {
-	//SectionProfiler p("RenderSystem::UpdateEntities");
-
-	// Only for ones that moved
 
 	for (const Entity& entity : entities) {
 		int id = entityToComponentMap[entity.BufferPosition()];
 		RenderComponent& c = renderComponents[id];
 
 		c._dst = c.sprite.rect;
-		c._dst.position = entity.position;
+		c._dst.position = entity.position + c.offset;
 	}
 
-	//p.Submit();
 }
 
 RenderComponent& RenderSystem::NewComponent(EntityId id,const Sprite& sprite) {

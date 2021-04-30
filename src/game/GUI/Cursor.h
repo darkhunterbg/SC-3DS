@@ -12,10 +12,11 @@ public:
 private:
 	const SpriteAtlas* atlas;
 	const AnimationClip* currentClip;
-	int clipFrame;
-	int clipCountdown;
+	int clipFrame = 0;
+	int clipCountdown = 0;
 
 public:
+	bool isHoverState = false;
 	void Draw();
 	void Update(Camera& camera);
 };
