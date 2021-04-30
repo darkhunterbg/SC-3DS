@@ -5,7 +5,7 @@
 
 RenderSystem::RenderSystem(int maxEntities) {
 	entityToComponentMap = new int[maxEntities];
-	memset(entityToComponentMap, 0, sizeof(maxEntities) * sizeof(int));
+	memset(entityToComponentMap, -1, sizeof(maxEntities) * sizeof(int));
 	this->maxComponents = maxEntities;
 }
 RenderSystem::~RenderSystem() {
@@ -58,7 +58,7 @@ RenderComponent& RenderSystem::NewComponent(EntityId id,const Sprite& sprite) {
 }
 void RenderSystem::RemoveComponent(EntityId id) {
 	int cid = entityToComponentMap[id - 1];
-	entityToComponentMap[id - 1] = 0;
+	entityToComponentMap[id - 1] = -1;
 	renderComponents.erase(renderComponents.begin() + cid);
 	componentToEntityMap.erase(componentToEntityMap.begin() + cid);
 

@@ -24,4 +24,8 @@ private:
 	GameHUD* hud;
 	Cursor* cursor;
 	EntityManager* entityManager;
+	unsigned logicalFrame = 0;
+	unsigned frameCounter = 0;
+
+	void LogicalUpdate();
 };

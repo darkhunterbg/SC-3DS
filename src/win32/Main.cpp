@@ -25,7 +25,7 @@ void ExecDrawCommand(const SDLDrawCommand& cmd, SDL_Rect& clip, const int& n3dsU
 int main(int argc, char** argv) {
 
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_AUDIO);
-	window = SDL_CreateWindow("StarCraft", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1920, 1080, SDL_WINDOW_RESIZABLE);
+	window = SDL_CreateWindow("StarCraft", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1440, 720, SDL_WINDOW_RESIZABLE);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 	assetDir = std::filesystem::current_path();
@@ -37,13 +37,13 @@ int main(int argc, char** argv) {
 
 	Game::Start();
 
-	//if (argc > 1) {
-	//	std::string a = argv[1];
-	//	if (a == "-mute")
-	//	{
-	//		mute = true;
-	//	}
-	//}
+	if (argc > 1) {
+		std::string a = argv[1];
+		if (a == "-mute")
+		{
+			mute = true;
+		}
+	}
 
 	while (!done) {
 		Game::FrameStart();

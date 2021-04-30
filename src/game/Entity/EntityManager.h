@@ -6,6 +6,7 @@
 #include <array>
 #include <vector>
 #include "RenderSystem.h"
+#include "AnimationSystem.h"
 #include "../Camera.h"
 
 class EntityManager {
@@ -18,6 +19,7 @@ private:
 	unsigned nextFreePos = 0;
 
 	RenderSystem* renderSystem;
+	AnimationSystem* animationSystem;
 
 	inline Entity& GetEntity(EntityId id) { return entityBuffer[id - 1]; }
 
@@ -32,6 +34,9 @@ public:
 	void DrawEntites(const Camera& camera);
 
 	RenderComponent& AddRenderComponent(EntityId id, const Sprite& sprite);
+	
+	AnimationComponent& AddAnimationComponent(EntityId id, const AnimationClip* clip);
+	AnimationComponent* GetAnimationComponent(EntityId id) { return animationSystem->GetAnimationComponent(id); }
 
 	bool HasEntity(EntityId id) {
 		return entityBuffer[id-1].id != 0;

@@ -12,6 +12,9 @@ const SpriteAtlas* marine;
 
 std::array<AudioClip, 2> death;
 
+AnimationClip clip;
+AnimationClip deathClip;
+
 GameScene::GameScene() {
 
 }
@@ -45,12 +48,28 @@ void GameScene::Start() {
 	Game::Audio->PlayStream(stream, 0);
 	marine = Platform::LoadAtlas("marine.t3x");
 
+	clip.looping = true;
+	clip.AddSprite(marine->GetSprite(13));
+	clip.AddSprite(marine->GetSprite(30));
+	clip.AddSprite(marine->GetSprite(47));
+	clip.AddSprite(marine->GetSprite(30));
+
+	deathClip.AddSprite(marine->GetSprite(221));
+	deathClip.AddSprite(marine->GetSprite(222));
+	deathClip.AddSprite(marine->GetSprite(223));
+	deathClip.AddSprite(marine->GetSprite(224));
+	deathClip.AddSprite(marine->GetSprite(225));
+	deathClip.AddSprite(marine->GetSprite(226));
+	deathClip.AddSprite(marine->GetSprite(227));
+	deathClip.AddSprite(marine->GetSprite(228));
+
 	entityManager = new EntityManager();
 
 	for (int x = 0; x < 50; ++x) {
 		for (int y = 0; y < 100; ++y) {
 			auto e = entityManager->NewEntity({ x * 32,y * 32 });
-			entityManager->AddRenderComponent(e, marine->GetSprite(100));
+			entityManager->AddRenderComponent(e, clip.GetSprites()[0]);
+			entityManager->AddAnimationComponent(e, &clip);
 		}
 	}
 
@@ -60,20 +79,27 @@ void GameScene::Start() {
 
 int t = 0;
 
+void GameScene::LogicalUpdate() {
+	entityManager->UpdateEntities();
+
+	++t;
+
+	if (t % 60 == 0) {
+		hud->AddMinerals(8);
+		hud->AddGas(8);
+	}
+}
+
 void GameScene::Update() {
-	/*for (int x = 0; x < 50; ++x) {
-		for (int y = 0; y < 100; ++y) {
-			entityManager->SetPosition(x * 100 + y + 1, { x * 32,y * 32 });
-		}
-	}*/
-	//SectionProfiler p("Entity");
-
-	//for (int i = 0; i < 1000; i++) {
-	//	auto e = entityManager->NewEntity({ 0,0 });
-	//	entityManager->DeleteEntity(e);
-	//}
-
-	//p.Submit();
+	frameCounter += 2;
+	bool update = false;
+	while (frameCounter >= 5)
+	{
+		update = true;
+		++logicalFrame;
+		frameCounter -= 5;
+		LogicalUpdate();
+	}
 
 	if (Game::Gamepad.A) {
 		auto p = camera.ScreenToWorld(cursor->Position);
@@ -85,23 +111,19 @@ void GameScene::Update() {
 				if (rect.Contains(p)) {
 					int id = x * 100 + y + 1;
 					if (entityManager->HasEntity(id)) {
-						entityManager->DeleteEntity(id);
+						//entityManager->DeleteEntity(id);
+						auto* cmp = entityManager->GetAnimationComponent(id);
+						if (cmp->clip == &deathClip)
+							continue;
+						entityManager->GetAnimationComponent(id)->PlayClip(&deathClip);
 
 						int i = std::rand() % 2;
 						Game::Audio->PlayClip(death[i], 1);
+						
 					}
 				}
 			}
 		}
-	}
-
-	entityManager->UpdateEntities();
-
-	++t;
-
-	if (t % 60 == 0) {
-		hud->AddMinerals(8);
-		hud->AddGas(8);
 	}
 
 	hud->ApplyInput(camera);
@@ -109,8 +131,6 @@ void GameScene::Update() {
 	cursor->Update();
 
 	camera.Update();
-
-
 }
 
 void GameScene::Draw() {

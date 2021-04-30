@@ -24,6 +24,13 @@ public:
 	void Draw(const Camera& camera);
 
 	RenderComponent& NewComponent(EntityId id, const Sprite& sprite);
+	RenderComponent* GetComponent(EntityId id)  {
+		int cid = entityToComponentMap[id - 1];
+		if (cid > -1)
+			return &renderComponents[cid];
+
+		return nullptr;
+	}
 	void RemoveComponent(EntityId id);
 
 	void UpdateEntities(const Span<Entity> entity);
@@ -33,4 +40,5 @@ private:
 	
 	int* entityToComponentMap;
 	std::vector<EntityId> componentToEntityMap;
+
 };

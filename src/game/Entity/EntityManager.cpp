@@ -6,9 +6,11 @@
 
 EntityManager::EntityManager() {
 	renderSystem = new RenderSystem(MaxEntities);
+	animationSystem = new AnimationSystem(MaxEntities);
 }
 EntityManager::~EntityManager() {
 	delete renderSystem;
+	delete animationSystem;
 }
 
 EntityId EntityManager::NewEntity(Vector2Int position) {
@@ -62,10 +64,11 @@ void EntityManager::DeleteEntity(EntityId id) {
 			entities.erase(entities.begin() + i);
 			e->id = 0;
 
-
-			if (e->HasComponent<RenderComponent>()) {
+			if (e->HasComponent<RenderComponent>())
 				renderSystem->RemoveComponent(id);
-			}
+
+			if (e->HasComponent<AnimationComponent>())
+				animationSystem->RemoveComponent(id);
 
 			return;
 		}
@@ -76,7 +79,11 @@ void EntityManager::DeleteEntity(EntityId id) {
 
 void EntityManager::UpdateEntities() {
 
-	SectionProfiler p("UpdateEntities");
+	SectionProfiler p("UpdateAnimation");
+
+	animationSystem->UpdateAnimations(*renderSystem);
+
+	p.Submit();
 
 	collection.clear();
 
@@ -91,16 +98,16 @@ void EntityManager::UpdateEntities() {
 
 	renderSystem->UpdateEntities(updated);
 
-	p.Submit();
+	//p.Submit();
 }
 
 void EntityManager::DrawEntites(const Camera& camera) {
 
-	SectionProfiler p("DrawEntities");
+	//SectionProfiler p("DrawEntities");
 
 	renderSystem->Draw(camera);
 
-	p.Submit();
+	//p.Submit();
 }
 
 
@@ -110,5 +117,11 @@ RenderComponent& EntityManager::AddRenderComponent(EntityId id, const Sprite& sp
 	Entity& entity = GetEntity(id);
 	entity.changed = true;
 	entity.SetHasComponent<RenderComponent>(true);
+	return c;
+}
+AnimationComponent& EntityManager::AddAnimationComponent(EntityId id, const AnimationClip* clip) {
+	AnimationComponent& c = animationSystem->NewComponent(id, clip);
+	Entity& entity = GetEntity(id);
+	entity.SetHasComponent<AnimationComponent>(true);
 	return c;
 }

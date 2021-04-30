@@ -113,3 +113,25 @@ private:
 	int activeBufferIndex = 1;
 	int streamPos = 0;
 };
+
+
+class AnimationClip {
+private:
+	std::array< Sprite, 8> sprites;
+	unsigned spriteCount = 0;
+public:
+	bool looping = false;
+	int frameDuration = 2;
+
+	inline void AddSprite(const Sprite& sprite) {
+		sprites[spriteCount++] = sprite;
+	}
+	inline Span<Sprite> GetSprites() const {
+		return { sprites.data(), spriteCount };
+	}
+	inline unsigned GetSpriteCount() const { return spriteCount; }
+	inline const Sprite& GetSprite(unsigned index) const {
+		return sprites[index];
+	}
+};
+
