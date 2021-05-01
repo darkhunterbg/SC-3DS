@@ -14,8 +14,8 @@ private:
 
 public:
 	static Font SystemFont;
-	static GamepadState Gamepad;
-	static PointerState Pointer;
+	static Gamepad Gamepad;
+	static Pointer Pointer;
 	static AudioSystem* Audio;
 
 	static float DeltaTime;

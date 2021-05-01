@@ -55,6 +55,9 @@ public:
 	inline EntityId PointCast(Vector2Int point) {
 		return kinematicSystem->PointCast(point);
 	}
+	inline void RectCast(const Rectangle& rect, std::vector<EntityId>& result) {
+		kinematicSystem->RectCast(rect, result);
+	}
 
 	bool HasEntity(EntityId id) {
 		return GetEntity(id).id != 0;

@@ -35,3 +35,14 @@ EntityId KinematicSystem::PointCast(Vector2Int point)
 
 	return Entity::None;
 }
+
+void KinematicSystem::RectCast(Rectangle rect, std::vector< EntityId>& outResults) {
+	auto components = ColliderComponents.GetComponents();
+	unsigned size = components.Size();
+	for (unsigned i = 0; i < size; ++i) {
+		ColliderComponent& cmp = components.At(i);
+		if (cmp._worldBox.Intersects(rect))
+			outResults.push_back({ ColliderComponents.GetEntityIdForComponent(i) });
+	}
+
+}

@@ -64,4 +64,7 @@ namespace Colors {
 	constexpr Color LightPink{ 1.0f,0.71f, 0.75f, 1.0f };
 	constexpr Color CornflowerBlue = Color::ValueOf(0x6495EDFF);
 
+
+	constexpr Color UIGreen = { 0x10fc18ff };
+
 }

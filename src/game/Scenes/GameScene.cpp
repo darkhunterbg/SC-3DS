@@ -11,6 +11,7 @@
 const SpriteAtlas* marine;
 
 std::array<AudioClip, 2> death;
+std::vector<EntityId> selection;
 
 AnimationClip clip;
 AnimationClip deathClip;
@@ -108,30 +109,23 @@ void GameScene::Update() {
 		LogicalUpdate();
 	}
 
-	auto p = camera.ScreenToWorld(cursor->Position);
-
-	SectionProfiler profiler("Pointcast");
-
-	EntityId hover = entityManager->PointCast(p);
-
-	profiler.Submit();
-
-	cursor->isHoverState = hover != Entity::None;
-
-	if (Game::Gamepad.A && cursor->isHoverState) {
-
-		entityManager->GetAnimationComponent(hover).PlayClip(&deathClip);
-		entityManager->GetRenderComponent(hover).depth = -1;
-		entityManager->RemoveColliderComponent(hover);
-
-		int i = std::rand() % 2;
-		Game::Audio->PlayClip(death[i], 1);
-
-	}
 
 	hud->ApplyInput(camera);
 
-	cursor->Update(camera);
+	selection.clear();
+	cursor->Update(camera, *entityManager, selection);
+
+	if (selection.size() > 0) {
+		for (EntityId id : selection)
+		{
+			entityManager->GetAnimationComponent(id).PlayClip(&deathClip);
+			entityManager->GetRenderComponent(id).depth = -1;
+			entityManager->RemoveColliderComponent(id);
+
+			int i = std::rand() % 2;
+			Game::Audio->PlayClip(death[i], 1);
+		}
+	}
 
 	camera.Update();
 }

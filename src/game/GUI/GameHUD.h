@@ -26,6 +26,7 @@ public:
 private:
 	Font font;
 	const SpriteAtlas* iconsAtlas;
+	const SpriteAtlas* cmdIconsAtlas;
 	const SpriteAtlas* consoleAtlas;
 	Texture minimapTexture = nullptr;
 	Sprite minimapSprite;
@@ -49,6 +50,7 @@ private:
 
 	void DrawResource(Sprite icon, Vector2Int pos, const char* text, ...);
 	void DrawMinimap(const Camera& camera, const MapSystem& mapSystem);
+	void DrawAbilities();
 	void RenderMinimapTexture(const MapSystem& mapSystem);
 
 	static void UpdateResourceDiff(Resource& r);

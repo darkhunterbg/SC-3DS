@@ -15,24 +15,22 @@ namespace AssetBatcher
 			string path = Path.Combine(rootDir, "data_out", "unit", "terran");
 			var dir = Path.Combine(rootDir, "gfx");
 
-			T3SCursor();
+			T3SFolder("unit/cmdbtns/cmdicons", "cmdicons");
 		}
 
-		static void T3SCursor()
+		static void T3SFolder(string folder, string name)
 		{
-			string path = Path.GetFullPath("../../data_out/cursor");
-			string root = Path.GetFullPath("../../data_out");
+			string path = Path.GetFullPath($"../../gfx/{folder}");
+			string root = Path.GetFullPath("../../gfx");
 
 			string header = $"--atlas -f {format} -z {compression} -q high";
 
-			string fileName = Path.GetFullPath("../../gfx/cursor.t3s");
+			string fileName = Path.GetFullPath($"../../gfx/{name}.t3s");
 
 			using (StreamWriter s = new StreamWriter(fileName)) {
 				s.WriteLine(header);
-				foreach (var dir in Directory.GetDirectories(path)) {
-					foreach (var f in Directory.GetFiles(dir, "*.png")) {
-						s.WriteLine(f.Substring(root.Length + 1));
-					}
+				foreach (var f in Directory.GetFiles(path, "*.png", SearchOption.AllDirectories)) {
+					s.WriteLine(f.Substring(root.Length + 1));
 				}
 			}
 		}

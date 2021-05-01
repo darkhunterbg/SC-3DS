@@ -51,6 +51,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Game.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUD.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Input.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\Wave.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Map\MapSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GenericPlatform.cpp" />

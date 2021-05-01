@@ -6,7 +6,7 @@
 #include "../Map/MapSystem.h"
 #include "../MathLib.h"
 
-static constexpr const Color resourceTextColor = { 0x10fc18ff };
+
 //static Rectangle minimapDst = { {7,108},{128,128} };
 static Rectangle minimapDst = { {6,123},{113,113} };
 static constexpr const int MinimapTextureSize = 256;
@@ -17,6 +17,7 @@ GameHUD::GameHUD() {
 	font = Game::SystemFont;
 	iconsAtlas = Platform::LoadAtlas("game_icons.t3x");
 	consoleAtlas = Platform::LoadAtlas("game_tconsole.t3x");
+	//cmdIconsAtlas = Platform::LoadAtlas("cmdicons.t3x");
 }
 
 void GameHUD::DrawResource(Sprite icon, Vector2Int pos, const char* fmt, ...) {
@@ -28,7 +29,7 @@ void GameHUD::DrawResource(Sprite icon, Vector2Int pos, const char* fmt, ...) {
 	Platform::Draw(icon, { pos,{ 14, 14} }, Colors::White);
 	pos += {16, -2};
 	Platform::DrawText(font, pos + Vector2Int{ 1,1 }, textBuffer, Colors::Black, 0.4f);
-	Platform::DrawText(font, pos, textBuffer, resourceTextColor, 0.4f);
+	Platform::DrawText(font, pos, textBuffer, Colors::UIGreen, 0.4f);
 }
 
 static const  int GetResourceUpdate(int change) {
@@ -66,12 +67,14 @@ void GameHUD::LowerScreenGUI(const Camera& camera, const MapSystem& mapSystem) {
 	Platform::Draw(consoleAtlas->GetSprite(0), { {0, 0,},{ 320, 240} }, Colors::White);
 
 	DrawMinimap(camera, mapSystem);
+
+	DrawAbilities();
 }
 
 void GameHUD::ApplyInput(Camera& camera) {
-	if (Game::Pointer.Touch) {
-		if (minimapDst.Contains(Game::Pointer.Position)) {
-			Vector2Int pos = Game::Pointer.Position - Vector2Int(minimapDst.position);
+	if (Game::Pointer.IsDown()) {
+		if (minimapDst.Contains(Game::Pointer.Position())) {
+			Vector2Int pos = Game::Pointer.Position() - Vector2Int(minimapDst.position);
 			camera.Position = Vector2(pos) * minimapUpscale;
 		}
 	}
@@ -99,6 +102,16 @@ void GameHUD::DrawMinimap(const Camera& camera, const MapSystem& mapSystem) {
 	Platform::DrawLine(max, max - Vector2(s.x, 0), Colors::White);
 	Platform::DrawLine(min, min + Vector2(0, s.y), Colors::White);
 	Platform::DrawLine(max, max - Vector2(0, s.y), Colors::White);
+}
+
+void GameHUD::DrawAbilities() {
+
+	//Platform::Draw(cmdIconsAtlas->GetSprite(228), { {188,120},{28,28} }, Colors::White);
+	//Platform::Draw(cmdIconsAtlas->GetSprite(229), { {235,120},{28,28} }, Colors::White);
+	//Platform::Draw(cmdIconsAtlas->GetSprite(230), { {280,120},{28,28} }, Colors::White);
+	//Platform::Draw(cmdIconsAtlas->GetSprite(254), { {188,160},{28,28} }, Colors::White);
+	//Platform::Draw(cmdIconsAtlas->GetSprite(255), { {235,160},{28,28} }, Colors::White);
+	//Platform::Draw(cmdIconsAtlas->GetSprite(237), { {188,200},{28,28} }, { 0.5f,0.5f,0.5f,0.5f });
 }
 
 void GameHUD::RenderMinimapTexture(const MapSystem& mapSystem) {

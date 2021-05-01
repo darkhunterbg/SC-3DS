@@ -17,8 +17,8 @@ static std::string error;
 static double frameStartTime = 0;
 
 Font Game::SystemFont;
-GamepadState Game::Gamepad;
-PointerState Game::Pointer;
+Gamepad Game::Gamepad;
+Pointer Game::Pointer;
 AudioSystem* Game::Audio = nullptr;
 float Game::DeltaTime = 0;
 
@@ -57,8 +57,8 @@ bool Game::Update() {
 
 	SectionProfiler p("Update");
 
-	Platform::UpdateGamepadState(Gamepad);
-	Platform::UpdatePointerState(Pointer);
+	Gamepad.Update();
+	Pointer.Update();
 	Audio->UpdateAudio();
 
 	if (startup) {

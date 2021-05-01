@@ -6,16 +6,16 @@
 
 void Camera::Update() {
 
-	Scale = Game::Gamepad.R ? 2 : 1;
+	Scale = Game::Gamepad.IsButtonDown(GamepadButton::R) ? 2 : 1;
 
-	if (Game::Gamepad.L)
+	if (Game::Gamepad.IsButtonDown(GamepadButton::L))
 	{
-		Vector2 move = Game::Gamepad.CPad;
+		Vector2 move = Game::Gamepad.CPad();
 		move *= (int)(GetCameraSpeed());
 		Position += move;
 	}
 
-	Vector2 move = Game::Gamepad.CStick;
+	Vector2 move = Game::Gamepad.CStick()	;
 	move *= (int)(GetCameraSpeed());
 	Position += move;
 

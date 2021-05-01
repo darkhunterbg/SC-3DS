@@ -2,6 +2,7 @@
 #include "../Platform.h"
 #include "../Game.h"
 #include "../Camera.h"
+#include "../Entity/EntityManager.h"
 
 static constexpr const float Speed = 10;
 
@@ -89,16 +90,37 @@ void Cursor::Draw() {
 	Rectangle dst = { Position + frame.offset,frame.sprite.rect.size };
 	dst.position -= currentClip->frameSize / 2;
 
+	if (regionRect.size.LengthSquared() > 0) {
+		Rectangle rect;
+		rect.position = regionRect.position;
+		rect.size = Vector2Int(regionRect.size.x + 1, 2);
+		Platform::DrawRectangle(rect, Colors::UIGreen);
+
+		rect.size = Vector2Int(2, regionRect.size.y + 1);
+		Platform::DrawRectangle(rect, Colors::UIGreen);
+
+
+		rect.position = { regionRect.position.x , regionRect.GetMax().y - 1 };
+		rect.size = Vector2Int(regionRect.size.x, 2);
+		Platform::DrawRectangle(rect, Colors::UIGreen);
+
+		rect.position = { regionRect.GetMax().x - 1, regionRect.position.y };
+		rect.size = Vector2Int(2, regionRect.size.y);
+		Platform::DrawRectangle(rect, Colors::UIGreen);
+	}
+
 	Platform::Draw(frame.sprite, dst, Colors::White);
 }
 
-void Cursor::Update(Camera& camera) {
+void Cursor::Update(Camera& camera, EntityManager& entityManager, std::vector<EntityId>& outSelection) {
 
 	Vector2Int corner = { 0,0 };
+	
+	// TODO: State machine
 
-	if (!Game::Gamepad.L)
+	if (!Game::Gamepad.IsButtonDown(GamepadButton::L))
 	{
-		Vector2 move = Game::Gamepad.CPad;
+		Vector2 move = Game::Gamepad.CPad();
 		Position += move * Speed;
 	}
 
@@ -113,6 +135,8 @@ void Cursor::Update(Camera& camera) {
 	}
 
 
+	bool holding = Game::Gamepad.IsButtonDown(GamepadButton::A);
+
 	if (Position.y <= Limits.position.y) {
 		Position.y = Limits.position.y;
 		corner.y = -1;
@@ -121,6 +145,48 @@ void Cursor::Update(Camera& camera) {
 	if (Position.y >= Limits.position.y + Limits.size.y) {
 		Position.y = Limits.position.y + Limits.size.y;
 		corner.y = 1;
+	}
+
+	if (Game::Gamepad.IsButtonPressed(GamepadButton::A)) {
+		holdStart = camera.ScreenToWorld(Position);
+	}
+
+	Vector2Int worldPos = camera.ScreenToWorld(Position);
+	EntityId hover = entityManager.PointCast(worldPos);
+	bool dragging = (worldPos - holdStart).LengthSquared() != 0;
+
+	if (holding && dragging) {
+		Vector2Int start = camera.WorldToScreen(holdStart);
+		Vector2Int end = camera.WorldToScreen(worldPos);
+
+		regionRect.size = (end - start);
+		regionRect.size.x = std::abs(regionRect.size.x);
+		regionRect.size.y = std::abs(regionRect.size.y);
+		regionRect.position.x = std::min(start.x, end.x);
+		regionRect.position.y = std::min(start.y, end.y);
+	}
+
+	if (Game::Gamepad.IsButtonReleased(GamepadButton::A)) {
+		if (!dragging && hover) {
+			outSelection.push_back(hover);
+		}
+		else {
+			Vector2Int start = holdStart;
+			Vector2Int end = worldPos;
+
+			Rectangle rect;
+
+			rect.size = (end - start);
+			rect.size.x = std::abs(rect.size.x);
+			rect.size.y = std::abs(rect.size.y);
+			rect.position.x = std::min(start.x, end.x);
+			rect.position.y = std::min(start.y, end.y);
+
+			entityManager.RectCast(rect, outSelection);
+			holdStart = { 0,0 };
+			regionRect = { {0,0},{0,0} };
+
+		}
 	}
 
 	const auto* newClip = currentClip;
@@ -132,7 +198,14 @@ void Cursor::Update(Camera& camera) {
 		camera.Position += v * camera.GetCameraSpeed();
 	}
 	else {
-		newClip = isHoverState ? &magg : &arrow;
+		if (!holding || !dragging)
+		{
+			newClip = hover ? &magg : &arrow;
+		}
+		else {
+			newClip = &drag;
+
+		}
 	}
 
 	if (newClip != currentClip) {
@@ -140,4 +213,5 @@ void Cursor::Update(Camera& camera) {
 		clipFrame = 0;
 		clipCountdown = currentClip->frameDuration;
 	}
+
 }

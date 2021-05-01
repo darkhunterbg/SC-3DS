@@ -243,7 +243,7 @@ struct Rectangle
 	}
 	inline bool Intersects(const Rectangle& r) const
 	{
-		return r.position.x < position.x + size.x && position.x < r.position.x + size.x &&
+		return r.position.x < position.x + size.x && position.x < r.position.x + r.size.x &&
 			r.position.y < position.y + size.y && position.y < r.position.y + r.size.y;
 	}
 	inline bool Contains(const Vector2Int& v) const {
