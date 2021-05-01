@@ -19,6 +19,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Camera.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Color.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationSystem.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\Component.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\Entity.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\EntityManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\RenderSystem.h" />

@@ -22,6 +22,10 @@ struct Entity {
 	inline void SetHasComponent(bool hasComponent) {
 		components.set(TComponent::ComponentId, hasComponent);
 	}
+
+	static constexpr const int MaxEntities = 5000;
 };
+
+inline constexpr const int EntityIdToIndex(EntityId id) { return id - 1; }
 #pragma pack(pop)
 

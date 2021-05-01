@@ -3,16 +3,28 @@
 template<class T>
 class Span {
 public:
-	class Iterator {
+	class ConstIterator {
 	public:
-		Iterator(const Span<T>* span, unsigned pos) : _span(span), _pos(pos) {}
+		ConstIterator(const Span<T>* span, unsigned pos) : _span(span), _pos(pos) {}
 		const T& operator* () const { return _span->At(_pos); }
-		bool operator != (const Iterator& other) const { return _pos != other._pos; }
-		const Iterator& operator++ () { ++_pos;	return *this; }
+		bool operator != (const ConstIterator& other) const { return _pos != other._pos; }
+		const ConstIterator& operator++ () { ++_pos;	return *this; }
 	private:
 		const Span<T>* _span;
 		unsigned _pos;
 	};
+
+	class Iterator {
+	public:
+		Iterator(const Span<T>* span, unsigned pos) : _span(const_cast<Span<T>*>(span)), _pos(pos) {}
+		T& operator* () { return _span->At(_pos); }
+		bool operator != (const Iterator& other) const { return _pos != other._pos; }
+		Iterator& operator++ () { ++_pos;	return *this; }
+	private:
+		Span<T>* _span;
+		unsigned _pos;
+	};
+
 public:
 	Span() {}
 
@@ -39,13 +51,27 @@ public:
 		return _data[index];
 	}
 
+	T& At(unsigned index) {
+		//AIO_ASSERT(_data, "Tried to access nullptr span.");
+		//AIO_ASSERT(index < _size, "Out of range access %i of %i.", index, _size);
+
+		return _data[index];
+	}
+
 	inline const T& operator[](unsigned index)  const {
 		return At(index);
 	}
-	Iterator begin() const {
+	ConstIterator begin() const {
+		return ConstIterator(this, 0);
+	}
+	ConstIterator end() const {
+		return ConstIterator(this, _size);
+	}
+
+	Iterator begin() {
 		return Iterator(this, 0);
 	}
-	Iterator end() const {
+	Iterator end() {
 		return Iterator(this, _size);
 	}
 private:

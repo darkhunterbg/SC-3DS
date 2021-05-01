@@ -3,43 +3,33 @@
 #include <vector>
 #include "../Camera.h"
 #include "Entity.h"
+#include "Component.h"
 #include "../Assets.h"
 #include "../Span.h"
 
 
-
-struct RenderComponent {
-	static constexpr const int ComponentId = 0;
-
+struct RenderComponent : IComponent<0> {
 	Rectangle _dst;
 	Sprite sprite;
 	Vector2Int offset = { 0,0 };
+
+	inline void SetSprite(const Sprite& s) {
+		_dst.size = s.rect.size;
+		sprite = s;
+	}
+	inline void SetFrame(const SpriteFrame& frame) {
+		sprite = frame.sprite;
+		Vector2Int oldOffset = offset;
+		offset = frame.offset;
+		_dst.position += frame.offset - oldOffset;
+		_dst.size = frame.sprite.rect.size;
+	}
 };
 
 class RenderSystem {
 
 public:
-	RenderSystem(int maxEntities);
-	~RenderSystem();		
-
+	ComponentCollection<RenderComponent> RenderComponents;
 	void Draw(const Camera& camera);
-
-	RenderComponent& NewComponent(EntityId id, const Sprite& sprite);
-	RenderComponent* GetComponent(EntityId id)  {
-		int cid = entityToComponentMap[id - 1];
-		if (cid > -1)
-			return &renderComponents[cid];
-
-		return nullptr;
-	}
-	void RemoveComponent(EntityId id);
-
 	void UpdateEntities(const Span<Entity> entity);
-private:
-	std::vector<RenderComponent> renderComponents;
-	int maxComponents = 0;
-	
-	int* entityToComponentMap;
-	std::vector<EntityId> componentToEntityMap;
-
 };

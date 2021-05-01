@@ -10,9 +10,9 @@
 #include "../Camera.h"
 
 class EntityManager {
-	static constexpr const int MaxEntities = 5000;
+
 private:
-	std::array<Entity, MaxEntities> entityBuffer;
+	std::array<Entity, Entity::MaxEntities> entityBuffer;
 	std::vector<Entity*> entities;
 	std::vector<Entity> collection;
 	std::vector<EntityId> deleted;
@@ -21,7 +21,7 @@ private:
 	RenderSystem* renderSystem;
 	AnimationSystem* animationSystem;
 
-	inline Entity& GetEntity(EntityId id) { return entityBuffer[id - 1]; }
+	inline Entity& GetEntity(EntityId id) { return entityBuffer[EntityIdToIndex(id)]; }
 
 public:
 	EntityManager();
@@ -36,10 +36,10 @@ public:
 	RenderComponent& AddRenderComponent(EntityId id, const Sprite& sprite);
 	
 	AnimationComponent& AddAnimationComponent(EntityId id, const AnimationClip* clip);
-	AnimationComponent* GetAnimationComponent(EntityId id) { return animationSystem->GetAnimationComponent(id); }
+	AnimationComponent& GetAnimationComponent(EntityId id) { return animationSystem->AnimationComponents.GetComponent(id); }
 
 	bool HasEntity(EntityId id) {
-		return entityBuffer[id-1].id != 0;
+		return GetEntity(id).id != 0;
 	}
 
 	void SetPosition(EntityId id, Vector2Int position) {

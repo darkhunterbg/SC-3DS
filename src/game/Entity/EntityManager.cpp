@@ -5,8 +5,8 @@
 
 
 EntityManager::EntityManager() {
-	renderSystem = new RenderSystem(MaxEntities);
-	animationSystem = new AnimationSystem(MaxEntities);
+	renderSystem = new RenderSystem();
+	animationSystem = new AnimationSystem();
 }
 EntityManager::~EntityManager() {
 	delete renderSystem;
@@ -17,7 +17,7 @@ EntityId EntityManager::NewEntity(Vector2Int position) {
 
 	// This can be speed up with a queue 
 	bool foundFree = false;
-	for (; nextFreePos < MaxEntities; nextFreePos++) {
+	for (; nextFreePos < Entity::MaxEntities; nextFreePos++) {
 		if (entityBuffer[nextFreePos].id == 0)
 		{
 			foundFree = true;
@@ -25,7 +25,7 @@ EntityId EntityManager::NewEntity(Vector2Int position) {
 		}
 	}
 	if (!foundFree) {
-		for (nextFreePos = 0; nextFreePos < MaxEntities; nextFreePos++) {
+		for (nextFreePos = 0; nextFreePos < Entity::MaxEntities; nextFreePos++) {
 			if (entityBuffer[nextFreePos].id == 0)
 			{
 				foundFree = true;
@@ -48,7 +48,7 @@ EntityId EntityManager::NewEntity(Vector2Int position) {
 }
 
 void EntityManager::DeleteEntity(EntityId id) {
-	if (id == 0 || id > MaxEntities)
+	if (id == 0 || id > Entity::MaxEntities)
 		EXCEPTION("Tried to delete invalid entity!");
 
 
@@ -65,10 +65,10 @@ void EntityManager::DeleteEntity(EntityId id) {
 			e->id = 0;
 
 			if (e->HasComponent<RenderComponent>())
-				renderSystem->RemoveComponent(id);
+				renderSystem->RenderComponents.RemoveComponent(id);
 
 			if (e->HasComponent<AnimationComponent>())
-				animationSystem->RemoveComponent(id);
+				animationSystem->AnimationComponents.RemoveComponent(id);
 
 			return;
 		}
@@ -113,14 +113,16 @@ void EntityManager::DrawEntites(const Camera& camera) {
 
 RenderComponent& EntityManager::AddRenderComponent(EntityId id, const Sprite& sprite) {
 
-	RenderComponent& c = renderSystem->NewComponent(id, sprite);
+	RenderComponent& c = renderSystem->RenderComponents.NewComponent(id);
+	c.SetSprite(sprite);
 	Entity& entity = GetEntity(id);
 	entity.changed = true;
 	entity.SetHasComponent<RenderComponent>(true);
 	return c;
 }
 AnimationComponent& EntityManager::AddAnimationComponent(EntityId id, const AnimationClip* clip) {
-	AnimationComponent& c = animationSystem->NewComponent(id, clip);
+	AnimationComponent& c = animationSystem->AnimationComponents.NewComponent(id);
+	c.PlayClip(clip);
 	Entity& entity = GetEntity(id);
 	entity.SetHasComponent<AnimationComponent>(true);
 	return c;

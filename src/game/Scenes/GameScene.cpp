@@ -110,8 +110,8 @@ void GameScene::Update() {
 			if (rect.Contains(p)) {
 				int id = x * 100 + y + 1;
 				if (entityManager->HasEntity(id)) {
-					auto* cmp = entityManager->GetAnimationComponent(id);
-					if (cmp->clip == &deathClip)
+					const auto& cmp = entityManager->GetAnimationComponent(id);
+					if (cmp.clip == &deathClip)
 						continue;
 					hover = id;
 					break;
@@ -125,7 +125,7 @@ void GameScene::Update() {
 	if (Game::Gamepad.A && hover) {
 
 
-		entityManager->GetAnimationComponent(hover)->PlayClip(&deathClip);
+		entityManager->GetAnimationComponent(hover).PlayClip(&deathClip);
 
 		int i = std::rand() % 2;
 		Game::Audio->PlayClip(death[i], 1);
