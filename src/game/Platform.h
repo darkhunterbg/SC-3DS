@@ -28,7 +28,7 @@ public:
 	static Font LoadFont(const char* path);
 	static void DrawOnScreen(ScreenId screen);
 	static void DrawOnTexture(Texture texture);
-	static void Draw(const Sprite& sprite, Rectangle dst, Color color);
+	static void Draw(const Sprite& sprite, Rectangle dst, Color color = Colors::White, bool hFlip = false);
 	static void DrawText(const Font& font, Vector2Int position, const char* text, Color color, float scale = 1.0f);
 	static void DrawLine(Vector2Int src, Vector2Int dst, Color color);
 	static void DrawRectangle(Rectangle rect, Color color);

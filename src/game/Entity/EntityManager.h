@@ -8,6 +8,7 @@
 #include "RenderSystem.h"
 #include "AnimationSystem.h"
 #include "KinematicSystem.h"
+#include "NavigationSystem.h"
 
 #include "../Camera.h"
 
@@ -23,6 +24,7 @@ private:
 	RenderSystem* renderSystem;
 	AnimationSystem* animationSystem;
 	KinematicSystem* kinematicSystem;
+	NavigationSystem* navigationSystem;
 
 	inline Entity& GetEntity(EntityId id) { return entityBuffer[EntityIdToIndex(id)]; }
 
@@ -41,6 +43,9 @@ public:
 
 	AnimationComponent& AddAnimationComponent(EntityId id, const AnimationClip* clip);
 	AnimationComponent& GetAnimationComponent(EntityId id) { return animationSystem->AnimationComponents.GetComponent(id); }
+
+	NavigationComponent& AddNavigationComponent(EntityId id, int turnSpeed, int velocity);
+	NavigationComponent& GetNavigationComponent(EntityId id) { return navigationSystem->NavigationComponents.GetComponent(id); }
 
 	ColliderComponent& AddColliderComponent(EntityId id, const Rectangle& box);
 	ColliderComponent& GetColliderComponent(EntityId id) { return kinematicSystem->ColliderComponents.GetComponent(id); }

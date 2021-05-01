@@ -19,6 +19,8 @@ struct SDLDrawCommand {
 	SDL_Rect dst;
 	Uint8 r, g, b;
 
+	SDL_RendererFlip flip;
+
 	FC_Font* font;
 	std::string text;
 	float scale;

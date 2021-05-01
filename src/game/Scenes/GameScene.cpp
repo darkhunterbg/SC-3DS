@@ -11,10 +11,13 @@
 const SpriteAtlas* marine;
 
 std::array<AudioClip, 2> death;
+std::array<AudioClip, 4> what;
+std::array<AudioClip, 4> yes;
 std::vector<EntityId> selection;
 
 AnimationClip clip;
 AnimationClip deathClip;
+AnimationClip moveClips[32];
 
 GameScene::GameScene() {
 
@@ -46,6 +49,14 @@ void GameScene::Start() {
 	AudioStream* stream = Platform::LoadAudioStream("music/terran1.wav");
 	death[0] = Platform::LoadAudioClip("music/tmadth00.wav");
 	death[1] = Platform::LoadAudioClip("music/tmadth01.wav");
+	what[0] = Platform::LoadAudioClip("music/tmawht00.wav");
+	what[1] = Platform::LoadAudioClip("music/tmawht01.wav");
+	what[2] = Platform::LoadAudioClip("music/tmawht02.wav");
+	what[3] = Platform::LoadAudioClip("music/tmawht03.wav");
+	yes[0] = Platform::LoadAudioClip("music/tmayes00.wav");
+	yes[1] = Platform::LoadAudioClip("music/tmayes01.wav");
+	yes[2] = Platform::LoadAudioClip("music/tmayes02.wav");
+	yes[3] = Platform::LoadAudioClip("music/tmayes03.wav");
 	Game::Audio->PlayStream(stream, 0);
 	marine = Platform::LoadAtlas("marine.t3x");
 
@@ -72,12 +83,42 @@ void GameScene::Start() {
 
 	entityManager = new EntityManager();
 
-	for (int x = 50 - 1; x >= 0; --x) {
-		for (int y = 100 - 1; y >= 0; --y) {
+
+	for (int i = 0; i <= 16; ++i) {
+		moveClips[i].frameSize = { 64,64 };
+		moveClips[i].looping = true;
+		moveClips[i].frameDuration = 1;
+		for (int j = 0; j < 9; ++j)
+			moveClips[i].AddSprite(marine->GetSprite(i + j * 17 + 68));
+	}
+
+	for (int i = 17; i < 32; ++i) {
+		moveClips[i].frameSize = { 64,64 };
+		moveClips[i].looping = true;
+		moveClips[i].frameDuration = 1;
+		for (int j = 0; j < 9; ++j)
+			moveClips[i].AddSprite(marine->GetSprite(32 - i + j * 17 + 68), { 0,0 }, true);
+	}
+
+	for (int i = 0; i < 32; ++i) {
+		for (int j = 0; j < moveClips[i].GetFrameCount(); ++j)
+			moveClips[i].SetFrameOffset(j, (moveClips[i].frameSize - moveClips[i].GetFrame(j).sprite.rect.size) / 2 - moveClips[i].frameSize);
+
+	}
+
+	for (int x = 0; x < 10; ++x) {
+		for (int y = 0; y < 10; ++y) {
 			auto e = entityManager->NewEntity({ x * 32 + 16,y * 32 + 16 });
 			entityManager->AddRenderComponent(e, clip.GetFrame(0).sprite);
 			entityManager->AddColliderComponent(e, { clip.GetFrame(0).offset , clip.GetFrame(0).sprite.rect.size });
 			entityManager->AddAnimationComponent(e, &clip);
+			auto& nav = entityManager->AddNavigationComponent(e, 1, 4);
+			//nav.GoTo({ 256, 256 });
+
+			for (int i = 0; i < 32; ++i) {
+				nav.clips[i] = (&moveClips[i]);
+			}
+
 		}
 	}
 
@@ -97,7 +138,7 @@ void GameScene::LogicalUpdate() {
 		hud->AddGas(8);
 	}
 }
-
+std::vector<EntityId> tmp;
 void GameScene::Update() {
 	frameCounter += 2;
 	bool update = false;
@@ -112,20 +153,50 @@ void GameScene::Update() {
 
 	hud->ApplyInput(camera);
 
-	selection.clear();
-	cursor->Update(camera, *entityManager, selection);
+	tmp.clear();
+	cursor->Update(camera, *entityManager, tmp);
+	if (tmp.size() > 0)
+	{
+		selection.clear();
+		selection.insert(selection.begin(), tmp.begin(), tmp.end());
 
-	if (selection.size() > 0) {
+		int i = std::rand() % 4;
+		Game::Audio->PlayClip(what[i], 1);
+	}
+
+	if (Game::Gamepad.IsButtonPressed(GamepadButton::X)) {
+
+		for (EntityId id : selection)
+			if (entityManager->GetRenderComponent(id).depth != -1) {
+				auto& nav = entityManager->GetNavigationComponent(id);
+				nav.GoTo(camera.ScreenToWorld(cursor->Position));
+
+				int i = std::rand() % 4;
+				Game::Audio->PlayClip(yes[i], 1);
+			}
+	}
+
+	if (Game::Gamepad.IsButtonPressed(GamepadButton::Y)) {
+
+		for (EntityId id : selection)
+			if (entityManager->GetRenderComponent(id).depth != -1) {
+				auto& nav = entityManager->GetNavigationComponent(id);
+				nav.work = false;
+			}
+	}
+	if (Game::Gamepad.IsButtonPressed(GamepadButton::B)) {
 		for (EntityId id : selection)
 		{
 			entityManager->GetAnimationComponent(id).PlayClip(&deathClip);
 			entityManager->GetRenderComponent(id).depth = -1;
 			entityManager->RemoveColliderComponent(id);
+			entityManager->GetNavigationComponent(id).work = false;
 
 			int i = std::rand() % 2;
 			Game::Audio->PlayClip(death[i], 1);
 		}
 	}
+
 
 	camera.Update();
 }

@@ -132,7 +132,7 @@ Texture Platform::NewTexture(Vector2Int size) {
 
 	return tex;
 }
-void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color) {
+void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip) {
 	SDLDrawCommand cmd;
 
 	cmd.texture = sprite.GetTextureId<SDL_Texture>();
@@ -142,13 +142,11 @@ void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color) {
 	cmd.g = SDL_FloatToUint8(color.g);
 	cmd.b = SDL_FloatToUint8(color.b);
 	cmd.type = SDLDrawCommandType::Sprite;
+	cmd.flip = hFlip ? SDL_RendererFlip::SDL_FLIP_HORIZONTAL : SDL_RendererFlip::SDL_FLIP_NONE;
 
 	if (target != nullptr) {
-		SDL_Rect r;
-
-		//SDL_RenderGetViewport(renderer, &r);
 		SDL_SetTextureColorMod(cmd.texture, cmd.r, cmd.g, cmd.b);
-		SDL_RenderCopy(renderer, cmd.texture, &cmd.src, &cmd.dst);
+		SDL_RenderCopyEx(renderer, cmd.texture, &cmd.src, &cmd.dst, 0, nullptr, cmd.flip);
 	}
 	else
 		commandBuffers[(int)currentScreen].push_back(cmd);

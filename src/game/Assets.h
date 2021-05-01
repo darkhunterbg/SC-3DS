@@ -118,6 +118,7 @@ private:
 struct SpriteFrame {
 	Sprite sprite;
 	Vector2Int offset;
+	bool hFlip = false;
 };
 
 class AnimationClip {
@@ -137,8 +138,8 @@ public:
 	inline void SetFrameOffset(int frame, Vector2Int offset) {
 		frames[frame].offset = offset;
 	}
-	inline void AddSprite(const Sprite& sprite, Vector2Int offset = { 0,0 }) {
-		frames[frameCount++] = { sprite, offset };
+	inline void AddSprite(const Sprite& sprite, Vector2Int offset = { 0,0 }, bool hFlip = false) {
+		frames[frameCount++] = { sprite, offset , hFlip };
 	}
 	inline Span<SpriteFrame> GetFrames() const {
 		return { frames.data(), frameCount };

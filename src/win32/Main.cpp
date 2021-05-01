@@ -24,6 +24,15 @@ void ExecDrawCommand(const SDLDrawCommand& cmd, SDL_Rect& clip, const int& n3dsU
 
 int main(int argc, char** argv) {
 
+	float u = atan2f(-100, 0);
+	float r = atan2f(0, 100);
+	float d = atan2f(100, 0);
+	float l = atan2f(0, -100);
+
+	Vector2Int p = { -100,100 };
+	float angle = atan2f(-p.y, p.x)+ PI / 2.0f;
+	int mapped = ((int)(((angle * 16) / PI) +32) % 32);
+
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_AUDIO);
 	window = SDL_CreateWindow("StarCraft", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1440, 720, SDL_WINDOW_RESIZABLE);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
@@ -37,13 +46,13 @@ int main(int argc, char** argv) {
 
 	Game::Start();
 
-	if (argc > 1) {
-		std::string a = argv[1];
-		if (a == "-mute")
-		{
-			mute = true;
-		}
-	}
+	//if (argc > 1) {
+	//	std::string a = argv[1];
+	//	if (a == "-mute")
+	//	{
+	//		mute = true;
+	//	}
+	//}
 
 	while (!done) {
 		Game::FrameStart();
@@ -164,7 +173,7 @@ void ExecDrawCommand(const SDLDrawCommand& cmd, SDL_Rect& clip, const int& w, co
 		rect.h = (clip.h * rect.h) / h;
 
 		SDL_SetTextureColorMod(cmd.texture, cmd.r, cmd.g, cmd.b);
-		SDL_RenderCopy(renderer, cmd.texture, &cmd.src, &rect);
+		SDL_RenderCopyEx(renderer, cmd.texture, &cmd.src, &rect,0 , nullptr, cmd.flip);
 		break;
 	}
 	case SDLDrawCommandType::Text: {

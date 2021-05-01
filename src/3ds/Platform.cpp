@@ -84,15 +84,22 @@ void Platform::DrawOnScreen(ScreenId screen) {
 	currentScreen = screens[(int)screen];
 	C2D_SceneBegin(currentScreen);
 }
-void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color) {
+void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip) {
 	C2D_Image img = *sprite.GetTextureId<C2D_Image>();
 	C2D_ImageTint tint = { 0 };
 
-	if (color != Colors::White) {
-		u32 ucolor = C2D_Color32f(color.r, color.g, color.b, color.a);
-		for (int i = 0; i < 4; ++i)
-			tint.corners[i].color = ucolor;
+	if (hFlip) {
+		auto p = *img.subtex;
+		float f = p.left;
+		p.left = p.right;
+		p.right = f;
+		img.subtex = &p;
 	}
+	//if (color != Colors::White) {
+	//	u32 ucolor = C2D_Color32f(color.r, color.g, color.b, color.a);
+	//	for (int i = 0; i < 4; ++i)
+	//		tint.corners[i].color = ucolor;
+	//}
 	C2D_DrawImageAt(img, dst.position.x, dst.position.y, 0, nullptr, dst.size.x / (float)img.subtex->width, dst.size.y / (float)img.subtex->height);
 }
 void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color, float scale) {

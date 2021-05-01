@@ -20,10 +20,10 @@ void RenderSystem::Draw(const Camera& camera) {
 		dst.position -= camRect.position;
 		dst.position /= camera.Scale;
 		dst.size /= camera.Scale;
-		int order = cmp.depth * 100000;
-		order += dst.position.y * 400 + dst.position.x;
+		int order = cmp.depth * 10'000'000;
+		order += dst.position.y * 1000 + dst.position.x;
 		
-		render.push_back({ order, cmp.sprite, dst });
+		render.push_back({ order, cmp.sprite, dst, cmp.hFlip });
 	}
 
 
@@ -31,7 +31,7 @@ void RenderSystem::Draw(const Camera& camera) {
 
 	for (const auto& r : render)
 	{
-		Platform::Draw(r.sprite, r.dst, Colors::White);
+		Platform::Draw(r.sprite, r.dst, Colors::White, r.hFlip);
 	}
 }
 

@@ -53,7 +53,7 @@ struct Vector2T
 		return sqrtf(x * x + y * y);
 	}
 
-	inline float LengthSquared() const
+	inline T LengthSquared() const
 	{
 		return x * x + y * y;
 	}

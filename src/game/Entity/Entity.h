@@ -5,15 +5,14 @@
 
 typedef unsigned int EntityId;
 
-#pragma pack(push,4)
 struct Entity {
 
 	EntityId id = 0;
 	Vector2Int position = { 0,0 };
-	bool changed = false;
+	int orientation = 0;
 	std::bitset<32> components;
 
-	inline int BufferPosition() const { return id - 1; }
+	bool changed = false;
 
 	template <class TComponent>
 	inline bool HasComponent() const {
@@ -29,5 +28,4 @@ struct Entity {
 };
 
 inline constexpr const int EntityIdToIndex(EntityId id) { return id - 1; }
-#pragma pack(pop)
 

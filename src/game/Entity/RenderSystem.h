@@ -13,6 +13,7 @@ struct RenderComponent : IComponent<0> {
 	Rectangle _dst;
 	Sprite sprite;
 	Vector2Int offset = { 0,0 };
+	bool hFlip = false;
 
 	inline void SetSprite(const Sprite& s) {
 		_dst.size = s.rect.size;
@@ -24,6 +25,7 @@ struct RenderComponent : IComponent<0> {
 		offset = frame.offset;
 		_dst.position += frame.offset - oldOffset;
 		_dst.size = frame.sprite.rect.size;
+		hFlip = frame.hFlip;
 	}
 
 	inline void AddOffset(const Vector2Int& o) {
@@ -37,6 +39,7 @@ class RenderSystem {
 		int order;
 		Sprite sprite;
 		Rectangle dst;
+		bool hFlip;
 	};
 private:
 	std::vector< Render> render;

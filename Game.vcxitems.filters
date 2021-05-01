@@ -69,6 +69,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\KinematicSystem.h">
       <Filter>Entity</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\NavigationSystem.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -109,5 +112,8 @@
       <Filter>Entity</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Input.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\NavigationSystem.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

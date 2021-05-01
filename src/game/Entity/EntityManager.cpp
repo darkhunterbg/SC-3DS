@@ -8,11 +8,13 @@ EntityManager::EntityManager() {
 	renderSystem = new RenderSystem();
 	animationSystem = new AnimationSystem();
 	kinematicSystem = new KinematicSystem();
+	navigationSystem = new NavigationSystem();
 }
 EntityManager::~EntityManager() {
 	delete renderSystem;
 	delete animationSystem;
 	delete kinematicSystem;
+	delete navigationSystem;
 }
 
 EntityId EntityManager::NewEntity(Vector2Int position) {
@@ -72,6 +74,8 @@ void EntityManager::DeleteEntity(EntityId id) {
 				animationSystem->AnimationComponents.RemoveComponent(id);
 			if (e->HasComponent<ColliderComponent>())
 				kinematicSystem->ColliderComponents.RemoveComponent(id);
+			if (e->HasComponent<NavigationComponent>())
+				navigationSystem->NavigationComponents.RemoveComponent(id);
 
 			return;
 		}
@@ -81,6 +85,11 @@ void EntityManager::DeleteEntity(EntityId id) {
 }
 
 void EntityManager::UpdateEntities() {
+
+	SectionProfiler p("Navigation");
+
+	navigationSystem->UpdateNavigation(entityBuffer.data(),*animationSystem);
+	p.Submit();
 
 	animationSystem->UpdateAnimations(*renderSystem);
 
@@ -132,5 +141,13 @@ ColliderComponent& EntityManager::AddColliderComponent(EntityId id, const Rectan
 	ColliderComponent& c = kinematicSystem->ColliderComponents.NewComponent(id);
 	c.SetBox(box);
 	c._worldBox.position += entity.position;
+	return c;
+}
+NavigationComponent& EntityManager::AddNavigationComponent(EntityId id, int turnSpeed, int velocity) {
+	Entity& entity = GetEntity(id);
+	entity.SetHasComponent<NavigationComponent>(true);
+	NavigationComponent& c = navigationSystem->NavigationComponents.NewComponent(id);
+	c.turnSpeed = turnSpeed;
+	c.velocity = velocity;
 	return c;
 }
