@@ -9,6 +9,7 @@
 
 
 struct RenderComponent : IComponent<0> {
+	int layer = 0;
 	Rectangle _dst;
 	Sprite sprite;
 	Vector2Int offset = { 0,0 };
@@ -24,10 +25,22 @@ struct RenderComponent : IComponent<0> {
 		_dst.position += frame.offset - oldOffset;
 		_dst.size = frame.sprite.rect.size;
 	}
+
+	inline void AddOffset(const Vector2Int& o) {
+		_dst.position += o;
+		offset += o;
+	}
 };
 
 class RenderSystem {
-
+	struct Render {
+		int order;
+		Sprite sprite;
+		Rectangle dst;
+	};
+private:
+	std::vector< Render> render;
+	static bool RenderSort(const Render& a, const Render& b);
 public:
 	ComponentCollection<RenderComponent> RenderComponents;
 	void Draw(const Camera& camera);

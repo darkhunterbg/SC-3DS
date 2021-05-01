@@ -16,6 +16,7 @@ static void InitAnimation(const SpriteAtlas* atlas, AnimationClip& clip, int fra
 	atlasCounter += frames;
 	clip.looping = true;
 	clip.frameDuration = 10;
+	clip.frameSize = { 128,128 };
 }
 
 Cursor::Cursor() {
@@ -85,10 +86,8 @@ void Cursor::Draw() {
 
 	const SpriteFrame& frame = currentClip->GetFrame(clipFrame);
 
-
 	Rectangle dst = { Position + frame.offset,frame.sprite.rect.size };
-	dst.position -= {64, 64};
-	//dst.position -= dst.size / 2;
+	dst.position -= currentClip->frameSize / 2;
 
 	Platform::Draw(frame.sprite, dst, Colors::White);
 }

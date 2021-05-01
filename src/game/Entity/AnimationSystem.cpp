@@ -4,13 +4,13 @@
 
 
 
-void AnimationSystem::UpdateAnimations( RenderSystem& renderSystem) {
+void AnimationSystem::UpdateAnimations(RenderSystem& renderSystem) {
 	int cid = 0;
 	for (AnimationComponent& cmp : AnimationComponents.GetComponents()) {
 		cmp.frameCountdown--;
 		if (cmp.frameCountdown == 0) {
 			cmp.clipFrame++;
-	
+
 			cmp.frameCountdown = cmp.clip->frameDuration;
 			int framesCount = cmp.clip->GetFrameCount();
 			if (cmp.clip->looping)

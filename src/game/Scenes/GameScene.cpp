@@ -53,6 +53,9 @@ void GameScene::Start() {
 	clip.AddSprite(marine->GetSprite(30), { 23,19 });
 	clip.AddSprite(marine->GetSprite(47), { 23,19 });
 	clip.AddSprite(marine->GetSprite(30), { 23,19 });
+	clip.frameSize = { 64,64 };
+	for (auto& c : clip.GetFrames())
+		c.offset -= clip.frameSize;
 
 	deathClip.AddSprite(marine->GetSprite(221), { 22,19 });
 	deathClip.AddSprite(marine->GetSprite(222), { 23,19 });
@@ -62,13 +65,17 @@ void GameScene::Start() {
 	deathClip.AddSprite(marine->GetSprite(226), { 2,17 });
 	deathClip.AddSprite(marine->GetSprite(227), { 0,19 });
 	deathClip.AddSprite(marine->GetSprite(228), { 0,20 });
+	deathClip.frameSize = { 64,64 };
+	for (auto& c : deathClip.GetFrames())
+		c.offset -= deathClip.frameSize;
 
 	entityManager = new EntityManager();
 
-	for (int x = 0; x < 50; ++x) {
-		for (int y = 0; y < 100; ++y) {
-			auto e = entityManager->NewEntity({ x * 32 - 16,y * 32 - 16 });
-			entityManager->AddRenderComponent(e, clip.GetFrame()[0].sprite);
+	for (int x = 50 - 1; x >= 0; --x) {
+		for (int y = 100 - 1; y >= 0; --y) {
+			auto e = entityManager->NewEntity({ x * 32 + 16,y * 32 + 16 });
+			entityManager->AddRenderComponent(e, clip.GetFrame(0).sprite);
+
 			entityManager->AddAnimationComponent(e, &clip);
 		}
 	}
@@ -105,11 +112,11 @@ void GameScene::Update() {
 	EntityId hover = 0;
 	for (int x = 0; x < 50; ++x) {
 		for (int y = 0; y < 100; ++y) {
-			Rectangle rect = { {x * 32,y * 32},{25,25} };
-
-			if (rect.Contains(p)) {
-				int id = x * 100 + y + 1;
-				if (entityManager->HasEntity(id)) {
+			int id = x * 100 + y + 1;
+			if (entityManager->HasEntity(id)) {
+				auto r = entityManager->GetRenderComponent(id);
+				if (r._dst.Contains(p))
+				{
 					const auto& cmp = entityManager->GetAnimationComponent(id);
 					if (cmp.clip == &deathClip)
 						continue;
@@ -117,6 +124,7 @@ void GameScene::Update() {
 					break;
 				}
 			}
+
 		}
 	}
 
@@ -124,8 +132,8 @@ void GameScene::Update() {
 
 	if (Game::Gamepad.A && hover) {
 
-
 		entityManager->GetAnimationComponent(hover).PlayClip(&deathClip);
+		entityManager->GetRenderComponent(hover).layer = -1;
 
 		int i = std::rand() % 2;
 		Game::Audio->PlayClip(death[i], 1);

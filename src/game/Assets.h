@@ -127,6 +127,7 @@ private:
 public:
 	bool looping = false;
 	int frameDuration = 2;
+	Vector2Int frameSize = { 0,0 };
 
 	void AddSpritesFromAtlas(const SpriteAtlas* atlas, int start, int count, Vector2Int offset = { 0,0 });
 
@@ -139,7 +140,7 @@ public:
 	inline void AddSprite(const Sprite& sprite, Vector2Int offset = { 0,0 }) {
 		frames[frameCount++] = { sprite, offset };
 	}
-	inline Span<SpriteFrame> GetFrame() const {
+	inline Span<SpriteFrame> GetFrames() const {
 		return { frames.data(), frameCount };
 	}
 	inline unsigned GetFrameCount() const { return frameCount; }

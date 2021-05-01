@@ -34,7 +34,8 @@ public:
 	void DrawEntites(const Camera& camera);
 
 	RenderComponent& AddRenderComponent(EntityId id, const Sprite& sprite);
-	
+	RenderComponent& GetRenderComponent(EntityId id) { return renderSystem->RenderComponents.GetComponent(id); }
+
 	AnimationComponent& AddAnimationComponent(EntityId id, const AnimationClip* clip);
 	AnimationComponent& GetAnimationComponent(EntityId id) { return animationSystem->AnimationComponents.GetComponent(id); }
 
