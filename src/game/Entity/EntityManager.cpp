@@ -7,10 +7,12 @@
 EntityManager::EntityManager() {
 	renderSystem = new RenderSystem();
 	animationSystem = new AnimationSystem();
+	kinematicSystem = new KinematicSystem();
 }
 EntityManager::~EntityManager() {
 	delete renderSystem;
 	delete animationSystem;
+	delete kinematicSystem;
 }
 
 EntityId EntityManager::NewEntity(Vector2Int position) {
@@ -66,9 +68,10 @@ void EntityManager::DeleteEntity(EntityId id) {
 
 			if (e->HasComponent<RenderComponent>())
 				renderSystem->RenderComponents.RemoveComponent(id);
-
 			if (e->HasComponent<AnimationComponent>())
 				animationSystem->AnimationComponents.RemoveComponent(id);
+			if (e->HasComponent<ColliderComponent>())
+				kinematicSystem->ColliderComponents.RemoveComponent(id);
 
 			return;
 		}
@@ -79,11 +82,7 @@ void EntityManager::DeleteEntity(EntityId id) {
 
 void EntityManager::UpdateEntities() {
 
-	SectionProfiler p("UpdateAnimation");
-
 	animationSystem->UpdateAnimations(*renderSystem);
-
-	p.Submit();
 
 	collection.clear();
 
@@ -96,6 +95,7 @@ void EntityManager::UpdateEntities() {
 
 	Span<Entity> updated = { collection.data(),collection.size() };
 
+	kinematicSystem->UpdateEntities(updated);
 	renderSystem->UpdateEntities(updated);
 
 	//p.Submit();
@@ -112,12 +112,11 @@ void EntityManager::DrawEntites(const Camera& camera) {
 
 
 RenderComponent& EntityManager::AddRenderComponent(EntityId id, const Sprite& sprite) {
-
+	Entity& entity = GetEntity(id);
+	entity.SetHasComponent<RenderComponent>(true);
 	RenderComponent& c = renderSystem->RenderComponents.NewComponent(id);
 	c.SetSprite(sprite);
-	Entity& entity = GetEntity(id);
-	entity.changed = true;
-	entity.SetHasComponent<RenderComponent>(true);
+	c._dst.position += entity.position;
 	return c;
 }
 AnimationComponent& EntityManager::AddAnimationComponent(EntityId id, const AnimationClip* clip) {
@@ -125,5 +124,13 @@ AnimationComponent& EntityManager::AddAnimationComponent(EntityId id, const Anim
 	c.PlayClip(clip);
 	Entity& entity = GetEntity(id);
 	entity.SetHasComponent<AnimationComponent>(true);
+	return c;
+}
+ColliderComponent& EntityManager::AddColliderComponent(EntityId id, const Rectangle& box) {
+	Entity& entity = GetEntity(id);
+	entity.SetHasComponent<ColliderComponent>(true);
+	ColliderComponent& c = kinematicSystem->ColliderComponents.NewComponent(id);
+	c.SetBox(box);
+	c._worldBox.position += entity.position;
 	return c;
 }

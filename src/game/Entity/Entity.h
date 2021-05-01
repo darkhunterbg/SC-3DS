@@ -7,6 +7,7 @@ typedef unsigned int EntityId;
 
 #pragma pack(push,4)
 struct Entity {
+
 	EntityId id = 0;
 	Vector2Int position = { 0,0 };
 	bool changed = false;
@@ -15,7 +16,7 @@ struct Entity {
 	inline int BufferPosition() const { return id - 1; }
 
 	template <class TComponent>
-	inline bool HasComponent() {
+	inline bool HasComponent() const {
 		return components.test(TComponent::ComponentId);
 	}
 	template <class TComponent>
@@ -24,6 +25,7 @@ struct Entity {
 	}
 
 	static constexpr const int MaxEntities = 5000;
+	static constexpr const EntityId None = 0;
 };
 
 inline constexpr const int EntityIdToIndex(EntityId id) { return id - 1; }

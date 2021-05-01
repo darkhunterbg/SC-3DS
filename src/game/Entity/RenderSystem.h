@@ -9,7 +9,7 @@
 
 
 struct RenderComponent : IComponent<0> {
-	int layer = 0;
+	int depth = 0;
 	Rectangle _dst;
 	Sprite sprite;
 	Vector2Int offset = { 0,0 };

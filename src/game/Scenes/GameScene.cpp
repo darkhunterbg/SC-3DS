@@ -75,7 +75,7 @@ void GameScene::Start() {
 		for (int y = 100 - 1; y >= 0; --y) {
 			auto e = entityManager->NewEntity({ x * 32 + 16,y * 32 + 16 });
 			entityManager->AddRenderComponent(e, clip.GetFrame(0).sprite);
-
+			entityManager->AddColliderComponent(e, { clip.GetFrame(0).offset , clip.GetFrame(0).sprite.rect.size });
 			entityManager->AddAnimationComponent(e, &clip);
 		}
 	}
@@ -109,31 +109,20 @@ void GameScene::Update() {
 	}
 
 	auto p = camera.ScreenToWorld(cursor->Position);
-	EntityId hover = 0;
-	for (int x = 0; x < 50; ++x) {
-		for (int y = 0; y < 100; ++y) {
-			int id = x * 100 + y + 1;
-			if (entityManager->HasEntity(id)) {
-				auto r = entityManager->GetRenderComponent(id);
-				if (r._dst.Contains(p))
-				{
-					const auto& cmp = entityManager->GetAnimationComponent(id);
-					if (cmp.clip == &deathClip)
-						continue;
-					hover = id;
-					break;
-				}
-			}
 
-		}
-	}
+	SectionProfiler profiler("Pointcast");
 
-	cursor->isHoverState = hover != 0;
+	EntityId hover = entityManager->PointCast(p);
 
-	if (Game::Gamepad.A && hover) {
+	profiler.Submit();
+
+	cursor->isHoverState = hover != Entity::None;
+
+	if (Game::Gamepad.A && cursor->isHoverState) {
 
 		entityManager->GetAnimationComponent(hover).PlayClip(&deathClip);
-		entityManager->GetRenderComponent(hover).layer = -1;
+		entityManager->GetRenderComponent(hover).depth = -1;
+		entityManager->RemoveColliderComponent(hover);
 
 		int i = std::rand() % 2;
 		Game::Audio->PlayClip(death[i], 1);

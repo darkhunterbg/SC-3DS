@@ -20,7 +20,7 @@ void RenderSystem::Draw(const Camera& camera) {
 		dst.position -= camRect.position;
 		dst.position /= camera.Scale;
 		dst.size /= camera.Scale;
-		int order = cmp.layer * 100000;
+		int order = cmp.depth * 100000;
 		order += dst.position.y * 400 + dst.position.x;
 		
 		render.push_back({ order, cmp.sprite, dst });
@@ -42,6 +42,9 @@ bool RenderSystem::RenderSort(const Render& a, const Render& b) {
 void RenderSystem::UpdateEntities(const Span<Entity> entities) {
 
 	for (const Entity& entity : entities) {
+		if (!entity.HasComponent<RenderComponent>())
+			continue;
+
 		RenderComponent& c = RenderComponents.GetComponent(entity.id);
 		c._dst = c.sprite.rect;
 		c._dst.position = entity.position + c.offset;

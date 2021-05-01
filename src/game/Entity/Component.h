@@ -46,7 +46,7 @@ public:
 		int size = componentToEntityMap.size();
 		for (int i = cid; i < size; ++i) {
 			EntityId eid = componentToEntityMap[i];
-			entityToComponentMap[EntityIdToIndex(id)] -= 1;
+			entityToComponentMap[EntityIdToIndex(eid)] -= 1;
 		}
 
 	}
