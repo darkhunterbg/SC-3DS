@@ -35,7 +35,7 @@ include $(DEVKITARM)/3ds_rules
 
 TARGET		:=	SC
 BUILD		:=	build
-SOURCES		:=	src/3ds src/game src/game/Scenes src/game/Map src/game/GUI src/game/Loader src/game/Entity
+SOURCES		:=	src/3ds src/game src/game/Scenes src/game/Map src/game/GUI src/game/Loader src/game/Entity src/game/Data
 
 DATA		:=	data
 INCLUDES	:=	$(SOURCES)

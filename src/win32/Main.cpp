@@ -36,6 +36,7 @@ int main(int argc, char** argv) {
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_AUDIO);
 	window = SDL_CreateWindow("StarCraft", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1440, 720, SDL_WINDOW_RESIZABLE);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BlendMode::SDL_BLENDMODE_ADD);
 
 	assetDir = std::filesystem::current_path();
 
@@ -46,13 +47,13 @@ int main(int argc, char** argv) {
 
 	Game::Start();
 
-	//if (argc > 1) {
-	//	std::string a = argv[1];
-	//	if (a == "-mute")
-	//	{
-	//		mute = true;
-	//	}
-	//}
+	if (argc > 1) {
+		std::string a = argv[1];
+		if (a == "-mute")
+		{
+			mute = true;
+		}
+	}
 
 	while (!done) {
 		Game::FrameStart();
@@ -181,7 +182,7 @@ void ExecDrawCommand(const SDLDrawCommand& cmd, SDL_Rect& clip, const int& w, co
 		float y = (clip.h * cmd.dst.y) / h;
 		float s = (clip.w * cmd.scale) / (float)w;
 
-		FC_DrawScaleColor(cmd.font, renderer, x, y, FC_MakeScale(s, s), FC_MakeColor(cmd.r, cmd.g, cmd.b, 255), cmd.text.data());
+		FC_DrawScaleColor(cmd.font, renderer, x, y, FC_MakeScale(s, s), FC_MakeColor(cmd.r, cmd.g, cmd.b, cmd.a), cmd.text.data());
 
 		break;
 	}
@@ -198,7 +199,7 @@ void ExecDrawCommand(const SDLDrawCommand& cmd, SDL_Rect& clip, const int& w, co
 		int thickness = std::max(1, (clip.w) / w);
 
 
-		SDL_SetRenderDrawColor(renderer, cmd.r, cmd.g, cmd.b, 255);
+		SDL_SetRenderDrawColor(renderer, cmd.r, cmd.g, cmd.b, cmd.a);
 		SDL_RenderDrawLine(renderer, src.x , src.y , dst.x , dst.y );
 		for (int i = 1; i < thickness; ++i) {
 			//  -
@@ -221,7 +222,7 @@ void ExecDrawCommand(const SDLDrawCommand& cmd, SDL_Rect& clip, const int& w, co
 		rect.w = (clip.w * rect.w) / w;
 		rect.h = (clip.h * rect.h) / h;
 
-		SDL_SetRenderDrawColor(renderer, cmd.r, cmd.g, cmd.b, 255);
+		SDL_SetRenderDrawColor(renderer, cmd.r, cmd.g, cmd.b, cmd.a);
 		SDL_RenderFillRect(renderer, &rect);
 		break;
 	}

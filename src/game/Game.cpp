@@ -6,6 +6,7 @@
 #include "StringLib.h"
 #include "Audio.h"
 #include "Profiler.h"
+#include "Data/UnitDatabase.h"
 
 static Scene* currentScene;
 
@@ -51,6 +52,7 @@ void Game::Start() {
 	startup = true;
 	frameStartTime = Platform::ElaspedTime();
 	Audio = new AudioSystem();
+	UnitDatabase::Init();
 	//frameLoad.push_back(0);
 }
 bool Game::Update() {

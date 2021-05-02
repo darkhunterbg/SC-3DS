@@ -88,7 +88,7 @@ void EntityManager::UpdateEntities() {
 
 	SectionProfiler p("Navigation");
 
-	navigationSystem->UpdateNavigation(entityBuffer.data(),*animationSystem);
+	navigationSystem->UpdateNavigation(entityBuffer.data(), *animationSystem);
 	p.Submit();
 
 	animationSystem->UpdateAnimations(*renderSystem);
@@ -116,15 +116,30 @@ void EntityManager::DrawEntites(const Camera& camera) {
 
 	renderSystem->Draw(camera);
 
+	//kinematicSystem->DrawColliders(camera);
+
 	//p.Submit();
 }
 
+EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position) {
+	EntityId e = NewEntity(position);
+	AddRenderComponent(e, def.MovementAnimations[0].GetFrame(0));
+	AddAnimationComponent(e, &def.MovementAnimations[0]).pause = true;
+	auto& nav = AddNavigationComponent(e, def.RotationSpeed, def.MovementSpeed);
+	AddColliderComponent(e, def.Collider);
 
-RenderComponent& EntityManager::AddRenderComponent(EntityId id, const Sprite& sprite) {
+	for (int i = 0; i < 32; ++i) {
+		nav.clips[i] = (&def.MovementAnimations[i]);
+	}
+
+	return e;
+}
+
+RenderComponent& EntityManager::AddRenderComponent(EntityId id, const SpriteFrame& frame) {
 	Entity& entity = GetEntity(id);
 	entity.SetHasComponent<RenderComponent>(true);
 	RenderComponent& c = renderSystem->RenderComponents.NewComponent(id);
-	c.SetSprite(sprite);
+	c.SetFrame(frame);
 	c._dst.position += entity.position;
 	return c;
 }

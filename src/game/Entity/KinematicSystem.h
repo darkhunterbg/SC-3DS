@@ -17,12 +17,14 @@ struct ColliderComponent : IComponent<2> {
 	}
 };
 
+class Camera;
 
 class KinematicSystem {
 public:
 	ComponentCollection<ColliderComponent> ColliderComponents;
 
 	void UpdateEntities(Span<Entity> entities);
+	void DrawColliders(const Camera& camera);
 
 	void PointCast(Vector2Int point, std::vector< EntityId>& outResults);
 	EntityId PointCast(Vector2Int point);

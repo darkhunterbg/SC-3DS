@@ -79,7 +79,6 @@ void NavigationSystem::UpdateNavigation(Entity* entities, AnimationSystem& anima
 				animationSystem.AnimationComponents.GetComponent(entity.id)
 					.PlayClip(cmp.clips[entity.orientation]);
 			}
-			printf("Heading changed to %i\n", entity.orientation);
 
 			if (entity.orientation != heading)
 				continue;

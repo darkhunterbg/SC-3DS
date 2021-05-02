@@ -141,6 +141,7 @@ void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip
 	cmd.r = SDL_FloatToUint8(color.r);
 	cmd.g = SDL_FloatToUint8(color.g);
 	cmd.b = SDL_FloatToUint8(color.b);
+	cmd.a = SDL_FloatToUint8(color.a);
 	cmd.type = SDLDrawCommandType::Sprite;
 	cmd.flip = hFlip ? SDL_RendererFlip::SDL_FLIP_HORIZONTAL : SDL_RendererFlip::SDL_FLIP_NONE;
 
@@ -163,9 +164,10 @@ void Platform::DrawText(const Font& font, Vector2Int position, const char* text,
 	cmd.r = SDL_FloatToUint8(color.r);
 	cmd.g = SDL_FloatToUint8(color.g);
 	cmd.b = SDL_FloatToUint8(color.b);
+	cmd.a = SDL_FloatToUint8(color.a);
 
 	if (target != nullptr) {
-		FC_DrawScaleColor(cmd.font, renderer, cmd.dst.x, cmd.dst.y, FC_MakeScale(cmd.scale, cmd.scale), FC_MakeColor(cmd.r, cmd.g, cmd.b, 255), cmd.text.data());
+		FC_DrawScaleColor(cmd.font, renderer, cmd.dst.x, cmd.dst.y, FC_MakeScale(cmd.scale, cmd.scale), FC_MakeColor(cmd.r, cmd.g, cmd.b, cmd.a), cmd.text.data());
 	}
 	else {
 		commandBuffers[(int)currentScreen].push_back(cmd);
@@ -178,13 +180,14 @@ void Platform::DrawLine(Vector2Int src, Vector2Int dst, Color color) {
 	cmd.r = SDL_FloatToUint8(color.r);
 	cmd.g = SDL_FloatToUint8(color.g);
 	cmd.b = SDL_FloatToUint8(color.b);
+	cmd.a = SDL_FloatToUint8(color.a);
 	cmd.src.x = src.x;
 	cmd.src.y = src.y;
 	cmd.dst.x = dst.x;
 	cmd.dst.y = dst.y;
 
 	if (target != nullptr) {
-		SDL_SetRenderDrawColor(renderer, cmd.r, cmd.g, cmd.b, 255);
+		SDL_SetRenderDrawColor(renderer, cmd.r, cmd.g, cmd.b, cmd.a);
 		SDL_RenderDrawLine(renderer, cmd.src.x, cmd.src.y, cmd.dst.x, cmd.dst.y);
 	}
 	else
@@ -198,9 +201,10 @@ void Platform::DrawRectangle(Rectangle rect, Color color) {
 	cmd.r = SDL_FloatToUint8(color.r);
 	cmd.g = SDL_FloatToUint8(color.g);
 	cmd.b = SDL_FloatToUint8(color.b);
+	cmd.a = SDL_FloatToUint8(color.a);
 
 	if (target != nullptr) {
-		SDL_SetRenderDrawColor(renderer, cmd.r, cmd.g, cmd.b, 255);
+		SDL_SetRenderDrawColor(renderer, cmd.r, cmd.g, cmd.b, cmd.a);
 		SDL_RenderFillRect(renderer, &cmd.dst);
 	}
 	else

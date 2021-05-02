@@ -17,7 +17,7 @@ struct SDLDrawCommand {
 	SDL_Texture* texture;
 	SDL_Rect src;
 	SDL_Rect dst;
-	Uint8 r, g, b;
+	Uint8 r, g, b, a;
 
 	SDL_RendererFlip flip;
 

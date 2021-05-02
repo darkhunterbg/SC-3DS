@@ -1,15 +1,17 @@
 #pragma once
 
 #include <vector>
+#include <array>
+
 #include "Entity.h"
 #include "../Span.h"
-#include <array>
-#include <vector>
+
 #include "RenderSystem.h"
 #include "AnimationSystem.h"
 #include "KinematicSystem.h"
 #include "NavigationSystem.h"
 
+#include "../Data/UnitDef.h"
 #include "../Camera.h"
 
 class EntityManager {
@@ -38,7 +40,7 @@ public:
 	void UpdateEntities();
 	void DrawEntites(const Camera& camera);
 
-	RenderComponent& AddRenderComponent(EntityId id, const Sprite& sprite);
+	RenderComponent& AddRenderComponent(EntityId id, const SpriteFrame& frame);
 	RenderComponent& GetRenderComponent(EntityId id) { return renderSystem->RenderComponents.GetComponent(id); }
 
 	AnimationComponent& AddAnimationComponent(EntityId id, const AnimationClip* clip);
@@ -73,4 +75,6 @@ public:
 		e.position = position;
 		e.changed = true;
 	}
+
+	EntityId NewUnit(const UnitDef& def, Vector2Int position);
 };

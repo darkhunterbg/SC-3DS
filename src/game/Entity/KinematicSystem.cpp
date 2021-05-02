@@ -1,4 +1,7 @@
 #include "KinematicSystem.h"
+#include "Camera.h"
+#include "../Platform.h"
+
 
 void KinematicSystem::UpdateEntities(Span<Entity> entities)
 {
@@ -11,6 +14,27 @@ void KinematicSystem::UpdateEntities(Span<Entity> entities)
 	}
 }
 
+void KinematicSystem::DrawColliders(const Camera& camera) {
+	int cid = 0;
+	Rectangle camRect = camera.GetRectangle();
+	Color c = Colors::LightGreen;
+	c.a = 0.5f;
+
+	for (const ColliderComponent& cmp : ColliderComponents.GetComponents()) {
+
+		if (camRect.Intersects(cmp._worldBox)) {
+			
+			Rectangle dst = cmp._worldBox;
+			dst.position -= camRect.position;
+			dst.position /= camera.Scale;
+			dst.size /= camera.Scale;
+
+			Platform::DrawRectangle(dst, c);
+		}
+
+		++cid;
+	}
+}
 
 void KinematicSystem::PointCast(Vector2Int point, std::vector< EntityId>& outResults) {
 
