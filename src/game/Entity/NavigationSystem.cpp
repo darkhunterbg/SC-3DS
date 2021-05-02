@@ -30,14 +30,29 @@ void NavigationSystem::UpdateNavigation(Entity* entities, AnimationSystem& anima
 		EntityId id = NavigationComponents.GetEntityIdForComponent(cid);
 		Entity& entity = entities[EntityIdToIndex(id)];
 
-		Vector2Int distance = cmp.target - entity.position;
-		float angle = atan2f(distance.y, distance.x) + PI / 2.0f;
-		int heading = ((((int)((angle * 16) / PI) + 32) % 32) / 8) * 8;
+		int h = 1'000'000;
+		int heading = entity.orientation;
+		for (int i = 0; i < 32; i += 4) {
 
+			Vector2Int move = movementTable[i ] * cmp.velocity;
+			Vector2Int pos = entity.position + move;
+			int dist = (cmp.target - pos).LengthSquared();
+			dist -= i == entity.orientation ? 10 : 0;
+			if (dist < h)
+			{
+				h = dist;
+				heading = i;
+			}
+
+		}
+
+		/*
+			 Vector2Int distance = cmp.target - entity.position;
+			float angle = atan2f(distance.y, distance.x) + PI / 2.0f;
+			int heading = ((((int)((angle * 16) / PI) + 32) % 32) / 8) * 8;
+			*/
 
 		if (cmp.newNav || heading != entity.orientation) {
-
-
 			int diff = heading - entity.orientation;
 
 			if (diff != 0) {
@@ -71,6 +86,7 @@ void NavigationSystem::UpdateNavigation(Entity* entities, AnimationSystem& anima
 		}
 
 
+		Vector2Int distance = cmp.target - entity.position;
 
 		if (distance.LengthSquared() < cmp.velocity * cmp.velocity) {
 			entity.position = cmp.target;
@@ -82,10 +98,13 @@ void NavigationSystem::UpdateNavigation(Entity* entities, AnimationSystem& anima
 			}
 		}
 		else {
+
 			Vector2Int move = movementTable[heading] * cmp.velocity;
 			entity.position += move;
 		}
-		entity.changed = true;
-	}
 
+
+		entity.changed = true;
+
+	}
 }
