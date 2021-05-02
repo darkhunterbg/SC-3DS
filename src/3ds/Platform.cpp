@@ -88,13 +88,9 @@ void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip
 	C2D_Image img = *sprite.GetTextureId<C2D_Image>();
 	C2D_ImageTint tint = { 0 };
 
-	if (hFlip) {
-		auto p = *img.subtex;
-		float f = p.left;
-		p.left = p.right;
-		p.right = f;
-		img.subtex = &p;
-	}
+	if (hFlip)
+		dst.size.x *= -1;
+
 	//if (color != Colors::White) {
 	//	u32 ucolor = C2D_Color32f(color.r, color.g, color.b, color.a);
 	//	for (int i = 0; i < 4; ++i)

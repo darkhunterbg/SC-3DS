@@ -3,6 +3,7 @@
 #include "AnimationSystem.h"
 
 #include "../Assets.h"
+#include "../Platform.h"
 
 
 static Vector2 movementTable[]{
@@ -31,7 +32,8 @@ void NavigationSystem::UpdateNavigation(Entity* entities, AnimationSystem& anima
 
 		Vector2Int distance = cmp.target - entity.position;
 		float angle = atan2f(distance.y, distance.x) + PI / 2.0f;
-		int heading = ((((int)((angle * 16) / PI) + 32) % 32) / 4) * 4;
+		int heading = ((((int)((angle * 16) / PI) + 32) % 32) / 8) * 8;
+
 
 		if (cmp.newNav || heading != entity.orientation) {
 
@@ -54,6 +56,7 @@ void NavigationSystem::UpdateNavigation(Entity* entities, AnimationSystem& anima
 					entity.orientation = heading;
 				}
 			}
+
 			cmp.newNav = false;
 
 
@@ -66,6 +69,8 @@ void NavigationSystem::UpdateNavigation(Entity* entities, AnimationSystem& anima
 			if (entity.orientation != heading)
 				continue;
 		}
+
+
 
 		if (distance.LengthSquared() < cmp.velocity * cmp.velocity) {
 			entity.position = cmp.target;

@@ -67,7 +67,7 @@ void GameScene::Start() {
 	clip.AddSprite(marine->GetSprite(30), { 23,19 });
 	clip.frameSize = { 64,64 };
 	for (auto& c : clip.GetFrames())
-		c.offset -= clip.frameSize;
+		c.offset -= (clip.frameSize ) / 2;
 
 	deathClip.AddSprite(marine->GetSprite(221), { 22,19 });
 	deathClip.AddSprite(marine->GetSprite(222), { 23,19 });
@@ -79,7 +79,9 @@ void GameScene::Start() {
 	deathClip.AddSprite(marine->GetSprite(228), { 0,20 });
 	deathClip.frameSize = { 64,64 };
 	for (auto& c : deathClip.GetFrames())
-		c.offset -= deathClip.frameSize;
+	{
+		c.offset -= (deathClip.frameSize ) / 2;
+	}
 
 	entityManager = new EntityManager();
 
@@ -102,13 +104,17 @@ void GameScene::Start() {
 
 	for (int i = 0; i < 32; ++i) {
 		for (int j = 0; j < moveClips[i].GetFrameCount(); ++j)
-			moveClips[i].SetFrameOffset(j, (moveClips[i].frameSize - moveClips[i].GetFrame(j).sprite.rect.size) / 2 - moveClips[i].frameSize);
+		{
+			auto& c = moveClips[i];
+			auto& f = moveClips[i].GetFrame(j);
+			c.SetFrameOffset(j, (c.frameSize - f.sprite.rect.size)/2  - c.frameSize/2);
+		}
 
 	}
 
-	for (int x = 0; x < 10; ++x) {
-		for (int y = 0; y < 10; ++y) {
-			auto e = entityManager->NewEntity({ x * 32 + 16,y * 32 + 16 });
+	for (int x = 5; x < 6; ++x) {
+		for (int y = 5; y < 6; ++y) {
+			auto e = entityManager->NewEntity({ x * 32 ,y * 32  });
 			entityManager->AddRenderComponent(e, clip.GetFrame(0).sprite);
 			entityManager->AddColliderComponent(e, { clip.GetFrame(0).offset , clip.GetFrame(0).sprite.rect.size });
 			entityManager->AddAnimationComponent(e, &clip);
@@ -122,6 +128,7 @@ void GameScene::Start() {
 		}
 	}
 
+	selection.push_back(1);
 	//int id = 3542;
 	//entityManager->DeleteEntity(id);
 }
@@ -187,13 +194,15 @@ void GameScene::Update() {
 	if (Game::Gamepad.IsButtonPressed(GamepadButton::B)) {
 		for (EntityId id : selection)
 		{
-			entityManager->GetAnimationComponent(id).PlayClip(&deathClip);
-			entityManager->GetRenderComponent(id).depth = -1;
-			entityManager->RemoveColliderComponent(id);
-			entityManager->GetNavigationComponent(id).work = false;
+			if (entityManager->GetRenderComponent(id).depth != -1) {
+				entityManager->GetAnimationComponent(id).PlayClip(&deathClip);
+				entityManager->GetRenderComponent(id).depth = -1;
+				entityManager->RemoveColliderComponent(id);
+				entityManager->GetNavigationComponent(id).work = false;
 
-			int i = std::rand() % 2;
-			Game::Audio->PlayClip(death[i], 1);
+				int i = std::rand() % 2;
+				Game::Audio->PlayClip(death[i], 1);
+			}
 		}
 	}
 
