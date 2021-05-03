@@ -31,7 +31,6 @@ public:
 	void AddSprite(const Sprite& sprite);
 };
 
-
 struct Font {
 	void* fontId;
 
@@ -121,19 +120,34 @@ struct SpriteFrame {
 	bool hFlip = false;
 };
 
+class SpriteFrameAtlas {
+private:
+	const SpriteAtlas* atlas;
+	std::vector<SpriteFrame> frames;
+public:
+	Vector2Int FrameSize;
+	SpriteFrameAtlas(const SpriteAtlas* atlas);
+	inline void SetOffset(int index, Vector2Int offset) {
+		frames[index].offset = offset;
+	}
+	inline const SpriteFrame& GetFrame(int index) const {
+		return frames[index];
+	}
+};
+
 class AnimationClip {
 private:
 	std::array< SpriteFrame, 16> frames;
 	unsigned frameCount = 0;
 public:
 	bool looping = false;
-	int frameDuration = 2;
-	Vector2Int frameSize = { 0,0 };
+	int frameDuration = 1;
 
 	void AddSpritesFromAtlas(const SpriteAtlas* atlas, int start, int count, Vector2Int offset = { 0,0 });
 
-	inline void AddFrame(const SpriteFrame& frame) {
-		frames[frameCount++] = frame;
+	inline void AddFrame(const SpriteFrame& frame, bool hFlip = false) {
+		frames[frameCount] = frame;
+		frames[frameCount++].hFlip = hFlip;
 	}
 	inline void SetFrameOffset(int frame, Vector2Int offset) {
 		frames[frame].offset = offset;

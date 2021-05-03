@@ -17,7 +17,6 @@ static void InitAnimation(const SpriteAtlas* atlas, AnimationClip& clip, int fra
 	atlasCounter += frames;
 	clip.looping = true;
 	clip.frameDuration = 10;
-	clip.frameSize = { 128,128 };
 }
 
 Cursor::Cursor() {
@@ -88,7 +87,7 @@ void Cursor::Draw() {
 	const SpriteFrame& frame = currentClip->GetFrame(clipFrame);
 
 	Rectangle dst = { Position + frame.offset,frame.sprite.rect.size };
-	dst.position -= currentClip->frameSize / 2;
+	dst.position -= {64, 64};
 
 	if (regionRect.size.LengthSquared() > 0) {
 		Rectangle rect;

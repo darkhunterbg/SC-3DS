@@ -1,5 +1,6 @@
 #include "UnitDatabase.h"
 #include "Platform.h"
+#include "Generated.h"
 
 UnitDef UnitDatabase::Marine;
 std::vector<const UnitDef*> UnitDatabase::Units;
@@ -12,52 +13,43 @@ static void MarineData() {
 	u.RotationSpeed = 1;
 	u.Collider.position = { -9,-10 };
 	u.Collider.size = { 17,20 };
-	
+
 }
 static void MarineResources() {
-	auto a = Platform::LoadAtlas("marine.t3x");
+	auto a = SpriteDatabase::Load_unit_terran_marine();
 
 	UnitDef& u = UnitDatabase::Marine;
 
-	u.DeathAnimation.AddSprite(a->GetSprite(221), { 22,19 });
-	u.DeathAnimation.AddSprite(a->GetSprite(222), { 23,19 });
-	u.DeathAnimation.AddSprite(a->GetSprite(223), { 17,17 });
-	u.DeathAnimation.AddSprite(a->GetSprite(224), { 12,14 });
-	u.DeathAnimation.AddSprite(a->GetSprite(225), { 7,15 });
-	u.DeathAnimation.AddSprite(a->GetSprite(226), { 2,17 });
-	u.DeathAnimation.AddSprite(a->GetSprite(227), { 0,19 });
-	u.DeathAnimation.AddSprite(a->GetSprite(228), { 0,20 });
-	u.DeathAnimation.frameSize = { 64,64 };
-	for (auto& c : u.DeathAnimation.GetFrames())
-	{
-		c.offset -= (u.DeathAnimation.frameSize) / 2;
-	}
+	for (int i = 0; i < 8; ++i)
+		u.DeathAnimation.AddFrame(a->GetFrame(221 + i));
+
+	//for (auto& c : u.DeathAnimation.GetFrames())
+	//	c.offset -= (a->FrameSize) / 2;
 
 	for (int i = 0; i <= 16; ++i) {
-		u.MovementAnimations[i].frameSize = { 64,64 };
 		u.MovementAnimations[i].looping = true;
-		u.MovementAnimations[i].frameDuration = 1;
+
 		for (int j = 0; j < 9; ++j)
-			u.MovementAnimations[i].AddSprite(a->GetSprite(i + j * 17 + 68));
+			u.MovementAnimations[i].AddFrame(a->GetFrame(i + j * 17 + 68));
 	}
 
 	for (int i = 17; i < 32; ++i) {
-		u.MovementAnimations[i].frameSize = { 64,64 };
 		u.MovementAnimations[i].looping = true;
 		u.MovementAnimations[i].frameDuration = 1;
 		for (int j = 0; j < 9; ++j)
-			u.MovementAnimations[i].AddSprite(a->GetSprite(32 - i + j * 17 + 68), { 0,0 }, true);
-	}
-
-	for (int i = 0; i < 32; ++i) {
-		for (int j = 0; j < u.MovementAnimations[i].GetFrameCount(); ++j)
-		{
-			auto& c = u.MovementAnimations[i];
-			auto& f = u.MovementAnimations[i].GetFrame(j);
-			c.SetFrameOffset(j, (c.frameSize - f.sprite.rect.size) / 2 - c.frameSize / 2);
-		}
+			u.MovementAnimations[i].AddFrame(a->GetFrame(32 - i + j * 17 + 68), true);
 
 	}
+
+	//for (int i = 0; i < 32; ++i) {
+	//	for (int j = 0; j < u.MovementAnimations[i].GetFrameCount(); ++j)
+	//	{
+	//		auto& c = u.MovementAnimations[i];
+	//		auto& f = u.MovementAnimations[i].GetFrame(j);
+	//		//c.SetFrameOffset(j, f.offset - (a->FrameSize) / 2);
+	//	}
+
+	//}
 }
 
 void UnitDatabase::Init()

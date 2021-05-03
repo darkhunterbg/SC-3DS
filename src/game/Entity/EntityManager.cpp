@@ -116,7 +116,7 @@ void EntityManager::DrawEntites(const Camera& camera) {
 
 	renderSystem->Draw(camera);
 
-	//kinematicSystem->DrawColliders(camera);
+	kinematicSystem->DrawColliders(camera);
 
 	//p.Submit();
 }

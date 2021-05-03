@@ -70,3 +70,12 @@ void AnimationClip::AddSpritesFromAtlas(const SpriteAtlas* atlas, int start, int
 		AddFrame({ atlas->GetSprite(start + i), offset });
 	}
 }
+
+SpriteFrameAtlas::SpriteFrameAtlas(const SpriteAtlas* atlas)
+	:atlas(atlas)
+{
+	frames.reserve(atlas->GetSprites().Size());
+	for (const Sprite& s : atlas->GetSprites()) {
+		frames.push_back({ s,{0,0} });
+	}
+}

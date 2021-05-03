@@ -11,6 +11,10 @@ void RenderSystem::Draw(const Camera& camera) {
 
 	render.clear();
 
+	// Shadow rendering:
+	// Get all object to render in order
+	// Render shadow with additive blending, then object
+
 	for(RenderComponent& cmp : RenderComponents.GetComponents())
 	{
 		if (!camRect.Intersects(cmp._dst))
@@ -22,6 +26,7 @@ void RenderSystem::Draw(const Camera& camera) {
 		dst.size /= camera.Scale;
 		int order = cmp.depth * 10'000'000;
 		order += dst.position.y * 1000 + dst.position.x;
+
 		
 		render.push_back({ order, cmp.sprite, dst, cmp.hFlip });
 	}

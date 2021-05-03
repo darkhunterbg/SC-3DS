@@ -15,6 +15,7 @@ struct UnitDef {
 	Rectangle Collider;
 
 	AnimationClip MovementAnimations[32];
+	AnimationClip MovementAnimationsShadow[32];
 	AnimationClip AttackAnimations[32];
 	AnimationClip DeathAnimation;
 };
