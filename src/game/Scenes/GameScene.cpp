@@ -60,12 +60,15 @@ void GameScene::Start() {
 
 	entityManager = new EntityManager();
 
-	Color color[] = { Colors::Red, Colors::UIGreen, Colors::CornflowerBlue, Colors::MediumPurple,
-	 Colors::Orange, Colors::White };
+	Color color[] = { Colors::SCRed, Colors::SCBlue, Colors::SCLightGreen, Colors::SCPurle,
+	 Colors::SCOrange, Colors::SCGreen, Colors::SCBrown, Colors::SCLightYellow, Colors::SCWhite,
+	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
-	for (int x = 3; x < 10; ++x) {
-		for (int y = 3; y < 10; ++y) {
-			Color c = color[std::rand() % 6];
+	int i = 0;
+	for (int y = 3; y < 10; ++y) {
+		for (int x = 1; x < 13; ++x) {
+
+			Color c = color[(i++) % 12];
 			entityManager->NewUnit(UnitDatabase::Marine, { x * 32 ,y * 32 }, c);
 		}
 	}

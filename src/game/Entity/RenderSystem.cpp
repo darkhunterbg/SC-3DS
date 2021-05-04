@@ -53,7 +53,6 @@ void RenderSystem::Draw(const Camera& camera) {
 		Platform::Draw(r.sprite, r.dst, Colors::Black, r.hFlip);
 
 		if (r.color != Colors::Transparent) {
-			r.color.a = 0.5f;
 			Platform::Draw(r.colorSprite, r.dst, r.color, r.hFlip);
 		}
 	}

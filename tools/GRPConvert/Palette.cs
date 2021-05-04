@@ -27,7 +27,7 @@ namespace GRPConvert
 		{
 
 			Remapped[c] = newColor;
-			Colors[c] = newColor;
+			Colors[c] = Color.Black;
 			RemappedIndexes.Add(c);
 		}
 

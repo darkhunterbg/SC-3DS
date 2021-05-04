@@ -61,10 +61,24 @@ namespace Colors {
 	constexpr Color IndianRed{ 0.8f,0.36f,0.36f,1.0f };
 	constexpr Color MediumPurple{ 0.57f,0.43f,0.85f,1.0f };
 	constexpr Color LightBlue{ 0.67f,0.84f,0.90f,1.0f };
+	constexpr Color Blue{ 0,0,1,1 };
 	constexpr Color LightPink{ 1.0f,0.71f, 0.75f, 1.0f };
 	constexpr Color CornflowerBlue = Color::ValueOf(0x6495EDFF);
 	constexpr Color Transparent = { 0,0,0,0 };
 
 	constexpr Color UIGreen = { 0x10fc18ff };
+
+	constexpr Color SCRed = { 0xf40404ff };
+	constexpr Color SCBlue = { 0x0c48ccff };
+	constexpr Color SCLightGreen = { 0x2cb494ff };
+	constexpr Color SCPurle = { 0x88409cff };
+	constexpr Color SCOrange = { 0xf88c14ff };
+	constexpr Color SCGreen = { 0x088008ff };
+	constexpr Color SCBrown = { 0x703014ff };
+	constexpr Color SCLightYellow = { 0xfcfc7cff };
+	constexpr Color SCWhite = { 0xcce0d0ff };
+	constexpr Color SCTeal = { 0xecc4b0ff };
+	constexpr Color SCYellow = {0xfcfc38ff };
+	constexpr Color SCLightBlue = { 0x4068d4ff };
 
 }

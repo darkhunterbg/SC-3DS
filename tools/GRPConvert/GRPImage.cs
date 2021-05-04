@@ -67,7 +67,7 @@ namespace GRPConvert
 					int i = Pixels[x, y];
 					if (!(palette.RemappedIndexes.Contains(i)))
 						continue;
-					b.SetPixel(x, y, Color.White);
+					b.SetPixel(x, y, palette.Remapped[i]);
 				}
 			}
 
