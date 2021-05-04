@@ -26,7 +26,7 @@ void GameHUD::DrawResource(Sprite icon, Vector2Int pos, const char* fmt, ...) {
 	stbsp_vsnprintf(textBuffer, sizeof(textBuffer), fmt, args);
 	va_end(args);
 
-	Platform::Draw(icon, { pos,{ 14, 14} }, Colors::White);
+	Platform::Draw(icon, { pos,{ 14, 14} });
 	pos += {16, -2};
 	Platform::DrawText(font, pos + Vector2Int{ 1,1 }, textBuffer, Colors::Black, 0.4f);
 	Platform::DrawText(font, pos, textBuffer, Colors::UIGreen, 0.4f);
@@ -64,7 +64,7 @@ void GameHUD::UpperScreenGUI() {
 
 void GameHUD::LowerScreenGUI(const Camera& camera, const MapSystem& mapSystem) {
 
-	Platform::Draw(consoleAtlas->GetSprite(0), { {0, 0,},{ 320, 240} }, Colors::White);
+	Platform::Draw(consoleAtlas->GetSprite(0), { {0, 0,},{ 320, 240} });
 
 	DrawMinimap(camera, mapSystem);
 
@@ -86,7 +86,7 @@ void GameHUD::DrawMinimap(const Camera& camera, const MapSystem& mapSystem) {
 		RenderMinimapTexture(mapSystem);
 	}
 
-	Platform::Draw(minimapSprite, minimapDst, Colors::White);
+	Platform::Draw(minimapSprite, minimapDst);
 
 	Rectangle camRect = camera.GetRectangle();
 	Vector2 min = camRect.GetMin();
@@ -128,7 +128,7 @@ void GameHUD::RenderMinimapTexture(const MapSystem& mapSystem) {
 	for (const MapTile& tile : mapSystem.GetTiles()) {
 		Vector2 pos = Vector2(tile.position * tileSize) / upscale;
 		Vector2 size = Vector2(tile.sprite.rect.size) / upscale;
-		Platform::Draw(tile.sprite, { pos,size }, Colors::White);
+		Platform::Draw(tile.sprite, { pos,size });
 	}
 
 	Platform::DrawOnTexture(nullptr);

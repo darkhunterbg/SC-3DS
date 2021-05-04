@@ -45,7 +45,7 @@ void MapSystem::DrawTiles(const Camera& camera) {
 		dst.size /= camera.Scale;
 
 
-		Platform::Draw(tile.sprite, dst, Colors::White);
+		Platform::Draw(tile.sprite, dst);
 	}
 
 	auto t = minerals->GetSprite(0);
@@ -56,7 +56,7 @@ void MapSystem::DrawTiles(const Camera& camera) {
 		dst.position /= camera.Scale;
 		dst.size /= camera.Scale;
 
-		Platform::Draw(t, dst, Colors::White);
+		Platform::Draw(t, dst);
 	}
 }
 

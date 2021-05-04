@@ -143,6 +143,7 @@ void GameScene::Update() {
 		{
 			if (entityManager->GetRenderComponent(id).depth != -1) {
 				entityManager->GetAnimationComponent(id).PlayClip(&UnitDatabase::Marine.DeathAnimation);
+				entityManager->GetAnimationComponent(id).shadowClip = nullptr;
 				entityManager->GetRenderComponent(id).depth = -1;
 				entityManager->RemoveColliderComponent(id);
 				entityManager->GetNavigationComponent(id).work = false;

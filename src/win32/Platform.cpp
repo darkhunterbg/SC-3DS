@@ -46,8 +46,6 @@ SDL_Texture* LoadTexture(const std::string& path, Vector2Int& size) {
 		width, height);
 
 	SDL_UpdateTexture(tex, nullptr, image.data(), width * 4);
-	SDL_SetTextureBlendMode(tex, SDL_BlendMode::SDL_BLENDMODE_BLEND);
-
 	size = { (int)width,(int)height };
 
 	return tex;
@@ -129,7 +127,6 @@ void Platform::DrawOnTexture(Texture texture) {
 }
 Texture Platform::NewTexture(Vector2Int size) {
 	SDL_Texture* tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
-
 	return tex;
 }
 void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip) {
@@ -138,6 +135,7 @@ void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip
 	cmd.texture = sprite.GetTextureId<SDL_Texture>();
 	cmd.src = *(SDL_Rect*)&sprite.rect;
 	cmd.dst = *(SDL_Rect*)&dst;
+
 	cmd.r = SDL_FloatToUint8(color.r);
 	cmd.g = SDL_FloatToUint8(color.g);
 	cmd.b = SDL_FloatToUint8(color.b);
@@ -146,7 +144,17 @@ void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip
 	cmd.flip = hFlip ? SDL_RendererFlip::SDL_FLIP_HORIZONTAL : SDL_RendererFlip::SDL_FLIP_NONE;
 
 	if (target != nullptr) {
-		SDL_SetTextureColorMod(cmd.texture, cmd.r, cmd.g, cmd.b);
+		if (cmd.r != 0 || cmd.g != 0 || cmd.b != 0) {
+
+			SDL_SetTextureBlendMode(cmd.texture, SDL_BlendMode::SDL_BLENDMODE_ADD);
+			SDL_SetTextureColorMod(cmd.texture, cmd.r, cmd.g, cmd.b);
+		}
+		else {
+			SDL_SetTextureBlendMode(cmd.texture, SDL_BlendMode::SDL_BLENDMODE_BLEND);
+			SDL_SetTextureColorMod(cmd.texture, 255, 255, 255);
+		}
+
+
 		SDL_RenderCopyEx(renderer, cmd.texture, &cmd.src, &cmd.dst, 0, nullptr, cmd.flip);
 	}
 	else

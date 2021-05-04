@@ -108,7 +108,7 @@ void Cursor::Draw() {
 		Platform::DrawRectangle(rect, Colors::UIGreen);
 	}
 
-	Platform::Draw(frame.sprite, dst, Colors::White);
+	Platform::Draw(frame.sprite, dst);
 }
 
 void Cursor::Update(Camera& camera, EntityManager& entityManager, std::vector<EntityId>& outSelection) {

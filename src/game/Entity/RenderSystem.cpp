@@ -41,7 +41,7 @@ void RenderSystem::Draw(const Camera& camera) {
 
 	std::sort(render.begin(), render.end(), RenderSort);
 
-	Color c = Colors::Black;
+	Color c = Colors::White;
 	c.a = 0.5f;
 
 	for (const auto& r : render)
@@ -49,7 +49,7 @@ void RenderSystem::Draw(const Camera& camera) {
 		if (r.shadowDst.size.LengthSquared() > 0)
 			Platform::Draw(r.shadowSprite, r.shadowDst, c, r.hFlip);
 
-		Platform::Draw(r.sprite, r.dst, Colors::White, r.hFlip);
+		Platform::Draw(r.sprite, r.dst, Colors::Black, r.hFlip);
 	}
 }
 
