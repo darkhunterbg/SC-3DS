@@ -174,6 +174,7 @@ void ExecDrawCommand(const SDLDrawCommand& cmd, SDL_Rect& clip, const int& w, co
 		rect.h = (clip.h * rect.h) / h;
 
 		SDL_SetTextureColorMod(cmd.texture, cmd.r, cmd.g, cmd.b);
+		SDL_SetTextureAlphaMod(cmd.texture, cmd.a);
 		SDL_RenderCopyEx(renderer, cmd.texture, &cmd.src, &rect,0 , nullptr, cmd.flip);
 		break;
 	}

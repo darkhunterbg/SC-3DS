@@ -16,6 +16,7 @@ struct UnitDef {
 
 	AnimationClip MovementAnimations[32];
 	AnimationClip MovementAnimationsShadow[32];
+
 	AnimationClip AttackAnimations[32];
 	AnimationClip DeathAnimation;
 };

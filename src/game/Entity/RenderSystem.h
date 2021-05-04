@@ -15,6 +15,10 @@ struct RenderComponent : IComponent<0> {
 	Vector2Int offset = { 0,0 };
 	bool hFlip = false;
 
+	Rectangle _shadowDst;
+	Sprite shadowSprite;
+	Vector2Int shadowOffset = { 0,0 };
+
 	inline void SetSprite(const Sprite& s) {
 		_dst.size = s.rect.size;
 		sprite = s;
@@ -28,9 +32,12 @@ struct RenderComponent : IComponent<0> {
 		hFlip = frame.hFlip;
 	}
 
-	inline void AddOffset(const Vector2Int& o) {
-		_dst.position += o;
-		offset += o;
+	inline void SetShadowFrame(const SpriteFrame& frame) {
+		shadowSprite = frame.sprite;
+		Vector2Int oldOffset = shadowOffset;
+		shadowOffset = frame.offset;
+		_shadowDst.position += frame.offset - oldOffset;
+		_shadowDst.size = frame.sprite.rect.size;
 	}
 };
 
@@ -40,6 +47,8 @@ class RenderSystem {
 		Sprite sprite;
 		Rectangle dst;
 		bool hFlip;
+		Sprite shadowSprite;
+		Rectangle shadowDst;
 	};
 private:
 	std::vector< Render> render;

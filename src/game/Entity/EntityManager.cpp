@@ -116,20 +116,22 @@ void EntityManager::DrawEntites(const Camera& camera) {
 
 	renderSystem->Draw(camera);
 
-	kinematicSystem->DrawColliders(camera);
+	//kinematicSystem->DrawColliders(camera);
 
 	//p.Submit();
 }
 
 EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position) {
 	EntityId e = NewEntity(position);
-	AddRenderComponent(e, def.MovementAnimations[0].GetFrame(0));
+	auto& ren = AddRenderComponent(e, def.MovementAnimations[0].GetFrame(0));
+	ren.SetShadowFrame(def.MovementAnimationsShadow[0].GetFrame(0));
 	AddAnimationComponent(e, &def.MovementAnimations[0]).pause = true;
 	auto& nav = AddNavigationComponent(e, def.RotationSpeed, def.MovementSpeed);
 	AddColliderComponent(e, def.Collider);
 
 	for (int i = 0; i < 32; ++i) {
 		nav.clips[i] = (&def.MovementAnimations[i]);
+		nav.shadowClips[i] = (&def.MovementAnimationsShadow[i]);
 	}
 
 	return e;
@@ -141,6 +143,7 @@ RenderComponent& EntityManager::AddRenderComponent(EntityId id, const SpriteFram
 	RenderComponent& c = renderSystem->RenderComponents.NewComponent(id);
 	c.SetFrame(frame);
 	c._dst.position += entity.position;
+	c._shadowDst.position += entity.position;
 	return c;
 }
 AnimationComponent& EntityManager::AddAnimationComponent(EntityId id, const AnimationClip* clip) {

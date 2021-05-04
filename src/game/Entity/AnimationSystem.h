@@ -11,6 +11,8 @@ class RenderSystem;
 struct AnimationComponent : public IComponent<1> {
 
 	const AnimationClip* clip = nullptr;
+	const AnimationClip* shadowClip = nullptr;
+
 	int clipFrame = 0;
 	int frameCountdown = 0;
 	bool pause = true;

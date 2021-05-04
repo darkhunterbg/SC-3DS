@@ -34,7 +34,7 @@ void NavigationSystem::UpdateNavigation(Entity* entities, AnimationSystem& anima
 		int heading = entity.orientation;
 		for (int i = 0; i < 32; i += 4) {
 
-			Vector2Int move = movementTable[i ] * cmp.velocity;
+			Vector2Int move = movementTable[i] * cmp.velocity;
 			Vector2Int pos = entity.position + move;
 			int dist = (cmp.target - pos).LengthSquared();
 			dist -= i == entity.orientation ? 10 : 0;
@@ -76,8 +76,11 @@ void NavigationSystem::UpdateNavigation(Entity* entities, AnimationSystem& anima
 
 
 			if (entity.HasComponent<AnimationComponent>()) {
-				animationSystem.AnimationComponents.GetComponent(entity.id)
-					.PlayClip(cmp.clips[entity.orientation]);
+				auto& nav = animationSystem.AnimationComponents.GetComponent(entity.id);
+
+				nav.PlayClip(cmp.clips[entity.orientation]);
+				nav.shadowClip = cmp.shadowClips[entity.orientation];
+
 			}
 
 			if (entity.orientation != heading)

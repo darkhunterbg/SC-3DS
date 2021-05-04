@@ -25,6 +25,11 @@ void AnimationSystem::UpdateAnimations(RenderSystem& renderSystem) {
 					RenderComponent& rcomp = renderSystem.RenderComponents.GetComponent(eid);
 					const SpriteFrame& frame = cmp.clip->GetFrame(cmp.clipFrame);
 					rcomp.SetFrame(frame);
+
+					if (cmp.shadowClip != nullptr) {
+						const SpriteFrame& shadowFrame = cmp.shadowClip->GetFrame(cmp.clipFrame);
+						rcomp.SetShadowFrame(shadowFrame);
+					}
 				}
 			}
 		}

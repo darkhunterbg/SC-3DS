@@ -16,6 +16,7 @@ struct NavigationComponent : IComponent<3> {
 	int velocity = 0;
 
 	const AnimationClip* clips[32];
+	const AnimationClip* shadowClips[32];
 
 	void GoTo(Vector2Int position) {
 		target = position;
