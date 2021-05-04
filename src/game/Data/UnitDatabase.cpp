@@ -3,6 +3,7 @@
 #include "Generated.h"
 
 UnitDef UnitDatabase::Marine;
+UnitDef UnitDatabase::SCV;
 std::vector<const UnitDef*> UnitDatabase::Units;
 
 static void MarineData() {
@@ -21,7 +22,6 @@ static void MarineData() {
 	a.UnitColorFrameStart = 229 + a.FrameStart;
 
 	u.DeathAnimationDef = { 221 ,8, false };
-
 }
 static void MarineResources() {
 	auto a = SpriteDatabase::Load_unit_terran_marine();
@@ -33,13 +33,44 @@ static void MarineResources() {
 	u.MovementAnimationDef.GenerateAnimations(a, as, u.MovementAnimations, u.MovementAnimationsShadow, u.MovementAnimationsTeamColor);
 }
 
+
+static void SCVData() {
+	UnitDef& u = UnitDatabase::SCV;
+	u.Name = "SCV";
+	u.Health = 60;
+	u.MovementSpeed = 5;
+	u.RotationSpeed = 1;
+	u.Collider.position = { -10,-14 };
+	u.Collider.size = { 23,23 };
+
+	DirectionalAnimationDef& a = u.MovementAnimationDef;
+	a.FrameStart = 0;
+	a.FrameDuration = 1;
+	a.Looping = false;
+	a.UnitColorFrameStart = 51;
+	a.ShadowAdditionalOffset = { -1, 5 };
+
+	u.DeathAnimationDef = { 0 ,0, false };
+}
+static void SCVResources() {
+	auto a = SpriteDatabase::Load_unit_terran_scv();
+
+	UnitDef& u = UnitDatabase::SCV;
+
+	//u.DeathAnimationDef.GenerateAnimation(a, &u.DeathAnimation);
+	u.MovementAnimationDef.GenerateAnimations(a, a, u.MovementAnimations, u.MovementAnimationsShadow, u.MovementAnimationsTeamColor);
+}
+
 void UnitDatabase::Init()
 {
 	Units.push_back(&Marine);
+	Units.push_back(&SCV);
 	MarineData();
+	SCVData();
 }
 
 void UnitDatabase::LoadAllUnitResources()
 {
 	MarineResources();
+	SCVResources();
 }

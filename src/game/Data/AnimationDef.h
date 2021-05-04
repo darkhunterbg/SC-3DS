@@ -1,5 +1,7 @@
 #pragma once
 
+#include "..\MathLib.h"
+
 class SpriteFrameAtlas;
 class AnimationClip;
 
@@ -7,7 +9,9 @@ struct DirectionalAnimationDef {
 	int FrameStart;
 	int FrameDuration;
 	int UnitColorFrameStart;
-	bool Looping;
+	bool Looping = false;
+
+	Vector2Int ShadowAdditionalOffset;
 
 	void GenerateAnimations(const SpriteFrameAtlas* a, const SpriteFrameAtlas* sa,
 		AnimationClip* main, AnimationClip* shadow, AnimationClip* color);

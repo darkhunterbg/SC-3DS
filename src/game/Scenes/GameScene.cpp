@@ -69,7 +69,7 @@ void GameScene::Start() {
 		for (int x = 1; x < 13; ++x) {
 
 			Color c = color[(i++) % 12];
-			entityManager->NewUnit(UnitDatabase::Marine, { x * 32 ,y * 32 }, c);
+			entityManager->NewUnit(*UnitDatabase::Units[i%UnitDatabase::Units.size()], { x * 32 ,y * 32 }, c);
 		}
 	}
 

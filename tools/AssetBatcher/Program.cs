@@ -27,6 +27,8 @@ namespace AssetBatcher
 
 			T3SFolder("unit/terran/marine");
 			T3SFolder("unit/terran/tmashad");
+
+			T3SFolder("unit/terran/scv");
 			GeneraSourceCode();
 		}
 

@@ -30,8 +30,8 @@ int main(int argc, char** argv) {
 	float l = atan2f(0, -100);
 
 	Vector2Int p = { -100,100 };
-	float angle = atan2f(-p.y, p.x)+ PI / 2.0f;
-	int mapped = ((int)(((angle * 16) / PI) +32) % 32);
+	float angle = atan2f(-p.y, p.x) + PI / 2.0f;
+	int mapped = ((int)(((angle * 16) / PI) + 32) % 32);
 
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_AUDIO);
 	window = SDL_CreateWindow("StarCraft", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1440, 720, SDL_WINDOW_RESIZABLE);
@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
 		if (done)
 			break;
 
-	
+
 
 		Game::Draw();
 		Draw();
@@ -174,9 +174,9 @@ void ExecDrawCommand(const SDLDrawCommand& cmd, SDL_Rect& clip, const int& w, co
 		rect.h = (clip.h * rect.h) / h;
 
 		SDL_SetTextureAlphaMod(cmd.texture, cmd.a);
-		if (cmd.r != 0  || cmd.g !=0  || cmd.b != 0) {
+		if (cmd.r != 0 || cmd.g != 0 || cmd.b != 0 || cmd.a != 255) {
 
-			SDL_SetTextureBlendMode(cmd.texture, SDL_BlendMode::SDL_BLENDMODE_ADD);
+			SDL_SetTextureBlendMode(cmd.texture, SDL_BlendMode::SDL_BLENDMODE_BLEND);
 			SDL_SetTextureColorMod(cmd.texture, cmd.r, cmd.g, cmd.b);
 		}
 		else {
@@ -185,7 +185,7 @@ void ExecDrawCommand(const SDLDrawCommand& cmd, SDL_Rect& clip, const int& w, co
 		}
 
 
-		SDL_RenderCopyEx(renderer, cmd.texture, &cmd.src, &rect,0 , nullptr, cmd.flip);
+		SDL_RenderCopyEx(renderer, cmd.texture, &cmd.src, &rect, 0, nullptr, cmd.flip);
 		break;
 	}
 	case SDLDrawCommandType::Text: {
@@ -211,13 +211,13 @@ void ExecDrawCommand(const SDLDrawCommand& cmd, SDL_Rect& clip, const int& w, co
 
 
 		SDL_SetRenderDrawColor(renderer, cmd.r, cmd.g, cmd.b, cmd.a);
-		SDL_RenderDrawLine(renderer, src.x , src.y , dst.x , dst.y );
+		SDL_RenderDrawLine(renderer, src.x, src.y, dst.x, dst.y);
 		for (int i = 1; i < thickness; ++i) {
 			//  -
 			//	_
 			//	|
 			//		|
-			SDL_RenderDrawLine(renderer, src.x - i, src.y - i, dst.x + i, dst.y - i); 
+			SDL_RenderDrawLine(renderer, src.x - i, src.y - i, dst.x + i, dst.y - i);
 			SDL_RenderDrawLine(renderer, src.x - i, src.y + i, dst.x + i, dst.y + i);
 			SDL_RenderDrawLine(renderer, src.x - i, src.y - i, dst.x - i, dst.y + i);
 			SDL_RenderDrawLine(renderer, src.x + i, src.y - i, dst.x + i, dst.y + i);

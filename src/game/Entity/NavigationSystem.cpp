@@ -37,7 +37,7 @@ void NavigationSystem::UpdateNavigation(Entity* entities, AnimationSystem& anima
 			Vector2Int move = movementTable[i] * cmp.velocity;
 			Vector2Int pos = entity.position + move;
 			int dist = (cmp.target - pos).LengthSquared();
-			dist -= i == entity.orientation ? 10 : 0;
+			dist -= i == entity.orientation ? (cmp.velocity * cmp.velocity +1) : 0;
 			if (dist < h)
 			{
 				h = dist;

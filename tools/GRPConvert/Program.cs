@@ -39,8 +39,8 @@ namespace GRPConvert
 			string dataDir = Path.GetFullPath("..\\..\\mpq\\");
 			string dataOutDir = Path.GetFullPath("..\\..\\data_out\\");
 
-			//if (Directory.Exists(dataOutDir))
-			//	Directory.Delete(dataOutDir, true);
+			if (Directory.Exists(dataOutDir))
+				Directory.Delete(dataOutDir, true);
 
 			foreach (var l in lines)
 			{

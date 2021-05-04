@@ -1,14 +1,10 @@
-﻿palette Units
-
-unit\terran\marine.grp
-
-#palette Terrain
+﻿#palette Terrain
 #tileset\*.grp
 
-#palette Units
-#unit\*.grp
+palette Units
+unit\*.grp
 
-#palette Icons
-#unit\cmdbtns\*.grp
+palette Icons
+unit\cmdbtns\*.grp
 #game\icons.grp
-#cursor\*.grp
+cursor\*.grp

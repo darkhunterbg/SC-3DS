@@ -16,8 +16,10 @@ void DirectionalAnimationDef::GenerateAnimations(const SpriteFrameAtlas* a, cons
 
 		shadow[i].looping = Looping;
 		shadow[i].frameDuration = 1;
-		for (int j = 0; j < FrameDuration; ++j)
+		for (int j = 0; j < FrameDuration; ++j) {
 			shadow[i].AddFrameCentered(as->GetFrame(i + j * 17 + FrameStart), as->FrameSize);
+			shadow[i].SetFrameOffset(j, shadow[i].GetFrame(j).offset + ShadowAdditionalOffset);
+		}
 
 	}
 
@@ -32,8 +34,11 @@ void DirectionalAnimationDef::GenerateAnimations(const SpriteFrameAtlas* a, cons
 
 		shadow[i].looping = Looping;
 		shadow[i].frameDuration = 1;
-		for (int j = 0; j < FrameDuration; ++j)
+		for (int j = 0; j < FrameDuration; ++j) {
 			shadow[i].AddFrameCentered(as->GetFrame(32 - i + j * 17 + FrameStart), as->FrameSize, true);
+			shadow[i].SetFrameOffset(j, shadow[i].GetFrame(j).offset + ShadowAdditionalOffset);
+		}
+
 
 	}
 }

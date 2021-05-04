@@ -9,7 +9,7 @@ private:
 	UnitDatabase() = delete;
 	~UnitDatabase() = delete;
 public:
-	static UnitDef Marine;
+	static UnitDef Marine, SCV;
 
 	static std::vector<const UnitDef*> Units;
 
