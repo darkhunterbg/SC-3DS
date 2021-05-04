@@ -25,8 +25,8 @@ namespace AssetBatcher
 			string path = Path.Combine(rootDir, "data_out", "unit", "terran");
 			var dir = Path.Combine(rootDir, "gfx");
 
-			T3SFolder("unit/terran/marine", true);
-			T3SFolder("unit/terran/tmashad", true);
+			T3SFolder("unit/terran/marine");
+			T3SFolder("unit/terran/tmashad");
 			GeneraSourceCode();
 		}
 

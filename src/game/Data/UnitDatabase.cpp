@@ -22,7 +22,7 @@ static void MarineResources() {
 	UnitDef& u = UnitDatabase::Marine;
 
 	for (int i = 0; i < 8; ++i)
-		u.DeathAnimation.AddFrame(a->GetFrame(221 + i));
+		u.DeathAnimation.AddFrameCentered(a->GetFrame(221 + i), a->FrameSize);
 
 	//for (auto& c : u.DeathAnimation.GetFrames())
 	//	c.offset -= (a->FrameSize) / 2;
@@ -31,29 +31,32 @@ static void MarineResources() {
 		u.MovementAnimations[i].looping = true;
 
 		for (int j = 0; j < 9; ++j)
-			u.MovementAnimations[i].AddFrame(a->GetFrame(i + j * 17 + 68));
+			u.MovementAnimations[i].AddFrameCentered(a->GetFrame(i + j * 17 + 68), a->FrameSize);
+
 	}
 
 	for (int i = 17; i < 32; ++i) {
 		u.MovementAnimations[i].looping = true;
 		u.MovementAnimations[i].frameDuration = 1;
 		for (int j = 0; j < 9; ++j)
-			u.MovementAnimations[i].AddFrame(a->GetFrame(32 - i + j * 17 + 68), true);
+			u.MovementAnimations[i].AddFrameCentered(a->GetFrame(32 - i + j * 17 + 68), a->FrameSize, true);
+
 	}
 
 	for (int i = 0; i < 16; ++i) {
 		u.MovementAnimationsShadow[i].looping = true;
 		u.MovementAnimationsShadow[i].frameDuration = 1;
-		for (int j = 0; j < 9; ++j) {
-			u.MovementAnimationsShadow[i].AddFrame(as->GetFrame(i + j * 17 + 68));
-		}
+		for (int j = 0; j < 9; ++j)
+			u.MovementAnimationsShadow[i].AddFrameCentered(as->GetFrame(i + j * 17 + 68), as->FrameSize);
+
 	}
 
 	for (int i = 17; i < 32; ++i) {
 		u.MovementAnimationsShadow[i].looping = true;
 		u.MovementAnimationsShadow[i].frameDuration = 1;
-		for (int j = 0; j < 9; ++j)
-			u.MovementAnimationsShadow[i].AddFrame(as->GetFrame(32 - i + j * 17 + 68), true);
+		for (int j = 0; j < 9; ++j) 
+			u.MovementAnimationsShadow[i].AddFrameCentered(as->GetFrame(32 - i + j * 17 + 68), as->FrameSize, true);
+
 	}
 
 	//for (int i = 0; i < 32; ++i) {

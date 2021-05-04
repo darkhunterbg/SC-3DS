@@ -145,15 +145,18 @@ public:
 
 	void AddSpritesFromAtlas(const SpriteAtlas* atlas, int start, int count, Vector2Int offset = { 0,0 });
 
-	inline void AddFrame(const SpriteFrame& frame, bool hFlip = false) {
-		frames[frameCount] = frame;
-		frames[frameCount++].hFlip = hFlip;
+	inline void AddFrame(const SpriteFrame& frame) {
+		frames[frameCount++] = frame;
+	}
+	inline void AddFrameCentered(const SpriteFrame& frame, Vector2Int frameSize, bool hFlip = false) {
+		auto& f = frames[frameCount++] = frame;
+		f.hFlip = hFlip;
+		f.offset -= frameSize / 2;
+		if (hFlip) 
+			f.offset.x = frameSize.x / 2 - frame.offset.x - frame.sprite.rect.size.x;
 	}
 	inline void SetFrameOffset(int frame, Vector2Int offset) {
 		frames[frame].offset = offset;
-	}
-	inline void AddSprite(const Sprite& sprite, Vector2Int offset = { 0,0 }, bool hFlip = false) {
-		frames[frameCount++] = { sprite, offset , hFlip };
 	}
 	inline Span<SpriteFrame> GetFrames() const {
 		return { frames.data(), frameCount };
