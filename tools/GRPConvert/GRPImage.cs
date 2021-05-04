@@ -27,13 +27,47 @@ namespace GRPConvert
 		public Bitmap ToBitmap(Palette palette)
 		{
 			Bitmap b = new Bitmap(Width, Height);
-			for (int x = 0; x < Width; ++x) {
-				for (int y = 0; y < Height; ++y) {
+			for (int x = 0; x < Width; ++x)
+			{
+				for (int y = 0; y < Height; ++y)
+				{
 					int i = Pixels[x, y];
 					if (i == 0)
 						continue;
 					Color c = palette.Colors[i];
-					b.SetPixel(x , y , c);
+					b.SetPixel(x, y, c);
+				}
+			}
+
+			return b;
+		}
+
+		public bool UsesRemappedColors(Palette palette)
+		{
+			for (int x = 0; x < Width; ++x)
+			{
+				for (int y = 0; y < Height; ++y)
+				{
+					int i = Pixels[x, y];
+					if (palette.RemappedIndexes.Contains(i))
+						return true;
+				}
+			}
+
+			return false;
+		}
+
+		public Bitmap GenerateMapOfRemappedColors(Palette palette)
+		{
+			Bitmap b = new Bitmap(Width, Height);
+			for (int x = 0; x < Width; ++x)
+			{
+				for (int y = 0; y < Height; ++y)
+				{
+					int i = Pixels[x, y];
+					if (!(palette.RemappedIndexes.Contains(i)))
+						continue;
+					b.SetPixel(x, y, Color.White);
 				}
 			}
 
@@ -62,7 +96,8 @@ namespace GRPConvert
 			MaxHeight = BitConverter.ToInt16(data.AsSpan(i, 2));
 			i += 2;
 
-			for (int f = 0; f < NumberOfFrames; ++f) {
+			for (int f = 0; f < NumberOfFrames; ++f)
+			{
 				GRPFrame frame = new GRPFrame();
 				Frames.Add(frame);
 
@@ -86,20 +121,25 @@ namespace GRPConvert
 		{
 			int offset = frame.DataOffset;
 			List<int> imagRowOffsets = new List<int>();
-			for (int i = 0; i < frame.Height; ++i) {
+			for (int i = 0; i < frame.Height; ++i)
+			{
 				int rowOffset = BitConverter.ToUInt16(data.AsSpan(offset + i * 2, 2));
 				imagRowOffsets.Add(rowOffset);
 			}
 
 
-			for (int y = 0; y < frame.Height; ++y) {
+			for (int y = 0; y < frame.Height; ++y)
+			{
 				offset = frame.DataOffset + imagRowOffsets[y];
 
 				int x = 0;
-				while (x < frame.Width) {
+				while (x < frame.Width)
+				{
 					byte raw = data[offset++];
-					if ((raw & 0x80) == 0) {
-						if ((raw & 0x40) > 0) {
+					if ((raw & 0x80) == 0)
+					{
+						if ((raw & 0x40) > 0)
+						{
 
 							raw &= 0x3F;
 							byte converterdPacket = data[offset++];
@@ -111,19 +151,22 @@ namespace GRPConvert
 							Pixel p = default;
 							p.x = x;
 
-							do {
+							do
+							{
 								p.y = y;
 								p.color = converterdPacket;
-									frame.Pixels[p.x, p.y] = p.color;
+								frame.Pixels[p.x, p.y] = p.color;
 								p.x++;
 							}
 							while (--operationCounter > 0);
 
 							x += raw;
 						}
-						else {
+						else
+						{
 							int operationCounter = raw;
-							do {
+							do
+							{
 								byte converterdPacket = data[offset++];
 								Pixel p = default;
 								p.x = x;
@@ -135,7 +178,8 @@ namespace GRPConvert
 							while (--operationCounter > 0);
 						}
 					}
-					else {
+					else
+					{
 						raw &= 0x7F;
 						x += raw;
 					}

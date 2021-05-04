@@ -12,6 +12,7 @@ struct AnimationComponent : public IComponent<1> {
 
 	const AnimationClip* clip = nullptr;
 	const AnimationClip* shadowClip = nullptr;
+	const AnimationClip* unitColorClip = nullptr;
 
 	int clipFrame = 0;
 	int frameCountdown = 0;

@@ -121,10 +121,13 @@ void EntityManager::DrawEntites(const Camera& camera) {
 	//p.Submit();
 }
 
-EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position) {
+EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color color) {
 	EntityId e = NewEntity(position);
 	auto& ren = AddRenderComponent(e, def.MovementAnimations[0].GetFrame(0));
 	ren.SetShadowFrame(def.MovementAnimationsShadow[0].GetFrame(0));
+	ren.colorSprite = def.MovementAnimationsTeamColor[0].GetFrame(0).sprite;
+	ren.unitColor = color;
+
 	AddAnimationComponent(e, &def.MovementAnimations[0]).pause = true;
 	auto& nav = AddNavigationComponent(e, def.RotationSpeed, def.MovementSpeed);
 	AddColliderComponent(e, def.Collider);
@@ -132,6 +135,7 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position) {
 	for (int i = 0; i < 32; ++i) {
 		nav.clips[i] = (&def.MovementAnimations[i]);
 		nav.shadowClips[i] = (&def.MovementAnimationsShadow[i]);
+		nav.colorClips[i] = (&def.MovementAnimationsTeamColor[i]);
 	}
 
 	return e;

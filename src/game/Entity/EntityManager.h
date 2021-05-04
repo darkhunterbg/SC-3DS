@@ -76,5 +76,5 @@ public:
 		e.changed = true;
 	}
 
-	EntityId NewUnit(const UnitDef& def, Vector2Int position);
+	EntityId NewUnit(const UnitDef& def, Vector2Int position, Color color);
 };

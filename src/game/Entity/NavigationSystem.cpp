@@ -80,6 +80,7 @@ void NavigationSystem::UpdateNavigation(Entity* entities, AnimationSystem& anima
 
 				nav.PlayClip(cmp.clips[entity.orientation]);
 				nav.shadowClip = cmp.shadowClips[entity.orientation];
+				nav.unitColorClip = cmp.colorClips[entity.orientation];
 
 			}
 

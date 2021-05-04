@@ -30,18 +30,23 @@ static void MarineResources() {
 	for (int i = 0; i <= 16; ++i) {
 		u.MovementAnimations[i].looping = true;
 
-		for (int j = 0; j < 9; ++j)
+		for (int j = 0; j < 9; ++j) {
 			u.MovementAnimations[i].AddFrameCentered(a->GetFrame(i + j * 17 + 68), a->FrameSize);
-
+			u.MovementAnimationsTeamColor[i].AddFrameCentered(a->GetFrame(i + j * 17 + 68 + 229), a->FrameSize);
+		}
 	}
 
 	for (int i = 17; i < 32; ++i) {
 		u.MovementAnimations[i].looping = true;
 		u.MovementAnimations[i].frameDuration = 1;
-		for (int j = 0; j < 9; ++j)
+		for (int j = 0; j < 9; ++j) {
 			u.MovementAnimations[i].AddFrameCentered(a->GetFrame(32 - i + j * 17 + 68), a->FrameSize, true);
+			u.MovementAnimationsTeamColor[i].AddFrameCentered(a->GetFrame(32 - i + j * 17 + 68 + 229), a->FrameSize);
+		}
 
 	}
+
+
 
 	for (int i = 0; i < 16; ++i) {
 		u.MovementAnimationsShadow[i].looping = true;
@@ -54,7 +59,7 @@ static void MarineResources() {
 	for (int i = 17; i < 32; ++i) {
 		u.MovementAnimationsShadow[i].looping = true;
 		u.MovementAnimationsShadow[i].frameDuration = 1;
-		for (int j = 0; j < 9; ++j) 
+		for (int j = 0; j < 9; ++j)
 			u.MovementAnimationsShadow[i].AddFrameCentered(as->GetFrame(32 - i + j * 17 + 68), as->FrameSize, true);
 
 	}

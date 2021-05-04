@@ -1,14 +1,14 @@
-﻿unit\terran\tmashad.grp
+﻿palette Units
 
-palette Icons
+unit\terran\marine.grp
+
+#palette Terrain
+#tileset\*.grp
+
+#palette Units
+#unit\*.grp
+
+#palette Icons
+#unit\cmdbtns\*.grp
 #game\icons.grp
-cursor\*.grp
-
-palette Terrain
-tileset\*.grp
-
-palette Units
-unit\*.grp
-
-palette Icons
-unit\cmdbtns\*.grp
+#cursor\*.grp

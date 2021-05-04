@@ -35,7 +35,8 @@ void RenderSystem::Draw(const Camera& camera) {
 		order += dst.position.y * 1000 + dst.position.x;
 
 
-		render.push_back({ order, cmp.sprite, dst, cmp.hFlip, cmp.shadowSprite, shadowDst });
+		render.push_back({ order, cmp.sprite, dst, cmp.hFlip, cmp.shadowSprite, shadowDst ,
+			cmp.colorSprite, cmp.unitColor });
 	}
 
 
@@ -44,12 +45,17 @@ void RenderSystem::Draw(const Camera& camera) {
 	Color c = Colors::Black;
 	c.a = 0.5f;
 
-	for (const auto& r : render)
+	for ( auto& r : render)
 	{
 		if (r.shadowDst.size.LengthSquared() > 0)
 			Platform::Draw(r.shadowSprite, r.shadowDst, c, r.hFlip);
 
 		Platform::Draw(r.sprite, r.dst, Colors::Black, r.hFlip);
+
+		if (r.color != Colors::Transparent) {
+			r.color.a = 0.5f;
+			Platform::Draw(r.colorSprite, r.dst, r.color, r.hFlip);
+		}
 	}
 }
 

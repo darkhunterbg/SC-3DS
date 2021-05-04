@@ -15,10 +15,20 @@ namespace GRPConvert
 
 		public string Name;
 
+		public Dictionary<int, Color> Remapped = new Dictionary<int, Color>();
+		public List<int> RemappedIndexes = new List<int>();
 		public Palette(Color color)
 		{
 			for (int i = 0; i < 256; ++i)
 				Colors.Add(color);
+		}
+
+		public void Remap(int c, Color newColor)
+		{
+
+			Remapped[c] = newColor;
+			Colors[c] = newColor;
+			RemappedIndexes.Add(c);
 		}
 
 		public Palette(string path)

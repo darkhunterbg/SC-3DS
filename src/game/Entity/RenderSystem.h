@@ -6,7 +6,7 @@
 #include "Component.h"
 #include "../Assets.h"
 #include "../Span.h"
-
+#include "../Color.h"
 
 struct RenderComponent : IComponent<0> {
 	int depth = 0;
@@ -18,6 +18,9 @@ struct RenderComponent : IComponent<0> {
 	Rectangle _shadowDst;
 	Sprite shadowSprite;
 	Vector2Int shadowOffset = { 0,0 };
+
+	Color unitColor = Colors::Transparent;
+	Sprite colorSprite;
 
 	inline void SetSprite(const Sprite& s) {
 		_dst.size = s.rect.size;
@@ -49,6 +52,8 @@ class RenderSystem {
 		bool hFlip;
 		Sprite shadowSprite;
 		Rectangle shadowDst;
+		Sprite colorSprite;
+		Color color;
 	};
 private:
 	std::vector< Render> render;

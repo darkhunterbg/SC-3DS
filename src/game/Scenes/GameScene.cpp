@@ -58,21 +58,15 @@ void GameScene::Start() {
 	yes[3] = Platform::LoadAudioClip("music/tmayes03.wav");
 	Game::Audio->PlayStream(stream, 0);
 
-	//clip.looping = true;
-	//clip.AddSprite(marine->GetSprite(13), { 23,19 });
-	//clip.AddSprite(marine->GetSprite(30), { 23,19 });
-	//clip.AddSprite(marine->GetSprite(47), { 23,19 });
-	//clip.AddSprite(marine->GetSprite(30), { 23,19 });
-	//clip.frameSize = { 64,64 };
-	//for (auto& c : clip.GetFrames())
-	//	c.offset -= (clip.frameSize ) / 2;
-
 	entityManager = new EntityManager();
 
+	Color color[] = { Colors::Red, Colors::UIGreen, Colors::CornflowerBlue, Colors::MediumPurple,
+	 Colors::Orange, Colors::White };
 
-	for (int x = 5; x < 6; ++x) {
-		for (int y = 5; y < 6; ++y) {
-			entityManager->NewUnit(UnitDatabase::Marine, { x * 32 ,y * 32 });
+	for (int x = 3; x < 10; ++x) {
+		for (int y = 3; y < 10; ++y) {
+			Color c = color[std::rand() % 6];
+			entityManager->NewUnit(UnitDatabase::Marine, { x * 32 ,y * 32 }, c);
 		}
 	}
 
@@ -144,6 +138,7 @@ void GameScene::Update() {
 			if (entityManager->GetRenderComponent(id).depth != -1) {
 				entityManager->GetAnimationComponent(id).PlayClip(&UnitDatabase::Marine.DeathAnimation);
 				entityManager->GetAnimationComponent(id).shadowClip = nullptr;
+				entityManager->GetAnimationComponent(id).unitColorClip = nullptr;
 				entityManager->GetRenderComponent(id).depth = -1;
 				entityManager->RemoveColliderComponent(id);
 				entityManager->GetNavigationComponent(id).work = false;

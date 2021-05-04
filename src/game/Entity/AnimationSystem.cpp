@@ -30,6 +30,15 @@ void AnimationSystem::UpdateAnimations(RenderSystem& renderSystem) {
 						const SpriteFrame& shadowFrame = cmp.shadowClip->GetFrame(cmp.clipFrame);
 						rcomp.SetShadowFrame(shadowFrame);
 					}
+					else {
+						rcomp.shadowSprite.rect.size = { 0,0 };
+					}
+					if (cmp.unitColorClip != nullptr) {
+						rcomp.colorSprite = cmp.unitColorClip->GetFrame(cmp.clipFrame).sprite;
+					}
+					else {
+						rcomp.unitColor = Colors::Transparent;
+					}
 				}
 			}
 		}
