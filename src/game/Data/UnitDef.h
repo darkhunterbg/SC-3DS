@@ -4,6 +4,7 @@
 
 #include "../Assets.h"
 #include "../MathLib.h"
+#include "AnimationDef.h"
 
 struct UnitDef {
 
@@ -13,6 +14,9 @@ struct UnitDef {
 	unsigned RotationSpeed;
 
 	Rectangle Collider;
+
+	DirectionalAnimationDef MovementAnimationDef;
+	AnimationDef DeathAnimationDef;
 
 	AnimationClip MovementAnimations[32];
 	AnimationClip MovementAnimationsShadow[32];

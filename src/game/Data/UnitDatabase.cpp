@@ -14,6 +14,14 @@ static void MarineData() {
 	u.Collider.position = { -9,-10 };
 	u.Collider.size = { 17,20 };
 
+	DirectionalAnimationDef& a = u.MovementAnimationDef;
+	a.FrameStart = 68;
+	a.FrameDuration = 9;
+	a.Looping = true;
+	a.UnitColorFrameStart = 229 + a.FrameStart;
+
+	u.DeathAnimationDef = { 221 ,8, false };
+
 }
 static void MarineResources() {
 	auto a = SpriteDatabase::Load_unit_terran_marine();
@@ -21,58 +29,8 @@ static void MarineResources() {
 
 	UnitDef& u = UnitDatabase::Marine;
 
-	for (int i = 0; i < 8; ++i)
-		u.DeathAnimation.AddFrameCentered(a->GetFrame(221 + i), a->FrameSize);
-
-	//for (auto& c : u.DeathAnimation.GetFrames())
-	//	c.offset -= (a->FrameSize) / 2;
-
-	for (int i = 0; i <= 16; ++i) {
-		u.MovementAnimations[i].looping = true;
-
-		for (int j = 0; j < 9; ++j) {
-			u.MovementAnimations[i].AddFrameCentered(a->GetFrame(i + j * 17 + 68), a->FrameSize);
-			u.MovementAnimationsTeamColor[i].AddFrameCentered(a->GetFrame(i + j * 17 + 68 + 229), a->FrameSize);
-		}
-	}
-
-	for (int i = 17; i < 32; ++i) {
-		u.MovementAnimations[i].looping = true;
-		u.MovementAnimations[i].frameDuration = 1;
-		for (int j = 0; j < 9; ++j) {
-			u.MovementAnimations[i].AddFrameCentered(a->GetFrame(32 - i + j * 17 + 68), a->FrameSize, true);
-			u.MovementAnimationsTeamColor[i].AddFrameCentered(a->GetFrame(32 - i + j * 17 + 68 + 229), a->FrameSize);
-		}
-
-	}
-
-
-
-	for (int i = 0; i < 16; ++i) {
-		u.MovementAnimationsShadow[i].looping = true;
-		u.MovementAnimationsShadow[i].frameDuration = 1;
-		for (int j = 0; j < 9; ++j)
-			u.MovementAnimationsShadow[i].AddFrameCentered(as->GetFrame(i + j * 17 + 68), as->FrameSize);
-
-	}
-
-	for (int i = 17; i < 32; ++i) {
-		u.MovementAnimationsShadow[i].looping = true;
-		u.MovementAnimationsShadow[i].frameDuration = 1;
-		for (int j = 0; j < 9; ++j)
-			u.MovementAnimationsShadow[i].AddFrameCentered(as->GetFrame(32 - i + j * 17 + 68), as->FrameSize, true);
-
-	}
-
-	//for (int i = 0; i < 32; ++i) {
-	//	for (int j = 0; j < u.MovementAnimations[i].GetFrameCount(); ++j)
-	//	{
-	//		auto& c = u.MovementAnimations[i];
-	//		auto& f = u.MovementAnimations[i].GetFrame(j);
-	//		//c.SetFrameOffset(j, f.offset - (a->FrameSize) / 2);
-	//	}
-
-	//}
+	u.DeathAnimationDef.GenerateAnimation(a, &u.DeathAnimation);
+	u.MovementAnimationDef.GenerateAnimations(a, as, u.MovementAnimations, u.MovementAnimationsShadow, u.MovementAnimationsTeamColor);
 }
 
 void UnitDatabase::Init()
