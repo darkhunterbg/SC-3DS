@@ -41,7 +41,7 @@ void RenderSystem::Draw(const Camera& camera) {
 
 	std::sort(render.begin(), render.end(), RenderSort);
 
-	Color c = Colors::White;
+	Color c = Colors::Black;
 	c.a = 0.5f;
 
 	for (const auto& r : render)

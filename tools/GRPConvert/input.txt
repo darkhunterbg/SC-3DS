@@ -1,4 +1,6 @@
-﻿palette Icons
+﻿unit\terran\tmashad.grp
+
+palette Icons
 #game\icons.grp
 cursor\*.grp
 

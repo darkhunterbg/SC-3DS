@@ -173,17 +173,15 @@ void ExecDrawCommand(const SDLDrawCommand& cmd, SDL_Rect& clip, const int& w, co
 		rect.w = (clip.w * rect.w) / w;
 		rect.h = (clip.h * rect.h) / h;
 
-
+		SDL_SetTextureAlphaMod(cmd.texture, cmd.a);
 		if (cmd.r != 0  || cmd.g !=0  || cmd.b != 0) {
 
 			SDL_SetTextureBlendMode(cmd.texture, SDL_BlendMode::SDL_BLENDMODE_ADD);
 			SDL_SetTextureColorMod(cmd.texture, cmd.r, cmd.g, cmd.b);
-			SDL_SetTextureAlphaMod(cmd.texture, cmd.a);
 		}
 		else {
 			SDL_SetTextureBlendMode(cmd.texture, SDL_BlendMode::SDL_BLENDMODE_BLEND);
 			SDL_SetTextureColorMod(cmd.texture, 255, 255, 255);
-			SDL_SetTextureAlphaMod(cmd.texture, 255);
 		}
 
 

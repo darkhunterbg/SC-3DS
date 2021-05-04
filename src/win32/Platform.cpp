@@ -144,6 +144,8 @@ void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip
 	cmd.flip = hFlip ? SDL_RendererFlip::SDL_FLIP_HORIZONTAL : SDL_RendererFlip::SDL_FLIP_NONE;
 
 	if (target != nullptr) {
+		SDL_SetTextureAlphaMod(cmd.texture, cmd.a);
+
 		if (cmd.r != 0 || cmd.g != 0 || cmd.b != 0) {
 
 			SDL_SetTextureBlendMode(cmd.texture, SDL_BlendMode::SDL_BLENDMODE_ADD);

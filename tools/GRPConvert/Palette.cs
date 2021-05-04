@@ -15,6 +15,12 @@ namespace GRPConvert
 
 		public string Name;
 
+		public Palette(Color color)
+		{
+			for (int i = 0; i < 256; ++i)
+				Colors.Add(color);
+		}
+
 		public Palette(string path)
 		{
 			Name = Path.GetFileNameWithoutExtension(path);

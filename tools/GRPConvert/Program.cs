@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -10,8 +11,12 @@ namespace GRPConvert
 	{
 		static Dictionary<string, Palette> palettes = new Dictionary<string, Palette>();
 
+		static Palette shadowPalette;
+
 		static void Main(string[] args)
 		{
+			shadowPalette = new Palette(Color.Black);
+
 			foreach (var file in Directory.EnumerateFiles("..\\..\\palettes\\", "*.pal", SearchOption.AllDirectories)) {
 				palettes.Add(Path.GetFileNameWithoutExtension(file), new Palette(file));
 			}
@@ -60,12 +65,14 @@ namespace GRPConvert
 
 					string name = Path.GetFileNameWithoutExtension(f);
 
+					var p = f.EndsWith("shad.grp") ? shadowPalette : pal;
+
 					foreach (var fr in img.Frames) {
 
 						string frName = i.ToString("D3") + ".png";
 						string s = Path.Combine(dst, frName);
 						++i;
-						fr.ToBitmap(pal).Save(s, ImageFormat.Png);
+						fr.ToBitmap(p).Save(s, ImageFormat.Png);
 						info.Add($"{frName} {fr.XOffset} {fr.YOffset} {fr.Width} {fr.Height}");
 					}
 					File.WriteAllLines(Path.Combine(dst,$"info.txt"),info);
