@@ -31,13 +31,13 @@ void AnimationSystem::UpdateAnimations(RenderSystem& renderSystem) {
 						rcomp.SetShadowFrame(shadowFrame);
 					}
 					else {
-						rcomp.shadowSprite.rect.size = { 0,0 };
+						//rcomp.shadowSprite.rect.size = { 0,0 };
 					}
 					if (cmp.unitColorClip != nullptr) {
-						rcomp.colorSprite = cmp.unitColorClip->GetFrame(cmp.clipFrame).sprite;
+						rcomp.colorSprite = cmp.unitColorClip->GetFrame(cmp.clipFrame).sprite.image;
 					}
 					else {
-						rcomp.unitColor = Colors::Transparent;
+						rcomp.unitColor = 0;
 					}
 				}
 			}

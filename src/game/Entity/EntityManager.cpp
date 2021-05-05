@@ -125,8 +125,8 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 	EntityId e = NewEntity(position);
 	auto& ren = AddRenderComponent(e, def.MovementAnimations[0].GetFrame(0));
 	ren.SetShadowFrame(def.MovementAnimationsShadow[0].GetFrame(0));
-	ren.colorSprite = def.MovementAnimationsTeamColor[0].GetFrame(0).sprite;
-	ren.unitColor = color;
+	ren.colorSprite = def.MovementAnimationsTeamColor[0].GetFrame(0).sprite.image;
+	ren.unitColor = Color4(color);
 
 	AddAnimationComponent(e, &def.MovementAnimations[0]).pause = true;
 	auto& nav = AddNavigationComponent(e, def.RotationSpeed, def.MovementSpeed);
@@ -146,9 +146,8 @@ RenderComponent& EntityManager::AddRenderComponent(EntityId id, const SpriteFram
 	entity.SetHasComponent<RenderComponent>(true);
 	RenderComponent& c = renderSystem->RenderComponents.NewComponent(id);
 	c.SetFrame(frame);
-	c._dst.position += entity.position;
-	c._shadowDst.position += entity.position;
-	renderSystem->archetypes.push_back({ c._dst });
+	c._dst += entity.position;
+	c._shadowDst += entity.position;
 	return c;
 }
 AnimationComponent& EntityManager::AddAnimationComponent(EntityId id, const AnimationClip* clip) {

@@ -15,42 +15,45 @@ void RenderSystem::Draw(const Camera& camera) {
 
 	float camMul = 1.0f / camera.Scale;
 
+	int i = sizeof(RenderComponent);
+
 	render.clear();
 
 	for (RenderComponent& cmp : RenderComponents.GetComponents())
 	{
-		if (!camRect.Intersects(cmp._dst))
+		// TODO: size
+		if (!camRect.Contains(cmp._dst))
 			continue;
 
-		Rectangle dst = cmp._dst;
-		dst.position -= camRect.position;
-		dst.position /= camera.Scale;
+		Vector2Int dst = cmp._dst;
+		dst -= camRect.position;
+		dst /= camera.Scale;
 
-		Rectangle shadowDst = cmp._shadowDst;
-		shadowDst.position -= camRect.position;
-		shadowDst.position /= camera.Scale;
+		Vector2Int shadowDst = cmp._shadowDst;
+		shadowDst -= camRect.position;
+		shadowDst /= camera.Scale;
 
 		int order = cmp.depth * 10'000'000;
-		order += dst.position.y * 1000 + dst.position.x * 3;
+		order += dst.y * 1000 + dst.x * 3;
 
 		Vector2 flip = { cmp.hFlip ? -1.0f : 1.0f,1.0f };
 
 		BatchDrawCommand cmd;
 		cmd.order = order;
-		cmd.image = cmp.shadowSprite.image;
-		cmd.position = shadowDst.position;
+		cmd.image = cmp.shadowSprite;
+		cmd.position = shadowDst;
 		cmd.scale = flip * camMul;
 		cmd.color = { shadowColor, 1 };
 		render.push_back(cmd);
 
 		cmd.order++;
-		cmd.image = cmp.sprite.image;
-		cmd.position = dst.position;
+		cmd.image = cmp.sprite;
+		cmd.position = dst;
 		cmd.color = { Color4(Colors::Black),0 };
 		render.push_back(cmd);
 
 		cmd.order++;
-		cmd.image = cmp.colorSprite.image;
+		cmd.image = cmp.colorSprite;
 		cmd.color = { Color4(cmp.unitColor), 0.66f };
 		render.push_back(cmd);
 	}
@@ -83,11 +86,8 @@ void RenderSystem::UpdateEntities(const Span<Entity> entities) {
 			continue;
 
 		RenderComponent& c = RenderComponents.GetComponent(entity.id);
-		c._dst = c.sprite.rect;
-		c._dst.position = entity.position + c.offset;
-
-		c._shadowDst = c.shadowSprite.rect;
-		c._shadowDst.position = entity.position + c.shadowOffset;
+		c._dst = entity.position + c.offset;
+		c._shadowDst = entity.position + c.shadowOffset;
 	}
 
 }

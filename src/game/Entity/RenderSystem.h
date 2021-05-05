@@ -11,43 +11,37 @@
 
 struct RenderComponent : IComponent<0> {
 	int depth = 0;
-	Rectangle _dst;
-	Sprite sprite;
+	Vector2Int _dst;
+	Image sprite;
 	Vector2Int offset = { 0,0 };
 	bool hFlip = false;
 
-	Rectangle _shadowDst;
-	Sprite shadowSprite;
+	Vector2Int _shadowDst;
+	Image shadowSprite;
 	Vector2Int shadowOffset = { 0,0 };
 
-	Color unitColor = Colors::Transparent;
-	Sprite colorSprite;
+	Color4 unitColor;
+	Image colorSprite;
 
 	inline void SetSprite(const Sprite& s) {
-		_dst.size = s.rect.size;
-		sprite = s;
+		sprite = s.image;
 	}
 	inline void SetFrame(const SpriteFrame& frame) {
-		sprite = frame.sprite;
+		sprite = frame.sprite.image;
 		Vector2Int oldOffset = offset;
 		offset = frame.offset;
-		_dst.position += frame.offset - oldOffset;
-		_dst.size = frame.sprite.rect.size;
+		_dst += frame.offset - oldOffset;
 		hFlip = frame.hFlip;
 	}
 
 	inline void SetShadowFrame(const SpriteFrame& frame) {
-		shadowSprite = frame.sprite;
+		shadowSprite = frame.sprite.image;
 		Vector2Int oldOffset = shadowOffset;
 		shadowOffset = frame.offset;
-		_shadowDst.position += frame.offset - oldOffset;
-		_shadowDst.size = frame.sprite.rect.size;
+		_shadowDst += frame.offset - oldOffset;
 	}
 };
 
-struct RenderArchetype {
-	Rectangle _dst;
-};
 
 class RenderSystem {
 
@@ -57,7 +51,6 @@ private:
 	static bool RenderSort(const BatchDrawCommand& a, const BatchDrawCommand& b);
 public:
 	ComponentCollection<RenderComponent> RenderComponents;
-	std::vector<RenderArchetype> archetypes;
 	void Draw(const Camera& camera);
 	void UpdateEntities(const Span<Entity> entity);
 };
