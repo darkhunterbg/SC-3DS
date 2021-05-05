@@ -9,13 +9,9 @@
 void RenderSystem::Draw(const Camera& camera) {
 	Rectangle camRect = camera.GetRectangle();
 
-	SectionProfiler p("GenerateDraws");
-
 	constexpr Color4 shadowColor = Color4(0.0f, 0.0f, 0.0f, 0.5f);
 
 	float camMul = 1.0f / camera.Scale;
-
-	int i = sizeof(RenderComponent);
 
 	render.clear();
 
@@ -58,21 +54,10 @@ void RenderSystem::Draw(const Camera& camera) {
 		render.push_back(cmd);
 	}
 
-	p.Submit();
-
-	SectionProfiler p2("SortDraws");
-
 	std::sort(render.begin(), render.end(), RenderSort);
 
-	p2.Submit();
-
-
-	SectionProfiler p3("ExecuteDraws");
 
 	Platform::BatchDraw({ render.data(),render.size() });
-
-
-	p3.Submit();
 }
 
 bool RenderSystem::RenderSort(const BatchDrawCommand& a, const BatchDrawCommand& b) {

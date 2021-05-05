@@ -86,12 +86,12 @@ void EntityManager::DeleteEntity(EntityId id) {
 
 void EntityManager::UpdateEntities() {
 
-	//SectionProfiler p("Navigation");
+	SectionProfiler p("Update");
 
-	navigationSystem->UpdateNavigation(entityBuffer.data(), *animationSystem);
+	//navigationSystem->UpdateNavigation(entityBuffer.data(), *animationSystem);
 	//p.Submit();
 
-	animationSystem->UpdateAnimations(*renderSystem);
+	//animationSystem->UpdateAnimations(*renderSystem);
 
 	collection.clear();
 
@@ -104,21 +104,21 @@ void EntityManager::UpdateEntities() {
 
 	Span<Entity> updated = { collection.data(),collection.size() };
 
-	kinematicSystem->UpdateEntities(updated);
+	//kinematicSystem->UpdateEntities(updated);
 	renderSystem->UpdateEntities(updated);
 
-	//p.Submit();
+	p.Submit();
 }
 
 void EntityManager::DrawEntites(const Camera& camera) {
 
-	//SectionProfiler p("DrawEntities");
+	SectionProfiler p("DrawEntities");
 
 	renderSystem->Draw(camera);
 
 	//kinematicSystem->DrawColliders(camera);
 
-	//p.Submit();
+	p.Submit();
 }
 
 EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color color) {

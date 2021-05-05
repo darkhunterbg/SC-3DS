@@ -90,6 +90,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\PerformanceTestScene.h">
       <Filter>Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\Archetype.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">

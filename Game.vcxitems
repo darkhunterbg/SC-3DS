@@ -23,6 +23,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\UnitDatabase.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\UnitDef.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationSystem.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\Archetype.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\Component.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\Entity.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\EntityManager.h" />

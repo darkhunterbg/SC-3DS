@@ -69,7 +69,7 @@ void GameScene::Start() {
 		for (int x = 99; x >= 0; --x) {
 
 			Color c = color[(i++) % 12];
-			entityManager->NewUnit(*UnitDatabase::Units[i%UnitDatabase::Units.size()], { x * 32 ,y * 32 }, c);
+			entityManager->NewUnit(*UnitDatabase::Units[i % UnitDatabase::Units.size()], { x * 32 ,y * 32 }, c);
 		}
 	}
 
@@ -99,6 +99,15 @@ void GameScene::Update() {
 		++logicalFrame;
 		frameCounter -= 5;
 		LogicalUpdate();
+	}
+
+	int i = 0;
+	for (int y = 99; y >= 0; --y) {
+		for (int x = 99; x >= 0; --x) {
+
+			i++;
+			entityManager->SetPosition(i, { x * 32  ,y * 32  });
+		}
 	}
 
 
