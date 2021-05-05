@@ -10,21 +10,17 @@ struct AudioChannelState;
 typedef int AudioChannelHandle;
 
 struct DrawCommandColor {
-	uint32_t color;
+	Color4 color;
 	float blend;
 
-	constexpr  uint32_t Color32(char r, char g, char b, char a)
-	{
-		return r | (g << (uint32_t)8) | (b << (uint32_t)16) | (a << (uint32_t)24);
-	}
-
 	inline void AlphaBlend(float alpha) {
-		color = { Color32(0,0,0, alpha * 255) };
+		color = Color4(0.0f, 0.0f, 0.0f, alpha);
 		blend = 0;
 	}
 };
 
 struct BatchDrawCommand {
+	int order;
 	Image image;
 	Vector2 position;
 	Vector2 scale;
@@ -51,14 +47,12 @@ public:
 	static void DrawOnScreen(ScreenId screen);
 	static void DrawOnTexture(Texture texture);
 
-	static void TestDraw(Image sprite, Vector2Int  pos, float scale = 1, bool hFlip = false);
-
 	static void BatchDraw(Span< BatchDrawCommand> commands);
 	static void Draw(const Sprite& sprite, Rectangle dst, Color additiveBlendColor = Colors::Black, bool hFlip = false);
 	static void DrawText(const Font& font, Vector2Int position, const char* text, Color color, float scale = 1.0f);
 	static void DrawLine(Vector2Int src, Vector2Int dst, Color color);
 	static void DrawRectangle(Rectangle rect, Color color);
-	static Texture NewTexture(Vector2Int size);
+	static Image NewTexture(Vector2Int size);
 	static FILE* OpenAsset(const char* path);
 
 	static double ElaspedTime();

@@ -28,7 +28,7 @@ private:
 	const SpriteAtlas* iconsAtlas;
 	const SpriteAtlas* cmdIconsAtlas;
 	const SpriteAtlas* consoleAtlas;
-	Texture minimapTexture = nullptr;
+	Image minimapTexture = { 0,0 };
 	Sprite minimapSprite;
 	Vector2 minimapUpscale;
 

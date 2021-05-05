@@ -7,6 +7,7 @@
 #include "../Assets.h"
 #include "../Span.h"
 #include "../Color.h"
+#include "../Platform.h"
 
 struct RenderComponent : IComponent<0> {
 	int depth = 0;
@@ -49,20 +50,11 @@ struct RenderArchetype {
 };
 
 class RenderSystem {
-	struct Render {
-		int order;
-		Sprite sprite;
-		Rectangle dst;
-		bool hFlip;
-		Sprite shadowSprite;
-		Rectangle shadowDst;
-		Sprite colorSprite;
-		Color color;
-	};
-private:
-	std::vector< Render> render;
 
-	static bool RenderSort(const Render& a, const Render& b);
+private:
+	std::vector< BatchDrawCommand> render;
+
+	static bool RenderSort(const BatchDrawCommand& a, const BatchDrawCommand& b);
 public:
 	ComponentCollection<RenderComponent> RenderComponents;
 	std::vector<RenderArchetype> archetypes;

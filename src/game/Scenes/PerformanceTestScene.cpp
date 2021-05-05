@@ -13,7 +13,7 @@ void PerformanceTestScene::Start() {
 	auto s = UnitDatabase::Marine.MovementAnimations[0].GetFrame(0).sprite;
 
 	for (int i = 0; i < 2000; ++i) {
-		draws[i] = { s.image, {0,0},  {1,1}, {0} };
+		draws[i] = { 0, s.image, {0,0},  {1,1}, {0, 0} };
 		draws[i].color.AlphaBlend(1.0f);
 	}
 

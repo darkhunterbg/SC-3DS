@@ -70,12 +70,10 @@ void Profiler::ShowPerformance() {
 
 	float max = *std::max_element(frameLoad.begin(), frameLoad.end());
 
-	if (max < scale)
-		scale = std::fmax(1, scale / 2.0f);
-	else scale = max;
+	scale = std::fmax(1, max);
 
 	for (int i = 0; i < frameLoad.size(); ++i) {
-		int y = std::fmax(1, ((frameLoad[i] * 50) / (int)scale));
+		int y = std::fmax(1, ((frameLoad[i] * 50) / scale));
 		c = Colors::LightGreen;
 		if (frameLoad[i] > 1)
 			c = Colors::Orange;

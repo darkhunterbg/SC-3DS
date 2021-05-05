@@ -65,8 +65,8 @@ void GameScene::Start() {
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
 	int i = 0;
-	for (int y = 0; y < 100; ++y) {
-		for (int x = 0; x < 100; ++x) {
+	for (int y = 99; y >= 0; --y) {
+		for (int x = 99; x >= 0; --x) {
 
 			Color c = color[(i++) % 12];
 			entityManager->NewUnit(*UnitDatabase::Units[i%UnitDatabase::Units.size()], { x * 32 ,y * 32 }, c);

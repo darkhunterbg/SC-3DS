@@ -33,7 +33,7 @@ void GameHUD::DrawResource(Sprite icon, Vector2Int pos, const char* fmt, ...) {
 }
 
 static const  int GetResourceUpdate(int change) {
-	return std::max(1, (int)std::ceil(std::sqrt(change))/2 );
+	return std::max(1, (int)std::ceil(std::sqrt(change)) / 2);
 }
 
 void GameHUD::UpdateResourceDiff(GameHUD::Resource& r) {
@@ -82,7 +82,7 @@ void GameHUD::ApplyInput(Camera& camera) {
 
 void GameHUD::DrawMinimap(const Camera& camera, const MapSystem& mapSystem) {
 
-	if (minimapTexture == nullptr) {
+	if (minimapTexture.textureId == nullptr ) {
 		RenderMinimapTexture(mapSystem);
 	}
 
@@ -118,7 +118,7 @@ void GameHUD::RenderMinimapTexture(const MapSystem& mapSystem) {
 	Rectangle mapBounds = mapSystem.GetMapBounds();
 
 	minimapTexture = Platform::NewTexture({ MinimapTextureSize,MinimapTextureSize });
-	Platform::DrawOnTexture(minimapTexture);
+	Platform::DrawOnTexture(minimapTexture.textureId);
 
 	Vector2 upscale = Vector2(mapBounds.size) / Vector2(MinimapTextureSize, MinimapTextureSize);
 	minimapUpscale = Vector2(mapBounds.size) / Vector2(minimapDst.size);
@@ -132,6 +132,6 @@ void GameHUD::RenderMinimapTexture(const MapSystem& mapSystem) {
 	}
 
 	Platform::DrawOnTexture(nullptr);
-
-	//minimapSprite = { minimapTexture , {{0,0},{MinimapTextureSize,MinimapTextureSize}} };
+	minimapSprite.image = minimapTexture;
+	minimapSprite.rect = { {0,0},{MinimapTextureSize,MinimapTextureSize} };
 }

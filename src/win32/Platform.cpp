@@ -30,7 +30,6 @@ constexpr Uint8 SDL_FloatToUint8(float x) {
 	return (Uint8)(255.0f * ClampF(x, 0.0f, 1.0f) + 0.5f);
 }
 
-
 static 	void AudioCallback(void* userdata, Uint8* stream, int len);
 
 SDL_Texture* LoadTexture(const std::string& path, Vector2Int& size) {
@@ -83,7 +82,7 @@ const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 			return nullptr;
 		}
 		Rectangle rect = { {0,0},size };
-		Sprite s = { tex, rect };
+		Sprite s = { rect ,{ tex ,nullptr} };
 		asset->AddSprite(s);
 	}
 
@@ -128,14 +127,47 @@ void Platform::DrawOnTexture(Texture texture) {
 		SDL_SetRenderTarget(renderer, target);
 
 }
-Texture Platform::NewTexture(Vector2Int size) {
+Image Platform::NewTexture(Vector2Int size) {
 	SDL_Texture* tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
-	return tex;
+	return { tex, 0 };
+}
+
+
+void Platform::BatchDraw(Span<BatchDrawCommand> commands) {
+	for (const auto& cmd : commands) {
+		auto texture = (SDL_Texture*)cmd.image.textureId;
+		SDL_RendererFlip flags = cmd.scale.x < 0 ? SDL_RendererFlip::SDL_FLIP_HORIZONTAL : SDL_RendererFlip::SDL_FLIP_NONE;
+		Vector2Int size;
+		Uint32 f;
+		int access;
+		SDL_QueryTexture(texture, &f, &access, &size.x, &size.y);
+		SDL_Rect dst = {
+			(int)cmd.position.x,
+			(int)cmd.position.y,
+			(int)(size.x * std::abs(cmd.scale.x)),
+			(int)(size.y * cmd.scale.y) };
+
+		Uint8 r = cmd.color.color.GetR();
+		Uint8 g = cmd.color.color.GetG();
+		Uint8 b = cmd.color.color.GetB();
+		Uint8 a = cmd.color.color.GetA();
+
+		SDL_SetTextureBlendMode(texture, SDL_BlendMode::SDL_BLENDMODE_BLEND);
+		SDL_SetTextureAlphaMod(texture, a);
+		if (r != 0 || g != 0 || b != 0 || a != 255) {
+			SDL_SetTextureColorMod(texture, r, g, b);
+		}
+		else {
+			SDL_SetTextureColorMod(texture, 255, 255, 255);
+		}
+
+		SDL_RenderCopyEx(renderer, texture, nullptr, &dst, 0, nullptr, flags);
+	}
 }
 void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip) {
 	SDLDrawCommand cmd;
 
-	cmd.texture = sprite.GetTextureId<SDL_Texture>();
+	cmd.texture = (SDL_Texture*)sprite.image.textureId;
 	cmd.src = *(SDL_Rect*)&sprite.rect;
 	cmd.dst = *(SDL_Rect*)&dst;
 
@@ -147,14 +179,12 @@ void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip
 	cmd.flip = hFlip ? SDL_RendererFlip::SDL_FLIP_HORIZONTAL : SDL_RendererFlip::SDL_FLIP_NONE;
 
 	SDL_SetTextureAlphaMod(cmd.texture, cmd.a);
+	SDL_SetTextureBlendMode(cmd.texture, SDL_BlendMode::SDL_BLENDMODE_BLEND);
 
 	if (cmd.r != 0 || cmd.g != 0 || cmd.b != 0 || cmd.a != 255) {
-
-		SDL_SetTextureBlendMode(cmd.texture, SDL_BlendMode::SDL_BLENDMODE_BLEND);
 		SDL_SetTextureColorMod(cmd.texture, cmd.r, cmd.g, cmd.b);
 	}
 	else {
-		SDL_SetTextureBlendMode(cmd.texture, SDL_BlendMode::SDL_BLENDMODE_BLEND);
 		SDL_SetTextureColorMod(cmd.texture, 255, 255, 255);
 	}
 

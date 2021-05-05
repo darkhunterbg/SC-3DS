@@ -67,7 +67,7 @@ void Platform::DrawOnTexture(Texture texture) {
 		C2D_SceneBegin(currentScreen);
 		return;
 	}
-	const C3D_Tex* tex = ((C2D_Image*)texture)->tex;
+	const C3D_Tex* tex = (C3D_Tex*)texture;
 
 	for (const RenderTarget& rt : createdRenderTargets) {
 		if (rt.tex == tex) {
@@ -84,56 +84,42 @@ void Platform::DrawOnScreen(ScreenId screen) {
 	C2D_SceneBegin(currentScreen);
 }
 
-void Platform::TestDraw(Image image, Vector2Int pos, float scale, bool hFlip) {
-	C2D_Image img = *(C2D_Image*)&image;
-	Vector2 s = { scale, scale };
-
-
-	C2D_ImageTint tint;
-	C2D_AlphaImageTint(&tint, 1.0f);
-
-	C2D_DrawImageAt(img, pos.x, pos.y, 0, &tint, s.x, s.y);
-}
 void Platform::BatchDraw(Span< BatchDrawCommand> commands) {
 
-	for(const auto& cmd : commands) {
+	static constexpr const int depthStep = 0.0001f;
+
+	for (const auto& cmd : commands) {
 		C2D_Image img = *(C2D_Image*)&cmd.image;
-
 		C2D_ImageTint tint;
-		tint.corners[0] = { cmd.color.color, cmd.color.blend };
-		tint.corners[1] = { cmd.color.color, cmd.color.blend };
-		tint.corners[2] = { cmd.color.color, cmd.color.blend };
-		tint.corners[3] = { cmd.color.color, cmd.color.blend };
-
+		tint.corners[0] = { cmd.color.color.value, cmd.color.blend };
+		tint.corners[1] = { cmd.color.color.value, cmd.color.blend };
+		tint.corners[2] = { cmd.color.color.value, cmd.color.blend };
+		tint.corners[3] = { cmd.color.color.value, cmd.color.blend };
 		C2D_DrawImageAt(img, cmd.position.x, cmd.position.y, 0, &tint, cmd.scale.x, cmd.scale.y);
 	}
 }
 
 void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip) {
-	return;
-
-	const C2D_Image& img = *(C2D_Image*)sprite.image.textureId;
 
 
-	//for (int i = 0; i < 1000; ++i)
-	C2D_DrawImageAt(img, dst.position.x, dst.position.y, 0);
+	C2D_Image img = *(C2D_Image*)&sprite.image;
 
-	//if (hFlip)
-	//	dst.size.x *= -1;
-	//if (color != Colors::Black)
-	//{
-	//	C2D_ImageTint tint = { 0 };
-	//	u32 ucolor = C2D_Color32f(color.r, color.g, color.b, color.a);
-	//	for (int i = 0; i < 4; ++i) {
-	//		tint.corners[i].color = ucolor;
-	//		tint.corners[i].blend = 0.5f;
-	//	}
-	//	C2D_DrawImageAt(img, dst.position.x, dst.position.y, 0, &tint, dst.size.x / (float)img.subtex->width, dst.size.y / (float)img.subtex->height);
-	//}
-	//else
-	//{
-	//C2D_DrawImageAt(img, dst.position.x, dst.position.y, 0, nullptr, dst.size.x / (float)img.subtex->width, dst.size.y / (float)img.subtex->height);
-	//}
+	if (hFlip)
+		dst.size.x *= -1;
+	if (color != Colors::Black)
+	{
+		C2D_ImageTint tint;
+		u32 ucolor = C2D_Color32f(color.r, color.g, color.b, color.a);
+		tint.corners[0] = { ucolor , 0.5f };
+		tint.corners[1] = { ucolor , 0.5f };
+		tint.corners[2] = { ucolor , 0.5f };
+		tint.corners[3] = { ucolor , 0.5f };
+
+		C2D_DrawImageAt(img, dst.position.x, dst.position.y, 0, &tint, dst.size.x / (float)img.subtex->width, dst.size.y / (float)img.subtex->height);
+	}
+	else
+		C2D_DrawImageAt(img, dst.position.x, dst.position.y, 0, nullptr, dst.size.x / (float)img.subtex->width, dst.size.y / (float)img.subtex->height);
+
 
 }
 void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color, float scale) {
@@ -157,7 +143,7 @@ void Platform::DrawRectangle(Rectangle rect, Color color) {
 	u32 c = C2D_Color32f(color.r, color.g, color.b, color.a);
 	C2D_DrawRectSolid(rect.position.x, rect.position.y, 0, rect.size.x, rect.size.y, c);
 }
-Texture Platform::NewTexture(Vector2Int size) {
+Image Platform::NewTexture(Vector2Int size) {
 	C3D_Tex* tex = new C3D_Tex();
 	if (!C3D_TexInitVRAM(tex, size.x, size.y, GPU_TEXCOLOR::GPU_RGBA8))
 		EXCEPTION("Failed to create texture with size %ix%i!", size.x, size.y);
@@ -171,8 +157,6 @@ Texture Platform::NewTexture(Vector2Int size) {
 	C3D_RenderTargetClear(rt, C3D_ClearBits::C3D_CLEAR_COLOR, C2D_Color32(0, 0, 0, 255), 0);
 	createdRenderTargets.push_back({ rt,tex });
 
-	C2D_Image* result = new C2D_Image();
-	result->tex = tex;
 	Tex3DS_SubTexture* st = new Tex3DS_SubTexture();
 	st->width = size.x;
 	st->height = size.y;
@@ -180,9 +164,8 @@ Texture Platform::NewTexture(Vector2Int size) {
 	st->right = 0.0f;
 	st->right = 1.0f;
 	st->bottom = 1.0f;
-	result->subtex = st;
 
-	return result;
+	return { tex, st };
 }
 
 double Platform::ElaspedTime() {
