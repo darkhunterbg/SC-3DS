@@ -8,15 +8,15 @@
 #include <array>
 
 typedef void* Texture;
-
+struct Image {
+	Texture textureId;
+	Texture textureId2;
+};
 
 
 struct Sprite {
-	Texture textureId;
 	Rectangle rect;
-
-	template <class TTextureType>
-	TTextureType* GetTextureId() const { return reinterpret_cast<TTextureType*>(textureId); }
+	Image image;
 };
 
 class SpriteAtlas {

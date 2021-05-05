@@ -133,5 +133,5 @@ void GameHUD::RenderMinimapTexture(const MapSystem& mapSystem) {
 
 	Platform::DrawOnTexture(nullptr);
 
-	minimapSprite = { minimapTexture , {{0,0},{MinimapTextureSize,MinimapTextureSize}} };
+	//minimapSprite = { minimapTexture , {{0,0},{MinimapTextureSize,MinimapTextureSize}} };
 }

@@ -17,8 +17,6 @@ struct RenderTarget {
 };
 
 
-
-
 extern C3D_RenderTarget* screens[2];
 extern std::string assetDir;
 extern C2D_TextBuf textBuffer;
@@ -42,7 +40,8 @@ const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 	for (int i = 0; i < count; ++i) {
 		C2D_Image img = C2D_SpriteSheetGetImage(sheet, i);
 		Sprite s;
-		s.textureId = new C2D_Image(img);
+		s.image.textureId = img.tex;
+		s.image.textureId2 = (Texture)img.subtex;
 		s.rect.position = { img.subtex->left * img.tex->width , img.subtex->top * img.tex->height };
 		s.rect.size = { img.subtex->width, img.subtex->height };
 
@@ -84,27 +83,58 @@ void Platform::DrawOnScreen(ScreenId screen) {
 	currentScreen = screens[(int)screen];
 	C2D_SceneBegin(currentScreen);
 }
+
+void Platform::TestDraw(Image image, Vector2Int pos, float scale, bool hFlip) {
+	C2D_Image img = *(C2D_Image*)&image;
+	Vector2 s = { scale, scale };
+
+
+	C2D_ImageTint tint;
+	C2D_AlphaImageTint(&tint, 1.0f);
+
+	C2D_DrawImageAt(img, pos.x, pos.y, 0, &tint, s.x, s.y);
+}
+void Platform::BatchDraw(Span< BatchDrawCommand> commands) {
+
+	for(const auto& cmd : commands) {
+		C2D_Image img = *(C2D_Image*)&cmd.image;
+
+		C2D_ImageTint tint;
+		tint.corners[0] = { cmd.color.color, cmd.color.blend };
+		tint.corners[1] = { cmd.color.color, cmd.color.blend };
+		tint.corners[2] = { cmd.color.color, cmd.color.blend };
+		tint.corners[3] = { cmd.color.color, cmd.color.blend };
+
+		C2D_DrawImageAt(img, cmd.position.x, cmd.position.y, 0, &tint, cmd.scale.x, cmd.scale.y);
+	}
+}
+
 void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip) {
-	C2D_Image img = *sprite.GetTextureId<C2D_Image>();
+	return;
+
+	const C2D_Image& img = *(C2D_Image*)sprite.image.textureId;
 
 
-	if (hFlip)
-		dst.size.x *= -1;
-	if (color != Colors::Black)
-	{
-		C2D_ImageTint tint = { 0 };
-		u32 ucolor = C2D_Color32f(color.r, color.g, color.b, color.a);
-		for (int i = 0; i < 4; ++i) {
-			tint.corners[i].color = ucolor;
-			tint.corners[i].blend = 0.5f;
-		}
-		C2D_DrawImageAt(img, dst.position.x, dst.position.y, 0, &tint, dst.size.x / (float)img.subtex->width, dst.size.y / (float)img.subtex->height);
-	}
-	else
-	{
-		C2D_DrawImageAt(img, dst.position.x, dst.position.y, 0, nullptr, dst.size.x / (float)img.subtex->width, dst.size.y / (float)img.subtex->height);
-	}
-	
+	//for (int i = 0; i < 1000; ++i)
+	C2D_DrawImageAt(img, dst.position.x, dst.position.y, 0);
+
+	//if (hFlip)
+	//	dst.size.x *= -1;
+	//if (color != Colors::Black)
+	//{
+	//	C2D_ImageTint tint = { 0 };
+	//	u32 ucolor = C2D_Color32f(color.r, color.g, color.b, color.a);
+	//	for (int i = 0; i < 4; ++i) {
+	//		tint.corners[i].color = ucolor;
+	//		tint.corners[i].blend = 0.5f;
+	//	}
+	//	C2D_DrawImageAt(img, dst.position.x, dst.position.y, 0, &tint, dst.size.x / (float)img.subtex->width, dst.size.y / (float)img.subtex->height);
+	//}
+	//else
+	//{
+	//C2D_DrawImageAt(img, dst.position.x, dst.position.y, 0, nullptr, dst.size.x / (float)img.subtex->width, dst.size.y / (float)img.subtex->height);
+	//}
+
 }
 void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color, float scale) {
 	C2D_Font f = (C2D_Font)font.fontId;
@@ -227,7 +257,7 @@ void Platform::CreateChannel(AudioChannelState& channel) {
 
 	for (int i = 0; i < 2; ++i) {
 		platformChannel->waveBuff[i].data_vaddr = linearAlloc(channel.bufferSize);
-		platformChannel->waveBuff[i].nsamples = channel.bufferSize / (2* (channel.mono ? 1 : 2));
+		platformChannel->waveBuff[i].nsamples = channel.bufferSize / (2 * (channel.mono ? 1 : 2));
 	}
 
 	audioChannels.push_back(platformChannel);

@@ -98,7 +98,7 @@ void Profiler::FrameStart() {
 void Profiler::FrameEnd() {
 	auto now = Platform::ElaspedTime();
 	double thisFrameTime = (now - frameStartTime) * 1000;
-	frameTime = std::roundf((frameTime * 0.9 + thisFrameTime * 0.1) * 10.0) / 10.0;;
+	frameTime = std::roundf((frameTime * 0.9 + thisFrameTime * 0.1) * 10.0) / 10.0;
 	frameLoad.insert(frameLoad.begin(), thisFrameTime / 16.67);
 	if (frameLoad.size() >= 60)
 		frameLoad.erase(frameLoad.end() - 1);
