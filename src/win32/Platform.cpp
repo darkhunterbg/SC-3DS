@@ -18,7 +18,7 @@
 extern SDL_Renderer* renderer;
 extern SDL_Window* window;
 extern std::filesystem::path assetDir;
-extern std::vector<SDLDrawCommand> commandBuffers[2];
+extern SDL_Texture* screens[2];
 extern uint64_t mainTimer;
 extern Rectangle touchScreenLocation;
 extern bool mute;
@@ -117,13 +117,16 @@ FILE* Platform::OpenAsset(const char* path) {
 
 void Platform::DrawOnScreen(ScreenId screen) {
 	currentScreen = screen;
+	target = nullptr;
+	SDL_SetRenderTarget(renderer, screens[(int)currentScreen]);
 }
 void Platform::DrawOnTexture(Texture texture) {
 	target = (SDL_Texture*)texture;
-	SDL_SetRenderTarget(renderer, target);
-	SDL_Rect r;
-	SDL_RenderGetViewport(renderer, &r);
-	SDL_RenderSetClipRect(renderer, &r);
+	if (target == nullptr)
+		DrawOnScreen(currentScreen);
+	else
+		SDL_SetRenderTarget(renderer, target);
+
 }
 Texture Platform::NewTexture(Vector2Int size) {
 	SDL_Texture* tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
@@ -143,24 +146,20 @@ void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip
 	cmd.type = SDLDrawCommandType::Sprite;
 	cmd.flip = hFlip ? SDL_RendererFlip::SDL_FLIP_HORIZONTAL : SDL_RendererFlip::SDL_FLIP_NONE;
 
-	if (target != nullptr) {
-		SDL_SetTextureAlphaMod(cmd.texture, cmd.a);
+	SDL_SetTextureAlphaMod(cmd.texture, cmd.a);
 
-		if (cmd.r != 0 || cmd.g != 0 || cmd.b != 0) {
+	if (cmd.r != 0 || cmd.g != 0 || cmd.b != 0 || cmd.a != 255) {
 
-			SDL_SetTextureBlendMode(cmd.texture, SDL_BlendMode::SDL_BLENDMODE_ADD);
-			SDL_SetTextureColorMod(cmd.texture, cmd.r, cmd.g, cmd.b);
-		}
-		else {
-			SDL_SetTextureBlendMode(cmd.texture, SDL_BlendMode::SDL_BLENDMODE_BLEND);
-			SDL_SetTextureColorMod(cmd.texture, 255, 255, 255);
-		}
-
-
-		SDL_RenderCopyEx(renderer, cmd.texture, &cmd.src, &cmd.dst, 0, nullptr, cmd.flip);
+		SDL_SetTextureBlendMode(cmd.texture, SDL_BlendMode::SDL_BLENDMODE_BLEND);
+		SDL_SetTextureColorMod(cmd.texture, cmd.r, cmd.g, cmd.b);
 	}
-	else
-		commandBuffers[(int)currentScreen].push_back(cmd);
+	else {
+		SDL_SetTextureBlendMode(cmd.texture, SDL_BlendMode::SDL_BLENDMODE_BLEND);
+		SDL_SetTextureColorMod(cmd.texture, 255, 255, 255);
+	}
+
+	SDL_RenderCopyEx(renderer, cmd.texture, &cmd.src, &cmd.dst, 0, nullptr, cmd.flip);
+
 }
 void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color, float scale) {
 	SDLDrawCommand cmd;
@@ -176,12 +175,8 @@ void Platform::DrawText(const Font& font, Vector2Int position, const char* text,
 	cmd.b = SDL_FloatToUint8(color.b);
 	cmd.a = SDL_FloatToUint8(color.a);
 
-	if (target != nullptr) {
-		FC_DrawScaleColor(cmd.font, renderer, cmd.dst.x, cmd.dst.y, FC_MakeScale(cmd.scale, cmd.scale), FC_MakeColor(cmd.r, cmd.g, cmd.b, cmd.a), cmd.text.data());
-	}
-	else {
-		commandBuffers[(int)currentScreen].push_back(cmd);
-	}
+	FC_DrawScaleColor(cmd.font, renderer, cmd.dst.x, cmd.dst.y, FC_MakeScale(cmd.scale, cmd.scale), FC_MakeColor(cmd.r, cmd.g, cmd.b, cmd.a), cmd.text.data());
+
 }
 void Platform::DrawLine(Vector2Int src, Vector2Int dst, Color color) {
 	SDLDrawCommand cmd;
@@ -196,12 +191,10 @@ void Platform::DrawLine(Vector2Int src, Vector2Int dst, Color color) {
 	cmd.dst.x = dst.x;
 	cmd.dst.y = dst.y;
 
-	if (target != nullptr) {
-		SDL_SetRenderDrawColor(renderer, cmd.r, cmd.g, cmd.b, cmd.a);
-		SDL_RenderDrawLine(renderer, cmd.src.x, cmd.src.y, cmd.dst.x, cmd.dst.y);
-	}
-	else
-		commandBuffers[(int)currentScreen].push_back(cmd);
+
+	SDL_SetRenderDrawColor(renderer, cmd.r, cmd.g, cmd.b, cmd.a);
+	SDL_RenderDrawLine(renderer, cmd.src.x, cmd.src.y, cmd.dst.x, cmd.dst.y);
+
 }
 void Platform::DrawRectangle(Rectangle rect, Color color) {
 	SDLDrawCommand cmd;
@@ -213,12 +206,8 @@ void Platform::DrawRectangle(Rectangle rect, Color color) {
 	cmd.b = SDL_FloatToUint8(color.b);
 	cmd.a = SDL_FloatToUint8(color.a);
 
-	if (target != nullptr) {
-		SDL_SetRenderDrawColor(renderer, cmd.r, cmd.g, cmd.b, cmd.a);
-		SDL_RenderFillRect(renderer, &cmd.dst);
-	}
-	else
-		commandBuffers[(int)currentScreen].push_back(cmd);
+	SDL_SetRenderDrawColor(renderer, cmd.r, cmd.g, cmd.b, cmd.a);
+	SDL_RenderFillRect(renderer, &cmd.dst);
 }
 
 double Platform::ElaspedTime() {

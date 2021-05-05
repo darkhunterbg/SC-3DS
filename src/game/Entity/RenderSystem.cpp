@@ -11,9 +11,21 @@ void RenderSystem::Draw(const Camera& camera) {
 
 	render.clear();
 
-	// Shadow rendering:
-	// Get all object to render in order
-	// Render shadow with additive blending, then object
+
+	//for (const RenderComponent& cmp : RenderComponents.GetComponents())
+	//{
+	//	if (!camRect.Intersects(cmp._dst))
+	//		continue;
+
+	//	Rectangle dst = cmp._dst;
+	//	dst.position -= camRect.position;
+	//	dst.position /= camera.Scale;
+	//	dst.size /= camera.Scale;
+	//}
+
+	//return;
+
+	SectionProfiler p("GenerateDraws");
 
 	for (RenderComponent& cmp : RenderComponents.GetComponents())
 	{
@@ -39,11 +51,19 @@ void RenderSystem::Draw(const Camera& camera) {
 			cmp.colorSprite, cmp.unitColor });
 	}
 
+	p.Submit();
+
+	SectionProfiler p2("SortDraws");
 
 	std::sort(render.begin(), render.end(), RenderSort);
 
+	p2.Submit();
+
 	Color c = Colors::Black;
 	c.a = 0.5f;
+
+
+	SectionProfiler p3("ExecuteDraws");
 
 	for ( auto& r : render)
 	{
@@ -56,6 +76,8 @@ void RenderSystem::Draw(const Camera& camera) {
 			Platform::Draw(r.colorSprite, r.dst, r.color, r.hFlip);
 		}
 	}
+
+	p3.Submit();
 }
 
 bool RenderSystem::RenderSort(const Render& a, const Render& b) {

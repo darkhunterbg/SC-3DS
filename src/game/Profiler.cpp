@@ -27,6 +27,7 @@ SectionProfiler::~SectionProfiler() {
 void SectionProfiler::Submit() {
 	auto time = (Platform::ElaspedTime() - start) * 1000;
 	Profiler::AddStat(name, time);
+	recorded = true;
 }
 
 static std::vector<double> frameLoad;

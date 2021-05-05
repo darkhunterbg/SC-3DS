@@ -86,10 +86,10 @@ void EntityManager::DeleteEntity(EntityId id) {
 
 void EntityManager::UpdateEntities() {
 
-	SectionProfiler p("Navigation");
+	//SectionProfiler p("Navigation");
 
 	navigationSystem->UpdateNavigation(entityBuffer.data(), *animationSystem);
-	p.Submit();
+	//p.Submit();
 
 	animationSystem->UpdateAnimations(*renderSystem);
 
@@ -148,6 +148,7 @@ RenderComponent& EntityManager::AddRenderComponent(EntityId id, const SpriteFram
 	c.SetFrame(frame);
 	c._dst.position += entity.position;
 	c._shadowDst.position += entity.position;
+	renderSystem->archetypes.push_back({ c._dst });
 	return c;
 }
 AnimationComponent& EntityManager::AddAnimationComponent(EntityId id, const AnimationClip* clip) {

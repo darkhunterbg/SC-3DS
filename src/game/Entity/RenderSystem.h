@@ -44,6 +44,10 @@ struct RenderComponent : IComponent<0> {
 	}
 };
 
+struct RenderArchetype {
+	Rectangle _dst;
+};
+
 class RenderSystem {
 	struct Render {
 		int order;
@@ -57,9 +61,11 @@ class RenderSystem {
 	};
 private:
 	std::vector< Render> render;
+
 	static bool RenderSort(const Render& a, const Render& b);
 public:
 	ComponentCollection<RenderComponent> RenderComponents;
+	std::vector<RenderArchetype> archetypes;
 	void Draw(const Camera& camera);
 	void UpdateEntities(const Span<Entity> entity);
 };

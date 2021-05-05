@@ -40,6 +40,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Platform.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Profiler.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\GameScene.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\PerformanceTestScene.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Span.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\stb_sprintf.h" />
@@ -66,6 +67,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GenericPlatform.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Profiler.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\GameScene.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\PerformanceTestScene.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\StringLib.cpp" />
   </ItemGroup>

@@ -3,6 +3,7 @@
 #include "Platform.h"
 #include "Scenes/Scene.h"
 #include "Scenes/GameScene.h"
+#include "Scenes/PerformanceTestScene.h"
 #include "StringLib.h"
 #include "Audio.h"
 #include "Profiler.h"
@@ -57,7 +58,7 @@ void Game::Start() {
 }
 bool Game::Update() {
 
-	SectionProfiler p("Update");
+	//SectionProfiler p("Update");
 
 	Gamepad.Update();
 	Pointer.Update();
@@ -73,13 +74,13 @@ bool Game::Update() {
 			InitialScene();
 	}
 
-	p.Submit();
+	//p.Submit();
 
 	return true;
 }
 
 void Game::Draw() {
-	SectionProfiler p("Draw");
+	//SectionProfiler p("Draw");
 
 	if (startup) {
 		ShowTitleScreen();
@@ -89,7 +90,7 @@ void Game::Draw() {
 		if (currentScene)
 			currentScene->Draw();
 	}
-	p.Submit();
+	//p.Submit();
 
 	Profiler::ShowPerformance();
 }

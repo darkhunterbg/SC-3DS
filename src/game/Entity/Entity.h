@@ -23,7 +23,7 @@ struct Entity {
 		components.set(TComponent::ComponentId, hasComponent);
 	}
 
-	static constexpr const int MaxEntities = 5000;
+	static constexpr const int MaxEntities = 10000;
 	static constexpr const EntityId None = 0;
 };
 
