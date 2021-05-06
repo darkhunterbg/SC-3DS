@@ -7,18 +7,20 @@ int JobSystem::threads = 0;
 std::atomic_int JobSystem::remainingJobs = 0;
 std::atomic_int JobSystem::takenJobs = 0;
 std::vector<Job> JobSystem::jobs;
-void(*JobSystem::action)( int, int) = nullptr;
-
+std::function<void(int, int)> JobSystem::action = 0;
+thread_local int CurrentThreadId;
 
 void JobSystem::ThreadWork(int threadId)
 {
+	CurrentThreadId = threadId;
+
 	while (true) {
 		Platform::WaitSemaphore(semaphore);
-		ThreadWorkOnJob();
+		ThreadWorkOnJob(threadId);
 	}
 }
 
-void JobSystem::ThreadWorkOnJob()
+void JobSystem::ThreadWorkOnJob(int threadId)
 {
 	int totalJobs = jobs.size();
 	auto a = action;
@@ -37,6 +39,12 @@ void JobSystem::ThreadWorkOnJob()
 
 void JobSystem::ExecJob(int elements, int batchSize)
 {
+	if (!threads) {
+		action(0, elements);
+		return;
+	}
+
+
 	jobs.clear();
 
 	for (int i = 0; i < elements; i += batchSize) {
@@ -52,12 +60,14 @@ void JobSystem::ExecJob(int elements, int batchSize)
 		Platform::ReleaseSemaphore(semaphore, awake);
 	}
 
-	ThreadWorkOnJob();
+	ThreadWorkOnJob(0);
 	while (remainingJobs);
 }
 
 void JobSystem::Init()
 {
+	CurrentThreadId = 0;
+
 	semaphore = Platform::CreateSemaphore();
 	threads = Platform::StartThreads(ThreadWork);
 

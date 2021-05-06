@@ -256,3 +256,62 @@ void Platform::EnableChannel(const AudioChannelState& channel, bool enabled) {
 		ndspChnWaveBufClear(channel.handle);
 	}
 }
+
+static  int threadIds[] = { 1,2,3 };
+
+static std::function<void(int)> f;
+
+static void ThreadWork(void* arg) {
+	f(*(int*)arg);
+}
+
+int Platform::StartThreads(std::function<void(int)> threadWork) {
+
+	f = threadWork;
+
+	int threads = 0;
+
+	s32 prio = 0;
+
+	Result r = svcGetThreadPriority(&prio, CUR_THREAD_HANDLE);
+	if (r)
+		EXCEPTION("svcGetThreadPriority failed with %s", R_SUMMARY(r));
+
+	std::vector<int> cores;
+
+	for (int i = 0; i < 3; ++i) {
+		if (threadCreate(ThreadWork, &threadIds[threads], 4096, prio - 1, threadIds[i], true)) {
+			cores.push_back(threadIds[i]);
+			++threads;
+		}
+	}
+
+
+
+	//std::string coreIds;
+	//for (int i : cores)
+	//	coreIds += std::to_string(i) + ",";
+
+	//EXCEPTION("Created threads on cores %s, %i threads", coreIds.data(), cores.size());
+
+	return threads;
+}
+Semaphore Platform::CreateSemaphore() {
+	Handle* h = new Handle(0);
+	Result r = svcCreateSemaphore(h, 0, 100000);
+	if (r)
+		EXCEPTION("svcCreateSemaphore failed with %s", R_SUMMARY(r));
+
+	return h;
+}
+void Platform::WaitSemaphore(Semaphore s) {
+	Result r = svcWaitSynchronization(*(Handle*)s, -1);
+	if (r)
+		EXCEPTION("svcWaitSynchronization failed with %s", R_SUMMARY(r));
+}
+void Platform::ReleaseSemaphore(Semaphore s, int v) {
+	s32 o;
+	Result r = svcReleaseSemaphore(&o, *(Handle*)s, v);
+	if (r)
+		EXCEPTION("svcReleaseSemaphore failed with %s", R_SUMMARY(r));
+}

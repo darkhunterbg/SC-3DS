@@ -29,6 +29,7 @@ struct TransformCmp {
 	Vector2Int pos;
 };
 
+
 struct RenderArchetype {
 	std::vector < RenderPosCmp> pos;
 	std::vector < RenderCmp> ren;
@@ -86,17 +87,20 @@ bool RenderSort(const BatchDrawCommand& a, const BatchDrawCommand& b) {
 	return a.order < b.order;
 }
 
-
-std::vector<int> architypeToEntity;
+ThreadLocal<RenderArchetype>* tlRenderAchetype;
+//std::vector<int> architypeToEntity;
 
 void Update(int start, int end) {
 	for (int i = start; i < end; ++i) {
 		auto p = renderUpdatePosArchetype.outPos[i];
+
 		p->_dst = renderUpdatePosArchetype.worldPos[i] + renderUpdatePosArchetype.offset[i].offset;
 		p->_shadowDst = renderUpdatePosArchetype.worldPos[i] + renderUpdatePosArchetype.offset[i].shadowOffset;
 	}
 };
 
+
+ThreadLocal<RenderUpdatePosArchetype>* tlsRenderUpdatePosArchetype;
 
 void UpdateEntities() {
 	renderUpdatePosArchetype.outPos.clear();
@@ -104,25 +108,47 @@ void UpdateEntities() {
 	renderUpdatePosArchetype.offset.clear();
 
 	int size = transformComponents.size();
-	architypeToEntity.clear();
+	//architypeToEntity.clear();
 
-	for (int i = 0; i < size; ++i) {
-
-		if (entityChanged[i]) {
-			entityChanged[i] = false;
-
-			renderUpdatePosArchetype.outPos.push_back(&renderPosComponents[i]);
-			renderUpdatePosArchetype.worldPos.push_back(transformComponents[i].pos);
-			renderUpdatePosArchetype.offset.push_back(renderOffsetComponents[i]);
-			//architypeToEntity.push_back(i);
-		}
+	for (auto& r : tlsRenderUpdatePosArchetype->GetAll()) {
+		r.outPos.clear();
+		r.worldPos.clear();
+		r.offset.clear();
 	}
+
+	JobSystem::RunJob(size, 128, [](int start, int end) {
+		for (int i = start; i < end; ++i) {
+
+			if (entityChanged[i]) {
+				entityChanged[i] = false;
+
+				tlsRenderUpdatePosArchetype->Get().outPos.push_back(&renderPosComponents[i]);
+				tlsRenderUpdatePosArchetype->Get().worldPos.push_back(transformComponents[i].pos);
+				tlsRenderUpdatePosArchetype->Get().offset.push_back(renderOffsetComponents[i]);
+			}
+		}
+		});
+
+	for (const auto& r : tlsRenderUpdatePosArchetype->GetAll()) {
+		renderUpdatePosArchetype.outPos.insert(renderUpdatePosArchetype.outPos.begin(), r.outPos.begin(), r.outPos.end());
+		renderUpdatePosArchetype.worldPos.insert(renderUpdatePosArchetype.worldPos.begin(), r.worldPos.begin(), r.worldPos.end());
+		renderUpdatePosArchetype.offset.insert(renderUpdatePosArchetype.offset.begin(), r.offset.begin(), r.offset.end());
+	}
+
+	//for (int i = 0; i < size; ++i) {
+
+	//	if (entityChanged[i]) {
+	//		entityChanged[i] = false;
+
+	//		renderUpdatePosArchetype.outPos.push_back(&renderPosComponents[i]);
+	//		renderUpdatePosArchetype.worldPos.push_back(transformComponents[i].pos);
+	//		renderUpdatePosArchetype.offset.push_back(renderOffsetComponents[i]);
+	//	}
+	//}
 
 	size = renderUpdatePosArchetype.outPos.size();
 
-
-
-	JobSystem::RunJob(size, 64, Update);
+	JobSystem::RunJob(size, 128, Update);
 
 	//for (int i = 0; i < size; ++i) {
 	//	auto p = renderUpdatePosArchetype.outPos[i];
@@ -130,15 +156,9 @@ void UpdateEntities() {
 	//	p->_shadowDst = renderUpdatePosArchetype.worldPos[i] + renderUpdatePosArchetype.offset[i].shadowOffset;
 	//}
 
-	//size = architypeToEntity.size();
-
-	//for (int i = 0; i < size; ++i) {
-	//	const auto& p = renderUpdatePosArchetype.outPos[i];
-	//	int cid = architypeToEntity[i];
-	//	renderPosComponents[cid] = p;
-	//}
-
 }
+
+ThreadLocal<std::vector<BatchDrawCommand>>* tlRender;
 
 void DrawEntities(const Camera& camera) {
 
@@ -146,13 +166,60 @@ void DrawEntities(const Camera& camera) {
 
 	Rectangle camRect = camera.GetRectangle();
 
-	constexpr Color4 shadowColor = Color4(0.0f, 0.0f, 0.0f, 0.5f);
+	static constexpr Color4 shadowColor = Color4(0.0f, 0.0f, 0.0f, 0.5f);
 
 	float camMul = 1.0f / camera.Scale;
 
 	render.clear();
 
-	for (int i = 0; i < entitiesCount; ++i) {
+	for (auto& r : tlRender->GetAll())
+		r.clear();
+
+	JobSystem::RunJob(entitiesCount, 128, [camera, camRect, camMul](int start, int end) {
+		for (int i = start; i < end; ++i) {
+			const auto& rp = renderArchetype.pos[i];
+			const auto& r = renderArchetype.ren[i];
+
+			Vector2Int dst = rp._dst;
+			dst -= camRect.position;
+			dst /= camera.Scale;
+
+			Vector2Int shadowDst = rp._shadowDst;
+			shadowDst -= camRect.position;
+			shadowDst /= camera.Scale;
+
+			int order = r.depth * 10'000'000;
+			order += dst.y * 1000 + dst.x * 3;
+
+			Vector2 flip = { r.hFlip ? -1.0f : 1.0f,1.0f };
+
+			BatchDrawCommand cmd;
+			cmd.order = order;
+			cmd.image = r.shadowSprite;
+			cmd.position = shadowDst;
+			cmd.scale = flip * camMul;
+			cmd.color = { shadowColor, 1 };
+			tlRender->Get().push_back(cmd);
+
+			cmd.order++;
+			cmd.image = r.sprite;
+			cmd.position = dst;
+			cmd.color = { Color4(Colors::Black),0 };
+			tlRender->Get().push_back(cmd);
+
+			cmd.order++;
+			cmd.image = r.colorSprite;
+			cmd.color = { Color4(r.unitColor), 0.66f };
+			tlRender->Get().push_back(cmd);
+		}
+
+		});
+
+	for (const auto& r : tlRender->GetAll()) {
+		render.insert(render.begin(), r.begin(), r.end());
+	}
+
+	/*for (int i = 0; i < entitiesCount; ++i) {
 		const auto& rp = renderArchetype.pos[i];
 		const auto& r = renderArchetype.ren[i];
 
@@ -187,7 +254,7 @@ void DrawEntities(const Camera& camera) {
 		cmd.image = r.colorSprite;
 		cmd.color = { Color4(r.unitColor), 0.66f };
 		render.push_back(cmd);
-	}
+	}*/
 
 	std::sort(render.begin(), render.end(), RenderSort);
 
@@ -196,6 +263,13 @@ void DrawEntities(const Camera& camera) {
 }
 
 void PerformanceTestScene::Start() {
+
+	tlRenderAchetype = new ThreadLocal< RenderArchetype>();
+	tlRender = new ThreadLocal<std::vector<BatchDrawCommand>>();
+	tlsRenderUpdatePosArchetype = new ThreadLocal<RenderUpdatePosArchetype>();
+
+	int a = sizeof(RenderArchetype);
+	int b = sizeof(std::vector<BatchDrawCommand>);
 
 	UnitDatabase::LoadAllUnitResources();
 
@@ -223,15 +297,23 @@ static int t = 0;
 
 void PerformanceTestScene::Update() {
 
-	t++;
-	int i = 0;
-	for (int y = 99; y >= 0; --y) {
-		for (int x = 99; x >= 0; --x) {
+	//t++;
 
-
-			SetPosition(i++, { x * 32 +t ,y * 32 +t });
+	JobSystem::RunJob(10000, 128, [](int start, int end) {
+		for (int i = start; i < end; ++i) {
+			SetPosition(i, { (i / 100) * 32 + t ,(i % 100) * 32 + t });
 		}
-	}
+		});
+
+
+	//int i = 0;
+	//for (int y = 99; y >= 0; --y) {
+	//	for (int x = 99; x >= 0; --x) {
+
+
+	//		SetPosition(i++, { x * 32 + t ,y * 32 + t });
+	//	}
+	//}
 
 
 	SectionProfiler p("Update");
@@ -252,20 +334,45 @@ void PerformanceTestScene::Draw() {
 
 	Rectangle camRect = camera.GetRectangle();
 
-	int size = renderComponents.size();
-	for (int i = 0; i < size; ++i) {
-		const auto& rp = renderPosComponents[i];
-
-
-		if (!camRect.Contains(rp._dst))
-			continue;
-
-		renderArchetype.pos.push_back(rp);
-		renderArchetype.ren.push_back(renderComponents[i]);
+	for (RenderArchetype& r : tlRenderAchetype->GetAll()) {
+		r.pos.clear();
+		r.ren.clear();
 	}
 
-	//renderArchetype.pos.insert(renderArchetype.pos.begin(), renderPosComponents.begin(), renderPosComponents.end());
-	//renderArchetype.ren.insert(renderArchetype.ren.begin(), renderComponents.begin(), renderComponents.end());
+
+	int size = renderComponents.size();
+
+	JobSystem::RunJob(size, 128, [camRect](int start, int end) {
+
+		for (int i = start; i < end; ++i) {
+			const auto& rp = renderPosComponents[i];
+
+			if (!camRect.Contains(rp._dst))
+				continue;
+
+			tlRenderAchetype->Get().pos.push_back(rp);
+			tlRenderAchetype->Get().ren.push_back(renderComponents[i]);
+		}
+
+		});
+
+	for (RenderArchetype& r : tlRenderAchetype->GetAll()) {
+		renderArchetype.pos.insert(renderArchetype.pos.begin(), r.pos.begin(), r.pos.end());
+		renderArchetype.ren.insert(renderArchetype.ren.begin(), r.ren.begin(), r.ren.end());
+	}
+
+
+
+	//for (int i = 0; i < size; ++i) {
+	//	const auto& rp = renderPosComponents[i];
+
+
+	//	if (!camRect.Contains(rp._dst))
+	//		continue;
+
+	//	renderArchetype.pos.push_back(rp);
+	//	renderArchetype.ren.push_back(renderComponents[i]);
+	//}
 
 	DrawEntities(camera);
 

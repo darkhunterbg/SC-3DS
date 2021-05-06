@@ -92,11 +92,8 @@ int main()
 		u32 color = C2D_Color32f(Colors::CornflowerBlue.r, Colors::CornflowerBlue.g, Colors::CornflowerBlue.b, Colors::CornflowerBlue.a);
 		C2D_TargetClear(top, color);
 		C2D_TargetClear(bottom, color);
-
-		C2D_Prepare();
 		Game::Draw();
 	
-
 		C3D_FrameEnd(0);
 	}
 
@@ -115,6 +112,10 @@ void Init() {
 
 	// Enable N3DS 804MHz operation, where available
 	//osSetSpeedupEnable(true);
+
+	//Result r = APT_SetAppCpuTimeLimit(30);
+	//if (r)
+	//	FatalError("svcReleaseSemaphore failed with %s", R_SUMMARY(r));
 
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
 	C2D_Init(C2D_DEFAULT_MAX_OBJECTS*4);

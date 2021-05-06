@@ -360,7 +360,9 @@ static std::function<void(int)> threadWorkFunc;
 int Platform::StartThreads(std::function<void(int)> threadWork) {
 	threadWorkFunc = threadWork;
 
-	for (int i = 0; i < numberOfThreads; ++i) {
+	numberOfThreads =  SDL_GetCPUCount();
+
+	for (int i = 1; i < numberOfThreads; ++i) {
 		std::string name = "WorkerThread" + std::to_string(i);
 
 		SDL_CreateThread([](void* data) {
@@ -368,7 +370,7 @@ int Platform::StartThreads(std::function<void(int)> threadWork) {
 			return 0;
 			}, name.data(), new int(i));
 	}
-	return numberOfThreads;
+	return std::max(0, numberOfThreads - 1);
 }
 Semaphore Platform::CreateSemaphore() {
 	return SDL_CreateSemaphore(0);
