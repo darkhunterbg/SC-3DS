@@ -4,11 +4,24 @@
 
 Semaphore JobSystem::semaphore = nullptr;
 int JobSystem::threads = 0;
+
+static uint32_t padding[15];
+
+thread_local int CurrentThreadId;
+
+static uint32_t padding2[15];
+
 std::atomic_int JobSystem::remainingJobs = 0;
+
+static uint32_t padding3[15];
+
 std::atomic_int JobSystem::takenJobs = 0;
+
+static uint32_t padding4[15];
+
 std::vector<Job> JobSystem::jobs;
 std::function<void(int, int)> JobSystem::action = 0;
-thread_local int CurrentThreadId;
+
 
 void JobSystem::ThreadWork(int threadId)
 {

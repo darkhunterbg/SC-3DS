@@ -116,35 +116,35 @@ void UpdateEntities() {
 		r.offset.clear();
 	}
 
-	JobSystem::RunJob(size, 128, [](int start, int end) {
-		for (int i = start; i < end; ++i) {
+	//JobSystem::RunJob(size, 128, [](int start, int end) {
+	//	for (int i = start; i < end; ++i) {
 
-			if (entityChanged[i]) {
-				entityChanged[i] = false;
+	//		if (entityChanged[i]) {
+	//			entityChanged[i] = false;
 
-				tlsRenderUpdatePosArchetype->Get().outPos.push_back(&renderPosComponents[i]);
-				tlsRenderUpdatePosArchetype->Get().worldPos.push_back(transformComponents[i].pos);
-				tlsRenderUpdatePosArchetype->Get().offset.push_back(renderOffsetComponents[i]);
-			}
-		}
-		});
-
-	for (const auto& r : tlsRenderUpdatePosArchetype->GetAll()) {
-		renderUpdatePosArchetype.outPos.insert(renderUpdatePosArchetype.outPos.begin(), r.outPos.begin(), r.outPos.end());
-		renderUpdatePosArchetype.worldPos.insert(renderUpdatePosArchetype.worldPos.begin(), r.worldPos.begin(), r.worldPos.end());
-		renderUpdatePosArchetype.offset.insert(renderUpdatePosArchetype.offset.begin(), r.offset.begin(), r.offset.end());
-	}
-
-	//for (int i = 0; i < size; ++i) {
-
-	//	if (entityChanged[i]) {
-	//		entityChanged[i] = false;
-
-	//		renderUpdatePosArchetype.outPos.push_back(&renderPosComponents[i]);
-	//		renderUpdatePosArchetype.worldPos.push_back(transformComponents[i].pos);
-	//		renderUpdatePosArchetype.offset.push_back(renderOffsetComponents[i]);
+	//			tlsRenderUpdatePosArchetype->Get().outPos.push_back(&renderPosComponents[i]);
+	//			tlsRenderUpdatePosArchetype->Get().worldPos.push_back(transformComponents[i].pos);
+	//			tlsRenderUpdatePosArchetype->Get().offset.push_back(renderOffsetComponents[i]);
+	//		}
 	//	}
+	//	});
+
+	//for (const auto& r : tlsRenderUpdatePosArchetype->GetAll()) {
+	//	renderUpdatePosArchetype.outPos.insert(renderUpdatePosArchetype.outPos.begin(), r.outPos.begin(), r.outPos.end());
+	//	renderUpdatePosArchetype.worldPos.insert(renderUpdatePosArchetype.worldPos.begin(), r.worldPos.begin(), r.worldPos.end());
+	//	renderUpdatePosArchetype.offset.insert(renderUpdatePosArchetype.offset.begin(), r.offset.begin(), r.offset.end());
 	//}
+
+	for (int i = 0; i < size; ++i) {
+
+		if (entityChanged[i]) {
+			entityChanged[i] = false;
+
+			renderUpdatePosArchetype.outPos.push_back(&renderPosComponents[i]);
+			renderUpdatePosArchetype.worldPos.push_back(transformComponents[i].pos);
+			renderUpdatePosArchetype.offset.push_back(renderOffsetComponents[i]);
+		}
+	}
 
 	size = renderUpdatePosArchetype.outPos.size();
 
@@ -172,7 +172,7 @@ void DrawEntities(const Camera& camera) {
 
 	render.clear();
 
-	for (auto& r : tlRender->GetAll())
+	/*for (auto& r : tlRender->GetAll())
 		r.clear();
 
 	JobSystem::RunJob(entitiesCount, 128, [camera, camRect, camMul](int start, int end) {
@@ -217,9 +217,9 @@ void DrawEntities(const Camera& camera) {
 
 	for (const auto& r : tlRender->GetAll()) {
 		render.insert(render.begin(), r.begin(), r.end());
-	}
+	}*/
 
-	/*for (int i = 0; i < entitiesCount; ++i) {
+	for (int i = 0; i < entitiesCount; ++i) {
 		const auto& rp = renderArchetype.pos[i];
 		const auto& r = renderArchetype.ren[i];
 
@@ -254,7 +254,7 @@ void DrawEntities(const Camera& camera) {
 		cmd.image = r.colorSprite;
 		cmd.color = { Color4(r.unitColor), 0.66f };
 		render.push_back(cmd);
-	}*/
+	}
 
 	std::sort(render.begin(), render.end(), RenderSort);
 
@@ -299,24 +299,27 @@ void PerformanceTestScene::Update() {
 
 	//t++;
 
-	JobSystem::RunJob(10000, 128, [](int start, int end) {
-		for (int i = start; i < end; ++i) {
-			SetPosition(i, { (i / 100) * 32 + t ,(i % 100) * 32 + t });
-		}
-		});
-
-
-	//int i = 0;
-	//for (int y = 99; y >= 0; --y) {
-	//	for (int x = 99; x >= 0; --x) {
-
-
-	//		SetPosition(i++, { x * 32 + t ,y * 32 + t });
-	//	}
-	//}
-
-
 	SectionProfiler p("Update");
+
+	// Difference is not big enough to matter
+
+	//JobSystem::RunJob(10000, 128, [](int start, int end) {
+	//	for (int i = start; i < end; ++i) {
+	//		SetPosition(i, { (i / 100) * 32 + t ,(i % 100) * 32 + t });
+	//	}
+	//	});
+
+
+	int i = 0;
+	for (int y = 99; y >= 0; --y) {
+		for (int x = 99; x >= 0; --x) {
+
+
+			SetPosition(i++, { x * 32 + t ,y * 32 + t });
+		}
+	}
+
+
 	UpdateEntities();
 
 	p.Submit();
@@ -342,37 +345,37 @@ void PerformanceTestScene::Draw() {
 
 	int size = renderComponents.size();
 
-	JobSystem::RunJob(size, 128, [camRect](int start, int end) {
+	// Not much difference to matter
 
-		for (int i = start; i < end; ++i) {
-			const auto& rp = renderPosComponents[i];
+	//JobSystem::RunJob(size, 128, [camRect](int start, int end) {
 
-			if (!camRect.Contains(rp._dst))
-				continue;
+	//	for (int i = start; i < end; ++i) {
+	//		const auto& rp = renderPosComponents[i];
 
-			tlRenderAchetype->Get().pos.push_back(rp);
-			tlRenderAchetype->Get().ren.push_back(renderComponents[i]);
-		}
+	//		if (!camRect.Contains(rp._dst))
+	//			continue;
 
-		});
+	//		tlRenderAchetype->Get().pos.push_back(rp);
+	//		tlRenderAchetype->Get().ren.push_back(renderComponents[i]);
+	//	}
 
-	for (RenderArchetype& r : tlRenderAchetype->GetAll()) {
-		renderArchetype.pos.insert(renderArchetype.pos.begin(), r.pos.begin(), r.pos.end());
-		renderArchetype.ren.insert(renderArchetype.ren.begin(), r.ren.begin(), r.ren.end());
-	}
+	//	});
 
-
-
-	//for (int i = 0; i < size; ++i) {
-	//	const auto& rp = renderPosComponents[i];
-
-
-	//	if (!camRect.Contains(rp._dst))
-	//		continue;
-
-	//	renderArchetype.pos.push_back(rp);
-	//	renderArchetype.ren.push_back(renderComponents[i]);
+	//for (RenderArchetype& r : tlRenderAchetype->GetAll()) {
+	//	renderArchetype.pos.insert(renderArchetype.pos.begin(), r.pos.begin(), r.pos.end());
+	//	renderArchetype.ren.insert(renderArchetype.ren.begin(), r.ren.begin(), r.ren.end());
 	//}
+
+	for (int i = 0; i < size; ++i) {
+		const auto& rp = renderPosComponents[i];
+
+
+		if (!camRect.Contains(rp._dst))
+			continue;
+
+		renderArchetype.pos.push_back(rp);
+		renderArchetype.ren.push_back(renderComponents[i]);
+	}
 
 	DrawEntities(camera);
 
