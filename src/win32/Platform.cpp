@@ -22,6 +22,7 @@ extern SDL_Texture* screens[2];
 extern uint64_t mainTimer;
 extern Rectangle touchScreenLocation;
 extern bool mute;
+extern int numberOfThreads;
 
 static ScreenId currentScreen;
 static SDL_Texture* target = nullptr;
@@ -352,6 +353,32 @@ void Platform::EnableChannel(const AudioChannelState& channel, bool enabled) {
 
 	if (!mute)
 		SDL_PauseAudioDevice(channel.handle, enabled ? 0 : 1);
+}
+
+
+static std::function<void(int)> threadWorkFunc;
+int Platform::StartThreads(std::function<void(int)> threadWork) {
+	threadWorkFunc = threadWork;
+
+	for (int i = 0; i < numberOfThreads; ++i) {
+		std::string name = "WorkerThread" + std::to_string(i);
+
+		SDL_CreateThread([](void* data) {
+			threadWorkFunc(*(int*)data);
+			return 0;
+			}, name.data(), new int(i));
+	}
+	return numberOfThreads;
+}
+Semaphore Platform::CreateSemaphore() {
+	return SDL_CreateSemaphore(0);
+}
+void Platform::WaitSemaphore(Semaphore s) {
+	SDL_SemWait((SDL_sem*)s);
+}
+void Platform::ReleaseSemaphore(Semaphore s, int v) {
+	for (int i = 0; i < v; ++i)
+		SDL_SemPost((SDL_sem*)s);
 }
 
 

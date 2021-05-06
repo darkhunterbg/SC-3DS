@@ -8,6 +8,7 @@
 #include "Audio.h"
 #include "Profiler.h"
 #include "Data/UnitDatabase.h"
+#include "Job.h"
 
 static Scene* currentScene;
 
@@ -29,8 +30,8 @@ static void ShowTitleScreen() {
 	Platform::Draw(title->GetSprite(0), { {0,0},{400,240} });
 }
 static void InitialScene() {
-	Game::SetCurrentScene(new GameScene());
-	//Game::SetCurrentScene(new PerformanceTestScene());
+	//Game::SetCurrentScene(new GameScene());
+	Game::SetCurrentScene(new PerformanceTestScene());
 }
 
 void Game::FrameStart() {
@@ -47,6 +48,7 @@ void Game::FrameEnd() {
 
 void Game::Start() {
 
+	JobSystem::Init();
 	SystemFont = Platform::LoadFont("font.bcfnt");
 	title = Platform::LoadAtlas("glue_title.t3x");
 	startup = true;

@@ -3,6 +3,7 @@
 #include "../Platform.h"
 #include "../Profiler.h"
 #include <algorithm>
+#include "../Job.h"
 
 struct RenderCmp {
 	Color4 unitColor;
@@ -88,6 +89,15 @@ bool RenderSort(const BatchDrawCommand& a, const BatchDrawCommand& b) {
 
 std::vector<int> architypeToEntity;
 
+void Update(int start, int end) {
+	for (int i = start; i < end; ++i) {
+		auto p = renderUpdatePosArchetype.outPos[i];
+		p->_dst = renderUpdatePosArchetype.worldPos[i] + renderUpdatePosArchetype.offset[i].offset;
+		p->_shadowDst = renderUpdatePosArchetype.worldPos[i] + renderUpdatePosArchetype.offset[i].shadowOffset;
+	}
+};
+
+
 void UpdateEntities() {
 	renderUpdatePosArchetype.outPos.clear();
 	renderUpdatePosArchetype.worldPos.clear();
@@ -101,7 +111,7 @@ void UpdateEntities() {
 		if (entityChanged[i]) {
 			entityChanged[i] = false;
 
-			renderUpdatePosArchetype.outPos.push_back( &renderPosComponents[i]);
+			renderUpdatePosArchetype.outPos.push_back(&renderPosComponents[i]);
 			renderUpdatePosArchetype.worldPos.push_back(transformComponents[i].pos);
 			renderUpdatePosArchetype.offset.push_back(renderOffsetComponents[i]);
 			//architypeToEntity.push_back(i);
@@ -110,11 +120,15 @@ void UpdateEntities() {
 
 	size = renderUpdatePosArchetype.outPos.size();
 
-	for (int i = 0; i < size; ++i) {
-		auto p = renderUpdatePosArchetype.outPos[i];
-		p->_dst = renderUpdatePosArchetype.worldPos[i] + renderUpdatePosArchetype.offset[i].offset;
-		p->_shadowDst = renderUpdatePosArchetype.worldPos[i] + renderUpdatePosArchetype.offset[i].shadowOffset;
-	}
+
+
+	JobSystem::RunJob(size, 64, Update);
+
+	//for (int i = 0; i < size; ++i) {
+	//	auto p = renderUpdatePosArchetype.outPos[i];
+	//	p->_dst = renderUpdatePosArchetype.worldPos[i] + renderUpdatePosArchetype.offset[i].offset;
+	//	p->_shadowDst = renderUpdatePosArchetype.worldPos[i] + renderUpdatePosArchetype.offset[i].shadowOffset;
+	//}
 
 	//size = architypeToEntity.size();
 
@@ -214,8 +228,8 @@ void PerformanceTestScene::Update() {
 	for (int y = 99; y >= 0; --y) {
 		for (int x = 99; x >= 0; --x) {
 
-			
-			SetPosition(i++, { x * 32  ,y * 32  });
+
+			SetPosition(i++, { x * 32 +t ,y * 32 +t });
 		}
 	}
 

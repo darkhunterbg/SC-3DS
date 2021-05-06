@@ -15,6 +15,7 @@ std::filesystem::path assetDir;
 uint64_t mainTimer;
 Rectangle touchScreenLocation;
 bool mute = false;
+int numberOfThreads = 3;
 
 void Init();
 void Uninit();

@@ -34,6 +34,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUD.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Input.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Job.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\Wave.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Map\MapDef.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Map\MapSystem.h" />
@@ -63,6 +64,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUD.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Input.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Job.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\Wave.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Map\MapSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GenericPlatform.cpp" />

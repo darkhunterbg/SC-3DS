@@ -4,10 +4,12 @@
 #include "MathLib.h"
 #include "Color.h"
 #include "Input.h"
+#include <functional>
 
 
 struct AudioChannelState;
 typedef int AudioChannelHandle;
+typedef void* Semaphore;
 
 struct DrawCommandColor {
 	Color4 color;
@@ -26,7 +28,6 @@ struct BatchDrawCommand {
 	Vector2 scale;
 	DrawCommandColor color;
 };
-
 
 enum class ScreenId
 {
@@ -65,6 +66,11 @@ public:
 
 	static AudioClip LoadAudioClip(const char* path);
 	static AudioStream* LoadAudioStream(const char* path);
+
+	static int StartThreads(std::function<void(int)> threadWork);
+	static Semaphore CreateSemaphore();
+	static void WaitSemaphore(Semaphore);
+	static void ReleaseSemaphore(Semaphore, int);
 };
 
 
