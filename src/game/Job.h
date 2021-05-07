@@ -44,6 +44,8 @@ public:
 		action = a;
 		ExecJob(elements, batchSize);
 	}
+
+	static constexpr const int DefaultJobSize = 128;
 };
 
 extern thread_local int CurrentThreadId;

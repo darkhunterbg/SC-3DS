@@ -106,7 +106,7 @@ void GameScene::Update() {
 		for (int x = 99; x >= 0; --x) {
 
 			i++;
-			entityManager->SetPosition(i, { x * 32  ,y * 32 });
+			//entityManager->SetPosition(i, { x * 32  ,y * 32 });
 		}
 	}
 

@@ -1,6 +1,8 @@
 #include "RenderSystem.h"
 #include "../Platform.h"
 #include "../Profiler.h"
+#include "../Job.h"
+
 #include <algorithm>
 
 #include <cstring>
@@ -65,13 +67,19 @@ bool RenderSystem::RenderSort(const BatchDrawCommand& a, const BatchDrawCommand&
 	return a.order < b.order;
 }
 
-void RenderSystem::SetRenderPosition(RenderUpdatePositionArchetype& archetype) {
-	int size = archetype.outPos.size();
 
-	for (int i = 0; i < size; ++i) {
-		RenderDestinationComponent* p = archetype.outPos[i];
-		p->dst = archetype.worldPos[i] + archetype.offset[i].offset;
-		p->shadowDst = archetype.worldPos[i] + archetype.offset[i].shadowOffset;
-	}
+void RenderSystem::SetRenderPosition(RenderUpdatePositionArchetype& a) {
+	int size = a.outPos.size();
+	static RenderUpdatePositionArchetype& archetype = a;
+
+	JobSystem::RunJob(size, JobSystem::DefaultJobSize, [](int start, int end) {
+
+		for (int i = start; i < end; ++i) {
+			RenderDestinationComponent* p = archetype.outPos[i];
+			p->dst = archetype.worldPos[i] + archetype.offset[i].offset;
+			p->shadowDst = archetype.worldPos[i] + archetype.offset[i].shadowOffset;
+			archetype.outBB[i]->position = p->dst;
+		}
+		});
 }
 

@@ -69,6 +69,8 @@ public:
 		return components[cid];
 	}
 
+	inline TComponent& at(int i) { return components[i]; };
+	inline const TComponent& at(int i) const { return components[i]; }
 	inline size_t size() const { return components.size(); }
 	inline TComponent& operator[](int i) { return components[i]; }
 	inline const TComponent& operator[](int i) const { return components[i]; }

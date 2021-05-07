@@ -13,6 +13,7 @@ struct UnitDef {
 	unsigned MovementSpeed;
 	unsigned RotationSpeed;
 
+	Vector2Int RenderSize;
 	Rectangle Collider;
 
 	DirectionalAnimationDef MovementAnimationDef;

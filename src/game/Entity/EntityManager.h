@@ -41,6 +41,7 @@ public:
 	ComponentCollection<RenderComponent> RenderComponents;
 	ComponentCollection<RenderOffsetComponent> RenderOffsetComponents;
 	ComponentCollection<RenderDestinationComponent> RenderDestinationComponents;
+	ComponentCollection<Rectangle> RenderBoundingBoxComponents;
 
 	EntityManager();
 	~EntityManager();

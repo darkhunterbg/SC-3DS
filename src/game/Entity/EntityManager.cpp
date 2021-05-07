@@ -2,9 +2,7 @@
 #include "RenderSystem.h"
 #include "../Platform.h"
 #include "../Profiler.h"
-
-
-
+#include "../Job.h"
 
 EntityManager::EntityManager() {
 	renderSystem = new RenderSystem();
@@ -50,15 +48,18 @@ void EntityManager::DeleteEntity(EntityId id) {
 	EXCEPTION("Did not find entity for deletion: %i", id);
 }
 
+
+
 void EntityManager::UpdateEntities() {
 
 	updated = true;
 
-	SectionProfiler p("Update");
+
 
 	renderUpdatePosArchetype.outPos.clear();
 	renderUpdatePosArchetype.worldPos.clear();
 	renderUpdatePosArchetype.offset.clear();
+	renderUpdatePosArchetype.outBB.clear();
 
 	int size = EntityChangeComponents.size();
 
@@ -69,10 +70,16 @@ void EntityManager::UpdateEntities() {
 			renderUpdatePosArchetype.outPos.push_back(&RenderDestinationComponents[i]);
 			renderUpdatePosArchetype.worldPos.push_back(PositionComponents[i]);
 			renderUpdatePosArchetype.offset.push_back(RenderOffsetComponents[i]);
+			renderUpdatePosArchetype.outBB.push_back(&RenderBoundingBoxComponents[i]);
 		}
 	}
 
+	SectionProfiler p("Update");
+
 	renderSystem->SetRenderPosition(renderUpdatePosArchetype);
+
+
+	p.Submit();
 
 	//navigationSystem->UpdateNavigation(entityBuffer.data(), *animationSystem);
 	//p.Submit();
@@ -93,7 +100,6 @@ void EntityManager::UpdateEntities() {
 	//kinematicSystem->UpdateEntities(updated);
 	//renderSystem->UpdateEntities(updated);
 
-	p.Submit();
 }
 
 void EntityManager::CameraCull(const Camera& camera)
@@ -105,12 +111,12 @@ void EntityManager::CameraCull(const Camera& camera)
 	Rectangle camRect = camera.GetRectangle();
 
 	for (unsigned i = 0; i < size; ++i) {
-		const auto& rp = RenderDestinationComponents[i];
+		const Rectangle& bb = RenderBoundingBoxComponents[i];
 
-		if (!camRect.Contains(rp.dst))
+		if (!camRect.Intersects(bb))
 			continue;
 
-		renderArchetype.pos.push_back(rp);
+		renderArchetype.pos.push_back(RenderDestinationComponents[i]);
 		renderArchetype.ren.push_back(RenderComponents[i]);
 	}
 }
@@ -131,8 +137,8 @@ void EntityManager::DrawEntites(const Camera& camera) {
 
 EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color color) {
 	EntityId e = NewEntity();
-	PositionComponents.NewComponent(e,  position );
-	EntityChangeComponents.NewComponent(e, { true }) ;
+	PositionComponents.NewComponent(e, position);
+	EntityChangeComponents.NewComponent(e, { true });
 
 	RenderComponents.NewComponent(e, {
 		Color4(color),
@@ -147,6 +153,7 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 		});
 
 	RenderDestinationComponents.NewComponent(e);
+	RenderBoundingBoxComponents.NewComponent(e, { {0,0}, def.RenderSize });
 
 	//auto& ren = AddRenderComponent(e, def.MovementAnimations[0].GetFrame(0));
 	//ren.SetShadowFrame(def.MovementAnimationsShadow[0].GetFrame(0));

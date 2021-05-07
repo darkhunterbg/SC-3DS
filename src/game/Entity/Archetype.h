@@ -13,6 +13,7 @@ struct RenderArchetype {
 };
 struct RenderUpdatePositionArchetype {
 	ArchetypeCollection<RenderDestinationComponent*> outPos;
+	ArchetypeCollection<Rectangle*> outBB;
 	ArchetypeCollection<Vector2Int> worldPos;
 	ArchetypeCollection<RenderOffsetComponent> offset;
 };
