@@ -4,6 +4,8 @@
 #include "../Profiler.h"
 
 
+
+
 EntityManager::EntityManager() {
 	renderSystem = new RenderSystem();
 	animationSystem = new AnimationSystem();
@@ -17,42 +19,19 @@ EntityManager::~EntityManager() {
 	delete navigationSystem;
 }
 
-EntityId EntityManager::NewEntity(Vector2Int position) {
+EntityId EntityManager::NewEntity() {
 
 	// This can be speed up with a queue 
-	bool foundFree = false;
-	for (; nextFreePos < Entity::MaxEntities; nextFreePos++) {
-		if (entityBuffer[nextFreePos].id == 0)
-		{
-			foundFree = true;
-			break;
-		}
-	}
-	if (!foundFree) {
-		for (nextFreePos = 0; nextFreePos < Entity::MaxEntities; nextFreePos++) {
-			if (entityBuffer[nextFreePos].id == 0)
-			{
-				foundFree = true;
-				break;
-			}
-		}
-	}
-	if (!foundFree)
+	if (entities.size() == Entity::MaxEntities)
 		EXCEPTION("No more free entities left!");
 
-	Entity& e = entityBuffer[nextFreePos++];
-	e = Entity();
+	entities.push_back(++lastId);
 
-	e.id = nextFreePos;
-	e.position = position;
-
-	entities.push_back(&e);
-
-	return e.id;
+	return lastId;
 }
 
 void EntityManager::DeleteEntity(EntityId id) {
-	if (id == 0 || id > Entity::MaxEntities)
+	if (id == Entity::None || id > lastId)
 		EXCEPTION("Tried to delete invalid entity!");
 
 
@@ -61,22 +40,9 @@ void EntityManager::DeleteEntity(EntityId id) {
 	int totalEntities = entities.size();
 	for (unsigned i = 0; i < totalEntities; ++i)
 	{
-		Entity* e = entities[i];
-
-		if (e->id == id)
+		if (entities[i] == id)
 		{
 			entities.erase(entities.begin() + i);
-			e->id = 0;
-
-			if (e->HasComponent<RenderComponent>())
-				renderSystem->RenderComponents.RemoveComponent(id);
-			if (e->HasComponent<AnimationComponent>())
-				animationSystem->AnimationComponents.RemoveComponent(id);
-			if (e->HasComponent<ColliderComponent>())
-				kinematicSystem->ColliderComponents.RemoveComponent(id);
-			if (e->HasComponent<NavigationComponent>())
-				navigationSystem->NavigationComponents.RemoveComponent(id);
-
 			return;
 		}
 	}
@@ -86,35 +52,77 @@ void EntityManager::DeleteEntity(EntityId id) {
 
 void EntityManager::UpdateEntities() {
 
+	updated = true;
+
 	SectionProfiler p("Update");
+
+	renderUpdatePosArchetype.outPos.clear();
+	renderUpdatePosArchetype.worldPos.clear();
+	renderUpdatePosArchetype.offset.clear();
+
+	int size = EntityChangeComponents.size();
+
+	for (int i = 0; i < size; ++i) {
+		if (EntityChangeComponents[i].changed) {
+			EntityChangeComponents[i].changed = false;
+
+			renderUpdatePosArchetype.outPos.push_back(&RenderDestinationComponents[i]);
+			renderUpdatePosArchetype.worldPos.push_back(PositionComponents[i]);
+			renderUpdatePosArchetype.offset.push_back(RenderOffsetComponents[i]);
+		}
+	}
+
+	renderSystem->SetRenderPosition(renderUpdatePosArchetype);
 
 	//navigationSystem->UpdateNavigation(entityBuffer.data(), *animationSystem);
 	//p.Submit();
 
 	//animationSystem->UpdateAnimations(*renderSystem);
 
-	collection.clear();
+	//collection.clear();
 
-	for (Entity* e : entities) {
-		if (e->changed) {
-			e->changed = false;
-			collection.push_back(*e);
-		}
-	}
+	//for (Entity* e : entities) {
+	//	if (e->changed) {
+	//		e->changed = false;
+	//		collection.push_back(*e);
+	//	}
+	//}
 
-	Span<Entity> updated = { collection.data(),collection.size() };
+	//Span<Entity> updated = { collection.data(),collection.size() };
 
 	//kinematicSystem->UpdateEntities(updated);
-	renderSystem->UpdateEntities(updated);
+	//renderSystem->UpdateEntities(updated);
 
 	p.Submit();
 }
 
+void EntityManager::CameraCull(const Camera& camera)
+{
+	renderArchetype.pos.clear();
+	renderArchetype.ren.clear();
+	int size = RenderComponents.size();
+
+	Rectangle camRect = camera.GetRectangle();
+
+	for (unsigned i = 0; i < size; ++i) {
+		const auto& rp = RenderDestinationComponents[i];
+
+		if (!camRect.Contains(rp.dst))
+			continue;
+
+		renderArchetype.pos.push_back(rp);
+		renderArchetype.ren.push_back(RenderComponents[i]);
+	}
+}
 void EntityManager::DrawEntites(const Camera& camera) {
+
+	if (!updated)
+		return;
 
 	SectionProfiler p("DrawEntities");
 
-	renderSystem->Draw(camera);
+	CameraCull(camera);
+	renderSystem->Draw(camera, renderArchetype);
 
 	//kinematicSystem->DrawColliders(camera);
 
@@ -122,25 +130,48 @@ void EntityManager::DrawEntites(const Camera& camera) {
 }
 
 EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color color) {
-	EntityId e = NewEntity(position);
-	auto& ren = AddRenderComponent(e, def.MovementAnimations[0].GetFrame(0));
-	ren.SetShadowFrame(def.MovementAnimationsShadow[0].GetFrame(0));
-	ren.colorSprite = def.MovementAnimationsTeamColor[0].GetFrame(0).sprite.image;
-	ren.unitColor = Color4(color);
+	EntityId e = NewEntity();
+	PositionComponents.NewComponent(e,  position );
+	EntityChangeComponents.NewComponent(e, { true }) ;
 
-	AddAnimationComponent(e, &def.MovementAnimations[0]).pause = true;
-	auto& nav = AddNavigationComponent(e, def.RotationSpeed, def.MovementSpeed);
-	AddColliderComponent(e, def.Collider);
+	RenderComponents.NewComponent(e, {
+		Color4(color),
+		def.MovementAnimations[0].GetFrame(0).sprite.image,
+		def.MovementAnimationsShadow[0].GetFrame(0).sprite.image,
+		def.MovementAnimationsTeamColor[0].GetFrame(0).sprite.image,
+		});
 
-	for (int i = 0; i < 32; ++i) {
-		nav.clips[i] = (&def.MovementAnimations[i]);
-		nav.shadowClips[i] = (&def.MovementAnimationsShadow[i]);
-		nav.colorClips[i] = (&def.MovementAnimationsTeamColor[i]);
-	}
+	const auto& o = RenderOffsetComponents.NewComponent(e, {
+		def.MovementAnimations[0].GetFrame(0).offset,
+		def.MovementAnimationsShadow[0].GetFrame(0).offset
+		});
+
+	RenderDestinationComponents.NewComponent(e);
+
+	//auto& ren = AddRenderComponent(e, def.MovementAnimations[0].GetFrame(0));
+	//ren.SetShadowFrame(def.MovementAnimationsShadow[0].GetFrame(0));
+	//ren.colorSprite = def.MovementAnimationsTeamColor[0].GetFrame(0).sprite.image;
+	//ren.unitColor = Color4(color);
+
+	//AddAnimationComponent(e, &def.MovementAnimations[0]).pause = true;
+	//auto& nav = AddNavigationComponent(e, def.RotationSpeed, def.MovementSpeed);
+	//AddColliderComponent(e, def.Collider);
+
+	//for (int i = 0; i < 32; ++i) {
+	//	nav.clips[i] = (&def.MovementAnimations[i]);
+	//	nav.shadowClips[i] = (&def.MovementAnimationsShadow[i]);
+	//	nav.colorClips[i] = (&def.MovementAnimationsTeamColor[i]);
+	//}
 
 	return e;
 }
 
+void EntityManager::SetPosition(EntityId e, Vector2Int pos) {
+	PositionComponents.GetComponent(e) = pos;
+	EntityChangeComponents.GetComponent(e).changed = true;
+}
+
+/*
 RenderComponent& EntityManager::AddRenderComponent(EntityId id, const SpriteFrame& frame) {
 	Entity& entity = GetEntity(id);
 	entity.SetHasComponent<RenderComponent>(true);
@@ -173,3 +204,4 @@ NavigationComponent& EntityManager::AddNavigationComponent(EntityId id, int turn
 	c.velocity = velocity;
 	return c;
 }
+*/

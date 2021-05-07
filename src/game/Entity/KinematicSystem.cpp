@@ -5,13 +5,13 @@
 
 void KinematicSystem::UpdateEntities(Span<Entity> entities)
 {
-	for (const Entity& entity : entities) {
+	/*for (const Entity& entity : entities) {
 		if (!entity.HasComponent<ColliderComponent>())
 			continue;
 		ColliderComponent& component = ColliderComponents.GetComponent(entity.id);
 		component._worldBox = component._box;
 		component._worldBox.position += entity.position;
-	}
+	}*/
 }
 
 void KinematicSystem::DrawColliders(const Camera& camera) {

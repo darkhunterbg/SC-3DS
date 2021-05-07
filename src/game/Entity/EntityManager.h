@@ -4,6 +4,7 @@
 #include <array>
 
 #include "Entity.h"
+#include "Archetype.h"
 #include "../Span.h"
 
 #include "RenderSystem.h"
@@ -17,64 +18,41 @@
 class EntityManager {
 
 private:
-	std::array<Entity, Entity::MaxEntities> entityBuffer;
-	std::vector<Entity*> entities;
-	std::vector<Entity> collection;
+	std::vector<EntityId> entities;
 	std::vector<EntityId> deleted;
-	unsigned nextFreePos = 0;
+	EntityId lastId = Entity::None;
 
 	RenderSystem* renderSystem;
 	AnimationSystem* animationSystem;
 	KinematicSystem* kinematicSystem;
 	NavigationSystem* navigationSystem;
 
-	inline Entity& GetEntity(EntityId id) { return entityBuffer[EntityIdToIndex(id)]; }
+	RenderArchetype renderArchetype;
+	RenderUpdatePositionArchetype renderUpdatePosArchetype;
 
+	void CameraCull(const Camera& camera);
+
+	bool updated = false;
 public:
+
+	ComponentCollection<Vector2Int> PositionComponents;
+	ComponentCollection<EntityChangeComponent> EntityChangeComponents;
+
+	ComponentCollection<RenderComponent> RenderComponents;
+	ComponentCollection<RenderOffsetComponent> RenderOffsetComponents;
+	ComponentCollection<RenderDestinationComponent> RenderDestinationComponents;
+
 	EntityManager();
 	~EntityManager();
 
-	EntityId NewEntity(Vector2Int position);
+	EntityId NewEntity();
 	void DeleteEntity(EntityId id);
 
 	void UpdateEntities();
 	void DrawEntites(const Camera& camera);
 
-	RenderComponent& AddRenderComponent(EntityId id, const SpriteFrame& frame);
-	RenderComponent& GetRenderComponent(EntityId id) { return renderSystem->RenderComponents.GetComponent(id); }
-
-	AnimationComponent& AddAnimationComponent(EntityId id, const AnimationClip* clip);
-	AnimationComponent& GetAnimationComponent(EntityId id) { return animationSystem->AnimationComponents.GetComponent(id); }
-
-	NavigationComponent& AddNavigationComponent(EntityId id, int turnSpeed, int velocity);
-	NavigationComponent& GetNavigationComponent(EntityId id) { return navigationSystem->NavigationComponents.GetComponent(id); }
-
-	ColliderComponent& AddColliderComponent(EntityId id, const Rectangle& box);
-	ColliderComponent& GetColliderComponent(EntityId id) { return kinematicSystem->ColliderComponents.GetComponent(id); }
-	void RemoveColliderComponent(EntityId id) {
-		kinematicSystem->ColliderComponents.RemoveComponent(id);
-	}
-
-	
-	inline void PointCast(Vector2Int point, std::vector<EntityId>& result) {
-		kinematicSystem->PointCast(point, result);
-	}
-	inline EntityId PointCast(Vector2Int point) {
-		return kinematicSystem->PointCast(point);
-	}
-	inline void RectCast(const Rectangle& rect, std::vector<EntityId>& result) {
-		kinematicSystem->RectCast(rect, result);
-	}
-
-	bool HasEntity(EntityId id) {
-		return GetEntity(id).id != 0;
-	}
-
-	void SetPosition(EntityId id, Vector2Int position) {
-		Entity& e = GetEntity(id);
-		e.position = position;
-		e.changed = true;
-	}
 
 	EntityId NewUnit(const UnitDef& def, Vector2Int position, Color color);
+
+	void SetPosition(EntityId e, Vector2Int pos);
 };

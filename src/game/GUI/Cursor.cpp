@@ -151,7 +151,7 @@ void Cursor::Update(Camera& camera, EntityManager& entityManager, std::vector<En
 	}
 
 	Vector2Int worldPos = camera.ScreenToWorld(Position);
-	EntityId hover = entityManager.PointCast(worldPos);
+	EntityId hover = 0;// entityManager.PointCast(worldPos);
 	bool dragging = (worldPos - holdStart).LengthSquared() != 0;
 
 	if (holding && dragging) {
@@ -181,7 +181,7 @@ void Cursor::Update(Camera& camera, EntityManager& entityManager, std::vector<En
 			rect.position.x = std::min(start.x, end.x);
 			rect.position.y = std::min(start.y, end.y);
 
-			entityManager.RectCast(rect, outSelection);
+			//entityManager.RectCast(rect, outSelection);
 			holdStart = { 0,0 };
 			regionRect = { {0,0},{0,0} };
 

@@ -6,7 +6,7 @@
 #include <vector>
 
 
-struct ColliderComponent : IComponent<2> {
+struct ColliderComponent  {
 	Rectangle _worldBox;
 	Rectangle _box;
 

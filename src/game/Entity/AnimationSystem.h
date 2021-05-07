@@ -8,7 +8,7 @@
 class EntityManager;
 class RenderSystem;
 
-struct AnimationComponent : public IComponent<1> {
+struct AnimationComponent  {
 
 	const AnimationClip* clip = nullptr;
 	const AnimationClip* shadowClip = nullptr;

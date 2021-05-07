@@ -5,6 +5,7 @@
 
 
 void AnimationSystem::UpdateAnimations(RenderSystem& renderSystem) {
+	/*
 	int cid = 0;
 	for (AnimationComponent& cmp : AnimationComponents.GetComponents()) {
 		if (!cmp.pause)
@@ -44,5 +45,5 @@ void AnimationSystem::UpdateAnimations(RenderSystem& renderSystem) {
 		}
 		++cid;
 	}
-
+	*/
 }

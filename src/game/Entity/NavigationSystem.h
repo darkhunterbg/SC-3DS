@@ -7,7 +7,7 @@ class EntityManager;
 class AnimationSystem;
 class AnimationClip;
 
-struct NavigationComponent : IComponent<3> {
+struct NavigationComponent  {
 	bool work = false;
 	bool newNav = false;
 	Vector2Int target = { 0,0 };

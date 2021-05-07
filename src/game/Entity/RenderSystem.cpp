@@ -6,51 +6,51 @@
 #include <cstring>
 
 
-void RenderSystem::Draw(const Camera& camera) {
+void RenderSystem::Draw(const Camera& camera, RenderArchetype& archetype) {
 	Rectangle camRect = camera.GetRectangle();
 
-	constexpr Color4 shadowColor = Color4(0.0f, 0.0f, 0.0f, 0.5f);
+	constexpr const Color4 shadowColor = Color4(0.0f, 0.0f, 0.0f, 0.5f);
 
 	float camMul = 1.0f / camera.Scale;
 
 	render.clear();
 
-	for (RenderComponent& cmp : RenderComponents.GetComponents())
-	{
-		// TODO: size
-		if (!camRect.Contains(cmp._dst))
-			continue;
+	int entitiesCount = archetype.pos.size();
 
-		Vector2Int dst = cmp._dst;
+	for (int i = 0; i < entitiesCount; ++i) {
+		const auto& rp = archetype.pos[i];
+		const auto& r = archetype.ren[i];
+
+		Vector2Int dst = rp.dst;
 		dst -= camRect.position;
 		dst /= camera.Scale;
 
-		Vector2Int shadowDst = cmp._shadowDst;
+		Vector2Int shadowDst = rp.shadowDst;
 		shadowDst -= camRect.position;
 		shadowDst /= camera.Scale;
 
-		int order = cmp.depth * 10'000'000;
+		int order = r.depth * 10'000'000;
 		order += dst.y * 1000 + dst.x * 3;
 
-		Vector2 flip = { cmp.hFlip ? -1.0f : 1.0f,1.0f };
+		Vector2 flip = { r.hFlip ? -1.0f : 1.0f,1.0f };
 
 		BatchDrawCommand cmd;
 		cmd.order = order;
-		cmd.image = cmp.shadowSprite;
+		cmd.image = r.shadowSprite;
 		cmd.position = shadowDst;
 		cmd.scale = flip * camMul;
 		cmd.color = { shadowColor, 1 };
 		render.push_back(cmd);
 
 		cmd.order++;
-		cmd.image = cmp.sprite;
+		cmd.image = r.sprite;
 		cmd.position = dst;
 		cmd.color = { Color4(Colors::Black),0 };
 		render.push_back(cmd);
 
 		cmd.order++;
-		cmd.image = cmp.colorSprite;
-		cmd.color = { Color4(cmp.unitColor), 0.66f };
+		cmd.image = r.colorSprite;
+		cmd.color = { Color4(r.unitColor), 0.66f };
 		render.push_back(cmd);
 	}
 
@@ -64,17 +64,13 @@ bool RenderSystem::RenderSort(const BatchDrawCommand& a, const BatchDrawCommand&
 	return a.order < b.order;
 }
 
-void RenderSystem::UpdateEntities(const Span<Entity> entities) {
+void RenderSystem::SetRenderPosition(RenderUpdatePositionArchetype& archetype) {
+	int size = archetype.outPos.size();
 
-	for (const Entity& entity : entities) {
-		if (!entity.HasComponent<RenderComponent>())
-			continue;
-
-		RenderComponent& c = RenderComponents.GetComponent(entity.id);
-		c._dst = entity.position + c.offset;
-		c._shadowDst = entity.position + c.shadowOffset;
+	for (int i = 0; i < size; ++i) {
+		RenderDestinationComponent* p = archetype.outPos[i];
+		p->dst = archetype.worldPos[i] + archetype.offset[i].offset;
+		p->shadowDst = archetype.worldPos[i] + archetype.offset[i].shadowOffset;
 	}
-
 }
-
 

@@ -20,7 +20,7 @@ static Vector2 movementTable[]{
 };
 
 void NavigationSystem::UpdateNavigation(Entity* entities, AnimationSystem& animationSystem)
-{
+{ /*
 	int i = 0;
 	for (NavigationComponent& cmp : NavigationComponents.GetComponents()) {
 		int cid = i++;
@@ -46,11 +46,11 @@ void NavigationSystem::UpdateNavigation(Entity* entities, AnimationSystem& anima
 
 		}
 
-		/*
-			 Vector2Int distance = cmp.target - entity.position;
-			float angle = atan2f(distance.y, distance.x) + PI / 2.0f;
-			int heading = ((((int)((angle * 16) / PI) + 32) % 32) / 8) * 8;
-			*/
+		
+			// Vector2Int distance = cmp.target - entity.position;
+			//float angle = atan2f(distance.y, distance.x) + PI / 2.0f;
+			//int heading = ((((int)((angle * 16) / PI) + 32) % 32) / 8) * 8;
+			
 
 		if (cmp.newNav || heading != entity.orientation) {
 			int diff = heading - entity.orientation;
@@ -110,4 +110,5 @@ void NavigationSystem::UpdateNavigation(Entity* entities, AnimationSystem& anima
 		entity.changed = true;
 
 	}
+*/
 }

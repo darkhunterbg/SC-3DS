@@ -106,7 +106,7 @@ void GameScene::Update() {
 		for (int x = 99; x >= 0; --x) {
 
 			i++;
-			entityManager->SetPosition(i, { x * 32  ,y * 32  });
+			entityManager->SetPosition(i, { x * 32  ,y * 32 });
 		}
 	}
 
@@ -126,38 +126,38 @@ void GameScene::Update() {
 
 	if (Game::Gamepad.IsButtonPressed(GamepadButton::X)) {
 
-		for (EntityId id : selection)
+		/*for (EntityId id : selection)
 			if (entityManager->GetRenderComponent(id).depth != -1) {
 				auto& nav = entityManager->GetNavigationComponent(id);
 				nav.GoTo(camera.ScreenToWorld(cursor->Position));
 
 				int i = std::rand() % 4;
 				Game::Audio->PlayClip(yes[i], 1);
-			}
+			}*/
 	}
 
 	if (Game::Gamepad.IsButtonPressed(GamepadButton::Y)) {
 
-		for (EntityId id : selection)
+		/*for (EntityId id : selection)
 			if (entityManager->GetRenderComponent(id).depth != -1) {
 				auto& nav = entityManager->GetNavigationComponent(id);
 				nav.work = false;
-			}
+			}*/
 	}
 	if (Game::Gamepad.IsButtonPressed(GamepadButton::B)) {
 		for (EntityId id : selection)
 		{
-			if (entityManager->GetRenderComponent(id).depth != -1) {
-				entityManager->GetAnimationComponent(id).PlayClip(&UnitDatabase::Marine.DeathAnimation);
-				entityManager->GetAnimationComponent(id).shadowClip = nullptr;
-				entityManager->GetAnimationComponent(id).unitColorClip = nullptr;
-				entityManager->GetRenderComponent(id).depth = -1;
-				entityManager->RemoveColliderComponent(id);
-				entityManager->GetNavigationComponent(id).work = false;
+			//if (entityManager->GetRenderComponent(id).depth != -1) {
+			//	entityManager->GetAnimationComponent(id).PlayClip(&UnitDatabase::Marine.DeathAnimation);
+			//	entityManager->GetAnimationComponent(id).shadowClip = nullptr;
+			//	entityManager->GetAnimationComponent(id).unitColorClip = nullptr;
+			//	entityManager->GetRenderComponent(id).depth = -1;
+			//	entityManager->RemoveColliderComponent(id);
+			//	entityManager->GetNavigationComponent(id).work = false;
 
-				int i = std::rand() % 2;
-				Game::Audio->PlayClip(death[i], 1);
-			}
+			//	int i = std::rand() % 2;
+			//	Game::Audio->PlayClip(death[i], 1);
+			//}
 		}
 	}
 

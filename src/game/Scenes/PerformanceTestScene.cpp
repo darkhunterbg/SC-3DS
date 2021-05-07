@@ -30,7 +30,7 @@ struct TransformCmp {
 };
 
 
-struct RenderArchetype {
+struct RenderArch {
 	std::vector < RenderPosCmp> pos;
 	std::vector < RenderCmp> ren;
 };
@@ -49,7 +49,7 @@ std::vector<BatchDrawCommand> render;
 
 std::vector<bool> entityChanged;
 
-RenderArchetype renderArchetype;
+RenderArch renderArchetype;
 RenderUpdatePosArchetype renderUpdatePosArchetype;
 
 void NewEntity(const UnitDef& unit, Vector2Int pos, Color color) {
@@ -87,7 +87,7 @@ bool RenderSort(const BatchDrawCommand& a, const BatchDrawCommand& b) {
 	return a.order < b.order;
 }
 
-ThreadLocal<RenderArchetype>* tlRenderAchetype;
+ThreadLocal<RenderArch>* tlRenderAchetype;
 //std::vector<int> architypeToEntity;
 
 void Update(int start, int end) {
@@ -264,11 +264,11 @@ void DrawEntities(const Camera& camera) {
 
 void PerformanceTestScene::Start() {
 
-	tlRenderAchetype = new ThreadLocal< RenderArchetype>();
+	tlRenderAchetype = new ThreadLocal< RenderArch>();
 	tlRender = new ThreadLocal<std::vector<BatchDrawCommand>>();
 	tlsRenderUpdatePosArchetype = new ThreadLocal<RenderUpdatePosArchetype>();
 
-	int a = sizeof(RenderArchetype);
+	int a = sizeof(RenderArch);
 	int b = sizeof(std::vector<BatchDrawCommand>);
 
 	UnitDatabase::LoadAllUnitResources();
@@ -337,7 +337,7 @@ void PerformanceTestScene::Draw() {
 
 	Rectangle camRect = camera.GetRectangle();
 
-	for (RenderArchetype& r : tlRenderAchetype->GetAll()) {
+	for (RenderArch& r : tlRenderAchetype->GetAll()) {
 		r.pos.clear();
 		r.ren.clear();
 	}
