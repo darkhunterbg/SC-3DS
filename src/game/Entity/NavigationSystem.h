@@ -2,7 +2,9 @@
 
 #include "Entity.h"
 #include "Component.h"
+#include "Archetype.h"
 
+/*
 class EntityManager;
 class AnimationSystem;
 class AnimationClip;
@@ -25,11 +27,9 @@ struct NavigationComponent  {
 		newNav = true;
 	}
 
-};
+}; */
 
 class NavigationSystem {
 public:
-	ComponentCollection<NavigationComponent> NavigationComponents;
-
-	void UpdateNavigation(Entity* entities, AnimationSystem& animationSystem);
+	void UpdateNavigation(NavigationArchetype& archetype);
 };

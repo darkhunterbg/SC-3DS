@@ -69,7 +69,8 @@ void GameScene::Start() {
 		for (int x = 99; x >= 0; --x) {
 
 			Color c = color[(i++) % 12];
-			entityManager->NewUnit(*UnitDatabase::Units[i % UnitDatabase::Units.size()], { x * 32 ,y * 32 }, c);
+			EntityId e = entityManager->NewUnit(*UnitDatabase::Units[i % UnitDatabase::Units.size()], { x * 32 ,y * 32 }, c);
+			entityManager->GoTo(e, { 512,512 });
 		}
 	}
 

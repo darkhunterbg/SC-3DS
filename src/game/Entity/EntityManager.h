@@ -29,6 +29,7 @@ private:
 
 	RenderArchetype renderArchetype;
 	RenderUpdatePositionArchetype renderUpdatePosArchetype;
+	NavigationArchetype navigationArchetype;
 
 	void CameraCull(const Camera& camera);
 
@@ -43,6 +44,10 @@ public:
 	ComponentCollection<RenderDestinationComponent> RenderDestinationComponents;
 	ComponentCollection<Rectangle> RenderBoundingBoxComponents;
 
+	ComponentCollection<MovementComponent> MovementComponents;
+	ComponentCollection<NavigationWorkComponent> NavigationWorkComponents;
+	ComponentCollection<NavigationComponent> NavigationComponents;
+
 	EntityManager();
 	~EntityManager();
 
@@ -56,4 +61,5 @@ public:
 	EntityId NewUnit(const UnitDef& def, Vector2Int position, Color color);
 
 	void SetPosition(EntityId e, Vector2Int pos);
+	void GoTo(EntityId e, Vector2Int pos);
 };

@@ -52,7 +52,7 @@ void JobSystem::ThreadWorkOnJob(int threadId)
 
 void JobSystem::ExecJob(int elements, int batchSize)
 {
-	if (!threads) {
+	if (!threads || elements <= batchSize) {
 		action(0, elements);
 		return;
 	}

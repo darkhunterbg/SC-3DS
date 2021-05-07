@@ -19,8 +19,87 @@ static Vector2 movementTable[]{
 
 };
 
-void NavigationSystem::UpdateNavigation(Entity* entities, AnimationSystem& animationSystem)
-{ /*
+void NavigationSystem::UpdateNavigation(NavigationArchetype& archetype)
+{ 
+	int end = archetype.work.size();
+	int start = 0;
+	for (int i = start; i < end; ++i) {
+		auto& work = *archetype.work[i];
+		auto& movement = *archetype.movement[i];
+		auto& position = *archetype.position[i];
+		auto& nav = archetype.navigation[i];
+
+		int h = 1'000'000;
+		int heading = movement.orientation;
+		for (int i = 0; i < 32; i += 4) {
+
+			Vector2Int move = movementTable[i] * movement.velocity;
+			Vector2Int pos = position + move;
+			int dist = (nav.target - pos).LengthSquared();
+			dist -= i == movement.orientation ? (movement.velocity * movement.velocity + 1) : 0;
+			if (dist < h)
+			{
+				h = dist;
+				heading = i;
+			}
+
+		}
+
+
+		if ( heading != movement.orientation) {
+			int diff = heading - movement.orientation;
+
+			if (diff != 0) {
+				if (std::abs(diff) > movement.rotationSpeed) {
+					int sign = diff > 0 ? 1 : -1;
+					if (std::abs(diff) > 15)
+					{
+						sign = -sign;
+					}
+
+					movement.orientation += sign * movement.rotationSpeed;
+					movement.orientation = (movement.orientation + 32) % 32;
+				}
+				else {
+					movement.orientation = heading;
+				}
+			}
+
+
+			//if (entity.HasComponent<AnimationComponent>()) {
+			//	auto& nav = animationSystem.AnimationComponents.GetComponent(entity.id);
+
+			//	nav.PlayClip(cmp.clips[entity.orientation]);
+			//	nav.shadowClip = cmp.shadowClips[entity.orientation];
+			//	nav.unitColorClip = cmp.colorClips[entity.orientation];
+
+			//}
+
+			if (movement.orientation != heading)
+				continue;
+		}
+
+		Vector2Int distance = nav.target - position;
+
+		if (distance.LengthSquared() < movement.velocity * movement.velocity) {
+			position = nav.target;
+			work.work = false;
+
+		/*	if (entity.HasComponent<AnimationComponent>()) {
+				animationSystem.AnimationComponents.GetComponent(entity.id)
+					.pause = true;
+			}*/
+		}
+		else {
+
+			Vector2Int move = movementTable[heading] * movement.velocity;
+			position += move;
+		}
+
+		archetype.changed[i]->changed = true;
+	}
+	
+	/*
 	int i = 0;
 	for (NavigationComponent& cmp : NavigationComponents.GetComponents()) {
 		int cid = i++;

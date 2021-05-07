@@ -98,3 +98,18 @@ struct RenderDestinationComponent  {
 	Vector2Int dst;
 	Vector2Int shadowDst;
 };
+
+
+struct NavigationWorkComponent {
+	bool work;
+};
+
+struct NavigationComponent {
+	Vector2Int target;
+};
+
+struct MovementComponent {
+	unsigned orientation;
+	unsigned velocity;
+	unsigned rotationSpeed;
+};

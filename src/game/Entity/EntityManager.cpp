@@ -54,7 +54,26 @@ void EntityManager::UpdateEntities() {
 
 	updated = true;
 
+	SectionProfiler p("Nav");
 
+	navigationArchetype.clear();
+
+	int navSize = NavigationWorkComponents.size();
+
+	for (int i = 0; i < navSize; ++i) {
+		if (NavigationWorkComponents[i].work) {
+			navigationArchetype.work.push_back(&NavigationWorkComponents[i]);
+			navigationArchetype.changed.push_back(&EntityChangeComponents[i]);
+			navigationArchetype.movement.push_back(&MovementComponents[i]);
+			navigationArchetype.position.push_back(&PositionComponents[i]);
+			navigationArchetype.navigation.push_back(NavigationComponents[i]);
+		}
+	}
+
+	navigationSystem->UpdateNavigation(navigationArchetype);
+
+
+	p.Submit();
 
 	renderUpdatePosArchetype.outPos.clear();
 	renderUpdatePosArchetype.worldPos.clear();
@@ -74,12 +93,7 @@ void EntityManager::UpdateEntities() {
 		}
 	}
 
-	SectionProfiler p("Update");
-
 	renderSystem->SetRenderPosition(renderUpdatePosArchetype);
-
-
-	p.Submit();
 
 	//navigationSystem->UpdateNavigation(entityBuffer.data(), *animationSystem);
 	//p.Submit();
@@ -147,13 +161,17 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 		def.MovementAnimationsTeamColor[0].GetFrame(0).sprite.image,
 		});
 
-	const auto& o = RenderOffsetComponents.NewComponent(e, {
+	RenderOffsetComponents.NewComponent(e, {
 		def.MovementAnimations[0].GetFrame(0).offset,
 		def.MovementAnimationsShadow[0].GetFrame(0).offset
 		});
 
 	RenderDestinationComponents.NewComponent(e);
 	RenderBoundingBoxComponents.NewComponent(e, { {0,0}, def.RenderSize });
+
+	NavigationComponents.NewComponent(e);
+	NavigationWorkComponents.NewComponent(e, { false });
+	MovementComponents.NewComponent(e, { 0,def.MovementSpeed, def.RotationSpeed });
 
 	//auto& ren = AddRenderComponent(e, def.MovementAnimations[0].GetFrame(0));
 	//ren.SetShadowFrame(def.MovementAnimationsShadow[0].GetFrame(0));
@@ -176,6 +194,11 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 void EntityManager::SetPosition(EntityId e, Vector2Int pos) {
 	PositionComponents.GetComponent(e) = pos;
 	EntityChangeComponents.GetComponent(e).changed = true;
+}
+void EntityManager::GoTo(EntityId e, Vector2Int pos) {
+	
+	NavigationWorkComponents.GetComponent(e).work = true;
+	NavigationComponents.GetComponent(e).target = pos;
 }
 
 /*
