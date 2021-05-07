@@ -53,6 +53,18 @@ static void Move(int start, int end) {
 				}
 			}
 
+			const auto& unit = archetype.unit[i];
+			auto& ren = *archetype.ren[i];
+			auto& offset = *archetype.offset[i];
+
+			ren.sprite = unit.def->MovementAnimations[movement.orientation].GetFrame(0).sprite.image;
+			ren.hFlip = unit.def->MovementAnimations[movement.orientation].GetFrame(0).hFlip;
+			offset.offset = unit.def->MovementAnimations[movement.orientation].GetFrame(0).offset;
+			ren.shadowSprite = unit.def->MovementAnimationsShadow[movement.orientation].GetFrame(0).sprite.image;
+			offset.shadowOffset = unit.def->MovementAnimationsShadow[movement.orientation].GetFrame(0).offset;
+			ren.colorSprite = unit.def->MovementAnimationsTeamColor[movement.orientation].GetFrame(0).sprite.image;
+		
+			
 
 			//if (entity.HasComponent<AnimationComponent>()) {
 			//	auto& nav = animationSystem.AnimationComponents.GetComponent(entity.id);

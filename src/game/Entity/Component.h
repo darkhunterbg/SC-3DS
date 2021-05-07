@@ -9,6 +9,7 @@
 #include "../MathLib.h"
 #include "../Color.h"
 #include "../Assets.h"
+#include "../Data/UnitDef.h"
 
 ////template <unsigned id>
 //struct IComponent {
@@ -113,4 +114,8 @@ struct MovementComponent {
 	unsigned orientation;
 	unsigned velocity;
 	unsigned rotationSpeed;
+};
+
+struct UnitComponent {
+	const UnitDef* def;
 };

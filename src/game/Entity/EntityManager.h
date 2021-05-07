@@ -49,6 +49,8 @@ public:
 	ComponentCollection<NavigationWorkComponent> NavigationWorkComponents;
 	ComponentCollection<NavigationComponent> NavigationComponents;
 
+	ComponentCollection<UnitComponent> UnitComponents;
+
 	EntityManager();
 	~EntityManager();
 

@@ -90,6 +90,9 @@ void EntityManager::UpdateEntities() {
 			movementArchetype.position.push_back(&PositionComponents[i]);
 			movementArchetype.navigation.push_back(NavigationComponents[i]);
 			movementArchetype.changed.push_back(&EntityChangeComponents[i]);
+			movementArchetype.unit.push_back(UnitComponents[i]);
+			movementArchetype.ren.push_back(&RenderComponents[i]);
+			movementArchetype.offset.push_back(&RenderOffsetComponents[i]);
 		}
 	}
 
@@ -195,6 +198,8 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 	NavigationComponents.NewComponent(e);
 	NavigationWorkComponents.NewComponent(e, { false });
 	MovementComponents.NewComponent(e, { 0,def.MovementSpeed, def.RotationSpeed });
+
+	UnitComponents.NewComponent(e, { &def });
 
 	//auto& ren = AddRenderComponent(e, def.MovementAnimations[0].GetFrame(0));
 	//ren.SetShadowFrame(def.MovementAnimationsShadow[0].GetFrame(0));
