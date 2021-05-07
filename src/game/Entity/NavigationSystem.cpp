@@ -54,27 +54,12 @@ static void Move(int start, int end) {
 			}
 
 			const auto& unit = archetype.unit[i];
-			auto& ren = *archetype.ren[i];
-			auto& offset = *archetype.offset[i];
+			auto& anim = *archetype.anim[i];
 
-			ren.sprite = unit.def->MovementAnimations[movement.orientation].GetFrame(0).sprite.image;
-			ren.hFlip = unit.def->MovementAnimations[movement.orientation].GetFrame(0).hFlip;
-			offset.offset = unit.def->MovementAnimations[movement.orientation].GetFrame(0).offset;
-			ren.shadowSprite = unit.def->MovementAnimationsShadow[movement.orientation].GetFrame(0).sprite.image;
-			offset.shadowOffset = unit.def->MovementAnimationsShadow[movement.orientation].GetFrame(0).offset;
-			ren.colorSprite = unit.def->MovementAnimationsTeamColor[movement.orientation].GetFrame(0).sprite.image;
+			anim.PlayClip(&unit.def->MovementAnimations[movement.orientation]);
+			anim.shadowClip = &unit.def->MovementAnimationsShadow[movement.orientation];
+			anim.unitColorClip = &unit.def->MovementAnimationsTeamColor[movement.orientation];
 		
-			
-
-			//if (entity.HasComponent<AnimationComponent>()) {
-			//	auto& nav = animationSystem.AnimationComponents.GetComponent(entity.id);
-
-			//	nav.PlayClip(cmp.clips[entity.orientation]);
-			//	nav.shadowClip = cmp.shadowClips[entity.orientation];
-			//	nav.unitColorClip = cmp.colorClips[entity.orientation];
-
-			//}
-
 			if (movement.orientation != nav.targetHeading)
 				continue;
 		}
@@ -87,10 +72,9 @@ static void Move(int start, int end) {
 			position = nav.target;
 			work.work = false;
 
-			/*	if (entity.HasComponent<AnimationComponent>()) {
-					animationSystem.AnimationComponents.GetComponent(entity.id)
-						.pause = true;
-				}*/
+			auto& anim = *archetype.anim[i];
+			anim.pause = true;
+			anim.clipFrame = 0;
 		}
 		else {
 

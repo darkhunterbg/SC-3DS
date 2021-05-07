@@ -69,4 +69,5 @@ public:
 
 	void SetPosition(EntityId e, Vector2Int pos);
 	void GoTo(EntityId e, Vector2Int pos);
+	void SetOrientation(EntityId e, unsigned orientation);
 };

@@ -51,8 +51,6 @@ void EntityManager::DeleteEntity(EntityId id) {
 
 void EntityManager::UpdateSecondaryEntities() {
 
-	SectionProfiler p("NavCalculate");
-
 	navigationArchetype.clear();
 
 	int navSize = NavigationComponents.size();
@@ -66,9 +64,6 @@ void EntityManager::UpdateSecondaryEntities() {
 	}
 
 	navigationSystem->UpdateNavigation(navigationArchetype);
-
-	p.Submit();
-
 }
 
 
@@ -90,8 +85,7 @@ void EntityManager::UpdateEntities() {
 			movementArchetype.navigation.push_back(NavigationComponents[i]);
 			movementArchetype.changed.push_back(&EntityChangeComponents[i]);
 			movementArchetype.unit.push_back(UnitComponents[i]);
-			movementArchetype.ren.push_back(&RenderComponents[i]);
-			movementArchetype.offset.push_back(&RenderOffsetComponents[i]);
+			movementArchetype.anim.push_back(&AnimationComponents[i]);
 		}
 	}
 
@@ -138,25 +132,6 @@ void EntityManager::UpdateEntities() {
 	}
 
 	renderSystem->SetRenderPosition(renderUpdatePosArchetype);
-
-	//navigationSystem->UpdateNavigation(entityBuffer.data(), *animationSystem);
-	//p.Submit();
-
-	//animationSystem->UpdateAnimations(*renderSystem);
-
-	//collection.clear();
-
-	//for (Entity* e : entities) {
-	//	if (e->changed) {
-	//		e->changed = false;
-	//		collection.push_back(*e);
-	//	}
-	//}
-
-	//Span<Entity> updated = { collection.data(),collection.size() };
-
-	//kinematicSystem->UpdateEntities(updated);
-	//renderSystem->UpdateEntities(updated);
 
 }
 
@@ -220,9 +195,9 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 	UnitComponents.NewComponent(e, { &def });
 
 	auto& a =AnimationComponents.NewComponent(e);
-	a.PlayClip(&def.MovementAnimations[0]);
-	a.shadowClip = &def.MovementAnimationsShadow[0];
-	a.unitColorClip = &def.MovementAnimationsTeamColor[0];
+	//a.PlayClip(&def.MovementAnimations[0]);
+	//a.shadowClip = &def.MovementAnimationsShadow[0];
+	//a.unitColorClip = &def.MovementAnimationsTeamColor[0];
 
 	//auto& ren = AddRenderComponent(e, def.MovementAnimations[0].GetFrame(0));
 	//ren.SetShadowFrame(def.MovementAnimationsShadow[0].GetFrame(0));
@@ -250,6 +225,18 @@ void EntityManager::GoTo(EntityId e, Vector2Int pos) {
 	
 	NavigationWorkComponents.GetComponent(e).work = true;
 	NavigationComponents.GetComponent(e).target = pos;
+}
+
+void EntityManager::SetOrientation(EntityId e, unsigned orientation)
+{
+	MovementComponents.GetComponent(e).orientation = orientation;
+	auto& anim =AnimationComponents.GetComponent(e);
+	auto& unit = UnitComponents.GetComponent(e);
+
+	anim.PlayClip(&unit.def->MovementAnimations[orientation]);
+
+	anim.shadowClip = &unit.def->MovementAnimationsShadow[orientation];
+	anim.unitColorClip = &unit.def->MovementAnimationsTeamColor[orientation];
 }
 
 /*

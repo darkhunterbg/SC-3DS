@@ -70,7 +70,9 @@ void GameScene::Start() {
 
 			Color c = color[(i++) % 12];
 			EntityId e = entityManager->NewUnit(*UnitDatabase::Units[i % UnitDatabase::Units.size()], { x * 32 + 16,y * 32 +16}, c);
-			//entityManager->GoTo(e, { 512,512 });
+			int orientation = std::rand() % 32;
+			entityManager->SetOrientation(e, orientation);
+			entityManager->GoTo(e, { 512,512 });
 		}
 	}
 
@@ -82,10 +84,17 @@ void GameScene::Start() {
 int t = 0;
 
 void GameScene::AuxilaryUpdate() {
+
+	SectionProfiler p("AuxUpdate");
+
 	entityManager->UpdateSecondaryEntities();
+
+	p.Submit();
 }
 
 void GameScene::LogicalUpdate() {
+	SectionProfiler p("LogUpdate");
+
 	entityManager->UpdateEntities();
 
 	++t;
@@ -94,6 +103,8 @@ void GameScene::LogicalUpdate() {
 		hud->AddMinerals(8);
 		hud->AddGas(8);
 	}
+
+	p.Submit();
 }
 std::vector<EntityId> tmp;
 void GameScene::Update() {
@@ -119,14 +130,14 @@ void GameScene::Update() {
 		LogicalUpdate();
 	}
 
-	int i = 0;
-	for (int y = 99; y >= 0; --y) {
-		for (int x = 49; x >= 0; --x) {
+	//int i = 0;
+	//for (int y = 99; y >= 0; --y) {
+	//	for (int x = 49; x >= 0; --x) {
 
-			i++;
-			//entityManager->SetPosition(i, { x * 32  ,y * 32 });
-		}
-	}
+	//		i++;
+	//		//entityManager->SetPosition(i, { x * 32  ,y * 32 });
+	//	}
+	//}
 
 
 	hud->ApplyInput(camera);
@@ -144,23 +155,22 @@ void GameScene::Update() {
 
 	if (Game::Gamepad.IsButtonPressed(GamepadButton::X)) {
 
-		/*for (EntityId id : selection)
-			if (entityManager->GetRenderComponent(id).depth != -1) {
-				auto& nav = entityManager->GetNavigationComponent(id);
-				nav.GoTo(camera.ScreenToWorld(cursor->Position));
+		for (EntityId id : selection)
+			if (entityManager->RenderComponents.GetComponent(id).depth != -1) {
+				entityManager->GoTo(id, camera.ScreenToWorld(cursor->Position));
 
 				int i = std::rand() % 4;
 				Game::Audio->PlayClip(yes[i], 1);
-			}*/
+			}
 	}
 
 	if (Game::Gamepad.IsButtonPressed(GamepadButton::Y)) {
 
-		/*for (EntityId id : selection)
-			if (entityManager->GetRenderComponent(id).depth != -1) {
-				auto& nav = entityManager->GetNavigationComponent(id);
-				nav.work = false;
-			}*/
+		for (EntityId id : selection)
+			if (entityManager->RenderComponents.GetComponent(id).depth != -1) {
+				entityManager->NavigationWorkComponents.GetComponent(id).work = false;
+			
+			}
 	}
 	if (Game::Gamepad.IsButtonPressed(GamepadButton::B)) {
 		for (EntityId id : selection)

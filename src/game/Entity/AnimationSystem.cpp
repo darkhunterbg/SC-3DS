@@ -1,13 +1,13 @@
 #include "AnimationSystem.h"
-#include "RenderSystem.h"
+#include "../Job.h"
 #include <cstring>
 
 
+static AnimationArchetype* a;
 
-void AnimationSystem::UpdateAnimations(AnimationArchetype& archetype) {
+static void UpdateAnims(int start, int end) {
+	AnimationArchetype& archetype = *a;
 
-	int end = archetype.size();
-	int start = 0;
 
 	for (int i = start; i < end; ++i) {
 		auto& anim = *archetype.animation[i];
@@ -30,7 +30,7 @@ void AnimationSystem::UpdateAnimations(AnimationArchetype& archetype) {
 				ren.sprite = frame.sprite.image;
 				ren.hFlip = frame.hFlip;
 				offset.offset = frame.offset;
-				
+
 
 				if (anim.shadowClip != nullptr) {
 					const SpriteFrame& shadowFrame = anim.shadowClip->GetFrame(anim.clipFrame);
@@ -51,4 +51,12 @@ void AnimationSystem::UpdateAnimations(AnimationArchetype& archetype) {
 			}
 		}
 	}
+}
+
+void AnimationSystem::UpdateAnimations(AnimationArchetype& archetype) {
+
+	a = &archetype;
+
+	JobSystem::RunJob(archetype.size(), JobSystem::DefaultJobSize, UpdateAnims);
+
 }
