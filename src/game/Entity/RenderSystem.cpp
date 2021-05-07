@@ -15,6 +15,8 @@ void RenderSystem::Draw(const Camera& camera, RenderArchetype& archetype) {
 
 	render.clear();
 
+	Vector2 scale[] = { {camMul,camMul},{-camMul,camMul} };
+
 	int entitiesCount = archetype.pos.size();
 
 	for (int i = 0; i < entitiesCount; ++i) {
@@ -32,13 +34,12 @@ void RenderSystem::Draw(const Camera& camera, RenderArchetype& archetype) {
 		int order = r.depth * 10'000'000;
 		order += dst.y * 1000 + dst.x * 3;
 
-		Vector2 flip = { r.hFlip ? -1.0f : 1.0f,1.0f };
 
 		BatchDrawCommand cmd;
 		cmd.order = order;
 		cmd.image = r.shadowSprite;
 		cmd.position = shadowDst;
-		cmd.scale = flip * camMul;
+		cmd.scale = scale[r.hFlip];
 		cmd.color = { shadowColor, 1 };
 		render.push_back(cmd);
 
