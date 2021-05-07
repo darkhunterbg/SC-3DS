@@ -68,18 +68,22 @@ bool RenderSystem::RenderSort(const BatchDrawCommand& a, const BatchDrawCommand&
 }
 
 
-void RenderSystem::SetRenderPosition(RenderUpdatePositionArchetype& a) {
-	int size = a.outPos.size();
-	static RenderUpdatePositionArchetype& archetype = a;
+static RenderUpdatePositionArchetype* a;
 
-	JobSystem::RunJob(size, JobSystem::DefaultJobSize, [](int start, int end) {
+static void SetPosition(int start, int end) {
+	RenderUpdatePositionArchetype& archetype = *a;
 
-		for (int i = start; i < end; ++i) {
-			RenderDestinationComponent* p = archetype.outPos[i];
-			p->dst = archetype.worldPos[i] + archetype.offset[i].offset;
-			p->shadowDst = archetype.worldPos[i] + archetype.offset[i].shadowOffset;
-			archetype.outBB[i]->position = p->dst;
-		}
-		});
+	for (int i = start; i < end; ++i) {
+		RenderDestinationComponent* p = archetype.outPos[i];
+		p->dst = archetype.worldPos[i] + archetype.offset[i].offset;
+		p->shadowDst = archetype.worldPos[i] + archetype.offset[i].shadowOffset;
+		archetype.outBB[i]->SetCenter(archetype.worldPos[i]);
+	}
+}
+
+void RenderSystem::SetRenderPosition(RenderUpdatePositionArchetype& archetype) {
+	int size = archetype.outPos.size();
+	a = &archetype;
+	JobSystem::RunJob(size, JobSystem::DefaultJobSize, SetPosition);
 }
 

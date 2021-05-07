@@ -18,22 +18,38 @@ struct RenderUpdatePositionArchetype {
 	ArchetypeCollection<RenderOffsetComponent> offset;
 };
 
-struct NavigationArchetype {
+struct MovementArchetype {
 	ArchetypeCollection<NavigationWorkComponent*> work;
-	ArchetypeCollection<NavigationComponent> navigation;
-	ArchetypeCollection<Vector2Int*> position;
-	ArchetypeCollection<EntityChangeComponent*> changed;
 	ArchetypeCollection<MovementComponent*> movement;
+	ArchetypeCollection<Vector2Int*> position;
+	ArchetypeCollection<NavigationComponent> navigation;
+	ArchetypeCollection<EntityChangeComponent*> changed;
 
 	inline void clear() {
 		work.clear();
+		movement.clear();
+		position.clear();
+		navigation.clear();
+		changed.clear();
+	}
+
+	inline size_t size() const {
+		return  work.size();
+	}
+};
+
+struct NavigationArchetype {
+	ArchetypeCollection<NavigationComponent*> navigation;
+	ArchetypeCollection<Vector2Int> position;
+	ArchetypeCollection<MovementComponent> movement;
+
+	inline void clear() {
 		navigation.clear();
 		position.clear();
-		changed.clear();
 		movement.clear();
 	}
 
 	inline size_t size() const {
-		return work.size();
+		return navigation.size();
 	}
 };

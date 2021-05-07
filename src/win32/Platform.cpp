@@ -22,6 +22,7 @@ extern SDL_Texture* screens[2];
 extern uint64_t mainTimer;
 extern Rectangle touchScreenLocation;
 extern bool mute;
+extern bool noThreading;
 extern int numberOfThreads;
 
 static ScreenId currentScreen;
@@ -358,6 +359,9 @@ void Platform::EnableChannel(const AudioChannelState& channel, bool enabled) {
 
 static std::function<void(int)> threadWorkFunc;
 int Platform::StartThreads(std::function<void(int)> threadWork) {
+	if (noThreading)
+		return 0;
+
 	threadWorkFunc = threadWork;
 
 	numberOfThreads =  SDL_GetCPUCount();

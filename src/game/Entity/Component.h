@@ -106,6 +106,7 @@ struct NavigationWorkComponent {
 
 struct NavigationComponent {
 	Vector2Int target;
+	unsigned targetHeading;
 };
 
 struct MovementComponent {

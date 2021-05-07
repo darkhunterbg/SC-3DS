@@ -32,4 +32,5 @@ struct NavigationComponent  {
 class NavigationSystem {
 public:
 	void UpdateNavigation(NavigationArchetype& archetype);
+	void MoveEntities(MovementArchetype& archetype);
 };

@@ -66,10 +66,10 @@ void GameScene::Start() {
 
 	int i = 0;
 	for (int y = 99; y >= 0; --y) {
-		for (int x = 99; x >= 0; --x) {
+		for (int x = 49; x >= 0; --x) {
 
 			Color c = color[(i++) % 12];
-			EntityId e = entityManager->NewUnit(*UnitDatabase::Units[i % UnitDatabase::Units.size()], { x * 32 ,y * 32 }, c);
+			EntityId e = entityManager->NewUnit(*UnitDatabase::Units[i % UnitDatabase::Units.size()], { x * 32 + 16,y * 32 +16}, c);
 			entityManager->GoTo(e, { 512,512 });
 		}
 	}
@@ -80,6 +80,10 @@ void GameScene::Start() {
 }
 
 int t = 0;
+
+void GameScene::AuxilaryUpdate() {
+	entityManager->UpdateSecondaryEntities();
+}
 
 void GameScene::LogicalUpdate() {
 	entityManager->UpdateEntities();
@@ -94,9 +98,22 @@ void GameScene::LogicalUpdate() {
 std::vector<EntityId> tmp;
 void GameScene::Update() {
 	frameCounter += 2;
+	frameCounter2 += 2;
+
+	bool au = false;
+
+	while (frameCounter2 >=5)
+	{
+		frameCounter2 -= 5;
+		AuxilaryUpdate();
+		au = true;
+	}
 
 	while (frameCounter >= 5)
 	{
+		if (au)
+			EXCEPTION("Logical and Auxilary update happened in the same frame!");
+
 		++logicalFrame;
 		frameCounter -= 5;
 		LogicalUpdate();
@@ -104,7 +121,7 @@ void GameScene::Update() {
 
 	int i = 0;
 	for (int y = 99; y >= 0; --y) {
-		for (int x = 99; x >= 0; --x) {
+		for (int x = 49; x >= 0; --x) {
 
 			i++;
 			//entityManager->SetPosition(i, { x * 32  ,y * 32 });

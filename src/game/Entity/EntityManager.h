@@ -30,6 +30,7 @@ private:
 	RenderArchetype renderArchetype;
 	RenderUpdatePositionArchetype renderUpdatePosArchetype;
 	NavigationArchetype navigationArchetype;
+	MovementArchetype movementArchetype;
 
 	void CameraCull(const Camera& camera);
 
@@ -55,6 +56,7 @@ public:
 	void DeleteEntity(EntityId id);
 
 	void UpdateEntities();
+	void UpdateSecondaryEntities();
 	void DrawEntites(const Camera& camera);
 
 

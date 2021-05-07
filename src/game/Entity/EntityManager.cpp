@@ -49,28 +49,51 @@ void EntityManager::DeleteEntity(EntityId id) {
 }
 
 
+void EntityManager::UpdateSecondaryEntities() {
+
+	SectionProfiler p("NavCalculate");
+
+	navigationArchetype.clear();
+
+	int navSize = NavigationComponents.size();
+
+	for (int i = 0; i < navSize; ++i) {
+		if (NavigationWorkComponents[i].work) {
+			navigationArchetype.movement.push_back(MovementComponents[i]);
+			navigationArchetype.position.push_back(PositionComponents[i]);
+			navigationArchetype.navigation.push_back(&NavigationComponents[i]);
+		}
+	}
+
+	navigationSystem->UpdateNavigation(navigationArchetype);
+
+	p.Submit();
+
+}
+
 
 void EntityManager::UpdateEntities() {
 
 	updated = true;
 
-	SectionProfiler p("Nav");
+	SectionProfiler p("Movement");
 
-	navigationArchetype.clear();
+	movementArchetype.clear();
 
 	int navSize = NavigationWorkComponents.size();
 
 	for (int i = 0; i < navSize; ++i) {
-		if (NavigationWorkComponents[i].work) {
-			navigationArchetype.work.push_back(&NavigationWorkComponents[i]);
-			navigationArchetype.changed.push_back(&EntityChangeComponents[i]);
-			navigationArchetype.movement.push_back(&MovementComponents[i]);
-			navigationArchetype.position.push_back(&PositionComponents[i]);
-			navigationArchetype.navigation.push_back(NavigationComponents[i]);
+		if (NavigationWorkComponents[i].work ){
+
+			movementArchetype.work.push_back(&NavigationWorkComponents[i]);
+			movementArchetype.movement.push_back(&MovementComponents[i]);
+			movementArchetype.position.push_back(&PositionComponents[i]);
+			movementArchetype.navigation.push_back(NavigationComponents[i]);
+			movementArchetype.changed.push_back(&EntityChangeComponents[i]);
 		}
 	}
 
-	navigationSystem->UpdateNavigation(navigationArchetype);
+	navigationSystem->MoveEntities(movementArchetype);
 
 
 	p.Submit();
