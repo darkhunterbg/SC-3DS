@@ -76,7 +76,6 @@ void EntityManager::UpdateEntities() {
 
 	updated = true;
 
-	SectionProfiler p("Movement");
 
 	movementArchetype.clear();
 
@@ -98,6 +97,25 @@ void EntityManager::UpdateEntities() {
 
 	navigationSystem->MoveEntities(movementArchetype);
 
+	SectionProfiler p("Animations");
+
+
+	animationArchetype.clear();
+
+	int animSize = AnimationComponents.size();
+
+	for (int i = 0; i < animSize; ++i) {
+
+		if (AnimationComponents[i].pause)
+			continue;
+
+		animationArchetype.animation.push_back(&AnimationComponents[i]);
+		animationArchetype.ren.push_back(&RenderComponents[i]);
+		animationArchetype.offset.push_back(&RenderOffsetComponents[i]);
+		animationArchetype.changed.push_back(&EntityChangeComponents[i]);
+	}
+
+	animationSystem->UpdateAnimations(animationArchetype);
 
 	p.Submit();
 
@@ -200,6 +218,11 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 	MovementComponents.NewComponent(e, { 0,def.MovementSpeed, def.RotationSpeed });
 
 	UnitComponents.NewComponent(e, { &def });
+
+	auto& a =AnimationComponents.NewComponent(e);
+	a.PlayClip(&def.MovementAnimations[0]);
+	a.shadowClip = &def.MovementAnimationsShadow[0];
+	a.unitColorClip = &def.MovementAnimationsTeamColor[0];
 
 	//auto& ren = AddRenderComponent(e, def.MovementAnimations[0].GetFrame(0));
 	//ren.SetShadowFrame(def.MovementAnimationsShadow[0].GetFrame(0));

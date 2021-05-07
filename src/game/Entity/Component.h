@@ -119,3 +119,20 @@ struct MovementComponent {
 struct UnitComponent {
 	const UnitDef* def;
 };
+
+struct AnimationComponent {
+	bool pause = true;
+	const AnimationClip* clip = nullptr;
+	const AnimationClip* shadowClip = nullptr;
+	const AnimationClip* unitColorClip = nullptr;
+
+	int clipFrame = 0;
+	int frameCountdown = 0;
+
+	void PlayClip(const AnimationClip* clip) {
+		this->clip = clip;
+		clipFrame = -1;
+		frameCountdown = 1;
+		pause = false;
+	}
+};

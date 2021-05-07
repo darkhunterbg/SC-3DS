@@ -59,3 +59,19 @@ struct NavigationArchetype {
 		return navigation.size();
 	}
 };
+
+struct AnimationArchetype {
+
+	ArchetypeCollection<AnimationComponent*> animation;
+	ArchetypeCollection<RenderComponent*> ren;
+	ArchetypeCollection<RenderOffsetComponent*> offset;
+	ArchetypeCollection<EntityChangeComponent*> changed;
+
+	inline size_t size() const { return animation.size(); }
+	inline void clear() {
+		animation.clear();
+		ren.clear();
+		offset.clear();
+		changed.clear();
+	}
+};

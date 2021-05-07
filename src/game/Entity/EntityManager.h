@@ -31,6 +31,7 @@ private:
 	RenderUpdatePositionArchetype renderUpdatePosArchetype;
 	NavigationArchetype navigationArchetype;
 	MovementArchetype movementArchetype;
+	AnimationArchetype animationArchetype;
 
 	void CameraCull(const Camera& camera);
 
@@ -50,6 +51,8 @@ public:
 	ComponentCollection<NavigationComponent> NavigationComponents;
 
 	ComponentCollection<UnitComponent> UnitComponents;
+
+	ComponentCollection<AnimationComponent> AnimationComponents;
 
 	EntityManager();
 	~EntityManager();
