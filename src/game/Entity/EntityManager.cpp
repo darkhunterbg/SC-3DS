@@ -32,9 +32,6 @@ void EntityManager::DeleteEntity(EntityId id) {
 	if (id == Entity::None || id > lastId)
 		EXCEPTION("Tried to delete invalid entity!");
 
-
-	// TODO: this can be speedup with a map
-
 	int totalEntities = entities.size();
 	for (unsigned i = 0; i < totalEntities; ++i)
 	{
@@ -86,6 +83,8 @@ void EntityManager::UpdateEntities() {
 			movementArchetype.changed.push_back(&EntityChangeComponents[i]);
 			movementArchetype.unit.push_back(UnitComponents[i]);
 			movementArchetype.anim.push_back(&AnimationComponents[i]);
+			movementArchetype.animEnabled.push_back(&AnimationEnableComponents[i]);
+			movementArchetype.animTracker.push_back(&AnimationTrackerComponents[i]);
 		}
 	}
 
@@ -93,23 +92,9 @@ void EntityManager::UpdateEntities() {
 
 	SectionProfiler p("Animations");
 
+	animationSystem->GenerateAnimationUpdates(*this);
 
-	animationArchetype.clear();
-
-	int animSize = AnimationComponents.size();
-
-	for (int i = 0; i < animSize; ++i) {
-
-		if (AnimationComponents[i].pause)
-			continue;
-
-		animationArchetype.animation.push_back(&AnimationComponents[i]);
-		animationArchetype.ren.push_back(&RenderComponents[i]);
-		animationArchetype.offset.push_back(&RenderOffsetComponents[i]);
-		animationArchetype.changed.push_back(&EntityChangeComponents[i]);
-	}
-
-	animationSystem->UpdateAnimations(animationArchetype);
+	animationSystem->UpdateAnimations();
 
 	p.Submit();
 
@@ -195,6 +180,8 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 	UnitComponents.NewComponent(e, { &def });
 
 	auto& a =AnimationComponents.NewComponent(e);
+	AnimationTrackerComponents.NewComponent(e);
+	AnimationEnableComponents.NewComponent(e);
 	//a.PlayClip(&def.MovementAnimations[0]);
 	//a.shadowClip = &def.MovementAnimationsShadow[0];
 	//a.unitColorClip = &def.MovementAnimationsTeamColor[0];
@@ -233,8 +220,7 @@ void EntityManager::SetOrientation(EntityId e, unsigned orientation)
 	auto& anim =AnimationComponents.GetComponent(e);
 	auto& unit = UnitComponents.GetComponent(e);
 
-	anim.PlayClip(&unit.def->MovementAnimations[orientation]);
-
+	anim.clip = &unit.def->MovementAnimations[orientation];
 	anim.shadowClip = &unit.def->MovementAnimationsShadow[orientation];
 	anim.unitColorClip = &unit.def->MovementAnimationsTeamColor[orientation];
 }

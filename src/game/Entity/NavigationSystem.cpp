@@ -55,11 +55,15 @@ static void Move(int start, int end) {
 
 			const auto& unit = archetype.unit[i];
 			auto& anim = *archetype.anim[i];
+			auto& animEnable = *archetype.animEnabled[i];
+			auto& animTracker = *archetype.animTracker[i];
 
-			anim.PlayClip(&unit.def->MovementAnimations[movement.orientation]);
+			anim.clip  = &unit.def->MovementAnimations[movement.orientation];
 			anim.shadowClip = &unit.def->MovementAnimationsShadow[movement.orientation];
 			anim.unitColorClip = &unit.def->MovementAnimationsTeamColor[movement.orientation];
-		
+			animTracker.PlayClip(anim.clip);
+			animEnable.pause = false;
+
 			if (movement.orientation != nav.targetHeading)
 				continue;
 		}
@@ -72,9 +76,8 @@ static void Move(int start, int end) {
 			position = nav.target;
 			work.work = false;
 
-			auto& anim = *archetype.anim[i];
+			auto& anim = *archetype.animEnabled[i];
 			anim.pause = true;
-			anim.clipFrame = 0;
 		}
 		else {
 

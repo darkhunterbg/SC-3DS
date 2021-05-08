@@ -17,15 +17,19 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
+		OptDebug|x86 = OptDebug|x86
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{4DF7BCD4-DEA6-4726-BF85-5EE109F7D510}.Debug|x86.ActiveCfg = Debug|Win32
 		{4DF7BCD4-DEA6-4726-BF85-5EE109F7D510}.Debug|x86.Build.0 = Debug|Win32
+		{4DF7BCD4-DEA6-4726-BF85-5EE109F7D510}.OptDebug|x86.ActiveCfg = Debug|Win32
 		{4DF7BCD4-DEA6-4726-BF85-5EE109F7D510}.Release|x86.ActiveCfg = Debug|Win32
 		{4DF7BCD4-DEA6-4726-BF85-5EE109F7D510}.Release|x86.Build.0 = Debug|Win32
 		{E3CD75AC-3E22-423E-A626-8B8DCAB473FE}.Debug|x86.ActiveCfg = Debug|Win32
 		{E3CD75AC-3E22-423E-A626-8B8DCAB473FE}.Debug|x86.Build.0 = Debug|Win32
+		{E3CD75AC-3E22-423E-A626-8B8DCAB473FE}.OptDebug|x86.ActiveCfg = OptDebug|Win32
+		{E3CD75AC-3E22-423E-A626-8B8DCAB473FE}.OptDebug|x86.Build.0 = OptDebug|Win32
 		{E3CD75AC-3E22-423E-A626-8B8DCAB473FE}.Release|x86.ActiveCfg = Release|Win32
 		{E3CD75AC-3E22-423E-A626-8B8DCAB473FE}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection

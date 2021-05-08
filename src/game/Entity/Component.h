@@ -120,19 +120,36 @@ struct UnitComponent {
 	const UnitDef* def;
 };
 
-struct AnimationComponent {
+struct AnimationEnableComponent {
 	bool pause = true;
+};
+struct AnimationTrackerComponent {
+	int clipFrame = 0;
+	int frameCountdown = 0;
+	int totalFrames = 0;
+	int frameDuration = 0;
+	bool looping = false;
+
+	inline void Restart() {
+		clipFrame = -1;
+		frameCountdown = 1;
+	}
+
+	inline void PlayClip(const AnimationClip* clip) {
+		if (clip) {
+			totalFrames = clip->GetFrameCount();
+			frameDuration = clip->frameDuration;
+			looping = clip->looping;
+			clipFrame = -1;
+			frameCountdown = 1;
+		}
+	}
+};
+
+struct AnimationComponent {
+
 	const AnimationClip* clip = nullptr;
 	const AnimationClip* shadowClip = nullptr;
 	const AnimationClip* unitColorClip = nullptr;
 
-	int clipFrame = 0;
-	int frameCountdown = 0;
-
-	void PlayClip(const AnimationClip* clip) {
-		this->clip = clip;
-		clipFrame = -1;
-		frameCountdown = 1;
-		pause = false;
-	}
 };

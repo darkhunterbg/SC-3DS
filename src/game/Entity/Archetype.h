@@ -25,6 +25,8 @@ struct MovementArchetype {
 	ArchetypeCollection<NavigationComponent> navigation;
 	ArchetypeCollection<EntityChangeComponent*> changed;
 	ArchetypeCollection<UnitComponent> unit;
+	ArchetypeCollection<AnimationEnableComponent*> animEnabled;
+	ArchetypeCollection<AnimationTrackerComponent*>animTracker;
 	ArchetypeCollection<AnimationComponent*> anim;
 
 	inline void clear() {
@@ -34,6 +36,8 @@ struct MovementArchetype {
 		navigation.clear();
 		changed.clear();
 		unit.clear();
+		animEnabled.clear();
+		animTracker.clear();
 		anim.clear();
 	}
 
@@ -58,18 +62,3 @@ struct NavigationArchetype {
 	}
 };
 
-struct AnimationArchetype {
-
-	ArchetypeCollection<AnimationComponent*> animation;
-	ArchetypeCollection<RenderComponent*> ren;
-	ArchetypeCollection<RenderOffsetComponent*> offset;
-	ArchetypeCollection<EntityChangeComponent*> changed;
-
-	inline size_t size() const { return animation.size(); }
-	inline void clear() {
-		animation.clear();
-		ren.clear();
-		offset.clear();
-		changed.clear();
-	}
-};
