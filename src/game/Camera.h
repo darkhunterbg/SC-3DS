@@ -16,6 +16,11 @@ public:
 		return { Position - (Size * Scale)/2, Size * Scale };
 	}
 
+	inline Rectangle16 GetRectangle16() const {
+		return Rectangle16(Vector2Int16(Position - (Size * Scale) / 2), Vector2Int16(Size * Scale));
+	}
+
+
 	inline Vector2Int ScreenToWorld(Vector2Int p) {
 		return p * Scale + Position - (Size * Scale) / 2;
 	}

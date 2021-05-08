@@ -6,7 +6,6 @@
 #include "../Job.h"
 #include "../Entity/Component.h"
 
-typedef  Vector2T<short> Vector2Int16;
 
 struct RenderOffsetCmp {
 	Vector2Int offset = { 0,0 };

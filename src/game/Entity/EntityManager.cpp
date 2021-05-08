@@ -55,7 +55,7 @@ void EntityManager::UpdateSecondaryEntities() {
 	for (int i = 0; i < navSize; ++i) {
 		if (NavigationWorkComponents[i].work) {
 			navigationArchetype.movement.push_back(MovementComponents[i]);
-			navigationArchetype.position.push_back(PositionComponents[i]);
+			//navigationArchetype.position.push_back(PositionComponents[i]);
 			navigationArchetype.navigation.push_back(&NavigationComponents[i]);
 		}
 	}
@@ -74,11 +74,11 @@ void EntityManager::UpdateEntities() {
 	int navSize = NavigationWorkComponents.size();
 
 	for (int i = 0; i < navSize; ++i) {
-		if (NavigationWorkComponents[i].work ){
+		if (NavigationWorkComponents[i].work) {
 
 			movementArchetype.work.push_back(&NavigationWorkComponents[i]);
 			movementArchetype.movement.push_back(&MovementComponents[i]);
-			movementArchetype.position.push_back(&PositionComponents[i]);
+			//movementArchetype.position.push_back(&PositionComponents[i]);
 			movementArchetype.navigation.push_back(NavigationComponents[i]);
 			movementArchetype.changed.push_back(&EntityChangeComponents[i]);
 			movementArchetype.unit.push_back(UnitComponents[i]);
@@ -90,13 +90,13 @@ void EntityManager::UpdateEntities() {
 
 	navigationSystem->MoveEntities(movementArchetype);
 
-	SectionProfiler p("Animations");
+	//SectionProfiler p("Animations");
 
 	animationSystem->GenerateAnimationUpdates(*this);
 
 	animationSystem->UpdateAnimations();
 
-	p.Submit();
+	//p.Submit();
 
 	renderUpdatePosArchetype.outPos.clear();
 	renderUpdatePosArchetype.worldPos.clear();
@@ -104,6 +104,8 @@ void EntityManager::UpdateEntities() {
 	renderUpdatePosArchetype.outBB.clear();
 
 	int size = EntityChangeComponents.size();
+
+	SectionProfiler p("RenderUpdate");
 
 	for (int i = 0; i < size; ++i) {
 		if (EntityChangeComponents[i].changed) {
@@ -118,6 +120,8 @@ void EntityManager::UpdateEntities() {
 
 	renderSystem->SetRenderPosition(renderUpdatePosArchetype);
 
+	p.Submit();
+
 }
 
 void EntityManager::CameraCull(const Camera& camera)
@@ -126,10 +130,10 @@ void EntityManager::CameraCull(const Camera& camera)
 	renderArchetype.ren.clear();
 	int size = RenderComponents.size();
 
-	Rectangle camRect = camera.GetRectangle();
+	Rectangle16 camRect = camera.GetRectangle16();
 
 	for (unsigned i = 0; i < size; ++i) {
-		const Rectangle& bb = RenderBoundingBoxComponents[i];
+		const Rectangle16& bb = RenderBoundingBoxComponents[i];
 
 		if (!camRect.Intersects(bb))
 			continue;
@@ -143,7 +147,7 @@ void EntityManager::DrawEntites(const Camera& camera) {
 	if (!updated)
 		return;
 
-	SectionProfiler p("DrawEntities");
+	SectionProfiler p("RenderEntities");
 
 	CameraCull(camera);
 	renderSystem->Draw(camera, renderArchetype);
@@ -155,7 +159,7 @@ void EntityManager::DrawEntites(const Camera& camera) {
 
 EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color color) {
 	EntityId e = NewEntity();
-	PositionComponents.NewComponent(e, position);
+	PositionComponents.NewComponent(e, Vector2Int16( position));
 	EntityChangeComponents.NewComponent(e, { true });
 
 	RenderComponents.NewComponent(e, {
@@ -166,12 +170,12 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 		});
 
 	RenderOffsetComponents.NewComponent(e, {
-		def.MovementAnimations[0].GetFrame(0).offset,
-		def.MovementAnimationsShadow[0].GetFrame(0).offset
+	 Vector2Int16(def.MovementAnimations[0].GetFrame(0).offset),
+		Vector2Int16(def.MovementAnimationsShadow[0].GetFrame(0).offset)
 		});
 
 	RenderDestinationComponents.NewComponent(e);
-	RenderBoundingBoxComponents.NewComponent(e, { {0,0}, def.RenderSize });
+	RenderBoundingBoxComponents.NewComponent(e, { {0,0}, Vector2Int16( def.RenderSize) });
 
 	NavigationComponents.NewComponent(e);
 	NavigationWorkComponents.NewComponent(e, { false });
@@ -179,27 +183,9 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 
 	UnitComponents.NewComponent(e, { &def });
 
-	auto& a =AnimationComponents.NewComponent(e);
+	auto& a = AnimationComponents.NewComponent(e);
 	AnimationTrackerComponents.NewComponent(e);
 	AnimationEnableComponents.NewComponent(e);
-	//a.PlayClip(&def.MovementAnimations[0]);
-	//a.shadowClip = &def.MovementAnimationsShadow[0];
-	//a.unitColorClip = &def.MovementAnimationsTeamColor[0];
-
-	//auto& ren = AddRenderComponent(e, def.MovementAnimations[0].GetFrame(0));
-	//ren.SetShadowFrame(def.MovementAnimationsShadow[0].GetFrame(0));
-	//ren.colorSprite = def.MovementAnimationsTeamColor[0].GetFrame(0).sprite.image;
-	//ren.unitColor = Color4(color);
-
-	//AddAnimationComponent(e, &def.MovementAnimations[0]).pause = true;
-	//auto& nav = AddNavigationComponent(e, def.RotationSpeed, def.MovementSpeed);
-	//AddColliderComponent(e, def.Collider);
-
-	//for (int i = 0; i < 32; ++i) {
-	//	nav.clips[i] = (&def.MovementAnimations[i]);
-	//	nav.shadowClips[i] = (&def.MovementAnimationsShadow[i]);
-	//	nav.colorClips[i] = (&def.MovementAnimationsTeamColor[i]);
-	//}
 
 	return e;
 }
@@ -209,7 +195,7 @@ void EntityManager::SetPosition(EntityId e, Vector2Int pos) {
 	EntityChangeComponents.GetComponent(e).changed = true;
 }
 void EntityManager::GoTo(EntityId e, Vector2Int pos) {
-	
+
 	NavigationWorkComponents.GetComponent(e).work = true;
 	NavigationComponents.GetComponent(e).target = pos;
 }
@@ -217,7 +203,7 @@ void EntityManager::GoTo(EntityId e, Vector2Int pos) {
 void EntityManager::SetOrientation(EntityId e, unsigned orientation)
 {
 	MovementComponents.GetComponent(e).orientation = orientation;
-	auto& anim =AnimationComponents.GetComponent(e);
+	auto& anim = AnimationComponents.GetComponent(e);
 	auto& unit = UnitComponents.GetComponent(e);
 
 	anim.clip = &unit.def->MovementAnimations[orientation];

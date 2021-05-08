@@ -24,7 +24,7 @@ struct DrawCommandColor {
 struct BatchDrawCommand {
 	int order;
 	Image image;
-	Vector2 position;
+	Vector2Int16 position;
 	Vector2 scale;
 	DrawCommandColor color;
 };

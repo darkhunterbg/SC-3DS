@@ -94,13 +94,13 @@ struct RenderComponent {
 };
 
 struct RenderOffsetComponent  {
-	Vector2Int offset;
-	Vector2Int shadowOffset;
+	Vector2Int16 offset;
+	Vector2Int16 shadowOffset;
 };
 
 struct RenderDestinationComponent  {
-	Vector2Int dst;
-	Vector2Int shadowDst;
+	Vector2Int16 dst;
+	Vector2Int16 shadowDst;
 };
 
 

@@ -133,6 +133,7 @@ struct Vector2T
 
 typedef Vector2T<int> Vector2Int;
 typedef Vector2T<float> Vector2;
+typedef Vector2T<short> Vector2Int16;
 
 struct RectangleF
 {
@@ -247,6 +248,65 @@ struct Rectangle
 	}
 };
 
+
+
+struct Rectangle16
+{
+	Vector2Int16 position, size;
+
+	Rectangle16() {}
+	Rectangle16(const Vector2Int16& pos, const Vector2Int16& s)
+		: position(pos), size(s) {}
+
+
+	inline Vector2Int16 GetSize() const
+	{
+		return  size;
+	}
+	inline void SetSize(Vector2Int16 size)
+	{
+		this->size = size;
+	}
+
+	inline Vector2Int16 GetMin() const
+	{
+		return position;
+	}
+
+	inline Vector2Int16 GetMax() const
+	{
+		return position + size;
+	}
+
+	inline void SetMin(Vector2Int16 min)
+	{
+		position = min;
+	}
+
+	inline void SetMax(Vector2Int16 max)
+	{
+		size = (max - position);
+	}
+
+	inline Vector2Int16 GetCenter() const
+	{
+		return position + size / 2;
+	}
+	inline void SetCenter(Vector2Int16 center)
+	{
+		position = center;
+		position -= size / 2;
+	}
+	inline bool Intersects(const Rectangle16& r) const
+	{
+		return r.position.x < position.x + size.x && position.x < r.position.x + r.size.x &&
+			r.position.y < position.y + size.y && position.y < r.position.y + r.size.y;
+	}
+	inline bool Contains(const Vector2Int16& v) const {
+		return v.x <= position.x + size.x && v.x >= position.x &&
+			v.y <= position.y + size.y && v.y >= position.y;
+	}
+};
 
 inline Vector2Int Vector2Int_Ceil(const Vector2& v) {
 	return { (int)ceil(v.x), (int)ceilf(v.y) };

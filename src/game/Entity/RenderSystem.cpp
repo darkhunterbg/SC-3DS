@@ -9,7 +9,7 @@
 
 
 void RenderSystem::Draw(const Camera& camera, RenderArchetype& archetype) {
-	Rectangle camRect = camera.GetRectangle();
+	Rectangle16 camRect = camera.GetRectangle16();
 
 	constexpr const Color4 shadowColor = Color4(0.0f, 0.0f, 0.0f, 0.5f);
 
@@ -25,11 +25,11 @@ void RenderSystem::Draw(const Camera& camera, RenderArchetype& archetype) {
 		const auto& rp = archetype.pos[i];
 		const auto& r = archetype.ren[i];
 
-		Vector2Int dst = rp.dst;
+		Vector2Int16 dst = rp.dst;
 		dst -= camRect.position;
 		dst /= camera.Scale;
 
-		Vector2Int shadowDst = rp.shadowDst;
+		Vector2Int16 shadowDst = rp.shadowDst;
 		shadowDst -= camRect.position;
 		shadowDst /= camera.Scale;
 

@@ -71,8 +71,8 @@ void GameScene::Start() {
 			Color c = color[(i++) % 12];
 			EntityId e = entityManager->NewUnit(*UnitDatabase::Units[i % UnitDatabase::Units.size()], { x * 32 + 16,y * 32 +16}, c);
 			int orientation = std::rand() % 32;
-			entityManager->SetOrientation(e, orientation);
-			entityManager->GoTo(e, { 512,512 });
+			//entityManager->SetOrientation(e, orientation);
+			//entityManager->GoTo(e, { 512,512 });
 		}
 	}
 
@@ -130,14 +130,14 @@ void GameScene::Update() {
 		LogicalUpdate();
 	}
 
-	//int i = 0;
-	//for (int y = 99; y >= 0; --y) {
-	//	for (int x = 49; x >= 0; --x) {
+	int i = 0;
+	for (int y = 99; y >= 0; --y) {
+		for (int x = 49; x >= 0; --x) {
 
-	//		i++;
-	//		//entityManager->SetPosition(i, { x * 32  ,y * 32 });
-	//	}
-	//}
+			i++;
+			entityManager->SetPosition(i, { x * 32 + 16 ,y * 32 + 16 });
+		}
+	}
 
 
 	hud->ApplyInput(camera);

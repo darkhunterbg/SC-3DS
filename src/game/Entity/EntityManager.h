@@ -39,13 +39,13 @@ private:
 	bool updated = false;
 public:
 
-	ComponentCollection<Vector2Int> PositionComponents;
+	ComponentCollection<Vector2Int16> PositionComponents;
 	ComponentCollection<EntityChangeComponent> EntityChangeComponents;
 
 	ComponentCollection<RenderComponent> RenderComponents;
 	ComponentCollection<RenderOffsetComponent> RenderOffsetComponents;
 	ComponentCollection<RenderDestinationComponent> RenderDestinationComponents;
-	ComponentCollection<Rectangle> RenderBoundingBoxComponents;
+	ComponentCollection<Rectangle16> RenderBoundingBoxComponents;
 
 	ComponentCollection<MovementComponent> MovementComponents;
 	ComponentCollection<NavigationWorkComponent> NavigationWorkComponents;
