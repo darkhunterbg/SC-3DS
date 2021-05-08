@@ -12,12 +12,12 @@ void Camera::Update() {
 	{
 		Vector2 move = Game::Gamepad.CPad();
 		move *= (int)(GetCameraSpeed());
-		Position += move;
+		Position += Vector2Int(move);
 	}
 
 	Vector2 move = Game::Gamepad.CStick()	;
 	move *= (int)(GetCameraSpeed());
-	Position += move;
+	Position += Vector2Int(move);
 
 	Vector2Int ScaledSize = (Size * Scale) / 2;
 

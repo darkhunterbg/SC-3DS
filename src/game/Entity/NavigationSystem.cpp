@@ -81,7 +81,7 @@ static void Move(int start, int end) {
 		}
 		else {
 
-			Vector2Int move = movementTable[movement.orientation] * movement.velocity;
+			Vector2Int move = Vector2Int(movementTable[movement.orientation] * movement.velocity);
 			position += move;
 		}
 
@@ -111,7 +111,7 @@ static void UpdateNav(int start, int end) {
 		int heading = movement.orientation;
 		for (int i = 0; i < 8; i += 1) {
 
-			Vector2Int move = movementTable8[i] * movement.velocity;
+			Vector2Int move = Vector2Int(movementTable8[i] * movement.velocity);
 			Vector2Int pos = position + move;
 			int dist = (nav.target - pos).LengthSquared();
 			dist -= i * 4 == movement.orientation ? (movement.velocity * movement.velocity + 1) : 0;

@@ -61,6 +61,9 @@ public:
 		}
 
 	}
+	inline bool HasComponent(EntityId id) const {
+		return entityToComponentMap[Entity::ToIndex(id)] != -1;
+	}
 	inline TComponent& GetComponent(EntityId id) {
 		int cid = entityToComponentMap[Entity::ToIndex(id)];
 		return components[cid];

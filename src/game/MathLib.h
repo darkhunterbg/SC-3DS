@@ -35,30 +35,25 @@ struct Vector2T
 	constexpr Vector2T(T x, T y) { this->x = x; this->y = y; }
 	Vector2T(const Vector2T& o) { x = o.x, y = o.y; }
 	template<class T2>
-	constexpr Vector2T(const Vector2T<T2>& a) {
+	constexpr explicit Vector2T(const Vector2T<T2>& a) {
 		x = (T)a.x;
 		y = (T)a.y;
 	}
 	constexpr Vector2T(T all) {
 		x = all, y = all;
 	}
-	template<class T2>
-	constexpr Vector2T(T2 all) {
-		x = (T)all;
-		y = (T)all;
-	}
 
-	inline float Length() const
+	constexpr inline float Length() const
 	{
 		return sqrtf(x * x + y * y);
 	}
 
-	inline T LengthSquared() const
+	constexpr inline T LengthSquared() const
 	{
 		return x * x + y * y;
 	}
 
-	inline void Normalize()
+	constexpr inline void Normalize()
 	{
 		float l = Length();
 		x /= l;
@@ -84,19 +79,19 @@ struct Vector2T
 
 	inline Vector2T operator+(const Vector2T& b) const
 	{
-		return Vector2T{ x + b.x, y + b.y };
+		return Vector2T( x + b.x, y + b.y );
 	}
 	inline Vector2T operator-(const Vector2T& b) const
 	{
-		return Vector2T{ x - b.x, y - b.y };
+		return Vector2T( x - b.x, y - b.y );
 	}
 	inline Vector2T operator*(const Vector2T& b) const
 	{
-		return Vector2T{ x * b.x, y * b.y };
+		return Vector2T( x * b.x, y * b.y );
 	}
 	inline Vector2T operator/(const Vector2T& b) const
 	{
-		return Vector2T{ x / b.x, y / b.y };
+		return Vector2T( x / b.x, y / b.y );
 	}
 	inline  Vector2T& operator+=(const Vector2T& b)
 	{
@@ -132,12 +127,12 @@ struct Vector2T
 	}
 };
 
+
 //struct Vector2 : Vector2T<float> {};
 //struct Vector2Int : Vector2T<int> {};
 
 typedef Vector2T<int> Vector2Int;
 typedef Vector2T<float> Vector2;
-
 
 struct RectangleF
 {

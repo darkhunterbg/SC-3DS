@@ -89,19 +89,19 @@ void GameHUD::DrawMinimap(const Camera& camera, const MapSystem& mapSystem) {
 	Platform::Draw(minimapSprite, minimapDst);
 
 	Rectangle camRect = camera.GetRectangle();
-	Vector2 min = camRect.GetMin();
+	Vector2 min = Vector2(camRect.GetMin());
 	min /= minimapUpscale;
-	Vector2 max = camRect.GetMax();
+	Vector2 max = Vector2(camRect.GetMax());
 	max /= minimapUpscale;
-	min += minimapDst.position;
-	max += minimapDst.position;
+	min += Vector2(minimapDst.position);
+	max += Vector2(minimapDst.position);
 	Vector2 s = Vector2(camRect.size) / minimapUpscale;
 
 
-	Platform::DrawLine(min, min + Vector2(s.x, 0), Colors::White);
-	Platform::DrawLine(max, max - Vector2(s.x, 0), Colors::White);
-	Platform::DrawLine(min, min + Vector2(0, s.y), Colors::White);
-	Platform::DrawLine(max, max - Vector2(0, s.y), Colors::White);
+	Platform::DrawLine(Vector2Int(min), Vector2Int(min + Vector2(s.x, 0)), Colors::White);
+	Platform::DrawLine(Vector2Int(max), Vector2Int( max - Vector2(s.x, 0)), Colors::White);
+	Platform::DrawLine(Vector2Int(min), Vector2Int(min + Vector2(0, s.y)), Colors::White);
+	Platform::DrawLine(Vector2Int(max), Vector2Int(max - Vector2(0, s.y)), Colors::White);
 }
 
 void GameHUD::DrawAbilities() {
@@ -126,8 +126,8 @@ void GameHUD::RenderMinimapTexture(const MapSystem& mapSystem) {
 	Vector2Int tileSize = { MapTile::TileSize, MapTile::TileSize };
 
 	for (const MapTile& tile : mapSystem.GetTiles()) {
-		Vector2 pos = Vector2(tile.position * tileSize) / upscale;
-		Vector2 size = Vector2(tile.sprite.rect.size) / upscale;
+		Vector2Int pos = Vector2Int(Vector2(tile.position * tileSize) / upscale);
+		Vector2Int size = Vector2Int(Vector2(tile.sprite.rect.size) / upscale);
 		Platform::Draw(tile.sprite, { pos,size });
 	}
 

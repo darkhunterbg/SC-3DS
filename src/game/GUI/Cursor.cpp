@@ -120,7 +120,7 @@ void Cursor::Update(Camera& camera, EntityManager& entityManager, std::vector<En
 	if (!Game::Gamepad.IsButtonDown(GamepadButton::L))
 	{
 		Vector2 move = Game::Gamepad.CPad();
-		Position += move * Speed;
+		Position += Vector2Int(move * Speed);
 	}
 
 	if (Position.x <= Limits.position.x) {
@@ -193,8 +193,8 @@ void Cursor::Update(Camera& camera, EntityManager& entityManager, std::vector<En
 	if (corner.LengthSquared() != 0) {
 		int index = (corner.x + 1) + (corner.y + 1) * 3;
 		newClip = scrollAnim[index];
-		Vector2 v = Vector2::Normalize(corner);
-		camera.Position += v * camera.GetCameraSpeed();
+		Vector2 v = Vector2::Normalize(Vector2(corner));
+		camera.Position += Vector2Int(v * camera.GetCameraSpeed());
 	}
 	else {
 		if (!holding || !dragging)

@@ -72,8 +72,8 @@ void MapSystem::DrawMiniMapTiles(Vector2Int offset, const Camera& camera) {
 	if (downScale.y == 0)
 		downScale.y = 1;
 
-	Vector2Int size = minerals->GetSprite(0).rect.size / downScale;
-	Vector2Int pos = Vector2Int{ 160,120 } / downScale;
+	Vector2Int size = Vector2Int(Vector2(minerals->GetSprite(0).rect.size) / downScale);
+	Vector2Int pos = Vector2Int(Vector2(160, 120) / downScale);
 	pos += offset;
 
 	Platform::DrawRectangle({ pos,size }, Colors::LightBlue);
