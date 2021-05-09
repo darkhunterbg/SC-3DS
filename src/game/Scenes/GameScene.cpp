@@ -65,12 +65,13 @@ void GameScene::Start() {
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
 	int i = 0;
-	for (int y = 49; y >= 0; --y) {
+	for (int y = 99; y >= 0; --y) {
 		for (int x = 49; x >= 0; --x) {
 
-			Color c = color[(i++) % 12];
+			Color c = color[(i) % 12];
 			EntityId e = entityManager->NewUnit(*UnitDatabase::Units[i % UnitDatabase::Units.size()], { x * 32 + 16,y * 32 + 16 }, c);
 			//int orientation = std::rand() % 32;
+			i++;
 
 			/*if (i % 2) {
 				entityManager->RenderArchetype.Archetype.RemoveEntity(e);
@@ -81,7 +82,7 @@ void GameScene::Start() {
 		}
 	}
 
-	selection.push_back(1);
+	selection.push_back(0);
 	//int id = 3542;
 	//entityManager->DeleteEntity(id);
 }

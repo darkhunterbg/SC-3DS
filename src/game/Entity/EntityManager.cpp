@@ -22,14 +22,11 @@ void EntityManager::UpdateSecondaryEntities() {
 	animationSystem.GenerateAnimationUpdates(*this);
 
 	navigationSystem.UpdateNavigation(*this);
-	
 }
-
 
 void EntityManager::UpdateEntities() {
 
 	updated = true;
-
 
 	navigationSystem.MoveEntities(*this);
 	
@@ -78,18 +75,19 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 
 	auto& a = AnimationArchetype.AnimationComponents.NewComponent(e);
 	AnimationArchetype.TrackerComponents.NewComponent(e).PlayClip(&def.MovementAnimations[0]);
-	AnimationArchetype.EnableComponents.NewComponent(e).pause = false;
+	AnimationArchetype.EnableComponents.NewComponent(e).pause = true;
 	
-	a.clip = &def.MovementAnimations[0];
-	a.shadowClip = &def.MovementAnimationsShadow[0];
-	a.unitColorClip = &def.MovementAnimationsTeamColor[0];
+	//a.clip = &def.MovementAnimations[0];
+	//a.shadowClip = &def.MovementAnimationsShadow[0];
+	//a.unitColorClip = &def.MovementAnimationsTeamColor[0];
 
 	AnimationArchetype.Archetype.AddEntity(e);
 
 
 	NavigationArchetype.NavigationComponents.NewComponent(e);
 	NavigationArchetype.WorkComponents.NewComponent(e, { false });
-	NavigationArchetype.MovementComponents.NewComponent(e, { 0,def.MovementSpeed, def.RotationSpeed });
+	NavigationArchetype.MovementComponents.NewComponent(e).SetFromDef(def);
+	NavigationArchetype.OrientationComponents.NewComponent(e);
 
 	NavigationArchetype.Archetype.AddEntity(e);
 

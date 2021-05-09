@@ -117,13 +117,23 @@ struct NavigationWorkComponent {
 
 struct NavigationComponent {
 	Vector2Int16 target;
+	uint8_t currentHeading;
 	uint8_t targetHeading;
 };
 
+struct OrientationComponent {
+	bool changed = false;
+	uint8_t orientation = 0;
+};
+
 struct MovementComponent {
-	uint8_t orientation;
 	uint8_t velocity;
 	uint8_t rotationSpeed;
+
+	void SetFromDef(const UnitDef& def) {
+		velocity = def.MovementSpeed;
+		rotationSpeed = def.RotationSpeed;
+	}
 };
 
 struct UnitComponent {
@@ -134,7 +144,7 @@ struct AnimationEnableComponent {
 	bool pause = true;
 };
 struct AnimationTrackerComponent {
-	uint8_t clipFrame = 0;
+	int8_t clipFrame = 0;
 	uint8_t totalFrames = 0;
 	bool looping = false;
 

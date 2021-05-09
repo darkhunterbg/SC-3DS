@@ -51,6 +51,7 @@ public:
 		ComponentCollection<MovementComponent> MovementComponents;
 		ComponentCollection<NavigationWorkComponent> WorkComponents;
 		ComponentCollection<NavigationComponent> NavigationComponents;
+		ComponentCollection<OrientationComponent> OrientationComponents;
 	} NavigationArchetype;
 
 

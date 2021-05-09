@@ -81,8 +81,6 @@ void AnimationSystem::GenerateAnimationUpdates(EntityManager& em)
 
 
 void AnimationSystem::UpdateAnimations() {
-
 	s = this;
-
 	JobSystem::RunJob(data.size(), JobSystem::DefaultJobSize, UpdateAnimationsJob);
 }
