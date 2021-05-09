@@ -98,63 +98,23 @@ void EntityManager::UpdateEntities() {
 
 	//p.Submit();
 
-	renderUpdatePosArchetype.outPos.clear();
-	renderUpdatePosArchetype.worldPos.clear();
-	renderUpdatePosArchetype.offset.clear();
-	renderUpdatePosArchetype.outBB.clear();
-
-	int size = EntityChangeComponents.size();
-
-	SectionProfiler p("RenderUpdate");
-
-	for (int i = 0; i < size; ++i) {
-		if (EntityChangeComponents[i].changed) {
-			EntityChangeComponents[i].changed = false;
-
-			renderUpdatePosArchetype.outPos.push_back(&RenderDestinationComponents[i]);
-			renderUpdatePosArchetype.worldPos.push_back(PositionComponents[i]);
-			renderUpdatePosArchetype.offset.push_back(RenderOffsetComponents[i]);
-			renderUpdatePosArchetype.outBB.push_back(&RenderBoundingBoxComponents[i]);
-		}
-	}
-
-	renderSystem->SetRenderPosition(renderUpdatePosArchetype);
-
-	p.Submit();
+	renderSystem->UpdatePositions(*this);
 
 }
 
-void EntityManager::CameraCull(const Camera& camera)
-{
-	renderArchetype.pos.clear();
-	renderArchetype.ren.clear();
-	int size = RenderComponents.size();
 
-	Rectangle16 camRect = camera.GetRectangle16();
-
-	for (unsigned i = 0; i < size; ++i) {
-		const Rectangle16& bb = RenderBoundingBoxComponents[i];
-
-		if (!camRect.Intersects(bb))
-			continue;
-
-		renderArchetype.pos.push_back(RenderDestinationComponents[i]);
-		renderArchetype.ren.push_back(RenderComponents[i]);
-	}
-}
 void EntityManager::DrawEntites(const Camera& camera) {
 
 	if (!updated)
 		return;
 
-	SectionProfiler p("RenderEntities");
 
-	CameraCull(camera);
-	renderSystem->Draw(camera, renderArchetype);
+
+	renderSystem->Draw(camera, *this);
 
 	//kinematicSystem->DrawColliders(camera);
 
-	p.Submit();
+
 }
 
 EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color color) {

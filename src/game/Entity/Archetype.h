@@ -10,12 +10,31 @@ using ArchetypeCollection = std::vector<T>;
 struct RenderArchetype {
 	ArchetypeCollection<RenderDestinationComponent> pos;
 	ArchetypeCollection<RenderComponent> ren;
+
+	inline void clear() {
+		pos.clear();
+		ren.clear();
+	}
+	inline size_t size() const {
+		return pos.size();
+	}
 };
 struct RenderUpdatePositionArchetype {
 	ArchetypeCollection<RenderDestinationComponent*> outPos;
 	ArchetypeCollection<Rectangle16*> outBB;
 	ArchetypeCollection<Vector2Int16> worldPos;
 	ArchetypeCollection<RenderOffsetComponent> offset;
+
+	inline void clear() {
+
+		outPos.clear();
+		worldPos.clear();
+		offset.clear();
+		outBB.clear();
+	}
+	inline size_t size() {
+		return outPos.size();
+	}
 };
 
 struct MovementArchetype {

@@ -2,14 +2,36 @@
 #include "../Platform.h"
 #include "../Profiler.h"
 #include "../Job.h"
+#include "../Camera.h"
+#include "EntityManager.h"
 
 #include <algorithm>
-
 #include <cstring>
 
+void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
 
-void RenderSystem::Draw(const Camera& camera, RenderArchetype& archetype) {
+	renderArchetype.clear();
+	int size = em.RenderComponents.size();
+
+	for (unsigned i = 0; i < size; ++i) {
+		const Rectangle16& bb = em.RenderBoundingBoxComponents[i];
+
+		if (!camRect.Intersects(bb))
+			continue;
+
+		renderArchetype.pos.push_back(em.RenderDestinationComponents[i]);
+		renderArchetype.ren.push_back(em.RenderComponents[i]);
+	}
+}
+
+
+void RenderSystem::Draw(const Camera& camera, EntityManager& em) {
+
+	SectionProfiler p("RenderEntities");
+
 	Rectangle16 camRect = camera.GetRectangle16();
+
+	CameraCull(camRect, em);
 
 	constexpr const Color4 shadowColor = Color4(0.0f, 0.0f, 0.0f, 0.5f);
 
@@ -19,11 +41,11 @@ void RenderSystem::Draw(const Camera& camera, RenderArchetype& archetype) {
 
 	Vector2 scale[] = { {camMul,camMul},{-camMul,camMul} };
 
-	int entitiesCount = archetype.pos.size();
+	int entitiesCount = renderArchetype.size();
 
 	for (int i = 0; i < entitiesCount; ++i) {
-		const auto& rp = archetype.pos[i];
-		const auto& r = archetype.ren[i];
+		const auto& rp = renderArchetype.pos[i];
+		const auto& r = renderArchetype.ren[i];
 
 		Vector2Int16 dst = rp.dst;
 		dst -= camRect.position;
@@ -59,8 +81,9 @@ void RenderSystem::Draw(const Camera& camera, RenderArchetype& archetype) {
 
 	std::sort(render.begin(), render.end(), RenderSort);
 
-
 	Platform::BatchDraw({ render.data(),render.size() });
+
+	p.Submit();
 }
 
 bool RenderSystem::RenderSort(const BatchDrawCommand& a, const BatchDrawCommand& b) {
@@ -81,9 +104,32 @@ static void SetPosition(int start, int end) {
 	}
 }
 
-void RenderSystem::SetRenderPosition(RenderUpdatePositionArchetype& archetype) {
-	int size = archetype.outPos.size();
-	a = &archetype;
+void RenderSystem::UpdatePositions(EntityManager& em) {
+
+	SectionProfiler p("RenderUpdate");
+
+	renderUpdatePosArchetype.outPos.clear();
+	renderUpdatePosArchetype.worldPos.clear();
+	renderUpdatePosArchetype.offset.clear();
+	renderUpdatePosArchetype.outBB.clear();
+
+	int size = em.EntityChangeComponents.size();
+
+	for (int i = 0; i < size; ++i) {
+		if (em.EntityChangeComponents[i].changed) {
+			em.EntityChangeComponents[i].changed = false;
+
+			renderUpdatePosArchetype.outPos.push_back(&em.RenderDestinationComponents[i]);
+			renderUpdatePosArchetype.worldPos.push_back(em.PositionComponents[i]);
+			renderUpdatePosArchetype.offset.push_back(em.RenderOffsetComponents[i]);
+			renderUpdatePosArchetype.outBB.push_back(&em.RenderBoundingBoxComponents[i]);
+		}
+	}
+
+	size = renderUpdatePosArchetype.outPos.size();
+	a = &renderUpdatePosArchetype;
 	JobSystem::RunJob(size, JobSystem::DefaultJobSize, SetPosition);
+
+	p.Submit();
 }
 

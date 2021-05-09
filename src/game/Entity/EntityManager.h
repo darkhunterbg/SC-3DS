@@ -27,14 +27,9 @@ private:
 	KinematicSystem* kinematicSystem;
 	NavigationSystem* navigationSystem;
 
-	RenderArchetype renderArchetype;
-	RenderUpdatePositionArchetype renderUpdatePosArchetype;
+
 	NavigationArchetype navigationArchetype;
 	MovementArchetype movementArchetype;
-
-
-
-	void CameraCull(const Camera& camera);
 
 	bool updated = false;
 public:
