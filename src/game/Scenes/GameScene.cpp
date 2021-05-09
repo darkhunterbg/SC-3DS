@@ -134,14 +134,14 @@ void GameScene::Update() {
 		LogicalUpdate();
 	}
 
-	//int i = 0;
-	//for (int y = 99; y >= 0; --y) {
-	//	for (int x = 49; x >= 0; --x) {
+	int i = 0;
+	for (int y = 99; y >= 0; --y) {
+		for (int x = 49; x >= 0; --x) {
 
-	//		i++;
-	//		entityManager->SetPosition(i, { x * 32 + 16 ,y * 32 + 16 });
-	//	}
-	//}
+			i++;
+			entityManager->SetPosition(i, { x * 32 + 16 ,y * 32 + 16 });
+		}
+	}
 
 
 	hud->ApplyInput(camera);
@@ -160,7 +160,7 @@ void GameScene::Update() {
 	if (Game::Gamepad.IsButtonPressed(GamepadButton::X)) {
 
 		for (EntityId id : selection)
-			if (entityManager->RenderComponents.GetComponent(id).depth != -1) {
+			if (entityManager->RenderArchetype.RenderComponents.GetComponent(id).depth != -1) {
 				entityManager->GoTo(id, camera.ScreenToWorld(cursor->Position));
 
 				int i = std::rand() % 4;
@@ -171,9 +171,8 @@ void GameScene::Update() {
 	if (Game::Gamepad.IsButtonPressed(GamepadButton::Y)) {
 
 		for (EntityId id : selection)
-			if (entityManager->RenderComponents.GetComponent(id).depth != -1) {
+			if (entityManager->RenderArchetype.RenderComponents.GetComponent(id).depth != -1) {
 				entityManager->NavigationWorkComponents.GetComponent(id).work = false;
-
 			}
 	}
 	if (Game::Gamepad.IsButtonPressed(GamepadButton::B)) {

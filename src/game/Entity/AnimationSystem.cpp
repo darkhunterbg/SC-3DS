@@ -65,8 +65,8 @@ void AnimationSystem::GenerateAnimationUpdates(EntityManager& em)
 			{
 				archetype.animation.push_back(em.AnimationComponents[i]);
 				archetype.tracker.push_back(em.AnimationTrackerComponents[i]);
-				archetype.ren.push_back(&em.RenderComponents[i]);
-				archetype.offset.push_back(&em.RenderOffsetComponents[i]);
+				archetype.ren.push_back(&em.RenderArchetype.RenderComponents[i]);
+				archetype.offset.push_back(&em.RenderArchetype.OffsetComponents[i]);
 				archetype.changed.push_back(&em.EntityChangeComponents[i]);
 			}
 		}

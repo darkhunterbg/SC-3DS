@@ -104,22 +104,22 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 	
 	EntityChangeComponents.NewComponent(e, { true });
 
-	RenderComponents.NewComponent(e, {
+	RenderArchetype.RenderComponents.NewComponent(e, {
 		Color4(color),
 		def.MovementAnimations[0].GetFrame(0).sprite.image,
 		def.MovementAnimationsShadow[0].GetFrame(0).sprite.image,
 		def.MovementAnimationsTeamColor[0].GetFrame(0).sprite.image,
 		});
 
-	RenderOffsetComponents.NewComponent(e, {
+	RenderArchetype.OffsetComponents.NewComponent(e, {
 	 Vector2Int16(def.MovementAnimations[0].GetFrame(0).offset),
 		Vector2Int16(def.MovementAnimationsShadow[0].GetFrame(0).offset)
 		});
 
-	RenderDestinationComponents.NewComponent(e);
-	RenderBoundingBoxComponents.NewComponent(e, { {0,0}, Vector2Int16( def.RenderSize) });
+	RenderArchetype.DestinationComponents.NewComponent(e);
+	RenderArchetype.BoundingBoxComponents.NewComponent(e, { {0,0}, Vector2Int16( def.RenderSize) });
 
-	RenderArchetype.AddEntity(e);
+	RenderArchetype.Archetype.AddEntity(e);
 
 	/*
 	NavigationComponents.NewComponent(e);

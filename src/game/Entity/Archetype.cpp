@@ -1,12 +1,12 @@
 #include "Archetype.h"
 #include "Debug.h"
 
-Archetype::Archetype(const char* name): name(name)
+EntityArchetype::EntityArchetype(const char* name): name(name)
 {
 	memset(hasEntity.data(), false, Entity::MaxEntities * sizeof(bool));
 }
 
-void Archetype::AddEntity(EntityId id)
+void EntityArchetype::AddEntity(EntityId id)
 {
 	if (HasEntity(id))
 		EXCEPTION("Entity %i already added to archetype %s!", name);
@@ -25,7 +25,7 @@ void Archetype::AddEntity(EntityId id)
 	entities.insert(entities.begin(), id);
 }
 
-void Archetype::RemoveEntity(EntityId id)
+void EntityArchetype::RemoveEntity(EntityId id)
 {
 	if (!HasEntity(id))
 		EXCEPTION("Entity %i is not part of archetype %s!", name);

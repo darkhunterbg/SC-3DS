@@ -16,7 +16,6 @@
 #include "../Camera.h"
 
 class EntityManager {
-
 private:
 	EntityCollection entities;
 
@@ -25,20 +24,28 @@ private:
 	KinematicSystem* kinematicSystem;
 	NavigationSystem* navigationSystem;
 
-
 	NavigationArchetype navigationArchetype;
 	MovementArchetype movementArchetype;
 
 	bool updated = false;
+
 public:
 
 	ComponentCollection<Vector2Int16> PositionComponents;
 	ComponentCollection<EntityChangeComponent> EntityChangeComponents;
 
-	ComponentCollection<RenderComponent> RenderComponents;
-	ComponentCollection<RenderOffsetComponent> RenderOffsetComponents;
-	ComponentCollection<RenderDestinationComponent> RenderDestinationComponents;
-	ComponentCollection<Rectangle16> RenderBoundingBoxComponents;
+	struct {
+		EntityArchetype Archetype = EntityArchetype("Render");
+		ComponentCollection<RenderComponent> RenderComponents;
+		ComponentCollection<RenderOffsetComponent> OffsetComponents;
+		ComponentCollection<RenderDestinationComponent> DestinationComponents;
+		ComponentCollection<Rectangle16> BoundingBoxComponents;
+	} RenderArchetype;
+
+
+
+
+
 
 	ComponentCollection<MovementComponent> MovementComponents;
 	ComponentCollection<NavigationWorkComponent> NavigationWorkComponents;
@@ -50,7 +57,7 @@ public:
 	ComponentCollection<AnimationTrackerComponent> AnimationTrackerComponents;
 	ComponentCollection<AnimationComponent> AnimationComponents;
 
-	Archetype RenderArchetype = Archetype("Render");
+
 
 	EntityManager();
 	~EntityManager();

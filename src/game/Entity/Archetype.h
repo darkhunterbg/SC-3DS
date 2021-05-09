@@ -8,16 +8,16 @@ template <class T>
 using ArchetypeCollection = std::vector<T>;
 
 
-class Archetype {
+class EntityArchetype {
 private:
 	std::vector<EntityId> entities;
 	std::array<bool, Entity::MaxEntities> hasEntity;
 	const char* name;
 public:
-	Archetype(const Archetype&) = delete;
-	Archetype& operator=(const Archetype&) = delete;
+	EntityArchetype(const EntityArchetype&) = delete;
+	EntityArchetype& operator=(const EntityArchetype&) = delete;
 
-	Archetype(const char* name);
+	EntityArchetype(const char* name);
 
 	inline const Span<EntityId> GetEntities() const {
 		return { entities.data(), entities.size() };
@@ -30,35 +30,7 @@ public:
 };
 
 
-struct RenderArchetype {
-	ArchetypeCollection<RenderDestinationComponent> pos;
-	ArchetypeCollection<RenderComponent> ren;
 
-	inline void clear() {
-		pos.clear();
-		ren.clear();
-	}
-	inline size_t size() const {
-		return pos.size();
-	}
-};
-struct RenderUpdatePositionArchetype {
-	ArchetypeCollection<RenderDestinationComponent*> outPos;
-	ArchetypeCollection<Rectangle16*> outBB;
-	ArchetypeCollection<Vector2Int16> worldPos;
-	ArchetypeCollection<RenderOffsetComponent> offset;
-
-	inline void clear() {
-
-		outPos.clear();
-		worldPos.clear();
-		offset.clear();
-		outBB.clear();
-	}
-	inline size_t size() {
-		return outPos.size();
-	}
-};
 
 struct MovementArchetype {
 	ArchetypeCollection<NavigationWorkComponent*> work;

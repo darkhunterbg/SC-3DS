@@ -15,14 +15,48 @@ class Camera;
 
 class RenderSystem {
 
+	struct RenderData {
+		std::vector<RenderDestinationComponent> pos;
+		std::vector<RenderComponent> ren;
+
+		inline void clear() {
+			pos.clear();
+			ren.clear();
+		}
+		inline size_t size() const {
+			return pos.size();
+		}
+	};
+
+	struct RenderUpdatePosData {
+		std::vector<RenderDestinationComponent*> outPos;
+		std::vector<Rectangle16*> outBB;
+		std::vector<Vector2Int16> worldPos;
+		std::vector<RenderOffsetComponent> offset;
+
+		inline void clear() {
+
+			outPos.clear();
+			worldPos.clear();
+			offset.clear();
+			outBB.clear();
+		}
+		inline size_t size() {
+			return outPos.size();
+		}
+	};
+
+
 private:
 	std::vector< BatchDrawCommand> render;
 
-	RenderArchetype renderArchetype;
-	RenderUpdatePositionArchetype renderUpdatePosArchetype;
+	RenderData renderData;
+	RenderUpdatePosData renderUpdatePosData;
 
 
 	void CameraCull(const Rectangle16& rect, EntityManager& em);
+
+	static void UpdateRenderPositionsJob(int start, int end);
 
 	static bool RenderSort(const BatchDrawCommand& a, const BatchDrawCommand& b);
 public:

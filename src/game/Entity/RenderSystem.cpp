@@ -12,18 +12,18 @@ void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
 
 	SectionProfiler p("CameraCull");
 
-	renderArchetype.clear();
+	renderData.clear();
 
-	for (EntityId id : em.RenderArchetype.GetEntities()) {
+	for (EntityId id : em.RenderArchetype.Archetype.GetEntities()) {
 
 		int i = Entity::ToIndex(id);
-		const Rectangle16& bb = em.RenderBoundingBoxComponents[i];
+		const Rectangle16& bb = em.RenderArchetype.BoundingBoxComponents[i];
 
 		if (!camRect.Intersects(bb))
 			continue;
 
-		renderArchetype.pos.push_back(em.RenderDestinationComponents[i]);
-		renderArchetype.ren.push_back(em.RenderComponents[i]);
+		renderData.pos.push_back(em.RenderArchetype.DestinationComponents[i]);
+		renderData.ren.push_back(em.RenderArchetype.RenderComponents[i]);
 
 	}
 
@@ -46,11 +46,11 @@ void RenderSystem::Draw(const Camera& camera, EntityManager& em) {
 
 	Vector2 scale[] = { {camMul,camMul},{-camMul,camMul} };
 
-	int entitiesCount = renderArchetype.size();
+	int entitiesCount = renderData.size();
 
 	for (int i = 0; i < entitiesCount; ++i) {
-		const auto& rp = renderArchetype.pos[i];
-		const auto& r = renderArchetype.ren[i];
+		const auto& rp = renderData.pos[i];
+		const auto& r = renderData.ren[i];
 
 		Vector2Int16 dst = rp.dst;
 		dst -= camRect.position;
@@ -96,16 +96,16 @@ bool RenderSystem::RenderSort(const BatchDrawCommand& a, const BatchDrawCommand&
 }
 
 
-static RenderUpdatePositionArchetype* a;
+static RenderSystem* s;
 
-static void SetPosition(int start, int end) {
-	RenderUpdatePositionArchetype& archetype = *a;
+void RenderSystem::UpdateRenderPositionsJob(int start, int end) {
+	RenderUpdatePosData& data = s->renderUpdatePosData;
 
 	for (int i = start; i < end; ++i) {
-		RenderDestinationComponent* p = archetype.outPos[i];
-		p->dst = archetype.worldPos[i] + archetype.offset[i].offset;
-		p->shadowDst = archetype.worldPos[i] + archetype.offset[i].shadowOffset;
-		archetype.outBB[i]->SetCenter(archetype.worldPos[i]);
+		RenderDestinationComponent* p = data.outPos[i];
+		p->dst = data.worldPos[i] + data.offset[i].offset;
+		p->shadowDst = data.worldPos[i] + data.offset[i].shadowOffset;
+		data.outBB[i]->SetCenter(data.worldPos[i]);
 	}
 }
 
@@ -113,7 +113,7 @@ void RenderSystem::UpdatePositions(EntityManager& em) {
 
 	SectionProfiler p("RenderUpdate");
 
-	renderUpdatePosArchetype.clear();
+	renderUpdatePosData.clear();
 
 	for (EntityId id : em.GetEntities()) {
 		int i = Entity::ToIndex(id);
@@ -121,20 +121,20 @@ void RenderSystem::UpdatePositions(EntityManager& em) {
 		if (em.EntityChangeComponents[i].changed) {
 			em.EntityChangeComponents[i].changed = false;
 
-			if (em.RenderArchetype.HasEntity(id))
+			if (em.RenderArchetype.Archetype.HasEntity(id))
 			{
-				renderUpdatePosArchetype.outPos.push_back(&em.RenderDestinationComponents[i]);
-				renderUpdatePosArchetype.worldPos.push_back(em.PositionComponents[i]);
-				renderUpdatePosArchetype.offset.push_back(em.RenderOffsetComponents[i]);
-				renderUpdatePosArchetype.outBB.push_back(&em.RenderBoundingBoxComponents[i]);
+				renderUpdatePosData.outPos.push_back(&em.RenderArchetype.DestinationComponents[i]);
+				renderUpdatePosData.worldPos.push_back(em.PositionComponents[i]);
+				renderUpdatePosData.offset.push_back(em.RenderArchetype.OffsetComponents[i]);
+				renderUpdatePosData.outBB.push_back(&em.RenderArchetype.BoundingBoxComponents[i]);
 			}
 
 		}
 	}
 
-	int size = renderUpdatePosArchetype.size();
-	a = &renderUpdatePosArchetype;
-	JobSystem::RunJob(size, JobSystem::DefaultJobSize, SetPosition);
+	int size = renderUpdatePosData.size();
+	s = this;
+	JobSystem::RunJob(renderUpdatePosData.size(), JobSystem::DefaultJobSize, UpdateRenderPositionsJob);
 
 	p.Submit();
 }
