@@ -56,6 +56,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\Generated.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\UnitDatabase.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationSystem.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\Entity.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\EntityManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\KinematicSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\NavigationSystem.cpp" />

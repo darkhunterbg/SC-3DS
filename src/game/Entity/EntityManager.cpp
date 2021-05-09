@@ -17,37 +17,16 @@ EntityManager::~EntityManager() {
 	delete navigationSystem;
 }
 
-EntityId EntityManager::NewEntity() {
-
-	// This can be speed up with a queue 
-	if (entities.size() == Entity::MaxEntities)
-		EXCEPTION("No more free entities left!");
-
-	entities.push_back(++lastId);
-
-	return lastId;
-}
-
 void EntityManager::DeleteEntity(EntityId id) {
-	if (id == Entity::None || id > lastId)
-		EXCEPTION("Tried to delete invalid entity!");
-
-	int totalEntities = entities.size();
-	for (unsigned i = 0; i < totalEntities; ++i)
-	{
-		if (entities[i] == id)
-		{
-			entities.erase(entities.begin() + i);
-			return;
-		}
-	}
-
-	EXCEPTION("Did not find entity for deletion: %i", id);
+	entities.DeleteEntity(id);
+	
+	// TODO: remove components;
 }
 
 
 void EntityManager::UpdateSecondaryEntities() {
 
+	/*
 	navigationArchetype.clear();
 
 	int navSize = NavigationComponents.size();
@@ -61,6 +40,7 @@ void EntityManager::UpdateSecondaryEntities() {
 	}
 
 	navigationSystem->UpdateNavigation(navigationArchetype);
+	*/
 }
 
 
@@ -68,7 +48,7 @@ void EntityManager::UpdateEntities() {
 
 	updated = true;
 
-
+	/*
 	movementArchetype.clear();
 
 	int navSize = NavigationWorkComponents.size();
@@ -95,6 +75,7 @@ void EntityManager::UpdateEntities() {
 	animationSystem->GenerateAnimationUpdates(*this);
 
 	animationSystem->UpdateAnimations();
+	*/
 
 	//p.Submit();
 
@@ -118,8 +99,9 @@ void EntityManager::DrawEntites(const Camera& camera) {
 }
 
 EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color color) {
-	EntityId e = NewEntity();
+	EntityId e = entities.NewEntity();
 	PositionComponents.NewComponent(e, Vector2Int16( position));
+	
 	EntityChangeComponents.NewComponent(e, { true });
 
 	RenderComponents.NewComponent(e, {
@@ -137,6 +119,7 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 	RenderDestinationComponents.NewComponent(e);
 	RenderBoundingBoxComponents.NewComponent(e, { {0,0}, Vector2Int16( def.RenderSize) });
 
+	/*
 	NavigationComponents.NewComponent(e);
 	NavigationWorkComponents.NewComponent(e, { false });
 	MovementComponents.NewComponent(e, { 0,def.MovementSpeed, def.RotationSpeed });
@@ -146,6 +129,7 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 	auto& a = AnimationComponents.NewComponent(e);
 	AnimationTrackerComponents.NewComponent(e);
 	AnimationEnableComponents.NewComponent(e);
+	*/
 
 	return e;
 }

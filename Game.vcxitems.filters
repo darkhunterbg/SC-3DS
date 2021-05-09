@@ -150,5 +150,8 @@
       <Filter>Scenes</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Job.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\Entity.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

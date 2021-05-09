@@ -18,9 +18,7 @@
 class EntityManager {
 
 private:
-	std::vector<EntityId> entities;
-	std::vector<EntityId> deleted;
-	EntityId lastId = Entity::None;
+	EntityCollection entities;
 
 	RenderSystem* renderSystem;
 	AnimationSystem* animationSystem;
@@ -55,7 +53,9 @@ public:
 	EntityManager();
 	~EntityManager();
 
-	EntityId NewEntity();
+	inline const Span<EntityId> GetEntities() const {
+		return entities.GetEntities();
+	}
 	void DeleteEntity(EntityId id);
 
 	void UpdateEntities();

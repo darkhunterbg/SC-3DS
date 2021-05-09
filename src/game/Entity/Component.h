@@ -11,6 +11,8 @@
 #include "../Assets.h"
 #include "../Data/UnitDef.h"
 
+#include "../Platform.h"
+
 ////template <unsigned id>
 //struct IComponent {
 //	//static constexpr const unsigned ComponentId = id;
@@ -21,63 +23,70 @@ template <class TComponent, unsigned MaxComponents = Entity::MaxEntities>
 class ComponentCollection
 {
 private:
-	std::vector<TComponent> components;
-	std::vector<EntityId> componentToEntityMap;
-	std::array<int, MaxComponents> entityToComponentMap;
+	std::array<bool, MaxComponents> hasComponent;
+	std::array<TComponent, MaxComponents> components;
+
 public:
+
 	ComponentCollection() {
-		memset(entityToComponentMap.data(), -1, sizeof(MaxComponents) * sizeof(int));
+		memset(hasComponent.data(), false, MaxComponents * sizeof(bool));
+		
 	}
 
-	inline Span<TComponent> GetComponents() const { return { components.data(),components.size() }; }
-	inline EntityId GetEntityIdForComponent(int cid) const { return componentToEntityMap[cid]; }
+	ComponentCollection(const ComponentCollection&) = delete;
+	ComponentCollection& operator=(const ComponentCollection&) = delete;
 
 	TComponent& NewComponent(EntityId id) {
-		int cid = components.size();
-		entityToComponentMap[Entity::ToIndex(id)] = cid;
-		componentToEntityMap.push_back(id);
-		components.push_back(TComponent());
-		return components[cid];
+		int index = Entity::ToIndex(id);
+		if (hasComponent[index])
+			EXCEPTION("Entity %i already has component!", id);
+
+		hasComponent[index] = true;
+		components[index] = TComponent();
+		return components[index];
 	}
 
 	TComponent& NewComponent(EntityId id, const TComponent& component) {
-		int cid = components.size();
-		entityToComponentMap[Entity::ToIndex(id)] = cid;
-		componentToEntityMap.push_back(id);
-		components.push_back(component);
-		return components[cid];
+		int index = Entity::ToIndex(id);
+		if (hasComponent[index])
+			EXCEPTION("Entity %i already has component!", id);
+
+		hasComponent[index] = true;
+		components[index] = component;
+		return components[index];
 	}
 
 	void RemoveComponent(EntityId id) {
-		int cid = entityToComponentMap[Entity::ToIndex(id)];
-		entityToComponentMap[Entity::ToIndex(id)] = -1;
-		components.erase(components.begin() + cid);
-		componentToEntityMap.erase(componentToEntityMap.begin() + cid);
+		int index = Entity::ToIndex(id);
+		if (!hasComponent[index])
+			EXCEPTION("Entity %i does not have component!", id);
 
-		int size = componentToEntityMap.size();
-		for (int i = cid; i < size; ++i) {
-			EntityId eid = componentToEntityMap[i];
-			entityToComponentMap[Entity::ToIndex(eid)] -= 1;
-		}
+		hasComponent[index] = false;
 
 	}
 	inline bool HasComponent(EntityId id) const {
-		return entityToComponentMap[Entity::ToIndex(id)] != -1;
+		return hasComponent[Entity::ToIndex(id)];
 	}
+
 	inline TComponent& GetComponent(EntityId id) {
-		int cid = entityToComponentMap[Entity::ToIndex(id)];
-		return components[cid];
+		return components[Entity::ToIndex(id)];
 	}
-	inline const TComponent* GetComponent(EntityId id) const {
-		int cid = entityToComponentMap[Entity::ToIndex(id)];
-		return components[cid];
+	inline TComponent& GetComponent(EntityId id) const {
+		return components[Entity::ToIndex(id)];
+	}
+	inline const TComponent* TryGetComponent(EntityId id) const {
+		if (!hasComponent[Entity::ToIndex(id)])
+			return nullptr;
+		return components[Entity::ToIndex(id)];
 	}
 
 	inline TComponent& at(int i) { return components[i]; };
 	inline const TComponent& at(int i) const { return components[i]; }
-	inline size_t size() const { return components.size(); }
 	inline TComponent& operator[](int i) { return components[i]; }
 	inline const TComponent& operator[](int i) const { return components[i]; }
+	inline size_t size() const { return 0; }
+
+	// we need component iteration somehow
 };
 
 struct EntityChangeComponent {

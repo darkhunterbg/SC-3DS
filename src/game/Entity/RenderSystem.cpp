@@ -11,19 +11,20 @@
 void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
 
 	renderArchetype.clear();
-	int size = em.RenderComponents.size();
 
-	for (unsigned i = 0; i < size; ++i) {
-		const Rectangle16& bb = em.RenderBoundingBoxComponents[i];
+	for (EntityId id : em.GetEntities()) {
+		if (em.RenderBoundingBoxComponents.HasComponent(id)) {
+			int i = Entity::ToIndex(id);
+			const Rectangle16& bb = em.RenderBoundingBoxComponents[i];
 
-		if (!camRect.Intersects(bb))
-			continue;
+			if (!camRect.Intersects(bb))
+				continue;
 
-		renderArchetype.pos.push_back(em.RenderDestinationComponents[i]);
-		renderArchetype.ren.push_back(em.RenderComponents[i]);
+			renderArchetype.pos.push_back(em.RenderDestinationComponents[i]);
+			renderArchetype.ren.push_back(em.RenderComponents[i]);
+		}
 	}
 }
-
 
 void RenderSystem::Draw(const Camera& camera, EntityManager& em) {
 
@@ -108,25 +109,26 @@ void RenderSystem::UpdatePositions(EntityManager& em) {
 
 	SectionProfiler p("RenderUpdate");
 
-	renderUpdatePosArchetype.outPos.clear();
-	renderUpdatePosArchetype.worldPos.clear();
-	renderUpdatePosArchetype.offset.clear();
-	renderUpdatePosArchetype.outBB.clear();
+	renderUpdatePosArchetype.clear();
 
-	int size = em.EntityChangeComponents.size();
+	for (EntityId id : em.GetEntities()) {
+		int i = Entity::ToIndex(id);
 
-	for (int i = 0; i < size; ++i) {
 		if (em.EntityChangeComponents[i].changed) {
 			em.EntityChangeComponents[i].changed = false;
 
-			renderUpdatePosArchetype.outPos.push_back(&em.RenderDestinationComponents[i]);
-			renderUpdatePosArchetype.worldPos.push_back(em.PositionComponents[i]);
-			renderUpdatePosArchetype.offset.push_back(em.RenderOffsetComponents[i]);
-			renderUpdatePosArchetype.outBB.push_back(&em.RenderBoundingBoxComponents[i]);
+			if (em.RenderComponents.HasComponent(Entity::ToId(id)))
+			{
+				renderUpdatePosArchetype.outPos.push_back(&em.RenderDestinationComponents[i]);
+				renderUpdatePosArchetype.worldPos.push_back(em.PositionComponents[i]);
+				renderUpdatePosArchetype.offset.push_back(em.RenderOffsetComponents[i]);
+				renderUpdatePosArchetype.outBB.push_back(&em.RenderBoundingBoxComponents[i]);
+			}
+
 		}
 	}
 
-	size = renderUpdatePosArchetype.outPos.size();
+	int size = renderUpdatePosArchetype.size();
 	a = &renderUpdatePosArchetype;
 	JobSystem::RunJob(size, JobSystem::DefaultJobSize, SetPosition);
 
