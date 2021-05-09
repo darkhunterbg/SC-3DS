@@ -66,7 +66,7 @@ void GameScene::Start() {
 
 	int i = 0;
 	for (int y = 49; y >= 0; --y) {
-		for (int x = 99; x >= 0; --x) {
+		for (int x = 49; x >= 0; --x) {
 
 			Color c = color[(i++) % 12];
 			EntityId e = entityManager->NewUnit(*UnitDatabase::Units[i % UnitDatabase::Units.size()], { x * 32 + 16,y * 32 + 16 }, c);
@@ -77,7 +77,7 @@ void GameScene::Start() {
 				entityManager->AnimationArchetype.Archetype.RemoveEntity(e);
 			}*/
 			//entityManager->SetOrientation(e, orientation);
-			//entityManager->GoTo(e, { 512,512 });
+			entityManager->GoTo(e, { 512,512 });
 		}
 	}
 
@@ -173,7 +173,7 @@ void GameScene::Update() {
 
 		for (EntityId id : selection)
 			if (entityManager->RenderArchetype.RenderComponents.GetComponent(id).depth != -1) {
-				entityManager->NavigationWorkComponents.GetComponent(id).work = false;
+				entityManager->NavigationArchetype.WorkComponents.GetComponent(id).work = false;
 			}
 	}
 	if (Game::Gamepad.IsButtonPressed(GamepadButton::B)) {

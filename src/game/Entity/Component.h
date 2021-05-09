@@ -116,14 +116,14 @@ struct NavigationWorkComponent {
 };
 
 struct NavigationComponent {
-	Vector2Int target;
-	unsigned targetHeading;
+	Vector2Int16 target;
+	uint8_t targetHeading;
 };
 
 struct MovementComponent {
-	unsigned orientation;
-	unsigned velocity;
-	unsigned rotationSpeed;
+	uint8_t orientation;
+	uint8_t velocity;
+	uint8_t rotationSpeed;
 };
 
 struct UnitComponent {

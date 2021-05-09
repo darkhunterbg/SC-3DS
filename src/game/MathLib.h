@@ -53,6 +53,11 @@ struct Vector2T
 		return x * x + y * y;
 	}
 
+	constexpr inline unsigned LengthSquaredInt() const
+	{
+		return x * x + y * y;
+	}
+
 	constexpr inline void Normalize()
 	{
 		float l = Length();

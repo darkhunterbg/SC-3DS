@@ -10,8 +10,8 @@ struct UnitDef {
 
 	std::string Name;
 	unsigned Health;
-	unsigned MovementSpeed;
-	unsigned RotationSpeed;
+	uint8_t MovementSpeed;
+	uint8_t RotationSpeed;
 
 	Vector2Int RenderSize;
 	Rectangle Collider;

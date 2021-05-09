@@ -2,11 +2,11 @@
 #include "EntityManager.h"
 #include "AnimationSystem.h"
 #include "Job.h"
+#include "../Profiler.h"
 
 #include "../Assets.h"
-#include "../Platform.h"
 
-static Vector2 movementTable[]{
+static const Vector2 movementTable32[]{
 	{0,-1}, {0,-1},
 	{0.7,-0.7},{0.7,-0.7},{0.7,-0.7},{0.7,-0.7},
 	{1,0}, {1,0}, {1,0}, {1,0},
@@ -18,32 +18,28 @@ static Vector2 movementTable[]{
 	{0,-1},{0,-1}
 
 };
-static Vector2 movementTable8[]{
-			{0,-1}, {0.7,-0.7},{1,0}, {0.7,0.7},{0,1}, {-0.7,0.7}, {-1,0},{-0.7,-0.7}
+static const Vector2 movementTable8[]{
+		{0,-1}, {0.7,-0.7},{1,0}, {0.7,0.7},{0,1}, {-0.7,0.7}, {-1,0},{-0.7,-0.7}
 };
-static MovementArchetype* ma;
-static NavigationArchetype* na;
+static NavigationSystem* s;
 
-static void Move(int start, int end) {
-	MovementArchetype& archetype = *ma;
+ void NavigationSystem::MoveEntitiesJob(int start, int end) {
+	 MovementData& data = s->movementData;
 
 	for (int i = start; i < end; ++i) {
-		auto& work = *archetype.work[i];
-		auto& movement = *archetype.movement[i];
-		const auto& nav = archetype.navigation[i];
-
+		auto& work = *data.work[i];
+		auto& movement = *data.movement[i];
+		const auto& nav = data.navigation[i];
 
 		if (nav.targetHeading != movement.orientation) {
 
-			int diff = nav.targetHeading - movement.orientation;
+			uint8_t diff = nav.targetHeading - movement.orientation;
 
 			if (diff != 0) {
 				if (std::abs(diff) > movement.rotationSpeed) {
 					int sign = diff > 0 ? 1 : -1;
 					if (std::abs(diff) > 15)
-					{
 						sign = -sign;
-					}
 
 					movement.orientation += sign * movement.rotationSpeed;
 					movement.orientation = (movement.orientation + 32) % 32;
@@ -53,10 +49,10 @@ static void Move(int start, int end) {
 				}
 			}
 
-			const auto& unit = archetype.unit[i];
-			auto& anim = *archetype.anim[i];
-			auto& animEnable = *archetype.animEnabled[i];
-			auto& animTracker = *archetype.animTracker[i];
+			const auto& unit = data.unit[i];
+			auto& anim = *data.anim[i];
+			auto& animEnable = *data.animEnabled[i];
+			auto& animTracker = *data.animTracker[i];
 
 			anim.clip  = &unit.def->MovementAnimations[movement.orientation];
 			anim.shadowClip = &unit.def->MovementAnimationsShadow[movement.orientation];
@@ -68,52 +64,75 @@ static void Move(int start, int end) {
 				continue;
 		}
 
-		auto& position = *archetype.position[i];
+		auto& position = *data.position[i];
 
-		Vector2Int distance = nav.target - position;
+		Vector2Int distance = Vector2Int(nav.target - position);
 
-		if (distance.LengthSquared() < movement.velocity * movement.velocity) {
+		if (distance.LengthSquaredInt() < movement.velocity * movement.velocity) {
 			position = nav.target;
 			work.work = false;
 
-			auto& anim = *archetype.animEnabled[i];
+			auto& anim = *data.animEnabled[i];
 			anim.pause = true;
 		}
 		else {
 
-			Vector2Int move = Vector2Int(movementTable[movement.orientation] * movement.velocity);
+			Vector2Int16 move = Vector2Int16(movementTable32[movement.orientation] * movement.velocity);
 			position += move;
 		}
 
-		archetype.changed[i]->changed = true;
+		data.changed[i]->changed = true;
 	}
 }
 
-void NavigationSystem::MoveEntities(MovementArchetype& archetype) {
-	ma = &archetype;
-	int end = archetype.size();
+void NavigationSystem::MoveEntities(EntityManager& em) {
 
-	JobSystem::RunJob(end, JobSystem::DefaultJobSize, Move);
+	SectionProfiler p("MoveEntities");
+
+	movementData.clear();
+
+	for (EntityId id : em.NavigationArchetype.Archetype.GetEntities()) {
+		int i = Entity::ToIndex(id);
+		if (em.NavigationArchetype.WorkComponents[i].work) {
+			movementData.work.push_back(&em.NavigationArchetype.WorkComponents[i]);
+			movementData.movement.push_back(&em.NavigationArchetype.MovementComponents[i]);
+			movementData.position.push_back(&em.PositionComponents[i]);
+			movementData.navigation.push_back(em.NavigationArchetype.NavigationComponents[i]);
+			movementData.changed.push_back(&em.EntityChangeComponents[i]);
+			movementData.unit.push_back(em.UnitComponents[i]);
+
+			if (em.AnimationArchetype.Archetype.HasEntity(id)) {
+				// TODO: animation update goes to a different update
+				movementData.anim.push_back(&em.AnimationArchetype.AnimationComponents[i]);
+				movementData.animEnabled.push_back(&em.AnimationArchetype.EnableComponents[i]);
+				movementData.animTracker.push_back(&em.AnimationArchetype.TrackerComponents[i]);
+			}
+		}
+	}
+
+	s = this;
+	JobSystem::RunJob(movementData.size(), JobSystem::DefaultJobSize, MoveEntitiesJob);
+
+	p.Submit();
 }
 
+void NavigationSystem::UpdateNavigationJob(int start, int end) {
+	NavigationData& data = s->navigationData;
 
-
-static void UpdateNav(int start, int end) {
-	NavigationArchetype& archetype = *na;
 
 	for (int i = start; i < end; ++i) {
-		auto& nav = *archetype.navigation[i];
-		const auto& movement = archetype.movement[i];
-		const auto& position = archetype.position[i];
+		auto& nav = *data.navigation[i];
+		const auto& movement = data.movement[i];
+		const auto& position = data.position[i];
 
 
-		int h = 1'000'000;
-		int heading = movement.orientation;
+		int h = std::numeric_limits<int>::max();
+		uint8_t heading = movement.orientation;
 		for (int i = 0; i < 8; i += 1) {
 
-			Vector2Int move = Vector2Int(movementTable8[i] * movement.velocity);
-			Vector2Int pos = position + move;
-			int dist = (nav.target - pos).LengthSquared();
+			Vector2Int16 move = Vector2Int16(movementTable8[i] * movement.velocity);
+			Vector2Int16 pos = position + move;
+			int dist = (nav.target - pos).LengthSquaredInt();
 			dist -= i * 4 == movement.orientation ? (movement.velocity * movement.velocity + 1) : 0;
 			if (dist < h)
 			{
@@ -126,10 +145,22 @@ static void UpdateNav(int start, int end) {
 	}
 }
 
-void NavigationSystem::UpdateNavigation(NavigationArchetype& archetype)
+void NavigationSystem::UpdateNavigation(EntityManager& em)
 {
-	na = &archetype;
-	int end = archetype.size();
-	//int start = 0;
-	JobSystem::RunJob(end, JobSystem::DefaultJobSize, UpdateNav);
+	SectionProfiler p("UpdateNavigation");
+
+	navigationData.clear();
+
+	for (EntityId id : em.NavigationArchetype.Archetype.GetEntities()) {
+		int i = Entity::ToIndex(id);
+
+		if (em.NavigationArchetype.WorkComponents[i].work) {
+			navigationData.movement.push_back(em.NavigationArchetype.MovementComponents[i]);
+			navigationData.position.push_back(em.PositionComponents[i]);
+			navigationData.navigation.push_back(&em.NavigationArchetype.NavigationComponents[i]);
+		}
+	}
+
+	s = this;
+	JobSystem::RunJob(navigationData.size(), JobSystem::DefaultJobSize, UpdateNavigationJob);
 }

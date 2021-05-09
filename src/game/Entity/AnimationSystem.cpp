@@ -44,8 +44,6 @@ void AnimationSystem::UpdateAnimationsJob(int start, int end) {
 
 void AnimationSystem::GenerateAnimationUpdates(EntityManager& em)
 {
-	SectionProfiler p("AnimationsGenerate");
-
 	data.clear();
 	int end = em.AnimationArchetype.EnableComponents.size();
 
@@ -83,8 +81,6 @@ void AnimationSystem::GenerateAnimationUpdates(EntityManager& em)
 
 
 void AnimationSystem::UpdateAnimations() {
-
-	SectionProfiler p("AnimationsUpdate");
 
 	s = this;
 

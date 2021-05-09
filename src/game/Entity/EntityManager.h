@@ -19,13 +19,10 @@ class EntityManager {
 private:
 	EntityCollection entities;
 
-	RenderSystem* renderSystem;
-	AnimationSystem* animationSystem;
-	KinematicSystem* kinematicSystem;
-	NavigationSystem* navigationSystem;
-
-	NavigationArchetype navigationArchetype;
-	MovementArchetype movementArchetype;
+	RenderSystem renderSystem;
+	AnimationSystem animationSystem;
+	KinematicSystem kinematicSystem;
+	NavigationSystem navigationSystem;
 
 	bool updated = false;
 
@@ -49,10 +46,13 @@ public:
 		ComponentCollection<AnimationTrackerComponent> TrackerComponents;
 	} AnimationArchetype;
 
+	struct {
+		EntityArchetype Archetype = EntityArchetype("Navigation");
+		ComponentCollection<MovementComponent> MovementComponents;
+		ComponentCollection<NavigationWorkComponent> WorkComponents;
+		ComponentCollection<NavigationComponent> NavigationComponents;
+	} NavigationArchetype;
 
-	ComponentCollection<MovementComponent> MovementComponents;
-	ComponentCollection<NavigationWorkComponent> NavigationWorkComponents;
-	ComponentCollection<NavigationComponent> NavigationComponents;
 
 	ComponentCollection<UnitComponent> UnitComponents;
 

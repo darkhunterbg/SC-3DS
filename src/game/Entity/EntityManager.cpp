@@ -5,44 +5,24 @@
 #include "../Job.h"
 
 EntityManager::EntityManager() {
-	renderSystem = new RenderSystem();
-	animationSystem = new AnimationSystem();
-	kinematicSystem = new KinematicSystem();
-	navigationSystem = new NavigationSystem();
+
 }
 EntityManager::~EntityManager() {
-	delete renderSystem;
-	delete animationSystem;
-	delete kinematicSystem;
-	delete navigationSystem;
+
 }
 
 void EntityManager::DeleteEntity(EntityId id) {
 	entities.DeleteEntity(id);
-	
 	// TODO: remove components;
 }
 
 
 void EntityManager::UpdateSecondaryEntities() {
 
-	animationSystem->GenerateAnimationUpdates(*this);
+	animationSystem.GenerateAnimationUpdates(*this);
 
-	/*
-	navigationArchetype.clear();
-
-	int navSize = NavigationComponents.size();
-
-	for (int i = 0; i < navSize; ++i) {
-		if (NavigationWorkComponents[i].work) {
-			navigationArchetype.movement.push_back(MovementComponents[i]);
-			//navigationArchetype.position.push_back(PositionComponents[i]);
-			navigationArchetype.navigation.push_back(&NavigationComponents[i]);
-		}
-	}
-
-	navigationSystem->UpdateNavigation(navigationArchetype);
-	*/
+	navigationSystem.UpdateNavigation(*this);
+	
 }
 
 
@@ -50,32 +30,12 @@ void EntityManager::UpdateEntities() {
 
 	updated = true;
 
-	/*
-	movementArchetype.clear();
 
-	int navSize = NavigationWorkComponents.size();
+	navigationSystem.MoveEntities(*this);
+	
+	animationSystem.UpdateAnimations();
 
-	for (int i = 0; i < navSize; ++i) {
-		if (NavigationWorkComponents[i].work) {
-
-			movementArchetype.work.push_back(&NavigationWorkComponents[i]);
-			movementArchetype.movement.push_back(&MovementComponents[i]);
-			//movementArchetype.position.push_back(&PositionComponents[i]);
-			movementArchetype.navigation.push_back(NavigationComponents[i]);
-			movementArchetype.changed.push_back(&EntityChangeComponents[i]);
-			movementArchetype.unit.push_back(UnitComponents[i]);
-			movementArchetype.anim.push_back(&AnimationComponents[i]);
-			movementArchetype.animEnabled.push_back(&AnimationEnableComponents[i]);
-			movementArchetype.animTracker.push_back(&AnimationTrackerComponents[i]);
-		}
-	}
-
-	navigationSystem->MoveEntities(movementArchetype);
-	*/
-
-	animationSystem->UpdateAnimations();
-
-	renderSystem->UpdatePositions(*this);
+	renderSystem.UpdatePositions(*this);
 }
 
 
@@ -84,7 +44,7 @@ void EntityManager::DrawEntites(const Camera& camera) {
 	if (!updated)
 		return;
 
-	renderSystem->Draw(camera, *this);
+	renderSystem.Draw(camera, *this);
 
 	//kinematicSystem->DrawColliders(camera);
 
@@ -96,6 +56,7 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 	PositionComponents.NewComponent(e, Vector2Int16( position));
 	
 	EntityChangeComponents.NewComponent(e, { true });
+	UnitComponents.NewComponent(e, { &def });
 
 	RenderArchetype.RenderComponents.NewComponent(e, {
 		Color4(color),
@@ -114,13 +75,6 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 
 	RenderArchetype.Archetype.AddEntity(e);
 
-	/*
-	NavigationComponents.NewComponent(e);
-	NavigationWorkComponents.NewComponent(e, { false });
-	MovementComponents.NewComponent(e, { 0,def.MovementSpeed, def.RotationSpeed });
-
-	UnitComponents.NewComponent(e, { &def });
-	*/
 
 	auto& a = AnimationArchetype.AnimationComponents.NewComponent(e);
 	AnimationArchetype.TrackerComponents.NewComponent(e).PlayClip(&def.MovementAnimations[0]);
@@ -132,6 +86,13 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 
 	AnimationArchetype.Archetype.AddEntity(e);
 
+
+	NavigationArchetype.NavigationComponents.NewComponent(e);
+	NavigationArchetype.WorkComponents.NewComponent(e, { false });
+	NavigationArchetype.MovementComponents.NewComponent(e, { 0,def.MovementSpeed, def.RotationSpeed });
+
+	NavigationArchetype.Archetype.AddEntity(e);
+
 	return e;
 }
 
@@ -141,42 +102,6 @@ void EntityManager::SetPosition(EntityId e, Vector2Int pos) {
 }
 void EntityManager::GoTo(EntityId e, Vector2Int pos) {
 
-	NavigationWorkComponents.GetComponent(e).work = true;
-	NavigationComponents.GetComponent(e).target = pos;
+	NavigationArchetype.WorkComponents.GetComponent(e).work = true;
+	NavigationArchetype.NavigationComponents.GetComponent(e).target = pos;
 }
-
-
-/*
-RenderComponent& EntityManager::AddRenderComponent(EntityId id, const SpriteFrame& frame) {
-	Entity& entity = GetEntity(id);
-	entity.SetHasComponent<RenderComponent>(true);
-	RenderComponent& c = renderSystem->RenderComponents.NewComponent(id);
-	c.SetFrame(frame);
-	c._dst += entity.position;
-	c._shadowDst += entity.position;
-	return c;
-}
-AnimationComponent& EntityManager::AddAnimationComponent(EntityId id, const AnimationClip* clip) {
-	AnimationComponent& c = animationSystem->AnimationComponents.NewComponent(id);
-	c.PlayClip(clip);
-	Entity& entity = GetEntity(id);
-	entity.SetHasComponent<AnimationComponent>(true);
-	return c;
-}
-ColliderComponent& EntityManager::AddColliderComponent(EntityId id, const Rectangle& box) {
-	Entity& entity = GetEntity(id);
-	entity.SetHasComponent<ColliderComponent>(true);
-	ColliderComponent& c = kinematicSystem->ColliderComponents.NewComponent(id);
-	c.SetBox(box);
-	c._worldBox.position += entity.position;
-	return c;
-}
-NavigationComponent& EntityManager::AddNavigationComponent(EntityId id, int turnSpeed, int velocity) {
-	Entity& entity = GetEntity(id);
-	entity.SetHasComponent<NavigationComponent>(true);
-	NavigationComponent& c = navigationSystem->NavigationComponents.NewComponent(id);
-	c.turnSpeed = turnSpeed;
-	c.velocity = velocity;
-	return c;
-}
-*/
