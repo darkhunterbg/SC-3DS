@@ -94,6 +94,7 @@
       <Filter>Entity</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Job.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Debug.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -151,6 +152,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Job.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\Entity.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\Archetype.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
   </ItemGroup>

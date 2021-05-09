@@ -69,8 +69,12 @@ void GameScene::Start() {
 		for (int x = 49; x >= 0; --x) {
 
 			Color c = color[(i++) % 12];
-			EntityId e = entityManager->NewUnit(*UnitDatabase::Units[i % UnitDatabase::Units.size()], { x * 32 + 16,y * 32 +16}, c);
+			EntityId e = entityManager->NewUnit(*UnitDatabase::Units[i % UnitDatabase::Units.size()], { x * 32 + 16,y * 32 + 16 }, c);
 			int orientation = std::rand() % 32;
+
+			if (i % 2) {
+				//entityManager->RenderArchetype.RemoveEntity(e);
+			}
 			//entityManager->SetOrientation(e, orientation);
 			//entityManager->GoTo(e, { 512,512 });
 		}
@@ -113,7 +117,7 @@ void GameScene::Update() {
 
 	bool au = false;
 
-	while (frameCounter2 >=5)
+	while (frameCounter2 >= 5)
 	{
 		frameCounter2 -= 5;
 		AuxilaryUpdate();
@@ -130,14 +134,14 @@ void GameScene::Update() {
 		LogicalUpdate();
 	}
 
-	int i = 0;
-	for (int y = 99; y >= 0; --y) {
-		for (int x = 49; x >= 0; --x) {
+	//int i = 0;
+	//for (int y = 99; y >= 0; --y) {
+	//	for (int x = 49; x >= 0; --x) {
 
-			i++;
-			entityManager->SetPosition(i, { x * 32 + 16 ,y * 32 + 16 });
-		}
-	}
+	//		i++;
+	//		entityManager->SetPosition(i, { x * 32 + 16 ,y * 32 + 16 });
+	//	}
+	//}
 
 
 	hud->ApplyInput(camera);
@@ -169,7 +173,7 @@ void GameScene::Update() {
 		for (EntityId id : selection)
 			if (entityManager->RenderComponents.GetComponent(id).depth != -1) {
 				entityManager->NavigationWorkComponents.GetComponent(id).work = false;
-			
+
 			}
 	}
 	if (Game::Gamepad.IsButtonPressed(GamepadButton::B)) {

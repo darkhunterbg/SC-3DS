@@ -1,5 +1,6 @@
 #include "Platform.h"
 #include "Loader/Wave.h"
+#include "Debug.h"
 
 static constexpr const int AudioStreamBufferSize = 4096;
 

@@ -50,6 +50,8 @@ public:
 	ComponentCollection<AnimationTrackerComponent> AnimationTrackerComponents;
 	ComponentCollection<AnimationComponent> AnimationComponents;
 
+	Archetype RenderArchetype = Archetype("Render");
+
 	EntityManager();
 	~EntityManager();
 

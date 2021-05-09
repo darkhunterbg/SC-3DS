@@ -119,6 +119,8 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 	RenderDestinationComponents.NewComponent(e);
 	RenderBoundingBoxComponents.NewComponent(e, { {0,0}, Vector2Int16( def.RenderSize) });
 
+	RenderArchetype.AddEntity(e);
+
 	/*
 	NavigationComponents.NewComponent(e);
 	NavigationWorkComponents.NewComponent(e, { false });

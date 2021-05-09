@@ -10,20 +10,24 @@
 
 void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
 
+	SectionProfiler p("CameraCull");
+
 	renderArchetype.clear();
 
-	for (EntityId id : em.GetEntities()) {
-		if (em.RenderBoundingBoxComponents.HasComponent(id)) {
-			int i = Entity::ToIndex(id);
-			const Rectangle16& bb = em.RenderBoundingBoxComponents[i];
+	for (EntityId id : em.RenderArchetype.GetEntities()) {
 
-			if (!camRect.Intersects(bb))
-				continue;
+		int i = Entity::ToIndex(id);
+		const Rectangle16& bb = em.RenderBoundingBoxComponents[i];
 
-			renderArchetype.pos.push_back(em.RenderDestinationComponents[i]);
-			renderArchetype.ren.push_back(em.RenderComponents[i]);
-		}
+		if (!camRect.Intersects(bb))
+			continue;
+
+		renderArchetype.pos.push_back(em.RenderDestinationComponents[i]);
+		renderArchetype.ren.push_back(em.RenderComponents[i]);
+
 	}
+
+	p.Submit();
 }
 
 void RenderSystem::Draw(const Camera& camera, EntityManager& em) {
@@ -117,7 +121,7 @@ void RenderSystem::UpdatePositions(EntityManager& em) {
 		if (em.EntityChangeComponents[i].changed) {
 			em.EntityChangeComponents[i].changed = false;
 
-			if (em.RenderComponents.HasComponent(Entity::ToId(id)))
+			if (em.RenderArchetype.HasEntity(id))
 			{
 				renderUpdatePosArchetype.outPos.push_back(&em.RenderDestinationComponents[i]);
 				renderUpdatePosArchetype.worldPos.push_back(em.PositionComponents[i]);

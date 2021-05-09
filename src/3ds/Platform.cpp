@@ -11,6 +11,8 @@
 #include "Audio.h"
 #include "NDSAudioChannel.h"
 
+#include "Debug.h"
+
 struct RenderTarget {
 	C3D_RenderTarget* rt;
 	C3D_Tex* tex;

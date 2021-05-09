@@ -11,7 +11,7 @@
 #include "../Assets.h"
 #include "../Data/UnitDef.h"
 
-#include "../Platform.h"
+#include "Debug.h"
 
 ////template <unsigned id>
 //struct IComponent {
@@ -25,12 +25,10 @@ class ComponentCollection
 private:
 	std::array<bool, MaxComponents> hasComponent;
 	std::array<TComponent, MaxComponents> components;
-
 public:
 
 	ComponentCollection() {
 		memset(hasComponent.data(), false, MaxComponents * sizeof(bool));
-		
 	}
 
 	ComponentCollection(const ComponentCollection&) = delete;

@@ -3,7 +3,7 @@
 #include <vector>
 #include <array>
 #include "../Span.h"
-typedef int EntityId;
+typedef short EntityId;
 
 class Entity {
 private:
@@ -21,9 +21,12 @@ class EntityCollection
 private:
 	std::vector<EntityId> entities;
 	std::vector<EntityId> sortedEntities;
-	std::array<int, Entity::MaxEntities> entityToIndexMap;
+	std::array<short, Entity::MaxEntities> entityToIndexMap;
 	EntityId lastId = 0;
 public:
+	EntityCollection(const EntityCollection&) = delete;
+	EntityCollection& operator=(const EntityCollection&) = delete;
+
 	EntityCollection();
 
 	inline const Span<EntityId> GetEntities() const { return { sortedEntities.data(),sortedEntities.size() }; }

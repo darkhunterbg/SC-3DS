@@ -1,5 +1,5 @@
 #include "Entity.h"
-#include "../Platform.h"
+#include "Debug.h"
 #include <algorithm>
 
 EntityCollection::EntityCollection()

@@ -7,6 +7,29 @@
 template <class T>
 using ArchetypeCollection = std::vector<T>;
 
+
+class Archetype {
+private:
+	std::vector<EntityId> entities;
+	std::array<bool, Entity::MaxEntities> hasEntity;
+	const char* name;
+public:
+	Archetype(const Archetype&) = delete;
+	Archetype& operator=(const Archetype&) = delete;
+
+	Archetype(const char* name);
+
+	inline const Span<EntityId> GetEntities() const {
+		return { entities.data(), entities.size() };
+	}
+	inline bool HasEntity(EntityId id) const {
+		return hasEntity[Entity::ToIndex(id)];
+	}
+	void AddEntity(EntityId id);
+	void RemoveEntity(EntityId id);
+};
+
+
 struct RenderArchetype {
 	ArchetypeCollection<RenderDestinationComponent> pos;
 	ArchetypeCollection<RenderComponent> ren;
