@@ -9,9 +9,6 @@
 #include <cstring>
 
 void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
-
-	SectionProfiler p("CameraCull");
-
 	renderData.clear();
 
 	for (EntityId id : em.RenderArchetype.Archetype.GetEntities()) {
@@ -26,14 +23,9 @@ void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
 		renderData.ren.push_back(em.RenderArchetype.RenderComponents[i]);
 
 	}
-
-	p.Submit();
 }
 
 void RenderSystem::Draw(const Camera& camera, EntityManager& em) {
-
-	SectionProfiler p("RenderEntities");
-
 	Rectangle16 camRect = camera.GetRectangle16();
 
 	CameraCull(camRect, em);
@@ -87,8 +79,6 @@ void RenderSystem::Draw(const Camera& camera, EntityManager& em) {
 	std::sort(render.begin(), render.end(), RenderSort);
 
 	Platform::BatchDraw({ render.data(),render.size() });
-
-	p.Submit();
 }
 
 bool RenderSystem::RenderSort(const BatchDrawCommand& a, const BatchDrawCommand& b) {
@@ -110,8 +100,6 @@ void RenderSystem::UpdateRenderPositionsJob(int start, int end) {
 }
 
 void RenderSystem::UpdatePositions(EntityManager& em) {
-
-	SectionProfiler p("RenderUpdate");
 
 	renderUpdatePosData.clear();
 
@@ -135,7 +123,5 @@ void RenderSystem::UpdatePositions(EntityManager& em) {
 	int size = renderUpdatePosData.size();
 	s = this;
 	JobSystem::RunJob(renderUpdatePosData.size(), JobSystem::DefaultJobSize, UpdateRenderPositionsJob);
-
-	p.Submit();
 }
 

@@ -1,20 +1,20 @@
 #include "AnimationSystem.h"
 #include "../Job.h"
 #include "EntityManager.h"
+#include "../Profiler.h"
 #include <cstring>
 
 
-static AnimationArchetype* a;
+static AnimationSystem* s;
 
-static void UpdateAnims(int start, int end) {
-	AnimationArchetype& archetype = *a;
-
+void AnimationSystem::UpdateAnimationsJob(int start, int end) {
+	AnimationData& data = s->data;
 
 	for (int i = start; i < end; ++i) {
-		const auto& anim = archetype.animation[i];
-		const auto& tracker = archetype.tracker[i];
-		auto& ren = *archetype.ren[i];
-		auto& offset = *archetype.offset[i];
+		const auto& anim = data.animation[i];
+		const auto& tracker = data.tracker[i];
+		auto& ren = *data.ren[i];
+		auto& offset = *data.offset[i];
 
 		const SpriteFrame& frame = anim.clip->GetFrame(tracker.clipFrame);
 		ren.sprite = frame.sprite.image;
@@ -37,44 +37,56 @@ static void UpdateAnims(int start, int end) {
 			ren.unitColor = 0;
 		}
 
-		archetype.changed[i]->changed = true;
+		data.changed[i]->changed = true;
 
 	}
 }
 
 void AnimationSystem::GenerateAnimationUpdates(EntityManager& em)
 {
-	archetype.clear();
-	int end = em.AnimationEnableComponents.size();
-	int start = 0;
-	for (int i = start; i < end; ++i) {
-		if (em.AnimationEnableComponents[i].pause)
+	SectionProfiler p("AnimationsGenerate");
+
+	data.clear();
+	int end = em.AnimationArchetype.EnableComponents.size();
+
+	for (EntityId id : em.AnimationArchetype.Archetype.GetEntities()) {
+		int i = Entity::ToIndex(id);
+
+		auto& enable = em.AnimationArchetype.EnableComponents[i];
+
+		if (enable.pause)
 			continue;
 
-		auto& tracker = em.AnimationTrackerComponents[i];
-		tracker.frameCountdown--;
-		if (tracker.frameCountdown == 0) {
-			tracker.clipFrame++;
+		auto& tracker = em.AnimationArchetype.TrackerComponents[i];
 
-			tracker.frameCountdown = tracker.frameDuration;
-			int framesCount = tracker.totalFrames;
-			if (tracker.looping)
-				tracker.clipFrame %= framesCount;
+		tracker.clipFrame++;
 
-			if (tracker.clipFrame < framesCount)
-			{
-				archetype.animation.push_back(em.AnimationComponents[i]);
-				archetype.tracker.push_back(em.AnimationTrackerComponents[i]);
-				archetype.ren.push_back(&em.RenderArchetype.RenderComponents[i]);
-				archetype.offset.push_back(&em.RenderArchetype.OffsetComponents[i]);
-				archetype.changed.push_back(&em.EntityChangeComponents[i]);
-			}
+		int framesCount = tracker.totalFrames;
+		if (tracker.looping)
+			tracker.clipFrame %= framesCount;
+
+		if (tracker.clipFrame < framesCount &&
+			em.RenderArchetype.Archetype.HasEntity(id))
+		{
+			data.animation.push_back(em.AnimationArchetype.AnimationComponents[i]);
+			data.tracker.push_back(em.AnimationArchetype.TrackerComponents[i]);
+			data.ren.push_back(&em.RenderArchetype.RenderComponents[i]);
+			data.offset.push_back(&em.RenderArchetype.OffsetComponents[i]);
+			data.changed.push_back(&em.EntityChangeComponents[i]);
+		}
+		else {
+			enable.pause = true;
 		}
 	}
 }
 
 
+
 void AnimationSystem::UpdateAnimations() {
-	a = &archetype;
-	JobSystem::RunJob(archetype.size(), JobSystem::DefaultJobSize, UpdateAnims);
+
+	SectionProfiler p("AnimationsUpdate");
+
+	s = this;
+
+	JobSystem::RunJob(data.size(), JobSystem::DefaultJobSize, UpdateAnimationsJob);
 }

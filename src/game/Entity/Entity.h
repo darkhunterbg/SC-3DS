@@ -22,7 +22,7 @@ private:
 	std::vector<EntityId> entities;
 	std::vector<EntityId> sortedEntities;
 	std::array<short, Entity::MaxEntities> entityToIndexMap;
-	EntityId lastId = 0;
+	EntityId lastId = Entity::None;
 public:
 	EntityCollection(const EntityCollection&) = delete;
 	EntityCollection& operator=(const EntityCollection&) = delete;

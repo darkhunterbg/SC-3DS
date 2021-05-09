@@ -65,16 +65,17 @@ void GameScene::Start() {
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
 	int i = 0;
-	for (int y = 99; y >= 0; --y) {
-		for (int x = 49; x >= 0; --x) {
+	for (int y = 49; y >= 0; --y) {
+		for (int x = 99; x >= 0; --x) {
 
 			Color c = color[(i++) % 12];
 			EntityId e = entityManager->NewUnit(*UnitDatabase::Units[i % UnitDatabase::Units.size()], { x * 32 + 16,y * 32 + 16 }, c);
-			int orientation = std::rand() % 32;
+			//int orientation = std::rand() % 32;
 
-			if (i % 2) {
-				//entityManager->RenderArchetype.RemoveEntity(e);
-			}
+			/*if (i % 2) {
+				entityManager->RenderArchetype.Archetype.RemoveEntity(e);
+				entityManager->AnimationArchetype.Archetype.RemoveEntity(e);
+			}*/
 			//entityManager->SetOrientation(e, orientation);
 			//entityManager->GoTo(e, { 512,512 });
 		}
@@ -134,14 +135,14 @@ void GameScene::Update() {
 		LogicalUpdate();
 	}
 
-	int i = 0;
-	for (int y = 99; y >= 0; --y) {
-		for (int x = 49; x >= 0; --x) {
+	//int i = 0;
+	//for (int y = 99; y >= 0; --y) {
+	//	for (int x = 49; x >= 0; --x) {
 
-			i++;
-			entityManager->SetPosition(i, { x * 32 + 16 ,y * 32 + 16 });
-		}
-	}
+	//		i++;
+	//		entityManager->SetPosition(i, { x * 32 + 16 ,y * 32 + 16 });
+	//	}
+	//}
 
 
 	hud->ApplyInput(camera);

@@ -42,9 +42,12 @@ public:
 		ComponentCollection<Rectangle16> BoundingBoxComponents;
 	} RenderArchetype;
 
-
-
-
+	struct {
+		EntityArchetype Archetype = EntityArchetype("Animation");
+		ComponentCollection<AnimationComponent> AnimationComponents;
+		ComponentCollection<AnimationEnableComponent> EnableComponents;
+		ComponentCollection<AnimationTrackerComponent> TrackerComponents;
+	} AnimationArchetype;
 
 
 	ComponentCollection<MovementComponent> MovementComponents;
@@ -53,11 +56,7 @@ public:
 
 	ComponentCollection<UnitComponent> UnitComponents;
 
-	ComponentCollection<AnimationEnableComponent> AnimationEnableComponents;
-	ComponentCollection<AnimationTrackerComponent> AnimationTrackerComponents;
-	ComponentCollection<AnimationComponent> AnimationComponents;
-
-
+public:
 
 	EntityManager();
 	~EntityManager();
@@ -76,5 +75,4 @@ public:
 
 	void SetPosition(EntityId e, Vector2Int pos);
 	void GoTo(EntityId e, Vector2Int pos);
-	void SetOrientation(EntityId e, unsigned orientation);
 };

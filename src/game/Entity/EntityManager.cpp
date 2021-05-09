@@ -26,6 +26,8 @@ void EntityManager::DeleteEntity(EntityId id) {
 
 void EntityManager::UpdateSecondaryEntities() {
 
+	animationSystem->GenerateAnimationUpdates(*this);
+
 	/*
 	navigationArchetype.clear();
 
@@ -69,18 +71,11 @@ void EntityManager::UpdateEntities() {
 	}
 
 	navigationSystem->MoveEntities(movementArchetype);
-
-	//SectionProfiler p("Animations");
-
-	animationSystem->GenerateAnimationUpdates(*this);
-
-	animationSystem->UpdateAnimations();
 	*/
 
-	//p.Submit();
+	animationSystem->UpdateAnimations();
 
 	renderSystem->UpdatePositions(*this);
-
 }
 
 
@@ -88,8 +83,6 @@ void EntityManager::DrawEntites(const Camera& camera) {
 
 	if (!updated)
 		return;
-
-
 
 	renderSystem->Draw(camera, *this);
 
@@ -127,11 +120,17 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 	MovementComponents.NewComponent(e, { 0,def.MovementSpeed, def.RotationSpeed });
 
 	UnitComponents.NewComponent(e, { &def });
-
-	auto& a = AnimationComponents.NewComponent(e);
-	AnimationTrackerComponents.NewComponent(e);
-	AnimationEnableComponents.NewComponent(e);
 	*/
+
+	auto& a = AnimationArchetype.AnimationComponents.NewComponent(e);
+	AnimationArchetype.TrackerComponents.NewComponent(e).PlayClip(&def.MovementAnimations[0]);
+	AnimationArchetype.EnableComponents.NewComponent(e).pause = false;
+	
+	a.clip = &def.MovementAnimations[0];
+	a.shadowClip = &def.MovementAnimationsShadow[0];
+	a.unitColorClip = &def.MovementAnimationsTeamColor[0];
+
+	AnimationArchetype.Archetype.AddEntity(e);
 
 	return e;
 }
@@ -146,16 +145,6 @@ void EntityManager::GoTo(EntityId e, Vector2Int pos) {
 	NavigationComponents.GetComponent(e).target = pos;
 }
 
-void EntityManager::SetOrientation(EntityId e, unsigned orientation)
-{
-	MovementComponents.GetComponent(e).orientation = orientation;
-	auto& anim = AnimationComponents.GetComponent(e);
-	auto& unit = UnitComponents.GetComponent(e);
-
-	anim.clip = &unit.def->MovementAnimations[orientation];
-	anim.shadowClip = &unit.def->MovementAnimationsShadow[orientation];
-	anim.unitColorClip = &unit.def->MovementAnimationsTeamColor[orientation];
-}
 
 /*
 RenderComponent& EntityManager::AddRenderComponent(EntityId id, const SpriteFrame& frame) {
