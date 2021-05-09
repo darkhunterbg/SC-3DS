@@ -100,12 +100,12 @@ struct RenderComponent {
 	bool hFlip = false;
 };
 
-struct RenderOffsetComponent  {
+struct RenderOffsetComponent {
 	Vector2Int16 offset;
 	Vector2Int16 shadowOffset;
 };
 
-struct RenderDestinationComponent  {
+struct RenderDestinationComponent {
 	Vector2Int16 dst;
 	Vector2Int16 shadowDst;
 };
@@ -119,6 +119,7 @@ struct NavigationComponent {
 	Vector2Int16 target;
 	uint8_t currentHeading;
 	uint8_t targetHeading;
+	Rectangle16 collider;
 };
 
 struct OrientationComponent {
@@ -167,4 +168,21 @@ struct AnimationComponent {
 	const AnimationClip* shadowClip = nullptr;
 	const AnimationClip* unitColorClip = nullptr;
 
+};
+
+
+struct ColliderComponent {
+	// TODO: split to components, system?, Rectangle8?
+	Rectangle16 worldCollider;
+	Rectangle16 collider;
+
+	void SetBox(const Rectangle16& b) {
+		Vector2Int16 p = worldCollider.position - worldCollider.position;
+		collider = worldCollider = b;
+		worldCollider.position += p;
+	}
+
+	inline void SetPosition(const Vector2Int16& pos) {
+		worldCollider.position = collider.position + pos;
+	}
 };

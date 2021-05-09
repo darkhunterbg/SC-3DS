@@ -54,8 +54,13 @@ public:
 		ComponentCollection<OrientationComponent> OrientationComponents;
 	} NavigationArchetype;
 
+	struct {
+		EntityArchetype Archetype = EntityArchetype("Collision");
+		ComponentCollection<ColliderComponent> ColliderComponents;
+	} CollisionArchetype;
 
 	ComponentCollection<UnitComponent> UnitComponents;
+
 
 public:
 
@@ -76,4 +81,19 @@ public:
 
 	void SetPosition(EntityId e, Vector2Int pos);
 	void GoTo(EntityId e, Vector2Int pos);
+
+	bool CollidesWithAny(const Rectangle16& collider, EntityId skip) {
+
+		for (EntityId id : CollisionArchetype.Archetype.GetEntities()) {
+			if (id == skip)
+				continue;
+
+			int i = Entity::ToIndex(id);
+
+			if(collider.Intersects(CollisionArchetype.ColliderComponents[i].worldCollider))
+				return true;
+		}
+
+		return false;
+	}
 };

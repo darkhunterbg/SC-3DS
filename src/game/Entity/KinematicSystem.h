@@ -6,22 +6,22 @@
 #include <vector>
 
 
-struct ColliderComponent  {
-	Rectangle _worldBox;
-	Rectangle _box;
-
-	void SetBox(const Rectangle& b) {
-		Vector2Int p = _worldBox.position - _box.position;
-		_worldBox = _box = b;
-		_worldBox.position += p;
-	}
-};
+//struct ColliderComponent  {
+//	Rectangle _worldBox;
+//	Rectangle _box;
+//
+//	void SetBox(const Rectangle& b) {
+//		Vector2Int p = _worldBox.position - _box.position;
+//		_worldBox = _box = b;
+//		_worldBox.position += p;
+//	}
+//};
 
 class Camera;
 
 class KinematicSystem {
 public:
-	ComponentCollection<ColliderComponent> ColliderComponents;
+	//ComponentCollection<ColliderComponent> ColliderComponents;
 
 	void UpdateEntities(Span<Entity> entities);
 	void DrawColliders(const Camera& camera);

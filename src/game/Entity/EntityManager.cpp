@@ -43,6 +43,27 @@ void EntityManager::DrawEntites(const Camera& camera) {
 
 	renderSystem.Draw(camera, *this);
 
+	Rectangle camRect = camera.GetRectangle();
+	Color c = Colors::LightGreen;
+	c.a = 0.5f;
+
+	//for (EntityId id : CollisionArchetype.Archetype.GetEntities()) {
+	//	int i = Entity::ToIndex(id);
+	//	const auto& cmp = CollisionArchetype.ColliderComponents[i];
+	//	Rectangle dst = { Vector2Int( cmp.worldCollider.position), Vector2Int( cmp.worldCollider.size )};
+
+	//	if (camRect.Intersects(dst)) {
+
+	//		dst.position -= camRect.position;
+	//		dst.position /= camera.Scale;
+	//		dst.size /= camera.Scale;
+
+	//		Platform::DrawRectangle(dst, c);
+	//	}
+	//
+	//}
+
+
 	//kinematicSystem->DrawColliders(camera);
 
 
@@ -90,6 +111,9 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 	NavigationArchetype.OrientationComponents.NewComponent(e);
 
 	NavigationArchetype.Archetype.AddEntity(e);
+
+	CollisionArchetype.ColliderComponents.NewComponent(e).SetBox(def.Collider);
+	CollisionArchetype.Archetype.AddEntity(e);
 
 	return e;
 }

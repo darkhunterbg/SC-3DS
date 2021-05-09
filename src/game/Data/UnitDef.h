@@ -14,7 +14,7 @@ struct UnitDef {
 	uint8_t RotationSpeed;
 
 	Vector2Int RenderSize;
-	Rectangle Collider;
+	Rectangle16 Collider;
 
 	DirectionalAnimationDef MovementAnimationDef;
 	AnimationDef DeathAnimationDef;

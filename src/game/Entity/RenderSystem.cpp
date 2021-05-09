@@ -109,6 +109,11 @@ void RenderSystem::UpdatePositions(EntityManager& em) {
 		if (em.EntityChangeComponents[i].changed) {
 			em.EntityChangeComponents[i].changed = false;
 
+			// TODO: move out from here
+			if (em.CollisionArchetype.Archetype.HasEntity(id)) {
+				em.CollisionArchetype.ColliderComponents.GetComponent(id).SetPosition(em.PositionComponents[i]);
+			}
+
 			if (em.RenderArchetype.Archetype.HasEntity(id))
 			{
 				renderUpdatePosData.outPos.push_back(&em.RenderArchetype.DestinationComponents[i]);
