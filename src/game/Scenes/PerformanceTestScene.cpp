@@ -14,10 +14,15 @@ void PerformanceTestScene::Start() {
 	camera.Size = { 400,240 };
 	camera.Scale = 2;
 
-	for (int i = 0; i < 10000; ++i) {
+	entityManager.Init({ 128 * 32,128 * 32 });
+	entityManager.DrawColliders = true;
+
+	for (int i = 0; i < 4000; ++i) {
 		entityManager.NewUnit(UnitDatabase::Marine,
 			Vector2Int16(Vector2Int{ (i / 100) * 32 + 16, (i % 100) * 32 + 16 }),
 			Colors::Red);
+
+		entityManager.RenderArchetype.Archetype.RemoveEntity(i);
 	}
 
 	entityManager.UpdateEntities();
@@ -28,19 +33,20 @@ static int c = 0;
 void PerformanceTestScene::Update() {
 
 	c = 0;
-	for (int i = 0; i < 10000; ++i) {
+	for (int i = 0; i < 4000; ++i) {
 		entityManager.SetPosition(i, entityManager.PositionComponents[i] + Vector2Int16{1, 1});
 	}
+	entityManager.UpdateSecondaryEntities();
 	entityManager.UpdateEntities();
 
-	/*SectionProfiler p("CollidesWith");
+	SectionProfiler p("CollidesWith");
 
-	for (int i = 0; i < 1000; ++i) {
-		c += entityManager.CollidesWithAny(entityManager.CollisionArchetype.ColliderComponents[i].worldCollider, i) ?
-			1 : 0;
+	//for (int i = 0; i < 4000; ++i) {
+	//	c += entityManager.CollidesWithAny(entityManager.CollisionArchetype.ColliderComponents[i].worldCollider, i) ?
+	//		1 : 0;
 
-	}
-	p.Submit();*/
+	//}
+	p.Submit();
 }
 
 

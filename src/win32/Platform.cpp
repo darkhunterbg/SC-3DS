@@ -137,7 +137,7 @@ Image Platform::NewTexture(Vector2Int size) {
 }
 
 
-void Platform::BatchDraw(Span<BatchDrawCommand> commands) {
+void Platform::BatchDraw(const Span<BatchDrawCommand> commands) {
 	for (const auto& cmd : commands) {
 		auto texture = (SDL_Texture*)cmd.image.textureId;
 		SDL_RendererFlip flags = cmd.scale.x < 0 ? SDL_RendererFlip::SDL_FLIP_HORIZONTAL : SDL_RendererFlip::SDL_FLIP_NONE;

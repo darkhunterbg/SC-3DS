@@ -86,7 +86,7 @@ void Platform::DrawOnScreen(ScreenId screen) {
 	C2D_SceneBegin(currentScreen);
 }
 
-void Platform::BatchDraw(Span< BatchDrawCommand> commands) {
+void Platform::BatchDraw(const Span< BatchDrawCommand> commands) {
 
 	static constexpr const int depthStep = 0.0001f;
 

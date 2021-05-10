@@ -1,5 +1,6 @@
 #include "Job.h"
 #include "Platform.h"
+#include "Debug.h"
 #include <cmath>
 
 Semaphore JobSystem::semaphore = nullptr;
@@ -38,15 +39,15 @@ void JobSystem::ThreadWorkOnJob(int threadId)
 	int totalJobs = jobs.size();
 	auto a = action;
 
-	int nextJob = takenJobs++;
+	int nextJob = takenJobs.fetch_add(1, std::memory_order_seq_cst);
 
 	while (nextJob < totalJobs) {
 		Job job = jobs[nextJob];
 		a(job.start, job.end);
 
-		--remainingJobs;
+		remainingJobs.fetch_sub(1 , std::memory_order_seq_cst);
 
-		nextJob = takenJobs.fetch_add(1);
+		nextJob = takenJobs.fetch_add(1 , std::memory_order_seq_cst);
 	}
 }
 
@@ -56,7 +57,6 @@ void JobSystem::ExecJob(int elements, int batchSize)
 		action(0, elements);
 		return;
 	}
-
 
 	jobs.clear();
 
@@ -74,7 +74,14 @@ void JobSystem::ExecJob(int elements, int batchSize)
 	}
 
 	ThreadWorkOnJob(0);
-	while (remainingJobs);
+
+	auto time = Platform::ElaspedTime();
+	while (remainingJobs) {
+		auto delta = Platform::ElaspedTime() - time;
+		if (delta > 3)
+			EXCEPTION("Main thread locked! Remaining jobs %i, taken jobs %i, total jobs %i",
+				(int)remainingJobs, (int)takenJobs, jobs.size());
+	}
 }
 
 void JobSystem::Init()

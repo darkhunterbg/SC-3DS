@@ -28,7 +28,7 @@ public:
 	void DrawTiles(const Camera& camera);
 	void DrawMiniMapTiles(Vector2Int offset, const Camera& camera);
 
-	inline Span<MapTile> GetTiles() const {
+	inline const Span<MapTile> GetTiles() const {
 		return { tiles.data(),tiles.size() };
 	}
 };

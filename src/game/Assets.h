@@ -23,7 +23,7 @@ class SpriteAtlas {
 private:
 	std::vector<Sprite> sprites;
 public:
-	inline Span<Sprite> GetSprites() const { return { sprites.data(),sprites.size() }; }
+	inline const Span<Sprite> GetSprites() const { return { sprites.data(),sprites.size() }; }
 	inline const Sprite& GetSprite(int pos) const { return sprites[pos]; };
 
 	SpriteAtlas(int initialSize = 0);

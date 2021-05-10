@@ -11,11 +11,35 @@ EntityManager::~EntityManager() {
 
 }
 
-void EntityManager::DeleteEntity(EntityId id) {
-	entities.DeleteEntity(id);
-	// TODO: remove components;
+void EntityManager::Init(Vector2Int16 mapSize)
+{
+	kinematicSystem.SetSize(mapSize);
 }
 
+void EntityManager::DeleteEntity(EntityId id) {
+	entities.DeleteEntity(id);
+	// TODO: remove archetypes;
+}
+
+void EntityManager::CollectEntityChanges() {
+	changedData.clear();
+	for (EntityId id : entities) {
+		int i = Entity::ToIndex(id);
+		if (EntityChangeComponents[i].changed) {
+			changedData.entity.push_back(id);
+			changedData.position.push_back(PositionComponents[i]);
+
+		}
+	}
+
+}
+void EntityManager::ApplyEntityChanges() {
+	for (EntityId id : changedData.entity) {
+		int i = Entity::ToIndex(id);
+
+		EntityChangeComponents[i].changed = false;
+	}
+}
 
 void EntityManager::UpdateSecondaryEntities() {
 
@@ -32,17 +56,14 @@ void EntityManager::UpdateEntities() {
 
 	animationSystem.UpdateAnimations();
 
-	renderSystem.UpdatePositions(*this);
+	CollectEntityChanges();
 
-	kinematicSystem.RefreshColliders(*this);
+	renderSystem.UpdatePositions(*this, changedData);
 
-	for (EntityId id : GetEntities()) {
-		int i = Entity::ToIndex(id);
+	kinematicSystem.UpdateCollidersPosition(*this, changedData);
+	kinematicSystem.ApplyCollidersChange(*this, changedData);
 
-		if (EntityChangeComponents[i].changed) {
-			EntityChangeComponents[i].changed = false;
-		}
-	}
+	ApplyEntityChanges();
 }
 
 
@@ -53,13 +74,14 @@ void EntityManager::DrawEntites(const Camera& camera) {
 
 	renderSystem.Draw(camera, *this);
 
-	kinematicSystem.DrawColliders(camera);
+	if (DrawColliders)
+		kinematicSystem.DrawColliders(camera);
 }
 
 EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color color) {
 	EntityId e = entities.NewEntity();
-	PositionComponents.NewComponent(e,  position);
-	
+	PositionComponents.NewComponent(e, position);
+
 	EntityChangeComponents.NewComponent(e, { true });
 	UnitComponents.NewComponent(e, { &def });
 
@@ -76,7 +98,7 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color
 		});
 
 	RenderArchetype.DestinationComponents.NewComponent(e);
-	RenderArchetype.BoundingBoxComponents.NewComponent(e, { {0,0}, Vector2Int16( def.RenderSize) });
+	RenderArchetype.BoundingBoxComponents.NewComponent(e, { {0,0}, Vector2Int16(def.RenderSize) });
 
 	RenderArchetype.Archetype.AddEntity(e);
 
@@ -84,7 +106,7 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color
 	auto& a = AnimationArchetype.AnimationComponents.NewComponent(e);
 	AnimationArchetype.TrackerComponents.NewComponent(e).PlayClip(&def.MovementAnimations[0]);
 	AnimationArchetype.EnableComponents.NewComponent(e).pause = true;
-	
+
 	//a.clip = &def.MovementAnimations[0];
 	//a.shadowClip = &def.MovementAnimationsShadow[0];
 	//a.unitColorClip = &def.MovementAnimationsTeamColor[0];

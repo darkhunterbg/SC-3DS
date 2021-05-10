@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
 	SDL_MaximizeWindow(window);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-	SDL_SetRenderDrawBlendMode(renderer, SDL_BlendMode::SDL_BLENDMODE_ADD);
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BlendMode::SDL_BLENDMODE_BLEND);
 
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 

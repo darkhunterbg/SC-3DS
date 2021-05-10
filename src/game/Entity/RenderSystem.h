@@ -12,6 +12,7 @@
 
 class EntityManager;
 class Camera;
+struct EntityChangedData;
 
 class RenderSystem {
 
@@ -61,6 +62,6 @@ private:
 	static bool RenderSort(const BatchDrawCommand& a, const BatchDrawCommand& b);
 public:
 	void Draw(const Camera& camera, EntityManager& em);
-	void UpdatePositions(EntityManager& em);
+	void UpdatePositions(EntityManager& em, const EntityChangedData& changed);
 
 };

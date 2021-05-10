@@ -15,6 +15,14 @@
 #include "../Data/UnitDef.h"
 #include "../Camera.h"
 
+struct EntityChangedData {
+	std::vector<EntityId> entity;
+	std::vector<Vector2Int16> position;
+
+	size_t size() const { return entity.size(); }
+	void clear() { entity.clear(); position.clear(); }
+};
+
 class EntityManager {
 private:
 	EntityCollection entities;
@@ -25,6 +33,8 @@ private:
 	NavigationSystem navigationSystem;
 
 	bool updated = false;
+
+	EntityChangedData changedData;
 
 public:
 
@@ -60,12 +70,18 @@ public:
 	} CollisionArchetype;
 
 	ComponentCollection<UnitComponent> UnitComponents;
-
+private:
+	void CollectEntityChanges();
+	void ApplyEntityChanges();
 
 public:
+	bool DrawColliders = false;
+
 
 	EntityManager();
 	~EntityManager();
+
+	void Init(Vector2Int16 mapSize);
 
 	inline const Span<EntityId> GetEntities() const {
 		return entities.GetEntities();

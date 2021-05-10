@@ -99,32 +99,26 @@ void RenderSystem::UpdateRenderPositionsJob(int start, int end) {
 	}
 }
 
-void RenderSystem::UpdatePositions(EntityManager& em) {
+void RenderSystem::UpdatePositions(EntityManager& em, const EntityChangedData& changed) {
 
 	renderUpdatePosData.clear();
 
-	for (EntityId id : em.GetEntities()) {
-		int i = Entity::ToIndex(id);
+	int size = changed.size();
+	for (int item = 0; item < size; ++item) {
+		EntityId id = changed.entity[item];
 
-		if (em.EntityChangeComponents[i].changed) {
+		if (em.RenderArchetype.Archetype.HasEntity(id))
+		{
+			int i = Entity::ToIndex(id);
 
-			// TODO: move out from here
-			if (em.CollisionArchetype.Archetype.HasEntity(id)) {
-				em.CollisionArchetype.ColliderComponents.GetComponent(id).SetPosition(em.PositionComponents[i]);
-			}
-
-			if (em.RenderArchetype.Archetype.HasEntity(id))
-			{
-				renderUpdatePosData.outPos.push_back(&em.RenderArchetype.DestinationComponents[i]);
-				renderUpdatePosData.worldPos.push_back(em.PositionComponents[i]);
-				renderUpdatePosData.offset.push_back(em.RenderArchetype.OffsetComponents[i]);
-				renderUpdatePosData.outBB.push_back(&em.RenderArchetype.BoundingBoxComponents[i]);
-			}
-
+			renderUpdatePosData.outPos.push_back(&em.RenderArchetype.DestinationComponents[i]);
+			renderUpdatePosData.worldPos.push_back(changed.position[item]);
+			renderUpdatePosData.offset.push_back(em.RenderArchetype.OffsetComponents[i]);
+			renderUpdatePosData.outBB.push_back(&em.RenderArchetype.BoundingBoxComponents[i]);
 		}
 	}
 
-	int size = renderUpdatePosData.size();
+
 	s = this;
 	JobSystem::RunJob(renderUpdatePosData.size(), JobSystem::DefaultJobSize, UpdateRenderPositionsJob);
 }

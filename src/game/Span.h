@@ -5,23 +5,23 @@ class Span {
 public:
 	class ConstIterator {
 	public:
-		ConstIterator(const Span<T>* span, unsigned pos) : _span(span), _pos(pos) {}
-		const T& operator* () const { return _span->At(_pos); }
+		ConstIterator(const Span<T>& span, unsigned pos) : _span(span), _pos(pos) {}
+		const T& operator* () const { return _span[_pos]; }
 		bool operator != (const ConstIterator& other) const { return _pos != other._pos; }
 		const ConstIterator& operator++ () { ++_pos;	return *this; }
 	private:
-		const Span<T>* _span;
+		const Span<T> _span;
 		unsigned _pos;
 	};
 
 	class Iterator {
 	public:
-		Iterator(const Span<T>* span, unsigned pos) : _span(const_cast<Span<T>*>(span)), _pos(pos) {}
-		T& operator* () { return _span->At(_pos); }
+		Iterator( Span<T>& span, unsigned pos) : _span(span), _pos(pos) {}
+		T& operator* () { return _span[_pos]; }
 		bool operator != (const Iterator& other) const { return _pos != other._pos; }
 		Iterator& operator++ () { ++_pos;	return *this; }
 	private:
-		Span<T>* _span;
+		Span<T> _span;
 		unsigned _pos;
 	};
 
@@ -62,17 +62,17 @@ public:
 		return At(index);
 	}
 	ConstIterator begin() const {
-		return ConstIterator(this, 0);
+		return ConstIterator(*this, 0);
 	}
 	ConstIterator end() const {
-		return ConstIterator(this, _size);
+		return ConstIterator(*this, _size);
 	}
 
 	Iterator begin() {
-		return Iterator(this, 0);
+		return Iterator(*this, 0);
 	}
 	Iterator end() {
-		return Iterator(this, _size);
+		return Iterator(*this, _size);
 	}
 private:
 
