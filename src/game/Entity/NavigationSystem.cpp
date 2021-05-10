@@ -100,7 +100,7 @@ void NavigationSystem::SetMovementAnimJob(int start, int end) {
 }
 void NavigationSystem::MoveEntities(EntityManager& em) {
 
-	SectionProfiler p("MoveEntities");
+	//SectionProfiler p("MoveEntities");
 
 	movementData.clear();
 
@@ -151,8 +151,6 @@ void NavigationSystem::MoveEntities(EntityManager& em) {
 			em.AnimationArchetype.EnableComponents[i].pause = true;
 		}
 	}
-
-	p.Submit();
 }
 
 
@@ -309,7 +307,7 @@ void NavigationSystem::UpdateNavigationJob(int start, int end) {
 }
 void NavigationSystem::UpdateNavigation(EntityManager& em)
 {
-	SectionProfiler p("UpdateNavigation");
+	//SectionProfiler p("UpdateNavigation");
 
 	navigationData.clear();
 

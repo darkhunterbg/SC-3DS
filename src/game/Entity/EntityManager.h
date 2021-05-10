@@ -102,4 +102,10 @@ public:
 
 		return kinematicSystem.CollidesWithAny(collider, skip);
 	}
+	inline void RectCast(const Rectangle16& collider, std::vector<EntityId>& result) {
+		return kinematicSystem.RectCast(collider, result);
+	}
+	inline EntityId PointCast(Vector2Int16 point) {
+		return kinematicSystem.PointCast(point);
+	}
 };

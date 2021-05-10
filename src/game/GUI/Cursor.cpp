@@ -86,7 +86,7 @@ void Cursor::Draw() {
 
 	const SpriteFrame& frame = currentClip->GetFrame(clipFrame);
 
-	Rectangle dst = { Position + frame.offset,frame.sprite.rect.size };
+	Rectangle dst = { Vector2Int(Position) + frame.offset,frame.sprite.rect.size };
 	dst.position -= {64, 64};
 
 	if (regionRect.size.LengthSquared() > 0) {
@@ -114,13 +114,13 @@ void Cursor::Draw() {
 void Cursor::Update(Camera& camera, EntityManager& entityManager, std::vector<EntityId>& outSelection) {
 
 	Vector2Int corner = { 0,0 };
-	
+
 	// TODO: State machine
 
 	if (!Game::Gamepad.IsButtonDown(GamepadButton::L))
 	{
 		Vector2 move = Game::Gamepad.CPad();
-		Position += Vector2Int(move * Speed);
+		Position += Vector2Int16(move * Speed);
 	}
 
 	if (Position.x <= Limits.position.x) {
@@ -150,13 +150,13 @@ void Cursor::Update(Camera& camera, EntityManager& entityManager, std::vector<En
 		holdStart = camera.ScreenToWorld(Position);
 	}
 
-	Vector2Int worldPos = camera.ScreenToWorld(Position);
-	EntityId hover = 0;// entityManager.PointCast(worldPos);
+	Vector2Int16 worldPos = camera.ScreenToWorld(Position);
+	EntityId hover = entityManager.PointCast(worldPos);
 	bool dragging = (worldPos - holdStart).LengthSquared() != 0;
 
 	if (holding && dragging) {
-		Vector2Int start = camera.WorldToScreen(holdStart);
-		Vector2Int end = camera.WorldToScreen(worldPos);
+		Vector2Int16 start = camera.WorldToScreen(holdStart);
+		Vector2Int16 end = camera.WorldToScreen(worldPos);
 
 		regionRect.size = (end - start);
 		regionRect.size.x = std::abs(regionRect.size.x);
@@ -170,10 +170,10 @@ void Cursor::Update(Camera& camera, EntityManager& entityManager, std::vector<En
 			outSelection.push_back(hover);
 		}
 		else {
-			Vector2Int start = holdStart;
-			Vector2Int end = worldPos;
+			Vector2Int16 start = holdStart;
+			Vector2Int16 end = worldPos;
 
-			Rectangle rect;
+			Rectangle16 rect;
 
 			rect.size = (end - start);
 			rect.size.x = std::abs(rect.size.x);
@@ -181,7 +181,7 @@ void Cursor::Update(Camera& camera, EntityManager& entityManager, std::vector<En
 			rect.position.x = std::min(start.x, end.x);
 			rect.position.y = std::min(start.y, end.y);
 
-			//entityManager.RectCast(rect, outSelection);
+			entityManager.RectCast(rect, outSelection);
 			holdStart = { 0,0 };
 			regionRect = { {0,0},{0,0} };
 
@@ -194,7 +194,7 @@ void Cursor::Update(Camera& camera, EntityManager& entityManager, std::vector<En
 		int index = (corner.x + 1) + (corner.y + 1) * 3;
 		newClip = scrollAnim[index];
 		Vector2 v = Vector2::Normalize(Vector2(corner));
-		camera.Position += Vector2Int(v * camera.GetCameraSpeed());
+		camera.Position += Vector2Int16(v * camera.GetCameraSpeed());
 	}
 	else {
 		if (!holding || !dragging)

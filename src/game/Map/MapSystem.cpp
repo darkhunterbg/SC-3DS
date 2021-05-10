@@ -8,10 +8,10 @@ MapSystem::MapSystem(const MapDef& map) {
 	auto tile = Platform::LoadAtlas("tileset_tile.t3x")->GetSprite(0);
 	minerals = Platform::LoadAtlas("unit_neutral_min01.t3x");
 
-	Vector2Int size = { 6,6 };
+	Vector2Int16 size = { 6,6 };
 
-	for (int i = 0; i < map.size.x; i += size.x) {
-		for (int j = 0; j < map.size.y; j += size.y) {
+	for (short i = 0; i < map.size.x; i += size.x) {
+		for (short j = 0; j < map.size.y; j += size.y) {
 			MapTile t;
 
 			t.position = { i,j };
@@ -22,7 +22,7 @@ MapSystem::MapSystem(const MapDef& map) {
 	}
 
 	mapBounds.position = { 0,0 };
-	mapBounds.size = map.size * Vector2Int(32, 32);
+	mapBounds.size = map.size * Vector2Int16(32, 32);
 
 
 }
@@ -35,7 +35,7 @@ void MapSystem::DrawTiles(const Camera& camera) {
 	Rectangle camRect = camera.GetRectangle();
 
 	for (const MapTile& tile : tiles) {
-		Rectangle dst = { tile.position * Vector2Int(32,32) , tile.sprite.rect.size };
+		Rectangle dst = { Vector2Int( tile.position * Vector2Int16(32,32) ), tile.sprite.rect.size };
 
 		if (!camRect.Intersects(dst))
 			continue;

@@ -43,7 +43,8 @@ void KinematicSystem::UpdateCollidersPosition(EntityManager& em, const EntityCha
 
 	updateColliderPosData.clear();
 
-	for (int item = 0; item < data.size(); ++item) {
+	int size = data.size();
+	for (int item = 0; item < size; ++item) {
 
 		EntityId id = data.entity[item];
 
@@ -59,11 +60,14 @@ void KinematicSystem::UpdateCollidersPosition(EntityManager& em, const EntityCha
 
 	s = this;
 
-	JobSystem::RunJob(data.size(), JobSystem::DefaultJobSize, ColliderChangeJob);
+	JobSystem::RunJob(updateColliderPosData.size(), JobSystem::DefaultJobSize, ColliderChangeJob);
+
+	p2.Submit();
 }
 
 void KinematicSystem::ApplyCollidersChange(EntityManager& em)
 {
+	
 	SectionProfiler p("ApplyCollidersChange");
 
 	int size = updateColliderPosData.size();
@@ -81,6 +85,7 @@ void KinematicSystem::ApplyCollidersChange(EntityManager& em)
 			collidersTree.AddEntity(wc, id, updateCollider[index]);
 		}
 	}
+
 }
 
 
@@ -105,7 +110,6 @@ void KinematicSystem::DrawColliders(const Camera& camera) {
 			Platform::DrawRectangle(dst, c);
 		}
 	}
-
 }
 
 bool KinematicSystem::CollidesWithAny(const Rectangle16& collider, EntityId skip)
@@ -122,3 +126,4 @@ bool KinematicSystem::CollidesWithAny(const Rectangle16& collider, EntityId skip
 
 	return false;
 }
+

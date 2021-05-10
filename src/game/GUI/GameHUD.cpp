@@ -115,7 +115,9 @@ void GameHUD::DrawAbilities() {
 }
 
 void GameHUD::RenderMinimapTexture(const MapSystem& mapSystem) {
-	Rectangle mapBounds = mapSystem.GetMapBounds();
+	Rectangle mapBounds;
+	mapBounds.position = Vector2Int(mapSystem.GetMapBounds().position);
+	mapBounds.size = Vector2Int(mapSystem.GetMapBounds().size);
 
 	minimapTexture = Platform::NewTexture({ MinimapTextureSize,MinimapTextureSize });
 	Platform::DrawOnTexture(minimapTexture.textureId);
@@ -126,7 +128,7 @@ void GameHUD::RenderMinimapTexture(const MapSystem& mapSystem) {
 	Vector2Int tileSize = { MapTile::TileSize, MapTile::TileSize };
 
 	for (const MapTile& tile : mapSystem.GetTiles()) {
-		Vector2Int pos = Vector2Int(Vector2(tile.position * tileSize) / upscale);
+		Vector2Int pos = Vector2Int(Vector2( Vector2Int(tile.position) * tileSize) / upscale);
 		Vector2Int size = Vector2Int(Vector2(tile.sprite.rect.size) / upscale);
 		Platform::Draw(tile.sprite, { pos,size });
 	}

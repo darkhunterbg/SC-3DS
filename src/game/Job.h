@@ -41,6 +41,9 @@ public:
 	static void Init();
 	static inline void RunJob(int elements, int batchSize,
 		const std::function<void(int, int)>& a) {
+
+		if (!elements)
+			return;
 		action = a;
 		ExecJob(elements, batchSize);
 	}

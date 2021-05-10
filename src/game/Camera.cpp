@@ -12,14 +12,14 @@ void Camera::Update() {
 	{
 		Vector2 move = Game::Gamepad.CPad();
 		move *= (int)(GetCameraSpeed());
-		Position += Vector2Int(move);
+		Position += Vector2Int16(move);
 	}
 
 	Vector2 move = Game::Gamepad.CStick()	;
 	move *= (int)(GetCameraSpeed());
-	Position += Vector2Int(move);
+	Position += Vector2Int16(move);
 
-	Vector2Int ScaledSize = (Size * Scale) / 2;
+	Vector2Int16 ScaledSize = (Size * Scale) / 2;
 
 	if (Position.x < Limits.position.x + ScaledSize.x)
 		Position.x = Limits.position.x + ScaledSize.x;

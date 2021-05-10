@@ -9,7 +9,7 @@
 
 
 struct MapTile {
-	Vector2Int position;
+	Vector2Int16 position;
 	Sprite sprite;
 	static constexpr const int TileSize = 32;
 };
@@ -18,12 +18,12 @@ class MapSystem {
 
 private:
 	std::vector<MapTile> tiles;
-	Rectangle mapBounds;
+	Rectangle16 mapBounds;
 public:
 	MapSystem(const MapDef& map);
 	~MapSystem();
 
-	Rectangle GetMapBounds() const { return mapBounds; }
+	Rectangle16 GetMapBounds() const { return mapBounds; }
 
 	void DrawTiles(const Camera& camera);
 	void DrawMiniMapTiles(Vector2Int offset, const Camera& camera);

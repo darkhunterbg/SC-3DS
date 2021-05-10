@@ -158,3 +158,29 @@ void EntityTree::RectCastCollider(const Rectangle16& region, EntityTreeCellId ce
 		}
 	}
 }
+
+EntityId EntityTree::PointCastEntity(Vector2Int16 point, EntityTreeCellId cellId) const
+{
+	auto& cell = GetCell(cellId);
+
+	if (cell.region.Contains(point)) {
+		auto end = cell.colliders.size();
+
+		for (unsigned i = 0; i < end; ++i) {
+			if (cell.colliders[i].Contains(point)) {
+				return cell.entities[i];
+			}
+		}
+
+		if (cell.leafStart)
+		{
+			for (int i = 0; i < 4; ++i) {
+				EntityId id = PointCastEntity(point, cell.leafStart + i);
+				if (id != Entity::None)
+					return id;
+			}
+		}
+	}
+
+	return Entity::None;
+}

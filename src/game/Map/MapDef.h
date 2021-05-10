@@ -3,5 +3,5 @@
 #include "../MathLib.h"
 
 struct MapDef {
-	Vector2Int size;
+	Vector2Int16 size;
 };

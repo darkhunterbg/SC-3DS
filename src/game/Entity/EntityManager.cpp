@@ -59,7 +59,6 @@ void EntityManager::UpdateEntities() {
 	CollectEntityChanges();
 
 	renderSystem.UpdatePositions(*this, changedData);
-
 	kinematicSystem.UpdateCollidersPosition(*this, changedData);
 	kinematicSystem.ApplyCollidersChange(*this);
 

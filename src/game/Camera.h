@@ -5,26 +5,25 @@
 class Camera {
 	static constexpr const int CameraSpeed = 10;
 public:
-	Vector2Int Position;
-	Vector2Int Size;
-	Rectangle Limits;
+	Vector2Int16 Position;
+	Vector2Int16 Size;
+	Rectangle16 Limits;
 	int Scale = 1;
 
 	inline int GetCameraSpeed() const { return CameraSpeed * Scale; }
 
-	inline Rectangle GetRectangle() const {
-		return { Position - (Size * Scale)/2, Size * Scale };
-	}
-
 	inline Rectangle16 GetRectangle16() const {
-		return Rectangle16(Vector2Int16(Position - (Size * Scale) / 2), Vector2Int16(Size * Scale));
+		return Rectangle16((Position - (Size * Scale) / 2), Size * Scale);
 	}
 
+	inline Rectangle GetRectangle() const {
+		return Rectangle{ Vector2Int( Position - (Size * Scale) / 2), Vector2Int( Size * Scale) };
+	}
 
-	inline Vector2Int ScreenToWorld(Vector2Int p) {
+	inline Vector2Int16 ScreenToWorld(Vector2Int16 p) {
 		return p * Scale + Position - (Size * Scale) / 2;
 	}
-	inline Vector2Int WorldToScreen(Vector2Int p) {
+	inline Vector2Int16 WorldToScreen(Vector2Int16 p) {
 		return (p - Position + (Size * Scale) / 2) / Scale;
 	}
 

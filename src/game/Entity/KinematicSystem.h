@@ -54,4 +54,12 @@ public:
 	void DrawColliders(const Camera& camera);
 
 	bool CollidesWithAny(const Rectangle16& rect, EntityId skip);
+	
+	inline void RectCast(const Rectangle16& collider, std::vector<EntityId>& result) const {
+		return collidersTree.RectCastEntity(collider, result);
+	}
+
+	inline EntityId PointCast(Vector2Int16 point) const {
+		return collidersTree.PointCastEntity(point);
+	}
 };
