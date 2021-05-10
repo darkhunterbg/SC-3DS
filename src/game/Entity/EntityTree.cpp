@@ -57,12 +57,14 @@ void EntityTree::UpdateEntityCollider(const Rectangle16& collider, EntityId id, 
 
 	if (current != next) {
 
-		for (int i = 0; i < size; ++i) {
-			if (cell.entities[i] == id) {
-				cell.colliders.erase(cell.colliders.begin() + i);
-				cell.entities.erase(cell.entities.begin() + i);
-				break;
-			}
+		int i = entityToCellPositionMap[Entity::ToIndex(id)];
+
+		cell.colliders.erase(cell.colliders.begin() + i);
+		cell.entities.erase(cell.entities.begin() + i);
+		--size;
+		for (; i < size; ++i) {
+			EntityId id = cell.entities[i];
+			entityToCellPositionMap[Entity::ToIndex(id)]--;
 		}
 
 		auto& newCell = GetCell(next);
@@ -70,15 +72,12 @@ void EntityTree::UpdateEntityCollider(const Rectangle16& collider, EntityId id, 
 		newCell.colliders.push_back(collider);
 		newCell.entities.push_back(id);
 		entityToCellMap[Entity::ToIndex(id)] = next;
+		entityToCellPositionMap[Entity::ToIndex(id)] = newCell.entities.size() - 1;
 	}
 	else {
 
-		for (int i = 0; i < size; ++i) {
-			if (cell.entities[i] == id) {
-				cell.colliders[i] = collider;
-				break;
-			}
-		}
+		int i = entityToCellPositionMap[Entity::ToIndex(id)];
+		cell.colliders[i] = collider;
 	}
 }
 
@@ -87,6 +86,7 @@ void EntityTree::AddEntity(const Rectangle16& collider, EntityId id, EntityTreeC
 	cell.colliders.push_back(collider);
 	cell.entities.push_back(id);
 	entityToCellMap[Entity::ToIndex(id)] = cellId;
+	entityToCellPositionMap[Entity::ToIndex(id)] = cell.entities.size() - 1;
 }
 
 EntityTreeCellId EntityTree::GetCellIdForCollider(const Rectangle16& collider, EntityTreeCellId cellId) const {

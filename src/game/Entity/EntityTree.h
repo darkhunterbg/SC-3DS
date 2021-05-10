@@ -16,6 +16,7 @@ class EntityTree {
 
 	std::vector<Cell> cells;
 	std::array<EntityTreeCellId, Entity::MaxEntities> entityToCellMap;
+	std::array<unsigned short, Entity::MaxEntities> entityToCellPositionMap;
 private:
 	EntityTreeCellId GetCellIdForCollider(const Rectangle16& collider, EntityTreeCellId cellId) const;
 	void RectCastEntity(const Rectangle16& region, EntityTreeCellId cellId, std::vector<EntityId>& result) const;
