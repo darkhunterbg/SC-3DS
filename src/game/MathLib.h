@@ -311,6 +311,7 @@ struct Rectangle16
 		return v.x <= position.x + size.x && v.x >= position.x &&
 			v.y <= position.y + size.y && v.y >= position.y;
 	}
+
 };
 
 inline Vector2Int Vector2Int_Ceil(const Vector2& v) {

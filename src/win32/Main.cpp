@@ -29,6 +29,8 @@ int main(int argc, char** argv) {
 	SDL_MaximizeWindow(window);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BlendMode::SDL_BLENDMODE_ADD);
+
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
 	screens[0] = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 400, 240);
@@ -139,5 +141,6 @@ void Draw() {
 		SDL_SetRenderTarget(renderer, screen);
 		SDL_RenderClear(renderer);
 	}
+
 
 }

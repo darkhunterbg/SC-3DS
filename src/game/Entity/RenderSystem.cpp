@@ -107,7 +107,6 @@ void RenderSystem::UpdatePositions(EntityManager& em) {
 		int i = Entity::ToIndex(id);
 
 		if (em.EntityChangeComponents[i].changed) {
-			em.EntityChangeComponents[i].changed = false;
 
 			// TODO: move out from here
 			if (em.CollisionArchetype.Archetype.HasEntity(id)) {

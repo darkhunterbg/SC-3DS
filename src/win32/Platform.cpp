@@ -240,6 +240,7 @@ void Platform::DrawRectangle(Rectangle rect, Color color) {
 	cmd.b = SDL_FloatToUint8(color.b);
 	cmd.a = SDL_FloatToUint8(color.a);
 
+
 	SDL_SetRenderDrawColor(renderer, cmd.r, cmd.g, cmd.b, cmd.a);
 	SDL_RenderFillRect(renderer, &cmd.dst);
 }

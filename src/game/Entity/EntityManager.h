@@ -77,23 +77,13 @@ public:
 	void DrawEntites(const Camera& camera);
 
 
-	EntityId NewUnit(const UnitDef& def, Vector2Int position, Color color);
+	EntityId NewUnit(const UnitDef& def, Vector2Int16 position, Color color);
 
-	void SetPosition(EntityId e, Vector2Int pos);
-	void GoTo(EntityId e, Vector2Int pos);
+	void SetPosition(EntityId e, Vector2Int16 pos);
+	void GoTo(EntityId e, Vector2Int16 pos);
 
-	bool CollidesWithAny(const Rectangle16& collider, EntityId skip) {
+	inline bool CollidesWithAny(const Rectangle16& collider, EntityId skip) {
 
-		for (EntityId id : CollisionArchetype.Archetype.GetEntities()) {
-			if (id == skip)
-				continue;
-
-			int i = Entity::ToIndex(id);
-
-			if(collider.Intersects(CollisionArchetype.ColliderComponents[i].worldCollider))
-				return true;
-		}
-
-		return false;
+		return kinematicSystem.CollidesWithAny(collider, skip);
 	}
 };

@@ -29,10 +29,20 @@ void EntityManager::UpdateEntities() {
 	updated = true;
 
 	navigationSystem.MoveEntities(*this);
-	
+
 	animationSystem.UpdateAnimations();
 
 	renderSystem.UpdatePositions(*this);
+
+	kinematicSystem.RefreshColliders(*this);
+
+	for (EntityId id : GetEntities()) {
+		int i = Entity::ToIndex(id);
+
+		if (EntityChangeComponents[i].changed) {
+			EntityChangeComponents[i].changed = false;
+		}
+	}
 }
 
 
@@ -43,35 +53,12 @@ void EntityManager::DrawEntites(const Camera& camera) {
 
 	renderSystem.Draw(camera, *this);
 
-	Rectangle camRect = camera.GetRectangle();
-	Color c = Colors::LightGreen;
-	c.a = 0.5f;
-
-	//for (EntityId id : CollisionArchetype.Archetype.GetEntities()) {
-	//	int i = Entity::ToIndex(id);
-	//	const auto& cmp = CollisionArchetype.ColliderComponents[i];
-	//	Rectangle dst = { Vector2Int( cmp.worldCollider.position), Vector2Int( cmp.worldCollider.size )};
-
-	//	if (camRect.Intersects(dst)) {
-
-	//		dst.position -= camRect.position;
-	//		dst.position /= camera.Scale;
-	//		dst.size /= camera.Scale;
-
-	//		Platform::DrawRectangle(dst, c);
-	//	}
-	//
-	//}
-
-
-	//kinematicSystem->DrawColliders(camera);
-
-
+	kinematicSystem.DrawColliders(camera);
 }
 
-EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color color) {
+EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color color) {
 	EntityId e = entities.NewEntity();
-	PositionComponents.NewComponent(e, Vector2Int16( position));
+	PositionComponents.NewComponent(e,  position);
 	
 	EntityChangeComponents.NewComponent(e, { true });
 	UnitComponents.NewComponent(e, { &def });
@@ -118,11 +105,11 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int position, Color c
 	return e;
 }
 
-void EntityManager::SetPosition(EntityId e, Vector2Int pos) {
+void EntityManager::SetPosition(EntityId e, Vector2Int16 pos) {
 	PositionComponents.GetComponent(e) = pos;
 	EntityChangeComponents.GetComponent(e).changed = true;
 }
-void EntityManager::GoTo(EntityId e, Vector2Int pos) {
+void EntityManager::GoTo(EntityId e, Vector2Int16 pos) {
 
 	NavigationArchetype.WorkComponents.GetComponent(e).work = true;
 	NavigationArchetype.NavigationComponents.GetComponent(e).target = pos;

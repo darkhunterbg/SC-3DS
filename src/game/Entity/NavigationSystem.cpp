@@ -211,19 +211,23 @@ void NavigationSystem::UpdateNavigationJob(int start, int end) {
 		EntityId entity = data.entities[i];
 
 
-		static constexpr const int maxIter = 1;
+		static constexpr const int maxIter = 4;
 
 
 		uint8_t v = movement.velocity;
 
 		results.clear();
 
-		for (int i = 0; i < 8; i++) {
+
+
+		for (int i = 0; i <= 4; i++) {
 			Vector2Int16 p = position;
 
-			int eval = Evaluate(i, v, p, nav, entity);
+			int d = (nav.targetHeading + 6 + i) % 8;
+
+			int eval = Evaluate(d, v, p, nav, entity);
 			if (eval != std::numeric_limits<int>::max())
-				results.push_back({ p , 1, eval , (uint8_t)(i * 4) , (uint8_t)(i * 4) });
+				results.push_back({ p , 1, eval , (uint8_t)(d * 4) , (uint8_t)(d * 4) });
 		}
 
 
@@ -259,8 +263,9 @@ void NavigationSystem::UpdateNavigationJob(int start, int end) {
 			++action.iter;
 
 
-			for (int d = 0; d < 8; ++d) {
+			for (int p = 0; p <= 4; ++p) {
 
+				int d = (p + currentDir + 6) % 8;
 
 				Vector2Int16 move = Vector2Int16(movementTable8[d] * v);
 				action.pos = currentPos + move;
