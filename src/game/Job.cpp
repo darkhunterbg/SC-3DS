@@ -12,7 +12,7 @@ thread_local int CurrentThreadId;
 
 static uint32_t padding2[15];
 
-std::atomic_int JobSystem::remainingJobs = 0;
+std::atomic_int JobSystem::workingThreads = 0;
 
 static uint32_t padding3[15];
 
@@ -30,7 +30,9 @@ void JobSystem::ThreadWork(int threadId)
 
 	while (true) {
 		Platform::WaitSemaphore(semaphore);
+
 		ThreadWorkOnJob(threadId);
+
 	}
 }
 
@@ -45,10 +47,19 @@ void JobSystem::ThreadWorkOnJob(int threadId)
 		Job job = jobs[nextJob];
 		a(job.start, job.end);
 
-		remainingJobs.fetch_sub(1 , std::memory_order_seq_cst);
-
-		nextJob = takenJobs.fetch_add(1 , std::memory_order_seq_cst);
+		nextJob = takenJobs.fetch_add(1, std::memory_order_seq_cst);
 	}
+
+	workingThreads.fetch_sub(1, std::memory_order_seq_cst);
+
+	//auto t = Platform::ElaspedTime();
+	//while (remainingJobs > 0)
+	//{
+	//	t = Platform::ElaspedTime() - t;
+	//	if( t> 3)
+	//		EXCEPTION("JOBS still remain !");
+	//} 
+
 }
 
 void JobSystem::ExecJob(int elements, int batchSize)
@@ -65,22 +76,21 @@ void JobSystem::ExecJob(int elements, int batchSize)
 		jobs.push_back({ i, i + count });
 	}
 
-	remainingJobs = jobs.size();
+	workingThreads = std::min(threads, (int)jobs.size()) + 1;
 	takenJobs = 0;
 
-	int awake = std::min(threads, (int)jobs.size() - 1);
-	if (awake > 0) {
-		Platform::ReleaseSemaphore(semaphore, awake);
+	if (workingThreads > 1) {
+		Platform::ReleaseSemaphore(semaphore, workingThreads - 1);
 	}
 
 	ThreadWorkOnJob(0);
 
 	auto time = Platform::ElaspedTime();
-	while (remainingJobs) {
+	while (workingThreads) {
 		auto delta = Platform::ElaspedTime() - time;
 		if (delta > 3)
-			EXCEPTION("Main thread locked! Remaining jobs %i, taken jobs %i, total jobs %i",
-				(int)remainingJobs, (int)takenJobs, jobs.size());
+			EXCEPTION("Main thread locked! Taken jobs %i/%i, working threads %i",
+				(int)takenJobs, jobs.size(), (int)workingThreads);
 	}
 }
 

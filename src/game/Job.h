@@ -22,18 +22,18 @@ class ThreadLocal;
 class JobSystem {
 private:
 	JobSystem() = delete;
-	~JobSystem() =delete;
+	~JobSystem() = delete;
 
 	static Semaphore semaphore;
 	static int threads;
-	static std::atomic_int remainingJobs;
+	static std::atomic_int workingThreads;
 	static std::atomic_int takenJobs;
 	static std::vector<Job> jobs;
-	static std::function<void( int, int)> action;
+	static std::function<void(int, int)> action;
 
 	static void ThreadWorkOnJob(int threadId);
 	static void ThreadWork(int threadId);
-	static void ExecJob( int elements, int batchSize);
+	static void ExecJob(int elements, int batchSize);
 
 	template <class T>
 	friend class ThreadLocal;
