@@ -13,18 +13,33 @@ class EntityManager;
 struct EntityChangedData;
 class Camera;
 
-struct Collider {
-	Rectangle16 rect;
-	EntityId id;
-};
-
 class KinematicSystem {
+
+	struct UpdateColliderPosData {
+		std::vector<EntityId> entity;
+		std::vector<Rectangle16> collider;
+		std::vector<Vector2Int16> position;
+		std::vector<Rectangle16> worldCollider;
+
+		inline size_t size() const { return entity.size(); }
+		inline void clear() {
+			entity.clear();
+			collider.clear();
+			position.clear();
+			worldCollider.clear();
+
+		}
+	};
+
 private:
 	ThreadLocal<std::vector< EntityId>> list;
 	std::vector< Rectangle16> drawColliders;
 	EntityTree collidersTree;
 	std::array<bool, Entity::MaxEntities> entityInTree;
 	std::array<EntityTreeCellId, Entity::MaxEntities> updateCollider;
+
+	UpdateColliderPosData updateColliderPosData;
+
 	static void ColliderChangeJob(int start, int end);
 public:
 
@@ -32,9 +47,9 @@ public:
 
 	void SetSize(Vector2Int16 size);
 
-	void UpdateCollidersPosition( EntityManager& em, const EntityChangedData& data);
+	void UpdateCollidersPosition(EntityManager& em, const EntityChangedData& data);
 
-	void ApplyCollidersChange( EntityManager& em, const EntityChangedData& data);
+	void ApplyCollidersChange(EntityManager& em);
 
 	void DrawColliders(const Camera& camera);
 

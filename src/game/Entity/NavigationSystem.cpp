@@ -323,7 +323,7 @@ void NavigationSystem::UpdateNavigation(EntityManager& em)
 			navigationData.movement.push_back(em.NavigationArchetype.MovementComponents[i]);
 			navigationData.position.push_back(em.PositionComponents[i]);
 			em.NavigationArchetype.NavigationComponents[i].currentHeading = em.NavigationArchetype.OrientationComponents[i].orientation;
-			em.NavigationArchetype.NavigationComponents[i].collider = em.CollisionArchetype.ColliderComponents[i].collider;
+			em.NavigationArchetype.NavigationComponents[i].collider =  em.CollisionArchetype.ColliderComponents[i].collider;
 			navigationData.navigation.push_back(&em.NavigationArchetype.NavigationComponents[i]);
 			navigationData.entities.push_back(id);
 		}

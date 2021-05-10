@@ -17,27 +17,22 @@ void KinematicSystem::SetSize(Vector2Int16 size)
 	collidersTree.Init({ Vector2Int16{0,0},size }, 8 * 32);
 }
 
-static EntityManager* e;
 static KinematicSystem* s;
-static const EntityChangedData* d;
 
 void KinematicSystem::ColliderChangeJob(int start, int end) {
-	EntityManager& em = *e;
-	const EntityChangedData& data = *d;
 
-	for (int item = start; item < end; ++item) {
+	UpdateColliderPosData& data = s->updateColliderPosData;
 
-		EntityId id = data.entity[item];
+	for (int i = start; i < end; ++i) {
+		int index = Entity::ToIndex(data.entity[i]);
 
+		const auto& collider = data.collider[i];
+		const auto& pos = data.position[i];
+		auto& wc = data.worldCollider[i];
+		wc = collider;
+		wc.position += pos;
 
-		if (em.CollisionArchetype.Archetype.HasEntity(id)) {
-			int i = Entity::ToIndex(id);
-
-			auto& c = em.CollisionArchetype.ColliderComponents[i];
-			c.SetPosition(data.position[item]);
-			s->updateCollider[i] = s->collidersTree.GetCellIdForCollider(c.worldCollider);
-		}
-
+		s->updateCollider[index] = s->collidersTree.GetCellIdForCollider(wc);
 	}
 }
 
@@ -46,35 +41,45 @@ void KinematicSystem::UpdateCollidersPosition(EntityManager& em, const EntityCha
 {
 	SectionProfiler p2("UpdateCollidersPosition");
 
-	e = &em;
-	s = this;
-	d = &data;
+	updateColliderPosData.clear();
 
-	JobSystem::RunJob(data.size(), JobSystem::DefaultJobSize, ColliderChangeJob);
-}
-
-void KinematicSystem::ApplyCollidersChange( EntityManager& em, const EntityChangedData& data)
-{
-	SectionProfiler p("ApplyCollidersChange");
-
-	int size = data.size();
-	for (int item = 0; item < size; ++item) {
+	for (int item = 0; item < data.size(); ++item) {
 
 		EntityId id = data.entity[item];
 
 		if (em.CollisionArchetype.Archetype.HasEntity(id)) {
 			int i = Entity::ToIndex(id);
-			const auto& collider = em.CollisionArchetype.ColliderComponents[i];
-			if (entityInTree[i]) {
 
-				collidersTree.UpdateEntityCollider(collider.worldCollider, id, updateCollider[i]);
-			}
-			else {
-				entityInTree[i] = true;
-				collidersTree.AddEntity(collider.worldCollider, id, updateCollider[i]);
-			}
+			updateColliderPosData.entity.push_back(id);
+			updateColliderPosData.collider.push_back(em.CollisionArchetype.ColliderComponents[i].collider);
+			updateColliderPosData.position.push_back(data.position[item]);
+			updateColliderPosData.worldCollider.push_back({});
 		}
+	}
 
+	s = this;
+
+	JobSystem::RunJob(data.size(), JobSystem::DefaultJobSize, ColliderChangeJob);
+}
+
+void KinematicSystem::ApplyCollidersChange(EntityManager& em)
+{
+	SectionProfiler p("ApplyCollidersChange");
+
+	int size = updateColliderPosData.size();
+	for (int i = 0; i < size; ++i) {
+
+		EntityId id = updateColliderPosData.entity[i];
+		int index = Entity::ToIndex(id);
+		const auto& wc = updateColliderPosData.worldCollider[i];
+
+		if (entityInTree[i]) {
+			collidersTree.UpdateEntityCollider(wc, id, updateCollider[index]);
+		}
+		else {
+			entityInTree[i] = true;
+			collidersTree.AddEntity(wc, id, updateCollider[index]);
+		}
 	}
 }
 

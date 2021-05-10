@@ -170,19 +170,6 @@ struct AnimationComponent {
 
 };
 
-
 struct ColliderComponent {
-	// TODO: split to components, system?, Rectangle8?
-	Rectangle16 worldCollider;
 	Rectangle16 collider;
-
-	void SetBox(const Rectangle16& b) {
-		Vector2Int16 p = worldCollider.position - worldCollider.position;
-		collider = worldCollider = b;
-		worldCollider.position += p;
-	}
-
-	inline void SetPosition(const Vector2Int16& pos) {
-		worldCollider.position = collider.position + pos;
-	}
 };

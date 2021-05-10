@@ -61,7 +61,7 @@ void EntityManager::UpdateEntities() {
 	renderSystem.UpdatePositions(*this, changedData);
 
 	kinematicSystem.UpdateCollidersPosition(*this, changedData);
-	kinematicSystem.ApplyCollidersChange(*this, changedData);
+	kinematicSystem.ApplyCollidersChange(*this);
 
 	ApplyEntityChanges();
 }
@@ -121,7 +121,7 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color
 
 	NavigationArchetype.Archetype.AddEntity(e);
 
-	CollisionArchetype.ColliderComponents.NewComponent(e).SetBox(def.Collider);
+	CollisionArchetype.ColliderComponents.NewComponent(e).collider = def.Collider;
 	CollisionArchetype.Archetype.AddEntity(e);
 
 	return e;
