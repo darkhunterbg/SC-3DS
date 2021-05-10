@@ -9,6 +9,7 @@
 #include <cstring>
 
 void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
+	SectionProfiler p("CameraCull");
 	renderData.clear();
 
 	for (EntityId id : em.RenderArchetype.Archetype.GetEntities()) {
@@ -100,7 +101,7 @@ void RenderSystem::UpdateRenderPositionsJob(int start, int end) {
 }
 
 void RenderSystem::UpdatePositions(EntityManager& em, const EntityChangedData& changed) {
-
+	SectionProfiler p("UpdatePositions");
 	renderUpdatePosData.clear();
 
 	int size = changed.size();

@@ -3,6 +3,8 @@
 #include <cstring>
 
 void EntityTree::Init(Rectangle16 region, short minRegionSize, short cellItemReserve) {
+
+	Vector2Int16 size = region.size;
 	cells.clear();
 
 	cells.reserve(10000);
@@ -14,6 +16,7 @@ void EntityTree::Init(Rectangle16 region, short minRegionSize, short cellItemRes
 	subdivide.push_back(0);
 
 	cells.push_back({ region,0 });
+	cells[0].bitShiftSize = log2(region.size.x);
 
 	while (subdivide.size() > 0) {
 		auto i = *subdivide.begin();
@@ -39,13 +42,17 @@ void EntityTree::Init(Rectangle16 region, short minRegionSize, short cellItemRes
 		region.size /= 2;
 
 		cells.push_back({ region });
+		cells.rbegin()->bitShiftSize = cells[i].bitShiftSize - 1;
 		region.position.x += region.size.x;
 		cells.push_back({ region });
+		cells.rbegin()->bitShiftSize = cells[i].bitShiftSize - 1;
 		region.position.x -= region.size.x;
 		region.position.y += region.size.y;
 		cells.push_back({ region });
+		cells.rbegin()->bitShiftSize = cells[i].bitShiftSize - 1;
 		region.position.x += region.size.x;
 		cells.push_back({ region });
+		cells.rbegin()->bitShiftSize = cells[i].bitShiftSize - 1;
 	}
 
 }
@@ -94,28 +101,25 @@ EntityTreeCellId EntityTree::GetCellIdForCollider(const Rectangle16& collider, E
 	if (!cell.leafStart)
 		return cellId;
 
-	EntityTreeCellId lastIntersection = -1;
-	int intersections = 0;
+	int shift = cell.bitShiftSize - 1;
 
-	for (int i = cell.leafStart; i < cell.leafStart + 4; ++i) {
-		const Cell& subCell = GetCell(i);
-		if (subCell.region.Intersects(collider)) {
-			++intersections;
-			lastIntersection = i;
-		}
+	Vector2Int16 min = collider.position - cell.region.position;
+	Vector2Int16 max = min + collider.size;
 
-	}
+	min.x = min.x >> shift;
+	min.y = min.y >> shift;
 
-	if (intersections > 1) {
+	max.x = max.x >> shift;
+	max.y = max.y >> shift;
+
+	if (min != max)
 		return cellId;
-	}
-	else {
 
-		if (lastIntersection < 0)
-			return 0;
+	EntityTreeCellId nextCell = cell.leafStart;
+	nextCell += min.x;
+	nextCell += min.y << 1;
 
-		return GetCellIdForCollider(collider, lastIntersection);
-	}
+	return GetCellIdForCollider(collider, nextCell);
 }
 
 void EntityTree::RectCastEntity(const Rectangle16& region, EntityTreeCellId cellId, std::vector<EntityId>& result) const {
@@ -132,9 +136,10 @@ void EntityTree::RectCastEntity(const Rectangle16& region, EntityTreeCellId cell
 
 		if (cell.leafStart)
 		{
-			for (int i = 0; i < 4; ++i) {
-				RectCastEntity(region, cell.leafStart + i, result);
-			}
+			RectCastEntity(region, cell.leafStart, result);
+			RectCastEntity(region, cell.leafStart + 1, result);
+			RectCastEntity(region, cell.leafStart + 2, result);
+			RectCastEntity(region, cell.leafStart + 3, result);
 		}
 	}
 }
@@ -158,7 +163,6 @@ void EntityTree::RectCastCollider(const Rectangle16& region, EntityTreeCellId ce
 		}
 	}
 }
-
 EntityId EntityTree::PointCastEntity(Vector2Int16 point, EntityTreeCellId cellId) const
 {
 	auto& cell = GetCell(cellId);

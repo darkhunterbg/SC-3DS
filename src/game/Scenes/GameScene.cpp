@@ -73,6 +73,7 @@ void GameScene::Start() {
 			Color c = color[(i) % 12];
 			EntityId e = entityManager->NewUnit(*UnitDatabase::Units[i % UnitDatabase::Units.size()], 
 				Vector2Int16( Vector2Int{ x * 32 + 16,y * 32 + 16 }), c);
+			entityManager->CollisionArchetype.Archetype.RemoveEntity(e);
 			//int orientation = std::rand() % 32;
 			i++;
 
@@ -139,14 +140,15 @@ void GameScene::Update() {
 		LogicalUpdate();
 	}
 
-	//int i = 0;
-	//for (int y = 99; y >= 0; --y) {
-	//	for (int x = 49; x >= 0; --x) {
+	int i = 0;
+	for (int y = 99; y >= 0; --y) {
+		for (int x = 99; x >= 0; --x) {
 
-	//		i++;
-	//		entityManager->SetPosition(i, { x * 32 + 16 ,y * 32 + 16 });
-	//	}
-	//}
+			entityManager->SetPosition(i, Vector2Int16(Vector2Int{ x * 32 + 16 ,y * 32 + 16 }));
+
+			i++;
+		}
+	}
 
 
 	hud->ApplyInput(camera);

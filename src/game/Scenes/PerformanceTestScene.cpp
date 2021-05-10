@@ -39,14 +39,16 @@ void PerformanceTestScene::Update() {
 	entityManager.UpdateSecondaryEntities();
 	entityManager.UpdateEntities();
 
-	SectionProfiler p("CollidesWith");
+	//SectionProfiler p("CollidesWith");
 
 	//for (int i = 0; i < 4000; ++i) {
-	//	c += entityManager.CollidesWithAny(entityManager.CollisionArchetype.ColliderComponents[i].worldCollider, i) ?
+	//	Rectangle16 r = entityManager.CollisionArchetype.ColliderComponents[i].collider;
+	//	r.position += entityManager.PositionComponents[i];
+	//	c += entityManager.CollidesWithAny(r, i) ?
 	//		1 : 0;
 
 	//}
-	p.Submit();
+	//p.Submit();
 }
 
 
