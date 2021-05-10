@@ -89,7 +89,7 @@ void Cursor::Draw() {
 	Rectangle dst = { Vector2Int(Position) + frame.offset,frame.sprite.rect.size };
 	dst.position -= {64, 64};
 
-	if (regionRect.size.LengthSquared() > 0) {
+	if (regionRect.size.LengthSquaredInt() > 0) {
 		Rectangle rect;
 		rect.position = regionRect.position;
 		rect.size = Vector2Int(regionRect.size.x + 1, 2);
@@ -166,7 +166,7 @@ void Cursor::Update(Camera& camera, EntityManager& entityManager, std::vector<En
 	}
 
 	if (Game::Gamepad.IsButtonReleased(GamepadButton::A)) {
-		if (!dragging && hover) {
+		if (!dragging && hover != Entity::None) {
 			outSelection.push_back(hover);
 		}
 		else {
@@ -199,7 +199,7 @@ void Cursor::Update(Camera& camera, EntityManager& entityManager, std::vector<En
 	else {
 		if (!holding || !dragging)
 		{
-			newClip = hover ? &magg : &arrow;
+			newClip = hover != Entity::None ? &magg : &arrow;
 		}
 		else {
 			newClip = &drag;

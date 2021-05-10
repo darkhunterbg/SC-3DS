@@ -67,13 +67,13 @@ void GameScene::Start() {
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
 	int i = 0;
-	for (int y = 99; y >= 0; --y) {
+	for (int y = 49; y >= 0; --y) {
 		for (int x = 99; x >= 0; --x) {
 
 			Color c = color[(i) % 12];
 			EntityId e = entityManager->NewUnit(*UnitDatabase::Units[i % UnitDatabase::Units.size()], 
 				Vector2Int16( Vector2Int{ x * 32 + 16,y * 32 + 16 }), c);
-			entityManager->CollisionArchetype.Archetype.RemoveEntity(e);
+			//entityManager->CollisionArchetype.Archetype.RemoveEntity(e);
 			//int orientation = std::rand() % 32;
 			i++;
 
@@ -140,15 +140,15 @@ void GameScene::Update() {
 		LogicalUpdate();
 	}
 
-	int i = 0;
-	for (int y = 99; y >= 0; --y) {
-		for (int x = 99; x >= 0; --x) {
+	//int i = 0;
+	//for (int y = 49; y >= 0; --y) {
+	//	for (int x = 99; x >= 0; --x) {
 
-			entityManager->SetPosition(i, Vector2Int16(Vector2Int{ x * 32 + 16 ,y * 32 + 16 }));
+	//		entityManager->SetPosition(i, Vector2Int16(Vector2Int{ x * 32 + 16 ,y * 32 + 16 }));
 
-			i++;
-		}
-	}
+	//		i++;
+	//	}
+	//}
 
 
 	hud->ApplyInput(camera);
@@ -185,17 +185,19 @@ void GameScene::Update() {
 	if (Game::Gamepad.IsButtonPressed(GamepadButton::B)) {
 		for (EntityId id : selection)
 		{
-			//if (entityManager->GetRenderComponent(id).depth != -1) {
-			//	entityManager->GetAnimationComponent(id).PlayClip(&UnitDatabase::Marine.DeathAnimation);
-			//	entityManager->GetAnimationComponent(id).shadowClip = nullptr;
-			//	entityManager->GetAnimationComponent(id).unitColorClip = nullptr;
-			//	entityManager->GetRenderComponent(id).depth = -1;
-			//	entityManager->RemoveColliderComponent(id);
-			//	entityManager->GetNavigationComponent(id).work = false;
+			if (entityManager->RenderArchetype.RenderComponents[id].depth != -1) {
+				entityManager->AnimationArchetype.AnimationComponents[id].clip = &UnitDatabase::Marine.DeathAnimation;
+				entityManager->AnimationArchetype.AnimationComponents[id].shadowClip = nullptr;
+				entityManager->AnimationArchetype.AnimationComponents[id].unitColorClip = nullptr;
+				entityManager->AnimationArchetype.EnableComponents[id].pause = false;
+				entityManager->AnimationArchetype.TrackerComponents[id].PlayClip(&UnitDatabase::Marine.DeathAnimation);
+				entityManager->RenderArchetype.RenderComponents[id].depth = -1;
+				entityManager->CollisionArchetype.Archetype.RemoveEntity(id);
+				entityManager->NavigationArchetype.Archetype.RemoveEntity(id);
 
-			//	int i = std::rand() % 2;
-			//	Game::Audio->PlayClip(death[i], 1);
-			//}
+				int i = std::rand() % 2;
+				Game::Audio->PlayClip(death[i], 1);
+			}
 		}
 	}
 

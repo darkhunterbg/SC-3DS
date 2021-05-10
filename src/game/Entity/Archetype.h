@@ -4,9 +4,6 @@
 #include "Component.h"
 #include <vector>
 
-template <class T>
-using ArchetypeCollection = std::vector<T>;
-
 
 class EntityArchetype {
 private:
