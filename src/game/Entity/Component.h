@@ -119,7 +119,6 @@ struct NavigationComponent {
 	Vector2Int16 target;
 	uint8_t currentHeading;
 	uint8_t targetHeading;
-	Rectangle16 collider;
 };
 
 struct OrientationComponent {

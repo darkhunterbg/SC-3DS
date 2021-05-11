@@ -25,4 +25,6 @@ struct UnitDef {
 
 	AnimationClip AttackAnimations[32];
 	AnimationClip DeathAnimation;
+
+
 };

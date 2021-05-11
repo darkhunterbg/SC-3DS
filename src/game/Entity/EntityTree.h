@@ -41,7 +41,10 @@ public:
 		return PointCastEntity(point, 0);
 	}
 	inline EntityTreeCellId GetCellIdForCollider(const Rectangle16& collider) const {
-		return GetCellIdForCollider(collider, 0);
+		if (GetCell(0).region.Contains(collider.position))
+			return GetCellIdForCollider(collider, 0);
+		else
+			return 0;
 	}
 	inline const Cell& GetCell(EntityTreeCellId cellId) const {
 		return cells[cellId];

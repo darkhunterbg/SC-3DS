@@ -54,6 +54,8 @@ void EntityManager::UpdateSecondaryEntities() {
 
 	navigationSystem.UpdateNavigation(*this);
 
+	navigationSystem.ApplyUnitNavigaion(*this);
+
 	animationSystem.SetUnitOrientationAnimations(*this);
 
 	animationSystem.GenerateAnimationUpdates(*this);
@@ -118,12 +120,7 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color
 	AnimationArchetype.TrackerComponents.NewComponent(e).PlayClip(&def.MovementAnimations[0]);
 	AnimationArchetype.EnableComponents.NewComponent(e).pause = true;
 
-	//a.clip = &def.MovementAnimations[0];
-	//a.shadowClip = &def.MovementAnimationsShadow[0];
-	//a.unitColorClip = &def.MovementAnimationsTeamColor[0];
-
 	AnimationArchetype.Archetype.AddEntity(e);
-
 
 	NavigationArchetype.NavigationComponents.NewComponent(e);
 	NavigationArchetype.WorkComponents.NewComponent(e, { false });
@@ -148,4 +145,5 @@ void EntityManager::GoTo(EntityId e, Vector2Int16 pos) {
 
 	NavigationArchetype.WorkComponents.GetComponent(e).work = true;
 	NavigationArchetype.NavigationComponents.GetComponent(e).target = pos;
+	NavigationArchetype.NavigationComponents.GetComponent(e).targetHeading = 255;
 }

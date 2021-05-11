@@ -11,8 +11,6 @@ static AnimationSystem* s;
 void AnimationSystem::UpdateAnimationsJob(int start, int end) {
 	AnimationData& data = s->data;
 
-
-
 	for (int i = start; i < end; ++i) {
 		const auto& anim = data.animation[i];
 		const auto& tracker = data.tracker[i];
@@ -76,7 +74,6 @@ void AnimationSystem::GenerateAnimationsUpdatesJob(int start, int end) {
 
 void AnimationSystem::GenerateAnimationUpdates(EntityManager& em)
 {
-	SectionProfiler p("GenerateAnimationUpdates");
 	e = &em;
 	s = this;
 
@@ -103,16 +100,12 @@ void AnimationSystem::GenerateAnimationUpdates(EntityManager& em)
 
 
 void AnimationSystem::UpdateAnimations() {
-	SectionProfiler p("UpdateAnimations");
-
 	s = this;
 	JobSystem::RunJob(data.size(), JobSystem::DefaultJobSize, UpdateAnimationsJob);
 }
 
 
 void AnimationSystem::SetUnitOrientationAnimations(EntityManager& em) {
-	SectionProfiler p("OrientationAnimations");
-
 	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {
 		int i = Entity::ToId(id);
 		auto& orientation = em.UnitArchetype.OrientationComponents[i];

@@ -4,6 +4,15 @@
 
 static const constexpr float PI = 3.14159265359f;
 
+/// <summary>
+/// Note: this will return 0 if x = 0!
+/// </summary>
+/// <param name="x"></param>
+/// <returns></returns>
+constexpr int sign(int x) {
+	return (x >> 31) | ((unsigned)-x >> 31);
+}
+
 constexpr float RadToDeg(float rad) {
 	return (rad * 180.f) / PI;
 }
@@ -16,6 +25,8 @@ constexpr float ClampF(float x, float min, float max)
 {
 	return x <= min ? min : x >= max ? max : x;
 }
+
+
 inline static float LerpF(float a, float b, float l)
 {
 	float c = b - a;
