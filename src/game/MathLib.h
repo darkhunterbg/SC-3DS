@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <stdint.h>
 
 static const constexpr float PI = 3.14159265359f;
 
@@ -76,13 +77,13 @@ struct Vector2T
 		y /= l;
 	}
 
-	template<class T2>
-	inline Vector2T& operator =(const Vector2T<T2>& a) {
-		x = (T)a.x;
-		y = (T)a.y;
+	//template<class T2>
+	//inline Vector2T& operator =(const Vector2T<T2>& a) {
+	//	x = (T)a.x;
+	//	y = (T)a.y;
 
-		return *this;
-	}
+	//	return *this;
+	//}
 
 
 	static Vector2T Normalize(const Vector2T& a)
@@ -156,8 +157,8 @@ struct Vector2T
 
 typedef Vector2T<int> Vector2Int;
 typedef Vector2T<float> Vector2;
-typedef Vector2T<short> Vector2Int16;
-typedef Vector2T<char> Vector2Int8;
+typedef Vector2T<int16_t> Vector2Int16;
+typedef Vector2T<int8_t> Vector2Int8;
 
 struct RectangleF
 {
@@ -186,12 +187,12 @@ struct RectangleF
 
 	inline void SetMin(Vector2Int min)
 	{
-		this->min = min;
+		this->min = Vector2(min);
 	}
 
 	inline void SetMax(Vector2Int max)
 	{
-		this->max = max;
+		this->max = Vector2(max);
 	}
 	inline Vector2 GetCenter() const
 	{

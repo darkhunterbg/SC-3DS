@@ -92,6 +92,7 @@ void Platform::BatchDraw(const Span< BatchDrawCommand> commands) {
 
 	for (const auto& cmd : commands) {
 		C2D_Image img = *(C2D_Image*)&cmd.image;
+
 		C2D_ImageTint tint;
 		tint.corners[0] = { cmd.color.color.value, cmd.color.blend };
 		tint.corners[1] = { cmd.color.color.value, cmd.color.blend };

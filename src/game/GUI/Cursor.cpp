@@ -91,7 +91,7 @@ void Cursor::Draw() {
 
 	if (regionRect.size.LengthSquaredInt() > 0) {
 		Rectangle rect;
-		rect.position = regionRect.position;
+		rect.position = Vector2Int(regionRect.position);
 		rect.size = Vector2Int(regionRect.size.x + 1, 2);
 		Platform::DrawRectangle(rect, Colors::UIGreen);
 

@@ -53,7 +53,9 @@ public:
 
 	void DrawColliders(const Camera& camera);
 
-	bool CollidesWithAny(const Rectangle16& rect, EntityId skip);
+	inline bool CollidesWithAny(const Rectangle16& collider, EntityId skip) const {
+		return collidersTree.CollidesWithAny(collider, skip);
+	}
 	
 	inline void RectCast(const Rectangle16& collider, std::vector<EntityId>& result) const {
 		return collidersTree.RectCastEntity(collider, result);

@@ -29,7 +29,7 @@ static void MarineResources() {
 
 	UnitDef& u = UnitDatabase::Marine;
 
-	u.RenderSize = a->FrameSize;
+	u.RenderSize = Vector2Int16(a->FrameSize);
 	u.DeathAnimationDef.GenerateAnimation(a, &u.DeathAnimation);
 	u.MovementAnimationDef.GenerateAnimations(a, as, u.MovementAnimations, u.MovementAnimationsShadow, u.MovementAnimationsTeamColor);
 }
@@ -58,7 +58,7 @@ static void SCVResources() {
 
 	UnitDef& u = UnitDatabase::SCV;
 
-	u.RenderSize = a->FrameSize;
+	u.RenderSize = Vector2Int16(a->FrameSize);
 	//u.DeathAnimationDef.GenerateAnimation(a, &u.DeathAnimation);
 	u.MovementAnimationDef.GenerateAnimations(a, a, u.MovementAnimations, u.MovementAnimationsShadow, u.MovementAnimationsTeamColor);
 }

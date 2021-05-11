@@ -111,21 +111,6 @@ void KinematicSystem::DrawColliders(const Camera& camera) {
 	}
 }
 
-bool KinematicSystem::CollidesWithAny(const Rectangle16& collider, EntityId skip)
-{
-	auto& l = list.Get();
-	l.clear();
-
-	collidersTree.RectCastEntity(collider, l);
-
-	for (const auto& c : l) {
-		if (c != skip)
-			return true;
-	}
-
-	return false;
-}
-
 void KinematicSystem::MoveEntities(EntityManager& em)
 {
 	static const Vector2Int8 zero = { 0,0 };
@@ -138,7 +123,8 @@ void KinematicSystem::MoveEntities(EntityManager& em)
 			continue;
 
 		auto& pos = em.PositionComponents[i];
-		pos += Vector2Int16(em.MovementArchetype.MovementComponents[i].velocity);
+		pos +=  Vector2Int16(em.MovementArchetype.MovementComponents[i].velocity);
+
 		/*	moveData.movement.push_back(&em.MovementArchetype.MovementComponents[i]);
 			moveData.position.push_back(&em.PositionComponents[i]);*/
 		em.EntityChangeComponents[i].changed = true;

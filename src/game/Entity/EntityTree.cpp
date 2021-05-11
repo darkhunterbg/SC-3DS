@@ -171,11 +171,45 @@ void EntityTree::RectCastCollider(const Rectangle16& region, EntityTreeCellId ce
 
 		if (cell.leafStart)
 		{
-			for (int i = 0; i < 4; ++i) {
-				RectCastCollider(region, cell.leafStart + i, result);
-			}
+			RectCastCollider(region, cell.leafStart, result);
+			RectCastCollider(region, cell.leafStart + 1, result);
+			RectCastCollider(region, cell.leafStart + 2, result);
+			RectCastCollider(region, cell.leafStart + 3, result);
 		}
 	}
+}
+bool EntityTree::CollidesWithAny(const Rectangle16& region, EntityId ignore, EntityTreeCellId cellId) const
+{
+	auto& cell = GetCell(cellId);
+
+	if (region.Intersects(cell.region)) {
+
+		auto end = cell.colliders.size();
+
+		for (unsigned i = 0; i < end; ++i) {
+			if (cell.entities[i] != ignore &&
+				cell.colliders[i].Intersects(region)) {
+				return true;
+			}
+		}
+
+		if (cell.leafStart)
+		{
+			if (CollidesWithAny(region, ignore, cell.leafStart))
+				return true;
+
+			if (CollidesWithAny(region, ignore, cell.leafStart + 1))
+				return true;
+
+			if (CollidesWithAny(region, ignore, cell.leafStart + 2))
+				return true;
+
+			if (CollidesWithAny(region, ignore, cell.leafStart + 3))
+				return true;
+		}
+	}
+
+	return false;
 }
 EntityId EntityTree::PointCastEntity(Vector2Int16 point, EntityTreeCellId cellId) const
 {
@@ -202,3 +236,5 @@ EntityId EntityTree::PointCastEntity(Vector2Int16 point, EntityTreeCellId cellId
 
 	return Entity::None;
 }
+
+

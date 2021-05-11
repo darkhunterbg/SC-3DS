@@ -23,7 +23,7 @@ void PerformanceTestScene::Start() {
 	entityManager.Init({ 128 * 32,128 * 32 });
 	//entityManager.DrawColliders = true;
 
-	for (int i = 0; i < 10000 / 2; ++i) {
+	for (int i = 0; i < 10000 / 10; ++i) {
 		entityManager.NewUnit(UnitDatabase::Marine,
 			Vector2Int16(Vector2Int{ (i / 100) * 32 + 16, (i % 100) * 32 + 16 }),
 			Colors::Red);

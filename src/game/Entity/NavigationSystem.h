@@ -33,12 +33,14 @@ class NavigationSystem {
 		std::vector<NavigationComponent*> navigation;
 		std::vector<Vector2Int16> position;
 		std::vector<uint8_t> velocity;
+		std::vector<Rectangle16> collider;
 		std::vector<EntityId> entity;
 
 		inline void clear() {
 			navigation.clear();
 			position.clear();
 			velocity.clear();
+			collider.clear();
 			entity.clear();
 		}
 

@@ -26,21 +26,21 @@ static const Vector2 movementTable8[]{
 static NavigationSystem* s;
 static EntityManager* e;
 
-static inline int Evaluate(uint8_t d, uint8_t v, Vector2Int16 pos, const NavigationComponent& nav, EntityId entity) {
-	Vector2Int16 move = Vector2Int16(movementTable8[d] * (v ));
+static inline int Evaluate(uint8_t d, uint8_t v, Vector2Int16 pos, const Rectangle16& collider, const NavigationComponent& nav, EntityId entity) {
+	Vector2Int16 move = Vector2Int16(movementTable8[d] * (v));
 	pos += move;
 
-	//Rectangle16 c = nav.collider;
-	//c.position += pos;
+	Rectangle16 c = collider;
+	c.position += pos;
 
-	//if (!e->CollidesWithAny(c, entity))
+	if (!e->CollidesWithAny(c, entity))
 	{
-		//action.dir = d * 4;
 		int dist = ((nav.target - pos)).LengthSquaredInt();
-		dist -= d << 2 == nav.targetHeading ? v << 2 : 0;
-		//action.value = dist;
-	/*	if (dist <= v * v)
-			return 0;*/
+
+		if (dist > 64)
+			dist -= d << 2 == nav.targetHeading ? 64 : 0;
+		else
+			dist -= d << 2 == nav.targetHeading ? v << 2 : 0;
 
 		return dist;
 	}
@@ -58,6 +58,7 @@ void NavigationSystem::UpdateNavigationJob(int start, int end) {
 		auto& nav = *data.navigation[i];
 		uint8_t velocity = data.velocity[i];
 		const auto& position = data.position[i];
+		const auto& collider = data.collider[i];
 		EntityId entity = data.entity[i];
 
 		int val = std::numeric_limits<int>::max();
@@ -65,7 +66,7 @@ void NavigationSystem::UpdateNavigationJob(int start, int end) {
 
 		for (uint8_t d = 0; d < 8; d++) {
 
-			int eval = Evaluate(d, velocity, position, nav, entity);
+			int eval = Evaluate(d, velocity, position, collider, nav, entity);
 			if (eval < val) {
 				val = eval;
 				dir = d << 2;
@@ -96,8 +97,10 @@ void NavigationSystem::UpdateNavigation(EntityManager& em)
 					em.UnitArchetype.OrientationComponents[i].orientation ==
 					nav.targetHeading) {
 
+		
 					navigationData.velocity.push_back(em.UnitArchetype.MovementComponents[i].movementSpeed);
 					navigationData.position.push_back(em.PositionComponents[i]);
+					navigationData.collider.push_back(em.CollisionArchetype.ColliderComponents[i].collider);
 					//em.NavigationArchetype.NavigationComponents[i].collider =  em.CollisionArchetype.ColliderComponents[i].collider;
 					navigationData.navigation.push_back(&nav);
 					navigationData.entity.push_back(id);
@@ -162,7 +165,7 @@ void NavigationSystem::ApplyUnitNavigationJob(int start, int end) {
 				em.NavigationArchetype.WorkComponents[i].work = false;
 			}
 			else {
-				movement.velocity = Vector2Int16(movementTable32[orientation.orientation] * velocity);
+				movement.velocity = Vector2Int8(movementTable32[orientation.orientation] * velocity);
 			}
 		}
 	}

@@ -128,7 +128,7 @@ public:
 	Vector2Int FrameSize;
 	SpriteFrameAtlas(const SpriteAtlas* atlas);
 	inline void SetOffset(int index, Vector2Int offset) {
-		frames[index].offset = offset;
+		frames[index].offset = Vector2Int16(offset);
 	}
 	inline const SpriteFrame& GetFrame(int index) const {
 		return frames[index];

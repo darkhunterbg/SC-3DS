@@ -75,7 +75,7 @@ void GameHUD::ApplyInput(Camera& camera) {
 	if (Game::Pointer.IsDown()) {
 		if (minimapDst.Contains(Game::Pointer.Position())) {
 			Vector2Int pos = Game::Pointer.Position() - Vector2Int(minimapDst.position);
-			camera.Position = Vector2(pos) * minimapUpscale;
+			camera.Position = Vector2Int16(Vector2(pos) * minimapUpscale);
 		}
 	}
 }

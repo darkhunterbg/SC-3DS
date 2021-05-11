@@ -25,6 +25,8 @@ private:
 	void RectCastCollider(const Rectangle16& region, EntityTreeCellId cellId, std::vector<Rectangle16>& result) const;
 
 	EntityId PointCastEntity(Vector2Int16 point, EntityTreeCellId cellId) const;
+
+	bool CollidesWithAny(const Rectangle16& region, EntityId ignore, EntityTreeCellId cellId) const;
 public:
 	void Init(Rectangle16 region, short minRegionSize, short cellItemReserve = 32);
 
@@ -39,6 +41,9 @@ public:
 	}
 	inline EntityId PointCastEntity(Vector2Int16 point) const {
 		return PointCastEntity(point, 0);
+	}
+	inline bool CollidesWithAny(const Rectangle16& region, EntityId ignore) const {
+		return CollidesWithAny(region, ignore, 0 );
 	}
 	inline EntityTreeCellId GetCellIdForCollider(const Rectangle16& collider) const {
 		if (GetCell(0).region.Contains(collider.position))

@@ -68,13 +68,13 @@ void GameScene::Start() {
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
 	int i = 0;
-	for (int y = 49; y >= 0; --y) {
-		for (int x = 99; x >= 0; --x) {
+	for (int y = 19; y >= 0; --y) {
+		for (int x = 19; x >= 0; --x) {
 
 			Color c = color[(i) % 12];
-			EntityId e = entityManager->NewUnit(*UnitDatabase::Units[i % UnitDatabase::Units.size()], 
-				Vector2Int16( Vector2Int{ x * 32 + 16,y * 32 + 16 }), c);
-	
+			EntityId e = entityManager->NewUnit(*UnitDatabase::Units[i % UnitDatabase::Units.size()],
+				Vector2Int16(Vector2Int{ x * 64 + 16,y * 64 + 16 }), c);
+
 			//entityManager->CollisionArchetype.Archetype.RemoveEntity(e);
 			//int orientation = std::rand() % 32;
 			i++;
@@ -84,7 +84,7 @@ void GameScene::Start() {
 				entityManager->AnimationArchetype.Archetype.RemoveEntity(e);
 			}*/
 			//entityManager->SetOrientation(e, orientation);
-			//entityManager->GoTo(e, { 512,512 });
+			entityManager->GoTo(e, Vector2Int16(Vector2Int{ 512 * ((i +1)% 2) +32, 512 * (i % 2) } +32));
 		}
 	}
 
@@ -132,7 +132,7 @@ void GameScene::Update() {
 
 	while (frameCounter >= 5)
 	{
-	
+
 		++logicalFrame;
 		frameCounter -= 5;
 		LogicalUpdate();
@@ -192,6 +192,7 @@ void GameScene::Update() {
 				entityManager->RenderArchetype.RenderComponents[id].depth = -1;
 				entityManager->CollisionArchetype.Archetype.RemoveEntity(id);
 				entityManager->NavigationArchetype.Archetype.RemoveEntity(id);
+				entityManager->MovementArchetype.Archetype.RemoveEntity(id);
 
 				int i = std::rand() % 2;
 				Game::Audio->PlayClip(death[i], 1);
