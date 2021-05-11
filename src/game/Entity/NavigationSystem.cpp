@@ -23,6 +23,10 @@ static const Vector2 movementTable32[]{
 static const Vector2 movementTable8[]{
 		{0,-1}, {0.8,-0.8},{1,0}, {0.8,0.8},{0,1}, {-0.8,0.8}, {-1,0},{-0.8,-0.8}
 };
+static const Vector2Int16 movementTableNavGrid[]{
+		{0,-1}, {1,-1},{1,0}, {1,1},{0,1}, {-1,1}, {-1,0},{-1,-1}
+};
+
 static NavigationSystem* s;
 static EntityManager* e;
 
@@ -49,6 +53,25 @@ static inline int Evaluate(uint8_t d, uint8_t v, Vector2Int16 pos, const Rectang
 	return  std::numeric_limits<int>::max();
 }
 
+static inline int EvaluateNavGrid(uint8_t d, Vector2Int16 pos, Vector2Int16 trg) {
+	Vector2Int16 p = pos;
+	p.x = p.x >> 5;
+	p.y = p.y >> 5;
+	p += movementTableNavGrid[d];
+
+
+	if (s->IsPassable(p.x, p.y)) {
+		Vector2Int16 t = trg;
+		t.x = t.x >> 5;
+		t.y = t.y >> 5;
+
+		int dist = (t - p).LengthSquaredInt();
+		return dist;
+	}
+
+	return std::numeric_limits<int>::max();
+}
+
 void NavigationSystem::UpdateNavigationJob(int start, int end) {
 	NavigationData& data = s->navigationData;
 	EntityManager& em = *e;
@@ -61,15 +84,29 @@ void NavigationSystem::UpdateNavigationJob(int start, int end) {
 		const auto& collider = data.collider[i];
 		EntityId entity = data.entity[i];
 
-		int val = std::numeric_limits<int>::max();
 		uint8_t dir = 255;
+		int val = std::numeric_limits<int>::max();
 
-		for (uint8_t d = 0; d < 8; d++) {
+		if ((nav.target - position).LengthSquaredInt() < 64 * 64)
+		{
+			for (uint8_t d = 0; d < 8; d++) {
 
-			int eval = Evaluate(d, velocity, position, collider, nav, entity);
-			if (eval < val) {
-				val = eval;
-				dir = d << 2;
+				int eval = Evaluate(d, velocity, position, collider, nav, entity);
+				if (eval < val) {
+					val = eval;
+					dir = d << 2;
+				}
+			}
+		}
+		else {
+
+			for (uint8_t d = 0; d < 8; d++) {
+
+				int eval = EvaluateNavGrid(d,  position,  nav.target);
+				if (eval < val) {
+					val = eval;
+					dir = d << 2;
+				}
 			}
 		}
 
@@ -171,6 +208,13 @@ void NavigationSystem::ApplyUnitNavigationJob(int start, int end) {
 	}
 }
 
+void NavigationSystem::SetSize(Vector2Int16 size)
+{
+	gridSize = size / 32;
+	memset(navGrid.data(), 0, gridSize.x * gridSize.y);
+
+;}
+
 void NavigationSystem::ApplyUnitNavigaion(EntityManager& em)
 {
 	SectionProfiler p("ApplyNavigation");
@@ -179,4 +223,37 @@ void NavigationSystem::ApplyUnitNavigaion(EntityManager& em)
 	EntityManager* e = &em;
 
 	JobSystem::RunJob(applyNav.size(), JobSystem::DefaultJobSize, ApplyUnitNavigationJob);
+}
+
+void NavigationSystem::UpdateNavGrid(EntityManager& em)
+{
+	SectionProfiler p("UpdateNavGrid");
+
+	memset(navGrid.data(), 0, gridSize.x * gridSize.y);
+
+	for (EntityId id : em.CollisionArchetype.Archetype.GetEntities()) {
+		int i = Entity::ToIndex(id);
+		
+		//Rectangle16 collider = em.CollisionArchetype.ColliderComponents[i].collider;
+		//collider.position += em.PositionComponents[i];
+
+		Vector2Int16 center = em.PositionComponents[i];
+
+		center.x = center.x >> 5;
+		center.y = center.y >> 5;
+
+		//collider.position.x = collider.position.x >> 3;
+		//collider.position.y =collider.position.y >> 3;
+		//collider.size.x = collider.size.x >> 3;
+		//collider.size.y = collider.size.y >> 3;
+
+		SetUnpassable(center.x, center.y);
+
+		//Vector2Int max = Vector2Int(collider.GetMax());
+	/*	for (int y = collider.position.y; y < max.x; ++y) {
+			for (int x = collider.position.x; x < max.y; ++x) {
+				SetPassable( x,y );
+			}
+		}*/
+	}
 }

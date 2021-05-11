@@ -19,6 +19,7 @@ EntityManager::~EntityManager() {
 
 void EntityManager::Init(Vector2Int16 mapSize)
 {
+	navigationSystem.SetSize(mapSize);
 	kinematicSystem.SetSize(mapSize);
 }
 
@@ -51,6 +52,8 @@ void EntityManager::ApplyEntityChanges() {
 }
 
 void EntityManager::UpdateSecondaryEntities() {
+
+	navigationSystem.UpdateNavGrid(*this);
 
 	navigationSystem.UpdateNavigation(*this);
 

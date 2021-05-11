@@ -68,8 +68,8 @@ void GameScene::Start() {
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
 	int i = 0;
-	for (int y = 19; y >= 0; --y) {
-		for (int x = 19; x >= 0; --x) {
+	for (int y = 1; y >= 0; --y) {
+		for (int x = 1; x >= 0; --x) {
 
 			Color c = color[(i) % 12];
 			EntityId e = entityManager->NewUnit(*UnitDatabase::Units[i % UnitDatabase::Units.size()],
@@ -84,7 +84,7 @@ void GameScene::Start() {
 				entityManager->AnimationArchetype.Archetype.RemoveEntity(e);
 			}*/
 			//entityManager->SetOrientation(e, orientation);
-			entityManager->GoTo(e, Vector2Int16(Vector2Int{ 512 * ((i +1)% 2) +32, 512 * (i % 2) } +32));
+			//entityManager->GoTo(e, Vector2Int16(Vector2Int{ 512 * ((i +1)% 2) +32, 512 * (i % 2) } +32));
 		}
 	}
 

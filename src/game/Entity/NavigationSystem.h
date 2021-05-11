@@ -7,28 +7,6 @@ class EntityManager;
 
 class NavigationSystem {
 
-	struct MovementData {
-		std::vector<NavigationWorkComponent*> work;
-		std::vector<MovementComponent> movement;
-		std::vector<OrientationComponent*> orientation;
-		std::vector<Vector2Int16*> position;
-		std::vector<NavigationComponent> navigation;
-		std::vector<EntityChangeComponent*> changed;
-
-		inline void clear() {
-			work.clear();
-			movement.clear();
-			orientation.clear();
-			position.clear();
-			navigation.clear();
-			changed.clear();
-		}
-
-		inline size_t size() const {
-			return work.size();
-		}
-	};
-
 	struct NavigationData {
 		std::vector<NavigationComponent*> navigation;
 		std::vector<Vector2Int16> position;
@@ -49,15 +27,48 @@ class NavigationSystem {
 		}
 	};
 private:
-	MovementData movementData;
 	NavigationData navigationData;
+
+	std::array<uint32_t, (256 * 256) / 8> navGrid;
+	Vector2Int16 gridSize;
 
 	std::vector<EntityId> applyNav;
 
 	static void UpdateNavigationJob(int start, int end);
 	static void ApplyUnitNavigationJob(int start, int end);
+
+
 public:
+
+	inline bool IsPassable(int x, int y) {
+		if (x < 0 || x > gridSize.x || y < 0 || y> gridSize.y)
+			return false;
+
+		int i = (x >> 3) + (y * gridSize.x) >> 3;
+		uint32_t var = navGrid[i];
+
+		bool result = var & (1 << (x >> 3));
+		return !result;
+	}
+
+	inline void SetPassable(int x, int y) {
+		int i = (x >> 3) + (y * gridSize.x) >> 3;
+		uint32_t& var = navGrid[i];
+		var |= (1 << (x >> 3));
+	}
+	inline void SetUnpassable(int x, int y) {
+		int i = (x >> 3) + (y * gridSize.x) >> 3;
+		uint32_t& var = navGrid[i];
+		var &= ~(1 << (x >> 3));
+	}
+
+
+	void SetSize(Vector2Int16 size);
+
 	void UpdateNavigation(EntityManager& em);
 
 	void ApplyUnitNavigaion(EntityManager& em);
+
+	void UpdateNavGrid(EntityManager& em);
+
 };
