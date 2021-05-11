@@ -11,6 +11,7 @@ EntityManager::EntityManager() {
 	archetypes.push_back(&NavigationArchetype.Archetype);
 	archetypes.push_back(&CollisionArchetype.Archetype);
 	archetypes.push_back(&MovementArchetype.Archetype);
+	archetypes.push_back(&UnitArchetype.Archetype);
 }
 EntityManager::~EntityManager() {
 
@@ -91,7 +92,9 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color
 	PositionComponents.NewComponent(e, position);
 
 	EntityChangeComponents.NewComponent(e, { true });
-	UnitComponents.NewComponent(e, { &def });
+	UnitArchetype.UnitComponents.NewComponent(e, { &def });
+	UnitArchetype.OrientationComponents.NewComponent(e);
+	UnitArchetype.Archetype.AddEntity(e);
 
 	RenderArchetype.RenderComponents.NewComponent(e, {
 		Color4(color),
@@ -124,14 +127,14 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color
 
 	NavigationArchetype.NavigationComponents.NewComponent(e);
 	NavigationArchetype.WorkComponents.NewComponent(e, { false });
-	NavigationArchetype.OrientationComponents.NewComponent(e);
+
 
 	NavigationArchetype.Archetype.AddEntity(e);
 
 	CollisionArchetype.ColliderComponents.NewComponent(e).collider = def.Collider;
 	CollisionArchetype.Archetype.AddEntity(e);
 
-	MovementArchetype.MovementComponents.NewComponent(e).SetFromDef(def);
+	MovementArchetype.MovementComponents.NewComponent(e);
 	MovementArchetype.Archetype.AddEntity(e);
 
 	return e;

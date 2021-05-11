@@ -11,7 +11,7 @@ struct DirectionalAnimationDef {
 	int UnitColorFrameStart;
 	bool Looping = false;
 
-	Vector2Int ShadowAdditionalOffset;
+	Vector2Int16 ShadowAdditionalOffset;
 
 	void GenerateAnimations(const SpriteFrameAtlas* a, const SpriteFrameAtlas* sa,
 		AnimationClip* main, AnimationClip* shadow, AnimationClip* color);

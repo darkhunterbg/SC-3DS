@@ -62,18 +62,21 @@ void RenderSystem::Draw(const Camera& camera, EntityManager& em) {
 		cmd.position = shadowDst;
 		cmd.scale = scale[r.hFlip];
 		cmd.color = { shadowColor, 1 };
-		render.push_back(cmd);
+		if (cmd.image.textureId)
+			render.push_back(cmd);
 
 		cmd.order++;
 		cmd.image = r.sprite;
 		cmd.position = dst;
 		cmd.color = { Color4(Colors::Black),0 };
+
 		render.push_back(cmd);
 
 		cmd.order++;
 		cmd.image = r.colorSprite;
 		cmd.color = { Color4(r.unitColor), 0.66f };
-		render.push_back(cmd);
+		if (cmd.image.textureId)
+			render.push_back(cmd);
 	}
 
 	std::sort(render.begin(), render.end(), RenderSort);

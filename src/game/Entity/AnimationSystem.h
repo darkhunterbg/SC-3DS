@@ -26,8 +26,8 @@ class AnimationSystem {
 
 private:
 	AnimationData data;
-
 	static void UpdateAnimationsJob(int start, int end);
+	static void GenerateAnimationsUpdatesJob(int start, int end);
 public:
 	void GenerateAnimationUpdates(EntityManager& entityManager);
 	void UpdateAnimations();

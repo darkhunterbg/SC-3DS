@@ -17,7 +17,7 @@ void PerformanceTestScene::Start() {
 	entityManager.Init({ 128 * 32,128 * 32 });
 	//entityManager.DrawColliders = true;
 
-	for (int i = 0; i < 10000; ++i) {
+	for (int i = 0; i < 5000; ++i) {
 		entityManager.NewUnit(UnitDatabase::Marine,
 			Vector2Int16(Vector2Int{ (i / 100) * 32 + 16, (i % 100) * 32 + 16 }),
 			Colors::Red);
@@ -25,8 +25,8 @@ void PerformanceTestScene::Start() {
 		entityManager.CollisionArchetype.Archetype.RemoveEntity(i);
 		entityManager.NavigationArchetype.Archetype.RemoveEntity(i);
 		entityManager.MovementArchetype.MovementComponents[i].velocity = { 2,2 };
-		entityManager.NavigationArchetype.OrientationComponents[i].changed = true;
-		entityManager.NavigationArchetype.OrientationComponents[i].orientation = 12;
+		entityManager.UnitArchetype.OrientationComponents[i].changed = true;
+		entityManager.UnitArchetype.OrientationComponents[i].orientation = 12;
 	}
 }
 static int t = 0;

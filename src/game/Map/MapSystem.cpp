@@ -35,7 +35,7 @@ void MapSystem::DrawTiles(const Camera& camera) {
 	Rectangle camRect = camera.GetRectangle();
 
 	for (const MapTile& tile : tiles) {
-		Rectangle dst = { Vector2Int( tile.position * Vector2Int16(32,32) ), tile.sprite.rect.size };
+		Rectangle dst = { Vector2Int( tile.position * Vector2Int16(32,32) ), Vector2Int( tile.sprite.rect.size )};
 
 		if (!camRect.Intersects(dst))
 			continue;
@@ -49,7 +49,7 @@ void MapSystem::DrawTiles(const Camera& camera) {
 	}
 
 	auto t = minerals->GetSprite(0);
-	Rectangle dst = { {160,120}, t.rect.size };
+	Rectangle dst = { {160,120}, Vector2Int( t.rect.size )};
 
 	if (camRect.Intersects(dst)) {
 		dst.position -= camRect.position;

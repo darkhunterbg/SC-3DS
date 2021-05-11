@@ -129,14 +129,6 @@ struct OrientationComponent {
 
 struct MovementComponent {
 	Vector2Int8 velocity;
-	//Vector2Int8 acelleration;
-	//uint8_t maxVelocity = 127;
-
-
-	void SetFromDef(const UnitDef& def) {
-		velocity = def.MovementSpeed;
-		//rotationSpeed = def.RotationSpeed;
-	}
 };
 
 struct UnitComponent {

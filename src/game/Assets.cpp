@@ -67,7 +67,7 @@ int AudioStream::GetRemaining() const {
 void AnimationClip::AddSpritesFromAtlas(const SpriteAtlas* atlas, int start, int count, Vector2Int offset)
 {
 	for (int i = 0; i < count; ++i) {
-		AddFrame({ atlas->GetSprite(start + i), offset });
+		AddFrame({ atlas->GetSprite(start + i), Vector2Int16( offset ) });
 	}
 }
 

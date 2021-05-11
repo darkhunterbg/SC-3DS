@@ -15,7 +15,7 @@ struct Image {
 
 
 struct Sprite {
-	Rectangle rect;
+	Rectangle16 rect;
 	Image image;
 };
 
@@ -116,7 +116,7 @@ private:
 
 struct SpriteFrame {
 	Sprite sprite;
-	Vector2Int offset;
+	Vector2Int16 offset;
 	bool hFlip = false;
 };
 
@@ -138,31 +138,34 @@ public:
 class AnimationClip {
 private:
 	std::array< SpriteFrame, 16> frames;
-	unsigned frameCount = 0;
+	uint8_t frameCount = 0;
 public:
+	AnimationClip() {}
+	AnimationClip(const AnimationClip&) = delete;
+	AnimationClip& operator=(const AnimationClip&) = delete;
+
 	bool looping = false;
-	int frameDuration = 1;
 
 	void AddSpritesFromAtlas(const SpriteAtlas* atlas, int start, int count, Vector2Int offset = { 0,0 });
 
 	inline void AddFrame(const SpriteFrame& frame) {
 		frames[frameCount++] = frame;
 	}
-	inline void AddFrameCentered(const SpriteFrame& frame, Vector2Int frameSize, bool hFlip = false) {
+	inline void AddFrameCentered(const SpriteFrame& frame, Vector2Int16 frameSize, bool hFlip = false) {
 		auto& f = frames[frameCount++] = frame;
 		f.hFlip = hFlip;
 		f.offset -= frameSize / 2;
 		if (hFlip) 
 			f.offset.x = frameSize.x / 2 - frame.offset.x - frame.sprite.rect.size.x;
 	}
-	inline void SetFrameOffset(int frame, Vector2Int offset) {
+	inline void SetFrameOffset(uint8_t frame, Vector2Int16 offset) {
 		frames[frame].offset = offset;
 	}
 	inline Span<SpriteFrame> GetFrames() const {
 		return { frames.data(), frameCount };
 	}
-	inline unsigned GetFrameCount() const { return frameCount; }
-	inline const SpriteFrame& GetFrame(unsigned index) const {
+	inline uint8_t GetFrameCount() const { return frameCount; }
+	inline const SpriteFrame& GetFrame(uint8_t index) const {
 		return frames[index];
 	}
 };

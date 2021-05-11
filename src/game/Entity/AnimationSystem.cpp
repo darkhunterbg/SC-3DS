@@ -7,6 +7,7 @@
 
 static AnimationSystem* s;
 
+
 void AnimationSystem::UpdateAnimationsJob(int start, int end) {
 	AnimationData& data = s->data;
 
@@ -30,13 +31,13 @@ void AnimationSystem::UpdateAnimationsJob(int start, int end) {
 			offset.shadowOffset = shadowFrame.offset;
 		}
 		else {
-			//rcomp.shadowSprite.rect.size = { 0,0 };
+			ren.shadowSprite = { nullptr };
 		}
-		if (anim.unitColorClip != nullptr) {
+		if (anim.unitColorClip ) {
 			ren.colorSprite = anim.unitColorClip->GetFrame(tracker.clipFrame).sprite.image;
 		}
 		else {
-			ren.unitColor = 0;
+			ren.colorSprite = { nullptr };
 		}
 
 		data.changed[i]->changed = true;
@@ -44,14 +45,16 @@ void AnimationSystem::UpdateAnimationsJob(int start, int end) {
 	}
 }
 
-void AnimationSystem::GenerateAnimationUpdates(EntityManager& em)
-{
-	SectionProfiler p("GenerateAnimationUpdates");
+EntityManager* e;
 
-	data.clear();
-	int end = em.AnimationArchetype.EnableComponents.size();
+void AnimationSystem::GenerateAnimationsUpdatesJob(int start, int end) {
+	EntityManager& em = *e;
+	AnimationSystem& system = *s;
 
-	for (EntityId id : em.AnimationArchetype.Archetype.GetEntities()) {
+	auto data = em.AnimationArchetype.Archetype.GetEntities();
+
+	for (int index = start; index < end; index++) {
+		EntityId id = data[index];
 		int i = Entity::ToIndex(id);
 
 		auto& enable = em.AnimationArchetype.EnableComponents[i];
@@ -67,9 +70,26 @@ void AnimationSystem::GenerateAnimationUpdates(EntityManager& em)
 		if (tracker.looping)
 			tracker.clipFrame %= framesCount;
 
-		// Thread this, boolean flags?
+		enable.pause = tracker.clipFrame >= framesCount;
+	}
+}
 
-		if (tracker.clipFrame < framesCount )
+void AnimationSystem::GenerateAnimationUpdates(EntityManager& em)
+{
+	SectionProfiler p("GenerateAnimationUpdates");
+	e = &em;
+	s = this;
+
+	JobSystem::RunJob(em.AnimationArchetype.Archetype.GetEntities().Size(),
+		JobSystem::DefaultJobSize, GenerateAnimationsUpdatesJob);
+
+	data.clear();
+
+	for (EntityId id : em.AnimationArchetype.Archetype.GetEntities()) {
+		int i = Entity::ToIndex(id);
+
+		if ( em.RenderArchetype.Archetype.HasEntity(id) &&
+			!em.AnimationArchetype.EnableComponents[i].pause)
 		{
 			data.animation.push_back(em.AnimationArchetype.AnimationComponents[i]);
 			data.tracker.push_back(em.AnimationArchetype.TrackerComponents[i]);
@@ -77,10 +97,8 @@ void AnimationSystem::GenerateAnimationUpdates(EntityManager& em)
 			data.offset.push_back(&em.RenderArchetype.OffsetComponents[i]);
 			data.changed.push_back(&em.EntityChangeComponents[i]);
 		}
-		else {
-			enable.pause = true;
-		}
 	}
+
 }
 
 
@@ -95,15 +113,15 @@ void AnimationSystem::UpdateAnimations() {
 void AnimationSystem::SetUnitOrientationAnimations(EntityManager& em) {
 	SectionProfiler p("OrientationAnimations");
 
-	for (EntityId id : em.AnimationArchetype.Archetype.GetEntities()) {
+	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {
 		int i = Entity::ToId(id);
-		auto& orientation = em.NavigationArchetype.OrientationComponents[i];
+		auto& orientation = em.UnitArchetype.OrientationComponents[i];
 
 		if (orientation.changed)
 		{
 			orientation.changed = false;
 
-			const auto& unit = em.UnitComponents[i];
+			const auto& unit = em.UnitArchetype.UnitComponents[i];
 			auto& anim = em.AnimationArchetype.AnimationComponents[i];
 			auto& animEnable = em.AnimationArchetype.EnableComponents[i];
 			auto& animTracker = em.AnimationArchetype.TrackerComponents[i];

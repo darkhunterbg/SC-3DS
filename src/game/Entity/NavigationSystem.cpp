@@ -291,12 +291,12 @@ void NavigationSystem::UpdateNavigation(EntityManager& em)
 		int i = Entity::ToIndex(id);
 
 		if (em.NavigationArchetype.WorkComponents[i].work &&
-			em.NavigationArchetype.OrientationComponents[i].orientation ==
+			em.UnitArchetype.OrientationComponents[i].orientation ==
 			em.NavigationArchetype.NavigationComponents[i].targetHeading) {
 
 			navigationData.movement.push_back(em.MovementArchetype.MovementComponents[i]);
 			navigationData.position.push_back(em.PositionComponents[i]);
-			em.NavigationArchetype.NavigationComponents[i].currentHeading = em.NavigationArchetype.OrientationComponents[i].orientation;
+			em.NavigationArchetype.NavigationComponents[i].currentHeading = em.UnitArchetype.OrientationComponents[i].orientation;
 			em.NavigationArchetype.NavigationComponents[i].collider =  em.CollisionArchetype.ColliderComponents[i].collider;
 			navigationData.navigation.push_back(&em.NavigationArchetype.NavigationComponents[i]);
 			navigationData.entities.push_back(id);

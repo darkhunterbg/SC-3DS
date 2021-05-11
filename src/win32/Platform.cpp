@@ -85,7 +85,7 @@ const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 			delete asset;
 			return nullptr;
 		}
-		Rectangle rect = { {0,0},size };
+		Rectangle16 rect = { {0,0},Vector2Int16( size )};
 		Sprite s = { rect ,{ tex ,nullptr} };
 		asset->AddSprite(s);
 	}
@@ -172,7 +172,10 @@ void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip
 	SDLDrawCommand cmd;
 
 	cmd.texture = (SDL_Texture*)sprite.image.textureId;
-	cmd.src = *(SDL_Rect*)&sprite.rect;
+	cmd.src.x = sprite.rect.position.x;
+	cmd.src.y = sprite.rect.position.y;
+	cmd.src.w = sprite.rect.size.x;
+	cmd.src.h = sprite.rect.size.y;
 	cmd.dst = *(SDL_Rect*)&dst;
 
 	cmd.r = SDL_FloatToUint8(color.r);

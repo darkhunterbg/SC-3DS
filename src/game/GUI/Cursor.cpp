@@ -16,7 +16,7 @@ static void InitAnimation(const SpriteAtlas* atlas, AnimationClip& clip, int fra
 	clip.AddSpritesFromAtlas(atlas, atlasCounter, frames, offset);
 	atlasCounter += frames;
 	clip.looping = true;
-	clip.frameDuration = 10;
+
 }
 
 Cursor::Cursor() {
@@ -80,13 +80,13 @@ void Cursor::Draw() {
 	clipCountdown--;
 
 	if (clipCountdown <= 0) {
-		clipCountdown = currentClip->frameDuration;
+		clipCountdown = 10;
 		clipFrame = (++clipFrame) % currentClip->GetFrameCount();
 	}
 
 	const SpriteFrame& frame = currentClip->GetFrame(clipFrame);
 
-	Rectangle dst = { Vector2Int(Position) + frame.offset,frame.sprite.rect.size };
+	Rectangle dst = { Vector2Int(Position + frame.offset ), Vector2Int(frame.sprite.rect.size) };
 	dst.position -= {64, 64};
 
 	if (regionRect.size.LengthSquaredInt() > 0) {
@@ -210,7 +210,7 @@ void Cursor::Update(Camera& camera, EntityManager& entityManager, std::vector<En
 	if (newClip != currentClip) {
 		currentClip = newClip;
 		clipFrame = 0;
-		clipCountdown = currentClip->frameDuration;
+		clipCountdown = 10;
 	}
 
 }

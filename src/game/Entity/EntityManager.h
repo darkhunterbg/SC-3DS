@@ -62,7 +62,7 @@ public:
 
 		ComponentCollection<NavigationWorkComponent> WorkComponents;
 		ComponentCollection<NavigationComponent> NavigationComponents;
-		ComponentCollection<OrientationComponent> OrientationComponents;
+
 	} NavigationArchetype;
 
 	struct {
@@ -75,8 +75,12 @@ public:
 		ComponentCollection<MovementComponent> MovementComponents;
 	} MovementArchetype;
 
+	struct {
+		EntityArchetype Archetype = EntityArchetype("Unit");
+		ComponentCollection<OrientationComponent> OrientationComponents;
+		ComponentCollection<UnitComponent> UnitComponents;
+	} UnitArchetype;
 
-	ComponentCollection<UnitComponent> UnitComponents;
 private:
 	void CollectEntityChanges();
 	void ApplyEntityChanges();
