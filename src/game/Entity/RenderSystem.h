@@ -8,7 +8,6 @@
 #include "../Span.h"
 #include "../Color.h"
 #include "../Platform.h"
-#include "Archetype.h"
 
 class EntityManager;
 class Camera;

@@ -30,5 +30,5 @@ private:
 	static void UpdateAnimationsJob(int start, int end);
 public:
 	void GenerateAnimationUpdates(EntityManager& entityManager);
-	void UpdateAnimations( );
+	void UpdateAnimations();
 };

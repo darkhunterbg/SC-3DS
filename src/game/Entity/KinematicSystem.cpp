@@ -36,11 +36,8 @@ void KinematicSystem::ColliderChangeJob(int start, int end) {
 	}
 }
 
-
 void KinematicSystem::UpdateCollidersPosition(EntityManager& em, const EntityChangedData& data)
 {
-	SectionProfiler p2("UpdateCollidersPosition");
-
 	updateColliderPosData.clear();
 
 	int size = data.size();
@@ -61,14 +58,10 @@ void KinematicSystem::UpdateCollidersPosition(EntityManager& em, const EntityCha
 	s = this;
 
 	JobSystem::RunJob(updateColliderPosData.size(), JobSystem::DefaultJobSize, ColliderChangeJob);
-
-	p2.Submit();
 }
 
 void KinematicSystem::ApplyCollidersChange(EntityManager& em)
 {
-	SectionProfiler p("ApplyCollidersChange");
-
 	for (EntityId id : em.CollisionArchetype.Archetype.RemovedEntities()) {
 		int i = Entity::ToIndex(id);
 		entityInTree[i] = false;
@@ -92,7 +85,6 @@ void KinematicSystem::ApplyCollidersChange(EntityManager& em)
 	}
 
 }
-
 
 void KinematicSystem::DrawColliders(const Camera& camera) {
 
@@ -130,5 +122,26 @@ bool KinematicSystem::CollidesWithAny(const Rectangle16& collider, EntityId skip
 	}
 
 	return false;
+}
+
+void KinematicSystem::MoveEntities(EntityManager& em)
+{
+	SectionProfiler p("MoveEntities");
+
+	static const Vector2Int8 zero = { 0,0 };
+
+	for (EntityId id : em.MovementArchetype.Archetype.GetEntities()) {
+		int i = Entity::ToIndex(id);
+
+		Vector2Int8 movement = em.MovementArchetype.MovementComponents[i].velocity;
+		if (movement == zero)
+			continue;
+
+		auto& pos = em.PositionComponents[i];
+		pos += Vector2Int16(em.MovementArchetype.MovementComponents[i].velocity);
+	/*	moveData.movement.push_back(&em.MovementArchetype.MovementComponents[i]);
+		moveData.position.push_back(&em.PositionComponents[i]);*/
+		em.EntityChangeComponents[i].changed = true;
+	}
 }
 

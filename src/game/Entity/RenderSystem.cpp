@@ -9,7 +9,6 @@
 #include <cstring>
 
 void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
-	SectionProfiler p("CameraCull");
 	renderData.clear();
 
 	for (EntityId id : em.RenderArchetype.Archetype.GetEntities()) {
@@ -86,7 +85,6 @@ bool RenderSystem::RenderSort(const BatchDrawCommand& a, const BatchDrawCommand&
 	return a.order < b.order;
 }
 
-
 static RenderSystem* s;
 
 void RenderSystem::UpdateRenderPositionsJob(int start, int end) {
@@ -101,7 +99,6 @@ void RenderSystem::UpdateRenderPositionsJob(int start, int end) {
 }
 
 void RenderSystem::UpdatePositions(EntityManager& em, const EntityChangedData& changed) {
-	SectionProfiler p("UpdatePositions");
 	renderUpdatePosData.clear();
 
 	int size = changed.size();
@@ -118,7 +115,6 @@ void RenderSystem::UpdatePositions(EntityManager& em, const EntityChangedData& c
 			renderUpdatePosData.outBB.push_back(&em.RenderArchetype.BoundingBoxComponents[i]);
 		}
 	}
-
 
 	s = this;
 	JobSystem::RunJob(renderUpdatePosData.size(), JobSystem::DefaultJobSize, UpdateRenderPositionsJob);

@@ -23,12 +23,12 @@ template <class TComponent, unsigned MaxComponents = Entity::MaxEntities>
 class ComponentCollection
 {
 private:
-	std::array<bool, MaxComponents> hasComponent;
+	//std::array<bool, MaxComponents> hasComponent;
 	std::array<TComponent, MaxComponents> components;
 public:
 
 	ComponentCollection() {
-		memset(hasComponent.data(), false, MaxComponents * sizeof(bool));
+		//memset(hasComponent.data(), false, MaxComponents * sizeof(bool));
 	}
 
 	ComponentCollection(const ComponentCollection&) = delete;
@@ -36,25 +36,25 @@ public:
 
 	TComponent& NewComponent(EntityId id) {
 		int index = Entity::ToIndex(id);
-		if (hasComponent[index])
+		/*if (hasComponent[index])
 			EXCEPTION("Entity %i already has component!", id);
 
-		hasComponent[index] = true;
+		hasComponent[index] = true;*/
 		components[index] = TComponent();
 		return components[index];
 	}
 
 	TComponent& NewComponent(EntityId id, const TComponent& component) {
 		int index = Entity::ToIndex(id);
-		if (hasComponent[index])
-			EXCEPTION("Entity %i already has component!", id);
+		//if (hasComponent[index])
+		//	EXCEPTION("Entity %i already has component!", id);
 
-		hasComponent[index] = true;
+		//hasComponent[index] = true;
 		components[index] = component;
 		return components[index];
 	}
 
-	void RemoveComponent(EntityId id) {
+	/*void RemoveComponent(EntityId id) {
 		int index = Entity::ToIndex(id);
 		if (!hasComponent[index])
 			EXCEPTION("Entity %i does not have component!", id);
@@ -64,7 +64,7 @@ public:
 	}
 	inline bool HasComponent(EntityId id) const {
 		return hasComponent[Entity::ToIndex(id)];
-	}
+	}*/
 
 	inline TComponent& GetComponent(EntityId id) {
 		return components[Entity::ToIndex(id)];
@@ -72,11 +72,11 @@ public:
 	inline TComponent& GetComponent(EntityId id) const {
 		return components[Entity::ToIndex(id)];
 	}
-	inline const TComponent* TryGetComponent(EntityId id) const {
+	/*inline const TComponent* TryGetComponent(EntityId id) const {
 		if (!hasComponent[Entity::ToIndex(id)])
 			return nullptr;
 		return components[Entity::ToIndex(id)];
-	}
+	}*/
 
 	inline TComponent& at(int i) { return components[i]; };
 	inline const TComponent& at(int i) const { return components[i]; }
@@ -128,12 +128,14 @@ struct OrientationComponent {
 };
 
 struct MovementComponent {
-	uint8_t velocity;
-	uint8_t rotationSpeed;
+	Vector2Int8 velocity;
+	//Vector2Int8 acelleration;
+	//uint8_t maxVelocity = 127;
+
 
 	void SetFromDef(const UnitDef& def) {
 		velocity = def.MovementSpeed;
-		rotationSpeed = def.RotationSpeed;
+		//rotationSpeed = def.RotationSpeed;
 	}
 };
 

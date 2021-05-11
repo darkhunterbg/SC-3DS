@@ -146,6 +146,7 @@ struct Vector2T
 typedef Vector2T<int> Vector2Int;
 typedef Vector2T<float> Vector2;
 typedef Vector2T<short> Vector2Int16;
+typedef Vector2T<char> Vector2Int8;
 
 struct RectangleF
 {

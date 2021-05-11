@@ -83,7 +83,7 @@ private:
 	NavigationData navigationData;
 
 	static void UpdateNavigationJob(int start, int end);
-	static void MoveEntitiesJob(int start, int end);
+	//static void MoveEntitiesJob(int start, int end);
 	static void SetMovementAnimJob(int start, int end);
 
 	ThreadLocal<std::vector<AStarAction>>* tlsResults;
@@ -93,5 +93,5 @@ public:
 	}
 
 	void UpdateNavigation(EntityManager& em);
-	void MoveEntities(EntityManager& em);
+	//void MoveEntities(EntityManager& em);
 };

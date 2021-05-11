@@ -62,4 +62,7 @@ public:
 	inline EntityId PointCast(Vector2Int16 point) const {
 		return collidersTree.PointCastEntity(point);
 	}
+
+
+	void MoveEntities(EntityManager& em);
 };

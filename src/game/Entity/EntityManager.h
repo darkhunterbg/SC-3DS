@@ -59,7 +59,7 @@ public:
 
 	struct {
 		EntityArchetype Archetype = EntityArchetype("Navigation");
-		ComponentCollection<MovementComponent> MovementComponents;
+
 		ComponentCollection<NavigationWorkComponent> WorkComponents;
 		ComponentCollection<NavigationComponent> NavigationComponents;
 		ComponentCollection<OrientationComponent> OrientationComponents;
@@ -69,6 +69,11 @@ public:
 		EntityArchetype Archetype = EntityArchetype("Collision");
 		ComponentCollection<ColliderComponent> ColliderComponents;
 	} CollisionArchetype;
+
+	struct {
+		EntityArchetype Archetype = EntityArchetype("Movement");
+		ComponentCollection<MovementComponent> MovementComponents;
+	} MovementArchetype;
 
 
 	ComponentCollection<UnitComponent> UnitComponents;

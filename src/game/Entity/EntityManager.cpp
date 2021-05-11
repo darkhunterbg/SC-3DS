@@ -10,6 +10,7 @@ EntityManager::EntityManager() {
 	archetypes.push_back(&AnimationArchetype.Archetype);
 	archetypes.push_back(&NavigationArchetype.Archetype);
 	archetypes.push_back(&CollisionArchetype.Archetype);
+	archetypes.push_back(&MovementArchetype.Archetype);
 }
 EntityManager::~EntityManager() {
 
@@ -59,7 +60,7 @@ void EntityManager::UpdateEntities() {
 
 	updated = true;
 
-	navigationSystem.MoveEntities(*this);
+	kinematicSystem.MoveEntities(*this);
 
 	animationSystem.UpdateAnimations();
 
@@ -71,7 +72,6 @@ void EntityManager::UpdateEntities() {
 
 	ApplyEntityChanges();
 }
-
 
 void EntityManager::DrawEntites(const Camera& camera) {
 
@@ -122,13 +122,15 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color
 
 	NavigationArchetype.NavigationComponents.NewComponent(e);
 	NavigationArchetype.WorkComponents.NewComponent(e, { false });
-	NavigationArchetype.MovementComponents.NewComponent(e).SetFromDef(def);
 	NavigationArchetype.OrientationComponents.NewComponent(e);
 
 	NavigationArchetype.Archetype.AddEntity(e);
 
 	CollisionArchetype.ColliderComponents.NewComponent(e).collider = def.Collider;
 	CollisionArchetype.Archetype.AddEntity(e);
+
+	MovementArchetype.MovementComponents.NewComponent(e).SetFromDef(def);
+	MovementArchetype.Archetype.AddEntity(e);
 
 	return e;
 }

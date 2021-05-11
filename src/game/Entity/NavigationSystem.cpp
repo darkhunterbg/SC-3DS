@@ -26,6 +26,7 @@ static const Vector2 movementTable8[]{
 static NavigationSystem* s;
 static EntityManager* e;
 
+/*
 void NavigationSystem::MoveEntitiesJob(int start, int end) {
 	MovementData& data = s->movementData;
 
@@ -67,8 +68,8 @@ void NavigationSystem::MoveEntitiesJob(int start, int end) {
 			position = nav.target;
 			work.work = false;
 
-			/*	auto& anim = *data.animEnabled[i];
-				anim.pause = true;*/
+			//	auto& anim = *data.animEnabled[i];
+			//	anim.pause = true;
 		}
 		else {
 
@@ -78,7 +79,7 @@ void NavigationSystem::MoveEntitiesJob(int start, int end) {
 
 		data.changed[i]->changed = true;
 	}
-}
+}*/
 void NavigationSystem::SetMovementAnimJob(int start, int end) {
 	auto& data = s->movementAnimData;
 
@@ -98,7 +99,7 @@ void NavigationSystem::SetMovementAnimJob(int start, int end) {
 		animEnable.pause = false;
 	}
 }
-void NavigationSystem::MoveEntities(EntityManager& em) {
+/*void NavigationSystem::MoveEntities(EntityManager& em) {
 
 	//SectionProfiler p("MoveEntities");
 
@@ -108,7 +109,7 @@ void NavigationSystem::MoveEntities(EntityManager& em) {
 		int i = Entity::ToIndex(id);
 		if (em.NavigationArchetype.WorkComponents[i].work) {
 			movementData.work.push_back(&em.NavigationArchetype.WorkComponents[i]);
-			movementData.movement.push_back(em.NavigationArchetype.MovementComponents[i]);
+			movementData.movement.push_back(em.MovementArchetype.MovementComponents[i]);
 			movementData.orientation.push_back(&em.NavigationArchetype.OrientationComponents[i]);
 			movementData.position.push_back(&em.PositionComponents[i]);
 			movementData.navigation.push_back(em.NavigationArchetype.NavigationComponents[i]);
@@ -127,7 +128,7 @@ void NavigationSystem::MoveEntities(EntityManager& em) {
 		if (em.NavigationArchetype.OrientationComponents[i].changed &&
 			em.AnimationArchetype.Archetype.HasEntity(id))
 		{
-			movementAnimData.movement.push_back(em.NavigationArchetype.MovementComponents[i]);
+			movementAnimData.movement.push_back(em.MovementArchetype.MovementComponents[i]);
 			movementAnimData.orientation.push_back(&em.NavigationArchetype.OrientationComponents[i]);
 			movementAnimData.unit.push_back(em.UnitComponents[i]);
 			movementAnimData.anim.push_back(&em.AnimationArchetype.AnimationComponents[i]);
@@ -153,9 +154,7 @@ void NavigationSystem::MoveEntities(EntityManager& em) {
 	}
 }
 
-
-
-
+*/
 
 static bool ActionSort(const AStarAction& a, const AStarAction& b)
 {
@@ -201,22 +200,17 @@ void NavigationSystem::UpdateNavigationJob(int start, int end) {
 
 	auto& results = s->tlsResults->Get();
 
-
 	for (int i = start; i < end; ++i) {
 		auto& nav = *data.navigation[i];
 		const auto& movement = data.movement[i];
 		const auto& position = data.position[i];
 		EntityId entity = data.entities[i];
 
-
 		static constexpr const int maxIter = 2;
 
-
-		uint8_t v = movement.velocity;
+		uint8_t v = movement.velocity.Length();
 
 		results.clear();
-
-
 
 		for (int i = 0; i < 8; i++) {
 			Vector2Int16 p = position;
@@ -281,7 +275,7 @@ void NavigationSystem::UpdateNavigationJob(int start, int end) {
 
 					results.push_back(action);
 
-					if (dist < movement.velocity * movement.velocity)
+					if (dist < movement.velocity.LengthSquaredInt())
 					{
 						action.iter = maxIter;
 						//action.value = 0;
@@ -318,7 +312,7 @@ void NavigationSystem::UpdateNavigation(EntityManager& em)
 			em.NavigationArchetype.OrientationComponents[i].orientation ==
 			em.NavigationArchetype.NavigationComponents[i].targetHeading) {
 
-			navigationData.movement.push_back(em.NavigationArchetype.MovementComponents[i]);
+			navigationData.movement.push_back(em.MovementArchetype.MovementComponents[i]);
 			navigationData.position.push_back(em.PositionComponents[i]);
 			em.NavigationArchetype.NavigationComponents[i].currentHeading = em.NavigationArchetype.OrientationComponents[i].orientation;
 			em.NavigationArchetype.NavigationComponents[i].collider =  em.CollisionArchetype.ColliderComponents[i].collider;
