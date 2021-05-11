@@ -59,6 +59,7 @@ void GameScene::Start() {
 	Game::Audio->PlayStream(stream, 0);
 
 	entityManager = new EntityManager();
+	entityManager->DrawColliders = true;
 
 	entityManager->Init(Vector2Int16(mapSystem->GetMapBounds().size));
 

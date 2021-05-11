@@ -36,6 +36,7 @@ private:
 
 	EntityChangedData changedData;
 
+	std::vector<EntityArchetype*> archetypes;
 public:
 
 	ComponentCollection<Vector2Int16> PositionComponents;
@@ -68,6 +69,7 @@ public:
 		EntityArchetype Archetype = EntityArchetype("Collision");
 		ComponentCollection<ColliderComponent> ColliderComponents;
 	} CollisionArchetype;
+
 
 	ComponentCollection<UnitComponent> UnitComponents;
 private:

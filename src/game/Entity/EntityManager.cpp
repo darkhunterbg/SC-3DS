@@ -6,6 +6,10 @@
 
 EntityManager::EntityManager() {
 
+	archetypes.push_back(&RenderArchetype.Archetype);
+	archetypes.push_back(&AnimationArchetype.Archetype);
+	archetypes.push_back(&NavigationArchetype.Archetype);
+	archetypes.push_back(&CollisionArchetype.Archetype);
 }
 EntityManager::~EntityManager() {
 
@@ -39,6 +43,9 @@ void EntityManager::ApplyEntityChanges() {
 
 		EntityChangeComponents[i].changed = false;
 	}
+
+	for (auto archetype : archetypes)
+		archetype->CommitChanges();
 }
 
 void EntityManager::UpdateSecondaryEntities() {

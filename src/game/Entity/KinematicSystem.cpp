@@ -67,8 +67,13 @@ void KinematicSystem::UpdateCollidersPosition(EntityManager& em, const EntityCha
 
 void KinematicSystem::ApplyCollidersChange(EntityManager& em)
 {
-	
 	SectionProfiler p("ApplyCollidersChange");
+
+	for (EntityId id : em.CollisionArchetype.Archetype.RemovedEntities()) {
+		int i = Entity::ToIndex(id);
+		entityInTree[i] = false;
+		collidersTree.RemoveEntity(id);
+	}
 
 	int size = updateColliderPosData.size();
 	for (int i = 0; i < size; ++i) {
@@ -77,11 +82,11 @@ void KinematicSystem::ApplyCollidersChange(EntityManager& em)
 		int index = Entity::ToIndex(id);
 		const auto& wc = updateColliderPosData.worldCollider[i];
 
-		if (entityInTree[i]) {
+		if (entityInTree[index]) {
 			collidersTree.UpdateEntityCollider(wc, id, updateCollider[index]);
 		}
 		else {
-			entityInTree[i] = true;
+			entityInTree[index] = true;
 			collidersTree.AddEntity(wc, id, updateCollider[index]);
 		}
 	}

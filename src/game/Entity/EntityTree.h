@@ -30,7 +30,7 @@ public:
 
 	void UpdateEntityCollider(const Rectangle16& collider, EntityId id, EntityTreeCellId next);
 	void AddEntity(const Rectangle16& collider, EntityId id, EntityTreeCellId cellId);
-
+	void RemoveEntity(EntityId id);
 	inline void RectCastEntity(const Rectangle16& rect, std::vector<EntityId>& result) const {
 		RectCastEntity(rect, 0, result);
 	}

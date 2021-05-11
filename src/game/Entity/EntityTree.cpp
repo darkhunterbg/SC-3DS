@@ -96,6 +96,20 @@ void EntityTree::AddEntity(const Rectangle16& collider, EntityId id, EntityTreeC
 	entityToCellPositionMap[Entity::ToIndex(id)] = cell.entities.size() - 1;
 }
 
+void EntityTree::RemoveEntity(EntityId id)
+{
+	auto& cell = GetCell(entityToCellMap[Entity::ToIndex(id)]);
+	int size = cell.colliders.size();
+	int i = entityToCellPositionMap[Entity::ToIndex(id)];
+	cell.colliders.erase(cell.colliders.begin() + i);
+	cell.entities.erase(cell.entities.begin() + i);
+	--size;
+	for (; i < size; ++i) {
+		EntityId id = cell.entities[i];
+		entityToCellPositionMap[Entity::ToIndex(id)]--;
+	}
+}
+
 EntityTreeCellId EntityTree::GetCellIdForCollider(const Rectangle16& collider, EntityTreeCellId cellId) const {
 	const Cell& cell = GetCell(cellId);
 	if (!cell.leafStart)
