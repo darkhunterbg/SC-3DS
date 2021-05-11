@@ -78,6 +78,7 @@ public:
 	struct {
 		EntityArchetype Archetype = EntityArchetype("Unit");
 		ComponentCollection<OrientationComponent> OrientationComponents;
+		ComponentCollection<UnitMovementComponent> MovementComponents;
 		ComponentCollection<UnitComponent> UnitComponents;
 	} UnitArchetype;
 

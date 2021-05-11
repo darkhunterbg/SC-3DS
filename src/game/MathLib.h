@@ -93,7 +93,7 @@ struct Vector2T
 	}
 
 	inline bool operator == (const Vector2T& b) const {
-		return (x - b.x + y - b.y) == 0;
+		return !(x - b.x) && !(y - b.y);
 	}
 
 	inline bool operator != (const Vector2T& b) const {

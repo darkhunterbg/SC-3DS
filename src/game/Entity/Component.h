@@ -117,7 +117,6 @@ struct NavigationWorkComponent {
 
 struct NavigationComponent {
 	Vector2Int16 target;
-	uint8_t currentHeading;
 	uint8_t targetHeading;
 };
 
@@ -132,6 +131,16 @@ struct MovementComponent {
 
 struct UnitComponent {
 	const UnitDef* def;
+};
+
+struct UnitMovementComponent {
+	uint8_t movementSpeed;
+	uint8_t rotationSpeed;
+
+	inline void FromDef(const UnitDef& def) {
+		movementSpeed = def.MovementSpeed;
+		rotationSpeed = def.RotationSpeed;
+	}
 };
 
 struct AnimationEnableComponent {

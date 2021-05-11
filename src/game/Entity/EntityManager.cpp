@@ -96,6 +96,7 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color
 	EntityChangeComponents.NewComponent(e, { true });
 	UnitArchetype.UnitComponents.NewComponent(e, { &def });
 	UnitArchetype.OrientationComponents.NewComponent(e);
+	UnitArchetype.MovementComponents.NewComponent(e).FromDef(def);
 	UnitArchetype.Archetype.AddEntity(e);
 
 	RenderArchetype.RenderComponents.NewComponent(e, {
