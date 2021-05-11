@@ -31,4 +31,6 @@ private:
 public:
 	void GenerateAnimationUpdates(EntityManager& entityManager);
 	void UpdateAnimations();
+
+	void SetUnitOrientationAnimations(EntityManager& entityManager);
 };

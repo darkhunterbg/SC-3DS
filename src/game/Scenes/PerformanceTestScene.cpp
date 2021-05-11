@@ -10,7 +10,7 @@ void PerformanceTestScene::Start() {
 
 	UnitDatabase::LoadAllUnitResources();
 
-	camera.Position = { 400,240 };
+	camera.Position = { 200,120 };
 	camera.Size = { 400,240 };
 	camera.Scale = 1;
 
@@ -22,16 +22,35 @@ void PerformanceTestScene::Start() {
 			Vector2Int16(Vector2Int{ (i / 100) * 32 + 16, (i % 100) * 32 + 16 }),
 			Colors::Red);
 
-		//entityManager.RenderArchetype.Archetype.RemoveEntity(i);
-		entityManager.MovementArchetype.MovementComponents[i].velocity = 1;
+		entityManager.CollisionArchetype.Archetype.RemoveEntity(i);
+		entityManager.NavigationArchetype.Archetype.RemoveEntity(i);
+		entityManager.MovementArchetype.MovementComponents[i].velocity = { 2,2 };
+		entityManager.NavigationArchetype.OrientationComponents[i].changed = true;
+		entityManager.NavigationArchetype.OrientationComponents[i].orientation = 12;
 	}
 }
 static int t = 0;
 static int c = 0;
 
+static unsigned frameCounter = 2;
+static unsigned frameCounter2 = 0;
+
 void PerformanceTestScene::Update() {
-	entityManager.UpdateSecondaryEntities();
-	entityManager.UpdateEntities();
+
+	frameCounter += 2;
+	frameCounter2 += 2;
+
+	while (frameCounter2 >= 5)
+	{
+		frameCounter2 -= 5;
+		entityManager.UpdateSecondaryEntities();
+	}
+
+	while (frameCounter >= 5)
+	{
+		frameCounter -= 5;
+		entityManager.UpdateEntities();
+	}
 }
 
 

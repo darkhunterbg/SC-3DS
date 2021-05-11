@@ -10,6 +10,8 @@ static AnimationSystem* s;
 void AnimationSystem::UpdateAnimationsJob(int start, int end) {
 	AnimationData& data = s->data;
 
+
+
 	for (int i = start; i < end; ++i) {
 		const auto& anim = data.animation[i];
 		const auto& tracker = data.tracker[i];
@@ -44,6 +46,8 @@ void AnimationSystem::UpdateAnimationsJob(int start, int end) {
 
 void AnimationSystem::GenerateAnimationUpdates(EntityManager& em)
 {
+	SectionProfiler p("GenerateAnimationUpdates");
+
 	data.clear();
 	int end = em.AnimationArchetype.EnableComponents.size();
 
@@ -63,8 +67,9 @@ void AnimationSystem::GenerateAnimationUpdates(EntityManager& em)
 		if (tracker.looping)
 			tracker.clipFrame %= framesCount;
 
-		if (tracker.clipFrame < framesCount &&
-			em.RenderArchetype.Archetype.HasEntity(id))
+		// Thread this, boolean flags?
+
+		if (tracker.clipFrame < framesCount )
 		{
 			data.animation.push_back(em.AnimationArchetype.AnimationComponents[i]);
 			data.tracker.push_back(em.AnimationArchetype.TrackerComponents[i]);
@@ -79,8 +84,35 @@ void AnimationSystem::GenerateAnimationUpdates(EntityManager& em)
 }
 
 
-
 void AnimationSystem::UpdateAnimations() {
+	SectionProfiler p("UpdateAnimations");
+
 	s = this;
 	JobSystem::RunJob(data.size(), JobSystem::DefaultJobSize, UpdateAnimationsJob);
+}
+
+
+void AnimationSystem::SetUnitOrientationAnimations(EntityManager& em) {
+	SectionProfiler p("OrientationAnimations");
+
+	for (EntityId id : em.AnimationArchetype.Archetype.GetEntities()) {
+		int i = Entity::ToId(id);
+		auto& orientation = em.NavigationArchetype.OrientationComponents[i];
+
+		if (orientation.changed)
+		{
+			orientation.changed = false;
+
+			const auto& unit = em.UnitComponents[i];
+			auto& anim = em.AnimationArchetype.AnimationComponents[i];
+			auto& animEnable = em.AnimationArchetype.EnableComponents[i];
+			auto& animTracker = em.AnimationArchetype.TrackerComponents[i];
+
+			anim.clip = &unit.def->MovementAnimations[orientation.orientation];
+			anim.shadowClip = &unit.def->MovementAnimationsShadow[orientation.orientation];
+			anim.unitColorClip = &unit.def->MovementAnimationsTeamColor[orientation.orientation];
+			animTracker.PlayClip(anim.clip);
+			animEnable.pause = false;
+		}
+	}
 }

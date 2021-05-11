@@ -104,6 +104,7 @@ void GameScene::AuxilaryUpdate() {
 	p.Submit();
 }
 
+
 void GameScene::LogicalUpdate() {
 	SectionProfiler p("LogUpdate");
 
@@ -123,20 +124,15 @@ void GameScene::Update() {
 	frameCounter += 2;
 	frameCounter2 += 2;
 
-	bool au = false;
-
 	while (frameCounter2 >= 5)
 	{
 		frameCounter2 -= 5;
 		AuxilaryUpdate();
-		au = true;
 	}
 
 	while (frameCounter >= 5)
 	{
-		if (au)
-			EXCEPTION("Logical and Auxilary update happened in the same frame!");
-
+	
 		++logicalFrame;
 		frameCounter -= 5;
 		LogicalUpdate();

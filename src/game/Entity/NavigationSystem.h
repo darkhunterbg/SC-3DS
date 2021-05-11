@@ -79,12 +79,10 @@ class NavigationSystem {
 	};
 private:
 	MovementData movementData;
-	MovementAnimData movementAnimData;
 	NavigationData navigationData;
 
 	static void UpdateNavigationJob(int start, int end);
 	//static void MoveEntitiesJob(int start, int end);
-	static void SetMovementAnimJob(int start, int end);
 
 	ThreadLocal<std::vector<AStarAction>>* tlsResults;
 public:

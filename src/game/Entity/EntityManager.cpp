@@ -51,9 +51,11 @@ void EntityManager::ApplyEntityChanges() {
 
 void EntityManager::UpdateSecondaryEntities() {
 
-	animationSystem.GenerateAnimationUpdates(*this);
-
 	navigationSystem.UpdateNavigation(*this);
+
+	animationSystem.SetUnitOrientationAnimations(*this);
+
+	animationSystem.GenerateAnimationUpdates(*this);
 }
 
 void EntityManager::UpdateEntities() {

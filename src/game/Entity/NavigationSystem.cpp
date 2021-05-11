@@ -80,25 +80,7 @@ void NavigationSystem::MoveEntitiesJob(int start, int end) {
 		data.changed[i]->changed = true;
 	}
 }*/
-void NavigationSystem::SetMovementAnimJob(int start, int end) {
-	auto& data = s->movementAnimData;
 
-	for (int i = start; i < end; ++i) {
-		const auto& unit = data.unit[i];
-		const auto& movement = data.movement[i];
-		auto& orientation = *data.orientation[i];
-		auto& anim = *data.anim[i];
-		auto& animEnable = *data.animEnabled[i];
-		auto& animTracker = *data.animTracker[i];
-
-		orientation.changed = false;
-		anim.clip = &unit.def->MovementAnimations[orientation.orientation];
-		anim.shadowClip = &unit.def->MovementAnimationsShadow[orientation.orientation];
-		anim.unitColorClip = &unit.def->MovementAnimationsTeamColor[orientation.orientation];
-		animTracker.PlayClip(anim.clip);
-		animEnable.pause = false;
-	}
-}
 /*void NavigationSystem::MoveEntities(EntityManager& em) {
 
 	//SectionProfiler p("MoveEntities");

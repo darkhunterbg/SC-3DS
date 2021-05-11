@@ -64,8 +64,10 @@ void KinematicSystem::ApplyCollidersChange(EntityManager& em)
 {
 	for (EntityId id : em.CollisionArchetype.Archetype.RemovedEntities()) {
 		int i = Entity::ToIndex(id);
-		entityInTree[i] = false;
-		collidersTree.RemoveEntity(id);
+		if (entityInTree[i]) {
+			entityInTree[i] = false;
+			collidersTree.RemoveEntity(id);
+		}
 	}
 
 	int size = updateColliderPosData.size();
@@ -126,8 +128,6 @@ bool KinematicSystem::CollidesWithAny(const Rectangle16& collider, EntityId skip
 
 void KinematicSystem::MoveEntities(EntityManager& em)
 {
-	SectionProfiler p("MoveEntities");
-
 	static const Vector2Int8 zero = { 0,0 };
 
 	for (EntityId id : em.MovementArchetype.Archetype.GetEntities()) {
@@ -139,8 +139,8 @@ void KinematicSystem::MoveEntities(EntityManager& em)
 
 		auto& pos = em.PositionComponents[i];
 		pos += Vector2Int16(em.MovementArchetype.MovementComponents[i].velocity);
-	/*	moveData.movement.push_back(&em.MovementArchetype.MovementComponents[i]);
-		moveData.position.push_back(&em.PositionComponents[i]);*/
+		/*	moveData.movement.push_back(&em.MovementArchetype.MovementComponents[i]);
+			moveData.position.push_back(&em.PositionComponents[i]);*/
 		em.EntityChangeComponents[i].changed = true;
 	}
 }
