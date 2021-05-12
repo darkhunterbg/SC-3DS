@@ -9,8 +9,6 @@ void SpriteAtlas::AddSprite(const Sprite& sprite) {
 	sprites.push_back(sprite);
 }
 
-
-
 bool AudioStream::FillNextBuffer() {
 
 	activeBufferIndex = (activeBufferIndex + 1) % BufferCount;
@@ -67,7 +65,7 @@ int AudioStream::GetRemaining() const {
 void AnimationClip::AddSpritesFromAtlas(const SpriteAtlas* atlas, int start, int count, Vector2Int offset)
 {
 	for (int i = 0; i < count; ++i) {
-		AddFrame({ atlas->GetSprite(start + i), Vector2Int16( offset ) });
+		AddFrame({ atlas->GetSprite(start + i), Vector2Int16(offset) });
 	}
 }
 
@@ -78,4 +76,34 @@ SpriteFrameAtlas::SpriteFrameAtlas(const SpriteAtlas* atlas)
 	for (const Sprite& s : atlas->GetSprites()) {
 		frames.push_back({ s,{0,0} });
 	}
+}
+
+UnitAnimationClip::UnitAnimationClip() {
+	for (auto& sf : frames) {
+		sf.sprite.image = { nullptr };
+		sf.shadowSprite.image = { nullptr };
+		sf.colorSprite.image = { nullptr };
+	}
+}
+uint8_t UnitAnimationClip::AddFrameCentered( const SpriteFrame& frame, Vector2Int16 frameSize, bool hFlip)
+{
+	frames[frameCount].sprite = frame.sprite;
+	frames[frameCount].hFlip = hFlip;
+	Vector2Int16 offset = frame.offset - frameSize / 2;
+	if (hFlip)
+		offset.x = frameSize.x / 2 - frame.offset.x - frame.sprite.rect.size.x;
+	frames[frameCount].offset = offset;
+
+	return frameCount++;
+}
+void UnitAnimationClip::AddShadowFrameCentered(uint8_t index, const SpriteFrame& frame, Vector2Int16 frameSize, Vector2Int16 additionalOffset)
+{
+	frames[index].shadowSprite = frame.sprite;
+	Vector2Int16 offset = frame.offset - frameSize / 2;
+	frames[index].shadowOffset = offset + additionalOffset;
+}
+
+void UnitAnimationClip::AddColorFrame(uint8_t index, const SpriteFrame& frame)
+{
+	frames[index].colorSprite = frame.sprite;
 }

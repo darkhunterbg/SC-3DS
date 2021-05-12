@@ -3,24 +3,45 @@
 #include "..\MathLib.h"
 
 class SpriteFrameAtlas;
+class UnitAnimationClip;
 class AnimationClip;
 
-struct DirectionalAnimationDef {
-	int FrameStart;
-	int FrameDuration;
-	int UnitColorFrameStart;
+struct AnimationDef {
+	int FrameStart = 0;
+	int FrameDuration = 1;
 	bool Looping = false;
 
-	Vector2Int16 ShadowAdditionalOffset;
-
-	void GenerateAnimations(const SpriteFrameAtlas* a, const SpriteFrameAtlas* sa,
-		AnimationClip* main, AnimationClip* shadow, AnimationClip* color);
-};
-
-struct AnimationDef {
-	int FrameStart;
-	int FrameDuration;
-	bool Looping;
+	AnimationDef() {}
+	AnimationDef(const AnimationDef&) = delete;
+	AnimationDef& operator=(const AnimationDef&) = delete;
 
 	void GenerateAnimation(const SpriteFrameAtlas* a, AnimationClip* clip);
+};
+
+struct UnitAnimationDef {
+	int FrameStart = 0;
+	int FrameDuration = 1;
+	int UnitColorFrameStart = 0;
+	bool Looping = false;
+	Vector2Int16 ShadowAdditionalOffset;
+
+	UnitAnimationDef() {}
+	UnitAnimationDef(const UnitAnimationDef&) = delete;
+	UnitAnimationDef& operator=(const UnitAnimationDef&) = delete;
+
+	void GenerateAnimation(const SpriteFrameAtlas* a, const SpriteFrameAtlas* sa, UnitAnimationClip& clip);
+};
+
+struct UnitDirectionalAnimationDef {
+	int FrameStart = 0;
+	int FrameDuration = 1;
+	int UnitColorFrameStart = 0;
+	bool Looping = false;
+	Vector2Int16 ShadowOffset;
+
+	UnitDirectionalAnimationDef() {}
+	UnitDirectionalAnimationDef(const UnitDirectionalAnimationDef&) = delete;
+	UnitDirectionalAnimationDef& operator=(const UnitDirectionalAnimationDef&) = delete;
+
+	void GenerateAnimations(const SpriteFrameAtlas* a, const SpriteFrameAtlas* sa, UnitAnimationClip clips[32]);
 };

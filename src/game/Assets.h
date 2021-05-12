@@ -155,7 +155,7 @@ public:
 		auto& f = frames[frameCount++] = frame;
 		f.hFlip = hFlip;
 		f.offset -= frameSize / 2;
-		if (hFlip) 
+		if (hFlip)
 			f.offset.x = frameSize.x / 2 - frame.offset.x - frame.sprite.rect.size.x;
 	}
 	inline void SetFrameOffset(uint8_t frame, Vector2Int16 offset) {
@@ -170,3 +170,36 @@ public:
 	}
 };
 
+struct UnitSpriteFrame {
+	Sprite sprite;
+	Vector2Int16 offset;
+	Sprite shadowSprite;
+	Vector2Int16 shadowOffset;
+	Sprite colorSprite;
+	bool hFlip = false;
+};
+
+class UnitAnimationClip {
+private:
+	std::array<UnitSpriteFrame, 16> frames;
+	uint8_t frameCount = 0;
+public:
+	bool looping = false;
+
+	UnitAnimationClip();
+	UnitAnimationClip(const UnitAnimationClip&) = delete;
+	UnitAnimationClip& operator=(const UnitAnimationClip&) = delete;
+
+	inline const Span<UnitSpriteFrame> GetFrames() const {
+		return { frames.data(), frameCount };
+	}
+	inline uint8_t GetFrameCount() const { return frameCount; }
+	inline const UnitSpriteFrame& GetFrame(uint8_t index) const {
+		return frames[index];
+	}
+
+	uint8_t AddFrameCentered(const SpriteFrame& frame, Vector2Int16 frameSize, bool hFlip = false);
+	void AddShadowFrameCentered(uint8_t frameIndex, const SpriteFrame& frame, Vector2Int16 frameSize, Vector2Int16 additionalOffset = { 0,0 });
+	void AddColorFrame(uint8_t frameIndex, const SpriteFrame& frame);
+
+};

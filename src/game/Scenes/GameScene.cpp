@@ -68,8 +68,8 @@ void GameScene::Start() {
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
 	int i = 0;
-	for (int y = 1; y >= 0; --y) {
-		for (int x = 1; x >= 0; --x) {
+	for (int y = 0; y >= 0; --y) {
+		for (int x = 0; x >= 0; --x) {
 
 			Color c = color[(i) % 12];
 			EntityId e = entityManager->NewUnit(*UnitDatabase::Units[i % UnitDatabase::Units.size()],
@@ -185,8 +185,6 @@ void GameScene::Update() {
 		{
 			if (entityManager->RenderArchetype.RenderComponents[id].depth != -1) {
 				entityManager->AnimationArchetype.AnimationComponents[id].clip = &UnitDatabase::Marine.DeathAnimation;
-				entityManager->AnimationArchetype.AnimationComponents[id].shadowClip = nullptr;
-				entityManager->AnimationArchetype.AnimationComponents[id].unitColorClip = nullptr;
 				entityManager->AnimationArchetype.EnableComponents[id].pause = false;
 				entityManager->AnimationArchetype.TrackerComponents[id].PlayClip(&UnitDatabase::Marine.DeathAnimation);
 				entityManager->RenderArchetype.RenderComponents[id].depth = -1;

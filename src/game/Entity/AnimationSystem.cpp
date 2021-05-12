@@ -17,29 +17,16 @@ void AnimationSystem::UpdateAnimationsJob(int start, int end) {
 		auto& ren = *data.ren[i];
 		auto& offset = *data.offset[i];
 
-		const SpriteFrame& frame = anim.clip->GetFrame(tracker.clipFrame);
-		ren.sprite = frame.sprite.image;
+		const UnitSpriteFrame& frame = anim.clip->GetFrame(tracker.clipFrame);
 		ren.hFlip = frame.hFlip;
+		ren.sprite = frame.sprite.image;
+		ren.shadowSprite = frame.shadowSprite.image;
+		ren.colorSprite = frame.colorSprite.image;
+
 		offset.offset = frame.offset;
-
-
-		if (anim.shadowClip != nullptr) {
-			const SpriteFrame& shadowFrame = anim.shadowClip->GetFrame(tracker.clipFrame);
-			ren.shadowSprite = shadowFrame.sprite.image;
-			offset.shadowOffset = shadowFrame.offset;
-		}
-		else {
-			ren.shadowSprite = { nullptr };
-		}
-		if (anim.unitColorClip ) {
-			ren.colorSprite = anim.unitColorClip->GetFrame(tracker.clipFrame).sprite.image;
-		}
-		else {
-			ren.colorSprite = { nullptr };
-		}
+		offset.shadowOffset = frame.shadowOffset;
 
 		data.changed[i]->changed = true;
-
 	}
 }
 
@@ -120,8 +107,6 @@ void AnimationSystem::SetUnitOrientationAnimations(EntityManager& em) {
 			auto& animTracker = em.AnimationArchetype.TrackerComponents[i];
 
 			anim.clip = &unit.def->MovementAnimations[orientation.orientation];
-			anim.shadowClip = &unit.def->MovementAnimationsShadow[orientation.orientation];
-			anim.unitColorClip = &unit.def->MovementAnimationsTeamColor[orientation.orientation];
 			animTracker.PlayClip(anim.clip);
 			animEnable.pause = false;
 		}

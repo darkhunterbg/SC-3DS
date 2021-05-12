@@ -72,6 +72,12 @@ static inline int EvaluateNavGrid(uint8_t d, Vector2Int16 pos, Vector2Int16 trg)
 	return std::numeric_limits<int>::max();
 }
 
+void NavigationSystem::SetSize(Vector2Int16 size)
+{
+	gridSize = size / 32;
+	memset(navGrid.data(), 0, gridSize.x * gridSize.y);
+}
+
 void NavigationSystem::UpdateNavigationJob(int start, int end) {
 	NavigationData& data = s->navigationData;
 	EntityManager& em = *e;
@@ -87,7 +93,7 @@ void NavigationSystem::UpdateNavigationJob(int start, int end) {
 		uint8_t dir = 255;
 		int val = std::numeric_limits<int>::max();
 
-		if ((nav.target - position).LengthSquaredInt() < 64 * 64)
+		//if ((nav.target - position).LengthSquaredInt() < 64 * 64)
 		{
 			for (uint8_t d = 0; d < 8; d++) {
 
@@ -98,24 +104,24 @@ void NavigationSystem::UpdateNavigationJob(int start, int end) {
 				}
 			}
 		}
-		else {
+		//else {
 
-			for (uint8_t d = 0; d < 8; d++) {
+		//	for (uint8_t d = 0; d < 8; d++) {
 
-				int eval = EvaluateNavGrid(d,  position,  nav.target);
-				if (eval < val) {
-					val = eval;
-					dir = d << 2;
-				}
-			}
-		}
+		//		int eval = EvaluateNavGrid(d,  position,  nav.target);
+		//		if (eval < val) {
+		//			val = eval;
+		//			dir = d << 2;
+		//		}
+		//	}
+		//}
 
 		nav.targetHeading = dir;
 	}
 }
 void NavigationSystem::UpdateNavigation(EntityManager& em)
 {
-	SectionProfiler p("UpdateNavigation");
+	//SectionProfiler p("UpdateNavigation");
 
 	navigationData.clear();
 
@@ -145,11 +151,10 @@ void NavigationSystem::UpdateNavigation(EntityManager& em)
 			}
 		}
 	}
-	p.Submit();
+
 	s = this;
 	e = &em;
 
-	SectionProfiler p2("UpdateNavigationJob");
 	JobSystem::RunJob(navigationData.size(), JobSystem::DefaultJobSize, UpdateNavigationJob);
 }
 
@@ -208,19 +213,12 @@ void NavigationSystem::ApplyUnitNavigationJob(int start, int end) {
 	}
 }
 
-void NavigationSystem::SetSize(Vector2Int16 size)
-{
-	gridSize = size / 32;
-	memset(navGrid.data(), 0, gridSize.x * gridSize.y);
-
-;}
-
 void NavigationSystem::ApplyUnitNavigaion(EntityManager& em)
 {
-	SectionProfiler p("ApplyNavigation");
+	//SectionProfiler p("ApplyNavigation");
 
-	NavigationSystem* s = this;
-	EntityManager* e = &em;
+	s = this;
+	e = &em;
 
 	JobSystem::RunJob(applyNav.size(), JobSystem::DefaultJobSize, ApplyUnitNavigationJob);
 }

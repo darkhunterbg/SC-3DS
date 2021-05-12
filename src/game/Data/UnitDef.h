@@ -16,15 +16,14 @@ struct UnitDef {
 	Vector2Int16 RenderSize;
 	Rectangle16 Collider;
 
-	DirectionalAnimationDef MovementAnimationDef;
-	AnimationDef DeathAnimationDef;
+	UnitDirectionalAnimationDef MovementAnimationDef;
+	UnitAnimationDef DeathAnimationDef;
 
-	AnimationClip MovementAnimations[32];
-	AnimationClip MovementAnimationsShadow[32];
-	AnimationClip MovementAnimationsTeamColor[32];
+	UnitAnimationClip MovementAnimations[32];
+	UnitAnimationClip AttackAnimations[32];
+	UnitAnimationClip DeathAnimation;
 
-	AnimationClip AttackAnimations[32];
-	AnimationClip DeathAnimation;
-
-
+	UnitDef() {}
+	UnitDef(const UnitDef&) = delete;
+	UnitDef& operator=(const UnitDef&) = delete;
 };

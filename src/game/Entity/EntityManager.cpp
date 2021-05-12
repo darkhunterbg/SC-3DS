@@ -53,7 +53,7 @@ void EntityManager::ApplyEntityChanges() {
 
 void EntityManager::UpdateSecondaryEntities() {
 
-	navigationSystem.UpdateNavGrid(*this);
+	//navigationSystem.UpdateNavGrid(*this);
 
 	navigationSystem.UpdateNavigation(*this);
 
@@ -105,13 +105,13 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color
 	RenderArchetype.RenderComponents.NewComponent(e, {
 		Color4(color),
 		def.MovementAnimations[0].GetFrame(0).sprite.image,
-		def.MovementAnimationsShadow[0].GetFrame(0).sprite.image,
-		def.MovementAnimationsTeamColor[0].GetFrame(0).sprite.image,
+		def.MovementAnimations[0].GetFrame(0).shadowSprite.image,
+		def.MovementAnimations[0].GetFrame(0).colorSprite.image,
 		});
 
 	RenderArchetype.OffsetComponents.NewComponent(e, {
 	 Vector2Int16(def.MovementAnimations[0].GetFrame(0).offset),
-		Vector2Int16(def.MovementAnimationsShadow[0].GetFrame(0).offset)
+		Vector2Int16(def.MovementAnimations[0].GetFrame(0).shadowOffset)
 		});
 
 	RenderArchetype.DestinationComponents.NewComponent(e);

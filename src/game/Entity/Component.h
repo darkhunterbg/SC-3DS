@@ -155,21 +155,21 @@ struct AnimationTrackerComponent {
 		clipFrame = -1;
 	}
 
-	inline void PlayClip(const AnimationClip* clip) {
+	inline void PlayClip(const UnitAnimationClip* clip) {
 		if (clip) {
 			totalFrames = clip->GetFrameCount();
 			looping = clip->looping;
 			clipFrame = -1;
 		}
+		else {
+			totalFrames = 0;
+			clipFrame = 0;
+		}
 	}
 };
 
 struct AnimationComponent {
-
-	const AnimationClip* clip = nullptr;
-	const AnimationClip* shadowClip = nullptr;
-	const AnimationClip* unitColorClip = nullptr;
-
+	const UnitAnimationClip* clip;
 };
 
 struct ColliderComponent {

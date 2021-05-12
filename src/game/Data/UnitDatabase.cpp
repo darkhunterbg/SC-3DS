@@ -15,13 +15,15 @@ static void MarineData() {
 	u.Collider.position = { -9,-10 };
 	u.Collider.size = { 17,20 };
 
-	DirectionalAnimationDef& a = u.MovementAnimationDef;
+	UnitDirectionalAnimationDef& a = u.MovementAnimationDef;
 	a.FrameStart = 68;
 	a.FrameDuration = 9;
 	a.Looping = true;
 	a.UnitColorFrameStart = 229 + a.FrameStart;
 
-	u.DeathAnimationDef = { 221 ,8, false };
+	u.DeathAnimationDef.FrameStart = 221;
+	u.DeathAnimationDef.FrameDuration = 8; 
+	u.DeathAnimationDef.UnitColorFrameStart = -1;
 }
 static void MarineResources() {
 	auto a = SpriteDatabase::Load_unit_terran_marine();
@@ -30,8 +32,8 @@ static void MarineResources() {
 	UnitDef& u = UnitDatabase::Marine;
 
 	u.RenderSize = Vector2Int16(a->FrameSize);
-	u.DeathAnimationDef.GenerateAnimation(a, &u.DeathAnimation);
-	u.MovementAnimationDef.GenerateAnimations(a, as, u.MovementAnimations, u.MovementAnimationsShadow, u.MovementAnimationsTeamColor);
+	u.DeathAnimationDef.GenerateAnimation(a, nullptr, u.DeathAnimation);
+	u.MovementAnimationDef.GenerateAnimations(a, as, u.MovementAnimations);
 }
 
 
@@ -44,14 +46,12 @@ static void SCVData() {
 	u.Collider.position = { -10,-14 };
 	u.Collider.size = { 23,23 };
 
-	DirectionalAnimationDef& a = u.MovementAnimationDef;
+	UnitDirectionalAnimationDef& a = u.MovementAnimationDef;
 	a.FrameStart = 0;
 	a.FrameDuration = 1;
 	a.Looping = false;
 	a.UnitColorFrameStart = 51;
-	a.ShadowAdditionalOffset = { -1, 5 };
-
-	u.DeathAnimationDef = { 0 ,0, false };
+	a.ShadowOffset = { -1, 5 };
 }
 static void SCVResources() {
 	auto a = SpriteDatabase::Load_unit_terran_scv();
@@ -60,7 +60,7 @@ static void SCVResources() {
 
 	u.RenderSize = Vector2Int16(a->FrameSize);
 	//u.DeathAnimationDef.GenerateAnimation(a, &u.DeathAnimation);
-	u.MovementAnimationDef.GenerateAnimations(a, a, u.MovementAnimations, u.MovementAnimationsShadow, u.MovementAnimationsTeamColor);
+	u.MovementAnimationDef.GenerateAnimations(a, a, u.MovementAnimations);
 }
 
 void UnitDatabase::Init()
