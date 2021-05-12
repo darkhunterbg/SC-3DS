@@ -177,16 +177,19 @@ void GameScene::Update() {
 		for (EntityId id : selection)
 		{
 			if (entityManager->RenderArchetype.RenderComponents[id].depth != -1) {
-				entityManager->AnimationArchetype.AnimationComponents[id].clip = &UnitDatabase::Marine.DeathAnimation;
+				auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
+
+				entityManager->AnimationArchetype.AnimationComponents[id].clip = &def->DeathAnimation;
 				entityManager->AnimationArchetype.EnableComponents[id].pause = false;
-				entityManager->AnimationArchetype.TrackerComponents[id].PlayClip(&UnitDatabase::Marine.DeathAnimation);
+				entityManager->AnimationArchetype.TrackerComponents[id].PlayClip(&def->DeathAnimation);
 				entityManager->RenderArchetype.RenderComponents[id].depth = -1;
 				entityManager->CollisionArchetype.Archetype.RemoveEntity(id);
 				entityManager->NavigationArchetype.Archetype.RemoveEntity(id);
 				entityManager->MovementArchetype.Archetype.RemoveEntity(id);
 
-				int i = std::rand() % 2;
-				auto& def = entityManager->UnitArchetype.UnitComponents[selection[0]].def;
+			
+
+				int i = std::rand() % def->DeathSoundDef.TotalClips;
 				Game::Audio->PlayClip(def->DeathSoundDef.Clips[i], 1);
 				//Game::Audio->PlayClip(death[i], 1);
 			}

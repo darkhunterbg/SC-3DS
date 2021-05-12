@@ -41,9 +41,22 @@ namespace GRPConvert
 
 			Colors.Clear();
 
-			for (int i = 0; i < data.Length / 3; ++i) {
-				Color c = Color.FromArgb(255, data[i * 3], data[i * 3 + 1], data[i * 3 + 2]);
-				Colors.Add(c);
+
+			if (data.Length == 768)
+			{
+				for (int i = 0; i < data.Length / 3; ++i)
+				{
+					Color c = Color.FromArgb(255, data[i * 3], data[i * 3 + 1], data[i * 3 + 2]);
+					Colors.Add(c);
+				}
+			}
+			else
+			{
+				for (int i = 0; i < data.Length / 4; ++i)
+				{
+					Color c = Color.FromArgb(data[i * 4 + 3], data[i * 4], data[i * 4 + 1], data[i * 4 + 2]);
+					Colors.Add(c);
+				}
 			}
 		}
 	}

@@ -39,8 +39,6 @@ namespace GRPConvert
 			string dataDir = Path.GetFullPath("..\\..\\mpq\\");
 			string dataOutDir = Path.GetFullPath("..\\..\\data_out\\");
 
-			if (Directory.Exists(dataOutDir))
-				Directory.Delete(dataOutDir, true);
 
 			foreach (var l in lines)
 			{
@@ -48,6 +46,18 @@ namespace GRPConvert
 					continue;
 				if (string.IsNullOrWhiteSpace(l))
 					continue;
+
+				if (l.Equals("clear"))
+				{
+					if (Directory.Exists(dataOutDir))
+						Directory.Delete(dataOutDir, true);
+					continue;
+				}
+
+				if (l.Equals("done"))
+				{
+					break;
+				}
 
 				if (l.StartsWith("palette"))
 				{
@@ -99,7 +109,7 @@ namespace GRPConvert
 					i = 0;
 					foreach (var fr in img.Frames)
 					{
-						if (fr.UsesRemappedColors(p))
+						if (p.Name == "Units" && fr.UsesRemappedColors(p))
 						{
 							string frName = "cm_" + i.ToString("D3") + ".png";
 							string s = Path.Combine(dst, frName);

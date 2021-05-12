@@ -1,8 +1,18 @@
 ﻿#palette Terrain
 #tileset\*.grp
 
+clear
+
 palette Units
-unit\*.grp
+unit\terran\*.grp
+unit\protoss\*.grp
+unit\neutral\*.grp
+unit\zerg\*.grp
+
+palette Orange
+unit\thingy\tbangs.grp
+unit\thingy\tbangx.grp
+unit\thingy\tbangl.grp
 
 palette Icons
 unit\cmdbtns\*.grp

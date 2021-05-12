@@ -32,9 +32,15 @@ void AnimationSystem::UpdateAnimationsJob(int start, int end) {
 
 EntityManager* e;
 
+//int i = 1;
+
 void AnimationSystem::GenerateAnimationsUpdatesJob(int start, int end) {
 	EntityManager& em = *e;
 	AnimationSystem& system = *s;
+
+	//++i;
+	//if (i % 2 != 0)
+	//	return;
 
 	auto data = em.AnimationArchetype.Archetype.GetEntities();
 

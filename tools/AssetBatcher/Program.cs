@@ -29,6 +29,7 @@ namespace AssetBatcher
 			T3SFolder("unit/terran/tmashad");
 
 			T3SFolder("unit/terran/scv");
+			T3SFolder("unit/thingy/tbangs");
 			GeneraSourceCode();
 		}
 

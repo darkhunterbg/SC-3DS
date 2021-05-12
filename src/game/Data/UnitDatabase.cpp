@@ -8,7 +8,7 @@ std::vector<const UnitDef*> UnitDatabase::Units;
 
 static void MarineData() {
 	UnitDef& u = UnitDatabase::Marine;
-	u.Name = "Marrine";
+	u.Name = "Terran Marine";
 	u.Health = 40;
 	u.MovementSpeed = 4;
 	u.RotationSpeed = 1;
@@ -22,7 +22,7 @@ static void MarineData() {
 	a.UnitColorFrameStart = 229 + a.FrameStart;
 
 	u.DeathAnimationDef.FrameStart = 221;
-	u.DeathAnimationDef.FrameDuration = 8; 
+	u.DeathAnimationDef.FrameDuration = 8;
 	u.DeathAnimationDef.UnitColorFrameStart = -1;
 
 	u.DeathSoundDef = { "sound/terran/marine/tmadth", 2 };
@@ -47,7 +47,7 @@ static void MarineResources() {
 
 static void SCVData() {
 	UnitDef& u = UnitDatabase::SCV;
-	u.Name = "SCV";
+	u.Name = "Terran SCV";
 	u.Health = 60;
 	u.MovementSpeed = 5;
 	u.RotationSpeed = 1;
@@ -61,12 +61,17 @@ static void SCVData() {
 	a.UnitColorFrameStart = 51;
 	a.ShadowOffset = { -1, 5 };
 
+	u.DeathAnimationDef.FrameStart = 0;
+	u.DeathAnimationDef.FrameDuration = 9;
+	u.DeathAnimationDef.UnitColorFrameStart = -1;
+
 	u.DeathSoundDef = { "sound/terran/scv/tscdth", 1 };
 	u.SelectedSoundDef = { "sound/terran/scv/tscwht", 4 };
 	u.ActionConfirmSoundDef = { "sound/terran/scv/tscyes", 4 };
 }
 static void SCVResources() {
 	auto a = SpriteDatabase::Load_unit_terran_scv();
+	auto ad = SpriteDatabase::Load_unit_thingy_tbangs();
 
 	UnitDef& u = UnitDatabase::SCV;
 
@@ -75,7 +80,7 @@ static void SCVResources() {
 	u.DeathSoundDef.LoadSoundClips();
 
 	u.RenderSize = Vector2Int16(a->FrameSize);
-	//u.DeathAnimationDef.GenerateAnimation(a, &u.DeathAnimation);
+	u.DeathAnimationDef.GenerateAnimation(ad, nullptr, u.DeathAnimation);
 	u.MovementAnimationDef.GenerateAnimations(a, a, u.MovementAnimations);
 }
 

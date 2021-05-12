@@ -5,6 +5,7 @@ std::vector<const SpriteFrameAtlas*> SpriteDatabase::Units;
 SpriteFrameAtlas* SpriteDatabase::unit_terran_marine;
 SpriteFrameAtlas* SpriteDatabase::unit_terran_tmashad;
 SpriteFrameAtlas* SpriteDatabase::unit_terran_scv;
+SpriteFrameAtlas* SpriteDatabase::unit_thingy_tbangs;
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_marine() {
 	const SpriteAtlas* atlas = Platform::LoadAtlas("unit_terran_marine.t3x");
@@ -807,6 +808,25 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_scv() {
 	a->SetOffset(99, Vector2Int(25,14));
 	a->SetOffset(100, Vector2Int(25,14));
 	a->SetOffset(101, Vector2Int(23,15));
+
+	return a;
+}
+
+const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_tbangs() {
+	const SpriteAtlas* atlas = Platform::LoadAtlas("unit_thingy_tbangs.t3x");
+	auto* a = unit_thingy_tbangs = new SpriteFrameAtlas(atlas);
+	Units.push_back(a);
+	a->FrameSize = Vector2Int(128, 128);
+
+	a->SetOffset(0, Vector2Int(30,47));
+	a->SetOffset(1, Vector2Int(19,32));
+	a->SetOffset(2, Vector2Int(17,25));
+	a->SetOffset(3, Vector2Int(16,17));
+	a->SetOffset(4, Vector2Int(16,14));
+	a->SetOffset(5, Vector2Int(17,14));
+	a->SetOffset(6, Vector2Int(18,14));
+	a->SetOffset(7, Vector2Int(16,15));
+	a->SetOffset(8, Vector2Int(14,21));
 
 	return a;
 }
