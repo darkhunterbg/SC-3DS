@@ -24,12 +24,20 @@ static void MarineData() {
 	u.DeathAnimationDef.FrameStart = 221;
 	u.DeathAnimationDef.FrameDuration = 8; 
 	u.DeathAnimationDef.UnitColorFrameStart = -1;
+
+	u.DeathSoundDef = { "sound/terran/marine/tmadth", 2 };
+	u.SelectedSoundDef = { "sound/terran/marine/tmawht", 4 };
+	u.ActionConfirmSoundDef = { "sound/terran/marine/tmayes", 4 };
 }
 static void MarineResources() {
 	auto a = SpriteDatabase::Load_unit_terran_marine();
 	auto as = SpriteDatabase::Load_unit_terran_tmashad();
 
 	UnitDef& u = UnitDatabase::Marine;
+
+	u.SelectedSoundDef.LoadSoundClips();
+	u.ActionConfirmSoundDef.LoadSoundClips();
+	u.DeathSoundDef.LoadSoundClips();
 
 	u.RenderSize = Vector2Int16(a->FrameSize);
 	u.DeathAnimationDef.GenerateAnimation(a, nullptr, u.DeathAnimation);
@@ -52,11 +60,19 @@ static void SCVData() {
 	a.Looping = false;
 	a.UnitColorFrameStart = 51;
 	a.ShadowOffset = { -1, 5 };
+
+	u.DeathSoundDef = { "sound/terran/scv/tscdth", 1 };
+	u.SelectedSoundDef = { "sound/terran/scv/tscwht", 4 };
+	u.ActionConfirmSoundDef = { "sound/terran/scv/tscyes", 4 };
 }
 static void SCVResources() {
 	auto a = SpriteDatabase::Load_unit_terran_scv();
 
 	UnitDef& u = UnitDatabase::SCV;
+
+	u.SelectedSoundDef.LoadSoundClips();
+	u.ActionConfirmSoundDef.LoadSoundClips();
+	u.DeathSoundDef.LoadSoundClips();
 
 	u.RenderSize = Vector2Int16(a->FrameSize);
 	//u.DeathAnimationDef.GenerateAnimation(a, &u.DeathAnimation);
