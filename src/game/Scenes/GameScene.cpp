@@ -10,10 +10,7 @@
 #include "../Data/UnitDatabase.h"
 
 
-std::array<AudioClip, 2> death;
-std::array<AudioClip, 4> what;
-std::array<AudioClip, 4> yes;
-std::vector<EntityId> selection;
+static std::vector<EntityId> selection;
 
 
 GameScene::GameScene() {
@@ -45,17 +42,8 @@ void GameScene::Start() {
 
 	UnitDatabase::LoadAllUnitResources();
 
+	// TODO music is in multiple folders
 	AudioStream* stream = Platform::LoadAudioStream("music/terran1.wav");
-	death[0] = Platform::LoadAudioClip("music/tmadth00.wav");
-	death[1] = Platform::LoadAudioClip("music/tmadth01.wav");
-	what[0] = Platform::LoadAudioClip("music/tmawht00.wav");
-	what[1] = Platform::LoadAudioClip("music/tmawht01.wav");
-	what[2] = Platform::LoadAudioClip("music/tmawht02.wav");
-	what[3] = Platform::LoadAudioClip("music/tmawht03.wav");
-	yes[0] = Platform::LoadAudioClip("music/tmayes00.wav");
-	yes[1] = Platform::LoadAudioClip("music/tmayes01.wav");
-	yes[2] = Platform::LoadAudioClip("music/tmayes02.wav");
-	yes[3] = Platform::LoadAudioClip("music/tmayes03.wav");
 	Game::Audio->PlayStream(stream, 0);
 
 	entityManager = new EntityManager();
@@ -68,13 +56,15 @@ void GameScene::Start() {
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
 	int i = 0;
-	for (int y = 0; y >= 0; --y) {
-		for (int x = 0; x >= 0; --x) {
+	for (int y = 2; y >= 0; --y) {
+		for (int x = 2; x >= 0; --x) {
 
 			Color c = color[(i) % 12];
-			EntityId e = entityManager->NewUnit(*UnitDatabase::Units[i % UnitDatabase::Units.size()],
+			EntityId e = entityManager->NewUnit(*UnitDatabase::Units[(i) % UnitDatabase::Units.size()],
 				Vector2Int16(Vector2Int{ x * 64 + 16,y * 64 + 16 }), c);
-
+			
+			//entityManager->UnitArchetype.OrientationComponents[i].orientation = 24;
+			//entityManager->UnitArchetype.OrientationComponents[i].changed = true;
 			//entityManager->CollisionArchetype.Archetype.RemoveEntity(e);
 			//int orientation = std::rand() % 32;
 			i++;
@@ -159,7 +149,8 @@ void GameScene::Update() {
 		selection.insert(selection.begin(), tmp.begin(), tmp.end());
 
 		int i = std::rand() % 4;
-		Game::Audio->PlayClip(what[i], 1);
+		auto& def = entityManager->UnitArchetype.UnitComponents[selection[0]].def;
+		Game::Audio->PlayClip(def->SelectedSoundDef.Clips[i], 1);
 	}
 
 	if (Game::Gamepad.IsButtonPressed(GamepadButton::X)) {
@@ -168,8 +159,10 @@ void GameScene::Update() {
 			if (entityManager->RenderArchetype.RenderComponents.GetComponent(id).depth != -1) {
 				entityManager->GoTo(id, Vector2Int16(camera.ScreenToWorld(cursor->Position)));
 
+				auto& def = entityManager->UnitArchetype.UnitComponents[selection[0]].def;
+
 				int i = std::rand() % 4;
-				Game::Audio->PlayClip(yes[i], 1);
+				Game::Audio->PlayClip(def->ActionConfirmSoundDef.Clips[i], 1);
 			}
 	}
 
@@ -193,7 +186,9 @@ void GameScene::Update() {
 				entityManager->MovementArchetype.Archetype.RemoveEntity(id);
 
 				int i = std::rand() % 2;
-				Game::Audio->PlayClip(death[i], 1);
+				auto& def = entityManager->UnitArchetype.UnitComponents[selection[0]].def;
+				Game::Audio->PlayClip(def->DeathSoundDef.Clips[i], 1);
+				//Game::Audio->PlayClip(death[i], 1);
 			}
 		}
 	}

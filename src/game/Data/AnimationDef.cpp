@@ -1,5 +1,6 @@
 #include "AnimationDef.h"
 #include "../Assets.h"
+#include "../Debug.h"
 
 void AnimationDef::GenerateAnimation(const SpriteFrameAtlas* a, AnimationClip* clip) {
 
@@ -43,7 +44,7 @@ void UnitDirectionalAnimationDef::GenerateAnimations(const SpriteFrameAtlas* a, 
 		clips[i].looping = Looping;
 
 		for (int j = 0; j < FrameDuration; ++j) {
-			clips[i].AddFrameCentered(a->GetFrame(FrameStart + 32 - i + j * 17), Vector2Int16(a->FrameSize));
+			clips[i].AddFrameCentered(a->GetFrame(FrameStart + 32 - i + j * 17), Vector2Int16(a->FrameSize) , true);
 			if (sa != nullptr)
 				clips[i].AddShadowFrameCentered(j, sa->GetFrame(FrameStart + 32 - i + j * 17), Vector2Int16(sa->FrameSize), ShadowOffset);
 
@@ -51,5 +52,7 @@ void UnitDirectionalAnimationDef::GenerateAnimations(const SpriteFrameAtlas* a, 
 				clips[i].AddColorFrame(j, a->GetFrame(UnitColorFrameStart + 32 - i + j * 17));
 		}
 	}
+
+
 }
 

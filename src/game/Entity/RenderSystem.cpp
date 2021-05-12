@@ -94,9 +94,9 @@ void RenderSystem::UpdateRenderPositionsJob(int start, int end) {
 	RenderUpdatePosData& data = s->renderUpdatePosData;
 
 	for (int i = start; i < end; ++i) {
-		RenderDestinationComponent* p = data.outPos[i];
-		p->dst = data.worldPos[i] + data.offset[i].offset;
-		p->shadowDst = data.worldPos[i] + data.offset[i].shadowOffset;
+		RenderDestinationComponent& p = *data.outPos[i];
+		p.dst = data.worldPos[i] + data.offset[i].offset;
+		p.shadowDst = data.worldPos[i] + data.offset[i].shadowOffset;
 		data.outBB[i]->SetCenter(data.worldPos[i]);
 	}
 }

@@ -108,6 +108,7 @@ struct RenderOffsetComponent {
 struct RenderDestinationComponent {
 	Vector2Int16 dst;
 	Vector2Int16 shadowDst;
+
 };
 
 

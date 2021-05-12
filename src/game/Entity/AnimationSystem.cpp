@@ -72,7 +72,7 @@ void AnimationSystem::GenerateAnimationUpdates(EntityManager& em)
 	for (EntityId id : em.AnimationArchetype.Archetype.GetEntities()) {
 		int i = Entity::ToIndex(id);
 
-		if ( em.RenderArchetype.Archetype.HasEntity(id) &&
+		if (em.RenderArchetype.Archetype.HasEntity(id) &&
 			!em.AnimationArchetype.EnableComponents[i].pause)
 		{
 			data.animation.push_back(em.AnimationArchetype.AnimationComponents[i]);
@@ -109,6 +109,14 @@ void AnimationSystem::SetUnitOrientationAnimations(EntityManager& em) {
 			anim.clip = &unit.def->MovementAnimations[orientation.orientation];
 			animTracker.PlayClip(anim.clip);
 			animEnable.pause = false;
+		}
+		else {
+			//static const  Vector2Int8 zero = Vector2Int8{ 0,0 };
+
+			//if (em.MovementArchetype.MovementComponents[i].velocity == zero) {
+
+			//	em.AnimationArchetype.EnableComponents[i].pause = true;
+			//}
 		}
 	}
 }

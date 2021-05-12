@@ -85,7 +85,7 @@ UnitAnimationClip::UnitAnimationClip() {
 		sf.colorSprite.image = { nullptr };
 	}
 }
-uint8_t UnitAnimationClip::AddFrameCentered( const SpriteFrame& frame, Vector2Int16 frameSize, bool hFlip)
+uint8_t UnitAnimationClip::AddFrameCentered(const SpriteFrame& frame, Vector2Int16 frameSize, bool hFlip)
 {
 	frames[frameCount].sprite = frame.sprite;
 	frames[frameCount].hFlip = hFlip;
@@ -100,7 +100,9 @@ void UnitAnimationClip::AddShadowFrameCentered(uint8_t index, const SpriteFrame&
 {
 	frames[index].shadowSprite = frame.sprite;
 	Vector2Int16 offset = frame.offset - frameSize / 2;
-	frames[index].shadowOffset = offset + additionalOffset;
+	if (frames[index].hFlip)
+		offset.x = frameSize.x / 2 - frame.offset.x - frame.sprite.rect.size.x;
+	frames[index].shadowOffset = offset +additionalOffset;
 }
 
 void UnitAnimationClip::AddColorFrame(uint8_t index, const SpriteFrame& frame)
