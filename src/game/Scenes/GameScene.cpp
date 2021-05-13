@@ -182,6 +182,7 @@ void GameScene::Update() {
 				entityManager->AnimationArchetype.AnimationComponents[id].clip = &def->DeathAnimation;
 				entityManager->AnimationArchetype.EnableComponents[id].pause = false;
 				entityManager->AnimationArchetype.TrackerComponents[id].PlayClip(&def->DeathAnimation);
+				entityManager->AnimationArchetype.ChangedComponenets[id].frameChanged = false;
 				entityManager->RenderArchetype.RenderComponents[id].depth = -1;
 				entityManager->CollisionArchetype.Archetype.RemoveEntity(id);
 				entityManager->NavigationArchetype.Archetype.RemoveEntity(id);

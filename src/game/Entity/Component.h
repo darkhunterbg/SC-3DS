@@ -147,9 +147,14 @@ struct UnitMovementComponent {
 struct AnimationEnableComponent {
 	bool pause = true;
 };
+struct AnimationChangedComponent {
+	bool frameChanged = false;
+};
 struct AnimationTrackerComponent {
 	int8_t clipFrame = 0;
+	uint8_t frameCountdown = 1;
 	uint8_t totalFrames = 0;
+	uint8_t frameTime = 1;
 	bool looping = false;
 
 	inline void Restart() {
@@ -161,6 +166,7 @@ struct AnimationTrackerComponent {
 			totalFrames = clip->GetFrameCount();
 			looping = clip->looping;
 			clipFrame = -1;
+			frameCountdown = frameTime = clip->frameTime;
 		}
 		else {
 			totalFrames = 0;

@@ -55,6 +55,7 @@ public:
 		ComponentCollection<AnimationComponent> AnimationComponents;
 		ComponentCollection<AnimationEnableComponent> EnableComponents;
 		ComponentCollection<AnimationTrackerComponent> TrackerComponents;
+		ComponentCollection<AnimationChangedComponent> ChangedComponenets;
 	} AnimationArchetype;
 
 	struct {

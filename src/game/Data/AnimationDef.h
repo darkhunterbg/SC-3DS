@@ -8,19 +8,21 @@ class AnimationClip;
 
 struct AnimationDef {
 	int FrameStart = 0;
-	int FrameDuration = 1;
+	int FrameCount = 1;
+	int FrameTime = 1;
 	bool Looping = false;
 
 	AnimationDef() {}
 	AnimationDef(const AnimationDef&) = delete;
 	AnimationDef& operator=(const AnimationDef&) = delete;
 
-	void GenerateAnimation(const SpriteFrameAtlas* a, AnimationClip* clip);
+	void GenerateAnimation(const SpriteFrameAtlas* a, AnimationClip& clip);
 };
 
 struct UnitAnimationDef {
 	int FrameStart = 0;
-	int FrameDuration = 1;
+	int FrameCount = 1;
+	int FrameTime = 1;
 	int UnitColorFrameStart = 0;
 	bool Looping = false;
 	Vector2Int16 ShadowAdditionalOffset;
@@ -34,7 +36,8 @@ struct UnitAnimationDef {
 
 struct UnitDirectionalAnimationDef {
 	int FrameStart = 0;
-	int FrameDuration = 1;
+	int FrameCount = 1;
+	int FrameTime = 1;
 	int UnitColorFrameStart = 0;
 	bool Looping = false;
 	Vector2Int16 ShadowOffset;

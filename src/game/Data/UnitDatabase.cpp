@@ -17,13 +17,14 @@ static void MarineData() {
 
 	UnitDirectionalAnimationDef& a = u.MovementAnimationDef;
 	a.FrameStart = 68;
-	a.FrameDuration = 9;
+	a.FrameCount = 9;
 	a.Looping = true;
 	a.UnitColorFrameStart = 229 + a.FrameStart;
 
 	u.DeathAnimationDef.FrameStart = 221;
-	u.DeathAnimationDef.FrameDuration = 8;
+	u.DeathAnimationDef.FrameCount = 8;
 	u.DeathAnimationDef.UnitColorFrameStart = -1;
+	u.DeathAnimationDef.FrameTime = 2;
 
 	u.DeathSoundDef = { "sound/terran/marine/tmadth", 2 };
 	u.SelectedSoundDef = { "sound/terran/marine/tmawht", 4 };
@@ -56,14 +57,15 @@ static void SCVData() {
 
 	UnitDirectionalAnimationDef& a = u.MovementAnimationDef;
 	a.FrameStart = 0;
-	a.FrameDuration = 1;
+	a.FrameCount = 1;
 	a.Looping = false;
 	a.UnitColorFrameStart = 51;
 	a.ShadowOffset = { -1, 5 };
 
 	u.DeathAnimationDef.FrameStart = 0;
-	u.DeathAnimationDef.FrameDuration = 9;
+	u.DeathAnimationDef.FrameCount = 9;
 	u.DeathAnimationDef.UnitColorFrameStart = -1;
+	u.DeathAnimationDef.FrameTime = 2;
 
 	u.DeathSoundDef = { "sound/terran/scv/tscdth", 1 };
 	u.SelectedSoundDef = { "sound/terran/scv/tscwht", 4 };

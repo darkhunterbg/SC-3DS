@@ -136,15 +136,17 @@ public:
 };
 
 class AnimationClip {
+
+public:
+	uint8_t frameTime = 1;
+	bool looping = false;
 private:
-	std::array< SpriteFrame, 16> frames;
 	uint8_t frameCount = 0;
+	std::array< SpriteFrame, 16> frames;
 public:
 	AnimationClip() {}
 	AnimationClip(const AnimationClip&) = delete;
 	AnimationClip& operator=(const AnimationClip&) = delete;
-
-	bool looping = false;
 
 	void AddSpritesFromAtlas(const SpriteAtlas* atlas, int start, int count, Vector2Int offset = { 0,0 });
 
@@ -180,12 +182,14 @@ struct UnitSpriteFrame {
 };
 
 class UnitAnimationClip {
-private:
-	std::array<UnitSpriteFrame, 16> frames;
-	uint8_t frameCount = 0;
-public:
-	bool looping = false;
 
+public:
+	uint8_t frameTime = 1;
+	bool looping = false;
+private:
+	uint8_t frameCount = 0;
+	std::array<UnitSpriteFrame, 16> frames;
+public:
 	UnitAnimationClip();
 	UnitAnimationClip(const UnitAnimationClip&) = delete;
 	UnitAnimationClip& operator=(const UnitAnimationClip&) = delete;

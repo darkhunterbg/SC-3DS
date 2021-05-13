@@ -123,12 +123,12 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color
 	auto& a = AnimationArchetype.AnimationComponents.NewComponent(e);
 	AnimationArchetype.TrackerComponents.NewComponent(e).PlayClip(&def.MovementAnimations[0]);
 	AnimationArchetype.EnableComponents.NewComponent(e).pause = true;
+	AnimationArchetype.ChangedComponenets.NewComponent(e).frameChanged = true;
 
 	AnimationArchetype.Archetype.AddEntity(e);
 
 	NavigationArchetype.NavigationComponents.NewComponent(e);
 	NavigationArchetype.WorkComponents.NewComponent(e, { false });
-
 
 	NavigationArchetype.Archetype.AddEntity(e);
 

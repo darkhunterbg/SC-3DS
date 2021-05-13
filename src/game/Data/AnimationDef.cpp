@@ -2,19 +2,21 @@
 #include "../Assets.h"
 #include "../Debug.h"
 
-void AnimationDef::GenerateAnimation(const SpriteFrameAtlas* a, AnimationClip* clip) {
+void AnimationDef::GenerateAnimation(const SpriteFrameAtlas* a, AnimationClip& clip) {
 
-	clip->looping = Looping;
+	clip.looping = Looping;
+	clip.frameTime = FrameTime;
 
-	for (int i = 0; i < FrameDuration; ++i)
-		clip->AddFrameCentered(a->GetFrame(FrameStart + i), Vector2Int16(a->FrameSize));
+	for (int i = 0; i < FrameCount; ++i)
+		clip.AddFrameCentered(a->GetFrame(FrameStart + i), Vector2Int16(a->FrameSize));
 }
 
 void UnitAnimationDef::GenerateAnimation(const SpriteFrameAtlas* a, const SpriteFrameAtlas* sa, UnitAnimationClip& clip)
 {
 	clip.looping = Looping;
+	clip.frameTime = FrameTime;
 
-	for (int i = 0; i < FrameDuration; ++i) {
+	for (int i = 0; i < FrameCount; ++i) {
 		clip.AddFrameCentered(a->GetFrame(FrameStart + i), Vector2Int16(a->FrameSize));
 		if (sa != nullptr)
 			clip.AddShadowFrameCentered(i, sa->GetFrame(FrameStart + i), Vector2Int16(sa->FrameSize), ShadowAdditionalOffset);
@@ -27,8 +29,9 @@ void UnitDirectionalAnimationDef::GenerateAnimations(const SpriteFrameAtlas* a, 
 {
 	for (int i = 0; i <= 16; ++i) {
 		clips[i].looping = Looping;
+		clips[i].frameTime = FrameTime;
 
-		for (int j = 0; j < FrameDuration; ++j) {
+		for (int j = 0; j < FrameCount; ++j) {
 
 			clips[i].AddFrameCentered(a->GetFrame(FrameStart + i + j * 17), Vector2Int16(a->FrameSize));
 			if (sa != nullptr)
@@ -42,8 +45,9 @@ void UnitDirectionalAnimationDef::GenerateAnimations(const SpriteFrameAtlas* a, 
 
 	for (int i = 17; i < 32; ++i) {
 		clips[i].looping = Looping;
+		clips[i].frameTime = FrameTime;
 
-		for (int j = 0; j < FrameDuration; ++j) {
+		for (int j = 0; j < FrameCount; ++j) {
 			clips[i].AddFrameCentered(a->GetFrame(FrameStart + 32 - i + j * 17), Vector2Int16(a->FrameSize) , true);
 			if (sa != nullptr)
 				clips[i].AddShadowFrameCentered(j, sa->GetFrame(FrameStart + 32 - i + j * 17), Vector2Int16(sa->FrameSize), ShadowOffset);
