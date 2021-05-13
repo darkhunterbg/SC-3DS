@@ -92,6 +92,12 @@ struct EntityChangeComponent {
 };
 
 struct RenderComponent {
+	Image sprite;
+	int depth = 0;
+	bool hFlip = false;
+};
+
+struct RenderUnitComponent {
 	Color4 unitColor;
 	Image sprite;
 	Image shadowSprite;
@@ -100,15 +106,14 @@ struct RenderComponent {
 	bool hFlip = false;
 };
 
-struct RenderOffsetComponent {
+struct RenderUnitOffsetComponent {
 	Vector2Int16 offset;
 	Vector2Int16 shadowOffset;
 };
 
-struct RenderDestinationComponent {
+struct RenderUnitDestinationComponent {
 	Vector2Int16 dst;
 	Vector2Int16 shadowDst;
-
 };
 
 

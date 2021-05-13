@@ -11,7 +11,7 @@ class AnimationSystem {
 		std::vector<AnimationComponent> animation;
 		std::vector<AnimationTrackerComponent> tracker;
 		std::vector<RenderComponent*> ren;
-		std::vector<RenderOffsetComponent*> offset;
+		//std::vector<RenderOffsetComponent*> offset;
 		std::vector<EntityChangeComponent*> changed;
 
 		inline size_t size() const { return animation.size(); }
@@ -19,7 +19,7 @@ class AnimationSystem {
 			animation.clear();
 			tracker.clear();
 			ren.clear();
-			offset.clear();
+			//offset.clear();
 			changed.clear();
 		}
 	};

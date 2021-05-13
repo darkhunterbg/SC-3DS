@@ -45,10 +45,13 @@ public:
 	struct {
 		EntityArchetype Archetype = EntityArchetype("Render");
 		ComponentCollection<RenderComponent> RenderComponents;
-		ComponentCollection<RenderOffsetComponent> OffsetComponents;
-		ComponentCollection<RenderDestinationComponent> DestinationComponents;
+		ComponentCollection<Vector2Int16> OffsetComponents;
+		ComponentCollection<Vector2Int16> DestinationComponents;
+
 		ComponentCollection<Rectangle16> BoundingBoxComponents;
 	} RenderArchetype;
+
+	
 
 	struct {
 		EntityArchetype Archetype = EntityArchetype("Animation");
@@ -78,6 +81,16 @@ public:
 
 	struct {
 		EntityArchetype Archetype = EntityArchetype("Unit");
+
+		struct {
+			EntityArchetype Archetype = EntityArchetype("Unit.Render");
+			ComponentCollection<RenderUnitComponent> RenderComponents;
+			ComponentCollection<RenderUnitOffsetComponent> RenderOffsetComponents;
+			ComponentCollection<RenderUnitDestinationComponent> RenderDestinationComponents;
+			ComponentCollection<Rectangle16> RenderBoundingBoxComponents;
+		}  RenderArchetype;
+
+
 		ComponentCollection<OrientationComponent> OrientationComponents;
 		ComponentCollection<UnitMovementComponent> MovementComponents;
 		ComponentCollection<UnitComponent> UnitComponents;

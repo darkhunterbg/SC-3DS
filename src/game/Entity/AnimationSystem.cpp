@@ -11,6 +11,7 @@ static AnimationSystem* s;
 void AnimationSystem::UpdateAnimationsJob(int start, int end) {
 	AnimationData& data = s->data;
 
+	/*
 	for (int i = start; i < end; ++i) {
 		const auto& anim = data.animation[i];
 		const auto& tracker = data.tracker[i];
@@ -28,6 +29,7 @@ void AnimationSystem::UpdateAnimationsJob(int start, int end) {
 
 		data.changed[i]->changed = true;
 	}
+	*/
 }
 
 EntityManager* e;
@@ -90,7 +92,7 @@ void AnimationSystem::GenerateAnimationUpdates(EntityManager& em)
 			data.animation.push_back(em.AnimationArchetype.AnimationComponents[i]);
 			data.tracker.push_back(em.AnimationArchetype.TrackerComponents[i]);
 			data.ren.push_back(&em.RenderArchetype.RenderComponents[i]);
-			data.offset.push_back(&em.RenderArchetype.OffsetComponents[i]);
+			//data.offset.push_back(&em.RenderArchetype.OffsetComponents[i]);
 			data.changed.push_back(&em.EntityChangeComponents[i]);
 		}
 	}

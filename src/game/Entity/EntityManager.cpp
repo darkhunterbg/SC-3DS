@@ -12,6 +12,7 @@ EntityManager::EntityManager() {
 	archetypes.push_back(&CollisionArchetype.Archetype);
 	archetypes.push_back(&MovementArchetype.Archetype);
 	archetypes.push_back(&UnitArchetype.Archetype);
+	archetypes.push_back(&UnitArchetype.RenderArchetype.Archetype);
 }
 EntityManager::~EntityManager() {
 
@@ -102,22 +103,22 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color
 	UnitArchetype.MovementComponents.NewComponent(e).FromDef(def);
 	UnitArchetype.Archetype.AddEntity(e);
 
-	RenderArchetype.RenderComponents.NewComponent(e, {
+	UnitArchetype.RenderArchetype.RenderComponents.NewComponent(e, {
 		Color4(color),
 		def.MovementAnimations[0].GetFrame(0).sprite.image,
 		def.MovementAnimations[0].GetFrame(0).shadowSprite.image,
 		def.MovementAnimations[0].GetFrame(0).colorSprite.image,
 		});
 
-	RenderArchetype.OffsetComponents.NewComponent(e, {
+	UnitArchetype.RenderArchetype.RenderOffsetComponents.NewComponent(e, {
 	 Vector2Int16(def.MovementAnimations[0].GetFrame(0).offset),
 		Vector2Int16(def.MovementAnimations[0].GetFrame(0).shadowOffset)
 		});
 
-	RenderArchetype.DestinationComponents.NewComponent(e);
-	RenderArchetype.BoundingBoxComponents.NewComponent(e, { {0,0}, def.RenderSize });
+	UnitArchetype.RenderArchetype.RenderDestinationComponents.NewComponent(e);
+	UnitArchetype.RenderArchetype.RenderBoundingBoxComponents.NewComponent(e, { {0,0}, def.RenderSize });
 
-	RenderArchetype.Archetype.AddEntity(e);
+	UnitArchetype.RenderArchetype.Archetype.AddEntity(e);
 
 
 	auto& a = AnimationArchetype.AnimationComponents.NewComponent(e);

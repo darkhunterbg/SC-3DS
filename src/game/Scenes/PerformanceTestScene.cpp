@@ -7,18 +7,13 @@
 #include "../Entity/Component.h"
 
 
-
-int* table;
-
 void PerformanceTestScene::Start() {
-
-	int s = sign(-5);
 
 	UnitDatabase::LoadAllUnitResources();
 
-	camera.Position = { 200,120 };
+	camera.Position = { 200 * 2,120  * 2};
 	camera.Size = { 400,240 };
-	camera.Scale = 1;
+	camera.Scale = 2;
 
 	entityManager.Init({ 128 * 32,128 * 32 });
 
@@ -26,7 +21,7 @@ void PerformanceTestScene::Start() {
 
 	//entityManager.DrawColliders = true;
 
-	for (int i = 0; i < 1000 ; ++i) {
+	for (int i = 0; i < 10000 ; ++i) {
 		entityManager.NewUnit(UnitDatabase::Marine,
 			Vector2Int16(Vector2Int{ (i / 100) * 32 + 16, (i % 100) * 32 + 16 }),
 			Colors::Red);
@@ -37,7 +32,7 @@ void PerformanceTestScene::Start() {
 		//entityManager.UnitArchetype.OrientationComponents[i].changed = true;
 		//entityManager.UnitArchetype.OrientationComponents[i].orientation = 12;
 
-		entityManager.GoTo(i, { 1024,1024 });
+		//entityManager.GoTo(i, { 1024,1024 });
 	}
 }
 static int t = 0;
