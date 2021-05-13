@@ -9,8 +9,6 @@
 #include <cstring>
 
 void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
-	SectionProfiler p("CameraCull");
-
 	renderData.clear();
 
 	for (EntityId id : em.RenderArchetype.Archetype.GetEntities()) {
@@ -32,12 +30,12 @@ void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
 		auto& arch = em.UnitArchetype.RenderArchetype;
 
 		int i = Entity::ToIndex(id);
-		const Rectangle16& bb = arch.RenderBoundingBoxComponents[i];
+		const Rectangle16& bb = arch.BoundingBoxComponents[i];
 
 		if (!camRect.Intersects(bb))
 			continue;
 
-		renderUnitData.pos.push_back(arch.RenderDestinationComponents[i]);
+		renderUnitData.pos.push_back(arch.DestinationComponents[i]);
 		renderUnitData.ren.push_back(arch.RenderComponents[i]);
 
 	}
@@ -121,7 +119,6 @@ void RenderSystem::DrawUnits(const Camera& camera, const Rectangle16& camRect) {
 }
 
 void RenderSystem::Draw(const Camera& camera, EntityManager& em) {
-	SectionProfiler p("Draw");
 	Rectangle16 camRect = camera.GetRectangle16();
 
 	CameraCull(camRect, em);
@@ -148,7 +145,6 @@ void RenderSystem::UpdateRenderPositionsJob(int start, int end) {
 	for (int i = start; i < end; ++i) {
 		Vector2Int16& p = *data.outPos[i];
 		p = data.worldPos[i] + data.offset[i];
-		//p.shadowDst = data.worldPos[i] + data.offset[i].shadowOffset;
 		data.outBB[i]->SetCenter(data.worldPos[i]);
 	}
 }
@@ -163,9 +159,7 @@ void RenderSystem::UpdateUnitRenderPositionsJob(int start, int end) {
 	}
 }
 
-void RenderSystem::UpdatePositions(EntityManager& em, const EntityChangedData& changed){
-	SectionProfiler p("UpdatePositions");
-
+void RenderSystem::UpdatePositions(EntityManager& em, const EntityChangedData& changed) {
 	renderUpdatePosData.clear();
 	renderUnitUpdatePosData.clear();
 
@@ -176,28 +170,48 @@ void RenderSystem::UpdatePositions(EntityManager& em, const EntityChangedData& c
 		if (em.RenderArchetype.Archetype.HasEntity(id))
 		{
 			int i = Entity::ToIndex(id);
+			em.FlagComponents[i].set(ComponentFlags::RenderChanged);
+		}
 
-			auto& arch = em.RenderArchetype;
+		if (em.UnitArchetype.RenderArchetype.Archetype.HasEntity(id))
+		{
+			int i = Entity::ToIndex(id);
+			em.FlagComponents[i].set(ComponentFlags::UnitRenderChanged);
+		}
+	}
 
+	for (EntityId id : em.RenderArchetype.Archetype.GetEntities()) {
+
+		int i = Entity::ToIndex(id);
+		auto& arch = em.RenderArchetype;
+
+		if (em.FlagComponents[i].test(ComponentFlags::RenderChanged)) {
+
+			em.FlagComponents[i].clear(ComponentFlags::RenderChanged);
 			renderUpdatePosData.outPos.push_back(&arch.DestinationComponents[i]);
-			renderUpdatePosData.worldPos.push_back(changed.position[item]);
+			renderUpdatePosData.worldPos.push_back(em.PositionComponents[i]);
 			renderUpdatePosData.offset.push_back(arch.OffsetComponents[i]);
 			renderUpdatePosData.outBB.push_back(&arch.BoundingBoxComponents[i]);
 		}
+	}
 
-		if (em.UnitArchetype.RenderArchetype.Archetype.HasEntity(id)) {
-			int i = Entity::ToIndex(id);
+	for (EntityId id : em.UnitArchetype.RenderArchetype.Archetype.GetEntities()) {
 
-			auto& arch = em.UnitArchetype.RenderArchetype;
+		int i = Entity::ToIndex(id);
+		auto& arch = em.UnitArchetype.RenderArchetype;
 
-			renderUnitUpdatePosData.outPos.push_back(&arch.RenderDestinationComponents[i]);
-			renderUnitUpdatePosData.worldPos.push_back(changed.position[item]);
-			renderUnitUpdatePosData.offset.push_back(arch.RenderOffsetComponents[i]);
-			renderUnitUpdatePosData.outBB.push_back(&arch.RenderBoundingBoxComponents[i]);
+		if (em.FlagComponents[i].test(ComponentFlags::UnitRenderChanged)) {
+
+			em.FlagComponents[i].clear(ComponentFlags::UnitRenderChanged);
+			renderUnitUpdatePosData.outPos.push_back(&arch.DestinationComponents[i]);
+			renderUnitUpdatePosData.worldPos.push_back(em.PositionComponents[i]);
+			renderUnitUpdatePosData.offset.push_back(arch.OffsetComponents[i]);
+			renderUnitUpdatePosData.outBB.push_back(&arch.BoundingBoxComponents[i]);
 		}
 	}
 
 	s = this;
+
 	JobSystem::RunJob(renderUpdatePosData.size(), JobSystem::DefaultJobSize, UpdateRenderPositionsJob);
 	JobSystem::RunJob(renderUnitUpdatePosData.size(), JobSystem::DefaultJobSize, UpdateUnitRenderPositionsJob);
 }

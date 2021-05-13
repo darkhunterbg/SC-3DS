@@ -40,33 +40,26 @@ private:
 public:
 
 	ComponentCollection<Vector2Int16> PositionComponents;
-	ComponentCollection<EntityChangeComponent> EntityChangeComponents;
+	ComponentCollection<FlagsComponent> FlagComponents;
 
 	struct {
 		EntityArchetype Archetype = EntityArchetype("Render");
 		ComponentCollection<RenderComponent> RenderComponents;
 		ComponentCollection<Vector2Int16> OffsetComponents;
 		ComponentCollection<Vector2Int16> DestinationComponents;
-
 		ComponentCollection<Rectangle16> BoundingBoxComponents;
 	} RenderArchetype;
 
-	
 
 	struct {
 		EntityArchetype Archetype = EntityArchetype("Animation");
 		ComponentCollection<AnimationComponent> AnimationComponents;
-		ComponentCollection<AnimationEnableComponent> EnableComponents;
 		ComponentCollection<AnimationTrackerComponent> TrackerComponents;
-		ComponentCollection<AnimationChangedComponent> ChangedComponenets;
 	} AnimationArchetype;
 
 	struct {
 		EntityArchetype Archetype = EntityArchetype("Navigation");
-
-		ComponentCollection<NavigationWorkComponent> WorkComponents;
 		ComponentCollection<NavigationComponent> NavigationComponents;
-
 	} NavigationArchetype;
 
 	struct {
@@ -85,13 +78,18 @@ public:
 		struct {
 			EntityArchetype Archetype = EntityArchetype("Unit.Render");
 			ComponentCollection<RenderUnitComponent> RenderComponents;
-			ComponentCollection<RenderUnitOffsetComponent> RenderOffsetComponents;
-			ComponentCollection<RenderUnitDestinationComponent> RenderDestinationComponents;
-			ComponentCollection<Rectangle16> RenderBoundingBoxComponents;
+			ComponentCollection<RenderUnitOffsetComponent> OffsetComponents;
+			ComponentCollection<RenderUnitDestinationComponent> DestinationComponents;
+			ComponentCollection<Rectangle16> BoundingBoxComponents;
 		}  RenderArchetype;
 
+		struct {
+			EntityArchetype Archetype = EntityArchetype("Unit.Animation");
+			ComponentCollection<UnitAnimationComponent> AnimationComponents;
+			ComponentCollection<UnitAnimationTrackerComponent> TrackerComponents;
+		} AnimationArchetype;
 
-		ComponentCollection<OrientationComponent> OrientationComponents;
+		ComponentCollection<uint8_t> OrientationComponents;
 		ComponentCollection<UnitMovementComponent> MovementComponents;
 		ComponentCollection<UnitComponent> UnitComponents;
 	} UnitArchetype;
@@ -120,7 +118,8 @@ public:
 
 
 	EntityId NewUnit(const UnitDef& def, Vector2Int16 position, Color color);
-
+	void PlayAnimation(EntityId id, const AnimationClip& clip);
+	void PlayUnitAnimation(EntityId id, const UnitAnimationClip& clip);
 	void SetPosition(EntityId e, Vector2Int16 pos);
 	void GoTo(EntityId e, Vector2Int16 pos);
 

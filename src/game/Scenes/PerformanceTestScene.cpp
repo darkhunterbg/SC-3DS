@@ -7,16 +7,16 @@
 #include "../Entity/Component.h"
 
 
+
 void PerformanceTestScene::Start() {
 
 	UnitDatabase::LoadAllUnitResources();
 
-	camera.Position = { 200 * 2,120  * 2};
+	camera.Position = { 200 ,120  };
 	camera.Size = { 400,240 };
-	camera.Scale = 2;
+	camera.Scale = 1;
 
 	entityManager.Init({ 128 * 32,128 * 32 });
-
 
 
 	//entityManager.DrawColliders = true;
@@ -25,6 +25,8 @@ void PerformanceTestScene::Start() {
 		entityManager.NewUnit(UnitDatabase::Marine,
 			Vector2Int16(Vector2Int{ (i / 100) * 32 + 16, (i % 100) * 32 + 16 }),
 			Colors::Red);
+
+		entityManager.PlayUnitAnimation(i, UnitDatabase::Marine.MovementAnimations[4]);
 
 		//entityManager.CollisionArchetype.Archetype.RemoveEntity(i);
 		//entityManager.NavigationArchetype.Archetype.RemoveEntity(i);

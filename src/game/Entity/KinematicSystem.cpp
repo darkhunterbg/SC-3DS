@@ -127,7 +127,7 @@ void KinematicSystem::MoveEntities(EntityManager& em)
 
 		/*	moveData.movement.push_back(&em.MovementArchetype.MovementComponents[i]);
 			moveData.position.push_back(&em.PositionComponents[i]);*/
-		em.EntityChangeComponents[i].changed = true;
+		em.FlagComponents[i].set(ComponentFlags::PositionChanged, true);
 	}
 }
 

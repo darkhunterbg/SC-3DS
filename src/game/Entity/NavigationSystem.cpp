@@ -131,13 +131,13 @@ void NavigationSystem::UpdateNavigation(EntityManager& em)
 		if (em.NavigationArchetype.Archetype.HasEntity(id)) {
 			int i = Entity::ToIndex(id);
 
-			if (em.NavigationArchetype.WorkComponents[i].work) {
+			if (em.FlagComponents[i].test(ComponentFlags::NavigationWork)) {
 				applyNav.push_back(id);
 
 				auto& nav = em.NavigationArchetype.NavigationComponents[i];
 
 				if (nav.targetHeading == 255 ||
-					em.UnitArchetype.OrientationComponents[i].orientation ==
+					em.UnitArchetype.OrientationComponents[i] ==
 					nav.targetHeading) {
 
 		
@@ -169,10 +169,10 @@ void NavigationSystem::ApplyUnitNavigationJob(int start, int end) {
 		auto& orientation = em.UnitArchetype.OrientationComponents[i];
 		const auto& unitMove = em.UnitArchetype.MovementComponents[i];;
 
-		auto& work = em.NavigationArchetype.WorkComponents[i];
+		auto& flags = em.FlagComponents[i]; 
 		auto& movement = em.MovementArchetype.MovementComponents[i];
 
-		int8_t diff = nav.targetHeading - orientation.orientation;
+		int8_t diff = nav.targetHeading - orientation;
 
 		if (diff != 0) {
 
@@ -185,14 +185,14 @@ void NavigationSystem::ApplyUnitNavigationJob(int start, int end) {
 					if (std::abs(diff) > 16)
 						s = -s;
 
-					orientation.orientation += s * rotation;
-					orientation.orientation = (orientation.orientation + 32) % 32;
+					orientation += s * rotation;
+					orientation = (orientation + 32) % 32;
 				}
 				else {
-					orientation.orientation = nav.targetHeading;
+					orientation = nav.targetHeading;
 				}
 			}
-			orientation.changed = true;
+			flags.set(ComponentFlags::UnitOrientationChanged);
 			movement.velocity = { 0,0 };
 		}
 		else {
@@ -204,10 +204,10 @@ void NavigationSystem::ApplyUnitNavigationJob(int start, int end) {
 
 			if (distance.LengthSquaredInt() < velocity * velocity) {
 				movement.velocity = { 0,0 };
-				em.NavigationArchetype.WorkComponents[i].work = false;
+				flags.clear(ComponentFlags::NavigationWork);
 			}
 			else {
-				movement.velocity = Vector2Int8(movementTable32[orientation.orientation] * velocity);
+				movement.velocity = Vector2Int8(movementTable32[orientation] * velocity);
 			}
 		}
 	}

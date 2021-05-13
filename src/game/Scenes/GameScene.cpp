@@ -170,7 +170,7 @@ void GameScene::Update() {
 
 		for (EntityId id : selection)
 			if (entityManager->RenderArchetype.RenderComponents.GetComponent(id).depth != -1) {
-				entityManager->NavigationArchetype.WorkComponents.GetComponent(id).work = false;
+				entityManager->FlagComponents.GetComponent(id).clear(ComponentFlags::NavigationWork);
 			}
 	}
 	if (Game::Gamepad.IsButtonPressed(GamepadButton::B)) {
@@ -179,10 +179,7 @@ void GameScene::Update() {
 			if (entityManager->RenderArchetype.RenderComponents[id].depth != -1) {
 				auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
 
-				entityManager->AnimationArchetype.AnimationComponents[id].clip = &def->DeathAnimation;
-				entityManager->AnimationArchetype.EnableComponents[id].pause = false;
-				entityManager->AnimationArchetype.TrackerComponents[id].PlayClip(&def->DeathAnimation);
-				entityManager->AnimationArchetype.ChangedComponenets[id].frameChanged = false;
+				entityManager->PlayUnitAnimation(id, def->DeathAnimation);
 				entityManager->RenderArchetype.RenderComponents[id].depth = -1;
 				entityManager->CollisionArchetype.Archetype.RemoveEntity(id);
 				entityManager->NavigationArchetype.Archetype.RemoveEntity(id);

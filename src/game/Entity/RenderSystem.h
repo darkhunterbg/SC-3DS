@@ -78,7 +78,7 @@ class RenderSystem {
 	};
 
 private:
-	std::vector< BatchDrawCommand> render;
+	std::vector<BatchDrawCommand> render;
 
 	RenderData renderData;
 	RenderUnitData renderUnitData;

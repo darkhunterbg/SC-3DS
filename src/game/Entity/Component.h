@@ -3,6 +3,7 @@
 #include <vector>
 #include <array>
 #include <cstring>
+#include <bitset>
 
 #include "Entity.h"
 #include "../Span.h"
@@ -12,6 +13,8 @@
 #include "../Data/UnitDef.h"
 
 #include "Debug.h"
+
+
 
 ////template <unsigned id>
 //struct IComponent {
@@ -87,8 +90,28 @@ public:
 	// we need component iteration somehow
 };
 
-struct EntityChangeComponent {
-	bool changed;
+enum class ComponentFlags {
+	PositionChanged = 0,
+	RenderChanged = 1,
+	UnitRenderChanged = 2,
+	UnitOrientationChanged = 3,
+	AnimationEnabled = 4,
+	AnimationFrameChanged = 5,
+	UnitAnimationFrameChanged = 6,
+	NavigationWork = 7,
+};
+
+struct FlagsComponent {
+	std::bitset<32> value;
+	inline bool test(ComponentFlags flag) const {
+		return value.test((int)flag);
+	}
+	inline void set(ComponentFlags flag, bool v = true) {
+		value.set((int)flag, v);
+	}
+	inline void clear(ComponentFlags flag) {
+		value.set((int)flag, false);
+	}
 };
 
 struct RenderComponent {
@@ -106,6 +129,7 @@ struct RenderUnitComponent {
 	bool hFlip = false;
 };
 
+
 struct RenderUnitOffsetComponent {
 	Vector2Int16 offset;
 	Vector2Int16 shadowOffset;
@@ -117,18 +141,9 @@ struct RenderUnitDestinationComponent {
 };
 
 
-struct NavigationWorkComponent {
-	bool work;
-};
-
 struct NavigationComponent {
 	Vector2Int16 target;
 	uint8_t targetHeading;
-};
-
-struct OrientationComponent {
-	bool changed = false;
-	uint8_t orientation = 0;
 };
 
 struct MovementComponent {
@@ -149,12 +164,7 @@ struct UnitMovementComponent {
 	}
 };
 
-struct AnimationEnableComponent {
-	bool pause = true;
-};
-struct AnimationChangedComponent {
-	bool frameChanged = false;
-};
+
 struct AnimationTrackerComponent {
 	int8_t clipFrame = 0;
 	uint8_t frameCountdown = 1;
@@ -164,6 +174,33 @@ struct AnimationTrackerComponent {
 
 	inline void Restart() {
 		clipFrame = -1;
+		frameCountdown = frameTime;
+	}
+
+	inline void PlayClip(const AnimationClip* clip) {
+		if (clip) {
+			totalFrames = clip->GetFrameCount();
+			looping = clip->looping;
+			clipFrame = -1;
+			frameCountdown = frameTime = clip->frameTime;
+		}
+		else {
+			totalFrames = 0;
+			clipFrame = 0;
+		}
+	}
+};
+
+struct UnitAnimationTrackerComponent {
+	int8_t clipFrame = 0;
+	uint8_t frameCountdown = 1;
+	uint8_t totalFrames = 0;
+	uint8_t frameTime = 1;
+	bool looping = false;
+
+	inline void Restart() {
+		clipFrame = -1;
+		frameCountdown = frameTime;
 	}
 
 	inline void PlayClip(const UnitAnimationClip* clip) {
@@ -180,9 +217,14 @@ struct AnimationTrackerComponent {
 	}
 };
 
-struct AnimationComponent {
+struct UnitAnimationComponent {
 	const UnitAnimationClip* clip;
 };
+
+struct AnimationComponent {
+	const AnimationClip* clip;
+};
+
 
 struct ColliderComponent {
 	Rectangle16 collider;
