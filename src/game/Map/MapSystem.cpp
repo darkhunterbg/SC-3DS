@@ -1,12 +1,13 @@
 #include "MapSystem.h"
 #include "../Platform.h"
+#include "../Game.h"
 
 static const SpriteAtlas* minerals;
 
 
 MapSystem::MapSystem(const MapDef& map) {
-	auto tile = Platform::LoadAtlas("tileset_tile.t3x")->GetSprite(0);
-	minerals = Platform::LoadAtlas("unit_neutral_min01.t3x");
+	auto tile = Game::AssetLoader.LoadAtlas("tileset_tile.t3x")->GetSprite(0);
+	minerals = Game::AssetLoader.LoadAtlas("unit_neutral_min01.t3x");
 
 	Vector2Int16 size = { 6,6 };
 

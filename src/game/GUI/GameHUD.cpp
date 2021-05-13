@@ -15,8 +15,8 @@ static constexpr const int MinimapTextureSize = 256;
 GameHUD::GameHUD() {
 
 	font = Game::SystemFont;
-	iconsAtlas = Platform::LoadAtlas("game_icons.t3x");
-	consoleAtlas = Platform::LoadAtlas("game_tconsole.t3x");
+	iconsAtlas = Game::AssetLoader.LoadAtlas("game_icons.t3x");
+	consoleAtlas = Game::AssetLoader.LoadAtlas("game_tconsole.t3x");
 	//cmdIconsAtlas = Platform::LoadAtlas("cmdicons.t3x");
 }
 

@@ -1,5 +1,5 @@
 #include "GameScene.h"
-#include "../Platform.h"
+//#include "../Platform.h"
 #include "../Map/MapSystem.h"
 #include "../Game.h"
 #include "../GUI/GameHUD.h"
@@ -43,8 +43,8 @@ void GameScene::Start() {
 	UnitDatabase::LoadAllUnitResources();
 
 	// TODO music is in multiple folders
-	AudioStream* stream = Platform::LoadAudioStream("music/terran1.wav");
-	Game::Audio->PlayStream(stream, 0);
+	AudioStream* stream = Game::AssetLoader.LoadAudioStream("music/terran1.wav");
+	Game::Audio.PlayStream(stream, 0);
 
 	entityManager = new EntityManager();
 	//entityManager->DrawColliders = true;
@@ -150,7 +150,7 @@ void GameScene::Update() {
 
 		int i = std::rand() % 4;
 		auto& def = entityManager->UnitArchetype.UnitComponents[selection[0]].def;
-		Game::Audio->PlayClip(def->SelectedSoundDef.Clips[i], 1);
+		Game::Audio.PlayClip(def->SelectedSoundDef.Clips[i], 1);
 	}
 
 	if (Game::Gamepad.IsButtonPressed(GamepadButton::X)) {
@@ -159,10 +159,10 @@ void GameScene::Update() {
 			if (entityManager->RenderArchetype.RenderComponents.GetComponent(id).depth != -1) {
 				entityManager->GoTo(id, Vector2Int16(camera.ScreenToWorld(cursor->Position)));
 
-				auto& def = entityManager->UnitArchetype.UnitComponents[selection[0]].def;
+				auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
 
-				int i = std::rand() % 4;
-				Game::Audio->PlayClip(def->ActionConfirmSoundDef.Clips[i], 1);
+				int i = std::rand() % def->ActionConfirmSoundDef.TotalClips;
+				Game::Audio.PlayClip(def->ActionConfirmSoundDef.Clips[i], 1);
 			}
 	}
 
@@ -190,8 +190,7 @@ void GameScene::Update() {
 			
 
 				int i = std::rand() % def->DeathSoundDef.TotalClips;
-				Game::Audio->PlayClip(def->DeathSoundDef.Clips[i], 1);
-				//Game::Audio->PlayClip(death[i], 1);
+				Game::Audio.PlayClip(def->DeathSoundDef.Clips[i], 1);
 			}
 		}
 	}

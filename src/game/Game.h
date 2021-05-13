@@ -1,10 +1,11 @@
 #pragma once
 
 #include "Assets.h"
+#include "Audio.h"
+#include "AssetLoader.h"
 #include "Input.h"
 
 class Scene;
-class AudioSystem;
 
 class Game {
 
@@ -16,7 +17,8 @@ public:
 	static Font SystemFont;
 	static Gamepad Gamepad;
 	static Pointer Pointer;
-	static AudioSystem* Audio;
+	static AudioSystem Audio;
+	static AssetLoader AssetLoader;
 
 	static float DeltaTime;
 

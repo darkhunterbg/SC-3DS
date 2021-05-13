@@ -101,6 +101,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\SoundDef.h">
       <Filter>Data</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\AssetLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -125,7 +126,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\Wave.cpp">
       <Filter>Loader</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GenericPlatform.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Audio.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\EntityManager.cpp">
       <Filter>Entity</Filter>
@@ -169,5 +169,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\SoundDef.cpp">
       <Filter>Data</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\AssetLoader.cpp" />
   </ItemGroup>
 </Project>

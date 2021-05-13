@@ -20,7 +20,7 @@ static void InitAnimation(const SpriteAtlas* atlas, AnimationClip& clip, int fra
 }
 
 Cursor::Cursor() {
-	atlas = Platform::LoadAtlas("cursor.t3x");
+	atlas = Game::AssetLoader.LoadAtlas("cursor.t3x");
 	currentClip = &arrow;
 	InitAnimation(atlas, arrow, 5, { 63,63 });
 	InitAnimation(atlas, drag, 4, { 55,53 });

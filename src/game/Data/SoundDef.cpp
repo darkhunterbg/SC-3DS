@@ -1,6 +1,6 @@
 #include "SoundDef.h"
 #include "../StringLib.h"
-#include "../Platform.h"
+#include "../Game.h"
 
 void SoundDef::LoadSoundClips()
 {
@@ -9,6 +9,6 @@ void SoundDef::LoadSoundClips()
 	pattern += "%02i.wav";
 	for (int i = 0; i < TotalClips; ++i) {
 		stbsp_snprintf(buffer, sizeof(buffer), pattern.data(), i);
-		Clips[i] = Platform::LoadAudioClip(buffer);
+		Clips[i] = Game::AssetLoader.LoadAudioClip(buffer);
 	}
 }

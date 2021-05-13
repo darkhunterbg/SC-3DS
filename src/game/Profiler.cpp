@@ -65,7 +65,7 @@ void Profiler::ShowPerformance() {
 	if (frameLoad.size() == 0)
 		return;
 
-	Vector2Int offset = { 61 ,y + 50 };
+	Vector2Int offset = { 60 ,y + 50 };
 
 
 	float max = *std::max_element(frameLoad.begin(), frameLoad.end());

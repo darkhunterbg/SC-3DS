@@ -69,7 +69,7 @@ namespace AssetBatcher
 
 
 					s.WriteLine($"const SpriteFrameAtlas* SpriteDatabase::Load_{e.Name}() {{");
-					s.WriteLine($"\tconst SpriteAtlas* atlas = Platform::LoadAtlas(\"{e.Name}.t3x\");");
+					s.WriteLine($"\tconst SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas(\"{e.Name}.t3x\");");
 					s.WriteLine($"\tauto* a = {e.Name} = new SpriteFrameAtlas(atlas);");
 					s.WriteLine($"\tUnits.push_back(a);");
 					s.WriteLine($"\ta->FrameSize = Vector2Int({width}, {height});");
@@ -183,10 +183,9 @@ public:
 
 		public static string SourceStart =
 @"#include ""Generated.h""
-#include ""../Platform.h""
+#include ""../Game.h""
 
 std::vector<const SpriteFrameAtlas*> SpriteDatabase::Units;";
-
 
 	}
 }

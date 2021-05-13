@@ -81,7 +81,10 @@ struct AudioChannelState {
 class AudioSystem {
 
 public:
-	AudioSystem();
+	AudioSystem(){}
+	AudioSystem(const AudioSystem&) = delete;
+	AudioSystem& operator=(const AudioSystem&) = delete;
+	void Init();
 	void PlayClip(AudioClip clip, int channel);
 	void PlayStream(AudioStream* stream, int channel);
 	void UpdateAudio();

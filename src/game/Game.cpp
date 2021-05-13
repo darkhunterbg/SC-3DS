@@ -20,7 +20,8 @@ static double frameStartTime = 0;
 Font Game::SystemFont;
 Gamepad Game::Gamepad;
 Pointer Game::Pointer;
-AudioSystem* Game::Audio = nullptr;
+AudioSystem Game::Audio;
+AssetLoader Game::AssetLoader;
 float Game::DeltaTime = 0;
 
 
@@ -49,11 +50,11 @@ void Game::FrameEnd() {
 void Game::Start() {
 
 	JobSystem::Init();
-	SystemFont = Platform::LoadFont("font.bcfnt");
-	title = Platform::LoadAtlas("glue_title.t3x");
+	SystemFont = AssetLoader.LoadFont("font.bcfnt");
+	title = AssetLoader.LoadAtlas("glue_title.t3x");
 	startup = true;
 	frameStartTime = Platform::ElaspedTime();
-	Audio = new AudioSystem();
+	Audio.Init();
 	UnitDatabase::Init();
 	//frameLoad.push_back(0);
 }
@@ -63,7 +64,7 @@ bool Game::Update() {
 
 	Gamepad.Update();
 	Pointer.Update();
-	Audio->UpdateAudio();
+	Audio.UpdateAudio();
 
 	if (startup) {
 

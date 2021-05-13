@@ -3,7 +3,7 @@
 
 static constexpr const int AudioChannelBufferSize = 4096 ;
 
-AudioSystem::AudioSystem() {
+void AudioSystem::Init() {
 	channels[1].mono = true;
 
 	for (int i = 0; i < channels.size(); i++) {
