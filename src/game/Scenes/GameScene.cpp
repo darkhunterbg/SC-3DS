@@ -56,13 +56,15 @@ void GameScene::Start() {
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
 	int i = 0;
-	for (int y = 2; y >= 0; --y) {
-		for (int x = 2; x >= 0; --x) {
+	for (int y = 99; y >= 0; --y) {
+		for (int x = 99; x >= 0; --x) {
 
 			Color c = color[(i) % 12];
-			EntityId e = entityManager->NewUnit(*UnitDatabase::Units[(i) % UnitDatabase::Units.size()],
-				Vector2Int16(Vector2Int{ x * 64 + 16,y * 64 + 16 }), c);
+			auto& def = *UnitDatabase::Units[(i) % UnitDatabase::Units.size()];
+			EntityId e = entityManager->NewUnit(def,
+				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 + 16 }), c);
 			
+			entityManager->PlayUnitAnimation(e, def.MovementAnimations[12]);
 			//entityManager->UnitArchetype.OrientationComponents[i].orientation = 24;
 			//entityManager->UnitArchetype.OrientationComponents[i].changed = true;
 			//entityManager->CollisionArchetype.Archetype.RemoveEntity(e);
@@ -114,14 +116,20 @@ void GameScene::Update() {
 	frameCounter += 2;
 	frameCounter2 += 2;
 
+	bool logical = false;
+
 	while (frameCounter2 >= 5)
 	{
+		
 		frameCounter2 -= 5;
 		AuxilaryUpdate();
 	}
 
+
+
 	while (frameCounter >= 5)
 	{
+		logical = true;
 
 		++logicalFrame;
 		frameCounter -= 5;
@@ -143,56 +151,62 @@ void GameScene::Update() {
 
 	tmp.clear();
 	cursor->Update(camera, *entityManager, tmp);
-	if (tmp.size() > 0)
+
+	//if (logical)
 	{
-		selection.clear();
-		selection.insert(selection.begin(), tmp.begin(), tmp.end());
 
-		int i = std::rand() % 4;
-		auto& def = entityManager->UnitArchetype.UnitComponents[selection[0]].def;
-		Game::Audio.PlayClip(def->SelectedSoundDef.Clips[i], 1);
-	}
-
-	if (Game::Gamepad.IsButtonPressed(GamepadButton::X)) {
-
-		for (EntityId id : selection)
-			if (entityManager->RenderArchetype.RenderComponents.GetComponent(id).depth != -1) {
-				entityManager->GoTo(id, Vector2Int16(camera.ScreenToWorld(cursor->Position)));
-
-				auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
-
-				int i = std::rand() % def->ActionConfirmSoundDef.TotalClips;
-				Game::Audio.PlayClip(def->ActionConfirmSoundDef.Clips[i], 1);
-			}
-	}
-
-	if (Game::Gamepad.IsButtonPressed(GamepadButton::Y)) {
-
-		for (EntityId id : selection)
-			if (entityManager->RenderArchetype.RenderComponents.GetComponent(id).depth != -1) {
-				entityManager->FlagComponents.GetComponent(id).clear(ComponentFlags::NavigationWork);
-			}
-	}
-	if (Game::Gamepad.IsButtonPressed(GamepadButton::B)) {
-		for (EntityId id : selection)
+		if (tmp.size() > 0)
 		{
-			if (entityManager->RenderArchetype.RenderComponents[id].depth != -1) {
-				auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
+			selection.clear();
+			selection.insert(selection.begin(), tmp.begin(), tmp.end());
 
-				entityManager->PlayUnitAnimation(id, def->DeathAnimation);
-				entityManager->RenderArchetype.RenderComponents[id].depth = -1;
-				entityManager->CollisionArchetype.Archetype.RemoveEntity(id);
-				entityManager->NavigationArchetype.Archetype.RemoveEntity(id);
-				entityManager->MovementArchetype.Archetype.RemoveEntity(id);
+			int i = std::rand() % 4;
+			auto& def = entityManager->UnitArchetype.UnitComponents[selection[0]].def;
+			Game::Audio.PlayClip(def->SelectedSoundDef.Clips[i], 1);
+		}
 
-			
+		if (Game::Gamepad.IsButtonPressed(GamepadButton::X)) {
 
-				int i = std::rand() % def->DeathSoundDef.TotalClips;
-				Game::Audio.PlayClip(def->DeathSoundDef.Clips[i], 1);
+			for (EntityId id : selection)
+				if (entityManager->UnitArchetype.RenderArchetype.RenderComponents.GetComponent(id).depth != -1) {
+					entityManager->GoTo(id, Vector2Int16(camera.ScreenToWorld(cursor->Position)));
+
+					auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
+
+					int i = std::rand() % def->ActionConfirmSoundDef.TotalClips;
+					Game::Audio.PlayClip(def->ActionConfirmSoundDef.Clips[i], 1);
+				}
+		}
+
+		// Unit animation death anim layer and death object should be configurable
+
+		if (Game::Gamepad.IsButtonPressed(GamepadButton::Y)) {
+
+			for (EntityId id : selection)
+				if (entityManager->UnitArchetype.RenderArchetype.RenderComponents.GetComponent(id).depth != -1) {
+					entityManager->FlagComponents.GetComponent(id).clear(ComponentFlags::NavigationWork);
+				}
+		}
+		if (Game::Gamepad.IsButtonPressed(GamepadButton::B)) {
+			for (EntityId id : selection)
+			{
+				if (entityManager->UnitArchetype.RenderArchetype.RenderComponents[id].depth != -1) {
+					auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
+
+					entityManager->PlayUnitAnimation(id, def->DeathAnimation);
+					entityManager->UnitArchetype.RenderArchetype.RenderComponents[id].depth = -1;
+					entityManager->CollisionArchetype.Archetype.RemoveEntity(id);
+					entityManager->NavigationArchetype.Archetype.RemoveEntity(id);
+					entityManager->MovementArchetype.Archetype.RemoveEntity(id);
+
+
+
+					int i = std::rand() % def->DeathSoundDef.TotalClips;
+					Game::Audio.PlayClip(def->DeathSoundDef.Clips[i], 1);
+				}
 			}
 		}
 	}
-
 
 	camera.Update();
 }

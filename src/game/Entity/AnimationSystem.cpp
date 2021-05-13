@@ -18,7 +18,11 @@ void AnimationSystem::UpdateUnitAnimationsJob(int start, int end) {
 		auto& offset = *data.offset[i];
 		auto& flags = *data.flags[i];
 
+		if (tracker.clipFrame < 0)
+			continue;
+
 		const UnitSpriteFrame& frame = anim.clip->GetFrame(tracker.clipFrame);
+
 		ren.hFlip = frame.hFlip;
 		ren.sprite = frame.sprite.image;
 		ren.shadowSprite = frame.shadowSprite.image;
@@ -82,11 +86,11 @@ void AnimationSystem::TickUnitAnimationsJob(int start, int end) {
 
 		f.set(ComponentFlags::UnitAnimationFrameChanged);
 
-		int framesCount = tracker.totalFrames;
 		if (tracker.looping)
-			tracker.clipFrame %= framesCount;
+			tracker.clipFrame %= tracker.totalFrames;
 
-		f.set(ComponentFlags::AnimationEnabled, tracker.clipFrame < framesCount);
+
+		f.set(ComponentFlags::AnimationEnabled, tracker.clipFrame < tracker.totalFrames);
 	}
 }
 void AnimationSystem::TickAnimationsJob(int start, int end) {
@@ -158,15 +162,19 @@ void AnimationSystem::TickAnimations(EntityManager& em)
 	for (EntityId id : em.UnitArchetype.AnimationArchetype.Archetype.GetEntities()) {
 		int i = Entity::ToIndex(id);
 		auto& f = em.FlagComponents[i];
-		if (f.test(ComponentFlags::UnitAnimationFrameChanged)) {
-			f.clear(ComponentFlags::UnitAnimationFrameChanged);
 
-			if (em.UnitArchetype.RenderArchetype.Archetype.HasEntity(id)) {
-				unitData.animation.push_back(em.UnitArchetype.AnimationArchetype.AnimationComponents[i]);
-				unitData.tracker.push_back(em.UnitArchetype.AnimationArchetype.TrackerComponents[i]);
-				unitData.ren.push_back(&em.UnitArchetype.RenderArchetype.RenderComponents[i]);
-				unitData.offset.push_back(&em.UnitArchetype.RenderArchetype.OffsetComponents[i]);
-				unitData.flags.push_back(&f);
+		if (f.test(ComponentFlags::AnimationEnabled))
+		{
+			if (f.test(ComponentFlags::UnitAnimationFrameChanged)) {
+				f.clear(ComponentFlags::UnitAnimationFrameChanged);
+
+				if (em.UnitArchetype.RenderArchetype.Archetype.HasEntity(id)) {
+					unitData.animation.push_back(em.UnitArchetype.AnimationArchetype.AnimationComponents[i]);
+					unitData.tracker.push_back(em.UnitArchetype.AnimationArchetype.TrackerComponents[i]);
+					unitData.ren.push_back(&em.UnitArchetype.RenderArchetype.RenderComponents[i]);
+					unitData.offset.push_back(&em.UnitArchetype.RenderArchetype.OffsetComponents[i]);
+					unitData.flags.push_back(&f);
+				}
 			}
 		}
 	}
