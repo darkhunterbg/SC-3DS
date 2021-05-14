@@ -102,6 +102,12 @@
       <Filter>Data</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\AssetLoader.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\GraphicsDef.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\GraphicsDatabase.h">
+      <Filter>Data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -170,5 +176,8 @@
       <Filter>Data</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\AssetLoader.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\GraphicsDatabase.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

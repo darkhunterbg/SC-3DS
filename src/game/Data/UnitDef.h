@@ -1,37 +1,43 @@
 #pragma once
 
 #include <string>
+#include <functional>
 
 #include "../Assets.h"
 #include "../MathLib.h"
 #include "AnimationDef.h"
 #include "SoundDef.h"
+#include "GraphicsDef.h"
 
 struct UnitDef {
+
 
 	std::string Name;
 	unsigned Health;
 	uint8_t MovementSpeed;
 	uint8_t RotationSpeed;
 
-	Vector2Int16 RenderSize;
-	Rectangle16 Collider;
 
-	SoundDef SelectedSoundDef;
-	SoundDef ActionConfirmSoundDef;
-	SoundDef DeathSoundDef;
+	struct {
+		UnitSound Ready;
+		UnitSound Yes;
+		UnitSound What;
+		UnitSound Annoyed;
+		UnitSound Death;
+	} Sounds;
 
-	UnitDirectionalAnimationDef MovementAnimationDef;
-	UnitAnimationDef DeathAnimationDef;
-	
+	const UnitGraphicsDef* Graphics = nullptr;
 
-	UnitAnimationClip MovementAnimations[32];
-	UnitAnimationClip AttackAnimations[32];
-	UnitAnimationClip DeathAnimation;
-
-
-
-	UnitDef() {}
+	UnitDef() {  }
 	UnitDef(const UnitDef&) = delete;
 	UnitDef& operator=(const UnitDef&) = delete;
+
+	inline void LoadAllSounds() {
+
+		UnitSound* s = (UnitSound*)&Sounds;
+		for (int i = 0; i < 5; ++i) {
+			if (s[i].TotalClips > 0)
+				s[i].LoadSoundClips();
+		}
+	}
 };

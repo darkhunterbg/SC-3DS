@@ -8,6 +8,7 @@
 #include "Audio.h"
 #include "Profiler.h"
 #include "Data/UnitDatabase.h"
+#include "Data/GraphicsDatabase.h"
 #include "Job.h"
 
 static Scene* currentScene;
@@ -31,8 +32,8 @@ static void ShowTitleScreen() {
 	Platform::Draw(title->GetSprite(0), { {0,0},{400,240} });
 }
 static void InitialScene() {
-	//Game::SetCurrentScene(new GameScene());
-	Game::SetCurrentScene(new PerformanceTestScene());
+	Game::SetCurrentScene(new GameScene());
+	//Game::SetCurrentScene(new PerformanceTestScene());
 }
 
 void Game::FrameStart() {
@@ -55,6 +56,8 @@ void Game::Start() {
 	startup = true;
 	frameStartTime = Platform::ElaspedTime();
 	Audio.Init();
+
+	GraphicsDatabase::Init();
 	UnitDatabase::Init();
 	//frameLoad.push_back(0);
 }

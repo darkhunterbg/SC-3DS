@@ -2,7 +2,7 @@
 #include "../StringLib.h"
 #include "../Game.h"
 
-void SoundDef::LoadSoundClips()
+void UnitSound::LoadSoundClips()
 {
 	char buffer[128];
 	std::string pattern = SoundPath;

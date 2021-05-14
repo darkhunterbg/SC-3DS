@@ -122,7 +122,7 @@ void EntityManager::DrawEntites(const Camera& camera) {
 EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color color, EntityId e) {
 
 	if (e == Entity::None)
-		EntityId e = entities.NewEntity();
+		e = entities.NewEntity();
 	PositionComponents.NewComponent(e, position);
 
 	FlagComponents.NewComponent(e);
@@ -133,23 +133,23 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color
 
 	UnitArchetype.RenderArchetype.RenderComponents.NewComponent(e, {
 		Color4(color),
-		def.MovementAnimations[0].GetFrame(0).sprite.image,
-		def.MovementAnimations[0].GetFrame(0).shadowSprite.image,
-		def.MovementAnimations[0].GetFrame(0).colorSprite.image,
+		def.Graphics->MovementAnimations[0].GetFrame(0).sprite.image,
+		def.Graphics->MovementAnimations[0].GetFrame(0).shadowSprite.image,
+		def.Graphics->MovementAnimations[0].GetFrame(0).colorSprite.image,
 		});
 
 	UnitArchetype.RenderArchetype.OffsetComponents.NewComponent(e, {
-	 Vector2Int16(def.MovementAnimations[0].GetFrame(0).offset),
-		Vector2Int16(def.MovementAnimations[0].GetFrame(0).shadowOffset)
+	 Vector2Int16(def.Graphics->MovementAnimations[0].GetFrame(0).offset),
+		Vector2Int16(def.Graphics->MovementAnimations[0].GetFrame(0).shadowOffset)
 		});
 
 	UnitArchetype.RenderArchetype.DestinationComponents.NewComponent(e);
-	UnitArchetype.RenderArchetype.BoundingBoxComponents.NewComponent(e, { {0,0}, def.RenderSize });
+	UnitArchetype.RenderArchetype.BoundingBoxComponents.NewComponent(e, { {0,0}, def.Graphics->RenderSize });
 
 	UnitArchetype.RenderArchetype.Archetype.AddEntity(e);
 
 	UnitArchetype.AnimationArchetype.AnimationComponents.NewComponent(e);
-	UnitArchetype.AnimationArchetype.TrackerComponents.NewComponent(e).PlayClip(&def.MovementAnimations[0]);
+	UnitArchetype.AnimationArchetype.TrackerComponents.NewComponent(e).PlayClip(&def.Graphics->MovementAnimations[0]);
 
 	UnitArchetype.AnimationArchetype.Archetype.AddEntity(e);
 
@@ -157,7 +157,7 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color
 
 	NavigationArchetype.Archetype.AddEntity(e);
 
-	CollisionArchetype.ColliderComponents.NewComponent(e).collider = def.Collider;
+	CollisionArchetype.ColliderComponents.NewComponent(e).collider = def.Graphics->Collider;
 	CollisionArchetype.Archetype.AddEntity(e);
 
 	MovementArchetype.MovementComponents.NewComponent(e);

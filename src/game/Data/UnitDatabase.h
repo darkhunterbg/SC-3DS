@@ -3,6 +3,7 @@
 #include "UnitDef.h"
 #include <vector>
 
+
 class UnitDatabase {
 
 private:
@@ -11,7 +12,7 @@ private:
 public:
 	static UnitDef Marine, SCV;
 
-	static std::vector<const UnitDef*> Units;
+	static std::vector<UnitDef*> Units;
 
 	static void Init();
 	static void LoadAllUnitResources();

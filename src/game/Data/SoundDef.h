@@ -2,7 +2,7 @@
 
 #include "../Assets.h"
 
-struct SoundDef {
+struct UnitSound {
 
 	const char* SoundPath;
 	uint8_t TotalClips = 0;
