@@ -1,16 +1,16 @@
 #include "Generated.h"
 #include "../Game.h"
 
-std::vector<const SpriteFrameAtlas*> SpriteDatabase::Units;
+
 SpriteFrameAtlas* SpriteDatabase::unit_terran_marine;
 SpriteFrameAtlas* SpriteDatabase::unit_terran_tmashad;
+SpriteFrameAtlas* SpriteDatabase::unit_terran_tmadeath;
 SpriteFrameAtlas* SpriteDatabase::unit_terran_scv;
 SpriteFrameAtlas* SpriteDatabase::unit_thingy_tbangs;
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_marine() {
 	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_terran_marine.t3x");
 	auto* a = unit_terran_marine = new SpriteFrameAtlas(atlas);
-	Units.push_back(a);
 	a->FrameSize = Vector2Int(64, 64);
 
 	a->SetOffset(0, Vector2Int(23,19));
@@ -472,7 +472,6 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_marine() {
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_tmashad() {
 	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_terran_tmashad.t3x");
 	auto* a = unit_terran_tmashad = new SpriteFrameAtlas(atlas);
-	Units.push_back(a);
 	a->FrameSize = Vector2Int(44, 44);
 
 	a->SetOffset(0, Vector2Int(14,28));
@@ -700,10 +699,21 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_tmashad() {
 	return a;
 }
 
+const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_tmadeath() {
+	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_terran_tmadeath.t3x");
+	auto* a = unit_terran_tmadeath = new SpriteFrameAtlas(atlas);
+	a->FrameSize = Vector2Int(64, 64);
+
+	a->SetOffset(0, Vector2Int(0,24));
+	a->SetOffset(1, Vector2Int(0,25));
+	a->SetOffset(2, Vector2Int(0,27));
+
+	return a;
+}
+
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_scv() {
 	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_terran_scv.t3x");
 	auto* a = unit_terran_scv = new SpriteFrameAtlas(atlas);
-	Units.push_back(a);
 	a->FrameSize = Vector2Int(72, 72);
 
 	a->SetOffset(0, Vector2Int(21,19));
@@ -815,7 +825,6 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_scv() {
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_tbangs() {
 	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_thingy_tbangs.t3x");
 	auto* a = unit_thingy_tbangs = new SpriteFrameAtlas(atlas);
-	Units.push_back(a);
 	a->FrameSize = Vector2Int(128, 128);
 
 	a->SetOffset(0, Vector2Int(30,47));

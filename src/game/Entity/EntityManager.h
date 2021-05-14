@@ -131,7 +131,7 @@ public:
 	void DrawEntites(const Camera& camera);
 
 
-
+	EntityId NewEmptyObject(Vector2Int16 position = { 0,0 });
 	EntityId NewUnit(const UnitDef& def, Vector2Int16 position, Color color, EntityId id = Entity::None);
 	void PlayAnimation(EntityId id, const AnimationClip& clip);
 	void PlayUnitAnimation(EntityId id, const UnitAnimationClip& clip);

@@ -163,6 +163,7 @@ public:
 	inline void SetFrameOffset(uint8_t frame, Vector2Int16 offset) {
 		frames[frame].offset = offset;
 	}
+	inline uint16_t GetDuration() const { return frameCount * (uint16_t)frameTime; }
 	inline Span<SpriteFrame> GetFrames() const {
 		return { frames.data(), frameCount };
 	}

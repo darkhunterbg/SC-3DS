@@ -60,7 +60,7 @@
     <NMakeBuildCommandLine>make</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>make clean all</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>C:/devkitPro/libctru/include;C:/devkitPro/devkitARM/arm-none-eabi/include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>C:/devkitPro/libctru/include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
     <ExecutablePath>$(VC_ExecutablePath_x86);$(CommonExecutablePath)</ExecutablePath>
     <NMakePreprocessorDefinitions>_3DS</NMakePreprocessorDefinitions>
     <IntDir>$(SolutionDir)tmp\$(Configuration)\</IntDir>

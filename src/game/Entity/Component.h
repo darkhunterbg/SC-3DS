@@ -118,6 +118,11 @@ struct RenderComponent {
 	Image sprite;
 	int8_t depth = 0;
 	bool hFlip = false;
+
+	inline void SetSpriteFrame(const SpriteFrame& s) {
+		sprite = s.sprite.image;
+		hFlip = s.hFlip;
+	}
 };
 
 struct RenderUnitComponent {
@@ -174,15 +179,15 @@ struct AnimationTrackerComponent {
 
 	inline void Restart() {
 		clipFrame = -1;
-		frameCountdown = frameTime;
+		frameCountdown = 1;
 	}
 
 	inline void PlayClip(const AnimationClip* clip) {
 		if (clip) {
 			totalFrames = clip->GetFrameCount();
 			looping = clip->looping;
-			clipFrame = -1;
-			frameCountdown = frameTime = clip->frameTime;
+			frameTime = clip->frameTime;
+			Restart();
 		}
 		else {
 			totalFrames = 0;
@@ -253,12 +258,13 @@ struct TimingComponent {
 
 enum class TimerExpiredAction : uint8_t {
 	None = 0,
-	DeleteEntity = 1,
+	UnitRemnantsThenDelete = 1,
+	DeleteEntity = 2,
 };
 
 
 struct TimingActionComponent {
 	TimerExpiredAction action;
 	
-	static constexpr const int ActionTypeCount = 2;
+	static constexpr const int ActionTypeCount = 3;
 };

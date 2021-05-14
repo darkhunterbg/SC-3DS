@@ -6,8 +6,6 @@
 
 void TimingSystem::UpdateTimers(EntityManager& em)
 {
-	SectionProfiler p("UpdateTimers");
-
 	for (auto& t : actionsTable)
 		t.entities.clear();
 
@@ -37,11 +35,33 @@ void TimingSystem::UpdateTimers(EntityManager& em)
 
 
 void TimingSystem::ApplyTimerActions(EntityManager& em) {
-	SectionProfiler p("ApplyTimers");
 
+	UnitRemnantsThenDelete(GetActionEntityTable(TimerExpiredAction::UnitRemnantsThenDelete), em);
 	DeleteEntities(GetActionEntityTable(TimerExpiredAction::DeleteEntity), em);
 }
 
-void TimingSystem::DeleteEntities( std::vector<EntityId>& entities, EntityManager& em) {
+void TimingSystem::UnitRemnantsThenDelete(std::vector<EntityId>& entities, EntityManager& em) {
+	if (entities.size() > 0) {
+		//em.DeleteEntities(entities);
+		for (EntityId id : entities) {
+			int i = Entity::ToIndex(id);
+			auto def = em.UnitArchetype.UnitComponents[i].def;
+			em.DeleteEntity(id);
+
+			auto e = em.NewEmptyObject(em.PositionComponents[i]);
+			em.RenderArchetype.Archetype.AddEntity(e);
+			em.RenderArchetype.RenderComponents.NewComponent(e).depth = def->Graphics->Remnants.Depth;
+			em.RenderArchetype.RenderComponents.GetComponent(e).SetSpriteFrame(def->Graphics->Remnants.Clip.GetFrame(0));
+			em.RenderArchetype.OffsetComponents.NewComponent(e) = def->Graphics->Remnants.Clip.GetFrame(0).offset;
+			em.RenderArchetype.DestinationComponents.NewComponent(e) = def->Graphics->Remnants.Clip.GetFrame(0).offset + em.PositionComponents[i];
+			em.RenderArchetype.BoundingBoxComponents.NewComponent(e) = em.UnitArchetype.RenderArchetype.BoundingBoxComponents
+				.GetComponent(id);
+			em.StartTimer(e, def->Graphics->Remnants.Clip.GetDuration() + 1, TimerExpiredAction::DeleteEntity);
+			em.PlayAnimation(e, def->Graphics->Remnants.Clip);
+		}
+	}
+}
+
+void TimingSystem::DeleteEntities(std::vector<EntityId>& entities, EntityManager& em) {
 	em.DeleteEntities(entities);
 }

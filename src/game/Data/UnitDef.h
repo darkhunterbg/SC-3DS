@@ -10,13 +10,10 @@
 #include "GraphicsDef.h"
 
 struct UnitDef {
-
-
 	std::string Name;
 	unsigned Health;
 	uint8_t MovementSpeed;
 	uint8_t RotationSpeed;
-
 
 	struct {
 		UnitSound Ready;

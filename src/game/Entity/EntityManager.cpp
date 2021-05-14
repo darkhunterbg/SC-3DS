@@ -122,6 +122,15 @@ void EntityManager::DrawEntites(const Camera& camera) {
 		kinematicSystem.DrawColliders(camera);
 }
 
+EntityId EntityManager::NewEmptyObject(Vector2Int16 position)
+{
+	EntityId e = entities.NewEntity();
+	PositionComponents.NewComponent(e, position);
+	FlagComponents.NewComponent(e).set(ComponentFlags::PositionChanged);
+
+	return e;
+}
+
 EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color color, EntityId e) {
 
 	if (e == Entity::None)
@@ -173,6 +182,16 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color
 	return e;
 }
 void EntityManager::PlayAnimation(EntityId e, const AnimationClip& clip) {
+
+	AnimationComponent& a = AnimationArchetype.AnimationComponents.GetComponent(e);
+	AnimationTrackerComponent& t = AnimationArchetype.TrackerComponents.GetComponent(e);
+
+	if (!AnimationArchetype.Archetype.HasEntity(e)) {
+		AnimationArchetype.Archetype.AddEntity(e);
+		AnimationArchetype.AnimationComponents.NewComponent(e);
+		AnimationArchetype.TrackerComponents.NewComponent(e);
+	}
+
 	AnimationArchetype.AnimationComponents[e].clip = &clip;
 	AnimationArchetype.TrackerComponents[e].PlayClip(&clip);
 	FlagComponents[e].set(ComponentFlags::AnimationEnabled);

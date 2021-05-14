@@ -18,10 +18,9 @@ private:
 	inline constexpr std::vector<EntityId>& GetActionEntityTable(TimerExpiredAction action) {
 		return actionsTable[(int)action].entities;
 	}
+	void UnitRemnantsThenDelete(std::vector<EntityId>& entities, EntityManager& em);
 	void DeleteEntities( std::vector<EntityId>& entities , EntityManager& em);
 public:
-
-
 	void UpdateTimers(EntityManager& em);
 	void ApplyTimerActions(EntityManager& em);
 };

@@ -62,27 +62,15 @@ void GameScene::Start() {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[(i) % UnitDatabase::Units.size()];
 			EntityId e = entityManager->NewUnit(def,
-				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 + 16 }), c);
+				Vector2Int16(Vector2Int{ x * 32 + 32,y * 32 + 16 }), c);
 
-			entityManager->PlayUnitAnimation(e, def.Graphics->MovementAnimations[12]);
-			//entityManager->UnitArchetype.OrientationComponents[i].orientation = 24;
-			//entityManager->UnitArchetype.OrientationComponents[i].changed = true;
-			//entityManager->CollisionArchetype.Archetype.RemoveEntity(e);
-			//int orientation = std::rand() % 32;
-			i++;
+			//entityManager->PlayUnitAnimation(e, def.Graphics->MovementAnimations[12]);
+			i += 1;
 
-			/*if (i % 2) {
-				entityManager->RenderArchetype.Archetype.RemoveEntity(e);
-				entityManager->AnimationArchetype.Archetype.RemoveEntity(e);
-			}*/
-			//entityManager->SetOrientation(e, orientation);
-			//entityManager->GoTo(e, Vector2Int16(Vector2Int{ 512 * ((i +1)% 2) +32, 512 * (i % 2) } +32));
 		}
 	}
 
 	selection.push_back(0);
-	//int id = 3542;
-	//entityManager->DeleteEntity(id);
 }
 
 int t = 0;
@@ -142,6 +130,7 @@ void GameScene::Update() {
 	tmp.clear();
 	cursor->Update(camera, *entityManager, tmp);
 
+	// TODO: Player input should be feed in the entity manager and on start of secondary update
 	//if (logical)
 	{
 
@@ -159,7 +148,7 @@ void GameScene::Update() {
 		if (Game::Gamepad.IsButtonPressed(GamepadButton::X)) {
 
 			for (EntityId id : selection)
-				if (entityManager->UnitArchetype.RenderArchetype.RenderComponents.GetComponent(id).depth != -1) {
+				if (entityManager->UnitArchetype.Archetype.HasEntity(id)) {
 					entityManager->GoTo(id, Vector2Int16(camera.ScreenToWorld(cursor->Position)));
 
 					auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
@@ -174,30 +163,35 @@ void GameScene::Update() {
 		if (Game::Gamepad.IsButtonPressed(GamepadButton::Y)) {
 
 			for (EntityId id : selection)
-				if (entityManager->UnitArchetype.RenderArchetype.RenderComponents.GetComponent(id).depth != -1) {
+				if (entityManager->NavigationArchetype.Archetype.HasEntity(id)) {
 					entityManager->FlagComponents.GetComponent(id).clear(ComponentFlags::NavigationWork);
 				}
 		}
 		if (Game::Gamepad.IsButtonPressed(GamepadButton::B)) {
 			for (EntityId id : selection)
 			{
-				if (entityManager->UnitArchetype.RenderArchetype.RenderComponents[id].depth != -1) {
-					auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
+				auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
+				entityManager->UnitArchetype.Archetype.RemoveEntity(id);
 
-					entityManager->PlayUnitAnimation(id, def->Graphics->DeathAnimation);
-					entityManager->UnitArchetype.RenderArchetype.RenderComponents[id].depth = -1;
-					entityManager->CollisionArchetype.Archetype.RemoveEntity(id);
-					entityManager->NavigationArchetype.Archetype.RemoveEntity(id);
-					entityManager->MovementArchetype.Archetype.RemoveEntity(id);
+				entityManager->PlayUnitAnimation(id, def->Graphics->DeathAnimation);
+				//entityManager->UnitArchetype.RenderArchetype.RenderComponents[id].depth = -1;
+				entityManager->CollisionArchetype.Archetype.RemoveEntity(id);
+				entityManager->NavigationArchetype.Archetype.RemoveEntity(id);
+				entityManager->MovementArchetype.Archetype.RemoveEntity(id);
 
-					entityManager->TimingArchetype.Archetype.AddEntity(id);
-					entityManager->StartTimer(id, def->Graphics->DeathAnimation.GetDuration() + 1, TimerExpiredAction::DeleteEntity);
-					entityManager->FlagComponents.GetComponent(id).set(ComponentFlags::UpdateTimers);
+				entityManager->TimingArchetype.Archetype.AddEntity(id);
 
-					int i = std::rand() % def->Sounds.Death.TotalClips;
-					Game::Audio.PlayClip(def->Sounds.Death.Clips[i], 1);
-				}
+				TimerExpiredAction action = def->Graphics->Remnants.HasRemnants() ?
+					TimerExpiredAction::UnitRemnantsThenDelete : TimerExpiredAction::DeleteEntity;
+
+				entityManager->StartTimer(id, def->Graphics->DeathAnimation.GetDuration() + 1, action);
+
+				int i = std::rand() % def->Sounds.Death.TotalClips;
+				Game::Audio.PlayClip(def->Sounds.Death.Clips[i], 1);
+
 			}
+
+			selection.clear();
 		}
 	}
 

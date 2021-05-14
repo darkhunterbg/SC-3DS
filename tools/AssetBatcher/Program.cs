@@ -27,6 +27,8 @@ namespace AssetBatcher
 
 			T3SFolder("unit/terran/marine");
 			T3SFolder("unit/terran/tmashad");
+			T3SFolder("unit/terran/tmadeath");
+			//T3SFolder("unit/terran/tmeDeath");
 
 			T3SFolder("unit/terran/scv");
 			T3SFolder("unit/thingy/tbangs");
@@ -71,7 +73,6 @@ namespace AssetBatcher
 					s.WriteLine($"const SpriteFrameAtlas* SpriteDatabase::Load_{e.Name}() {{");
 					s.WriteLine($"\tconst SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas(\"{e.Name}.t3x\");");
 					s.WriteLine($"\tauto* a = {e.Name} = new SpriteFrameAtlas(atlas);");
-					s.WriteLine($"\tUnits.push_back(a);");
 					s.WriteLine($"\ta->FrameSize = Vector2Int({width}, {height});");
 
 					s.WriteLine();
@@ -105,6 +106,8 @@ namespace AssetBatcher
 
 		static void T3SFolder(string folder, bool centerCoord = false)
 		{
+			Console.WriteLine(folder);
+
 			string name = folder.Replace('/', '_');
 
 			string path = Path.GetFullPath($"../../data_out/{folder}");
@@ -159,6 +162,8 @@ namespace AssetBatcher
 					}
 				}
 			}
+
+			Console.WriteLine(dir);
 		}
 	}
 
@@ -177,15 +182,13 @@ class SpriteDatabase{
 
 public:
 
-	static std::vector<const SpriteFrameAtlas*> Units;
-
 ";
 
 		public static string SourceStart =
 @"#include ""Generated.h""
 #include ""../Game.h""
 
-std::vector<const SpriteFrameAtlas*> SpriteDatabase::Units;";
+";
 
 	}
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 static const constexpr float PI = 3.14159265359f;
 

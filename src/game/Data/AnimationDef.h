@@ -8,7 +8,7 @@ class AnimationClip;
 
 struct AnimationDef {
 	int FrameStart = 0;
-	int FrameCount = 1;
+	int FrameCount = 0;
 	int FrameTime = 1;
 	bool Looping = false;
 
