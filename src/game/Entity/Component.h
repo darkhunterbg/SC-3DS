@@ -98,6 +98,7 @@ enum class ComponentFlags {
 	UnitAnimationFrameChanged = 6,
 	NavigationWork = 7,
 	UpdateTimers = 8,
+
 };
 
 struct FlagsComponent {
@@ -229,21 +230,35 @@ struct ColliderComponent {
 	Rectangle16 collider;
 };
 
-
-enum class TimerExpiredAction {
-	DeleteEntity = 0,
-};
+typedef uint16_t TimingDuration;
 
 struct TimingComponent {
-	std::array<uint16_t, 4 > timers;
-	std::array<TimerExpiredAction, 4 > actions;
-	uint8_t activeTimers = 0;
+	TimingDuration timer;
+	TimingDuration nextTimer;
 
-	inline void NewTimer(uint16_t durationFrames, TimerExpiredAction action) {
+	inline void NewTimer(TimingDuration duration, bool looping = false) {
 
-		timers[activeTimers] = durationFrames;
-		actions[activeTimers] = action;
-
-		++activeTimers;
+		timer = duration;
+		nextTimer = looping * duration;
 	}
+
+	inline static constexpr const TimingDuration FrameTime(int frames) {
+		return frames;
+	}
+
+	inline static constexpr const TimingDuration SecondsTime(float seconds) {
+		return (uint16_t)(seconds * 24);
+	}
+};
+
+enum class TimerExpiredAction : uint8_t {
+	None = 0,
+	DeleteEntity = 1,
+};
+
+
+struct TimingActionComponent {
+	TimerExpiredAction action;
+	
+	static constexpr const int ActionTypeCount = 2;
 };

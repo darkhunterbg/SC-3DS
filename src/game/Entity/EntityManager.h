@@ -100,6 +100,7 @@ public:
 	struct {
 		EntityArchetype Archetype = EntityArchetype("Timing");
 		ComponentCollection<TimingComponent> TimingComponents;
+		ComponentCollection<TimingActionComponent> ActionComponents;
 	} TimingArchetype;
 private:
 	void CollectEntityChanges();
@@ -136,6 +137,7 @@ public:
 	void PlayUnitAnimation(EntityId id, const UnitAnimationClip& clip);
 	void SetPosition(EntityId e, Vector2Int16 pos);
 	void GoTo(EntityId e, Vector2Int16 pos);
+	void StartTimer(EntityId e, uint16_t time, TimerExpiredAction action, bool looping = false);
 
 	inline bool CollidesWithAny(const Rectangle16& collider, EntityId skip) {
 

@@ -195,3 +195,18 @@ void EntityManager::GoTo(EntityId e, Vector2Int16 pos) {
 	NavigationArchetype.NavigationComponents.GetComponent(e).target = pos;
 	NavigationArchetype.NavigationComponents.GetComponent(e).targetHeading = 255;
 }
+void EntityManager::StartTimer(EntityId e, uint16_t time, TimerExpiredAction action, bool looping)
+{
+	TimingComponent& t = TimingArchetype.TimingComponents.GetComponent(e);
+	TimingActionComponent& a = TimingArchetype.ActionComponents.GetComponent(e);
+
+	if (!TimingArchetype.Archetype.HasEntity(e)) {
+		TimingArchetype.Archetype.AddEntity(e);
+		TimingArchetype.TimingComponents.NewComponent(e);
+		TimingArchetype.ActionComponents.NewComponent(e);
+	}
+
+	t.NewTimer(time, looping);
+	a.action = action;
+	FlagComponents.GetComponent(e).set(ComponentFlags::UpdateTimers);
+}

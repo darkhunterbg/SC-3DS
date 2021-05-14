@@ -21,21 +21,25 @@ void PerformanceTestScene::Start() {
 
 	//entityManager.DrawColliders = true;
 
-	//for (int i = 0; i < 10000 ; ++i) {
-	//	entityManager.NewUnit(UnitDatabase::Marine,
-	//		Vector2Int16(Vector2Int{ (i / 100) * 32 + 16, (i % 100) * 32 + 16 }),
-	//		Colors::Red);
+	for (int i = 0; i < 10000; ++i) {
+		entityManager.NewUnit(UnitDatabase::Marine,
+			Vector2Int16(Vector2Int{ (i / 100) * 32 + 16, (i % 100) * 32 + 16 }),
+			Colors::Red);
 
-	//	//entityManager.PlayUnitAnimation(i, UnitDatabase::Marine.MovementAnimations[4]);
+		//if (i % 4 == 0)
+			entityManager.StartTimer(i, TimingComponent::SecondsTime(1), TimerExpiredAction::DeleteEntity);
 
-	//	//entityManager.CollisionArchetype.Archetype.RemoveEntity(i);
-	//	//entityManager.NavigationArchetype.Archetype.RemoveEntity(i);
-	//	//entityManager.MovementArchetype.MovementComponents[i].velocity = { 2,2 };
-	//	//entityManager.UnitArchetype.OrientationComponents[i].changed = true;
-	//	//entityManager.UnitArchetype.OrientationComponents[i].orientation = 12;
 
-	//	//entityManager.GoTo(i, { 1024,1024 });
-	//}
+		//entityManager.PlayUnitAnimation(i, UnitDatabase::Marine.MovementAnimations[4]);
+
+		//entityManager.CollisionArchetype.Archetype.RemoveEntity(i);
+		//entityManager.NavigationArchetype.Archetype.RemoveEntity(i);
+		//entityManager.MovementArchetype.MovementComponents[i].velocity = { 2,2 };
+		//entityManager.UnitArchetype.OrientationComponents[i].changed = true;
+		//entityManager.UnitArchetype.OrientationComponents[i].orientation = 12;
+
+		//entityManager.GoTo(i, { 1024,1024 });
+	}
 }
 static int t = 0;
 static int c = 0;
@@ -43,35 +47,8 @@ static int c = 0;
 static unsigned frameCounter = 2;
 static unsigned frameCounter2 = 0;
 
-static int s1, s2, s3;
-
-static std::vector<EntityId> ids;
 
 void PerformanceTestScene::Update() {
-
-
-	SectionProfiler p("Unit Create");
-
-	ids.clear();
-	entityManager.NewEntities(1000, ids);
-
-
-	//entityManager.NewUnits(1000, UnitDatabase::Marine, ids);
-
-	for (int i = 0; i < ids.size(); ++i) {
-
-		//entityManager.NavigationArchetype.Archetype.AddEntity(i);
-	entityManager.NewUnit(UnitDatabase::Marine,
-			Vector2Int16(Vector2Int{ (i / 100) * 32 + 16, (i % 100) * 32 + 16 }),
-			Colors::Red, i);
-	}
-	p.Submit();
-
-	SectionProfiler p2("Unit Delete");
-
-	entityManager.DeleteEntities(ids);
-
-	p2.Submit();
 
 	frameCounter += 2;
 	frameCounter2 += 2;

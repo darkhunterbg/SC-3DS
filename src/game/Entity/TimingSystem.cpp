@@ -3,38 +3,34 @@
 #include "../Profiler.h"
 
 
-static std::vector<EntityId> expiredTimerEntities;
-static std::vector<TimerExpiredAction> expiredTimerActions;
 
 void TimingSystem::UpdateTimers(EntityManager& em)
 {
 	SectionProfiler p("UpdateTimers");
 
-	expiredTimerEntities.clear();
-	expiredTimerActions.clear();
+	for (auto& t : actionsTable)
+		t.entities.clear();
 
 	for (EntityId id : em.TimingArchetype.Archetype.GetEntities()) {
 		int i = Entity::ToIndex(id);
 
-		auto& flags = em.FlagComponents[i];
-		if (!flags.test(ComponentFlags::UpdateTimers))
+		auto& f = em.FlagComponents[i];
+		if (!f.test(ComponentFlags::UpdateTimers))
 			continue;
 
-		auto& timing = em.TimingArchetype.TimingComponents[i];
+		auto& t = em.TimingArchetype.TimingComponents[i];
+		--t.timer;
+		if (t.timer == 0) {
+			auto& a = em.TimingArchetype.ActionComponents[i];
+			GetActionEntityTable(a.action).push_back(id);
 
-		for (uint8_t t = 0; t < timing.activeTimers; ++t) {
-			--timing.timers[t];
-			if (timing.timers[t] == 0) {
-
-				expiredTimerEntities.push_back(id);
-				expiredTimerActions.push_back(timing.actions[t]);
-
-				--timing.activeTimers;
-				--t;
+			if (t.nextTimer > 0) {
+				t.timer = t.nextTimer;
+			}
+			else {
+				f.clear(ComponentFlags::UpdateTimers);
 			}
 		}
-
-		flags.set(ComponentFlags::UpdateTimers, timing.activeTimers);
 	}
 }
 
@@ -43,22 +39,9 @@ void TimingSystem::UpdateTimers(EntityManager& em)
 void TimingSystem::ApplyTimerActions(EntityManager& em) {
 	SectionProfiler p("ApplyTimers");
 
-	em.DeleteEntities(expiredTimerEntities);
+	DeleteEntities(GetActionEntityTable(TimerExpiredAction::DeleteEntity), em);
+}
 
-	// Todo order based on timer priority, split into groups and execute foreach (death should happen last)
-	/*for (const auto& timer : expiredTimers) {
-		EntityId id = timer.id;*/
-		//int i = Entity::ToIndex(id);
-
-		/*switch (timer.action)
-		{
-		case TimerExpiredAction::DeleteEntity: {
-			em.DeleteEntity(id);
-			break;
-		}
-
-		default:
-			break;
-		}
-	}*/
+void TimingSystem::DeleteEntities( std::vector<EntityId>& entities, EntityManager& em) {
+	em.DeleteEntities(entities);
 }

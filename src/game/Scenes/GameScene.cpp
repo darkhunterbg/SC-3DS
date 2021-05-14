@@ -191,8 +191,7 @@ void GameScene::Update() {
 					entityManager->MovementArchetype.Archetype.RemoveEntity(id);
 
 					entityManager->TimingArchetype.Archetype.AddEntity(id);
-					entityManager->TimingArchetype.TimingComponents.NewComponent(id)
-						.NewTimer(def->Graphics->DeathAnimation.GetDuration() + 1, TimerExpiredAction::DeleteEntity);
+					entityManager->StartTimer(id, def->Graphics->DeathAnimation.GetDuration() + 1, TimerExpiredAction::DeleteEntity);
 					entityManager->FlagComponents.GetComponent(id).set(ComponentFlags::UpdateTimers);
 
 					int i = std::rand() % def->Sounds.Death.TotalClips;
