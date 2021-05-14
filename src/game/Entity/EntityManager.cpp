@@ -16,6 +16,7 @@ EntityManager::EntityManager() {
 	archetypes.push_back(&UnitArchetype.Archetype);
 	archetypes.push_back(&UnitArchetype.RenderArchetype.Archetype);
 	archetypes.push_back(&UnitArchetype.AnimationArchetype.Archetype);
+	archetypes.push_back(&TimingArchetype.Archetype);
 }
 EntityManager::~EntityManager() {
 
@@ -79,6 +80,8 @@ void EntityManager::ApplyEntityChanges() {
 
 void EntityManager::UpdateSecondaryEntities() {
 
+	timingSystem.UpdateTimers(*this);
+	timingSystem.ApplyTimerActions(*this);
 	//navigationSystem.UpdateNavGrid(*this);
 
 	navigationSystem.UpdateNavigation(*this);

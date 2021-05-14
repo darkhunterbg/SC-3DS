@@ -56,14 +56,14 @@ void GameScene::Start() {
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
 	int i = 0;
-	for (int y = 2; y >= 1; --y) {
-		for (int x = 2; x >= 1; --x) {
+	for (int y = 99; y >= 0; --y) {
+		for (int x = 99; x >= 0; --x) {
 
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[(i) % UnitDatabase::Units.size()];
 			EntityId e = entityManager->NewUnit(def,
-				Vector2Int16(Vector2Int{ x * 64 + 16,y * 64 + 16 }), c);
-			
+				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 + 16 }), c);
+
 			entityManager->PlayUnitAnimation(e, def.Graphics->MovementAnimations[12]);
 			//entityManager->UnitArchetype.OrientationComponents[i].orientation = 24;
 			//entityManager->UnitArchetype.OrientationComponents[i].changed = true;
@@ -120,7 +120,7 @@ void GameScene::Update() {
 
 	while (frameCounter2 >= 5)
 	{
-		
+
 		frameCounter2 -= 5;
 		AuxilaryUpdate();
 	}
@@ -135,16 +135,6 @@ void GameScene::Update() {
 		frameCounter -= 5;
 		LogicalUpdate();
 	}
-
-	//int i = 0;
-	//for (int y = 49; y >= 0; --y) {
-	//	for (int x = 99; x >= 0; --x) {
-
-	//		entityManager->SetPosition(i, Vector2Int16(Vector2Int{ x * 32 + 16 ,y * 32 + 16 }));
-
-	//		i++;
-	//	}
-	//}
 
 
 	hud->ApplyInput(camera);
@@ -200,7 +190,10 @@ void GameScene::Update() {
 					entityManager->NavigationArchetype.Archetype.RemoveEntity(id);
 					entityManager->MovementArchetype.Archetype.RemoveEntity(id);
 
-
+					entityManager->TimingArchetype.Archetype.AddEntity(id);
+					entityManager->TimingArchetype.TimingComponents.NewComponent(id)
+						.NewTimer(def->Graphics->DeathAnimation.GetDuration() + 1, TimerExpiredAction::DeleteEntity);
+					entityManager->FlagComponents.GetComponent(id).set(ComponentFlags::UpdateTimers);
 
 					int i = std::rand() % def->Sounds.Death.TotalClips;
 					Game::Audio.PlayClip(def->Sounds.Death.Clips[i], 1);

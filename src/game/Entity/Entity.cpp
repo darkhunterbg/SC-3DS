@@ -92,6 +92,9 @@ static bool RemoveIf(EntityId id) {
 
 void EntityCollection::DeleteEntities(std::vector<EntityId>& deleteEntities, bool sorted)
 {
+	if (deleteEntities.size() == 0)
+		return;
+
 	if (!sorted)
 		std::sort(deleteEntities.begin(), deleteEntities.end());
 

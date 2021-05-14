@@ -11,6 +11,7 @@
 #include "AnimationSystem.h"
 #include "KinematicSystem.h"
 #include "NavigationSystem.h"
+#include "TimingSystem.h"
 
 #include "../Data/UnitDef.h"
 #include "../Camera.h"
@@ -31,6 +32,7 @@ private:
 	AnimationSystem animationSystem;
 	KinematicSystem kinematicSystem;
 	NavigationSystem navigationSystem;
+	TimingSystem timingSystem;
 
 	bool updated = false;
 
@@ -94,6 +96,11 @@ public:
 		ComponentCollection<UnitComponent> UnitComponents;
 	} UnitArchetype;
 
+
+	struct {
+		EntityArchetype Archetype = EntityArchetype("Timing");
+		ComponentCollection<TimingComponent> TimingComponents;
+	} TimingArchetype;
 private:
 	void CollectEntityChanges();
 	void ApplyEntityChanges();

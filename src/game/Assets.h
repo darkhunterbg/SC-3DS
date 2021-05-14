@@ -194,6 +194,7 @@ public:
 	UnitAnimationClip(const UnitAnimationClip&) = delete;
 	UnitAnimationClip& operator=(const UnitAnimationClip&) = delete;
 
+	inline uint16_t GetDuration() const { return frameCount * (uint16_t)frameTime; }
 	inline const Span<UnitSpriteFrame> GetFrames() const {
 		return { frames.data(), frameCount };
 	}

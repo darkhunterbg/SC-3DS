@@ -86,8 +86,6 @@ public:
 	inline TComponent& operator[](int i) { return components[i]; }
 	inline const TComponent& operator[](int i) const { return components[i]; }
 	inline size_t size() const { return 0; }
-
-	// we need component iteration somehow
 };
 
 enum class ComponentFlags {
@@ -99,6 +97,7 @@ enum class ComponentFlags {
 	AnimationFrameChanged = 5,
 	UnitAnimationFrameChanged = 6,
 	NavigationWork = 7,
+	UpdateTimers = 8,
 };
 
 struct FlagsComponent {
@@ -116,7 +115,7 @@ struct FlagsComponent {
 
 struct RenderComponent {
 	Image sprite;
-	int depth = 0;
+	int8_t depth = 0;
 	bool hFlip = false;
 };
 
@@ -228,4 +227,23 @@ struct AnimationComponent {
 
 struct ColliderComponent {
 	Rectangle16 collider;
+};
+
+
+enum class TimerExpiredAction {
+	DeleteEntity = 0,
+};
+
+struct TimingComponent {
+	std::array<uint16_t, 4 > timers;
+	std::array<TimerExpiredAction, 4 > actions;
+	uint8_t activeTimers = 0;
+
+	inline void NewTimer(uint16_t durationFrames, TimerExpiredAction action) {
+
+		timers[activeTimers] = durationFrames;
+		actions[activeTimers] = action;
+
+		++activeTimers;
+	}
 };
