@@ -111,13 +111,20 @@ public:
 		return entities.GetEntities();
 	}
 	void DeleteEntity(EntityId id);
+	void DeleteEntities(std::vector<EntityId>& entities);
+	EntityId NewEntity() { return entities.NewEntity(); }
+	void NewEntities(unsigned size, std::vector<EntityId>& outIds) {
+		entities.NewEntities(size, outIds);
+	}
+	void ClearEntities();
 
 	void UpdateEntities();
 	void UpdateSecondaryEntities();
 	void DrawEntites(const Camera& camera);
 
 
-	EntityId NewUnit(const UnitDef& def, Vector2Int16 position, Color color);
+
+	EntityId NewUnit(const UnitDef& def, Vector2Int16 position, Color color, EntityId id = Entity::None);
 	void PlayAnimation(EntityId id, const AnimationClip& clip);
 	void PlayUnitAnimation(EntityId id, const UnitAnimationClip& clip);
 	void SetPosition(EntityId e, Vector2Int16 pos);

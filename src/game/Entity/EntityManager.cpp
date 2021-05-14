@@ -4,6 +4,8 @@
 #include "../Profiler.h"
 #include "../Job.h"
 
+#include <algorithm>
+
 EntityManager::EntityManager() {
 
 	archetypes.push_back(&RenderArchetype.Archetype);
@@ -27,7 +29,32 @@ void EntityManager::Init(Vector2Int16 mapSize)
 
 void EntityManager::DeleteEntity(EntityId id) {
 	entities.DeleteEntity(id);
-	// TODO: remove archetypes;
+	for (auto& arch : archetypes) {
+		if (arch->HasEntity(id))
+			arch->RemoveEntity(id);
+	}
+
+}
+
+
+static std::vector<EntityId> scratch;
+
+void EntityManager::DeleteEntities(std::vector<EntityId>& e) {
+
+	std::sort(e.begin(), e.end());
+	for (auto& arch : archetypes) {
+		arch->RemoveEntities(e, scratch, true);
+	}
+
+	entities.DeleteEntities(e, true);
+}
+
+void EntityManager::ClearEntities()
+{
+	entities.ClearEntities();
+	for (auto& arch : archetypes) {
+		arch->ClearEntities();
+	}
 }
 
 void EntityManager::CollectEntityChanges() {
@@ -63,6 +90,7 @@ void EntityManager::UpdateSecondaryEntities() {
 	animationSystem.TickAnimations(*this);
 }
 
+
 void EntityManager::UpdateEntities() {
 
 	updated = true;
@@ -91,8 +119,10 @@ void EntityManager::DrawEntites(const Camera& camera) {
 		kinematicSystem.DrawColliders(camera);
 }
 
-EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color color) {
-	EntityId e = entities.NewEntity();
+EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color color, EntityId e) {
+
+	if (e == Entity::None)
+		EntityId e = entities.NewEntity();
 	PositionComponents.NewComponent(e, position);
 
 	FlagComponents.NewComponent(e);

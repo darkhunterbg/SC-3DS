@@ -32,6 +32,7 @@ public:
 	}
 	void AddEntity(EntityId id);
 	void RemoveEntity(EntityId id);
-
+	int RemoveEntities(std::vector<EntityId>& del, std::vector<EntityId>& scratch, bool sorted);
+	void ClearEntities();
 	void CommitChanges();
 };

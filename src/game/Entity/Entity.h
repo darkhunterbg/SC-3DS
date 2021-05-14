@@ -9,20 +9,20 @@ class Entity {
 private:
 	Entity() = delete;
 	~Entity() = delete;
+
 public:
 	static constexpr const int MaxEntities = 10'000;
 	static constexpr const EntityId None = -1;
-	static inline constexpr const int ToIndex(EntityId id) { return id ; }
-	static inline constexpr const EntityId ToId(int  index) { return index ; }
+	static inline constexpr const int ToIndex(EntityId id) { return id; }
+	static inline constexpr const EntityId ToId(int  index) { return index; }
 };
 
 class EntityCollection
 {
 private:
-	std::vector<EntityId> entities;
 	std::vector<EntityId> sortedEntities;
-	std::array<short, Entity::MaxEntities> entityToIndexMap;
-	EntityId lastId = Entity::None;
+	std::array<bool, Entity::MaxEntities> usedEntities;
+	std::vector<EntityId> freeEntities;
 public:
 	EntityCollection(const EntityCollection&) = delete;
 	EntityCollection& operator=(const EntityCollection&) = delete;
@@ -32,14 +32,18 @@ public:
 	inline const Span<EntityId> GetEntities() const { return { sortedEntities.data(),sortedEntities.size() }; }
 	inline EntityId GetEntity(int index) const { return sortedEntities[index]; }
 
+	void NewEntities(unsigned size, std::vector<EntityId>& outIds);
 	EntityId NewEntity();
 	void DeleteEntity(EntityId id);
+	void DeleteEntities(std::vector<EntityId>& e, bool sorted);
+	void ClearEntities();
+
 	inline bool EntityExists(EntityId id) const {
-		return entityToIndexMap[Entity::ToIndex(id)] != -1;
+		return usedEntities[Entity::ToIndex(id)];
 	}
 
-	inline EntityId at(int i)const  { return GetEntity(i); };
-	inline size_t size() const { return entities.size(); }
+	inline EntityId at(int i)const { return GetEntity(i); };
+	inline size_t size() const { return sortedEntities.size(); }
 	inline EntityId operator[](int i)  const { return GetEntity(i); }
 	inline Span<EntityId>::ConstIterator begin() const {
 		return GetEntities().begin();
