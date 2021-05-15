@@ -125,8 +125,6 @@ void KinematicSystem::MoveEntities(EntityManager& em)
 		auto& pos = em.PositionComponents[i];
 		pos +=  Vector2Int16(em.MovementArchetype.MovementComponents[i].velocity);
 
-		/*	moveData.movement.push_back(&em.MovementArchetype.MovementComponents[i]);
-			moveData.position.push_back(&em.PositionComponents[i]);*/
 		em.FlagComponents[i].set(ComponentFlags::PositionChanged, true);
 	}
 }

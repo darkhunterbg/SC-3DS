@@ -33,7 +33,7 @@ struct UnitGraphicsDef {
 
 	std::function<void()>  LoadResourcesAction;
 
-	inline bool HasMovementGlow() const { return MovementAnimationDef.FrameCount > 0; }
+	inline bool HasMovementGlow() const { return MovementGlowAnimationDef.FrameCount > 0; }
 	inline bool HasRemnants() const { return Remnants.Def.FrameCount > 0; };
 
 	UnitGraphicsDef() {}

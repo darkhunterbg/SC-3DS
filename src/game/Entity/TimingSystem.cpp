@@ -65,6 +65,6 @@ void TimingSystem::UnitRemnantsThenDelete(std::vector<EntityId>& entities, Entit
 
 void TimingSystem::DeleteEntities(std::vector<EntityId>& entities, EntityManager& em) {
 	if (entities.size() > 0) {
-		em.DeleteEntities(entities);
+		em.DeleteEntitiesSorted(entities);
 	}
 }

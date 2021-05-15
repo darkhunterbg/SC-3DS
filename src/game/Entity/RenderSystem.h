@@ -82,8 +82,8 @@ private:
 
 	RenderData renderData;
 	RenderUnitData renderUnitData;
-	RenderUpdatePosData renderUpdatePosData;
-	RenderUnitUpdatePosData renderUnitUpdatePosData;
+	RenderUpdatePosData updatePosData;
+	RenderUnitUpdatePosData unitUpdatePosData;
 
 	static void UpdateUnitRenderPositionsJob(int start, int end);
 	static void UpdateRenderPositionsJob(int start, int end);
@@ -96,4 +96,5 @@ private:
 public:
 	void Draw(const Camera& camera, EntityManager& em);
 	void UpdatePositions(EntityManager& em, const EntityChangedData& changed);
+	
 };

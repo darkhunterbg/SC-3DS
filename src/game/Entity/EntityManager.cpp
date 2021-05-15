@@ -47,7 +47,9 @@ void EntityManager::DeleteEntity(EntityId id) {
 	}
 
 }
-void EntityManager::DeleteEntities(std::vector<EntityId>& e) {
+
+
+void EntityManager::DeleteEntitiesSorted(std::vector<EntityId>& e) {
 	int max = e.size();
 
 	for (int i = 0; i < max; ++i) {
@@ -59,24 +61,61 @@ void EntityManager::DeleteEntities(std::vector<EntityId>& e) {
 		}
 	}
 
+	if (e.size() != max)
+		std::sort(e.begin(), e.end());
 
-	std::sort(e.begin(), e.end());
+
 	for (auto& arch : archetypes) {
 		arch->RemoveEntities(e, true);
 	}
 
-	entities.DeleteEntities(e, true);
+	entities.DeleteSortedEntities(e);
+}
+void EntityManager::DeleteEntities(const std::vector<EntityId>& e, bool sorted) {
+
+	scratch.clear();
+	scratch.insert(scratch.begin(), e.begin(), e.end());
+
+	if (!sorted)
+		std::sort(scratch.begin(), scratch.end());
+
+	DeleteEntitiesSorted(scratch);
+
 }
 void EntityManager::ClearEntityArchetypes(EntityId id) {
 	for (auto& arch : archetypes) {
 		if (arch->HasEntity(id))
 			arch->RemoveEntity(id);
 	}
+
+	if (ParentArchetype.Archetype.HasEntity(id)) {
+		const auto& cmp = ParentArchetype.ChildComponents.GetComponent(id);
+		for (int i = 0; i < cmp.childCount; ++i) {
+			DeleteEntity(cmp.children[id]);
+		}
+	}
 }
-void EntityManager::ClearEntitiesArchetypes(std::vector<EntityId>& e) {
-	std::sort(e.begin(), e.end());
+void EntityManager::ClearEntitiesArchetypes( std::vector<EntityId>& e, bool sorted) {
+	if (!sorted)
+		std::sort(e.begin(), e.end());
+
+	scratch.clear();
+
+	for (EntityId id : e) {
+		if (ParentArchetype.Archetype.HasEntity(id)) {
+			const auto& cmp = ParentArchetype.ChildComponents.GetComponent(id);
+			scratch.insert(scratch.end(), cmp.children.begin(), cmp.children.begin() + cmp.childCount);
+		}
+	}
+
+	if (scratch.size())
+	{
+		std::sort(scratch.begin(), scratch.end());
+		DeleteEntitiesSorted(scratch);
+	}
+
 	for (auto& arch : archetypes) {
-		arch->RemoveEntities(e, true);
+		arch->RemoveEntitiesSorted(e);
 	}
 }
 void EntityManager::ClearEntities()
@@ -106,7 +145,7 @@ void EntityManager::ApplyEntityChanges() {
 	for (auto archetype : archetypes)
 		archetype->CommitChanges();
 }
-void EntityManager::UpdateChildenPosition() {
+void EntityManager::UpdateChildrenPosition() {
 	for (EntityId id : ParentArchetype.Archetype.GetEntities()) {
 
 		if (FlagComponents.GetComponent(id).test(ComponentFlags::PositionChanged)) {
@@ -139,6 +178,8 @@ void EntityManager::UpdateSecondaryEntities() {
 	animationSystem.SetUnitOrientationAnimations(*this);
 
 	animationSystem.TickAnimations(*this);
+
+	renderSystem.UpdatePositions(*this, changedData);
 }
 
 void EntityManager::UpdateEntities() {
@@ -149,7 +190,7 @@ void EntityManager::UpdateEntities() {
 
 	animationSystem.UpdateAnimations();
 
-	UpdateChildenPosition();
+	UpdateChildrenPosition();
 
 	CollectEntityChanges();
 
@@ -222,6 +263,7 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color
 
 
 	if (def.Graphics->HasMovementGlow()) {
+		//EXCEPTION("Unit is not supposed to get to here!");
 		auto e2 = NewEntity();
 		FlagComponents.NewComponent(e2);
 		RenderArchetype.RenderComponents.GetComponent(e2).depth = 1;

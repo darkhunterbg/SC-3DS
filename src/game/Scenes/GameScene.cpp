@@ -55,16 +55,17 @@ void GameScene::Start() {
 	 Colors::SCOrange, Colors::SCGreen, Colors::SCBrown, Colors::SCLightYellow, Colors::SCWhite,
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
-	int i = 1;
-	for (int y = 0; y >= 0; --y) {
-		for (int x = 0; x >= 0; --x) {
+	int i = 0;
+	for (int y = 33; y >= 0; --y) {
+		for (int x = 33; x >= 0; --x) {
 
 			
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[(i) % UnitDatabase::Units.size()];
 			EntityId e = entityManager->NewUnit(def,
-				Vector2Int16(Vector2Int{ x * 32 + 96,y * 32 + 96 }), c);
+				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 + 16 }), c);
 
+			entityManager->GoTo(e, { 800,800 });
 			//entityManager->PlayUnitAnimation(e, def.Graphics->MovementAnimations[12]);
 			i += 1;
 
@@ -179,10 +180,10 @@ void GameScene::Update() {
 
 				auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
 
-				if (unit.HasMovementGlow()) {
+				/*if (unit.HasMovementGlow()) {
 					entityManager->DeleteEntity(unit.movementGlowEntity);
 					entityManager->ParentArchetype.Archetype.RemoveEntity(id);
-				}
+				}*/
 
 				entityManager->PlayUnitAnimation(id, def->Graphics->DeathAnimation);
 

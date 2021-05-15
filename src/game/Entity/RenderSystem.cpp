@@ -148,7 +148,7 @@ bool RenderSystem::RenderSort(const BatchDrawCommand& a, const BatchDrawCommand&
 static RenderSystem* s;
 
 void RenderSystem::UpdateRenderPositionsJob(int start, int end) {
-	RenderUpdatePosData& data = s->renderUpdatePosData;
+	RenderUpdatePosData& data = s->updatePosData;
 
 	for (int i = start; i < end; ++i) {
 		Vector2Int16& p = *data.outPos[i];
@@ -157,7 +157,7 @@ void RenderSystem::UpdateRenderPositionsJob(int start, int end) {
 	}
 }
 void RenderSystem::UpdateUnitRenderPositionsJob(int start, int end) {
-	RenderUnitUpdatePosData& data = s->renderUnitUpdatePosData;
+	RenderUnitUpdatePosData& data = s->unitUpdatePosData;
 
 	for (int i = start; i < end; ++i) {
 		RenderUnitDestinationComponent& p = *data.outPos[i];
@@ -167,60 +167,61 @@ void RenderSystem::UpdateUnitRenderPositionsJob(int start, int end) {
 	}
 }
 
+
+
 void RenderSystem::UpdatePositions(EntityManager& em, const EntityChangedData& changed) {
-	renderUpdatePosData.clear();
-	renderUnitUpdatePosData.clear();
+	updatePosData.clear();
+	unitUpdatePosData.clear();
 
-	int size = changed.size();
-	for (int item = 0; item < size; ++item) {
-		EntityId id = changed.entity[item];
+	for (EntityId id : changed.entity) {
+		if (em.RenderArchetype.Archetype.HasEntity(id) ||
+			em.UnitArchetype.RenderArchetype.Archetype.HasEntity(id))
 
-		if (em.RenderArchetype.Archetype.HasEntity(id))
-		{
-			int i = Entity::ToIndex(id);
-			em.FlagComponents[i].set(ComponentFlags::RenderChanged);
-		}
-
-		if (em.UnitArchetype.RenderArchetype.Archetype.HasEntity(id))
-		{
-			int i = Entity::ToIndex(id);
-			em.FlagComponents[i].set(ComponentFlags::RenderChanged);
-		}
+			em.FlagComponents.GetComponent(id).set(ComponentFlags::RenderChanged);
 	}
 
 	for (EntityId id : em.RenderArchetype.Archetype.GetEntities()) {
-
 		int i = Entity::ToIndex(id);
+		FlagsComponent& flag = em.FlagComponents[i];
+
+		if (!flag.test(ComponentFlags::RenderEnabled))
+			continue;
+		
 		auto& arch = em.RenderArchetype;
 
-		if (em.FlagComponents[i].test(ComponentFlags::RenderChanged)) {
+		if (flag.test(ComponentFlags::RenderChanged)) {
 
-			em.FlagComponents[i].clear(ComponentFlags::RenderChanged);
-			renderUpdatePosData.outPos.push_back(&arch.DestinationComponents[i]);
-			renderUpdatePosData.worldPos.push_back(em.PositionComponents[i]);
-			renderUpdatePosData.offset.push_back(arch.OffsetComponents[i]);
-			renderUpdatePosData.outBB.push_back(&arch.BoundingBoxComponents[i]);
+			flag.clear(ComponentFlags::RenderChanged);
+			updatePosData.outPos.push_back(&arch.DestinationComponents[i]);
+			updatePosData.worldPos.push_back(em.PositionComponents[i]);
+			updatePosData.offset.push_back(arch.OffsetComponents[i]);
+			updatePosData.outBB.push_back(&arch.BoundingBoxComponents[i]);
 		}
 	}
 
 	for (EntityId id : em.UnitArchetype.RenderArchetype.Archetype.GetEntities()) {
 
 		int i = Entity::ToIndex(id);
+		FlagsComponent& flag = em.FlagComponents[i];
+
+		if (!flag.test(ComponentFlags::RenderEnabled))
+			continue;
+
 		auto& arch = em.UnitArchetype.RenderArchetype;
 
-		if (em.FlagComponents[i].test(ComponentFlags::RenderChanged)) {
+		if (flag.test(ComponentFlags::RenderChanged)) {
 
-			em.FlagComponents[i].clear(ComponentFlags::RenderChanged);
-			renderUnitUpdatePosData.outPos.push_back(&arch.DestinationComponents[i]);
-			renderUnitUpdatePosData.worldPos.push_back(em.PositionComponents[i]);
-			renderUnitUpdatePosData.offset.push_back(arch.OffsetComponents[i]);
-			renderUnitUpdatePosData.outBB.push_back(&arch.BoundingBoxComponents[i]);
+			flag.clear(ComponentFlags::RenderChanged);
+			unitUpdatePosData.outPos.push_back(&arch.DestinationComponents[i]);
+			unitUpdatePosData.worldPos.push_back(em.PositionComponents[i]);
+			unitUpdatePosData.offset.push_back(arch.OffsetComponents[i]);
+			unitUpdatePosData.outBB.push_back(&arch.BoundingBoxComponents[i]);
 		}
 	}
 
 	s = this;
 
-	JobSystem::RunJob(renderUpdatePosData.size(), JobSystem::DefaultJobSize, UpdateRenderPositionsJob);
-	JobSystem::RunJob(renderUnitUpdatePosData.size(), JobSystem::DefaultJobSize, UpdateUnitRenderPositionsJob);
+	JobSystem::RunJob(updatePosData.size(), JobSystem::DefaultJobSize, UpdateRenderPositionsJob);
+	JobSystem::RunJob(unitUpdatePosData.size(), JobSystem::DefaultJobSize, UpdateUnitRenderPositionsJob);
 }
 

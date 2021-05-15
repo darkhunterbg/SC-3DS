@@ -89,10 +89,7 @@ static bool RemoveIf(EntityId id) {
 
 }
 
-
-
-int EntityArchetype::RemoveEntities(std::vector<EntityId>& del, bool sorted) {
-
+int EntityArchetype::RemoveEntitiesSorted(std::vector<EntityId>& del) {
 	scratch.clear();
 
 	for (EntityId id : del)
@@ -107,8 +104,6 @@ int EntityArchetype::RemoveEntities(std::vector<EntityId>& del, bool sorted) {
 	if (scratch.size() == 0)
 		return 0;
 
-	if (!sorted)
-		std::sort(scratch.begin(), scratch.end());
 
 	s = &scratch;
 	iter = 0;
@@ -117,6 +112,14 @@ int EntityArchetype::RemoveEntities(std::vector<EntityId>& del, bool sorted) {
 	entities.erase(std::remove_if(entities.begin(), entities.end(), RemoveIf), entities.end());
 
 	return scratch.size();
+}
+
+
+int EntityArchetype::RemoveEntities( std::vector<EntityId>& del, bool sorted) {
+	if (!sorted)
+		std::sort(del.begin(), del.end());
+
+	return RemoveEntitiesSorted(del);
 }
 
 void EntityArchetype::ClearEntities()

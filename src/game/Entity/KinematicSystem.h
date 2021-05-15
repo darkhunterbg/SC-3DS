@@ -65,7 +65,5 @@ public:
 		return collidersTree.PointCastEntity(point);
 	}
 
-
 	void MoveEntities(EntityManager& em);
-
 };

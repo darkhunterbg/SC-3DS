@@ -28,6 +28,7 @@ static void MarineData() {
 	d.MovementAnimationDef.Looping = true;
 	d.MovementAnimationDef.UnitColorFrameStart = 229 + d.MovementAnimationDef.FrameStart;
 
+
 	d.DeathAnimationDef.FrameStart = 221;
 	d.DeathAnimationDef.FrameCount = 8;
 	d.DeathAnimationDef.UnitColorFrameStart = -1;

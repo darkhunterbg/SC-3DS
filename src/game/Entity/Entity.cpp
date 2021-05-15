@@ -62,11 +62,11 @@ EntityId EntityCollection::NewEntity() {
 
 	usedEntities[Entity::ToIndex(id)] = true;
 
-	auto end = sortedEntities.cend();
-	for (auto i = sortedEntities.cbegin(); i != end; ++i)
+	auto end = sortedEntities.crend();
+	for (auto i = sortedEntities.crbegin(); i != end; ++i)
 	{
 		if (*i < id) {
-			sortedEntities.insert(i, id);
+			sortedEntities.insert(i.base(), id);
 			return id;
 		}
 	}
@@ -80,8 +80,8 @@ static const std::vector<EntityId>* s;
 static int iter = 0;
 
 static bool RemoveIf(EntityId id) {
-	auto& sratch = *s;
-	if (iter < sratch.size() && sratch[iter] == id)
+	auto& scratch = *s;
+	if (iter < scratch.size() && scratch[iter] == id)
 	{
 		++iter;
 		return true;
@@ -90,13 +90,10 @@ static bool RemoveIf(EntityId id) {
 
 }
 
-void EntityCollection::DeleteEntities(std::vector<EntityId>& deleteEntities, bool sorted)
+void EntityCollection::DeleteSortedEntities(std::vector<EntityId>& deleteEntities)
 {
 	if (deleteEntities.size() == 0)
 		return;
-
-	if (!sorted)
-		std::sort(deleteEntities.begin(), deleteEntities.end());
 
 	EntityId id = deleteEntities.front();
 	if (id <= Entity::None || id > Entity::MaxEntities ||
@@ -180,6 +177,8 @@ void EntityCollection::ClearEntities()
 	sortedEntities.clear();
 
 	memset(usedEntities.data(), false, sizeof(bool) * usedEntities.size());
+
+	freeEntities.clear();
 
 	EntityId id = usedEntities.size();
 	for (int i = 0; i < usedEntities.size(); i++) {

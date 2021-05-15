@@ -35,7 +35,7 @@ public:
 	void NewEntities(unsigned size, std::vector<EntityId>& outIds);
 	EntityId NewEntity();
 	void DeleteEntity(EntityId id);
-	void DeleteEntities(std::vector<EntityId>& e, bool sorted);
+	void DeleteSortedEntities(std::vector<EntityId>& e);
 	void ClearEntities();
 
 	inline bool EntityExists(EntityId id) const {

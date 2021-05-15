@@ -32,9 +32,10 @@ public:
 		return { removedEntities.data(), removedEntities.size() };
 	}
 	void AddEntity(EntityId id);
-	void AddEntities(std::vector<EntityId>& entities, bool sorted);
+	void AddEntities(std::vector<EntityId>& entities, bool sorted = false);
 	void RemoveEntity(EntityId id);
-	int RemoveEntities(std::vector<EntityId>& del, bool sorted);
+	int RemoveEntities(std::vector<EntityId>& del, bool sorted = false);
+	int RemoveEntitiesSorted(std::vector<EntityId>& del);
 	void ClearEntities();
 	void CommitChanges();
 };

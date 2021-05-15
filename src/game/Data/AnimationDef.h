@@ -48,7 +48,7 @@ struct UnitAnimationDef {
 
 struct UnitDirectionalAnimationDef {
 	int FrameStart = 0;
-	int FrameCount = 1;
+	int FrameCount = 0;
 	int FrameTime = 1;
 	int UnitColorFrameStart = 0;
 	bool Looping = false;

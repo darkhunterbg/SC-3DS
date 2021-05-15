@@ -39,6 +39,7 @@ private:
 	EntityChangedData changedData;
 
 	std::vector<EntityArchetype*> archetypes;
+	std::vector<EntityId> scratch;
 public:
 
 	ComponentCollection<Vector2Int16> PositionComponents;
@@ -109,9 +110,11 @@ public:
 		ComponentCollection<TimingActionComponent> ActionComponents;
 	} TimingArchetype;
 private:
+
+
 	void CollectEntityChanges();
 	void ApplyEntityChanges();
-	void UpdateChildenPosition();
+	void UpdateChildrenPosition();
 public:
 	bool DrawColliders = false;
 
@@ -125,9 +128,11 @@ public:
 		return entities.GetEntities();
 	}
 	void DeleteEntity(EntityId id);
-	void DeleteEntities(std::vector<EntityId>& entities);
+	void DeleteEntities(const std::vector<EntityId>& entities, bool sorted = false);
+	// NOTE: this will reuse given vector as scratch for performance reasons
+	void DeleteEntitiesSorted(std::vector<EntityId>& entities);
 	void ClearEntityArchetypes(EntityId id);
-	void ClearEntitiesArchetypes(std::vector<EntityId>& entities);
+	void ClearEntitiesArchetypes(std::vector<EntityId>& entities, bool sorted = false);
 	EntityId NewEntity() { return entities.NewEntity(); }
 	void NewEntities(unsigned size, std::vector<EntityId>& outIds) {
 		entities.NewEntities(size, outIds);
