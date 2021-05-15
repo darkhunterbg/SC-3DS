@@ -114,6 +114,15 @@ struct FlagsComponent {
 	}
 };
 
+struct ChildComponent {
+	std::array<EntityId, 4> children;
+	uint8_t childCount = 0;
+
+	inline void AddChild(EntityId child) {
+		children[childCount++] = child;
+	}
+};
+
 struct RenderComponent {
 	Image sprite;
 	int8_t depth = 0;

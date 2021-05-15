@@ -14,20 +14,27 @@ struct UnitGraphicsDef {
 	UnitDirectionalAnimationDef AttackAnimationDef;
 	UnitAnimationDef DeathAnimationDef;
 
+	DirectionalAnimationDef MovementGlowAnimationDef;
+
 	UnitAnimationClip MovementAnimations[32];
+	AnimationClip MovementGlowAnimations[32];
 	UnitAnimationClip AttackAnimations[32];
 	UnitAnimationClip IdleAnimations [32];
 	UnitAnimationClip DeathAnimation;
+
+	
 
 	struct {
 		AnimationDef Def;
 		AnimationClip Clip;
 		int Depth = 0;
 
-		inline bool HasRemnants() const { return Def.FrameCount > 0; } ;
 	} Remnants;
 
 	std::function<void()>  LoadResourcesAction;
+
+	inline bool HasMovementGlow() const { return MovementAnimationDef.FrameCount > 0; }
+	inline bool HasRemnants() const { return Remnants.Def.FrameCount > 0; };
 
 	UnitGraphicsDef() {}
 	UnitGraphicsDef(const UnitGraphicsDef&) = delete;

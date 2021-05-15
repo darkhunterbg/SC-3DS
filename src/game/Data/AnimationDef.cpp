@@ -11,6 +11,24 @@ void AnimationDef::GenerateAnimation(const SpriteFrameAtlas* a, AnimationClip& c
 		clip.AddFrameCentered(a->GetFrame(FrameStart + i), Vector2Int16(a->FrameSize));
 }
 
+void DirectionalAnimationDef::GenerateAnimations(const SpriteFrameAtlas* a, AnimationClip clips[32]) {
+	for (int i = 0; i <= 16; ++i) {
+		clips[i].looping = Looping;
+		clips[i].frameTime = FrameTime;
+
+		for (int j = 0; j < FrameCount; ++j)
+			clips[i].AddFrameCentered(a->GetFrame(FrameStart + i + j * 17), Vector2Int16(a->FrameSize));
+	}
+
+	for (int i = 17; i < 32; ++i) {
+		clips[i].looping = Looping;
+		clips[i].frameTime = FrameTime;
+
+		for (int j = 0; j < FrameCount; ++j) 
+			clips[i].AddFrameCentered(a->GetFrame(FrameStart + 32 - i + j * 17), Vector2Int16(a->FrameSize), true);
+	}
+}
+
 void UnitAnimationDef::GenerateAnimation(const SpriteFrameAtlas* a, const SpriteFrameAtlas* sa, UnitAnimationClip& clip)
 {
 	clip.looping = Looping;

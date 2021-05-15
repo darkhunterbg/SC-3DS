@@ -32,6 +32,7 @@ static void SCVData() {
 	u.Sounds.What = { "sound/terran/scv/tscwht", 4 };
 	u.Sounds.Yes = { "sound/terran/scv/tscyes", 4 };
 	u.Graphics = &GraphicsDatabase::SCV;
+
 }
 
 

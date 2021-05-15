@@ -45,12 +45,18 @@ public:
 	ComponentCollection<FlagsComponent> FlagComponents;
 
 	struct {
+		EntityArchetype Archetype = EntityArchetype("Parent");
+		ComponentCollection<ChildComponent> ChildComponents;
+	} ParentArchetype;
+
+	struct {
 		EntityArchetype Archetype = EntityArchetype("Render");
 		ComponentCollection<RenderComponent> RenderComponents;
 		ComponentCollection<Vector2Int16> OffsetComponents;
 		ComponentCollection<Vector2Int16> DestinationComponents;
 		ComponentCollection<Rectangle16> BoundingBoxComponents;
 	} RenderArchetype;
+
 
 
 	struct {

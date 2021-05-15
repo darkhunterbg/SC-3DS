@@ -50,7 +50,7 @@ static void SCVResources() {
 	d.RenderSize = Vector2Int16(a->FrameSize);
 	d.DeathAnimationDef.GenerateAnimation(ad, nullptr, d.DeathAnimation);
 	d.MovementAnimationDef.GenerateAnimations(a, a, d.MovementAnimations);
-
+	d.MovementGlowAnimationDef.GenerateAnimations(a, d.MovementGlowAnimations);
 }
 static void SCVData() {
 	UnitGraphicsDef& d = GraphicsDatabase::SCV;
@@ -59,9 +59,12 @@ static void SCVData() {
 
 	d.MovementAnimationDef.FrameStart = 0;
 	d.MovementAnimationDef.FrameCount = 1;
-	d.MovementAnimationDef.Looping = false;
 	d.MovementAnimationDef.UnitColorFrameStart = 51;
 	d.MovementAnimationDef.ShadowOffset = { -1, 5 };
+
+	d.MovementGlowAnimationDef.FrameStart = 102;
+	d.MovementGlowAnimationDef.FrameCount = 4;
+	d.MovementGlowAnimationDef.Looping = true;
 
 	d.DeathAnimationDef.FrameStart = 0;
 	d.DeathAnimationDef.FrameCount = 9;

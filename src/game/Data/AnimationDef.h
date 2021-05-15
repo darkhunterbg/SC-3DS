@@ -18,6 +18,18 @@ struct AnimationDef {
 
 	void GenerateAnimation(const SpriteFrameAtlas* a, AnimationClip& clip);
 };
+struct DirectionalAnimationDef {
+	int FrameStart = 0;
+	int FrameCount = 0;
+	int FrameTime = 1;
+	bool Looping = false;
+
+	DirectionalAnimationDef() {}
+	DirectionalAnimationDef(const DirectionalAnimationDef&) = delete;
+	DirectionalAnimationDef& operator=(const DirectionalAnimationDef&) = delete;
+
+	void GenerateAnimations(const SpriteFrameAtlas* a, AnimationClip clips[32]);
+};
 
 struct UnitAnimationDef {
 	int FrameStart = 0;

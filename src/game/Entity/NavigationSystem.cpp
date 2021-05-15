@@ -2,6 +2,8 @@
 #include "EntityManager.h"
 #include "AnimationSystem.h"
 #include "Job.h"
+#include "EntityUtil.h"
+
 #include "../Profiler.h"
 
 #include "../Assets.h"
@@ -194,6 +196,15 @@ void NavigationSystem::ApplyUnitNavigationJob(int start, int end) {
 			}
 			flags.set(ComponentFlags::UnitOrientationChanged);
 			movement.velocity = { 0,0 };
+
+			const auto& def = *em.UnitArchetype.UnitComponents.GetComponent(id).def;
+			if (def.Graphics->HasMovementGlow()) {
+				EntityId child = em.ParentArchetype.ChildComponents.GetComponent(id).children[0];
+				if (em.RenderArchetype.Archetype.HasEntity(child)) {
+					em.RenderArchetype.Archetype.RemoveEntity(child);
+					em.FlagComponents.GetComponent(child).clear(ComponentFlags::AnimationEnabled);
+				}
+			}
 		}
 		else {
 			const auto& position = em.PositionComponents[i];
@@ -205,9 +216,28 @@ void NavigationSystem::ApplyUnitNavigationJob(int start, int end) {
 			if (distance.LengthSquaredInt() < velocity * velocity) {
 				movement.velocity = { 0,0 };
 				flags.clear(ComponentFlags::NavigationWork);
+				const auto& def = *em.UnitArchetype.UnitComponents.GetComponent(id).def;
+				if (def.Graphics->HasMovementGlow()) {
+					EntityId child = em.ParentArchetype.ChildComponents.GetComponent(id).children[0];
+					if (em.RenderArchetype.Archetype.HasEntity(child)) {
+						em.RenderArchetype.Archetype.RemoveEntity(child);
+						em.FlagComponents.GetComponent(child).clear(ComponentFlags::AnimationEnabled);
+					}
+				}
 			}
 			else {
-				movement.velocity = Vector2Int8(movementTable32[orientation] * velocity);
+				Vector2Int8 v  = Vector2Int8(movementTable32[orientation] * velocity);
+				if (v != movement.velocity) {
+					movement.velocity = v;
+					const auto& def = *em.UnitArchetype.UnitComponents.GetComponent(id).def;
+					if (def.Graphics->HasMovementGlow()) {
+						EntityId child = em.ParentArchetype.ChildComponents.GetComponent(id).children[0];
+		
+						EntityUtil::PlayAnimation(child, def.Graphics->MovementGlowAnimations[orientation]);
+						if (!em.RenderArchetype.Archetype.HasEntity(child))
+							em.RenderArchetype.Archetype.AddEntity(child);
+					}
+				}
 			}
 		}
 	}

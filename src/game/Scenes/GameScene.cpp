@@ -55,14 +55,15 @@ void GameScene::Start() {
 	 Colors::SCOrange, Colors::SCGreen, Colors::SCBrown, Colors::SCLightYellow, Colors::SCWhite,
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
-	int i = 0;
-	for (int y = 99; y >= 0; --y) {
-		for (int x = 99; x >= 0; --x) {
+	int i = 1;
+	for (int y = 0; y >= 0; --y) {
+		for (int x = 0; x >= 0; --x) {
 
+			
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[(i) % UnitDatabase::Units.size()];
 			EntityId e = entityManager->NewUnit(def,
-				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 + 16 }), c);
+				Vector2Int16(Vector2Int{ x * 32 + 96,y * 32 + 96 }), c);
 
 			//entityManager->PlayUnitAnimation(e, def.Graphics->MovementAnimations[12]);
 			i += 1;
@@ -177,7 +178,7 @@ void GameScene::Update() {
 				auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
 				entityManager->PlayUnitAnimation(id, def->Graphics->DeathAnimation);
 
-				TimerExpiredAction action = def->Graphics->Remnants.HasRemnants() ?
+				TimerExpiredAction action = def->Graphics->HasRemnants() ?
 					TimerExpiredAction::UnitRemnantsThenDelete : TimerExpiredAction::DeleteEntity;
 
 				EntityUtil::StartTimer(id, def->Graphics->DeathAnimation.GetDuration(), action);

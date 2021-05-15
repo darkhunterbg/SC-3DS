@@ -19,6 +19,7 @@ EntityManager::EntityManager() {
 	archetypes.push_back(&UnitArchetype.RenderArchetype.Archetype);
 	archetypes.push_back(&UnitArchetype.AnimationArchetype.Archetype);
 	archetypes.push_back(&TimingArchetype.Archetype);
+	archetypes.push_back(&ParentArchetype.Archetype);;
 	EntityUtil::emInstance = this;
 }
 EntityManager::~EntityManager() {
@@ -111,6 +112,23 @@ void EntityManager::UpdateEntities() {
 
 	kinematicSystem.MoveEntities(*this);
 
+	for (EntityId id : ParentArchetype.Archetype.GetEntities()) {
+
+		if (FlagComponents.GetComponent(id).test(ComponentFlags::PositionChanged)) {
+			auto& childComp = ParentArchetype.ChildComponents.GetComponent(id);
+
+			const Vector2Int16& pos = PositionComponents.GetComponent(id);
+
+			for (int i = 0; i < childComp.childCount; ++i) {
+				EntityId child = childComp.children[i];
+
+				PositionComponents.GetComponent(child) = pos;
+				FlagComponents.GetComponent(child).set(ComponentFlags::PositionChanged);
+			}
+		}
+
+	}
+
 	animationSystem.UpdateAnimations();
 
 	CollectEntityChanges();
@@ -179,7 +197,23 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color
 
 	FlagComponents.GetComponent(e).set(ComponentFlags::PositionChanged);
 	FlagComponents.GetComponent(e).set(ComponentFlags::UnitRenderChanged);
-	FlagComponents.GetComponent(e).set(ComponentFlags::AnimationFrameChanged);
+	FlagComponents.GetComponent(e).set(ComponentFlags::UnitAnimationFrameChanged);
+
+
+	if (def.Graphics->HasMovementGlow()) {
+		auto e2 = NewEntity();
+		EntityUtil::SetRenderFromAnimationClip(e2, def.Graphics->MovementGlowAnimations[0], 0);
+		EntityUtil::SetPosition(e2, position);
+		RenderArchetype.RenderComponents.GetComponent(e2).depth = 1;
+		// TODO: anim bounding box
+		RenderArchetype.BoundingBoxComponents.NewComponent(e2, { position,{64,64} });
+		//RenderArchetype.Archetype.AddEntity(e2);
+		AnimationArchetype.Archetype.AddEntity(e2);
+		//EntityUtil::PlayAnimation(e2, def.Graphics->MovementGlowAnimations[0]);
+
+		ParentArchetype.Archetype.AddEntity(e);
+		ParentArchetype.ChildComponents.NewComponent(e).AddChild(e2);
+	}
 
 	return e;
 }

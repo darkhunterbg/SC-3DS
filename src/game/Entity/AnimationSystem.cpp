@@ -195,7 +195,7 @@ void AnimationSystem::SetUnitOrientationAnimations(EntityManager& em) {
 			const auto& orientation = em.UnitArchetype.OrientationComponents[i];
 
 			anim.clip = &unit.def->Graphics->MovementAnimations[orientation];
-			f.set(ComponentFlags::AnimationFrameChanged);
+			f.set(ComponentFlags::UnitAnimationFrameChanged);
 			animTracker.PlayClip(anim.clip);
 			f.set(ComponentFlags::AnimationEnabled);
 		}

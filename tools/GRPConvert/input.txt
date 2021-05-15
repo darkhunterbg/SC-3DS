@@ -10,6 +10,10 @@ unit\neutral\*.grp
 unit\zerg\*.grp
 
 palette Orange
+unit\thingy\*.grp
+
+palette Orange
+unit\thingy\tscglow.grp
 unit\thingy\tbangs.grp
 unit\thingy\tbangx.grp
 unit\thingy\tbangl.grp
