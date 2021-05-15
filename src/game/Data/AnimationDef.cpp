@@ -51,12 +51,12 @@ void UnitDirectionalAnimationDef::GenerateAnimations(const SpriteFrameAtlas* a, 
 
 		for (int j = 0; j < FrameCount; ++j) {
 
-			clips[i].AddFrameCentered(a->GetFrame(FrameStart + i + j * 17), Vector2Int16(a->FrameSize));
+			auto f = clips[i].AddFrameCentered(a->GetFrame(FrameStart + i + j * 17), Vector2Int16(a->FrameSize));
 			if (sa != nullptr)
-				clips[i].AddShadowFrameCentered(j, sa->GetFrame(FrameStart + i + j * 17), Vector2Int16(sa->FrameSize), ShadowOffset);
+				clips[i].AddShadowFrameCentered(f, sa->GetFrame(FrameStart + i + j * 17), Vector2Int16(sa->FrameSize), ShadowOffset);
 
 			if (UnitColorFrameStart >= 0)
-				clips[i].AddColorFrame(j, a->GetFrame(UnitColorFrameStart + i + j * 17));
+				clips[i].AddColorFrame(f, a->GetFrame(UnitColorFrameStart + i + j * 17));
 
 		}
 	}
@@ -66,12 +66,12 @@ void UnitDirectionalAnimationDef::GenerateAnimations(const SpriteFrameAtlas* a, 
 		clips[i].frameTime = FrameTime;
 
 		for (int j = 0; j < FrameCount; ++j) {
-			clips[i].AddFrameCentered(a->GetFrame(FrameStart + 32 - i + j * 17), Vector2Int16(a->FrameSize) , true);
+			auto f = clips[i].AddFrameCentered(a->GetFrame(FrameStart + 32 - i + j * 17), Vector2Int16(a->FrameSize) , true);
 			if (sa != nullptr)
-				clips[i].AddShadowFrameCentered(j, sa->GetFrame(FrameStart + 32 - i + j * 17), Vector2Int16(sa->FrameSize), ShadowOffset);
+				clips[i].AddShadowFrameCentered(f, sa->GetFrame(FrameStart + 32 - i + j * 17), Vector2Int16(sa->FrameSize), ShadowOffset);
 
 			if (UnitColorFrameStart >= 0)
-				clips[i].AddColorFrame(j, a->GetFrame(UnitColorFrameStart + 32 - i + j * 17));
+				clips[i].AddColorFrame(f, a->GetFrame(UnitColorFrameStart + 32 - i + j * 17));
 		}
 	}
 

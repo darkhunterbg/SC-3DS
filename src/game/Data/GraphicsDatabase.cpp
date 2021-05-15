@@ -15,6 +15,11 @@ static void MarineResources() {
 	d.RenderSize = Vector2Int16(a->FrameSize);
 	d.DeathAnimationDef.GenerateAnimation(a, nullptr, d.DeathAnimation);
 	d.MovementAnimationDef.GenerateAnimations(a, as, d.MovementAnimations);
+	d.AttackAnimationDef.GenerateAnimations(a, as, d.AttackAnimations);
+	d.AttackAnimationDef.FrameStart = 34;
+	d.AttackAnimationDef.UnitColorFrameStart = 229 + d.AttackAnimationDef.FrameStart;
+	d.AttackAnimationDef.GenerateAnimations(a, as, d.AttackAnimations);
+	d.IdleAnimationDef.GenerateAnimations(a, as, d.IdleAnimations);
 	d.Remnants.Def.GenerateAnimation(a, d.Remnants.Clip);
 }
 
@@ -28,6 +33,17 @@ static void MarineData() {
 	d.MovementAnimationDef.Looping = true;
 	d.MovementAnimationDef.UnitColorFrameStart = 229 + d.MovementAnimationDef.FrameStart;
 
+	d.AttackAnimationDef.FrameStart = 51;
+	d.AttackAnimationDef.FrameCount = 1;
+	d.AttackAnimationDef.UnitColorFrameStart = 229 + d.AttackAnimationDef.FrameStart;
+	d.AttackAnimationDef.FrameTime = 2;
+	d.AttackAnimationDef.Looping = true;
+
+	d.IdleAnimationDef.FrameStart = 0;
+	d.IdleAnimationDef.FrameCount = 3;
+	d.IdleAnimationDef.FrameTime = 2;
+	d.IdleAnimationDef.UnitColorFrameStart = 229 + d.IdleAnimationDef.FrameStart;
+	d.IdleAnimationDef.Looping = true;
 
 	d.DeathAnimationDef.FrameStart = 221;
 	d.DeathAnimationDef.FrameCount = 8;

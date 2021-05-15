@@ -140,6 +140,13 @@ struct RenderUnitComponent {
 	Image colorSprite;
 	int depth = 0;
 	bool hFlip = false;
+
+	inline void SetSpriteFrame(const UnitSpriteFrame& s) {
+		sprite = s.sprite.image;
+		shadowSprite = s.shadowSprite.image;
+		colorSprite = s.colorSprite.image;
+		hFlip = s.hFlip;
+	}
 };
 
 
@@ -166,6 +173,7 @@ struct MovementComponent {
 struct UnitComponent {
 	const UnitDef* def;
 	EntityId movementGlowEntity = Entity::None;
+	bool attackFlip = false;
 
 	inline bool HasMovementGlow() const { return movementGlowEntity != Entity::None; }
 };
@@ -262,12 +270,13 @@ struct TimingComponent {
 enum class TimerExpiredAction : uint8_t {
 	None = 0,
 	UnitRemnantsThenDelete = 1,
-	DeleteEntity = 2,
+	UnitToggleIdleAnimation = 2,
+	DeleteEntity = 3,
 };
 
 
 struct TimingActionComponent {
 	TimerExpiredAction action = TimerExpiredAction::None;
 	
-	static constexpr const int ActionTypeCount = 3;
+	static constexpr const int ActionTypeCount = 4;
 };

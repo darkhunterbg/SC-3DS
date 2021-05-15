@@ -50,7 +50,6 @@ void EntityUtil::CopyUnitRenderSettings(EntityId e) {
 	bb = Ubb;
 }
 
-
 void EntityUtil::PlayAnimation(EntityId e, const AnimationClip& clip) {
 	EntityManager& em = GetManager();
 
@@ -65,6 +64,21 @@ void EntityUtil::PlayAnimation(EntityId e, const AnimationClip& clip) {
 
 }
 
+void EntityUtil::PlayAnimation(EntityId e, const UnitAnimationClip& clip) {
+	EntityManager& em = GetManager();
+
+	UnitAnimationComponent& a = em.UnitArchetype.AnimationArchetype.AnimationComponents.GetComponent(e);
+	UnitAnimationTrackerComponent& t = em.UnitArchetype.AnimationArchetype.TrackerComponents.GetComponent(e);
+	FlagsComponent& f = em.FlagComponents.GetComponent(e);
+
+	a.clip = &clip;
+	t.PlayClip(&clip);
+	f.set(ComponentFlags::AnimationEnabled);
+	f.set(ComponentFlags::AnimationFrameChanged);
+
+}
+
+
 void EntityUtil::SetRenderFromAnimationClip(EntityId e, const AnimationClip& clip, uint8_t i) {
 	EntityManager& em = GetManager();
 
@@ -78,6 +92,24 @@ void EntityUtil::SetRenderFromAnimationClip(EntityId e, const AnimationClip& cli
 	offset = frame.offset;
 	bb.size = clip.GetFrameSize();
 	
+	f.set(ComponentFlags::RenderEnabled);
+	f.set(ComponentFlags::RenderChanged);
+}
+
+void EntityUtil::SetRenderFromAnimationClip(EntityId e, const UnitAnimationClip& clip, uint8_t i) {
+	EntityManager& em = GetManager();
+
+	RenderUnitComponent& render = em.UnitArchetype.RenderArchetype.RenderComponents.GetComponent(e);
+	RenderUnitOffsetComponent& offset = em.UnitArchetype.RenderArchetype.OffsetComponents.GetComponent(e);
+	Rectangle16& bb = em.UnitArchetype.RenderArchetype.BoundingBoxComponents.GetComponent(e);
+	FlagsComponent& f = em.FlagComponents.GetComponent(e);
+
+	const UnitSpriteFrame& frame = clip.GetFrame(i);
+	render.SetSpriteFrame(frame);
+	offset.offset = frame.offset;
+	offset.shadowOffset = frame.shadowOffset;
+	bb.size = clip.GetFrameSize();
+
 	f.set(ComponentFlags::RenderEnabled);
 	f.set(ComponentFlags::RenderChanged);
 }
