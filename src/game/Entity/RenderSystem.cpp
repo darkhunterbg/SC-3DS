@@ -14,6 +14,10 @@ void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
 	for (EntityId id : em.RenderArchetype.Archetype.GetEntities()) {
 
 		int i = Entity::ToIndex(id);
+
+		if (!em.FlagComponents[i].test(ComponentFlags::RenderEnabled))
+			continue;
+
 		const Rectangle16& bb = em.RenderArchetype.BoundingBoxComponents[i];
 
 		if (!camRect.Intersects(bb))
@@ -30,6 +34,10 @@ void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
 		auto& arch = em.UnitArchetype.RenderArchetype;
 
 		int i = Entity::ToIndex(id);
+
+		if (!em.FlagComponents[i].test(ComponentFlags::RenderEnabled))
+			continue;
+
 		const Rectangle16& bb = arch.BoundingBoxComponents[i];
 
 		if (!camRect.Intersects(bb))
@@ -176,7 +184,7 @@ void RenderSystem::UpdatePositions(EntityManager& em, const EntityChangedData& c
 		if (em.UnitArchetype.RenderArchetype.Archetype.HasEntity(id))
 		{
 			int i = Entity::ToIndex(id);
-			em.FlagComponents[i].set(ComponentFlags::UnitRenderChanged);
+			em.FlagComponents[i].set(ComponentFlags::RenderChanged);
 		}
 	}
 
@@ -200,9 +208,9 @@ void RenderSystem::UpdatePositions(EntityManager& em, const EntityChangedData& c
 		int i = Entity::ToIndex(id);
 		auto& arch = em.UnitArchetype.RenderArchetype;
 
-		if (em.FlagComponents[i].test(ComponentFlags::UnitRenderChanged)) {
+		if (em.FlagComponents[i].test(ComponentFlags::RenderChanged)) {
 
-			em.FlagComponents[i].clear(ComponentFlags::UnitRenderChanged);
+			em.FlagComponents[i].clear(ComponentFlags::RenderChanged);
 			renderUnitUpdatePosData.outPos.push_back(&arch.DestinationComponents[i]);
 			renderUnitUpdatePosData.worldPos.push_back(em.PositionComponents[i]);
 			renderUnitUpdatePosData.offset.push_back(arch.OffsetComponents[i]);

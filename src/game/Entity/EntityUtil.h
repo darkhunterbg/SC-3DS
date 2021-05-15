@@ -41,7 +41,7 @@ public:
 	/// <summary>
 	/// Set current position (will cause render update)
 	/// </summary>
-	static void  SetPosition(EntityId e, Vector2Int16 pos);
+	static void SetPosition(EntityId e, Vector2Int16 pos);
 
 	/// <summary>
 	/// Copies Unit.Render archetype to Render archetype

@@ -111,7 +111,7 @@ public:
 private:
 	void CollectEntityChanges();
 	void ApplyEntityChanges();
-
+	void UpdateChildenPosition();
 public:
 	bool DrawColliders = false;
 

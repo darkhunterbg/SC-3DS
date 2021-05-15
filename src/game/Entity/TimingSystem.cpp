@@ -56,8 +56,6 @@ void TimingSystem::UnitRemnantsThenDelete(std::vector<EntityId>& entities, Entit
 
 			em.FlagComponents.NewComponent(id);
 			EntityUtil::SetRenderFromAnimationClip(id, clip, 0);
-			em.RenderArchetype.BoundingBoxComponents.GetComponent(id) =
-				em.UnitArchetype.RenderArchetype.BoundingBoxComponents.GetComponent(id);
 			em.RenderArchetype.RenderComponents.GetComponent(id).depth = def->Graphics->Remnants.Depth;
 			EntityUtil::StartTimer(id, clip.GetDuration(), TimerExpiredAction::DeleteEntity);
 			EntityUtil::PlayAnimation(id, clip);

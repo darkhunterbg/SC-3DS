@@ -142,7 +142,7 @@ void NavigationSystem::UpdateNavigation(EntityManager& em)
 					em.UnitArchetype.OrientationComponents[i] ==
 					nav.targetHeading) {
 
-		
+
 					navigationData.velocity.push_back(em.UnitArchetype.MovementComponents[i].movementSpeed);
 					navigationData.position.push_back(em.PositionComponents[i]);
 					navigationData.collider.push_back(em.CollisionArchetype.ColliderComponents[i].collider);
@@ -171,10 +171,20 @@ void NavigationSystem::ApplyUnitNavigationJob(int start, int end) {
 		auto& orientation = em.UnitArchetype.OrientationComponents[i];
 		const auto& unitMove = em.UnitArchetype.MovementComponents[i];;
 
-		auto& flags = em.FlagComponents[i]; 
+		auto& flags = em.FlagComponents[i];
 		auto& movement = em.MovementArchetype.MovementComponents[i];
 
 		int8_t diff = nav.targetHeading - orientation;
+
+		const auto& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
+
+
+		if (unit.HasMovementGlow()) {
+			EntityId glow = unit.movementGlowEntity;
+			EntityUtil::SetRenderFromAnimationClip(glow,
+				unit.def->Graphics->MovementGlowAnimations[nav.targetHeading], 0);
+			EntityUtil::PlayAnimation(glow, unit.def->Graphics->MovementGlowAnimations[nav.targetHeading]);
+		}
 
 		if (diff != 0) {
 
@@ -193,18 +203,16 @@ void NavigationSystem::ApplyUnitNavigationJob(int start, int end) {
 				else {
 					orientation = nav.targetHeading;
 				}
+
+				if (unit.HasMovementGlow()) {
+					EntityId glow = unit.movementGlowEntity;
+					EntityUtil::SetRenderFromAnimationClip(glow,
+						unit.def->Graphics->MovementGlowAnimations[orientation], 0);
+					EntityUtil::PlayAnimation(glow, unit.def->Graphics->MovementGlowAnimations[orientation]);
+				}
 			}
 			flags.set(ComponentFlags::UnitOrientationChanged);
 			movement.velocity = { 0,0 };
-
-			const auto& def = *em.UnitArchetype.UnitComponents.GetComponent(id).def;
-			if (def.Graphics->HasMovementGlow()) {
-				EntityId child = em.ParentArchetype.ChildComponents.GetComponent(id).children[0];
-				if (em.RenderArchetype.Archetype.HasEntity(child)) {
-					em.RenderArchetype.Archetype.RemoveEntity(child);
-					em.FlagComponents.GetComponent(child).clear(ComponentFlags::AnimationEnabled);
-				}
-			}
 		}
 		else {
 			const auto& position = em.PositionComponents[i];
@@ -216,28 +224,15 @@ void NavigationSystem::ApplyUnitNavigationJob(int start, int end) {
 			if (distance.LengthSquaredInt() < velocity * velocity) {
 				movement.velocity = { 0,0 };
 				flags.clear(ComponentFlags::NavigationWork);
-				const auto& def = *em.UnitArchetype.UnitComponents.GetComponent(id).def;
-				if (def.Graphics->HasMovementGlow()) {
-					EntityId child = em.ParentArchetype.ChildComponents.GetComponent(id).children[0];
-					if (em.RenderArchetype.Archetype.HasEntity(child)) {
-						em.RenderArchetype.Archetype.RemoveEntity(child);
-						em.FlagComponents.GetComponent(child).clear(ComponentFlags::AnimationEnabled);
-					}
+
+				if (unit.HasMovementGlow()) {
+					EntityId glow = unit.movementGlowEntity;
+					em.FlagComponents.GetComponent(glow).clear(ComponentFlags::AnimationEnabled);
+					em.FlagComponents.GetComponent(glow).clear(ComponentFlags::RenderEnabled);
 				}
 			}
 			else {
-				Vector2Int8 v  = Vector2Int8(movementTable32[orientation] * velocity);
-				if (v != movement.velocity) {
-					movement.velocity = v;
-					const auto& def = *em.UnitArchetype.UnitComponents.GetComponent(id).def;
-					if (def.Graphics->HasMovementGlow()) {
-						EntityId child = em.ParentArchetype.ChildComponents.GetComponent(id).children[0];
-		
-						EntityUtil::PlayAnimation(child, def.Graphics->MovementGlowAnimations[orientation]);
-						if (!em.RenderArchetype.Archetype.HasEntity(child))
-							em.RenderArchetype.Archetype.AddEntity(child);
-					}
-				}
+				movement.velocity = Vector2Int8(movementTable32[orientation] * velocity);
 			}
 		}
 	}
@@ -261,7 +256,7 @@ void NavigationSystem::UpdateNavGrid(EntityManager& em)
 
 	for (EntityId id : em.CollisionArchetype.Archetype.GetEntities()) {
 		int i = Entity::ToIndex(id);
-		
+
 		//Rectangle16 collider = em.CollisionArchetype.ColliderComponents[i].collider;
 		//collider.position += em.PositionComponents[i];
 

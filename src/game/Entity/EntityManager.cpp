@@ -33,6 +33,13 @@ void EntityManager::Init(Vector2Int16 mapSize)
 }
 
 void EntityManager::DeleteEntity(EntityId id) {
+	if (ParentArchetype.Archetype.HasEntity(id)) {
+		const auto& cmp = ParentArchetype.ChildComponents.GetComponent(id);
+		for (int i = 0; i < cmp.childCount; ++i) {
+			DeleteEntity(cmp.children[id]);
+		}
+	}
+
 	entities.DeleteEntity(id);
 	for (auto& arch : archetypes) {
 		if (arch->HasEntity(id))
@@ -41,6 +48,17 @@ void EntityManager::DeleteEntity(EntityId id) {
 
 }
 void EntityManager::DeleteEntities(std::vector<EntityId>& e) {
+	int max = e.size();
+
+	for (int i = 0; i < max; ++i) {
+		EntityId id = e[i];
+
+		if (ParentArchetype.Archetype.HasEntity(id)) {
+			const auto& cmp = ParentArchetype.ChildComponents.GetComponent(id);
+			e.insert(e.end(), cmp.children.begin(), cmp.children.begin() + cmp.childCount);
+		}
+	}
+
 
 	std::sort(e.begin(), e.end());
 	for (auto& arch : archetypes) {
@@ -88,10 +106,29 @@ void EntityManager::ApplyEntityChanges() {
 	for (auto archetype : archetypes)
 		archetype->CommitChanges();
 }
+void EntityManager::UpdateChildenPosition() {
+	for (EntityId id : ParentArchetype.Archetype.GetEntities()) {
+
+		if (FlagComponents.GetComponent(id).test(ComponentFlags::PositionChanged)) {
+			auto& childComp = ParentArchetype.ChildComponents.GetComponent(id);
+
+			const Vector2Int16& pos = PositionComponents.GetComponent(id);
+
+			for (int i = 0; i < childComp.childCount; ++i) {
+				EntityId child = childComp.children[i];
+
+				PositionComponents.GetComponent(child) = pos;
+				FlagComponents.GetComponent(child).set(ComponentFlags::PositionChanged);
+			}
+		}
+	}
+}
 
 void EntityManager::UpdateSecondaryEntities() {
 
 	timingSystem.UpdateTimers(*this);
+
+	timingSystem.ApplyTimerActions(*this);
 
 	//navigationSystem.UpdateNavGrid(*this);
 
@@ -108,28 +145,11 @@ void EntityManager::UpdateEntities() {
 
 	updated = true;
 
-	timingSystem.ApplyTimerActions(*this);
-
 	kinematicSystem.MoveEntities(*this);
 
-	for (EntityId id : ParentArchetype.Archetype.GetEntities()) {
-
-		if (FlagComponents.GetComponent(id).test(ComponentFlags::PositionChanged)) {
-			auto& childComp = ParentArchetype.ChildComponents.GetComponent(id);
-
-			const Vector2Int16& pos = PositionComponents.GetComponent(id);
-
-			for (int i = 0; i < childComp.childCount; ++i) {
-				EntityId child = childComp.children[i];
-
-				PositionComponents.GetComponent(child) = pos;
-				FlagComponents.GetComponent(child).set(ComponentFlags::PositionChanged);
-			}
-		}
-
-	}
-
 	animationSystem.UpdateAnimations();
+
+	UpdateChildenPosition();
 
 	CollectEntityChanges();
 
@@ -196,23 +216,22 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color
 	MovementArchetype.Archetype.AddEntity(e);
 
 	FlagComponents.GetComponent(e).set(ComponentFlags::PositionChanged);
-	FlagComponents.GetComponent(e).set(ComponentFlags::UnitRenderChanged);
-	FlagComponents.GetComponent(e).set(ComponentFlags::UnitAnimationFrameChanged);
+	FlagComponents.GetComponent(e).set(ComponentFlags::RenderEnabled);
+	FlagComponents.GetComponent(e).set(ComponentFlags::RenderChanged);
+	FlagComponents.GetComponent(e).set(ComponentFlags::AnimationFrameChanged);
 
 
 	if (def.Graphics->HasMovementGlow()) {
 		auto e2 = NewEntity();
-		EntityUtil::SetRenderFromAnimationClip(e2, def.Graphics->MovementGlowAnimations[0], 0);
-		EntityUtil::SetPosition(e2, position);
+		FlagComponents.NewComponent(e2);
 		RenderArchetype.RenderComponents.GetComponent(e2).depth = 1;
-		// TODO: anim bounding box
-		RenderArchetype.BoundingBoxComponents.NewComponent(e2, { position,{64,64} });
-		//RenderArchetype.Archetype.AddEntity(e2);
+		RenderArchetype.Archetype.AddEntity(e2);
 		AnimationArchetype.Archetype.AddEntity(e2);
-		//EntityUtil::PlayAnimation(e2, def.Graphics->MovementGlowAnimations[0]);
 
 		ParentArchetype.Archetype.AddEntity(e);
 		ParentArchetype.ChildComponents.NewComponent(e).AddChild(e2);
+
+		UnitArchetype.UnitComponents.GetComponent(e).movementGlowEntity = e2;
 	}
 
 	return e;
@@ -221,9 +240,8 @@ void EntityManager::PlayUnitAnimation(EntityId e, const UnitAnimationClip& clip)
 	UnitArchetype.AnimationArchetype.AnimationComponents[e].clip = &clip;
 	UnitArchetype.AnimationArchetype.TrackerComponents[e].PlayClip(&clip);
 	FlagComponents[e].set(ComponentFlags::AnimationEnabled);
-	FlagComponents[e].set(ComponentFlags::UnitAnimationFrameChanged);
+	FlagComponents[e].set(ComponentFlags::AnimationFrameChanged);
 }
-
 void EntityManager::GoTo(EntityId e, Vector2Int16 pos) {
 
 	FlagComponents.GetComponent(e).set(ComponentFlags::NavigationWork);

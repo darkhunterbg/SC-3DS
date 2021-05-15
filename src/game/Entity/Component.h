@@ -90,14 +90,13 @@ public:
 
 enum class ComponentFlags {
 	PositionChanged = 0,
-	RenderChanged = 1,
-	UnitRenderChanged = 2,
+	RenderEnabled = 1,
+	RenderChanged = 2,
 	UnitOrientationChanged = 3,
 	AnimationEnabled = 4,
 	AnimationFrameChanged = 5,
-	UnitAnimationFrameChanged = 6,
-	NavigationWork = 7,
-	UpdateTimers = 8,
+	NavigationWork = 6,
+	UpdateTimers = 7,
 
 };
 
@@ -166,6 +165,9 @@ struct MovementComponent {
 
 struct UnitComponent {
 	const UnitDef* def;
+	EntityId movementGlowEntity = Entity::None;
+
+	inline bool HasMovementGlow() const { return movementGlowEntity != Entity::None; }
 };
 
 struct UnitMovementComponent {

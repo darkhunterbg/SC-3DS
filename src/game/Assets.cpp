@@ -84,6 +84,8 @@ void AnimationClip::AddFrameCentered(const SpriteFrame& frame, Vector2Int16 fram
 	f.offset -= frameSize / 2;
 	if (hFlip)
 		f.offset.x = frameSize.x / 2 - frame.offset.x - frame.sprite.rect.size.x;
+
+	this->frameSize = frameSize;
 }
 
 UnitAnimationClip::UnitAnimationClip() {
@@ -101,6 +103,8 @@ uint8_t UnitAnimationClip::AddFrameCentered(const SpriteFrame& frame, Vector2Int
 	if (hFlip)
 		offset.x = frameSize.x / 2 - frame.offset.x - frame.sprite.rect.size.x;
 	frames[frameCount].offset = offset;
+
+	this->frameSize = frameSize;
 
 	return frameCount++;
 }

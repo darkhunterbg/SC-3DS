@@ -96,5 +96,4 @@ private:
 public:
 	void Draw(const Camera& camera, EntityManager& em);
 	void UpdatePositions(EntityManager& em, const EntityChangedData& changed);
-
 };

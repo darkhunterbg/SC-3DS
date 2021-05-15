@@ -175,7 +175,15 @@ void GameScene::Update() {
 
 			for (EntityId id : selection)
 			{
+				auto& unit = entityManager->UnitArchetype.UnitComponents[id];
+
 				auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
+
+				if (unit.HasMovementGlow()) {
+					entityManager->DeleteEntity(unit.movementGlowEntity);
+					entityManager->ParentArchetype.Archetype.RemoveEntity(id);
+				}
+
 				entityManager->PlayUnitAnimation(id, def->Graphics->DeathAnimation);
 
 				TimerExpiredAction action = def->Graphics->HasRemnants() ?

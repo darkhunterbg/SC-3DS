@@ -31,7 +31,7 @@ void AnimationSystem::UpdateUnitAnimationsJob(int start, int end) {
 		offset.offset = frame.offset;
 		offset.shadowOffset = frame.shadowOffset;
 
-		flags.set(ComponentFlags::UnitRenderChanged);
+		flags.set(ComponentFlags::RenderChanged);
 	}
 	
 }
@@ -59,6 +59,9 @@ void AnimationSystem::UpdateAnimations() {
 	s = this;
 	JobSystem::RunJob(unitData.size(), JobSystem::DefaultJobSize, UpdateUnitAnimationsJob);
 	JobSystem::RunJob(data.size(), JobSystem::DefaultJobSize, UpdateAnimationsJob);
+
+	data.clear();
+	unitData.clear();
 }
 
 void AnimationSystem::TickUnitAnimationsJob(int start, int end) {
@@ -84,7 +87,7 @@ void AnimationSystem::TickUnitAnimationsJob(int start, int end) {
 		tracker.clipFrame++;
 		tracker.frameCountdown = tracker.frameTime;
 
-		f.set(ComponentFlags::UnitAnimationFrameChanged);
+		f.set(ComponentFlags::AnimationFrameChanged);
 
 		if (tracker.looping)
 			tracker.clipFrame %= tracker.totalFrames;
@@ -135,8 +138,6 @@ void AnimationSystem::TickAnimations(EntityManager& em)
 	JobSystem::RunJob(em.UnitArchetype.AnimationArchetype.Archetype.GetEntities().Size(),
 		JobSystem::DefaultJobSize, TickUnitAnimationsJob);
 
-	data.clear();
-	unitData.clear();
 	
 	for (EntityId id : em.AnimationArchetype.Archetype.GetEntities()) {
 		int i = Entity::ToIndex(id);
@@ -165,8 +166,8 @@ void AnimationSystem::TickAnimations(EntityManager& em)
 
 		if (f.test(ComponentFlags::AnimationEnabled))
 		{
-			if (f.test(ComponentFlags::UnitAnimationFrameChanged)) {
-				f.clear(ComponentFlags::UnitAnimationFrameChanged);
+			if (f.test(ComponentFlags::AnimationFrameChanged)) {
+				f.clear(ComponentFlags::AnimationFrameChanged);
 
 				if (em.UnitArchetype.RenderArchetype.Archetype.HasEntity(id)) {
 					unitData.animation.push_back(em.UnitArchetype.AnimationArchetype.AnimationComponents[i]);
@@ -195,7 +196,7 @@ void AnimationSystem::SetUnitOrientationAnimations(EntityManager& em) {
 			const auto& orientation = em.UnitArchetype.OrientationComponents[i];
 
 			anim.clip = &unit.def->Graphics->MovementAnimations[orientation];
-			f.set(ComponentFlags::UnitAnimationFrameChanged);
+			f.set(ComponentFlags::AnimationFrameChanged);
 			animTracker.PlayClip(anim.clip);
 			f.set(ComponentFlags::AnimationEnabled);
 		}

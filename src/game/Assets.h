@@ -143,13 +143,16 @@ public:
 private:
 	uint8_t frameCount = 0;
 	std::array< SpriteFrame, 16> frames;
+	Vector2Int16 frameSize;
 public:
+	
 	AnimationClip() {}
 	AnimationClip(const AnimationClip&) = delete;
 	AnimationClip& operator=(const AnimationClip&) = delete;
 
 	void AddSpritesFromAtlas(const SpriteAtlas* atlas, int start, int count, Vector2Int offset = { 0,0 });
 
+	inline Vector2Int16 GetFrameSize() const { return frameSize; }
 	inline void AddFrame(const SpriteFrame& frame) {
 		frames[frameCount++] = frame;
 	}
@@ -184,11 +187,14 @@ public:
 private:
 	uint8_t frameCount = 0;
 	std::array<UnitSpriteFrame, 16> frames;
+	Vector2Int16 frameSize;
 public:
+	
 	UnitAnimationClip();
 	UnitAnimationClip(const UnitAnimationClip&) = delete;
 	UnitAnimationClip& operator=(const UnitAnimationClip&) = delete;
 
+	inline Vector2Int16 GetFrameSize() const { return frameSize; }
 	inline uint16_t GetDuration() const { return frameCount * (uint16_t)frameTime; }
 	inline const Span<UnitSpriteFrame> GetFrames() const {
 		return { frames.data(), frameCount };

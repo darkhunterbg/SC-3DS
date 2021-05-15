@@ -62,6 +62,7 @@ void EntityUtil::PlayAnimation(EntityId e, const AnimationClip& clip) {
 	t.PlayClip(&clip);
 	f.set(ComponentFlags::AnimationEnabled);
 	f.set(ComponentFlags::AnimationFrameChanged);
+
 }
 
 void EntityUtil::SetRenderFromAnimationClip(EntityId e, const AnimationClip& clip, uint8_t i) {
@@ -69,10 +70,14 @@ void EntityUtil::SetRenderFromAnimationClip(EntityId e, const AnimationClip& cli
 
 	RenderComponent& render = em.RenderArchetype.RenderComponents.GetComponent(e);
 	Vector2Int16& offset = em.RenderArchetype.OffsetComponents.GetComponent(e);
+	Rectangle16& bb = em.RenderArchetype.BoundingBoxComponents.GetComponent(e);
+	FlagsComponent& f = em.FlagComponents.GetComponent(e);
 
 	const SpriteFrame& frame = clip.GetFrame(i);
 	render.SetSpriteFrame(frame);
 	offset = frame.offset;
+	bb.size = clip.GetFrameSize();
 	
-	em.FlagComponents.GetComponent(e).set(ComponentFlags::RenderChanged);
+	f.set(ComponentFlags::RenderEnabled);
+	f.set(ComponentFlags::RenderChanged);
 }
