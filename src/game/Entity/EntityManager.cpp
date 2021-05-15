@@ -1,10 +1,12 @@
 #include "EntityManager.h"
 #include "RenderSystem.h"
-#include "../Platform.h"
+#include "EntityUtil.h"
+
 #include "../Profiler.h"
-#include "../Job.h"
 
 #include <algorithm>
+
+static std::vector<EntityId> scratch;
 
 EntityManager::EntityManager() {
 
@@ -17,9 +19,10 @@ EntityManager::EntityManager() {
 	archetypes.push_back(&UnitArchetype.RenderArchetype.Archetype);
 	archetypes.push_back(&UnitArchetype.AnimationArchetype.Archetype);
 	archetypes.push_back(&TimingArchetype.Archetype);
+	EntityUtil::emInstance = this;
 }
 EntityManager::~EntityManager() {
-
+	EntityUtil::emInstance = nullptr;
 }
 
 void EntityManager::Init(Vector2Int16 mapSize)
@@ -36,20 +39,27 @@ void EntityManager::DeleteEntity(EntityId id) {
 	}
 
 }
-
-
-static std::vector<EntityId> scratch;
-
 void EntityManager::DeleteEntities(std::vector<EntityId>& e) {
 
 	std::sort(e.begin(), e.end());
 	for (auto& arch : archetypes) {
-		arch->RemoveEntities(e, scratch, true);
+		arch->RemoveEntities(e, true);
 	}
 
 	entities.DeleteEntities(e, true);
 }
-
+void EntityManager::ClearEntityArchetypes(EntityId id) {
+	for (auto& arch : archetypes) {
+		if (arch->HasEntity(id))
+			arch->RemoveEntity(id);
+	}
+}
+void EntityManager::ClearEntitiesArchetypes(std::vector<EntityId>& e) {
+	std::sort(e.begin(), e.end());
+	for (auto& arch : archetypes) {
+		arch->RemoveEntities(e, true);
+	}
+}
 void EntityManager::ClearEntities()
 {
 	entities.ClearEntities();
@@ -81,7 +91,7 @@ void EntityManager::ApplyEntityChanges() {
 void EntityManager::UpdateSecondaryEntities() {
 
 	timingSystem.UpdateTimers(*this);
-	timingSystem.ApplyTimerActions(*this);
+
 	//navigationSystem.UpdateNavGrid(*this);
 
 	navigationSystem.UpdateNavigation(*this);
@@ -93,10 +103,11 @@ void EntityManager::UpdateSecondaryEntities() {
 	animationSystem.TickAnimations(*this);
 }
 
-
 void EntityManager::UpdateEntities() {
 
 	updated = true;
+
+	timingSystem.ApplyTimerActions(*this);
 
 	kinematicSystem.MoveEntities(*this);
 
@@ -120,15 +131,6 @@ void EntityManager::DrawEntites(const Camera& camera) {
 
 	if (DrawColliders)
 		kinematicSystem.DrawColliders(camera);
-}
-
-EntityId EntityManager::NewEmptyObject(Vector2Int16 position)
-{
-	EntityId e = entities.NewEntity();
-	PositionComponents.NewComponent(e, position);
-	FlagComponents.NewComponent(e).set(ComponentFlags::PositionChanged);
-
-	return e;
 }
 
 EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color color, EntityId e) {
@@ -181,51 +183,16 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color
 
 	return e;
 }
-void EntityManager::PlayAnimation(EntityId e, const AnimationClip& clip) {
-
-	AnimationComponent& a = AnimationArchetype.AnimationComponents.GetComponent(e);
-	AnimationTrackerComponent& t = AnimationArchetype.TrackerComponents.GetComponent(e);
-
-	if (!AnimationArchetype.Archetype.HasEntity(e)) {
-		AnimationArchetype.Archetype.AddEntity(e);
-		AnimationArchetype.AnimationComponents.NewComponent(e);
-		AnimationArchetype.TrackerComponents.NewComponent(e);
-	}
-
-	AnimationArchetype.AnimationComponents[e].clip = &clip;
-	AnimationArchetype.TrackerComponents[e].PlayClip(&clip);
-	FlagComponents[e].set(ComponentFlags::AnimationEnabled);
-	FlagComponents[e].set(ComponentFlags::AnimationFrameChanged);
-
-}
 void EntityManager::PlayUnitAnimation(EntityId e, const UnitAnimationClip& clip) {
 	UnitArchetype.AnimationArchetype.AnimationComponents[e].clip = &clip;
 	UnitArchetype.AnimationArchetype.TrackerComponents[e].PlayClip(&clip);
 	FlagComponents[e].set(ComponentFlags::AnimationEnabled);
 	FlagComponents[e].set(ComponentFlags::UnitAnimationFrameChanged);
 }
-void EntityManager::SetPosition(EntityId e, Vector2Int16 pos) {
-	PositionComponents.GetComponent(e) = pos;
-	FlagComponents[e].set(ComponentFlags::PositionChanged);
-}
+
 void EntityManager::GoTo(EntityId e, Vector2Int16 pos) {
 
 	FlagComponents.GetComponent(e).set(ComponentFlags::NavigationWork);
 	NavigationArchetype.NavigationComponents.GetComponent(e).target = pos;
 	NavigationArchetype.NavigationComponents.GetComponent(e).targetHeading = 255;
-}
-void EntityManager::StartTimer(EntityId e, uint16_t time, TimerExpiredAction action, bool looping)
-{
-	TimingComponent& t = TimingArchetype.TimingComponents.GetComponent(e);
-	TimingActionComponent& a = TimingArchetype.ActionComponents.GetComponent(e);
-
-	if (!TimingArchetype.Archetype.HasEntity(e)) {
-		TimingArchetype.Archetype.AddEntity(e);
-		TimingArchetype.TimingComponents.NewComponent(e);
-		TimingArchetype.ActionComponents.NewComponent(e);
-	}
-
-	t.NewTimer(time, looping);
-	a.action = action;
-	FlagComponents.GetComponent(e).set(ComponentFlags::UpdateTimers);
 }

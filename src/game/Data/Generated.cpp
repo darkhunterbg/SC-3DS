@@ -4,7 +4,6 @@
 
 SpriteFrameAtlas* SpriteDatabase::unit_terran_marine;
 SpriteFrameAtlas* SpriteDatabase::unit_terran_tmashad;
-SpriteFrameAtlas* SpriteDatabase::unit_terran_tmadeath;
 SpriteFrameAtlas* SpriteDatabase::unit_terran_scv;
 SpriteFrameAtlas* SpriteDatabase::unit_thingy_tbangs;
 
@@ -465,6 +464,9 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_marine() {
 	a->SetOffset(449, Vector2Int(21,19));
 	a->SetOffset(450, Vector2Int(22,19));
 	a->SetOffset(451, Vector2Int(23,19));
+	a->SetOffset(452, Vector2Int(0,24));
+	a->SetOffset(453, Vector2Int(0,25));
+	a->SetOffset(454, Vector2Int(0,27));
 
 	return a;
 }
@@ -695,18 +697,6 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_tmashad() {
 	a->SetOffset(218, Vector2Int(12,26));
 	a->SetOffset(219, Vector2Int(12,26));
 	a->SetOffset(220, Vector2Int(15,27));
-
-	return a;
-}
-
-const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_tmadeath() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_terran_tmadeath.t3x");
-	auto* a = unit_terran_tmadeath = new SpriteFrameAtlas(atlas);
-	a->FrameSize = Vector2Int(64, 64);
-
-	a->SetOffset(0, Vector2Int(0,24));
-	a->SetOffset(1, Vector2Int(0,25));
-	a->SetOffset(2, Vector2Int(0,27));
 
 	return a;
 }

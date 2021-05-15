@@ -11,6 +11,7 @@ private:
 	std::vector<EntityId> newEntities;
 	std::vector<EntityId> removedEntities;
 	std::array<bool, Entity::MaxEntities> hasEntity;
+	std::vector<EntityId> scratch;
 	const char* name;
 public:
 	EntityArchetype(const EntityArchetype&) = delete;
@@ -31,8 +32,9 @@ public:
 		return { removedEntities.data(), removedEntities.size() };
 	}
 	void AddEntity(EntityId id);
+	void AddEntities(std::vector<EntityId>& entities, bool sorted);
 	void RemoveEntity(EntityId id);
-	int RemoveEntities(std::vector<EntityId>& del, std::vector<EntityId>& scratch, bool sorted);
+	int RemoveEntities(std::vector<EntityId>& del, bool sorted);
 	void ClearEntities();
 	void CommitChanges();
 };

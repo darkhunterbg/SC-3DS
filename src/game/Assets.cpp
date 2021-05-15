@@ -78,6 +78,14 @@ SpriteFrameAtlas::SpriteFrameAtlas(const SpriteAtlas* atlas)
 	}
 }
 
+void AnimationClip::AddFrameCentered(const SpriteFrame& frame, Vector2Int16 frameSize, bool hFlip) {
+	auto& f = frames[frameCount++] = frame;
+	f.hFlip = hFlip;
+	f.offset -= frameSize / 2;
+	if (hFlip)
+		f.offset.x = frameSize.x / 2 - frame.offset.x - frame.sprite.rect.size.x;
+}
+
 UnitAnimationClip::UnitAnimationClip() {
 	for (auto& sf : frames) {
 		sf.sprite.image = { nullptr };
@@ -104,7 +112,6 @@ void UnitAnimationClip::AddShadowFrameCentered(uint8_t index, const SpriteFrame&
 		offset.x = frameSize.x / 2 - frame.offset.x - frame.sprite.rect.size.x;
 	frames[index].shadowOffset = offset +additionalOffset;
 }
-
 void UnitAnimationClip::AddColorFrame(uint8_t index, const SpriteFrame& frame)
 {
 	frames[index].colorSprite = frame.sprite;

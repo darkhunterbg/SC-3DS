@@ -13,7 +13,7 @@ EntityArchetype::EntityArchetype(const char* name) : name(name)
 void EntityArchetype::AddEntity(EntityId id)
 {
 	if (HasEntity(id))
-		EXCEPTION("Entity %i already added to archetype %s!", name);
+		EXCEPTION("Entity %i already added to archetype %s!", id, name);
 
 	hasEntity[Entity::ToIndex(id)] = true;
 	newEntities.push_back(id);
@@ -28,11 +28,38 @@ void EntityArchetype::AddEntity(EntityId id)
 
 	entities.insert(entities.begin(), id);
 }
+void EntityArchetype::AddEntities(std::vector<EntityId>& add, bool sorted) {
+	if (!sorted)
+		std::sort(add.begin(), add.end());
+
+	for (EntityId id : add)
+		if (HasEntity(id)) {
+			EXCEPTION("Entity %i is already part of archetype %s!", id, name);
+		}
+		else
+			hasEntity[Entity::ToIndex(id)] = true;
+
+	int insertAt = entities.size();
+	EntityId id = add.front();
+	auto sortEnd = insertAt;
+	for (int i = 0; i < sortEnd; ++i)
+	{
+		if (entities[i] < id) {
+			insertAt = i;
+			break;
+		}
+	}
+
+	entities.insert(entities.cbegin() + insertAt, add.cbegin(), add.cend());
+	id = add.back();
+	size_t end = std::min(entities.size(), insertAt + (size_t)id + 1);
+	std::sort(entities.begin() + insertAt, entities.begin() + end);
+}
 
 void EntityArchetype::RemoveEntity(EntityId id)
 {
 	if (!HasEntity(id))
-		EXCEPTION("Entity %i is not part of archetype %s!", name);
+		EXCEPTION("Entity %i is not part of archetype %s!", id, name);
 
 	hasEntity[Entity::ToIndex(id)] = false;
 	removedEntities.push_back(id);
@@ -63,8 +90,8 @@ static bool RemoveIf(EntityId id) {
 }
 
 
-int EntityArchetype::RemoveEntities(std::vector<EntityId>& del,
-	std::vector<EntityId>& scratch, bool sorted) {
+
+int EntityArchetype::RemoveEntities(std::vector<EntityId>& del, bool sorted) {
 
 	scratch.clear();
 

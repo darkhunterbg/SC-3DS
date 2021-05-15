@@ -8,7 +8,7 @@
 #include "../Entity/EntityManager.h"
 #include "../Profiler.h"
 #include "../Data/UnitDatabase.h"
-
+#include "../Entity/EntityUtil.h"
 
 static std::vector<EntityId> selection;
 
@@ -62,7 +62,7 @@ void GameScene::Start() {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[(i) % UnitDatabase::Units.size()];
 			EntityId e = entityManager->NewUnit(def,
-				Vector2Int16(Vector2Int{ x * 32 + 32,y * 32 + 16 }), c);
+				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 + 16 }), c);
 
 			//entityManager->PlayUnitAnimation(e, def.Graphics->MovementAnimations[12]);
 			i += 1;
@@ -106,7 +106,7 @@ void GameScene::Update() {
 
 	bool logical = false;
 
-	while (frameCounter2 >= 5)
+	if (frameCounter2 >= 5)
 	{
 
 		frameCounter2 -= 5;
@@ -115,7 +115,7 @@ void GameScene::Update() {
 
 
 
-	while (frameCounter >= 5)
+	if (frameCounter >= 5)
 	{
 		logical = true;
 
@@ -158,8 +158,6 @@ void GameScene::Update() {
 				}
 		}
 
-		// Unit animation death anim layer and death object should be configurable
-
 		if (Game::Gamepad.IsButtonPressed(GamepadButton::Y)) {
 
 			for (EntityId id : selection)
@@ -168,23 +166,21 @@ void GameScene::Update() {
 				}
 		}
 		if (Game::Gamepad.IsButtonPressed(GamepadButton::B)) {
+			entityManager->UnitArchetype.Archetype.RemoveEntities(selection, false);
+			entityManager->CollisionArchetype.Archetype.RemoveEntities(selection, false);
+			entityManager->NavigationArchetype.Archetype.RemoveEntities(selection, false);
+			entityManager->MovementArchetype.Archetype.RemoveEntities(selection, false);
+
+
 			for (EntityId id : selection)
 			{
 				auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
-				entityManager->UnitArchetype.Archetype.RemoveEntity(id);
-
 				entityManager->PlayUnitAnimation(id, def->Graphics->DeathAnimation);
-				//entityManager->UnitArchetype.RenderArchetype.RenderComponents[id].depth = -1;
-				entityManager->CollisionArchetype.Archetype.RemoveEntity(id);
-				entityManager->NavigationArchetype.Archetype.RemoveEntity(id);
-				entityManager->MovementArchetype.Archetype.RemoveEntity(id);
-
-				entityManager->TimingArchetype.Archetype.AddEntity(id);
 
 				TimerExpiredAction action = def->Graphics->Remnants.HasRemnants() ?
 					TimerExpiredAction::UnitRemnantsThenDelete : TimerExpiredAction::DeleteEntity;
 
-				entityManager->StartTimer(id, def->Graphics->DeathAnimation.GetDuration() + 1, action);
+				EntityUtil::StartTimer(id, def->Graphics->DeathAnimation.GetDuration(), action);
 
 				int i = std::rand() % def->Sounds.Death.TotalClips;
 				Game::Audio.PlayClip(def->Sounds.Death.Clips[i], 1);

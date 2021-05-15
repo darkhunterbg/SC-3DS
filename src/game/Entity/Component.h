@@ -238,21 +238,13 @@ struct ColliderComponent {
 typedef uint16_t TimingDuration;
 
 struct TimingComponent {
-	TimingDuration timer;
-	TimingDuration nextTimer;
+	TimingDuration timer = 0;
+	TimingDuration nextTimer = 0;
 
 	inline void NewTimer(TimingDuration duration, bool looping = false) {
 
 		timer = duration;
 		nextTimer = looping * duration;
-	}
-
-	inline static constexpr const TimingDuration FrameTime(int frames) {
-		return frames;
-	}
-
-	inline static constexpr const TimingDuration SecondsTime(float seconds) {
-		return (uint16_t)(seconds * 24);
 	}
 };
 
@@ -264,7 +256,7 @@ enum class TimerExpiredAction : uint8_t {
 
 
 struct TimingActionComponent {
-	TimerExpiredAction action;
+	TimerExpiredAction action = TimerExpiredAction::None;
 	
 	static constexpr const int ActionTypeCount = 3;
 };

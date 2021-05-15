@@ -11,12 +11,11 @@ std::vector<const UnitGraphicsDef*> GraphicsDatabase::Units =
 static void MarineResources() {
 	auto a = SpriteDatabase::Load_unit_terran_marine();
 	auto as = SpriteDatabase::Load_unit_terran_tmashad();
-	auto ad = SpriteDatabase::Load_unit_terran_tmadeath();
 	UnitGraphicsDef& d = GraphicsDatabase::Marine;
 	d.RenderSize = Vector2Int16(a->FrameSize);
 	d.DeathAnimationDef.GenerateAnimation(a, nullptr, d.DeathAnimation);
 	d.MovementAnimationDef.GenerateAnimations(a, as, d.MovementAnimations);
-	d.Remnants.Def.GenerateAnimation(ad, d.Remnants.Clip);
+	d.Remnants.Def.GenerateAnimation(a, d.Remnants.Clip);
 }
 
 static void MarineData() {
@@ -34,6 +33,7 @@ static void MarineData() {
 	d.DeathAnimationDef.UnitColorFrameStart = -1;
 	d.DeathAnimationDef.FrameTime = 2;
 
+	d.Remnants.Def.FrameStart = 452;
 	d.Remnants.Def.FrameCount = 3;
 	d.Remnants.Def.FrameTime = 48;
 	d.Remnants.Depth = -1;

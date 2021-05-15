@@ -153,13 +153,7 @@ public:
 	inline void AddFrame(const SpriteFrame& frame) {
 		frames[frameCount++] = frame;
 	}
-	inline void AddFrameCentered(const SpriteFrame& frame, Vector2Int16 frameSize, bool hFlip = false) {
-		auto& f = frames[frameCount++] = frame;
-		f.hFlip = hFlip;
-		f.offset -= frameSize / 2;
-		if (hFlip)
-			f.offset.x = frameSize.x / 2 - frame.offset.x - frame.sprite.rect.size.x;
-	}
+	void AddFrameCentered(const SpriteFrame& frame, Vector2Int16 frameSize, bool hFlip = false);
 	inline void SetFrameOffset(uint8_t frame, Vector2Int16 offset) {
 		frames[frame].offset = offset;
 	}

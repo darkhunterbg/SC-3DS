@@ -9,7 +9,7 @@ namespace AssetBatcher
 	{
 		public string Name;
 		public bool Centered;
-		public string Path;
+		public List<string> Paths = new List<string>();
 	}
 
 	class Program
@@ -25,50 +25,52 @@ namespace AssetBatcher
 			string path = Path.Combine(rootDir, "data_out", "unit", "terran");
 			var dir = Path.Combine(rootDir, "gfx");
 
-			T3SFolder("unit/terran/marine");
-			T3SFolder("unit/terran/tmashad");
-			T3SFolder("unit/terran/tmadeath");
-			//T3SFolder("unit/terran/tmeDeath");
+			T3SFolders("unit/terran/marine", "unit/terran/tmadeath");
+			T3SFolders("unit/terran/tmashad");
 
-			T3SFolder("unit/terran/scv");
-			T3SFolder("unit/thingy/tbangs");
+			T3SFolders("unit/terran/scv");
+			T3SFolders("unit/thingy/tbangs");
 			GeneraSourceCode();
 		}
 
 		static void GeneraSourceCode()
 		{
-			using (StreamWriter s = new StreamWriter("../../src/game/Data/Generated.h")) {
+			using (StreamWriter s = new StreamWriter("../../src/game/Data/Generated.h"))
+			{
 
 				s.WriteLine(Template.HeaderStart);
 
-				foreach (var e in generated) {
+				foreach (var e in generated)
+				{
 					s.WriteLine($"\tstatic SpriteFrameAtlas* {e.Name};");
 				}
 
 
 				s.WriteLine();
 
-				foreach (var e in generated) {
+				foreach (var e in generated)
+				{
 					s.WriteLine($"\tstatic const SpriteFrameAtlas* Load_{e.Name}();");
 				}
 
 				s.WriteLine("};");
 			}
 
-			using (StreamWriter s = new StreamWriter("../../src/game/Data/Generated.cpp")) {
+			using (StreamWriter s = new StreamWriter("../../src/game/Data/Generated.cpp"))
+			{
 				s.WriteLine(Template.SourceStart);
-				foreach (var e in generated) {
+				foreach (var e in generated)
+				{
 					s.WriteLine($"SpriteFrameAtlas* SpriteDatabase::{e.Name};");
 				}
 				s.WriteLine();
 
-				foreach (var e in generated) {
-					string[] info = File.ReadAllLines(Path.Combine(e.Path, "info.txt")); ;
+				foreach (var e in generated)
+				{
+					string[] info = File.ReadAllLines(Path.Combine(e.Paths[0], "info.txt")); ;
 					var spl = info[0].Split(' ');
 					int width = int.Parse(spl[0]);
 					int height = int.Parse(spl[1]);
-
-
 
 					s.WriteLine($"const SpriteFrameAtlas* SpriteDatabase::Load_{e.Name}() {{");
 					s.WriteLine($"\tconst SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas(\"{e.Name}.t3x\");");
@@ -78,18 +80,28 @@ namespace AssetBatcher
 					s.WriteLine();
 
 					int x = 0;
-					foreach (string i in info.Skip(1)) {
-						var split = i.Split(' ');
-						int w = int.Parse(split[1]);
-						if (e.Centered)
-							w -= width / 2;
-						int h = int.Parse(split[2]);
-						if (e.Centered)
-							h -= height / 2;
 
-						s.WriteLine($"\ta->SetOffset({x}, Vector2Int({w},{h}));");
+					foreach (var path in e.Paths)
+					{
+						info = File.ReadAllLines(Path.Combine(path, "info.txt")); ;
+						spl = info[0].Split(' ');
 
-						++x;
+					
+						foreach (string i in info.Skip(1))
+						{
+							var split = i.Split(' ');
+							int w = int.Parse(split[1]);
+							if (e.Centered)
+								w -= width / 2;
+							int h = int.Parse(split[2]);
+							if (e.Centered)
+								h -= height / 2;
+
+							s.WriteLine($"\ta->SetOffset({x}, Vector2Int({w},{h}));");
+
+							++x;
+						}
+
 					}
 
 					s.WriteLine();
@@ -99,36 +111,48 @@ namespace AssetBatcher
 					s.WriteLine("}");
 
 					s.WriteLine();
+
 				}
 			}
 
 		}
 
-		static void T3SFolder(string folder, bool centerCoord = false)
+		static void T3SFolders(params string[] folders)
 		{
-			Console.WriteLine(folder);
 
-			string name = folder.Replace('/', '_');
+			string name = folders[0].Replace('/', '_');
 
-			string path = Path.GetFullPath($"../../data_out/{folder}");
+
 			string root = Path.GetFullPath("../../data_out");
 
 			string header = $"--atlas -f {format} -z {compression} -q high";
 
 			string fileName = Path.GetFullPath($"../../gfx/{name}.t3s");
 
-			using (StreamWriter s = new StreamWriter(fileName)) {
+			List<string> paths = new List<string>();
+
+			using (StreamWriter s = new StreamWriter(fileName))
+			{
 				s.WriteLine(header);
-				foreach (var f in Directory.GetFiles(path, "*.png", SearchOption.AllDirectories)) {
-					s.WriteLine("..\\data_out\\" + f.Substring(root.Length + 1));
+
+				foreach (var src in folders)
+				{
+					Console.WriteLine(src);
+
+					string path = Path.GetFullPath($"../../data_out/{src}");
+					paths.Add(path);
+					foreach (var f in Directory.GetFiles(path, "*.png", SearchOption.AllDirectories))
+					{
+						s.WriteLine("..\\data_out\\" + f.Substring(root.Length + 1));
+					}
 				}
 			}
 
 			generated.Add(new GeneratedInfo()
 			{
 				Name = name,
-				Centered = centerCoord,
-				Path = path,
+				Centered = false,
+				Paths = paths,
 			});
 		}
 
@@ -142,21 +166,25 @@ namespace AssetBatcher
 
 			string header = $"--atlas -f {format} -z {compression} -q high";
 
-			foreach (var g in grouped) {
+			foreach (var g in grouped)
+			{
 				string filePath = Path.GetFileNameWithoutExtension(g.Key);
 				if (g.Key != dir)
 					filePath = g.Key.Substring(dir.Length + 1);
 				var fileName = filePath.Replace('\\', '_');
 				string n = Path.GetFileNameWithoutExtension(g.Value[0]);
-				if (g.Value.Count == 1 && !int.TryParse(n, out _)) {
+				if (g.Value.Count == 1 && !int.TryParse(n, out _))
+				{
 					fileName = filePath.Replace('\\', '_') + "_" + n;
 				}
 				fileName = Path.Combine(dir, fileName) + ".t3s";
 
-				using (StreamWriter s = new StreamWriter(fileName)) {
+				using (StreamWriter s = new StreamWriter(fileName))
+				{
 					string h = $"{header}";
 					s.WriteLine(header);
-					foreach (var p in g.Value) {
+					foreach (var p in g.Value)
+					{
 						var f = p.Substring(dir.Length + 1);
 						s.WriteLine(f);
 					}

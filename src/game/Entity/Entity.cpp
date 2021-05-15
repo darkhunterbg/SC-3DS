@@ -143,7 +143,6 @@ void EntityCollection::DeleteEntities(std::vector<EntityId>& deleteEntities, boo
 	std::sort(freeEntities.begin() + insertAt, freeEntities.begin() + end, std::greater<EntityId>());
 }
 
-
 void EntityCollection::DeleteEntity(EntityId id) {
 	if (id <= Entity::None || id > Entity::MaxEntities ||
 		!usedEntities[Entity::ToIndex(id)])
@@ -175,7 +174,6 @@ void EntityCollection::DeleteEntity(EntityId id) {
 	EXCEPTION("Deleting entity %i was not found!", id);
 
 }
-
 
 void EntityCollection::ClearEntities()
 {

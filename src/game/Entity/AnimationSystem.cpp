@@ -51,7 +51,7 @@ void AnimationSystem::UpdateAnimationsJob(int start, int end) {
 
 		offset = frame.offset;
 
-		flags.set(ComponentFlags::UnitRenderChanged);
+		flags.set(ComponentFlags::RenderChanged);
 	}
 }
 

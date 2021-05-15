@@ -5,7 +5,7 @@
 #include <algorithm>
 #include "../Job.h"
 #include "../Entity/Component.h"
-
+#include "../Entity/EntityUtil.h"
 
 
 void PerformanceTestScene::Start() {
@@ -27,7 +27,7 @@ void PerformanceTestScene::Start() {
 			Colors::Red);
 
 		//if (i % 4 == 0)
-			entityManager.StartTimer(i, TimingComponent::SecondsTime(1), TimerExpiredAction::DeleteEntity);
+		EntityUtil::StartTimer(i, TimeUtil::SecondsTime(1), TimerExpiredAction::DeleteEntity);
 
 
 		//entityManager.PlayUnitAnimation(i, UnitDatabase::Marine.MovementAnimations[4]);

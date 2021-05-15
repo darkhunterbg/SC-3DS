@@ -1,14 +1,13 @@
 #include "TimingSystem.h"
 #include "EntityManager.h"
+#include "EntityUtil.h"
+
 #include "../Profiler.h"
 
 
 
 void TimingSystem::UpdateTimers(EntityManager& em)
 {
-	for (auto& t : actionsTable)
-		t.entities.clear();
-
 	for (EntityId id : em.TimingArchetype.Archetype.GetEntities()) {
 		int i = Entity::ToIndex(id);
 
@@ -38,30 +37,36 @@ void TimingSystem::ApplyTimerActions(EntityManager& em) {
 
 	UnitRemnantsThenDelete(GetActionEntityTable(TimerExpiredAction::UnitRemnantsThenDelete), em);
 	DeleteEntities(GetActionEntityTable(TimerExpiredAction::DeleteEntity), em);
+
+	for (auto& t : actionsTable)
+		t.entities.clear();
 }
 
 void TimingSystem::UnitRemnantsThenDelete(std::vector<EntityId>& entities, EntityManager& em) {
 	if (entities.size() > 0) {
-		//em.DeleteEntities(entities);
+		em.ClearEntitiesArchetypes(entities);
+		em.RenderArchetype.Archetype.AddEntities(entities, true);
+		em.AnimationArchetype.Archetype.AddEntities(entities, true);
+
 		for (EntityId id : entities) {
 			int i = Entity::ToIndex(id);
-			auto def = em.UnitArchetype.UnitComponents[i].def;
-			em.DeleteEntity(id);
 
-			auto e = em.NewEmptyObject(em.PositionComponents[i]);
-			em.RenderArchetype.Archetype.AddEntity(e);
-			em.RenderArchetype.RenderComponents.NewComponent(e).depth = def->Graphics->Remnants.Depth;
-			em.RenderArchetype.RenderComponents.GetComponent(e).SetSpriteFrame(def->Graphics->Remnants.Clip.GetFrame(0));
-			em.RenderArchetype.OffsetComponents.NewComponent(e) = def->Graphics->Remnants.Clip.GetFrame(0).offset;
-			em.RenderArchetype.DestinationComponents.NewComponent(e) = def->Graphics->Remnants.Clip.GetFrame(0).offset + em.PositionComponents[i];
-			em.RenderArchetype.BoundingBoxComponents.NewComponent(e) = em.UnitArchetype.RenderArchetype.BoundingBoxComponents
-				.GetComponent(id);
-			em.StartTimer(e, def->Graphics->Remnants.Clip.GetDuration() + 1, TimerExpiredAction::DeleteEntity);
-			em.PlayAnimation(e, def->Graphics->Remnants.Clip);
+			const auto def = em.UnitArchetype.UnitComponents[i].def;
+			const auto& clip = def->Graphics->Remnants.Clip;
+
+			em.FlagComponents.NewComponent(id);
+			EntityUtil::SetRenderFromAnimationClip(id, clip, 0);
+			em.RenderArchetype.BoundingBoxComponents.GetComponent(id) =
+				em.UnitArchetype.RenderArchetype.BoundingBoxComponents.GetComponent(id);
+			em.RenderArchetype.RenderComponents.GetComponent(id).depth = def->Graphics->Remnants.Depth;
+			EntityUtil::StartTimer(id, clip.GetDuration(), TimerExpiredAction::DeleteEntity);
+			EntityUtil::PlayAnimation(id, clip);
 		}
 	}
 }
 
 void TimingSystem::DeleteEntities(std::vector<EntityId>& entities, EntityManager& em) {
-	em.DeleteEntities(entities);
+	if (entities.size() > 0) {
+		em.DeleteEntities(entities);
+	}
 }
