@@ -17,6 +17,7 @@ struct UnitDef {
 	uint8_t RotationSpeed;
 
 	uint8_t UseSupplyDoubled = 0;
+	uint8_t ProvideSupplyDoubled = 0;
 
 	struct {
 		UnitSound Ready;

@@ -36,7 +36,6 @@ void TimingSystem::UpdateTimers(EntityManager& em)
 void TimingSystem::ApplyTimerActions(EntityManager& em) {
 
 	UnitRemnantsThenDelete(GetActionEntityTable(TimerExpiredAction::UnitRemnantsThenDelete), em);
-	UnitToggleIdleAnimation(GetActionEntityTable(TimerExpiredAction::UnitToggleIdleAnimation), em);
 	DeleteEntities(GetActionEntityTable(TimerExpiredAction::DeleteEntity), em);
 
 	for (auto& t : actionsTable)
@@ -60,24 +59,6 @@ void TimingSystem::UnitRemnantsThenDelete(std::vector<EntityId>& entities, Entit
 			em.RenderArchetype.RenderComponents.GetComponent(id).depth = def->Graphics->Remnants.Depth;
 			EntityUtil::StartTimer(id, clip.GetDuration(), TimerExpiredAction::DeleteEntity);
 			EntityUtil::PlayAnimation(id, clip);
-		}
-	}
-}
-
-void TimingSystem::UnitToggleIdleAnimation(std::vector<EntityId>& entities, EntityManager& em) {
-	if (entities.size() > 0) {
-		for (EntityId id : entities) {
-			uint8_t orientation = em.UnitArchetype.OrientationComponents.GetComponent(id);
-			 UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
-			if (unit.attackFlip) {
-
-				EntityUtil::SetRenderFromAnimationClip(id, unit.def->Graphics->IdleAnimations[orientation], 2);
-			}
-			else {
-				EntityUtil::SetRenderFromAnimationClip(id, unit.def->Graphics->AttackAnimations[orientation], 0);
-			}
-
-			unit.attackFlip = !unit.attackFlip;
 		}
 	}
 }

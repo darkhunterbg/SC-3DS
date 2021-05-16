@@ -186,6 +186,8 @@ void EntityManager::UpdateEntities() {
 
 	updated = true;
 
+	playerSystem.UpdatePlayerUnits(*this);
+
 	kinematicSystem.MoveEntities(*this);
 
 	animationSystem.UpdateAnimations();
@@ -222,10 +224,12 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color
 	UnitArchetype.UnitComponents.NewComponent(e, { &def });
 	UnitArchetype.OrientationComponents.NewComponent(e);
 	UnitArchetype.MovementComponents.NewComponent(e).FromDef(def);
+	UnitArchetype.DataComponents.NewComponent(e).FromDef(def);
+	UnitArchetype.OwnerComponents.NewComponent(e, { 0 });
 	UnitArchetype.Archetype.AddEntity(e);
 
 	UnitArchetype.RenderArchetype.RenderComponents.NewComponent(e, {
-		Color4(color),
+		Color32(color),
 		def.Graphics->MovementAnimations[0].GetFrame(0).sprite.image,
 		def.Graphics->MovementAnimations[0].GetFrame(0).shadowSprite.image,
 		def.Graphics->MovementAnimations[0].GetFrame(0).colorSprite.image,

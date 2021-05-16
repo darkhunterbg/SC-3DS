@@ -12,11 +12,11 @@ typedef int AudioChannelHandle;
 typedef void* Semaphore;
 
 struct DrawCommandColor {
-	Color4 color;
+	Color32 color;
 	float blend;
 
 	inline void AlphaBlend(float alpha) {
-		color = Color4(0.0f, 0.0f, 0.0f, alpha);
+		color = Color32(0.0f, 0.0f, 0.0f, alpha);
 		blend = 0;
 	}
 };

@@ -52,24 +52,24 @@ struct Color
 };
 
 
-struct Color4 {
+struct Color32 {
 	uint32_t value;
 
-	constexpr Color4() :value(0) {}
+	constexpr Color32() :value(0) {}
 
-	constexpr Color4(uint32_t c) : value(c) {}
+	constexpr Color32(uint32_t c) : value(c) {}
 
-	constexpr Color4(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+	constexpr Color32(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 		: value(0)
 	{
 		value = r | (g << (uint32_t)8) | (b << (uint32_t)16) | (a << (uint32_t)24);
 	}
 
-	constexpr explicit Color4(float r, float g, float b, float a)
-		:Color4((uint8_t)(r * 255), (uint8_t)(g * 255), (uint8_t)(b * 255), (uint8_t)(a * 255)) {}
+	constexpr explicit Color32(float r, float g, float b, float a)
+		:Color32((uint8_t)(r * 255), (uint8_t)(g * 255), (uint8_t)(b * 255), (uint8_t)(a * 255)) {}
 
-	constexpr explicit Color4(const Color& color)
-		: Color4(color.r, color.g, color.b, color.a) {}
+	constexpr explicit Color32(const Color& color)
+		: Color32(color.r, color.g, color.b, color.a) {}
 
 	constexpr uint8_t GetR() const {
 		return (value & 0xFF);

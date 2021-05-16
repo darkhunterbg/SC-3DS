@@ -72,13 +72,13 @@ void RenderSystem::DrawEntities(const Camera& camera, const Rectangle16& camRect
 		cmd.image = r.sprite;
 		cmd.position = dst;
 		cmd.scale = scale[r.hFlip];
-		cmd.color = { Color4(Colors::Black),0 };
+		cmd.color = { Color32(Colors::Black),0 };
 
 		render.push_back(cmd);
 	}
 }
 void RenderSystem::DrawUnits(const Camera& camera, const Rectangle16& camRect) {
-	constexpr const Color4 shadowColor = Color4(0.0f, 0.0f, 0.0f, 0.5f);
+	constexpr const Color32 shadowColor = Color32(0.0f, 0.0f, 0.0f, 0.5f);
 
 	float camMul = 1.0f / camera.Scale;
 
@@ -114,13 +114,13 @@ void RenderSystem::DrawUnits(const Camera& camera, const Rectangle16& camRect) {
 		cmd.order++;
 		cmd.image = r.sprite;
 		cmd.position = dst;
-		cmd.color = { Color4(Colors::Black),0 };
+		cmd.color = { Color32(Colors::Black),0 };
 
 		render.push_back(cmd);
 
 		cmd.order++;
 		cmd.image = r.colorSprite;
-		cmd.color = { Color4(r.unitColor), 0.66f };
+		cmd.color = { Color32(r.unitColor), 0.66f };
 		if (cmd.image.textureId)
 			render.push_back(cmd);
 	}

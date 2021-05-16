@@ -1,10 +1,12 @@
 #include "PlayerSystem.h"
+#include "EntityManager.h"
+
 
 PlayerId PlayerSystem::AddPlayer(const RaceDef& race, Color color)
 {
 	PlayerId id = players.size();
 
-	players.push_back(PlayerInfo(Color4(color), race, id));
+	players.push_back(PlayerInfo(Color32(color), race.Type, id));
 
 	return id;
 }
@@ -28,4 +30,22 @@ void PlayerSystem::AddGas(PlayerId i, int gas)
 	player.gas += gas;
 	if (player.gas < 0)
 		player.gas = 0;
+}
+
+void PlayerSystem::UpdatePlayerUnits(const EntityManager& em) {
+	
+	for (EntityId id : em.UnitArchetype.Archetype.NewEntities()) {
+		const PlayerId owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
+		const auto& data = em.UnitArchetype.DataComponents.GetComponent(id);
+
+		players[owner].currentSupplyDoubled += data.supplyUsage;
+		players[owner].maxSupplyDoubled += data.supplyProvides;
+	}
+	for (EntityId id : em.UnitArchetype.Archetype.RemovedEntities()) {
+		const PlayerId owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
+		const auto& data = em.UnitArchetype.DataComponents.GetComponent(id);
+
+		players[owner].currentSupplyDoubled -= data.supplyUsage;
+		players[owner].maxSupplyDoubled -= data.supplyProvides;
+	}
 }

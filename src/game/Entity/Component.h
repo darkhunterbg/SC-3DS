@@ -72,7 +72,7 @@ public:
 	inline TComponent& GetComponent(EntityId id) {
 		return components[Entity::ToIndex(id)];
 	}
-	inline TComponent& GetComponent(EntityId id) const {
+	inline const TComponent& GetComponent(EntityId id) const {
 		return components[Entity::ToIndex(id)];
 	}
 	/*inline const TComponent* TryGetComponent(EntityId id) const {
@@ -134,7 +134,7 @@ struct RenderComponent {
 };
 
 struct RenderUnitComponent {
-	Color4 unitColor;
+	Color32 unitColor;
 	Image sprite;
 	Image shadowSprite;
 	Image colorSprite;
@@ -173,9 +173,18 @@ struct MovementComponent {
 struct UnitComponent {
 	const UnitDef* def;
 	EntityId movementGlowEntity = Entity::None;
-	bool attackFlip = false;
 
 	inline bool HasMovementGlow() const { return movementGlowEntity != Entity::None; }
+};
+
+struct UnitDataComponent {
+	uint8_t supplyUsage = 0;
+	uint8_t supplyProvides = 0;
+
+	inline void FromDef(const UnitDef& def) {
+		supplyUsage = def.UseSupplyDoubled;
+		supplyProvides = def.ProvideSupplyDoubled;
+	}
 };
 
 struct UnitMovementComponent {
@@ -270,13 +279,12 @@ struct TimingComponent {
 enum class TimerExpiredAction : uint8_t {
 	None = 0,
 	UnitRemnantsThenDelete = 1,
-	UnitToggleIdleAnimation = 2,
-	DeleteEntity = 3,
+	DeleteEntity = 2,
 };
 
 
 struct TimingActionComponent {
 	TimerExpiredAction action = TimerExpiredAction::None;
 	
-	static constexpr const int ActionTypeCount = 4;
+	static constexpr const int ActionTypeCount = 3;
 };

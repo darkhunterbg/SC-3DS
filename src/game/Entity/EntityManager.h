@@ -103,6 +103,8 @@ public:
 		ComponentCollection<uint8_t> OrientationComponents;
 		ComponentCollection<UnitMovementComponent> MovementComponents;
 		ComponentCollection<UnitComponent> UnitComponents;
+		ComponentCollection<UnitDataComponent> DataComponents;
+		ComponentCollection<PlayerId> OwnerComponents;
 	} UnitArchetype;
 
 
