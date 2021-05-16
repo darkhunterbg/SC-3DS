@@ -9,6 +9,7 @@
 #include "Profiler.h"
 #include "Data/UnitDatabase.h"
 #include "Data/GraphicsDatabase.h"
+#include "Data/RaceDatabase.h"
 #include "Job.h"
 
 static Scene* currentScene;
@@ -59,6 +60,7 @@ void Game::Start() {
 
 	GraphicsDatabase::Init();
 	UnitDatabase::Init();
+	RaceDatabase::Init();
 	//frameLoad.push_back(0);
 }
 bool Game::Update() {

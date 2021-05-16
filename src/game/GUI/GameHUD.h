@@ -1,14 +1,14 @@
 #pragma once
 
 #include "../Assets.h"
-
+#include "../Data/RaceDef.h"
 
 class Camera;
 class MapSystem;
 
 class GameHUD {
 public:
-	GameHUD();
+	GameHUD(const RaceDef& race);
 
 	void ApplyInput(Camera& camera);
 	void UpperScreenGUI();
@@ -24,10 +24,11 @@ public:
 	inline void SetUsedSupply(int amount) { supply.current = amount; }
 
 private:
+	const RaceDef& race;
+
 	Font font;
 	const SpriteAtlas* iconsAtlas;
 	const SpriteAtlas* cmdIconsAtlas;
-	const SpriteAtlas* consoleAtlas;
 	Image minimapTexture = { 0,0 };
 	Sprite minimapSprite;
 	Vector2 minimapUpscale;

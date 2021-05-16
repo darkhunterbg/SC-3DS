@@ -8,9 +8,12 @@
 #include "../Entity/EntityManager.h"
 #include "../Profiler.h"
 #include "../Data/UnitDatabase.h"
+#include "../Data/RaceDatabase.h"
 #include "../Entity/EntityUtil.h"
 
 static std::vector<EntityId> selection;
+
+static  RaceDef* race;
 
 
 GameScene::GameScene() {
@@ -22,7 +25,10 @@ GameScene::~GameScene() {
 }
 
 void GameScene::Start() {
-	hud = new GameHUD();
+	race = &RaceDatabase::Terran;
+	race->LoadResourses();
+
+	hud = new GameHUD(*race);
 
 	hud->SetMinerals(50);
 	hud->SetGas(0);
@@ -42,8 +48,8 @@ void GameScene::Start() {
 
 	UnitDatabase::LoadAllUnitResources();
 
-	// TODO music is in multiple folders
-	AudioStream* stream = Game::AssetLoader.LoadAudioStream("music/terran1.wav");
+
+	AudioStream* stream = race->GameMusic[std::rand() % race->GameMusic.size()].Stream;
 	Game::Audio.PlayStream(stream, 0);
 
 	entityManager = new EntityManager();

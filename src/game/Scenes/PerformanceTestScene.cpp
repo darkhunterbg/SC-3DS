@@ -1,5 +1,6 @@
 #include "PerformanceTestScene.h"
-#include "Data/UnitDatabase.h"
+#include "../Data/UnitDatabase.h"
+#include "../Data/RaceDatabase.h"
 #include "../Platform.h"
 #include "../Profiler.h"
 #include <algorithm>
@@ -11,6 +12,7 @@
 void PerformanceTestScene::Start() {
 
 	UnitDatabase::LoadAllUnitResources();
+	RaceDatabase::Terran.LoadResourses();
 
 	camera.Position = { 200 ,120 };
 	camera.Size = { 400,240 };

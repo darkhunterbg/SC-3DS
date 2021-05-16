@@ -13,6 +13,7 @@ struct UnitDef {
 	std::string Name;
 	unsigned Health;
 	uint8_t MovementSpeed;
+	uint8_t Acceleration = 0;
 	uint8_t RotationSpeed;
 
 	struct {

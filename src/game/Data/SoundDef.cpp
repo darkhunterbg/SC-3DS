@@ -12,3 +12,20 @@ void UnitSound::LoadSoundClips()
 		Clips[i] = Game::AssetLoader.LoadAudioClip(buffer);
 	}
 }
+
+void AdvisorSounds::LoadSoundClips()
+{
+	char buffer[128];
+	std::string pattern = SoundPath;
+	pattern += "%02i.wav";
+
+	for (uint8_t id : SoundIds) {
+		stbsp_snprintf(buffer, sizeof(buffer), pattern.data(), id);
+		Clips[id] = Game::AssetLoader.LoadAudioClip(buffer);
+	}
+}
+
+void AudioStreamDef::Load()
+{
+	Stream = Game::AssetLoader.LoadAudioStream(Path);
+}

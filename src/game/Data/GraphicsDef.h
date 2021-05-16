@@ -5,6 +5,21 @@
 #include "../MathLib.h"
 #include <functional>
 
+struct SpriteAtlasDef {
+	const char* Path = nullptr;
+	const SpriteAtlas* Atlas = nullptr;
+
+	inline const Sprite& GetSprite(unsigned index) const {
+		return Atlas->GetSprite(index);
+	}
+
+	SpriteAtlasDef() {}
+	SpriteAtlasDef(const SpriteAtlasDef&) = delete;
+	SpriteAtlasDef& operator=(const SpriteAtlasDef&) = delete;
+
+	void Load();
+};
+
 struct UnitGraphicsDef {
 	Vector2Int16 RenderSize;
 	Rectangle16 Collider;
@@ -21,8 +36,6 @@ struct UnitGraphicsDef {
 	UnitAnimationClip AttackAnimations[32];
 	UnitAnimationClip IdleAnimations [32];
 	UnitAnimationClip DeathAnimation;
-
-	
 
 	struct {
 		AnimationDef Def;

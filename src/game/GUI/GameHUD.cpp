@@ -8,15 +8,14 @@
 
 
 //static Rectangle minimapDst = { {7,108},{128,128} };
-static Rectangle minimapDst = { {6,123},{113,113} };
+static Rectangle minimapDst = { {4,124},{113,113} };
 static constexpr const int MinimapTextureSize = 256;
 
 
-GameHUD::GameHUD() {
+GameHUD::GameHUD(const RaceDef& race) : race(race) {
 
 	font = Game::SystemFont;
 	iconsAtlas = Game::AssetLoader.LoadAtlas("game_icons.t3x");
-	consoleAtlas = Game::AssetLoader.LoadAtlas("game_tconsole.t3x");
 	//cmdIconsAtlas = Platform::LoadAtlas("cmdicons.t3x");
 }
 
@@ -55,16 +54,16 @@ void GameHUD::UpperScreenGUI() {
 	UpdateResourceDiff(gas);
 
 	// Supply
-	DrawResource(iconsAtlas->GetSprite(5), { 320,2 }, "%i/%i", supply.current, supply.max);
+	DrawResource(race.SupplyIcon, { 320,2 }, "%i/%i", supply.current, supply.max);
 	// Gas
-	DrawResource(iconsAtlas->GetSprite(2), { 240, 2 }, "%i", gas.shown);
+	DrawResource(race.GasIcon, { 240, 2 }, "%i", gas.shown);
 	// Minerals
 	DrawResource(iconsAtlas->GetSprite(0), { 160, 2 }, "%i", minerals.shown);
 }
 
 void GameHUD::LowerScreenGUI(const Camera& camera, const MapSystem& mapSystem) {
 
-	Platform::Draw(consoleAtlas->GetSprite(0), { {0, 0,},{ 320, 240} });
+	Platform::Draw(race.ConsoleSprite.GetSprite(0), { {0, 0,},{ 320, 240} });
 
 	DrawMinimap(camera, mapSystem);
 
