@@ -68,3 +68,17 @@ public:
 	/// </summary>
 	static void SetRenderFromAnimationClip(EntityId e, const UnitAnimationClip& clip, uint8_t frame);
 };
+
+class UnitEntityUtil {
+private:
+	UnitEntityUtil() = delete;
+	~UnitEntityUtil() = delete;
+
+	static EntityManager* emInstance;
+
+	friend class EntityManager;
+
+	static inline  EntityManager& GetManager() { return *emInstance; }
+public:
+	static EntityId NewUnit(const UnitDef& def, PlayerId player, Vector2Int16 position, EntityId id = Entity::None);
+};

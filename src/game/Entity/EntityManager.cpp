@@ -21,6 +21,7 @@ EntityManager::EntityManager() {
 	archetypes.push_back(&TimingArchetype.Archetype);
 	archetypes.push_back(&ParentArchetype.Archetype);;
 	EntityUtil::emInstance = this;
+	UnitEntityUtil::emInstance = this;
 }
 EntityManager::~EntityManager() {
 	EntityUtil::emInstance = nullptr;
@@ -214,74 +215,6 @@ void EntityManager::DrawEntites(const Camera& camera) {
 		kinematicSystem.DrawColliders(camera);
 }
 
-EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color color, EntityId e) {
-
-	if (e == Entity::None)
-		e = entities.NewEntity();
-	PositionComponents.NewComponent(e, position);
-
-	FlagComponents.NewComponent(e);
-	UnitArchetype.UnitComponents.NewComponent(e, { &def });
-	UnitArchetype.OrientationComponents.NewComponent(e);
-	UnitArchetype.MovementComponents.NewComponent(e).FromDef(def);
-	UnitArchetype.DataComponents.NewComponent(e).FromDef(def);
-	UnitArchetype.OwnerComponents.NewComponent(e, { 0 });
-	UnitArchetype.Archetype.AddEntity(e);
-
-	UnitArchetype.RenderArchetype.RenderComponents.NewComponent(e, {
-		Color32(color),
-		def.Graphics->MovementAnimations[0].GetFrame(0).sprite.image,
-		def.Graphics->MovementAnimations[0].GetFrame(0).shadowSprite.image,
-		def.Graphics->MovementAnimations[0].GetFrame(0).colorSprite.image,
-		});
-
-	UnitArchetype.RenderArchetype.OffsetComponents.NewComponent(e, {
-	 Vector2Int16(def.Graphics->MovementAnimations[0].GetFrame(0).offset),
-		Vector2Int16(def.Graphics->MovementAnimations[0].GetFrame(0).shadowOffset)
-		});
-
-	UnitArchetype.RenderArchetype.DestinationComponents.NewComponent(e);
-	UnitArchetype.RenderArchetype.BoundingBoxComponents.NewComponent(e, { {0,0}, def.Graphics->RenderSize });
-
-	UnitArchetype.RenderArchetype.Archetype.AddEntity(e);
-
-	UnitArchetype.AnimationArchetype.AnimationComponents.NewComponent(e);
-	UnitArchetype.AnimationArchetype.TrackerComponents.NewComponent(e).PlayClip(&def.Graphics->MovementAnimations[0]);
-
-	UnitArchetype.AnimationArchetype.Archetype.AddEntity(e);
-
-	NavigationArchetype.NavigationComponents.NewComponent(e);
-
-	NavigationArchetype.Archetype.AddEntity(e);
-
-	CollisionArchetype.ColliderComponents.NewComponent(e).collider = def.Graphics->Collider;
-	CollisionArchetype.Archetype.AddEntity(e);
-
-	MovementArchetype.MovementComponents.NewComponent(e);
-	MovementArchetype.Archetype.AddEntity(e);
-
-	FlagComponents.GetComponent(e).set(ComponentFlags::PositionChanged);
-	FlagComponents.GetComponent(e).set(ComponentFlags::RenderEnabled);
-	FlagComponents.GetComponent(e).set(ComponentFlags::RenderChanged);
-	FlagComponents.GetComponent(e).set(ComponentFlags::AnimationFrameChanged);
-
-
-	if (def.Graphics->HasMovementGlow()) {
-		//EXCEPTION("Unit is not supposed to get to here!");
-		auto e2 = NewEntity();
-		FlagComponents.NewComponent(e2);
-		RenderArchetype.RenderComponents.GetComponent(e2).depth = 1;
-		RenderArchetype.Archetype.AddEntity(e2);
-		AnimationArchetype.Archetype.AddEntity(e2);
-
-		ParentArchetype.Archetype.AddEntity(e);
-		ParentArchetype.ChildComponents.NewComponent(e).AddChild(e2);
-
-		UnitArchetype.UnitComponents.GetComponent(e).movementGlowEntity = e2;
-	}
-
-	return e;
-}
 void EntityManager::GoTo(EntityId e, Vector2Int16 pos) {
 
 	FlagComponents.GetComponent(e).set(ComponentFlags::NavigationWork);

@@ -4,10 +4,10 @@
 #include "../Data/UnitDef.h"
 #include "../Color.h"
 #include "Entity.h"
+#include "Component.h"
 
 #include <vector>
 
-typedef uint8_t PlayerId;
 
 class EntityManager;
 
@@ -37,6 +37,9 @@ struct PlayerInfo {
 class PlayerSystem {
 private:
 	std::vector<PlayerInfo> players;
+
+	friend class EntityManager;
+
 public:
 	PlayerId AddPlayer(const RaceDef& race, Color color);
 
@@ -44,7 +47,6 @@ public:
 
 	void AddMinerals(PlayerId player, int minerals);
 	void AddGas(PlayerId player, int gas);
-
 
 	void UpdatePlayerUnits(const EntityManager& em);
 };

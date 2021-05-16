@@ -151,7 +151,6 @@ public:
 	void UpdateSecondaryEntities();
 	void DrawEntites(const Camera& camera);
 
-	EntityId NewUnit(const UnitDef& def, Vector2Int16 position, Color color, EntityId id = Entity::None);
 	void GoTo(EntityId e, Vector2Int16 pos);
 
 	inline bool CollidesWithAny(const Rectangle16& collider, EntityId skip) {

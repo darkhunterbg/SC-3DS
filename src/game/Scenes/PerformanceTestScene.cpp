@@ -19,7 +19,7 @@ void PerformanceTestScene::Start() {
 	camera.Scale = 1;
 
 	entityManager.Init({ 128 * 32,128 * 32 });
-
+	entityManager.GetPlayerSystem().AddPlayer(RaceDatabase::Terran, Colors::White);
 
 	//entityManager.DrawColliders = true;
 
@@ -59,7 +59,7 @@ void PerformanceTestScene::Update() {
 	entityManager.NewEntities(1000, v);
 
 	for (int i = 0; i < v.size(); ++i) {
-		entityManager.NewUnit(UnitDatabase::Marine, { 0,0 }, Colors::White, v[i]);
+		UnitEntityUtil::NewUnit(UnitDatabase::Marine, 0, { 0,0 });
 	}
 
 	{

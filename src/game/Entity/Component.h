@@ -14,8 +14,6 @@
 
 #include "Debug.h"
 
-
-
 ////template <unsigned id>
 //struct IComponent {
 //	//static constexpr const unsigned ComponentId = id;
@@ -87,6 +85,8 @@ public:
 	inline const TComponent& operator[](int i) const { return components[i]; }
 	inline size_t size() const { return 0; }
 };
+
+typedef uint8_t PlayerId;
 
 enum class ComponentFlags {
 	PositionChanged = 0,

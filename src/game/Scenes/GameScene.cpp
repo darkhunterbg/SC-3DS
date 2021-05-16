@@ -23,7 +23,7 @@ GameScene::~GameScene() {
 }
 
 void GameScene::Start() {
-	auto& race = RaceDatabase::Terran;
+	auto& race = RaceDatabase::Protoss;
 	race.LoadResourses();
 
 	hud = new GameHUD(race);
@@ -64,8 +64,8 @@ void GameScene::Start() {
 			
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[(i) % UnitDatabase::Units.size()];
-			EntityId e = entityManager->NewUnit(def,
-				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 + 16 }), c);
+			EntityId e = UnitEntityUtil::NewUnit(def, 0,
+				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 + 16 }));
 
 			//entityManager->UnitArchetype.OrientationComponents.GetComponent(e) = 12;
 			EntityUtil::PlayAnimation(e, def.Graphics->AttackAnimations[12]);
