@@ -8,8 +8,8 @@
 #include "../Entity/MapSystem.h"
 
 
-static Rectangle minimapDst = { {4,108},{128,128} };
-//static Rectangle minimapDst = { {4,124},{113,113} };
+//static Rectangle minimapDst = { {4,108},{128,128} };
+static Rectangle minimapDst = { {4,124},{113,113} };
 
 
 
@@ -70,9 +70,12 @@ void GameHUD::UpperScreenGUI() {
 	DrawResource(race.GasIcon, { 240, 2 }, "%i", gas.shown);
 	// Minerals
 	DrawResource(iconsAtlas->GetSprite(0), { 160, 2 }, "%i", minerals.shown);
+
+	const auto& sprite = race.ConsoleSprite.GetSprite(1);
+	Platform::Draw(sprite, { {0, 240 - sprite.rect.size.y,}, Vector2Int(sprite.rect.size) });
 }
 
-void GameHUD::LowerScreenGUI(const Camera& camera,  MapSystem& mapSystem) {
+void GameHUD::LowerScreenGUI(const Camera& camera, MapSystem& mapSystem) {
 
 	Platform::Draw(race.ConsoleSprite.GetSprite(0), { {0, 0,},{ 320, 240} });
 
@@ -90,7 +93,7 @@ void GameHUD::ApplyInput(Camera& camera) {
 	}
 }
 
-void GameHUD::DrawMinimap(const Camera& camera,  MapSystem& mapSystem) {
+void GameHUD::DrawMinimap(const Camera& camera, MapSystem& mapSystem) {
 
 	mapSystem.DrawMinimap(minimapDst);
 
@@ -105,7 +108,7 @@ void GameHUD::DrawMinimap(const Camera& camera,  MapSystem& mapSystem) {
 
 
 	Platform::DrawLine(Vector2Int(min), Vector2Int(min + Vector2(s.x, 0)), Colors::White);
-	Platform::DrawLine(Vector2Int(max), Vector2Int( max - Vector2(s.x, 0)), Colors::White);
+	Platform::DrawLine(Vector2Int(max), Vector2Int(max - Vector2(s.x, 0)), Colors::White);
 	Platform::DrawLine(Vector2Int(min), Vector2Int(min + Vector2(0, s.y)), Colors::White);
 	Platform::DrawLine(Vector2Int(max), Vector2Int(max - Vector2(0, s.y)), Colors::White);
 }
