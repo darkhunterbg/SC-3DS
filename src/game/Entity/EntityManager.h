@@ -12,6 +12,7 @@
 #include "KinematicSystem.h"
 #include "NavigationSystem.h"
 #include "TimingSystem.h"
+#include "PlayerSystem.h"
 
 #include "../Data/UnitDef.h"
 #include "../Camera.h"
@@ -33,6 +34,7 @@ private:
 	KinematicSystem kinematicSystem;
 	NavigationSystem navigationSystem;
 	TimingSystem timingSystem;
+	PlayerSystem playerSystem;
 
 	bool updated = false;
 
@@ -124,6 +126,10 @@ public:
 
 	void Init(Vector2Int16 mapSize);
 
+	inline PlayerSystem& GetPlayerSystem() {
+		return playerSystem;
+	}
+
 	inline const Span<EntityId> GetEntities() const {
 		return entities.GetEntities();
 	}
@@ -144,7 +150,6 @@ public:
 	void DrawEntites(const Camera& camera);
 
 	EntityId NewUnit(const UnitDef& def, Vector2Int16 position, Color color, EntityId id = Entity::None);
-	void PlayUnitAnimation(EntityId id, const UnitAnimationClip& clip);
 	void GoTo(EntityId e, Vector2Int16 pos);
 
 	inline bool CollidesWithAny(const Rectangle16& collider, EntityId skip) {

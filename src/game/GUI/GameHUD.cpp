@@ -5,6 +5,8 @@
 #include "../Camera.h"
 #include "../Map/MapSystem.h"
 #include "../MathLib.h"
+#include "../Entity/PlayerSystem.h"
+
 
 
 //static Rectangle minimapDst = { {7,108},{128,128} };
@@ -29,6 +31,14 @@ void GameHUD::DrawResource(Sprite icon, Vector2Int pos, const char* fmt, ...) {
 	pos += {16, -2};
 	Platform::DrawText(font, pos + Vector2Int{ 1,1 }, textBuffer, Colors::Black, 0.4f);
 	Platform::DrawText(font, pos, textBuffer, Colors::UIGreen, 0.4f);
+}
+
+
+void GameHUD::UpdateInfo(const PlayerInfo& info) {
+	minerals.target = info.minerals;
+	gas.target = info.gas;
+	supply.current = info.GetCurrentSupply();
+	supply.max = info.GetMaxSupply();
 }
 
 static const  int GetResourceUpdate(int change) {

@@ -16,6 +16,8 @@ struct UnitDef {
 	uint8_t Acceleration = 0;
 	uint8_t RotationSpeed;
 
+	uint8_t UseSupplyDoubled = 0;
+
 	struct {
 		UnitSound Ready;
 		UnitSound Yes;
@@ -29,6 +31,10 @@ struct UnitDef {
 	UnitDef() {  }
 	UnitDef(const UnitDef&) = delete;
 	UnitDef& operator=(const UnitDef&) = delete;
+
+	inline void SetUseSupply(uint8_t amount, bool half = false) {
+		UseSupplyDoubled = (amount << 2 )+ half;
+	}
 
 	inline void LoadAllSounds() {
 

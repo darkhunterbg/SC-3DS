@@ -13,8 +13,6 @@
 
 static std::vector<EntityId> selection;
 
-static  RaceDef* race;
-
 
 GameScene::GameScene() {
 
@@ -25,15 +23,11 @@ GameScene::~GameScene() {
 }
 
 void GameScene::Start() {
-	race = &RaceDatabase::Terran;
-	race->LoadResourses();
+	auto& race = RaceDatabase::Terran;
+	race.LoadResourses();
 
-	hud = new GameHUD(*race);
+	hud = new GameHUD(race);
 
-	hud->SetMinerals(50);
-	hud->SetGas(0);
-	hud->SetMaxSupply(10);
-	hud->SetUsedSupply(4);
 
 	cursor = new Cursor();
 	cursor->Position = { 200,120 };
@@ -49,13 +43,15 @@ void GameScene::Start() {
 	UnitDatabase::LoadAllUnitResources();
 
 
-	AudioStream* stream = race->GameMusic[std::rand() % race->GameMusic.size()].Stream;
+	AudioStream* stream = race.GameMusic[std::rand() % race.GameMusic.size()].Stream;
 	Game::Audio.PlayStream(stream, 0);
 
 	entityManager = new EntityManager();
 	//entityManager->DrawColliders = true;
 
 	entityManager->Init(Vector2Int16(mapSystem->GetMapBounds().size));
+
+	entityManager->GetPlayerSystem().AddPlayer(race, Colors::SCBlue);
 
 	Color color[] = { Colors::SCRed, Colors::SCBlue, Colors::SCLightGreen, Colors::SCPurle,
 	 Colors::SCOrange, Colors::SCGreen, Colors::SCBrown, Colors::SCLightYellow, Colors::SCWhite,
@@ -72,7 +68,7 @@ void GameScene::Start() {
 				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 + 16 }), c);
 
 			//entityManager->UnitArchetype.OrientationComponents.GetComponent(e) = 12;
-			entityManager->PlayUnitAnimation(e, def.Graphics->AttackAnimations[12]);
+			EntityUtil::PlayAnimation(e, def.Graphics->AttackAnimations[12]);
 			//EntityUtil::StartTimer(e, 3, TimerExpiredAction::UnitToggleIdleAnimation, true);
 			//entityManager->GoTo(e, { 800,800 });
 			
@@ -101,11 +97,12 @@ void GameScene::LogicalUpdate() {
 
 	entityManager->UpdateEntities();
 
+
 	++t;
 
 	if (t % 60 == 0) {
-		hud->AddMinerals(8);
-		hud->AddGas(8);
+		entityManager->GetPlayerSystem().AddMinerals(0,8);
+		entityManager->GetPlayerSystem().AddGas(0, 8);
 	}
 
 	p.Submit();
@@ -192,7 +189,7 @@ void GameScene::Update() {
 					entityManager->ParentArchetype.Archetype.RemoveEntity(id);
 				}
 
-				entityManager->PlayUnitAnimation(id, def->Graphics->DeathAnimation);
+				EntityUtil::PlayAnimation(id, def->Graphics->DeathAnimation);
 
 				TimerExpiredAction action = def->Graphics->HasRemnants() ?
 					TimerExpiredAction::UnitRemnantsThenDelete : TimerExpiredAction::DeleteEntity;
@@ -212,6 +209,10 @@ void GameScene::Update() {
 }
 
 void GameScene::Draw() {
+	const PlayerInfo& playerInfo = entityManager->GetPlayerSystem().GetPlayerInfo(0);
+
+	hud->UpdateInfo(playerInfo);
+	
 	Platform::DrawOnScreen(ScreenId::Top);
 
 	mapSystem->DrawTiles(camera);

@@ -278,12 +278,6 @@ EntityId EntityManager::NewUnit(const UnitDef& def, Vector2Int16 position, Color
 
 	return e;
 }
-void EntityManager::PlayUnitAnimation(EntityId e, const UnitAnimationClip& clip) {
-	UnitArchetype.AnimationArchetype.AnimationComponents[e].clip = &clip;
-	UnitArchetype.AnimationArchetype.TrackerComponents[e].PlayClip(&clip);
-	FlagComponents[e].set(ComponentFlags::AnimationEnabled);
-	FlagComponents[e].set(ComponentFlags::AnimationFrameChanged);
-}
 void EntityManager::GoTo(EntityId e, Vector2Int16 pos) {
 
 	FlagComponents.GetComponent(e).set(ComponentFlags::NavigationWork);

@@ -5,6 +5,7 @@
 
 class Camera;
 class MapSystem;
+class PlayerInfo;
 
 class GameHUD {
 public:
@@ -13,15 +14,7 @@ public:
 	void ApplyInput(Camera& camera);
 	void UpperScreenGUI();
 	void LowerScreenGUI(const Camera& camera, const MapSystem& mapSystem);
-
-	inline void AddMinerals(int amount) { minerals.target += amount; }
-	inline void SetMinerals(int amount) { minerals.target = minerals.shown = amount; }
-
-	inline void AddGas(int amount) { gas.target += amount; }
-	inline void SetGas(int amount) { gas.target = gas.shown = amount; }
-
-	inline void SetMaxSupply(int amount) { supply.max = amount; };
-	inline void SetUsedSupply(int amount) { supply.current = amount; }
+	void UpdateInfo(const PlayerInfo& info);
 
 private:
 	const RaceDef& race;

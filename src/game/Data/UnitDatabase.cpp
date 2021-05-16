@@ -14,6 +14,7 @@ static void MarineData() {
 	u.Health = 40;
 	u.MovementSpeed = 4;
 	u.RotationSpeed = 1;
+	u.SetUseSupply(1);
 
 	u.Sounds.Death = { "sound/terran/marine/tmadth", 2 };
 	u.Sounds.What = { "sound/terran/marine/tmawht", 4 };
@@ -27,6 +28,7 @@ static void SCVData() {
 	u.Health = 60;
 	u.MovementSpeed = 5;
 	u.RotationSpeed = 1;
+	u.SetUseSupply(1);
 
 	u.Sounds.Death = { "sound/terran/scv/tscdth", 1 };
 	u.Sounds.What = { "sound/terran/scv/tscwht", 4 };
