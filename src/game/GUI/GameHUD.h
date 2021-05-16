@@ -9,7 +9,7 @@ class PlayerInfo;
 
 class GameHUD {
 public:
-	GameHUD(const RaceDef& race);
+	GameHUD(const RaceDef& race, Vector2Int16 mapSize);
 
 	void ApplyInput(Camera& camera);
 	void UpperScreenGUI();
@@ -22,8 +22,7 @@ private:
 	Font font;
 	const SpriteAtlas* iconsAtlas;
 	const SpriteAtlas* cmdIconsAtlas;
-	Image minimapTexture = { 0,0 };
-	Sprite minimapSprite;
+
 	Vector2 minimapUpscale;
 
 	char textBuffer[128];
@@ -45,7 +44,6 @@ private:
 	void DrawResource(Sprite icon, Vector2Int pos, const char* text, ...);
 	void DrawMinimap(const Camera& camera, const MapSystem& mapSystem);
 	void DrawAbilities();
-	void RenderMinimapTexture(const MapSystem& mapSystem);
 
 	static void UpdateResourceDiff(Resource& r);
 };

@@ -31,6 +31,7 @@ void EntityManager::Init(Vector2Int16 mapSize)
 {
 	navigationSystem.SetSize(mapSize);
 	kinematicSystem.SetSize(mapSize);
+	mapSystem.SetSize(mapSize);
 }
 
 void EntityManager::DeleteEntity(EntityId id) {
@@ -96,7 +97,7 @@ void EntityManager::ClearEntityArchetypes(EntityId id) {
 		}
 	}
 }
-void EntityManager::ClearEntitiesArchetypes( std::vector<EntityId>& e, bool sorted) {
+void EntityManager::ClearEntitiesArchetypes(std::vector<EntityId>& e, bool sorted) {
 	if (!sorted)
 		std::sort(e.begin(), e.end());
 
@@ -208,6 +209,8 @@ void EntityManager::DrawEntites(const Camera& camera) {
 
 	if (!updated)
 		return;
+
+	mapSystem.DrawMap(camera);
 
 	renderSystem.Draw(camera, *this);
 

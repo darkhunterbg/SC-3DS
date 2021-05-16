@@ -3,21 +3,22 @@
 #include "../Platform.h"
 #include "../StringLib.h"
 #include "../Camera.h"
-#include "../Map/MapSystem.h"
 #include "../MathLib.h"
 #include "../Entity/PlayerSystem.h"
-
+#include "../Entity/MapSystem.h"
 
 
 //static Rectangle minimapDst = { {7,108},{128,128} };
 static Rectangle minimapDst = { {4,124},{113,113} };
-static constexpr const int MinimapTextureSize = 256;
 
 
-GameHUD::GameHUD(const RaceDef& race) : race(race) {
+
+GameHUD::GameHUD(const RaceDef& race, Vector2Int16 mapSize) : race(race) {
 
 	font = Game::SystemFont;
 	iconsAtlas = Game::AssetLoader.LoadAtlas("game_icons.t3x");
+	minimapUpscale = Vector2(mapSize) / Vector2(minimapDst.size);
+
 	//cmdIconsAtlas = Platform::LoadAtlas("cmdicons.t3x");
 }
 
@@ -91,11 +92,10 @@ void GameHUD::ApplyInput(Camera& camera) {
 
 void GameHUD::DrawMinimap(const Camera& camera, const MapSystem& mapSystem) {
 
-	if (minimapTexture.textureId == nullptr ) {
-		RenderMinimapTexture(mapSystem);
-	}
+	if (mapSystem.GetMinimapSprite().image.textureId == nullptr)
+		return;
 
-	Platform::Draw(minimapSprite, minimapDst);
+	Platform::Draw(mapSystem.GetMinimapSprite(), minimapDst);
 
 	Rectangle camRect = camera.GetRectangle();
 	Vector2 min = Vector2(camRect.GetMin());
@@ -123,26 +123,3 @@ void GameHUD::DrawAbilities() {
 	//Platform::Draw(cmdIconsAtlas->GetSprite(237), { {188,200},{28,28} }, { 0.5f,0.5f,0.5f,0.5f });
 }
 
-void GameHUD::RenderMinimapTexture(const MapSystem& mapSystem) {
-	Rectangle mapBounds;
-	mapBounds.position = Vector2Int(mapSystem.GetMapBounds().position);
-	mapBounds.size = Vector2Int(mapSystem.GetMapBounds().size);
-
-	minimapTexture = Platform::NewTexture({ MinimapTextureSize,MinimapTextureSize });
-	Platform::DrawOnTexture(minimapTexture.textureId);
-
-	Vector2 upscale = Vector2(mapBounds.size) / Vector2(MinimapTextureSize, MinimapTextureSize);
-	minimapUpscale = Vector2(mapBounds.size) / Vector2(minimapDst.size);
-
-	Vector2Int tileSize = { MapTile::TileSize, MapTile::TileSize };
-
-	for (const MapTile& tile : mapSystem.GetTiles()) {
-		Vector2Int pos = Vector2Int(Vector2( Vector2Int(tile.position) * tileSize) / upscale);
-		Vector2Int size = Vector2Int(Vector2(tile.sprite.rect.size) / upscale);
-		Platform::Draw(tile.sprite, { pos,size });
-	}
-
-	Platform::DrawOnTexture(nullptr);
-	minimapSprite.image = minimapTexture;
-	minimapSprite.rect = { {0,0},{MinimapTextureSize,MinimapTextureSize} };
-}

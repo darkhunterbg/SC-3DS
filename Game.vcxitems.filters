@@ -4,9 +4,6 @@
     <Filter Include="Scenes">
       <UniqueIdentifier>{0e2292cd-4aac-4c45-ac2c-3f5208810757}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Map">
-      <UniqueIdentifier>{343beabe-3f3d-4e0c-9922-418a5a5b552f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GUI">
       <UniqueIdentifier>{a1c47caf-9f70-4c29-a597-79e7d9fe539a}</UniqueIdentifier>
     </Filter>
@@ -29,12 +26,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\stb_sprintf.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\StringLib.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Map\MapDef.h">
-      <Filter>Map</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Map\MapSystem.h">
-      <Filter>Map</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Camera.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Input.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Assets.h" />
@@ -123,6 +114,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\PlayerSystem.h">
       <Filter>Entity</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\MapSystem.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -132,9 +126,6 @@
       <Filter>Scenes</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\StringLib.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Map\MapSystem.cpp">
-      <Filter>Map</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Camera.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Assets.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Game.cpp" />
@@ -210,6 +201,9 @@
       <Filter>Data</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\PlayerSystem.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\MapSystem.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
   </ItemGroup>

@@ -3,7 +3,6 @@
 #include "Scene.h"
 #include "../Camera.h"
 
-class MapSystem;
 class GameHUD;
 class Cursor;
 class EntityManager;
@@ -19,7 +18,6 @@ public:
 	virtual void Draw() override;
 
 private:
-	MapSystem* mapSystem;
 	Camera camera;
 	GameHUD* hud;
 	Cursor* cursor;

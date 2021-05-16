@@ -13,6 +13,7 @@
 #include "NavigationSystem.h"
 #include "TimingSystem.h"
 #include "PlayerSystem.h"
+#include "MapSystem.h"
 
 #include "../Data/UnitDef.h"
 #include "../Camera.h"
@@ -35,6 +36,7 @@ private:
 	NavigationSystem navigationSystem;
 	TimingSystem timingSystem;
 	PlayerSystem playerSystem;
+	MapSystem mapSystem;
 
 	bool updated = false;
 
@@ -59,8 +61,6 @@ public:
 		ComponentCollection<Vector2Int16> DestinationComponents;
 		ComponentCollection<Rectangle16> BoundingBoxComponents;
 	} RenderArchetype;
-
-
 
 	struct {
 		EntityArchetype Archetype = EntityArchetype("Animation");
@@ -114,14 +114,11 @@ public:
 		ComponentCollection<TimingActionComponent> ActionComponents;
 	} TimingArchetype;
 private:
-
-
 	void CollectEntityChanges();
 	void ApplyEntityChanges();
 	void UpdateChildrenPosition();
 public:
 	bool DrawColliders = false;
-
 
 	EntityManager();
 	~EntityManager();
@@ -131,7 +128,9 @@ public:
 	inline PlayerSystem& GetPlayerSystem() {
 		return playerSystem;
 	}
-
+	inline MapSystem& GetMapSystem() {
+		return mapSystem;
+	}
 	inline const Span<EntityId> GetEntities() const {
 		return entities.GetEntities();
 	}

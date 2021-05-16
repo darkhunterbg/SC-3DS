@@ -1,6 +1,5 @@
 #include "GameScene.h"
 //#include "../Platform.h"
-#include "../Map/MapSystem.h"
 #include "../Game.h"
 #include "../GUI/GameHUD.h"
 #include "../GUI/Cursor.h"
@@ -13,32 +12,31 @@
 
 static std::vector<EntityId> selection;
 
-
 GameScene::GameScene() {
 
 }
 
 GameScene::~GameScene() {
-	delete mapSystem;
+
 }
 
 void GameScene::Start() {
-	auto& race = RaceDatabase::Protoss;
+	Vector2Int16 size = { 128 * 32,128 * 32 };
+
+	auto& race = RaceDatabase::Terran;
 	race.LoadResourses();
 
-	hud = new GameHUD(race);
+	hud = new GameHUD(race, size);
 
 
 	cursor = new Cursor();
 	cursor->Position = { 200,120 };
 
-	MapDef mapDef;
-	mapDef.size = { 128,128 };
 
-	mapSystem = new MapSystem(mapDef);
+
 	camera.Position = { 0,0 };
 	camera.Size = { 400,240 };
-	camera.Limits = mapSystem->GetMapBounds();
+	camera.Limits = { {0,0,}, size };
 
 	UnitDatabase::LoadAllUnitResources();
 
@@ -49,7 +47,7 @@ void GameScene::Start() {
 	entityManager = new EntityManager();
 	//entityManager->DrawColliders = true;
 
-	entityManager->Init(Vector2Int16(mapSystem->GetMapBounds().size));
+	entityManager->Init(size);
 
 	entityManager->GetPlayerSystem().AddPlayer(race, Colors::SCBlue);
 
@@ -96,7 +94,6 @@ void GameScene::LogicalUpdate() {
 	SectionProfiler p("LogUpdate");
 
 	entityManager->UpdateEntities();
-
 
 	++t;
 
@@ -215,8 +212,6 @@ void GameScene::Draw() {
 	
 	Platform::DrawOnScreen(ScreenId::Top);
 
-	mapSystem->DrawTiles(camera);
-
 	entityManager->DrawEntites(camera);
 
 	hud->UpperScreenGUI();
@@ -225,7 +220,5 @@ void GameScene::Draw() {
 
 	Platform::DrawOnScreen(ScreenId::Bottom);
 
-	hud->LowerScreenGUI(camera, *mapSystem);
-
-	mapSystem->DrawMiniMapTiles({ 7,108 }, camera);
+	hud->LowerScreenGUI(camera, entityManager->GetMapSystem());
 }
