@@ -56,8 +56,8 @@ void GameScene::Start() {
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
 	int i = 0;
-	for (int y = 49; y >= 0; --y) {
-		for (int x = 49; x >= 0; --x) {
+	for (int y = 9; y >= 0; --y) {
+		for (int x = 9; x >= 0; --x) {
 
 			
 			Color c = color[(i) % 12];
@@ -68,7 +68,7 @@ void GameScene::Start() {
 			//entityManager->UnitArchetype.OrientationComponents.GetComponent(e) = 12;
 			EntityUtil::PlayAnimation(e, def.Graphics->AttackAnimations[12]);
 			//EntityUtil::StartTimer(e, 3, TimerExpiredAction::UnitToggleIdleAnimation, true);
-			//entityManager->GoTo(e, { 800,800 });
+			//entityManager->GoTo(e, { 256,128 });
 			
 			i += 1;
 

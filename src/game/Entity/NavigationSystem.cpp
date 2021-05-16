@@ -32,7 +32,7 @@ static const Vector2Int16 movementTableNavGrid[]{
 static NavigationSystem* s;
 static EntityManager* e;
 
-static inline int Evaluate(uint8_t d, uint8_t v, Vector2Int16 pos, const Rectangle16& collider, const NavigationComponent& nav, EntityId entity) {
+static  int Evaluate(uint8_t d, uint8_t v, Vector2Int16 pos, const Rectangle16& collider, const NavigationComponent& nav, EntityId entity) {
 	Vector2Int16 move = Vector2Int16(movementTable8[d] * (v));
 	pos += move;
 
@@ -179,18 +179,20 @@ void NavigationSystem::ApplyUnitNavigationJob(int start, int end) {
 		const auto& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
 
 
-		if (unit.HasMovementGlow()) {
+		if (unit.HasMovementGlow() ) {
 			EntityId glow = unit.movementGlowEntity;
-			EntityUtil::SetRenderFromAnimationClip(glow,
-				unit.def->Graphics->MovementGlowAnimations[nav.targetHeading], 0);
-			EntityUtil::PlayAnimation(glow, unit.def->Graphics->MovementGlowAnimations[nav.targetHeading]);
+			if (!em.FlagComponents.GetComponent(glow).test(ComponentFlags::AnimationEnabled)) {
+				EntityUtil::SetRenderFromAnimationClip(glow,
+					unit.def->Graphics->MovementGlowAnimations[orientation], 0);
+				EntityUtil::PlayAnimation(glow, unit.def->Graphics->MovementGlowAnimations[orientation]);
+			}
 		}
 
 		if (diff != 0) {
 
 			if (nav.targetHeading != 255) {
 
-				uint8_t rotation = unitMove.rotationSpeed;;
+				uint8_t rotation = unitMove.rotationSpeed;
 
 				if (std::abs(diff) > rotation) {
 					int s = sign(diff);
