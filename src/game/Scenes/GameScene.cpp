@@ -21,7 +21,7 @@ GameScene::~GameScene() {
 }
 
 void GameScene::Start() {
-	Vector2Int16 size = { 128 * 32,128 * 32 };
+	Vector2Int16 size = { 64 * 32,64 * 32 };
 
 	auto& race = RaceDatabase::Terran;
 	race.LoadResourses();
@@ -56,8 +56,8 @@ void GameScene::Start() {
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
 	int i = 0;
-	for (int y = 9; y >= 0; --y) {
-		for (int x = 9; x >= 0; --x) {
+	for (int y = 40; y >= 0; --y) {
+		for (int x = 40; x >= 0; --x) {
 
 			
 			Color c = color[(i) % 12];

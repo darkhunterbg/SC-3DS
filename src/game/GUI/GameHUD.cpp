@@ -8,8 +8,8 @@
 #include "../Entity/MapSystem.h"
 
 
-//static Rectangle minimapDst = { {7,108},{128,128} };
-static Rectangle minimapDst = { {4,124},{113,113} };
+static Rectangle minimapDst = { {4,108},{128,128} };
+//static Rectangle minimapDst = { {4,124},{113,113} };
 
 
 
@@ -72,7 +72,7 @@ void GameHUD::UpperScreenGUI() {
 	DrawResource(iconsAtlas->GetSprite(0), { 160, 2 }, "%i", minerals.shown);
 }
 
-void GameHUD::LowerScreenGUI(const Camera& camera, const MapSystem& mapSystem) {
+void GameHUD::LowerScreenGUI(const Camera& camera,  MapSystem& mapSystem) {
 
 	Platform::Draw(race.ConsoleSprite.GetSprite(0), { {0, 0,},{ 320, 240} });
 
@@ -90,12 +90,9 @@ void GameHUD::ApplyInput(Camera& camera) {
 	}
 }
 
-void GameHUD::DrawMinimap(const Camera& camera, const MapSystem& mapSystem) {
+void GameHUD::DrawMinimap(const Camera& camera,  MapSystem& mapSystem) {
 
-	if (mapSystem.GetMinimapSprite().image.textureId == nullptr)
-		return;
-
-	Platform::Draw(mapSystem.GetMinimapSprite(), minimapDst);
+	mapSystem.DrawMinimap(minimapDst);
 
 	Rectangle camRect = camera.GetRectangle();
 	Vector2 min = Vector2(camRect.GetMin());

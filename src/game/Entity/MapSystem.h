@@ -2,28 +2,37 @@
 
 #include "../MathLib.h"
 #include "../Assets.h"
+#include <vector>
 
 class EntityManager;
 class Camera;
 
 class MapSystem {
+	struct MinimapData {
+		std::vector<Rectangle16> dst;
+
+		inline void clear() {
+			dst.clear();
+		}
+		inline size_t size() const { return dst.size(); }
+	};
 private:
+
 	Vector2Int16 mapSize;
 	Image minimapTexture = { 0,0 };
-	Sprite minimapSprite;
+	Image minimapTerrainTexture = { 0,0 };
 
-	void DrawMinimap();
-	void RenderMinimapTexture();
+	MinimapData minimapData;
+
+	void GenerateMiniampTerrainTexture();
+	void RenderMinimap();
 public:
-	MapSystem();
-
-	inline const Sprite& GetMinimapSprite() const {
-		return minimapSprite;
-	}
 
 	void SetSize(Vector2Int16 size);
 
 	void UpdateMap(EntityManager& em);
 
 	void DrawMap( const Camera& camera);
+
+	void DrawMinimap(Rectangle dst);
 };

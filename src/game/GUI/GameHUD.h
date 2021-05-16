@@ -13,7 +13,7 @@ public:
 
 	void ApplyInput(Camera& camera);
 	void UpperScreenGUI();
-	void LowerScreenGUI(const Camera& camera, const MapSystem& mapSystem);
+	void LowerScreenGUI(const Camera& camera, MapSystem& mapSystem);
 	void UpdateInfo(const PlayerInfo& info);
 
 private:
@@ -42,7 +42,7 @@ private:
 	Supply supply = { 0,0 };
 
 	void DrawResource(Sprite icon, Vector2Int pos, const char* text, ...);
-	void DrawMinimap(const Camera& camera, const MapSystem& mapSystem);
+	void DrawMinimap(const Camera& camera,  MapSystem& mapSystem);
 	void DrawAbilities();
 
 	static void UpdateResourceDiff(Resource& r);

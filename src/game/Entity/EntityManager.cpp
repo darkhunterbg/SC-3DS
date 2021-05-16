@@ -166,6 +166,7 @@ void EntityManager::UpdateChildrenPosition() {
 }
 
 void EntityManager::UpdateSecondaryEntities() {
+	mapSystem.UpdateMap(*this);
 
 	timingSystem.UpdateTimers(*this);
 
@@ -203,6 +204,7 @@ void EntityManager::UpdateEntities() {
 	kinematicSystem.ApplyCollidersChange(*this);
 
 	ApplyEntityChanges();
+
 }
 
 void EntityManager::DrawEntites(const Camera& camera) {

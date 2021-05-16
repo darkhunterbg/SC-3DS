@@ -114,4 +114,7 @@ namespace Colors {
 	constexpr Color SCYellow = { 0xfcfc38ff };
 	constexpr Color SCLightBlue = { 0x4068d4ff };
 
+	constexpr Color MapFriendly = { 0x0dff16ff };
+	constexpr Color MapResource = { 0x0dff16ff };
+
 }

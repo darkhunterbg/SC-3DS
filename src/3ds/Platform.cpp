@@ -160,13 +160,14 @@ Image Platform::NewTexture(Vector2Int size) {
 	C3D_RenderTargetClear(rt, C3D_ClearBits::C3D_CLEAR_COLOR, C2D_Color32(0, 0, 0, 255), 0);
 	createdRenderTargets.push_back({ rt,tex });
 
+
 	Tex3DS_SubTexture* st = new Tex3DS_SubTexture();
 	st->width = size.x;
 	st->height = size.y;
-	st->left = 0.0f;
-	st->right = 0.0f;
-	st->right = 1.0f;
-	st->bottom = 1.0f;
+	st->left = 0;
+	st->right = 1;
+	st->top = 1;
+	st->bottom = 0;
 
 	return { tex, st };
 }
