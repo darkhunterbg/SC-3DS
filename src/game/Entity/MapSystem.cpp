@@ -4,9 +4,28 @@
 #include "../Platform.h"
 
 static Sprite tile;
-static Sprite grad0h, grad0v, grad1, circle;
+//static Sprite grad0h, grad0v, grad1, circle;
 
 static constexpr const int MinimapTextureSize = 256;
+
+enum class EdgeType : uint8_t {
+	None = 0b0000,
+	Full = 0b1111,
+
+	Left1 = 0b0001,
+	Left3 = 0b1011,
+	UpLeft2 = 0b0011,
+	Up1 = 0b0010,
+	Up3 = 0b0111,
+	UpRight2 = 0b0110,
+	Right1 = 0b0100,
+	Right3 = 0b1110,
+	DownRight2 = 0b1100,
+	Down1 = 0b1000,
+	Down3 = 0b1101,
+	DownLeft2 = 0b1001,
+
+};
 
 void MapSystem::SetSize(Vector2Int16 size)
 {
@@ -101,17 +120,25 @@ void MapSystem::DrawFogOfWar(const Camera& camera) {
 
 			float a = visible ? 0 : 0.66f;
 
-			if (visible || isKnown) {
-			/*	int p = 0;
-				p += !v.IsKnown(t + Vector2Int16(-1, -1));
-				p += !v.IsKnown(t + Vector2Int16(1, -1));
-				p += !v.IsKnown(t + Vector2Int16(-1, 0));
-				p += !v.IsKnown(t + Vector2Int16(1, 0));
+			std::bitset<8> edge;
+			edge.set(1, !v.IsKnown(t + Vector2Int16(-1, 0)));
+			edge.set(2, !v.IsKnown(t + Vector2Int16(0, -1)));
+			edge.set(3, !v.IsKnown(t + Vector2Int16(1, 0)));
+			edge.set(4, !v.IsKnown(t + Vector2Int16(0, 1)));
 
-				p += !v.IsKnown(t + Vector2Int16(-1, 1));
-				p += !v.IsKnown(t + Vector2Int16(1, 1));
-				p += !v.IsKnown(t + Vector2Int16(0, -1));
-				p += !v.IsKnown(t + Vector2Int16(0, 1));*/
+			EdgeType type = (EdgeType)edge.to_ulong();
+
+			if (visible ||  type==EdgeType::None) {
+				/*	int p = 0;
+					p += !v.IsKnown(t + Vector2Int16(-1, -1));
+					p += !v.IsKnown(t + Vector2Int16(1, -1));
+					p += !v.IsKnown(t + Vector2Int16(-1, 0));
+					p += !v.IsKnown(t + Vector2Int16(1, 0));
+
+					p += !v.IsKnown(t + Vector2Int16(-1, 1));
+					p += !v.IsKnown(t + Vector2Int16(1, 1));
+					p += !v.IsKnown(t + Vector2Int16(0, -1));
+					p += !v.IsKnown(t + Vector2Int16(0, 1));*/
 
 				Color c = Colors::Transparent;
 				c.a = a;
@@ -151,7 +178,7 @@ void MapSystem::DrawFogOfWar(const Camera& camera) {
 
 
 	Platform::ToggleAlphaOverride(false);
-	
+
 
 	Platform::DrawOnTexture(nullptr);
 
