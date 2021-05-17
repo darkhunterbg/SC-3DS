@@ -26,6 +26,8 @@ void MapSystem::UpdateMap(EntityManager& em)
 			minimapData.dst.push_back(collider);
 		}
 	}
+
+	vision = &em.GetPlayerSystem().GetPlayerVision(0);
 }
 
 void MapSystem::DrawMap(const Camera& camera)
@@ -71,28 +73,74 @@ void MapSystem::GenerateMiniampTerrainTexture() {
 
 	Platform::DrawOnTexture(nullptr);
 }
+
+void MapSystem::RenderMinimapVision() {
+
+	if (minimapVisionTexture.textureId == nullptr) {
+		minimapVisionTexture = Platform::NewTexture({ MinimapTextureSize,MinimapTextureSize });
+	}
+
+	int mapSizeTiles = (int)mapSize.x / 32;
+	int multiplier = MinimapTextureSize / mapSizeTiles;
+
+	Platform::DrawOnTexture(minimapVisionTexture.textureId);
+	Platform::ClearBuffer(Colors::Black);
+
+	if (vision == nullptr)
+		return;
+
+	Color c = Colors::Transparent;
+
+	Platform::ToggleAlphaOverride(true);
+
+	for (const Circle16& circle : vision->visible) {
+		Vector2Int16 min = circle.position - Vector2Int16(circle.size, circle.size);
+		Vector2Int16 max = circle.position + Vector2Int16(circle.size, circle.size);
+		for (short y = min.y; y < max.y; ++y) {
+			for (short x = min.x; x < max.x; ++x) {
+				// TODO: mapSizeTiles should be vector
+				if (x < 0 || y < 0 || x >= mapSizeTiles || y >= mapSizeTiles)
+					continue;
+
+				if (circle.Contains(Vector2Int16(x, y))) {
+					Rectangle dst = { {x * multiplier, y * multiplier},{ multiplier, multiplier} };
+					Platform::DrawRectangle(dst, c);
+				}
+			}
+		}
+	}
+
+	Platform::ToggleAlphaOverride(false);
+}
 void MapSystem::RenderMinimap() {
 	if (minimapTexture.textureId == nullptr) {
 		minimapTexture = Platform::NewTexture({ MinimapTextureSize,MinimapTextureSize });
 	}
 
-	Platform::DrawOnTexture(minimapTexture.textureId);
-
-	Sprite terrainSprite;
-	terrainSprite.rect = { {0,0},{MinimapTextureSize,MinimapTextureSize} };
-	terrainSprite.image = minimapTerrainTexture;
-
-	Platform::Draw(terrainSprite, { {0,0}, {MinimapTextureSize,MinimapTextureSize} });
-
 	int mapSizeTiles = (int)mapSize.x / 32;
 	int multiplier = MinimapTextureSize / mapSizeTiles;
 
 
+	RenderMinimapVision();
+
+	Platform::DrawOnTexture(minimapTexture.textureId);
+	//Platform::ClearBuffer(Colors::Black);
+
+	Sprite fullMapSprite;
+	fullMapSprite.rect = { {0,0},{MinimapTextureSize,MinimapTextureSize} };
+	fullMapSprite.image = minimapTerrainTexture;
+	Platform::Draw(fullMapSprite, { {0,0}, {MinimapTextureSize,MinimapTextureSize} });
+
+	if (FogOfWarVisible) {
+		fullMapSprite.image = minimapVisionTexture;
+		Platform::Draw(fullMapSprite, { {0,0}, {MinimapTextureSize,MinimapTextureSize} });
+	}
+
 	//Platform::DrawRectangle({ {16,4},{4,4} }, Colors::MapFriendly);
 	for (const Rectangle16& collider : minimapData.dst) {
 		Rectangle dst;
-		dst.position = (Vector2Int(collider.GetCenter()) * multiplier) / 32;
-		dst.size = (Vector2Int(collider.size) * multiplier) / 16;
+		dst.position = (Vector2Int(collider.position) / 32) * multiplier;
+		dst.size = (Vector2Int(collider.size) / 16) * multiplier;
 		if (dst.size.x < multiplier * 2)
 			dst.size.x = multiplier * 2;
 		if (dst.size.y < multiplier * 2)
@@ -100,6 +148,8 @@ void MapSystem::RenderMinimap() {
 
 		Platform::DrawRectangle(dst, Colors::MapFriendly);
 	}
+
+
 
 	Platform::DrawOnTexture(nullptr);
 }

@@ -3,13 +3,21 @@
 #include "../Data/RaceDef.h"
 #include "../Data/UnitDef.h"
 #include "../Color.h"
+#include "../MathLib.h"
 #include "Entity.h"
 #include "Component.h"
 
 #include <vector>
 
-
 class EntityManager;
+
+struct PlayerVision {
+	std::vector<Circle16> visible;
+
+	inline void clear()  {
+		visible.clear();
+	}
+};
 
 struct PlayerInfo {
 	Color32 color;
@@ -37,6 +45,7 @@ struct PlayerInfo {
 class PlayerSystem {
 private:
 	std::vector<PlayerInfo> players;
+	std::vector<PlayerVision> playerVision;
 
 	friend class EntityManager;
 
@@ -44,6 +53,7 @@ public:
 	PlayerId AddPlayer(const RaceDef& race, Color color);
 
 	const PlayerInfo& GetPlayerInfo(PlayerId id) const;
+	const PlayerVision& GetPlayerVision(PlayerId id) const;
 
 	void AddMinerals(PlayerId player, int minerals);
 	void AddGas(PlayerId player, int gas);

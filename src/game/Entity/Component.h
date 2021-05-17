@@ -180,10 +180,12 @@ struct UnitComponent {
 struct UnitDataComponent {
 	uint8_t supplyUsage = 0;
 	uint8_t supplyProvides = 0;
+	uint8_t visiion = 1;
 
 	inline void FromDef(const UnitDef& def) {
 		supplyUsage = def.UseSupplyDoubled;
 		supplyProvides = def.ProvideSupplyDoubled;
+		visiion = def.Vision;
 	}
 };
 

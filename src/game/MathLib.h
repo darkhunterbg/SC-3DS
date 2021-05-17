@@ -67,7 +67,7 @@ struct Vector2T
 
 	constexpr inline unsigned LengthSquaredInt() const
 	{
-		return x * x + y * y;
+		return x * (unsigned)x + y * (unsigned)y;
 	}
 
 	constexpr inline void Normalize()
@@ -333,6 +333,16 @@ struct Rectangle16
 	}
 
 };
+
+struct Circle16 {
+	Vector2Int16 position;
+	short size;
+
+	inline bool Contains(const Vector2Int16& v) const {
+		return (position - v).LengthSquaredInt() < size * size;
+	}
+};
+
 
 inline Vector2Int Vector2Int_Ceil(const Vector2& v) {
 	return { (int)ceil(v.x), (int)ceilf(v.y) };

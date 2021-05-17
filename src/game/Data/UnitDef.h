@@ -15,6 +15,7 @@ struct UnitDef {
 	uint8_t MovementSpeed;
 	uint8_t Acceleration = 0;
 	uint8_t RotationSpeed;
+	uint8_t Vision = 1;
 
 	uint8_t UseSupplyDoubled = 0;
 	uint8_t ProvideSupplyDoubled = 0;

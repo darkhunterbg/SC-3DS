@@ -6,6 +6,7 @@
 
 class EntityManager;
 class Camera;
+class PlayerVision;
 
 class MapSystem {
 	struct MinimapData {
@@ -20,13 +21,17 @@ private:
 
 	Vector2Int16 mapSize;
 	Image minimapTexture = { 0,0 };
+	Image minimapVisionTexture = { 0,0 };
 	Image minimapTerrainTexture = { 0,0 };
 
 	MinimapData minimapData;
+	const PlayerVision* vision = nullptr;
 
 	void GenerateMiniampTerrainTexture();
 	void RenderMinimap();
+	void RenderMinimapVision();
 public:
+	bool FogOfWarVisible = true;
 
 	void SetSize(Vector2Int16 size);
 

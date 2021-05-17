@@ -46,18 +46,20 @@ void GameScene::Start() {
 
 	entityManager = new EntityManager();
 	//entityManager->DrawColliders = true;
+	//entityManager->GetMapSystem().FogOfWarVisible = false;
 
 	entityManager->Init(size);
 
 	entityManager->GetPlayerSystem().AddPlayer(race, Colors::SCBlue);
+	
 
 	Color color[] = { Colors::SCRed, Colors::SCBlue, Colors::SCLightGreen, Colors::SCPurle,
 	 Colors::SCOrange, Colors::SCGreen, Colors::SCBrown, Colors::SCLightYellow, Colors::SCWhite,
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
 	int i = 0;
-	for (int y = 40; y >= 0; --y) {
-		for (int x = 40; x >= 0; --x) {
+	for (int y = 2; y >= 2; --y) {
+		for (int x = 2; x >= 2; --x) {
 
 			
 			Color c = color[(i) % 12];

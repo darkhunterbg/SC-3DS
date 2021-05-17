@@ -24,8 +24,9 @@ extern std::string assetDir;
 extern C2D_TextBuf textBuffer;
 extern u64 mainTimer;
 extern std::vector<NDSAudioChannel*> audioChannels;
-static C3D_RenderTarget* currentScreen = nullptr;
+static C3D_RenderTarget* currentRT = nullptr;
 static std::vector< RenderTarget> createdRenderTargets;
+static int currentScreen = 0;
 
 const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 	std::string assetPath = assetDir + path;
@@ -63,16 +64,38 @@ Font Platform::LoadFont(const char* path) {
 	return { font };
 }
 
+void Platform::ToggleAlphaOverride(bool blend) {
+
+	C2D_Flush();
+
+	if (blend) {
+		C3D_AlphaBlend(
+			GPU_BLENDEQUATION::GPU_BLEND_ADD, GPU_BLENDEQUATION::GPU_BLEND_ADD,
+			GPU_BLENDFACTOR::GPU_SRC_ALPHA, GPU_BLENDFACTOR::GPU_ZERO,
+			GPU_BLENDFACTOR::GPU_SRC_ALPHA, GPU_BLENDFACTOR::GPU_ZERO);
+	}
+	else {
+		//C3D_AlphaTest(false, GPU_TESTFUNC::GPU_NEVER, 0);
+		C3D_AlphaBlend(
+			GPU_BLENDEQUATION::GPU_BLEND_ADD, GPU_BLENDEQUATION::GPU_BLEND_ADD,
+			GPU_BLENDFACTOR::GPU_SRC_ALPHA, GPU_BLENDFACTOR::GPU_ONE_MINUS_SRC_ALPHA,
+			GPU_BLENDFACTOR::GPU_SRC_ALPHA, GPU_BLENDFACTOR::GPU_ONE_MINUS_SRC_ALPHA);
+	}
+}
+
 void Platform::DrawOnTexture(Texture texture) {
 
 	if (texture == nullptr) {
-		C2D_SceneBegin(currentScreen);
+		currentRT = screens[currentScreen];
+		C2D_SceneBegin(currentRT);
 		return;
 	}
 	const C3D_Tex* tex = (C3D_Tex*)texture;
 
 	for (const RenderTarget& rt : createdRenderTargets) {
 		if (rt.tex == tex) {
+			currentRT = rt.rt;
+
 			C2D_SceneBegin(rt.rt);
 			return;
 		}
@@ -82,8 +105,13 @@ void Platform::DrawOnTexture(Texture texture) {
 }
 void Platform::DrawOnScreen(ScreenId screen) {
 
-	currentScreen = screens[(int)screen];
-	C2D_SceneBegin(currentScreen);
+	currentScreen = (int)screen;
+	currentRT = screens[currentScreen];
+	C2D_SceneBegin(currentRT);
+}
+
+void Platform::ClearBuffer(Color color) {
+	C2D_TargetClear(currentRT, Color32(color).value);
 }
 
 void Platform::BatchDraw(const Span< BatchDrawCommand> commands) {
@@ -103,14 +131,13 @@ void Platform::BatchDraw(const Span< BatchDrawCommand> commands) {
 }
 
 void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip) {
-
-
 	C2D_Image img = *(C2D_Image*)&sprite.image;
 
 	if (hFlip)
 		dst.size.x *= -1;
 	if (color != Colors::Black)
 	{
+
 		C2D_ImageTint tint;
 		u32 ucolor = C2D_Color32f(color.r, color.g, color.b, color.a);
 		tint.corners[0] = { ucolor , 0.5f };

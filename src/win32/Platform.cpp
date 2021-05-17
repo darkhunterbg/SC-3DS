@@ -27,8 +27,10 @@ extern bool mute;
 extern bool noThreading;
 extern int numberOfThreads;
 
-static ScreenId currentScreen;
+static ScreenId currentRT;
 static SDL_Texture* target = nullptr;
+
+static SDL_BlendMode blendMode = SDL_BlendMode::SDL_BLENDMODE_BLEND;
 
 constexpr Uint8 SDL_FloatToUint8(float x) {
 	return (Uint8)(255.0f * ClampF(x, 0.0f, 1.0f) + 0.5f);
@@ -119,14 +121,14 @@ FILE* Platform::OpenAsset(const char* path) {
 }
 
 void Platform::DrawOnScreen(ScreenId screen) {
-	currentScreen = screen;
+	currentRT = screen;
 	target = nullptr;
-	SDL_SetRenderTarget(renderer, screens[(int)currentScreen]);
+	SDL_SetRenderTarget(renderer, screens[(int)currentRT]);
 }
 void Platform::DrawOnTexture(Texture texture) {
 	target = (SDL_Texture*)texture;
 	if (target == nullptr)
-		DrawOnScreen(currentScreen);
+		DrawOnScreen(currentRT);
 	else
 		SDL_SetRenderTarget(renderer, target);
 
@@ -136,7 +138,28 @@ Image Platform::NewTexture(Vector2Int size) {
 	return { tex, 0 };
 }
 
+void Platform::ToggleAlphaOverride(bool enabled) {
 
+	if (enabled) {
+		blendMode = SDL_ComposeCustomBlendMode(
+			SDL_BlendFactor::SDL_BLENDFACTOR_ONE, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
+			SDL_BlendOperation::SDL_BLENDOPERATION_ADD,
+			SDL_BlendFactor::SDL_BLENDFACTOR_ONE, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
+			SDL_BlendOperation::SDL_BLENDOPERATION_ADD);
+	}
+	else {
+
+		blendMode = SDL_BlendMode::SDL_BLENDMODE_BLEND;
+	
+	}
+	SDL_SetRenderDrawBlendMode(renderer, blendMode);
+}
+
+void Platform::ClearBuffer(Color color) {
+	Color32 c(color);
+	SDL_SetRenderDrawColor(renderer, c.GetR(), c.GetG(), c.GetB(), c.GetA());
+	SDL_RenderClear(renderer);
+}
 void Platform::BatchDraw(const Span<BatchDrawCommand> commands) {
 	for (const auto& cmd : commands) {
 		auto texture = (SDL_Texture*)cmd.image.textureId;
@@ -156,7 +179,7 @@ void Platform::BatchDraw(const Span<BatchDrawCommand> commands) {
 		Uint8 b = cmd.color.color.GetB();
 		Uint8 a = cmd.color.color.GetA();
 
-		SDL_SetTextureBlendMode(texture, SDL_BlendMode::SDL_BLENDMODE_BLEND);
+		SDL_SetTextureBlendMode(texture, blendMode);
 		SDL_SetTextureAlphaMod(texture, a);
 		if (r != 0 || g != 0 || b != 0 || a != 255) {
 			SDL_SetTextureColorMod(texture, r, g, b);
@@ -186,7 +209,7 @@ void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip
 	cmd.flip = hFlip ? SDL_RendererFlip::SDL_FLIP_HORIZONTAL : SDL_RendererFlip::SDL_FLIP_NONE;
 
 	SDL_SetTextureAlphaMod(cmd.texture, cmd.a);
-	SDL_SetTextureBlendMode(cmd.texture, SDL_BlendMode::SDL_BLENDMODE_BLEND);
+	SDL_SetTextureBlendMode(cmd.texture, blendMode);
 
 	if (cmd.r != 0 || cmd.g != 0 || cmd.b != 0 || cmd.a != 255) {
 		SDL_SetTextureColorMod(cmd.texture, cmd.r, cmd.g, cmd.b);
