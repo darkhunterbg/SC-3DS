@@ -58,8 +58,8 @@ void GameScene::Start() {
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
 	int i = 0;
-	for (int y = 2; y >= 2; --y) {
-		for (int x = 2; x >= 2; --x) {
+	for (int y = 3; y >= 0; --y) {
+		for (int x = 3; x >= 0; --x) {
 
 			
 			Color c = color[(i) % 12];

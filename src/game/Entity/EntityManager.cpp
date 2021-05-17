@@ -219,6 +219,8 @@ void EntityManager::DrawEntites(const Camera& camera) {
 
 	if (DrawColliders)
 		kinematicSystem.DrawColliders(camera);
+
+	mapSystem.DrawFogOfWar(camera);
 }
 
 void EntityManager::GoTo(EntityId e, Vector2Int16 pos) {

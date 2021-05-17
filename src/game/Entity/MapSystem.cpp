@@ -51,6 +51,46 @@ void MapSystem::DrawMap(const Camera& camera)
 	}
 }
 
+void MapSystem::DrawFogOfWar(const Camera& camera) {
+	if (!FogOfWarVisible || vision == nullptr)
+		return;
+
+	Rectangle16 camRect = camera.GetRectangle16();
+
+	Vector2Int16 start = (camRect.position / 32);
+	Vector2Int16 end = (camRect.GetMax() / 32) + Vector2Int16{ 1, 1 };
+	const PlayerVision& v = *vision;
+
+	for (short y = start.y; y < end.y; ++y) {
+		for (short x = start.x; x < end.x; ++x) {
+
+			Vector2Int16 t = { x,y };
+
+			bool visible = false;
+
+			for (const auto& c : v.visible) {
+				if (c.Contains(t)) {
+					visible = true;
+					break;
+				}
+
+			}
+
+			if (!visible) {
+				Color c = Colors::Black;
+				if (v.IsKnown(t))
+					c.a = 0.5f;
+
+				Rectangle dst = { {x * 32,y * 32}, {32, 32} };
+				dst.position -= Vector2Int(camRect.position);
+				dst.position /= camera.Scale;
+				dst.size /= camera.Scale;
+
+				Platform::DrawRectangle(dst, c);
+			}
+		}
+	}
+}
 
 void MapSystem::GenerateMiniampTerrainTexture() {
 	Rectangle mapBounds = { {0,0}, Vector2Int(mapSize) };

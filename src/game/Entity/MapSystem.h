@@ -39,5 +39,7 @@ public:
 
 	void DrawMap( const Camera& camera);
 
+	void DrawFogOfWar(const Camera& camera);
+
 	void DrawMinimap(Rectangle dst);
 };

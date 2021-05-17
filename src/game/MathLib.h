@@ -103,19 +103,19 @@ struct Vector2T
 
 	inline Vector2T operator+(const Vector2T& b) const
 	{
-		return Vector2T( x + b.x, y + b.y );
+		return Vector2T(x + b.x, y + b.y);
 	}
 	inline Vector2T operator-(const Vector2T& b) const
 	{
-		return Vector2T( x - b.x, y - b.y );
+		return Vector2T(x - b.x, y - b.y);
 	}
 	inline Vector2T operator*(const Vector2T& b) const
 	{
-		return Vector2T( x * b.x, y * b.y );
+		return Vector2T(x * b.x, y * b.y);
 	}
 	inline Vector2T operator/(const Vector2T& b) const
 	{
-		return Vector2T( x / b.x, y / b.y );
+		return Vector2T(x / b.x, y / b.y);
 	}
 	inline  Vector2T& operator+=(const Vector2T& b)
 	{
@@ -339,7 +339,7 @@ struct Circle16 {
 	short size;
 
 	inline bool Contains(const Vector2Int16& v) const {
-		return (position - v).LengthSquaredInt() < size * size;
+		return (position - v).LengthSquaredInt() <= size * size;
 	}
 };
 
