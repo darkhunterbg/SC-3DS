@@ -114,6 +114,27 @@ void Platform::ClearBuffer(Color color) {
 	C2D_TargetClear(currentRT, Color32(color).value);
 }
 
+
+Sprite Platform::NewSprite(Image image, Rectangle16 src) {
+	C3D_Tex* tex = (C3D_Tex*)image.textureId;
+
+	auto* s = (Tex3DS_SubTexture*)image.textureId2;
+
+	auto* s2 = new Tex3DS_SubTexture();
+
+
+	s2->width = src.size.x;
+	s2->height = src.size.y;
+	s2->bottom = (float)src.position.y / (float)s->height;
+	s2->top = (float)(src.position.y + src.size.y) / (float)s->height;
+	s2->left = (float)src.position.x / (float)s->width;
+	s2->right = (float)(src.position.x + src.size.x) / (float)s->width;
+
+	//EXCEPTION("%.2f %.2f", s2->left, s2->right);
+
+	return { src, {tex,s2} };
+}
+
 void Platform::BatchDraw(const Span< BatchDrawCommand> commands) {
 
 	static constexpr const int depthStep = 0.0001f;
@@ -130,14 +151,15 @@ void Platform::BatchDraw(const Span< BatchDrawCommand> commands) {
 	}
 }
 
-void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip) {
+void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip, bool vFlip) {
 	C2D_Image img = *(C2D_Image*)&sprite.image;
 
 	if (hFlip)
 		dst.size.x *= -1;
+	if (vFlip)
+		dst.size.y *= -1;
 	if (color != Colors::Black)
 	{
-
 		C2D_ImageTint tint;
 		u32 ucolor = C2D_Color32f(color.r, color.g, color.b, color.a);
 		tint.corners[0] = { ucolor , 0.5f };

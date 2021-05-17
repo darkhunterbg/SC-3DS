@@ -4,6 +4,7 @@
 #include "../Platform.h"
 
 static Sprite tile;
+static Sprite grad0h, grad0v, grad1, circle;
 
 static constexpr const int MinimapTextureSize = 256;
 
@@ -12,6 +13,7 @@ void MapSystem::SetSize(Vector2Int16 size)
 	mapSize = size;
 
 	tile = Game::AssetLoader.LoadAtlas("tileset_tile.t3x")->GetSprite(0);
+	//circle = Game::AssetLoader.LoadAtlas("other.t3x")->GetSprite(0);
 }
 
 void MapSystem::UpdateMap(EntityManager& em)
@@ -51,15 +53,35 @@ void MapSystem::DrawMap(const Camera& camera)
 	}
 }
 
+
+static Sprite fowSprite;
+
 void MapSystem::DrawFogOfWar(const Camera& camera) {
 	if (!FogOfWarVisible || vision == nullptr)
 		return;
+
+	int div = 1;
+
+	Vector2Int16 FogOfWarTextureSize = { 512,256 };
+	FogOfWarTextureSize /= div;
+
+	if (fogOfWarTexture.textureId == nullptr) {
+		fogOfWarTexture = Platform::NewTexture(Vector2Int(FogOfWarTextureSize));
+		fowSprite = Platform::NewSprite(fogOfWarTexture, { {0,0}, {400,240} });
+	}
+
+	Platform::DrawOnTexture(fogOfWarTexture.textureId);
+	Platform::ClearBuffer(Colors::Black);
+
+	Platform::ToggleAlphaOverride(true);
+	//Platform::ToggleTestBlend();
 
 	Rectangle16 camRect = camera.GetRectangle16();
 
 	Vector2Int16 start = (camRect.position / 32);
 	Vector2Int16 end = (camRect.GetMax() / 32) + Vector2Int16{ 1, 1 };
 	const PlayerVision& v = *vision;
+
 
 	for (short y = start.y; y < end.y; ++y) {
 		for (short x = start.x; x < end.x; ++x) {
@@ -73,23 +95,80 @@ void MapSystem::DrawFogOfWar(const Camera& camera) {
 					visible = true;
 					break;
 				}
-
 			}
 
-			if (!visible) {
-				Color c = Colors::Black;
-				if (v.IsKnown(t))
-					c.a = 0.5f;
+			bool isKnown = v.IsKnown(t);
+
+			float a = visible ? 0 : 0.66f;
+
+			if (visible || isKnown) {
+			/*	int p = 0;
+				p += !v.IsKnown(t + Vector2Int16(-1, -1));
+				p += !v.IsKnown(t + Vector2Int16(1, -1));
+				p += !v.IsKnown(t + Vector2Int16(-1, 0));
+				p += !v.IsKnown(t + Vector2Int16(1, 0));
+
+				p += !v.IsKnown(t + Vector2Int16(-1, 1));
+				p += !v.IsKnown(t + Vector2Int16(1, 1));
+				p += !v.IsKnown(t + Vector2Int16(0, -1));
+				p += !v.IsKnown(t + Vector2Int16(0, 1));*/
+
+				Color c = Colors::Transparent;
+				c.a = a;
+
+				/*if (v.IsKnown(t))
+					c.a = 0.5f;*/
+
+
 
 				Rectangle dst = { {x * 32,y * 32}, {32, 32} };
 				dst.position -= Vector2Int(camRect.position);
 				dst.position /= camera.Scale;
 				dst.size /= camera.Scale;
+				dst.position /= div;
+				dst.size /= div;
 
+				//if(p==0)
 				Platform::DrawRectangle(dst, c);
+
+				//if (p >0) {
+				//	//c = Colors::White;
+				//	Vector2Int cntr = dst.GetCenter();
+				//	//dst.position += dst.size / 2;
+				//	dst.size *= 2;
+				//	dst.SetCenter(cntr);
+
+				//	Platform::Draw(circle, dst, c);
+
+
+
+				//}
+
 			}
 		}
 	}
+
+
+
+	Platform::ToggleAlphaOverride(false);
+	
+
+	Platform::DrawOnTexture(nullptr);
+
+
+	//fowSprite.image = fogOfWarTexture;
+	//fowSprite.rect = { {0,0}, {400,240} };
+
+	Platform::Draw(fowSprite, { {0,0},{400,240} });
+
+	//Rectangle16 src = { (camRect.position / 8), (camRect.size / 8) };
+
+	//static Sprite s = Platform::NewSprite(minimapVisionTexture, src);
+	//s.image = minimapVisionTexture;
+	//s.rect = src;
+
+	//Platform::Draw(s, { {0,0},{400,240} });
+
 }
 
 void MapSystem::GenerateMiniampTerrainTexture() {
@@ -199,7 +278,6 @@ void MapSystem::RenderMinimap() {
 
 		Platform::DrawRectangle(dst, Colors::MapFriendly);
 	}
-
 
 
 	Platform::DrawOnTexture(nullptr);

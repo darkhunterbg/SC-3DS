@@ -49,10 +49,12 @@ public:
 	static void DrawOnTexture(Texture texture);
 
 	static void ToggleAlphaOverride(bool blend);
+	//static void ToggleTestBlend();
 
+	static Sprite NewSprite(Image image, Rectangle16 src);
 	static void BatchDraw(const Span< BatchDrawCommand> commands);
 	static void ClearBuffer(Color color);
-	static void Draw(const Sprite& sprite, Rectangle dst, Color additiveBlendColor = Colors::Black, bool hFlip = false);
+	static void Draw(const Sprite& sprite, Rectangle dst, Color additiveBlendColor = Colors::Black, bool hFlip = false , bool vFlip = false);
 	static void DrawText(const Font& font, Vector2Int position, const char* text, Color color, float scale = 1.0f);
 	static void DrawLine(Vector2Int src, Vector2Int dst, Color color);
 	static void DrawRectangle(Rectangle rect, Color color);

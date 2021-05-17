@@ -23,6 +23,7 @@ private:
 	Image minimapTexture = { 0,0 };
 	Image minimapVisionTexture = { 0,0 };
 	Image minimapTerrainTexture = { 0,0 };
+	Image fogOfWarTexture = { 0,0 };
 
 	MinimapData minimapData;
 	const PlayerVision* vision = nullptr;

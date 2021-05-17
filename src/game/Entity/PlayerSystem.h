@@ -32,6 +32,9 @@ struct PlayerVision {
 	}
 
 	inline bool IsKnown(Vector2Int16 pos) const {
+		if (pos.x < 0 || pos.y < 0 || pos.x >= gridSize.x || pos.y >= gridSize.y)
+			return false;
+
 		int i = (pos.x >> 3) + ((pos.y * (int)gridSize.x) >> 3);
 
 		const std::bitset < 32 >& b = knoweldge[i];

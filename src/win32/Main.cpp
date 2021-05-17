@@ -22,12 +22,32 @@ void Init();
 void Uninit();
 void Draw();
 
+int static GetDriver() {
+	int d = SDL_GetNumRenderDrivers();
+
+	for (int i = 0; i < d; ++i) {
+		SDL_RendererInfo info;
+		SDL_GetRenderDriverInfo(i, &info);
+		if (info.name == std::string("direct3d11")) /*||
+			info.name == std::string("opengl"))*/
+			return i;
+	}
+
+	return -1;
+}
+
 int main(int argc, char** argv) {
 
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_AUDIO);
-	window = SDL_CreateWindow("StarCraft", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 400, 480, SDL_WINDOW_RESIZABLE);
+
+	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "direct3d11");
+
+	window = SDL_CreateWindow("StarCraft", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 400, 480,
+		SDL_WINDOW_RESIZABLE);
 	SDL_MaximizeWindow(window);
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
+
+	renderer = SDL_CreateRenderer(window, GetDriver(), SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE);
 
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BlendMode::SDL_BLENDMODE_BLEND);
 
@@ -54,6 +74,7 @@ int main(int argc, char** argv) {
 	}
 
 	while (!done) {
+
 		Game::FrameStart();
 
 		SDL_Event event;
@@ -71,23 +92,24 @@ int main(int argc, char** argv) {
 		if (done)
 			break;
 
+
 		done = !Game::Update();
 
 		if (done)
 			break;
 
 
-
 		Game::Draw();
+
 		Draw();
 
+		Game::FrameEnd();
 
 		SDL_RenderSetViewport(renderer, nullptr);
 		SDL_Rect clip = { 0 };
 		SDL_GetWindowSize(window, &clip.w, &clip.h);
 		SDL_RenderSetClipRect(renderer, &clip);
 
-		Game::FrameEnd();
 
 		SDL_RenderPresent(renderer);
 	}

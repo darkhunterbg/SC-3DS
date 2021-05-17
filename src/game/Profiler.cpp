@@ -42,7 +42,7 @@ void Profiler::ShowPerformance() {
 	char text[128];
 
 	Color c = Colors::White;
-	if (frameTime > 16.67)
+	if (frameTime > 16.7)
 		c = Colors::Orange;
 	if (frameTime > 33.4)
 		c = Colors::Red;
@@ -97,7 +97,7 @@ void Profiler::FrameEnd() {
 	auto now = Platform::ElaspedTime();
 	double thisFrameTime = (now - frameStartTime) * 1000;
 	frameTime = std::roundf((frameTime * 0.9 + thisFrameTime * 0.1) * 10.0) / 10.0;
-	frameLoad.insert(frameLoad.begin(), thisFrameTime / 16.67);
+	frameLoad.insert(frameLoad.begin(), thisFrameTime / 16.7);
 	if (frameLoad.size() >= 60)
 		frameLoad.erase(frameLoad.end() - 1);
 

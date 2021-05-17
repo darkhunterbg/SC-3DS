@@ -53,6 +53,8 @@ SDL_Texture* LoadTexture(const std::string& path, Vector2Int& size) {
 	SDL_UpdateTexture(tex, nullptr, image.data(), width * 4);
 	size = { (int)width,(int)height };
 
+	SDL_SetTextureScaleMode(tex, SDL_ScaleMode::SDL_ScaleModeBest);
+
 	return tex;
 }
 
@@ -87,7 +89,7 @@ const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 			delete asset;
 			return nullptr;
 		}
-		Rectangle16 rect = { {0,0},Vector2Int16( size )};
+		Rectangle16 rect = { {0,0},Vector2Int16(size) };
 		Sprite s = { rect ,{ tex ,nullptr} };
 		asset->AddSprite(s);
 	}
@@ -137,6 +139,10 @@ Image Platform::NewTexture(Vector2Int size) {
 	SDL_Texture* tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
 	return { tex, 0 };
 }
+Sprite Platform::NewSprite(Image image, Rectangle16 src) {
+	return { src, image };
+}
+
 
 void Platform::ToggleAlphaOverride(bool enabled) {
 
@@ -150,10 +156,26 @@ void Platform::ToggleAlphaOverride(bool enabled) {
 	else {
 
 		blendMode = SDL_BlendMode::SDL_BLENDMODE_BLEND;
-	
+
 	}
-	SDL_SetRenderDrawBlendMode(renderer, blendMode);
+	int error = SDL_SetRenderDrawBlendMode(renderer, blendMode);
+	if (error) {
+		const char* error = SDL_GetError();
+		EXCEPTION(error);
+	}
 }
+//void Platform::ToggleTestBlend() {
+//	blendMode = SDL_ComposeCustomBlendMode(
+//		SDL_BlendFactor::SDL_BLENDFACTOR_SRC_ALPHA, SDL_BlendFactor::SDL_BLENDFACTOR_DST_ALPHA,
+//		SDL_BlendOperation::SDL_BLENDOPERATION_REV_SUBTRACT,
+//		SDL_BlendFactor::SDL_BLENDFACTOR_SRC_ALPHA, SDL_BlendFactor::SDL_BLENDFACTOR_DST_ALPHA,
+//		SDL_BlendOperation::SDL_BLENDOPERATION_REV_SUBTRACT);
+//	int e = SDL_SetRenderDrawBlendMode(renderer, blendMode);
+//	if (e) {
+//		const char* error = SDL_GetError();
+//		EXCEPTION(error);
+//	}
+//}
 
 void Platform::ClearBuffer(Color color) {
 	Color32 c(color);
@@ -191,7 +213,7 @@ void Platform::BatchDraw(const Span<BatchDrawCommand> commands) {
 		SDL_RenderCopyEx(renderer, texture, nullptr, &dst, 0, nullptr, flags);
 	}
 }
-void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip) {
+void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip, bool vFlip) {
 	SDLDrawCommand cmd;
 
 	cmd.texture = (SDL_Texture*)sprite.image.textureId;
@@ -206,7 +228,12 @@ void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip
 	cmd.b = SDL_FloatToUint8(color.b);
 	cmd.a = SDL_FloatToUint8(color.a);
 	cmd.type = SDLDrawCommandType::Sprite;
+
 	cmd.flip = hFlip ? SDL_RendererFlip::SDL_FLIP_HORIZONTAL : SDL_RendererFlip::SDL_FLIP_NONE;
+	if (vFlip) {
+		cmd.flip = (SDL_RendererFlip)(cmd.flip | SDL_RendererFlip::SDL_FLIP_VERTICAL);
+	}
+
 
 	SDL_SetTextureAlphaMod(cmd.texture, cmd.a);
 	SDL_SetTextureBlendMode(cmd.texture, blendMode);
@@ -219,6 +246,7 @@ void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip
 	}
 
 	SDL_RenderCopyEx(renderer, cmd.texture, &cmd.src, &cmd.dst, 0, nullptr, cmd.flip);
+
 
 }
 void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color, float scale) {
@@ -393,7 +421,7 @@ int Platform::StartThreads(std::function<void(int)> threadWork) {
 
 	threadWorkFunc = threadWork;
 
-	numberOfThreads =  SDL_GetCPUCount();
+	numberOfThreads = SDL_GetCPUCount();
 
 	for (int i = 1; i < numberOfThreads; ++i) {
 		std::string name = "WorkerThread" + std::to_string(i);
