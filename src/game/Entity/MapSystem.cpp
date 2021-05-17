@@ -90,8 +90,19 @@ void MapSystem::RenderMinimapVision() {
 		return;
 
 	Color c = Colors::Transparent;
-
+	Color sc = Colors::Transparent;
+	sc.a = 0.6f;
 	Platform::ToggleAlphaOverride(true);
+
+
+	for (short y = 0; y < mapSizeTiles; ++y) {
+		for (short x = 0; x < mapSizeTiles; ++x) {
+			if (vision->IsKnown({ x,y })) {
+				Rectangle dst = { {x * multiplier, y * multiplier},{ multiplier, multiplier} };
+				Platform::DrawRectangle(dst, sc);
+			}
+		}
+	}
 
 	for (const Circle16& circle : vision->visible) {
 		Vector2Int16 min = circle.position - Vector2Int16(circle.size, circle.size);

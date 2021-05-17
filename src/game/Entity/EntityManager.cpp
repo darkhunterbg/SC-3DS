@@ -32,6 +32,7 @@ void EntityManager::Init(Vector2Int16 mapSize)
 	navigationSystem.SetSize(mapSize);
 	kinematicSystem.SetSize(mapSize);
 	mapSystem.SetSize(mapSize);
+	playerSystem.SetSize(mapSize);
 }
 
 void EntityManager::DeleteEntity(EntityId id) {

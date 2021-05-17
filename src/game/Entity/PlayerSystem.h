@@ -7,15 +7,42 @@
 #include "Entity.h"
 #include "Component.h"
 
+#include <bitset>
 #include <vector>
 
 class EntityManager;
 
 struct PlayerVision {
 	std::vector<Circle16> visible;
+	std::vector<std::bitset<32>> knoweldge;
+	Vector2Int16 gridSize;
 
-	inline void clear()  {
+	inline void clear() {
 		visible.clear();
+	}
+
+	inline void SetGridSize(Vector2Int16 size) {
+		gridSize = size;
+		int s = (size.x >> 3) * (size.y);
+		knoweldge.clear();
+		knoweldge.reserve(s);
+		for (int i = 0; i < s; ++i) {
+			knoweldge.push_back({ 0 });
+		}
+	}
+
+	inline bool IsKnown(Vector2Int16 pos) const {
+		int i = (pos.x >> 3) + ((pos.y * (int)gridSize.x) >> 3);
+
+		const std::bitset < 32 >& b = knoweldge[i];
+		return b.test((pos.x % 32));
+	}
+
+	inline void SetKnown(Vector2Int16 pos, bool known) {
+		int i = (pos.x >> 3) + ((pos.y * (int)gridSize.x) >> 3);
+
+		std::bitset < 32 >& b = knoweldge[i];
+		b.set((pos.x % 32), known);
 	}
 };
 
@@ -49,7 +76,10 @@ private:
 
 	friend class EntityManager;
 
+	Vector2Int16 gridSize;
 public:
+	void SetSize(Vector2Int16 size);
+
 	PlayerId AddPlayer(const RaceDef& race, Color color);
 
 	const PlayerInfo& GetPlayerInfo(PlayerId id) const;

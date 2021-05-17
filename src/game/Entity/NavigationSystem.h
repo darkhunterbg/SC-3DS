@@ -44,7 +44,7 @@ public:
 		if (x < 0 || x > gridSize.x || y < 0 || y> gridSize.y)
 			return false;
 
-		int i = ((x >> 3) + (y * gridSize.x)) >> 3;
+		int i = (x >> 3) + ((y * gridSize.x) >> 3);
 		uint32_t var = navGrid[i];
 
 		bool result = var & (1 << (x >> 3));
@@ -52,7 +52,7 @@ public:
 	}
 
 	inline void SetPassable(int x, int y) {
-		int i = ((x >> 3) + (y * gridSize.x)) >> 3;
+		int i = (x >> 3) + ((y * gridSize.x) >> 3);
 		uint32_t& var = navGrid[i];
 		var |= (1 << (x >> 3));
 	}

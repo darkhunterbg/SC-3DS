@@ -2,12 +2,20 @@
 #include "EntityManager.h"
 
 
+void PlayerSystem::SetSize(Vector2Int16 size)
+{
+	gridSize.x = size.x / 32;
+	gridSize.y = size.y / 32;
+}
+
+
 PlayerId PlayerSystem::AddPlayer(const RaceDef& race, Color color)
 {
 	PlayerId id = players.size();
 
 	players.push_back(PlayerInfo(Color32(color), race.Type, id));
 	playerVision.push_back(PlayerVision());
+	playerVision[id].SetGridSize(gridSize);
 
 	return id;
 }
@@ -66,5 +74,26 @@ void PlayerSystem::UpdatePlayerUnits(const EntityManager& em) {
 		position.x = position.x >> (5);
 		position.y = position.y >> (5);
 		playerVision[owner].visible.push_back({ position, data.visiion });
+
+
+	}
+
+	for (PlayerVision& vision : playerVision) {
+		for (const Circle16& circle : vision.visible) {
+			Vector2Int16 min = circle.position - Vector2Int16(circle.size, circle.size);
+			Vector2Int16 max = circle.position + Vector2Int16(circle.size, circle.size);
+			for (short y = min.y; y < max.y; ++y) {
+				for (short x = min.x; x < max.x; ++x) {
+					// TODO: mapSizeTiles should be vector
+					if (x < 0 || y < 0 || x >= vision.gridSize.x || y >= vision.gridSize.y)
+						continue;
+
+					if (circle.Contains(Vector2Int16(x, y))) {
+						vision.SetKnown(Vector2Int16(x, y), true);
+					}
+				}
+			}
+		}
 	}
 }
+
