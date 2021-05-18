@@ -51,27 +51,29 @@ void GameScene::Start() {
 	entityManager->Init(size);
 
 	entityManager->GetPlayerSystem().AddPlayer(race, Colors::SCBlue);
-	
+	entityManager->GetPlayerSystem().AddPlayer(race, Colors::SCRed);
+	entityManager->GetPlayerSystem().AddPlayer(race, Colors::SCLightGreen);
+	entityManager->GetPlayerSystem().AddPlayer(race, Colors::SCPurle);
 
 	Color color[] = { Colors::SCRed, Colors::SCBlue, Colors::SCLightGreen, Colors::SCPurle,
 	 Colors::SCOrange, Colors::SCGreen, Colors::SCBrown, Colors::SCLightYellow, Colors::SCWhite,
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
-	int i = 0;
-	for (int y = 10; y >= 10; --y) {
-		for (int x = 10; x >= 10; --x) {
+	int totalPlayers = 4;
 
-			
+	int i = 0;
+	for (int y = 40; y >= 0; --y) {
+		for (int x = 40; x >= 0; --x) {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[(i) % UnitDatabase::Units.size()];
-			EntityId e = UnitEntityUtil::NewUnit(def, 0,
+			EntityId e = UnitEntityUtil::NewUnit(def, i % 4,
 				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 + 16 }));
 
 			//entityManager->UnitArchetype.OrientationComponents.GetComponent(e) = 12;
 			EntityUtil::PlayAnimation(e, def.Graphics->AttackAnimations[12]);
 			//EntityUtil::StartTimer(e, 3, TimerExpiredAction::UnitToggleIdleAnimation, true);
-			//entityManager->GoTo(e, { 256,128 });
-			
+			//entityManager->GoTo(e, { 1024,1024 });
+
 			i += 1;
 
 		}
@@ -82,55 +84,22 @@ void GameScene::Start() {
 
 int t = 0;
 
-void GameScene::AuxilaryUpdate() {
 
-	SectionProfiler p("AuxUpdate");
+void GameScene::Update() {
 
-	entityManager->UpdateSecondaryEntities();
+	entityManager->Update();
 
-	p.Submit();
-}
-
-
-void GameScene::LogicalUpdate() {
-	SectionProfiler p("LogUpdate");
-
-	entityManager->UpdateEntities();
-
-	++t;
+	t++;
 
 	if (t % 60 == 0) {
-		entityManager->GetPlayerSystem().AddMinerals(0,8);
+		entityManager->GetPlayerSystem().AddMinerals(0, 8);
 		entityManager->GetPlayerSystem().AddGas(0, 8);
-	}
-
-	p.Submit();
-}
-std::vector<EntityId> tmp;
-void GameScene::Update() {
-	frameCounter += 2;
-	frameCounter2 += 2;
-
-	bool logical = false;
-
-	if (frameCounter2 >= 5)
-	{
-
-		frameCounter2 -= 5;
-		AuxilaryUpdate();
-	}
-
-	if (frameCounter >= 5)
-	{
-		logical = true;
-
-		++logicalFrame;
-		frameCounter -= 5;
-		LogicalUpdate();
 	}
 
 
 	hud->ApplyInput(camera);
+
+	static std::vector<EntityId> tmp;
 
 	tmp.clear();
 	cursor->Update(camera, *entityManager, tmp);
@@ -211,10 +180,10 @@ void GameScene::Draw() {
 	const PlayerInfo& playerInfo = entityManager->GetPlayerSystem().GetPlayerInfo(0);
 
 	hud->UpdateInfo(playerInfo);
-	
+
 	Platform::DrawOnScreen(ScreenId::Top);
 
-	entityManager->DrawEntites(camera);
+	entityManager->Draw(camera);
 
 	hud->UpperScreenGUI();
 

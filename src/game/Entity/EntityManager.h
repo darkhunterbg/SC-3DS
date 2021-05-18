@@ -38,7 +38,7 @@ private:
 	PlayerSystem playerSystem;
 	MapSystem mapSystem;
 
-	bool updated = false;
+	bool ready = false;
 
 	EntityChangedData changedData;
 
@@ -117,6 +117,15 @@ private:
 	void CollectEntityChanges();
 	void ApplyEntityChanges();
 	void UpdateChildrenPosition();
+	void Update0();
+	void Update1();
+	void Update2();
+	void Draw0(const Camera& camera);
+	void Draw1(const Camera& camera);
+	void Draw2(const Camera& camera);
+
+	unsigned long long frameCounter = 0;
+	int8_t updateId = 0;
 public:
 	bool DrawColliders = false;
 
@@ -146,9 +155,9 @@ public:
 	}
 	void ClearEntities();
 
-	void UpdateEntities();
-	void UpdateSecondaryEntities();
-	void DrawEntites(const Camera& camera);
+	void Update();
+
+	void Draw(const Camera& camera);
 
 	void GoTo(EntityId e, Vector2Int16 pos);
 

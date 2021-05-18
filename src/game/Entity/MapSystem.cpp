@@ -2,9 +2,9 @@
 #include "EntityManager.h"
 #include "../Game.h"
 #include "../Platform.h"
+#include "../Profiler.h"
 
 static Sprite tile;
-
 
 
 enum class EdgeType : uint8_t {
@@ -23,7 +23,6 @@ enum class EdgeType : uint8_t {
 	Down1 = 0b1000,
 	Down3 = 0b1101,
 	DownLeft2 = 0b1001,
-
 };
 
 void MapSystem::SetSize(Vector2Int16 size)
@@ -37,6 +36,8 @@ void MapSystem::SetSize(Vector2Int16 size)
 
 void MapSystem::UpdateMap(EntityManager& em)
 {
+	SectionProfiler p("UpdateMap");
+
 	minimapData.clear();
 
 	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {
@@ -44,6 +45,8 @@ void MapSystem::UpdateMap(EntityManager& em)
 		{
 			auto collider = em.CollisionArchetype.ColliderComponents.GetComponent(id).collider;
 			collider.position += em.PositionComponents.GetComponent(id);
+			collider.position /= 32;
+			collider.size /= 32;
 			minimapData.dst.push_back(collider);
 		}
 	}
@@ -53,6 +56,8 @@ void MapSystem::UpdateMap(EntityManager& em)
 
 void MapSystem::DrawMap(const Camera& camera)
 {
+	SectionProfiler p("DrawMap");
+
 	Rectangle16 camRect = camera.GetRectangle16();
 
 	short tileSize = 32 * 6;
@@ -73,12 +78,11 @@ void MapSystem::DrawMap(const Camera& camera)
 }
 
 
-static Sprite fowSprite;
-
 void MapSystem::DrawFogOfWar(const Camera& camera) {
 	if (!FogOfWarVisible || vision == nullptr)
 		return;
 
+	SectionProfiler p("DrawFogOfWar");
 
 	Vector2Int16 FogOfWarTextureSize = Vector2Int16(MinimapTextureSize, MinimapTextureSize);
 	FogOfWarTextureSize *= 4;
@@ -111,7 +115,7 @@ void MapSystem::DrawFogOfWar(const Camera& camera) {
 	Platform::DrawOnTexture(nullptr);
 	Platform::ChangeBlendingMode(BlendMode::Alpha);
 
-	Rectangle16 src =  { (camRect.position / 8), (camRect.size / 8) };
+	Rectangle16 src = { (camRect.position / 8), (camRect.size / 8) };
 	Sprite fowSprite = Platform::NewSprite(fogOfWarTexture, src);
 
 
@@ -140,11 +144,14 @@ void MapSystem::GenerateMiniampTerrainTexture() {
 	Platform::DrawOnTexture(nullptr);
 }
 
-void MapSystem::RenderMinimapVision() {
+void MapSystem::RenderMinimapFogOfWar() {
 
 	if (minimapFowTexture.textureId == nullptr) {
 		minimapFowTexture = Platform::NewTexture({ MinimapTextureSize,MinimapTextureSize });
 	}
+
+	SectionProfiler p("DrawMinimapFoW");
+
 
 	int mapSizeTiles = (int)mapSize.x / 32;
 	int multiplier = MinimapTextureSize / mapSizeTiles;
@@ -163,61 +170,57 @@ void MapSystem::RenderMinimapVision() {
 
 	for (short y = 0; y < mapSizeTiles; ++y) {
 		for (short x = 0; x < mapSizeTiles; ++x) {
-			if (vision->IsKnown({ x,y })) {
+			if (vision->IsVisible({ x,y })) {
+				Rectangle dst = { {x * multiplier, y * multiplier},{ multiplier, multiplier} };
+				Platform::DrawRectangle(dst, c);
+			}
+			else if (vision->IsKnown({ x,y })) {
 				Rectangle dst = { {x * multiplier, y * multiplier},{ multiplier, multiplier} };
 				Platform::DrawRectangle(dst, sc);
 			}
 		}
 	}
 
-	for (const Circle16& circle : vision->visible) {
-		Vector2Int16 min = circle.position - Vector2Int16(circle.size, circle.size);
-		Vector2Int16 max = circle.position + Vector2Int16(circle.size, circle.size);
-		for (short y = min.y; y < max.y; ++y) {
-			for (short x = min.x; x < max.x; ++x) {
-				// TODO: mapSizeTiles should be vector
-				if (x < 0 || y < 0 || x >= mapSizeTiles || y >= mapSizeTiles)
-					continue;
-
-				if (circle.Contains(Vector2Int16(x, y))) {
-					Rectangle dst = { {x * multiplier, y * multiplier},{ multiplier, multiplier} };
-					Platform::DrawRectangle(dst, c);
-				}
-			}
-		}
-	}
 
 	Platform::ChangeBlendingMode(BlendMode::Alpha);
 }
-void MapSystem::RenderMinimap() {
+
+void MapSystem::RedrawMinimap() {
+
+	SectionProfiler p("RedrawMinimap");
+
+	if (minimapTerrainTexture.textureId == nullptr) {
+		GenerateMiniampTerrainTexture();
+	}
+
 	if (minimapTexture.textureId == nullptr) {
 		minimapTexture = Platform::NewTexture({ MinimapTextureSize,MinimapTextureSize }, true);
 	}
 
+
 	int mapSizeTiles = (int)mapSize.x / 32;
 	int multiplier = MinimapTextureSize / mapSizeTiles;
 
-
-	RenderMinimapVision();
+	RenderMinimapFogOfWar();
 
 	Platform::DrawOnTexture(minimapTexture.textureId);
 	//Platform::ClearBuffer(Colors::Black);
 
 	Sprite fullMapSprite;
-	fullMapSprite.rect = { {0,0}, Vector2Int16(MinimapTextureSize,MinimapTextureSize) };
+	fullMapSprite.rect = { {0,0}, Vector2Int16(MinimapTextureSize) };
 	fullMapSprite.image = minimapTerrainTexture;
-	Platform::Draw(fullMapSprite, { {0,0}, {MinimapTextureSize,MinimapTextureSize} });
+	Platform::Draw(fullMapSprite, { {0,0}, Vector2Int(MinimapTextureSize) });
 
 	if (FogOfWarVisible) {
 		fullMapSprite.image = minimapFowTexture;
-		Platform::Draw(fullMapSprite, { {0,0}, {MinimapTextureSize,MinimapTextureSize} });
+		Platform::Draw(fullMapSprite, { {0,0}, Vector2Int(MinimapTextureSize) });
 	}
 
 	//Platform::DrawRectangle({ {16,4},{4,4} }, Colors::MapFriendly);
 	for (const Rectangle16& collider : minimapData.dst) {
 		Rectangle dst;
-		dst.position = (Vector2Int(collider.position) / 32) * multiplier;
-		dst.size = (Vector2Int(collider.size) / 16) * multiplier;
+		dst.position = (Vector2Int(collider.position)) * multiplier;
+		dst.size = (Vector2Int(collider.size) * 2) * multiplier;
 		if (dst.size.x < multiplier * 2)
 			dst.size.x = multiplier * 2;
 		if (dst.size.y < multiplier * 2)
@@ -232,11 +235,9 @@ void MapSystem::RenderMinimap() {
 
 void MapSystem::DrawMinimap(Rectangle dst)
 {
-	if (minimapTerrainTexture.textureId == nullptr) {
-		GenerateMiniampTerrainTexture();
+	if (minimapTexture.textureId == nullptr) {
+		return;
 	}
-
-	RenderMinimap();
 
 	Sprite minimapSprite;
 	minimapSprite.rect = { {0,0}, Vector2Int16(MinimapTextureSize,MinimapTextureSize) };

@@ -70,7 +70,7 @@ int main()
 		u32 kDown = hidKeysDown();
 		if (kDown & KEY_START)
 			break;
-		
+
 		for (auto channel : audioChannels) {
 			if (!channel->enabled)
 				continue;
@@ -93,7 +93,7 @@ int main()
 		C2D_TargetClear(top, color);
 		C2D_TargetClear(bottom, color);
 		Game::Draw();
-	
+
 		C3D_FrameEnd(0);
 	}
 
@@ -118,9 +118,8 @@ void Init() {
 	//	FatalError("svcReleaseSemaphore failed with %s", R_SUMMARY(r));
 
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
-	C2D_Init(C2D_DEFAULT_MAX_OBJECTS*4);
+	C2D_Init(C2D_DEFAULT_MAX_OBJECTS * 8);
 	C2D_Prepare();
-
 	screens[0] = top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
 	screens[1] = bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
 

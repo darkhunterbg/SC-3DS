@@ -1,6 +1,8 @@
 #include "PlayerSystem.h"
 #include "EntityManager.h"
-
+#include "../Profiler.h"
+#include "../MathLib.h"
+#include <algorithm>
 
 void PlayerSystem::SetSize(Vector2Int16 size)
 {
@@ -46,10 +48,14 @@ void PlayerSystem::AddGas(PlayerId i, int gas)
 		player.gas = 0;
 }
 
+static bool CircleSort(const  Circle16& a, Circle16& b) {
+	return a.position.LengthSquaredInt() < b.position.LengthSquaredInt();
+}
+
 void PlayerSystem::UpdatePlayerUnits(const EntityManager& em) {
 
 	for (PlayerVision& vision : playerVision) {
-		vision.clear();
+		vision.ClearVisible();
 	}
 
 	for (EntityId id : em.UnitArchetype.Archetype.NewEntities()) {
@@ -66,6 +72,9 @@ void PlayerSystem::UpdatePlayerUnits(const EntityManager& em) {
 		players[owner].currentSupplyDoubled -= data.supplyUsage;
 		players[owner].maxSupplyDoubled -= data.supplyProvides;
 	}
+
+	SectionProfiler p("PlayerCollectVision");
+
 	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {
 		// TODO: store in components to avoid constant calculations
 		PlayerId owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
@@ -73,27 +82,70 @@ void PlayerSystem::UpdatePlayerUnits(const EntityManager& em) {
 		Vector2Int16 position = em.PositionComponents.GetComponent(id);
 		position.x = position.x >> (5);
 		position.y = position.y >> (5);
+
 		playerVision[owner].visible.push_back({ position, data.visiion });
-
-
 	}
+	p.Submit();
+
+	SectionProfiler p2("PlayerGenerateVision");
 
 	for (PlayerVision& vision : playerVision) {
-		for (const Circle16& circle : vision.visible) {
-			Vector2Int16 min = circle.position - Vector2Int16(circle.size, circle.size);
-			Vector2Int16 max = circle.position + Vector2Int16(circle.size, circle.size);
-			for (short y = min.y; y < max.y; ++y) {
-				for (short x = min.x; x < max.x; ++x) {
-					// TODO: mapSizeTiles should be vector
-					if (x < 0 || y < 0 || x >= vision.gridSize.x || y >= vision.gridSize.y)
-						continue;
+		UpdatePlayerVision(vision);
 
-					if (circle.Contains(Vector2Int16(x, y))) {
-						vision.SetKnown(Vector2Int16(x, y), true);
-					}
-				}
-			}
+	}
+}
+
+static std::vector<Vector2Int16> circleCoord;
+
+static void InitCircle(int radius) {
+	if (circleCoord.size() > 0)
+		return;
+
+	for (int y = -radius; y <= radius; ++y) {
+		for (int x = -radius; x <= radius; ++x) {
+			circleCoord.push_back(Vector2Int16(x, y));
 		}
 	}
 }
 
+void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
+	
+	//std::sort(vision.visible.begin(), vision.visible.end(), CircleSort);
+
+	int max = vision.visibility.size();
+	int i = 0;
+	for (const Circle16& circle : vision.visible) {
+
+
+		Vector2Int16 min = circle.position - Vector2Int16(circle.size);
+		Vector2Int16 max = circle.position + Vector2Int16(circle.size);
+
+		min.x = std::max((short)0, min.x);
+		min.y = std::max((short)0, min.y);
+		max.x = std::min((short)(gridSize.x - 1), max.x);
+		max.y = std::min((short)(gridSize.y - 1), max.y);
+
+		// Circle can be mirrored, walk 4 times Pi/2 points only
+
+		int size = circle.size * circle.size;
+
+		for (short y = min.y; y < max.y; ++y) {
+			for (short x = min.x; x < max.x; ++x) {
+
+				Vector2Int16 p = Vector2Int16(x, y);
+				int i = vision.GetIndex(p);
+				int j = p.x % 32;
+				Vector2Int16 r = p - circle.position;
+
+				if (vision.visibility[i].test(j))
+					continue;
+
+				if (r.LengthSquaredInt() < size) {
+					vision.visibility[i].set(j);
+					vision.knoweldge[i].set(j);
+				}
+			}
+		}
+	}
+
+}

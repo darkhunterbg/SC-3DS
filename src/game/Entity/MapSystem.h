@@ -31,8 +31,7 @@ private:
 	const PlayerVision* vision = nullptr;
 
 	void GenerateMiniampTerrainTexture();
-	void RenderMinimap();
-	void RenderMinimapVision();
+	void RenderMinimapFogOfWar();
 public:
 	bool FogOfWarVisible = true;
 
@@ -45,4 +44,6 @@ public:
 	void DrawFogOfWar(const Camera& camera);
 
 	void DrawMinimap(Rectangle dst);
+
+	void RedrawMinimap();
 };

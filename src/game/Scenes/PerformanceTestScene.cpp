@@ -46,9 +46,6 @@ void PerformanceTestScene::Start() {
 static int t = 0;
 static int c = 0;
 
-static unsigned frameCounter = 2;
-static unsigned frameCounter2 = 0;
-
 
 static std::vector<EntityId> v;
 
@@ -68,26 +65,12 @@ void PerformanceTestScene::Update() {
 		entityManager.ClearEntitiesArchetypes(v);
 	}
 	entityManager.ClearEntities();
-	frameCounter += 2;
-	frameCounter2 += 2;
-
-
-	while (frameCounter2 >= 5)
-	{
-		frameCounter2 -= 5;
-		entityManager.UpdateSecondaryEntities();
-	}
-
-	while (frameCounter >= 5)
-	{
-		frameCounter -= 5;
-		entityManager.UpdateEntities();
-	}
+	entityManager.Update();
 }
 
 
 
 void PerformanceTestScene::Draw() {
 	Platform::DrawOnScreen(ScreenId::Top);
-	entityManager.DrawEntites(camera);
+	entityManager.Draw(camera);
 }

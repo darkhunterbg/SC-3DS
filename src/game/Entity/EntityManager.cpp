@@ -166,9 +166,12 @@ void EntityManager::UpdateChildrenPosition() {
 	}
 }
 
-void EntityManager::UpdateSecondaryEntities() {
+// Updates 12 per second (60 fps) 
+void EntityManager::Update0() {
 	mapSystem.UpdateMap(*this);
-
+}
+// Updates 24 per second (60 fps) 
+void EntityManager::Update1() {
 	timingSystem.UpdateTimers(*this);
 
 	timingSystem.ApplyTimerActions(*this);
@@ -185,10 +188,9 @@ void EntityManager::UpdateSecondaryEntities() {
 
 	renderSystem.UpdatePositions(*this, changedData);
 }
-
-void EntityManager::UpdateEntities() {
-
-	updated = true;
+// Update 24 per second (60 fps) 
+void EntityManager::Update2() {
+	ready = true;
 
 	playerSystem.UpdatePlayerUnits(*this);
 
@@ -205,22 +207,67 @@ void EntityManager::UpdateEntities() {
 	kinematicSystem.ApplyCollidersChange(*this);
 
 	ApplyEntityChanges();
+}
+
+// Draws 12 per second (60 fps) 
+void EntityManager::Draw0(const Camera& camera) {
+	mapSystem.RedrawMinimap();
+}
+// Draws 24 per second (60 fps) 
+void EntityManager::Draw1(const Camera& camera) {
+
+}
+// Draws 24 per second (60 fps) 
+void EntityManager::Draw2(const Camera& camera) {
+
 
 }
 
-void EntityManager::DrawEntites(const Camera& camera) {
+void EntityManager::Update() {
 
-	if (!updated)
-		return;
+	switch (updateId)
+	{
+	case 0:
+		Update0(); break;
+	case 1:
+		Update1();  break;
+	case 2:
+		Update2();  break;
+	default:
+		EXCEPTION("Invalid UpdateId %i", updateId);
+	}
 
-	mapSystem.DrawMap(camera);
+}
 
-	renderSystem.Draw(camera, *this);
+void EntityManager::Draw(const Camera& camera) {
 
-	if (DrawColliders)
-		kinematicSystem.DrawColliders(camera);
+	if (ready)
+	{
+		switch (updateId)
+		{
+		case 0:
+			Draw0(camera);  break;
+		case 1:
+			Draw1(camera);  break;
+		case 2:
+			Draw2(camera);  break;
+		default:
+			EXCEPTION("Invalid UpdateId %i", updateId);
+		}
 
-	mapSystem.DrawFogOfWar(camera);
+		mapSystem.DrawMap(camera);
+		renderSystem.Draw(camera, *this);
+		if (DrawColliders)
+			kinematicSystem.DrawColliders(camera);
+		mapSystem.DrawFogOfWar(camera);
+
+	}
+
+
+	frameCounter++;
+	updateId = (frameCounter % 5);
+	if (updateId > 0)
+		updateId = (updateId + 1) / 2;
 }
 
 void EntityManager::GoTo(EntityId e, Vector2Int16 pos) {

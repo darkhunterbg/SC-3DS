@@ -22,10 +22,4 @@ private:
 	GameHUD* hud;
 	Cursor* cursor;
 	EntityManager* entityManager;
-	unsigned logicalFrame = 0;
-	unsigned frameCounter = 2;
-	unsigned frameCounter2 = 0;
-
-	void LogicalUpdate();
-	void AuxilaryUpdate();
 };
