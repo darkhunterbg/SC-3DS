@@ -64,24 +64,37 @@ Font Platform::LoadFont(const char* path) {
 	return { font };
 }
 
-void Platform::ToggleAlphaOverride(bool blend) {
+void Platform::ChangeBlendingMode(BlendMode mode) {
 
 	C2D_Flush();
 
-	if (blend) {
-		C3D_AlphaBlend(
-			GPU_BLENDEQUATION::GPU_BLEND_ADD, GPU_BLENDEQUATION::GPU_BLEND_ADD,
-			GPU_BLENDFACTOR::GPU_SRC_ALPHA, GPU_BLENDFACTOR::GPU_ZERO,
-			GPU_BLENDFACTOR::GPU_SRC_ALPHA, GPU_BLENDFACTOR::GPU_ZERO);
-	}
-	else {
-		//C3D_AlphaTest(false, GPU_TESTFUNC::GPU_NEVER, 0);
+	switch (mode)
+	{
+	case BlendMode::Alpha:
 		C3D_AlphaBlend(
 			GPU_BLENDEQUATION::GPU_BLEND_ADD, GPU_BLENDEQUATION::GPU_BLEND_ADD,
 			GPU_BLENDFACTOR::GPU_SRC_ALPHA, GPU_BLENDFACTOR::GPU_ONE_MINUS_SRC_ALPHA,
 			GPU_BLENDFACTOR::GPU_SRC_ALPHA, GPU_BLENDFACTOR::GPU_ONE_MINUS_SRC_ALPHA);
+		break;
+	case BlendMode::AlphaOverride:
+		C3D_AlphaBlend(
+			GPU_BLENDEQUATION::GPU_BLEND_ADD, GPU_BLENDEQUATION::GPU_BLEND_ADD,
+			GPU_BLENDFACTOR::GPU_SRC_ALPHA, GPU_BLENDFACTOR::GPU_ZERO,
+			GPU_BLENDFACTOR::GPU_SRC_ALPHA, GPU_BLENDFACTOR::GPU_ZERO);
+		break;
+	case BlendMode::FullOverride:
+		C3D_AlphaBlend(
+			GPU_BLENDEQUATION::GPU_BLEND_ADD, GPU_BLENDEQUATION::GPU_BLEND_ADD,
+			GPU_BLENDFACTOR::GPU_ONE, GPU_BLENDFACTOR::GPU_ZERO,
+			GPU_BLENDFACTOR::GPU_ONE, GPU_BLENDFACTOR::GPU_ZERO);
+		break;
+	default:
+		break;
 	}
 }
+
+
+// Render without blending
 
 void Platform::DrawOnTexture(Texture texture) {
 
@@ -123,10 +136,10 @@ Sprite Platform::NewSprite(Image image, Rectangle16 src) {
 	auto* s2 = new Tex3DS_SubTexture();
 
 
-	s2->width = src.size.x;
-	s2->height = src.size.y;
-	s2->bottom = (float)src.position.y / (float)s->height;
-	s2->top = (float)(src.position.y + src.size.y) / (float)s->height;
+	s2->width = src.size.x ;
+	s2->height = src.size.y ;
+	s2->top = 1 - (float)src.position.y / (float)s->height;
+	s2->bottom = 1- (float)(src.position.y + src.size.y) / (float)s->height;
 	s2->left = (float)src.position.x / (float)s->width;
 	s2->right = (float)(src.position.x + src.size.x) / (float)s->width;
 
@@ -210,6 +223,8 @@ Image Platform::NewTexture(Vector2Int size, bool pixelFiltering) {
 	createdRenderTargets.push_back({ rt,tex });
 
 	if (!pixelFiltering)
+		C3D_TexSetFilter(tex, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR);
+	else
 		C3D_TexSetFilter(tex, GPU_TEXTURE_FILTER_PARAM::GPU_NEAREST, GPU_TEXTURE_FILTER_PARAM::GPU_NEAREST);
 
 	Tex3DS_SubTexture* st = new Tex3DS_SubTexture();

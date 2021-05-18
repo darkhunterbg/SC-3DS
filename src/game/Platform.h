@@ -35,6 +35,11 @@ enum class ScreenId
 	Bottom = 1,
 };
 
+enum class BlendMode {
+	Alpha = 0,
+	AlphaOverride = 1,
+	FullOverride = 2,
+};
 
 class Platform {
 
@@ -48,7 +53,7 @@ public:
 	static void DrawOnScreen(ScreenId screen);
 	static void DrawOnTexture(Texture texture);
 
-	static void ToggleAlphaOverride(bool blend);
+	static void ChangeBlendingMode(BlendMode mode);
 	//static void ToggleTestBlend();
 
 	static Sprite NewSprite(Image image, Rectangle16 src);

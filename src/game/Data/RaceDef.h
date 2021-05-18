@@ -2,7 +2,7 @@
 
 #include <cstdint>
 #include <string>
-#include <vector>>
+#include <vector>
 
 #include "GraphicsDef.h"
 #include "SoundDef.h"

@@ -87,6 +87,7 @@ struct Color32 {
 namespace Colors {
 	constexpr Color Black = { 0,0,0,1 };
 	constexpr Color White = { 1,1,1,1 };
+	constexpr Color Gray = { 0.5f,0.5f,0.5f,1 };
 
 	constexpr Color LightGreen = { 0.56f, 0.93f,0.56f,1.0f };
 	constexpr Color Orange{ 1.0f,0.5f,0.0f,1.0f };

@@ -21,9 +21,11 @@ private:
 
 	Vector2Int16 mapSize;
 	Image minimapTexture = { 0,0 };
-	Image minimapVisionTexture = { 0,0 };
+	Image minimapFowTexture = { 0,0 };
 	Image minimapTerrainTexture = { 0,0 };
 	Image fogOfWarTexture = { 0,0 };
+
+	short MinimapTextureSize = 0;
 
 	MinimapData minimapData;
 	const PlayerVision* vision = nullptr;
@@ -38,7 +40,7 @@ public:
 
 	void UpdateMap(EntityManager& em);
 
-	void DrawMap( const Camera& camera);
+	void DrawMap(const Camera& camera);
 
 	void DrawFogOfWar(const Camera& camera);
 

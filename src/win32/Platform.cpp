@@ -155,20 +155,31 @@ Sprite Platform::NewSprite(Image image, Rectangle16 src) {
 }
 
 
-void Platform::ToggleAlphaOverride(bool enabled) {
+void Platform::ChangeBlendingMode(BlendMode mode) {
 
-	if (enabled) {
+	switch (mode)
+	{
+	case BlendMode::Alpha:
+		blendMode = SDL_BlendMode::SDL_BLENDMODE_BLEND;
+		break;
+	case BlendMode::AlphaOverride:
+		blendMode = SDL_ComposeCustomBlendMode(
+			SDL_BlendFactor::SDL_BLENDFACTOR_SRC_ALPHA, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
+			SDL_BlendOperation::SDL_BLENDOPERATION_ADD,
+			SDL_BlendFactor::SDL_BLENDFACTOR_SRC_ALPHA, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
+			SDL_BlendOperation::SDL_BLENDOPERATION_ADD);
+		break;
+	case BlendMode::FullOverride:
 		blendMode = SDL_ComposeCustomBlendMode(
 			SDL_BlendFactor::SDL_BLENDFACTOR_ONE, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
 			SDL_BlendOperation::SDL_BLENDOPERATION_ADD,
 			SDL_BlendFactor::SDL_BLENDFACTOR_ONE, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
 			SDL_BlendOperation::SDL_BLENDOPERATION_ADD);
+		break;
+	default:
+		break;
 	}
-	else {
 
-		blendMode = SDL_BlendMode::SDL_BLENDMODE_BLEND;
-
-	}
 	int error = SDL_SetRenderDrawBlendMode(renderer, blendMode);
 	if (error) {
 		const char* error = SDL_GetError();
