@@ -109,7 +109,7 @@ static void InitCircle(int radius) {
 }
 
 void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
-	
+
 	//std::sort(vision.visible.begin(), vision.visible.end(), CircleSort);
 
 	int max = vision.visibility.size();
@@ -137,12 +137,13 @@ void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
 				int j = p.x % 32;
 				Vector2Int16 r = p - circle.position;
 
-				if (vision.visibility[i].test(j))
+				const auto& b = vision.visibility[i];
+				if (b & (1 << j))
 					continue;
 
 				if (r.LengthSquaredInt() < size) {
-					vision.visibility[i].set(j);
-					vision.knoweldge[i].set(j);
+					vision.visibility[i] |= (1 << j);
+					vision.knoweldge[i] |= (1 << j);
 				}
 			}
 		}

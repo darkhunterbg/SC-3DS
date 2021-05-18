@@ -14,7 +14,7 @@
 class EntityManager;
 
 struct PlayerVision {
-	typedef std::bitset<32> VisionCell;
+	typedef uint32_t VisionCell;
 
 	std::vector<Circle16> visible;
 	std::vector<VisionCell> knoweldge;
@@ -51,14 +51,14 @@ struct PlayerVision {
 		int i = (pos.x >> 5) + ((pos.y * (int)gridSize.x) >> 5);
 
 		const VisionCell& b = knoweldge[i];
-		return b.test((pos.x % 32));
+		return b & (1 << (pos.x % 32));// b.test((pos.x % 32));
 	}
 
 	inline void SetKnown(Vector2Int16 pos, bool known) {
 		int i = (pos.x >> 5) + ((pos.y * (int)gridSize.x) >> 5);
 
 		VisionCell& b = knoweldge[i];
-		b.set((pos.x % 32), known);
+		b |= (1 << (pos.x % 32));//b.set((pos.x % 32), known);
 	}
 
 	inline bool IsVisible(Vector2Int16 pos) const {
@@ -68,22 +68,22 @@ struct PlayerVision {
 		int i = (pos.x >> 5) + ((pos.y * (int)gridSize.x) >> 5);
 
 		const VisionCell& b = visibility[i];
-		return b.test((pos.x % 32));
+		return  b & (1 << (pos.x % 32)); //;b.test((pos.x % 32));
 	}
 
 	inline void SetVisible(Vector2Int16 pos, bool known) {
 		int i = (pos.x >> 5) + ((pos.y * (int)gridSize.x) >> 5);
 
 		VisionCell& b = visibility[i];
-		b.set((pos.x % 32), known);
+		b |= (1 << (pos.x % 32));// b.set((pos.x % 32), known);
 	}
-	inline void SetExplored(const Vector2Int16& pos) {
-		int i = (pos.x >> 5) + ((pos.y * (int)gridSize.x) >> 5);
-		int j = pos.x % 32;
+	//inline void SetExplored(const Vector2Int16& pos) {
+	//	int i = (pos.x >> 5) + ((pos.y * (int)gridSize.x) >> 5);
+	//	int j = pos.x % 32;
 
-		visibility[i].set(j);
-		knoweldge[i].set(j);
-	}
+	//	visibility[i].set(j);
+	//	knoweldge[i].set(j);
+	//}
 };
 
 struct PlayerInfo {

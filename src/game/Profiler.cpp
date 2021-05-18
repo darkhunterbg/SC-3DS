@@ -96,13 +96,20 @@ void Profiler::FrameStart() {
 void Profiler::FrameEnd() {
 	auto now = Platform::ElaspedTime();
 	double thisFrameTime = (now - frameStartTime) * 1000;
-	frameTime = std::roundf((frameTime * 0.9 + thisFrameTime * 0.1) * 10.0) / 10.0;
+
+	if (thisFrameTime > 1000)
+		return;
+
+	frameTime =  std::roundf((frameTime * 0.9 + thisFrameTime * 0.1) * 10.0) / 10.0;
 	frameLoad.insert(frameLoad.begin(), thisFrameTime / 16.7);
+
 	if (frameLoad.size() >= 60)
 		frameLoad.erase(frameLoad.end() - 1);
 
 }
 void Profiler::AddStat(const char* name, double timeMs) {
 	double r = profileData[name];
+	if (timeMs > 1000)
+		return;
 	profileData[name] = std::roundf((r * 0.9 + timeMs * 0.1) * 10.0) / 10.0;
 }
