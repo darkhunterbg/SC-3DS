@@ -195,7 +195,7 @@ void Platform::DrawRectangle(Rectangle rect, Color color) {
 	u32 c = C2D_Color32f(color.r, color.g, color.b, color.a);
 	C2D_DrawRectSolid(rect.position.x, rect.position.y, 0, rect.size.x, rect.size.y, c);
 }
-Image Platform::NewTexture(Vector2Int size) {
+Image Platform::NewTexture(Vector2Int size, bool pixelFiltering) {
 	C3D_Tex* tex = new C3D_Tex();
 	if (!C3D_TexInitVRAM(tex, size.x, size.y, GPU_TEXCOLOR::GPU_RGBA8))
 		EXCEPTION("Failed to create texture with size %ix%i!", size.x, size.y);
@@ -209,6 +209,8 @@ Image Platform::NewTexture(Vector2Int size) {
 	C3D_RenderTargetClear(rt, C3D_ClearBits::C3D_CLEAR_COLOR, C2D_Color32(0, 0, 0, 255), 0);
 	createdRenderTargets.push_back({ rt,tex });
 
+	if (!pixelFiltering)
+		C3D_TexSetFilter(tex, GPU_TEXTURE_FILTER_PARAM::GPU_NEAREST, GPU_TEXTURE_FILTER_PARAM::GPU_NEAREST);
 
 	Tex3DS_SubTexture* st = new Tex3DS_SubTexture();
 	st->width = size.x;

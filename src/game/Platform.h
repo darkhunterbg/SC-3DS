@@ -58,7 +58,7 @@ public:
 	static void DrawText(const Font& font, Vector2Int position, const char* text, Color color, float scale = 1.0f);
 	static void DrawLine(Vector2Int src, Vector2Int dst, Color color);
 	static void DrawRectangle(Rectangle rect, Color color);
-	static Image NewTexture(Vector2Int size);
+	static Image NewTexture(Vector2Int size, bool pixelFiltering = false);
 	static FILE* OpenAsset(const char* path);
 
 	static double ElaspedTime();

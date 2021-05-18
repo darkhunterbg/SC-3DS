@@ -339,7 +339,7 @@ struct Circle16 {
 	short size;
 
 	inline bool Contains(const Vector2Int16& v) const {
-		return (position - v).LengthSquaredInt() <= size * size;
+		return (position - v).LengthSquaredInt() < (size*size);
 	}
 };
 

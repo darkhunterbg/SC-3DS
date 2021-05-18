@@ -4,9 +4,9 @@
 #include "../Platform.h"
 
 static Sprite tile;
-//static Sprite grad0h, grad0v, grad1, circle;
+static Sprite circle;
 
-static constexpr const int MinimapTextureSize = 256;
+static  short MinimapTextureSize = 256;
 
 enum class EdgeType : uint8_t {
 	None = 0b0000,
@@ -31,8 +31,10 @@ void MapSystem::SetSize(Vector2Int16 size)
 {
 	mapSize = size;
 
+	MinimapTextureSize = size.x / 32;
+
 	tile = Game::AssetLoader.LoadAtlas("tileset_tile.t3x")->GetSprite(0);
-	//circle = Game::AssetLoader.LoadAtlas("other.t3x")->GetSprite(0);
+	circle = Game::AssetLoader.LoadAtlas("other.t3x")->GetSprite(0);
 }
 
 void MapSystem::UpdateMap(EntityManager& em)
@@ -79,20 +81,24 @@ void MapSystem::DrawFogOfWar(const Camera& camera) {
 	if (!FogOfWarVisible || vision == nullptr)
 		return;
 
-	int div = 1;
 
-	Vector2Int16 FogOfWarTextureSize = { 512,256 };
-	FogOfWarTextureSize /= div;
+	Vector2Int16 FogOfWarTextureSize = Vector2Int16(MinimapTextureSize, MinimapTextureSize);
+	FogOfWarTextureSize *= 4;
+
+	static Sprite fowDownscaleSprite;
 
 	if (fogOfWarTexture.textureId == nullptr) {
 		fogOfWarTexture = Platform::NewTexture(Vector2Int(FogOfWarTextureSize));
-		fowSprite = Platform::NewSprite(fogOfWarTexture, { {0,0}, {400,240} });
+		fowSprite = Platform::NewSprite(fogOfWarTexture, { {0,0}, FogOfWarTextureSize });
+
+		auto t = Platform::NewTexture(Vector2Int(MinimapTextureSize / 2));
+		fowDownscaleSprite = Platform::NewSprite(t, { {0,0},Vector2Int16( MinimapTextureSize / 2 )});
 	}
 
 	Platform::DrawOnTexture(fogOfWarTexture.textureId);
 	Platform::ClearBuffer(Colors::Black);
 
-	Platform::ToggleAlphaOverride(true);
+	//Platform::ToggleAlphaOverride(true);
 	//Platform::ToggleTestBlend();
 
 	Rectangle16 camRect = camera.GetRectangle16();
@@ -101,7 +107,7 @@ void MapSystem::DrawFogOfWar(const Camera& camera) {
 	Vector2Int16 end = (camRect.GetMax() / 32) + Vector2Int16{ 1, 1 };
 	const PlayerVision& v = *vision;
 
-
+	/*
 	for (short y = start.y; y < end.y; ++y) {
 		for (short x = start.x; x < end.x; ++x) {
 
@@ -128,25 +134,11 @@ void MapSystem::DrawFogOfWar(const Camera& camera) {
 
 			EdgeType type = (EdgeType)edge.to_ulong();
 
-			if (visible ||  type==EdgeType::None) {
-				/*	int p = 0;
-					p += !v.IsKnown(t + Vector2Int16(-1, -1));
-					p += !v.IsKnown(t + Vector2Int16(1, -1));
-					p += !v.IsKnown(t + Vector2Int16(-1, 0));
-					p += !v.IsKnown(t + Vector2Int16(1, 0));
+			if (  type!=EdgeType::None ) {
 
-					p += !v.IsKnown(t + Vector2Int16(-1, 1));
-					p += !v.IsKnown(t + Vector2Int16(1, 1));
-					p += !v.IsKnown(t + Vector2Int16(0, -1));
-					p += !v.IsKnown(t + Vector2Int16(0, 1));*/
 
 				Color c = Colors::Transparent;
 				c.a = a;
-
-				/*if (v.IsKnown(t))
-					c.a = 0.5f;*/
-
-
 
 				Rectangle dst = { {x * 32,y * 32}, {32, 32} };
 				dst.position -= Vector2Int(camRect.position);
@@ -158,43 +150,70 @@ void MapSystem::DrawFogOfWar(const Camera& camera) {
 				//if(p==0)
 				Platform::DrawRectangle(dst, c);
 
-				//if (p >0) {
-				//	//c = Colors::White;
-				//	Vector2Int cntr = dst.GetCenter();
-				//	//dst.position += dst.size / 2;
-				//	dst.size *= 2;
-				//	dst.SetCenter(cntr);
+				//if (type != EdgeType::None) {
+
+				//}
+
+				////if (p >0) {
+				////	//c = Colors::White;
+				////	Vector2Int cntr = dst.GetCenter();
+				////	//dst.position += dst.size / 2;
+				////	dst.size *= 2;
+				////	dst.SetCenter(cntr);
 
 				//	Platform::Draw(circle, dst, c);
 
 
 
-				//}
+				////}
 
 			}
 		}
 	}
-
-
-
 	Platform::ToggleAlphaOverride(false);
 
+	*/
+
+
+
+	//Platform::DrawOnTexture(fowSprite.image.textureId);
+	//Platform::ClearBuffer(Colors::Black);
+
+	//Rectangle16 src = { (camRect.position / 32), (camRect.size / 32) };
+
+	Platform::DrawOnTexture(fowDownscaleSprite.image.textureId);
+	Platform::ClearBuffer(Colors::Transparent);
+
+	Platform::Draw({ {{0,0},{MinimapTextureSize, MinimapTextureSize}}, minimapVisionTexture },
+		{ {0,0},{fowDownscaleSprite.rect.size.x,fowDownscaleSprite.rect.size.y} });
+
+	Platform::DrawOnTexture(fogOfWarTexture.textureId);
+	Platform::ClearBuffer(Colors::Transparent);
+
+	Platform::Draw( fowDownscaleSprite,
+		{ {0,0},{FogOfWarTextureSize.x,FogOfWarTextureSize.y} });
 
 	Platform::DrawOnTexture(nullptr);
 
+	int downScale = FogOfWarTextureSize.x / 8;
 
-	//fowSprite.image = fogOfWarTexture;
-	//fowSprite.rect = { {0,0}, {400,240} };
+	Rectangle16 src = { (camRect.position / 8), (camRect.size / 8) };
 
-	Platform::Draw(fowSprite, { {0,0},{400,240} });
+	Platform::Draw({ src, fogOfWarTexture.textureId }, { {0,0},{400,240} });
 
-	//Rectangle16 src = { (camRect.position / 8), (camRect.size / 8) };
+	//Vector2Int offset = { 0,0 };
+	//offset.x -= 16;
+	//offset.y -= 16;
+	//Platform::Draw({ src, fogOfWarTexture.textureId }, { offset,{400,240} });
+	//offset.x += 32;
+	//Platform::Draw({ src, fogOfWarTexture.textureId }, { offset,{400,240} });
 
-	//static Sprite s = Platform::NewSprite(minimapVisionTexture, src);
-	//s.image = minimapVisionTexture;
-	//s.rect = src;
+	//offset.y += 32;
+	//Platform::Draw({ src, fogOfWarTexture.textureId }, { offset,{400,240} });
 
-	//Platform::Draw(s, { {0,0},{400,240} });
+	//offset.x -= 32;
+
+	//Platform::Draw({ src, fogOfWarTexture.textureId }, { offset,{400,240} });
 
 }
 
@@ -271,7 +290,7 @@ void MapSystem::RenderMinimapVision() {
 }
 void MapSystem::RenderMinimap() {
 	if (minimapTexture.textureId == nullptr) {
-		minimapTexture = Platform::NewTexture({ MinimapTextureSize,MinimapTextureSize });
+		minimapTexture = Platform::NewTexture({ MinimapTextureSize,MinimapTextureSize }, true);
 	}
 
 	int mapSizeTiles = (int)mapSize.x / 32;
@@ -284,7 +303,7 @@ void MapSystem::RenderMinimap() {
 	//Platform::ClearBuffer(Colors::Black);
 
 	Sprite fullMapSprite;
-	fullMapSprite.rect = { {0,0},{MinimapTextureSize,MinimapTextureSize} };
+	fullMapSprite.rect = { {0,0}, Vector2Int16(MinimapTextureSize,MinimapTextureSize) };
 	fullMapSprite.image = minimapTerrainTexture;
 	Platform::Draw(fullMapSprite, { {0,0}, {MinimapTextureSize,MinimapTextureSize} });
 
@@ -319,7 +338,7 @@ void MapSystem::DrawMinimap(Rectangle dst)
 	RenderMinimap();
 
 	Sprite minimapSprite;
-	minimapSprite.rect = { {0,0},{MinimapTextureSize,MinimapTextureSize} };
+	minimapSprite.rect = { {0,0}, Vector2Int16(MinimapTextureSize,MinimapTextureSize) };
 	minimapSprite.image = minimapTexture;
 
 	Platform::Draw(minimapSprite, dst);

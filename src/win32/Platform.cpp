@@ -135,8 +135,19 @@ void Platform::DrawOnTexture(Texture texture) {
 		SDL_SetRenderTarget(renderer, target);
 
 }
-Image Platform::NewTexture(Vector2Int size) {
-	SDL_Texture* tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
+Image Platform::NewTexture(Vector2Int size, bool pixelFiltering) {
+	SDL_Texture* tex = nullptr;
+
+	if (pixelFiltering) {
+		std::string scale = SDL_GetHint(SDL_HINT_RENDER_SCALE_QUALITY);
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+		tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, scale.data());
+	}
+	else
+	{
+		tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
+	}
 	return { tex, 0 };
 }
 Sprite Platform::NewSprite(Image image, Rectangle16 src) {
@@ -247,7 +258,8 @@ void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip
 
 	SDL_RenderCopyEx(renderer, cmd.texture, &cmd.src, &cmd.dst, 0, nullptr, cmd.flip);
 
-
+	Uint32 f; int w; int h; int a;
+	SDL_QueryTexture(cmd.texture, &f, &a, &w, &h);
 }
 void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color, float scale) {
 	SDLDrawCommand cmd;
