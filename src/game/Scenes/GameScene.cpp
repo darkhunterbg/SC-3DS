@@ -21,7 +21,7 @@ GameScene::~GameScene() {
 }
 
 void GameScene::Start() {
-	Vector2Int16 size = { 64 * 32,64 * 32 };
+	Vector2Int16 size = { 256 * 32,256 * 32 };
 
 	auto& race = RaceDatabase::Terran;
 	race.LoadResourses();
@@ -50,23 +50,22 @@ void GameScene::Start() {
 
 	entityManager->Init(size);
 
-	entityManager->GetPlayerSystem().AddPlayer(race, Colors::SCBlue);
-	entityManager->GetPlayerSystem().AddPlayer(race, Colors::SCRed);
-	entityManager->GetPlayerSystem().AddPlayer(race, Colors::SCLightGreen);
-	entityManager->GetPlayerSystem().AddPlayer(race, Colors::SCPurle);
-
 	Color color[] = { Colors::SCRed, Colors::SCBlue, Colors::SCLightGreen, Colors::SCPurle,
 	 Colors::SCOrange, Colors::SCGreen, Colors::SCBrown, Colors::SCLightYellow, Colors::SCWhite,
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
-	int totalPlayers = 4;
+	int totalPlayers = 8;
+
+	for (int p = 0; p < totalPlayers; ++p) {
+		entityManager->GetPlayerSystem().AddPlayer(race, color[p]);
+	}
 
 	int i = 0;
-	for (int y = 40; y >= 0; --y) {
-		for (int x = 40; x >= 0; --x) {
+	for (int y = 10; y > 0; --y) {
+		for (int x = 10; x > 0; --x) {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[(i) % UnitDatabase::Units.size()];
-			EntityId e = UnitEntityUtil::NewUnit(def, i % 4,
+			EntityId e = UnitEntityUtil::NewUnit(def, i % totalPlayers,
 				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 + 16 }));
 
 			//entityManager->UnitArchetype.OrientationComponents.GetComponent(e) = 12;

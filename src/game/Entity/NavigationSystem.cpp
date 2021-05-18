@@ -77,7 +77,7 @@ static inline int EvaluateNavGrid(uint8_t d, Vector2Int16 pos, Vector2Int16 trg)
 void NavigationSystem::SetSize(Vector2Int16 size)
 {
 	gridSize = size / 32;
-	memset(navGrid.data(), 0, gridSize.x * gridSize.y);
+	//memset(navGrid.data(), 0, gridSize.x * gridSize.y);
 }
 
 void NavigationSystem::UpdateNavigationJob(int start, int end) {

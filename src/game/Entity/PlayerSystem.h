@@ -13,31 +13,29 @@
 
 class EntityManager;
 
+
+
 struct PlayerVision {
+	// Once VisionCell holds 32 cells bits.
+	// Set bit means visiblity is ON.
 	typedef uint32_t VisionCell;
 
-	std::vector<Circle16> visible;
-	std::vector<VisionCell> knoweldge;
-	std::vector<VisionCell> visibility;
 	Vector2Int16 gridSize;
 
+	std::vector<Circle16> ranges;
+	std::vector<VisionCell> knoweldge;
+	std::vector<VisionCell> visibility;
+	std::vector<uint8_t> visibilityCountdown;
+	//std::vector<uint16_t> visibilityTimers;
+
+
+
 	inline void ClearVisible() {
-		visible.clear();
+		ranges.clear();
 		memset(visibility.data(), 0, sizeof(VisionCell) * visibility.size());
 	}
 
-	inline void SetGridSize(Vector2Int16 size) {
-		gridSize = size;
-		int s = (size.x >> 5) * (size.y);
-		knoweldge.clear();
-		knoweldge.reserve(s);
-		visibility.clear();
-		visibility.reserve(s);
-		for (int i = 0; i < s; ++i) {
-			knoweldge.push_back({ 0 });
-			visibility.push_back({ 0 });
-		}
-	}
+	void SetGridSize(Vector2Int16 size);
 
 	inline int GetIndex(Vector2Int16 pos) const {
 		return (pos.x >> 5) + ((pos.y * (int)gridSize.x) >> 5);
@@ -51,14 +49,14 @@ struct PlayerVision {
 		int i = (pos.x >> 5) + ((pos.y * (int)gridSize.x) >> 5);
 
 		const VisionCell& b = knoweldge[i];
-		return b & (1 << (pos.x % 32));// b.test((pos.x % 32));
+		return b & (1 << (pos.x % 32));
 	}
 
 	inline void SetKnown(Vector2Int16 pos, bool known) {
 		int i = (pos.x >> 5) + ((pos.y * (int)gridSize.x) >> 5);
 
 		VisionCell& b = knoweldge[i];
-		b |= (1 << (pos.x % 32));//b.set((pos.x % 32), known);
+		b |= (1 << (pos.x % 32));
 	}
 
 	inline bool IsVisible(Vector2Int16 pos) const {
@@ -68,22 +66,23 @@ struct PlayerVision {
 		int i = (pos.x >> 5) + ((pos.y * (int)gridSize.x) >> 5);
 
 		const VisionCell& b = visibility[i];
-		return  b & (1 << (pos.x % 32)); //;b.test((pos.x % 32));
+		return  b & (1 << (pos.x % 32)); 
 	}
 
 	inline void SetVisible(Vector2Int16 pos, bool known) {
 		int i = (pos.x >> 5) + ((pos.y * (int)gridSize.x) >> 5);
 
 		VisionCell& b = visibility[i];
-		b |= (1 << (pos.x % 32));// b.set((pos.x % 32), known);
+		b |= (1 << (pos.x % 32));
 	}
-	//inline void SetExplored(const Vector2Int16& pos) {
-	//	int i = (pos.x >> 5) + ((pos.y * (int)gridSize.x) >> 5);
-	//	int j = pos.x % 32;
+	inline void SetExplored(const Vector2Int16& pos) {
+		int i = (pos.x >> 5) + ((pos.y * (int)gridSize.x) >> 5);
+		int j = pos.x % 32;
+		int k = 1 << j;
 
-	//	visibility[i].set(j);
-	//	knoweldge[i].set(j);
-	//}
+		visibility[i] |= k;
+		knoweldge[i] |= k;
+	}
 };
 
 struct PlayerInfo {
@@ -114,7 +113,7 @@ struct PlayerInfo {
 class PlayerSystem {
 private:
 	std::vector<PlayerInfo> players;
-	std::vector<PlayerVision> playerVision;
+	std::vector<PlayerVision*> playerVision;
 
 	friend class EntityManager;
 
@@ -133,4 +132,5 @@ public:
 	void AddGas(PlayerId player, int gas);
 
 	void UpdatePlayerUnits(const EntityManager& em);
+	void UpdateVision();
 };

@@ -168,6 +168,7 @@ void EntityManager::UpdateChildrenPosition() {
 
 // Updates 12 per second (60 fps) 
 void EntityManager::Update0() {
+	playerSystem.UpdateVision();
 	mapSystem.UpdateMap(*this);
 }
 // Updates 24 per second (60 fps) 
@@ -228,11 +229,14 @@ void EntityManager::Update() {
 	switch (updateId)
 	{
 	case 0:
-		Update0(); break;
+		Update0();
+		break;
 	case 1:
-		Update1();  break;
+		Update1();
+		break;
 	case 2:
-		Update2();  break;
+		Update2();
+		break;
 	default:
 		EXCEPTION("Invalid UpdateId %i", updateId);
 	}

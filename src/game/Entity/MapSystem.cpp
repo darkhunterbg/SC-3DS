@@ -56,7 +56,7 @@ void MapSystem::UpdateMap(EntityManager& em)
 
 void MapSystem::DrawMap(const Camera& camera)
 {
-	SectionProfiler p("DrawMap");
+	//SectionProfiler p("DrawMap");
 
 	Rectangle16 camRect = camera.GetRectangle16();
 
@@ -82,10 +82,12 @@ void MapSystem::DrawFogOfWar(const Camera& camera) {
 	if (!FogOfWarVisible || vision == nullptr)
 		return;
 
+	static constexpr const int Upscale = 4;
+
 	SectionProfiler p("DrawFogOfWar");
 
 	Vector2Int16 FogOfWarTextureSize = Vector2Int16(MinimapTextureSize, MinimapTextureSize);
-	FogOfWarTextureSize *= 4;
+	FogOfWarTextureSize *= Upscale;
 
 	static Sprite fowDownscaleSprite;
 	Platform::ChangeBlendingMode(BlendMode::FullOverride);
@@ -115,7 +117,8 @@ void MapSystem::DrawFogOfWar(const Camera& camera) {
 	Platform::DrawOnTexture(nullptr);
 	Platform::ChangeBlendingMode(BlendMode::Alpha);
 
-	Rectangle16 src = { (camRect.position / 8), (camRect.size / 8) };
+	static constexpr const int CamDownscale = 32 / Upscale;
+	Rectangle16 src = { (camRect.position / CamDownscale), (camRect.size / CamDownscale) };
 	Sprite fowSprite = Platform::NewSprite(fogOfWarTexture, src);
 
 
