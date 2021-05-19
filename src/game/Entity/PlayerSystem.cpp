@@ -32,6 +32,8 @@ void PlayerSystem::SetSize(Vector2Int16 size)
 {
 	gridSize.x = size.x / 32;
 	gridSize.y = size.y / 32;
+
+
 }
 
 PlayerId PlayerSystem::AddPlayer(const RaceDef& race, Color color)
@@ -104,9 +106,6 @@ void PlayerSystem::UpdatePlayerUnits(const EntityManager& em) {
 }
 static int playerUpdate = 0;
 
-
-static std::array<uint32_t, 128 * 128 / 32> buffer;
-
 bool PlayerSystem::UpdateNextPlayerVision(int players) {
 	SectionProfiler p("UpdatePlayerVision");
 
@@ -148,14 +147,12 @@ bool PlayerSystem::UpdateNextPlayerVision(int players) {
 
 
 void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
-	memset(buffer.data(), 0, buffer.size() * sizeof(uint32_t));
+	const int bitshift = std::log2(gridSize.x);
+	const Vector2Int16 gridSize = this->gridSize;
 
-	int max = vision.visibility.size();
-	int i = 0;
 	for (const Circle16& circle : vision.ranges) {
 		Vector2Int16 min = circle.position - Vector2Int16(circle.size);
 		Vector2Int16 max = circle.position + Vector2Int16(circle.size);
-
 
 		min.x = std::max((short)0, min.x);
 		min.y = std::max((short)0, min.y);
@@ -175,7 +172,7 @@ void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
 					Vector2Int16 r = circle.position - p;
 					if (r.LengthSquaredInt() < size) {
 
-						vision.visibilityCountdown[p.x + (p.y << 7)]
+						vision.visibilityCountdown[p.x + (p.y << bitshift)]
 							= TileVisibilityTimer;
 					}
 				}
@@ -188,18 +185,18 @@ void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
 					Vector2Int16 p = Vector2Int16(x, y);
 					Vector2Int16 r = circle.position - p;
 					if (r.LengthSquaredInt() < size) {
-						vision.visibilityCountdown[p.x + (p.y << 7)]
+						vision.visibilityCountdown[p.x + (p.y << bitshift)]
 							= TileVisibilityTimer;
 
 						p.x += r.x << 1;
-						vision.visibilityCountdown[p.x + (p.y << 7)]
+						vision.visibilityCountdown[p.x + (p.y << bitshift)]
 							= TileVisibilityTimer;
 
 						p.y += r.y << 1;
-						vision.visibilityCountdown[p.x + (p.y << 7)]
+						vision.visibilityCountdown[p.x + (p.y << bitshift)]
 							= TileVisibilityTimer;
 						p.x -= r.x << 1;
-						vision.visibilityCountdown[p.x + (p.y << 7)]
+						vision.visibilityCountdown[p.x + (p.y << bitshift)]
 							= TileVisibilityTimer;
 
 					}
@@ -208,10 +205,8 @@ void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
 			}
 
 			Vector2Int16 p = circle.position;
-			vision.visibilityCountdown[p.x + (p.y << 7)]
+			vision.visibilityCountdown[p.x + (p.y << bitshift)]
 				= TileVisibilityTimer;
 		}
-
 	}
-
 }

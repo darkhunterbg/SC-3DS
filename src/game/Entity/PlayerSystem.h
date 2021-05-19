@@ -118,6 +118,7 @@ private:
 	friend class EntityManager;
 
 	Vector2Int16 gridSize;
+	
 
 	void UpdatePlayerVision(PlayerVision& vision);
 public:
