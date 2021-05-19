@@ -226,7 +226,6 @@ void EntityManager::Draw1(const Camera& camera) {
 // Draws 24 per second (60 fps) 
 void EntityManager::Draw2(const Camera& camera) {
 
-
 }
 
 void EntityManager::Update() {

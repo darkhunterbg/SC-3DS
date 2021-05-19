@@ -32,14 +32,11 @@ void GameScene::Start() {
 	cursor = new Cursor();
 	cursor->Position = { 200,120 };
 
-
-
 	camera.Position = { 0,0 };
 	camera.Size = { 400,240 };
 	camera.Limits = { {0,0,}, size };
 
 	UnitDatabase::LoadAllUnitResources();
-
 
 	AudioStream* stream = race.GameMusic[std::rand() % race.GameMusic.size()].Stream;
 	Game::Audio.PlayStream(stream, 0);
@@ -66,7 +63,7 @@ void GameScene::Start() {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[(i) % UnitDatabase::Units.size()];
 			EntityId e = UnitEntityUtil::NewUnit(def, i % totalPlayers,
-				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 +16 }));
+				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 + 16 }));
 
 			//entityManager->UnitArchetype.OrientationComponents.GetComponent(e) = 12;
 			EntityUtil::PlayAnimation(e, def.Graphics->AttackAnimations[12]);

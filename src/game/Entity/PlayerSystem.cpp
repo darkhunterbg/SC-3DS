@@ -108,30 +108,26 @@ static int playerUpdate = 0;
 
 bool PlayerSystem::UpdateNextPlayerVision(int players) {
 	SectionProfiler p("UpdatePlayerVision");
+	const int bitshift = std::log2(gridSize.x);
+	const Vector2Int16 gridSize = this->gridSize;
 
 	int max = std::min((int)playerVision.size(), playerUpdate + players);
 	for (int i = playerUpdate; i < max; ++i) {
 		PlayerVision& vision = *playerVision[i];
 
-
 		UpdatePlayerVision(vision);
-
-
-	/*	SectionProfiler p2("UpdateVisionTimers");*/
-
 
 		int max = vision.visibilityCountdown.size();
 		for (int t = 0; t < max; ++t)
 		{
 			uint8_t& countdown = vision.visibilityCountdown[t];
-
+	
 			if (countdown > 0) {
 				--countdown;
-				Vector2Int16 p = Vector2Int16(t % gridSize.x, t / gridSize.x);
+				Vector2Int16 p = Vector2Int16(t % gridSize.x, t >> bitshift);
 				vision.SetExplored(p);
 			}
 		}
-
 
 		p.Submit();
 	}
@@ -158,7 +154,7 @@ void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
 		min.y = std::max((short)0, min.y);
 		max.x = std::min((short)(gridSize.x), max.x);
 		max.y = std::min((short)(gridSize.y), max.y);
-		
+
 		int size = circle.size * circle.size;
 
 		if (min != circle.position - Vector2Int16(circle.size) ||
@@ -168,7 +164,6 @@ void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
 				for (short x = min.x; x <= max.x; ++x) {
 
 					Vector2Int16 p = Vector2Int16(x, y);
-
 					Vector2Int16 r = circle.position - p;
 					if (r.LengthSquaredInt() < size) {
 
@@ -179,8 +174,8 @@ void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
 			}
 		}
 		else {
-			for (short y = min.y; y < circle.position.y; ++y) {
-				for (short x = min.x; x < circle.position.x; ++x) {
+			for (short y = min.y; y <= circle.position.y; ++y) {
+				for (short x = min.x; x <= circle.position.x; ++x) {
 
 					Vector2Int16 p = Vector2Int16(x, y);
 					Vector2Int16 r = circle.position - p;
@@ -200,13 +195,8 @@ void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
 							= TileVisibilityTimer;
 
 					}
-
 				}
 			}
-
-			Vector2Int16 p = circle.position;
-			vision.visibilityCountdown[p.x + (p.y << bitshift)]
-				= TileVisibilityTimer;
 		}
 	}
 }

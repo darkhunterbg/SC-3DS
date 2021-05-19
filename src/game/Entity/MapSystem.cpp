@@ -84,8 +84,6 @@ void MapSystem::DrawFogOfWar(const Camera& camera) {
 
 	static constexpr const int Upscale = 4;
 
-	SectionProfiler p("DrawFogOfWar");
-
 	Vector2Int16 FogOfWarTextureSize = Vector2Int16(MinimapTextureSize, MinimapTextureSize);
 	FogOfWarTextureSize *= Upscale;
 
@@ -155,7 +153,6 @@ void MapSystem::RenderMinimapFogOfWar() {
 
 	SectionProfiler p("DrawMinimapFoW");
 
-
 	int mapSizeTiles = (int)mapSize.x / 32;
 	int multiplier = MinimapTextureSize / mapSizeTiles;
 
@@ -170,7 +167,6 @@ void MapSystem::RenderMinimapFogOfWar() {
 	sc.a = 0.6f;
 	Platform::ChangeBlendingMode(BlendMode::FullOverride);
 
-
 	for (short y = 0; y < mapSizeTiles; ++y) {
 		for (short x = 0; x < mapSizeTiles; ++x) {
 			if (vision->IsVisible({ x,y })) {
@@ -184,13 +180,10 @@ void MapSystem::RenderMinimapFogOfWar() {
 		}
 	}
 
-
 	Platform::ChangeBlendingMode(BlendMode::Alpha);
 }
 
 void MapSystem::RedrawMinimap() {
-
-	SectionProfiler p("RedrawMinimap");
 
 	if (minimapTerrainTexture.textureId == nullptr) {
 		GenerateMiniampTerrainTexture();
@@ -200,11 +193,12 @@ void MapSystem::RedrawMinimap() {
 		minimapTexture = Platform::NewTexture({ MinimapTextureSize,MinimapTextureSize }, true);
 	}
 
-
 	int mapSizeTiles = (int)mapSize.x / 32;
 	int multiplier = MinimapTextureSize / mapSizeTiles;
 
 	RenderMinimapFogOfWar();
+
+	SectionProfiler p("DrawMinimapItems");
 
 	Platform::DrawOnTexture(minimapTexture.textureId);
 	//Platform::ClearBuffer(Colors::Black);
@@ -232,7 +226,6 @@ void MapSystem::RedrawMinimap() {
 		Platform::DrawRectangle(dst, Colors::MapFriendly);
 	}
 
-
 	Platform::DrawOnTexture(nullptr);
 }
 
@@ -247,5 +240,4 @@ void MapSystem::DrawMinimap(Rectangle dst)
 	minimapSprite.image = minimapTexture;
 
 	Platform::Draw(minimapSprite, dst);
-
 }
