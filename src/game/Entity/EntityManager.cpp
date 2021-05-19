@@ -136,6 +136,7 @@ void EntityManager::CollectEntityChanges() {
 		if (FlagComponents[i].test(ComponentFlags::PositionChanged)) {
 			changedData.entity.push_back(id);
 			changedData.position.push_back(PositionComponents[i]);
+			changedData.oldPosition.push_back(OldPositionComponents[i]);
 		}
 	}
 }
@@ -143,6 +144,7 @@ void EntityManager::ApplyEntityChanges() {
 	for (EntityId id : changedData.entity) {
 		int i = Entity::ToIndex(id);
 		FlagComponents[i].clear(ComponentFlags::PositionChanged);
+		OldPositionComponents[i] = PositionComponents[i];
 	}
 
 	for (auto archetype : archetypes)
@@ -168,7 +170,9 @@ void EntityManager::UpdateChildrenPosition() {
 
 // Updates 12 per second (60 fps) 
 void EntityManager::Update0() {
-	playerSystem.UpdateVision();
+
+	playerSystem.UpdateNextPlayerVision();
+		
 	mapSystem.UpdateMap(*this);
 }
 // Updates 24 per second (60 fps) 
@@ -193,7 +197,6 @@ void EntityManager::Update1() {
 void EntityManager::Update2() {
 	ready = true;
 
-	playerSystem.UpdatePlayerUnits(*this);
 
 	kinematicSystem.MoveEntities(*this);
 
@@ -203,9 +206,11 @@ void EntityManager::Update2() {
 
 	CollectEntityChanges();
 
+	playerSystem.UpdatePlayerUnits(*this);
 	renderSystem.UpdatePositions(*this, changedData);
 	kinematicSystem.UpdateCollidersPosition(*this, changedData);
 	kinematicSystem.ApplyCollidersChange(*this);
+
 
 	ApplyEntityChanges();
 }

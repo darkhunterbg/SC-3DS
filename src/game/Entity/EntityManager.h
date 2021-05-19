@@ -21,9 +21,11 @@
 struct EntityChangedData {
 	std::vector<EntityId> entity;
 	std::vector<Vector2Int16> position;
+	std::vector<Vector2Int16> oldPosition;
 
 	size_t size() const { return entity.size(); }
-	void clear() { entity.clear(); position.clear(); }
+	void clear() { entity.clear(); position.clear(); oldPosition.clear(); }
+
 };
 
 class EntityManager {
@@ -39,6 +41,7 @@ private:
 	MapSystem mapSystem;
 
 	bool ready = false;
+	bool doneUpdatingVision = false;
 
 	EntityChangedData changedData;
 
@@ -46,6 +49,7 @@ private:
 	std::vector<EntityId> scratch;
 public:
 
+	ComponentCollection<Vector2Int16> OldPositionComponents;
 	ComponentCollection<Vector2Int16> PositionComponents;
 	ComponentCollection<FlagsComponent> FlagComponents;
 
@@ -117,6 +121,7 @@ private:
 	void CollectEntityChanges();
 	void ApplyEntityChanges();
 	void UpdateChildrenPosition();
+
 	void Update0();
 	void Update1();
 	void Update2();

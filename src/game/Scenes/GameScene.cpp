@@ -21,7 +21,7 @@ GameScene::~GameScene() {
 }
 
 void GameScene::Start() {
-	Vector2Int16 size = { 256 * 32,256 * 32 };
+	Vector2Int16 size = { 128 * 32,128 * 32 };
 
 	auto& race = RaceDatabase::Terran;
 	race.LoadResourses();
@@ -61,12 +61,12 @@ void GameScene::Start() {
 	}
 
 	int i = 0;
-	for (int y = 10; y > 0; --y) {
-		for (int x = 10; x > 0; --x) {
+	for (int y = 40; y > 0; --y) {
+		for (int x = 40; x > 0; --x) {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[(i) % UnitDatabase::Units.size()];
 			EntityId e = UnitEntityUtil::NewUnit(def, i % totalPlayers,
-				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 + 16 }));
+				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 +16 }));
 
 			//entityManager->UnitArchetype.OrientationComponents.GetComponent(e) = 12;
 			EntityUtil::PlayAnimation(e, def.Graphics->AttackAnimations[12]);

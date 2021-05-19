@@ -102,36 +102,53 @@ void PlayerSystem::UpdatePlayerUnits(const EntityManager& em) {
 		playerVision[owner]->ranges.push_back({ position, data.visiion });
 	}
 }
+static int playerUpdate = 0;
 
-void PlayerSystem::UpdateVision() {
-	SectionProfiler p("UpdateVision");
 
-	for (PlayerVision* vision : playerVision) {
-		UpdatePlayerVision(*vision);
-	}
+static std::array<uint32_t, 128 * 128 / 32> buffer;
 
-	p.Submit();
+bool PlayerSystem::UpdateNextPlayerVision(int players) {
+	SectionProfiler p("UpdatePlayerVision");
 
-	SectionProfiler p2("UpdateVisionTimers");
+	int max = std::min((int)playerVision.size(), playerUpdate + players);
+	for (int i = playerUpdate; i < max; ++i) {
+		PlayerVision& vision = *playerVision[i];
 
-	for (PlayerVision* vision : playerVision) {
-		int max = vision->visibilityCountdown.size();
-		for (int i = 0; i < max; ++i)
+
+		UpdatePlayerVision(vision);
+
+
+	/*	SectionProfiler p2("UpdateVisionTimers");*/
+
+
+		int max = vision.visibilityCountdown.size();
+		for (int t = 0; t < max; ++t)
 		{
-			uint8_t& countdown = vision->visibilityCountdown[i];
+			uint8_t& countdown = vision.visibilityCountdown[t];
+
 			if (countdown > 0) {
 				--countdown;
-				Vector2Int16 p = Vector2Int16(i % gridSize.x, i / gridSize.x);
-				vision->SetExplored(p);
+				Vector2Int16 p = Vector2Int16(t % gridSize.x, t / gridSize.x);
+				vision.SetExplored(p);
 			}
 		}
+
+
+		p.Submit();
 	}
+
+
+	playerUpdate += players;
+	if (playerUpdate >= playerVision.size()) {
+		playerUpdate = 0;
+	}
+
+	return playerUpdate == 0;
 }
 
+
 void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
-
-
-	//std::sort(vision.visible.begin(), vision.visible.end(), CircleSort);
+	memset(buffer.data(), 0, buffer.size() * sizeof(uint32_t));
 
 	int max = vision.visibility.size();
 	int i = 0;
@@ -139,42 +156,62 @@ void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
 		Vector2Int16 min = circle.position - Vector2Int16(circle.size);
 		Vector2Int16 max = circle.position + Vector2Int16(circle.size);
 
+
 		min.x = std::max((short)0, min.x);
 		min.y = std::max((short)0, min.y);
 		max.x = std::min((short)(gridSize.x), max.x);
 		max.y = std::min((short)(gridSize.y), max.y);
-
-		// Circle can be mirrored, walk 4 times Pi/2 points only
-
+		
 		int size = circle.size * circle.size;
 
-		for (short y = min.y; y < max.y; ++y) {
-			for (short x = min.x; x < max.x; ++x) {
+		if (min != circle.position - Vector2Int16(circle.size) ||
+			max != circle.position + Vector2Int16(circle.size))
+		{
+			for (short y = min.y; y <= max.y; ++y) {
+				for (short x = min.x; x <= max.x; ++x) {
 
-				Vector2Int16 p = Vector2Int16(x, y);
-				Vector2Int16 r = p - circle.position;
-				/*	int i = vision.GetIndex(p);
-					int j = p.x % 32;
-					int k = 1 << j;
+					Vector2Int16 p = Vector2Int16(x, y);
 
+					Vector2Int16 r = circle.position - p;
+					if (r.LengthSquaredInt() < size) {
 
-					const auto& b = vision.visibility[i];
-					if (b & k)
-						continue;*/
-
-				if (r.LengthSquaredInt() < size) {
-
-					/*	vision.visibility[i] |= k;
-						vision.knoweldge[i] |= k;*/
-					uint8_t& coundown = vision.visibilityCountdown[x + y * gridSize.x];
-					/*	int timerId = x + y * gridSize.x;
-						if (coundown == 0) {
-							vision.visibilityTimers.push_back(timerId);
-						}*/
-					coundown = TileVisibilityTimer;
+						vision.visibilityCountdown[p.x + (p.y << 7)]
+							= TileVisibilityTimer;
+					}
 				}
 			}
 		}
+		else {
+			for (short y = min.y; y < circle.position.y; ++y) {
+				for (short x = min.x; x < circle.position.x; ++x) {
+
+					Vector2Int16 p = Vector2Int16(x, y);
+					Vector2Int16 r = circle.position - p;
+					if (r.LengthSquaredInt() < size) {
+						vision.visibilityCountdown[p.x + (p.y << 7)]
+							= TileVisibilityTimer;
+
+						p.x += r.x << 1;
+						vision.visibilityCountdown[p.x + (p.y << 7)]
+							= TileVisibilityTimer;
+
+						p.y += r.y << 1;
+						vision.visibilityCountdown[p.x + (p.y << 7)]
+							= TileVisibilityTimer;
+						p.x -= r.x << 1;
+						vision.visibilityCountdown[p.x + (p.y << 7)]
+							= TileVisibilityTimer;
+
+					}
+
+				}
+			}
+
+			Vector2Int16 p = circle.position;
+			vision.visibilityCountdown[p.x + (p.y << 7)]
+				= TileVisibilityTimer;
+		}
+
 	}
 
 }

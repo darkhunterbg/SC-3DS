@@ -124,6 +124,7 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 	if (e == Entity::None)
 		e = em.NewEntity();
 	em.PositionComponents.NewComponent(e, position);
+	em.OldPositionComponents.NewComponent(e, position);
 
 	em.FlagComponents.NewComponent(e);
 	em.UnitArchetype.UnitComponents.NewComponent(e, { &def });
@@ -174,6 +175,7 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 	if (def.Graphics->HasMovementGlow()) {
 
 		auto e2 = em.NewEntity();
+		em.OldPositionComponents.NewComponent(e2, position);
 		em.FlagComponents.NewComponent(e2);
 		em.RenderArchetype.RenderComponents.GetComponent(e2).depth = 1;
 		em.RenderArchetype.Archetype.AddEntity(e2);

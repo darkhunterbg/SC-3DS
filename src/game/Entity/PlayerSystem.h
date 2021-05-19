@@ -52,7 +52,7 @@ struct PlayerVision {
 		return b & (1 << (pos.x % 32));
 	}
 
-	inline void SetKnown(Vector2Int16 pos, bool known) {
+	inline void SetKnown(Vector2Int16 pos) {
 		int i = (pos.x >> 5) + ((pos.y * (int)gridSize.x) >> 5);
 
 		VisionCell& b = knoweldge[i];
@@ -69,7 +69,7 @@ struct PlayerVision {
 		return  b & (1 << (pos.x % 32)); 
 	}
 
-	inline void SetVisible(Vector2Int16 pos, bool known) {
+	inline void SetVisible(Vector2Int16 pos) {
 		int i = (pos.x >> 5) + ((pos.y * (int)gridSize.x) >> 5);
 
 		VisionCell& b = visibility[i];
@@ -132,5 +132,5 @@ public:
 	void AddGas(PlayerId player, int gas);
 
 	void UpdatePlayerUnits(const EntityManager& em);
-	void UpdateVision();
+	bool UpdateNextPlayerVision(int players = 256);
 };
