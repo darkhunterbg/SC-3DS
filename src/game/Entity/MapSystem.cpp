@@ -167,6 +167,8 @@ void MapSystem::RenderMinimapFogOfWar() {
 	sc.a = 0.6f;
 	Platform::ChangeBlendingMode(BlendMode::FullOverride);
 
+	// Collect all  visible and known in sperate list, then draw them in a scanline format
+
 	for (short y = 0; y < mapSizeTiles; ++y) {
 		for (short x = 0; x < mapSizeTiles; ++x) {
 			if (vision->IsVisible({ x,y })) {

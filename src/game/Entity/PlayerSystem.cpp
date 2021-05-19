@@ -2,6 +2,7 @@
 #include "EntityManager.h"
 #include "../Profiler.h"
 #include "../MathLib.h"
+#include "../Job.h"
 #include <algorithm>
 
 static constexpr const uint8_t TileVisibilityTimer = 50;
@@ -104,34 +105,29 @@ void PlayerSystem::UpdatePlayerUnits(const EntityManager& em) {
 		playerVision[owner]->ranges.push_back({ position, data.visiion });
 	}
 }
-static int playerUpdate = 0;
+
+static PlayerSystem* s;
+
+void PlayerSystem::UpdateNextPlayerVisionJob(int start, int end) {
+	for (int i = start; i < end; ++i) {
+		PlayerVision& vision = *s->playerVision[i];
+
+		s->UpdatePlayerVision(vision);
+	
+		s->UpdatePlayerVisionTimers(vision);
+	}
+}
+
 
 bool PlayerSystem::UpdateNextPlayerVision(int players) {
 	SectionProfiler p("UpdatePlayerVision");
-	const int bitshift = std::log2(gridSize.x);
-	const Vector2Int16 gridSize = this->gridSize;
+
+	s= this;
 
 	int max = std::min((int)playerVision.size(), playerUpdate + players);
-	for (int i = playerUpdate; i < max; ++i) {
-		PlayerVision& vision = *playerVision[i];
 
-		UpdatePlayerVision(vision);
 
-		int max = vision.visibilityCountdown.size();
-		for (int t = 0; t < max; ++t)
-		{
-			uint8_t& countdown = vision.visibilityCountdown[t];
-	
-			if (countdown > 0) {
-				--countdown;
-				Vector2Int16 p = Vector2Int16(t % gridSize.x, t >> bitshift);
-				vision.SetExplored(p);
-			}
-		}
-
-		p.Submit();
-	}
-
+	JobSystem::RunJob( max - playerUpdate, 1, UpdateNextPlayerVisionJob);
 
 	playerUpdate += players;
 	if (playerUpdate >= playerVision.size()) {
@@ -141,12 +137,52 @@ bool PlayerSystem::UpdateNextPlayerVision(int players) {
 	return playerUpdate == 0;
 }
 
+void PlayerSystem::UpdatePlayerVisionTimers(PlayerVision& vision) {
+	const int bitshift = std::log2(vision.gridSize.x);
+	const Vector2Int16 gridSize = vision.gridSize;
+	const int gridSizeBuckets = gridSize.x >> 5;
+
+	int bucketMax = (gridSize.x >> 5) * (gridSize.y >> 5);
+
+	for (int b = 0; b < bucketMax; ++b) {
+		if (!vision.timerBuckets.test(b))
+			continue;
+
+		int timers = 0;
+
+		Vector2Int min;
+		min.x = (b % gridSizeBuckets) << 5;
+		min.y = (b / gridSizeBuckets) << 5;
+
+		for (int y = min.y; y < min.y + 32; ++y) {
+			for (int x = min.x; x < min.x + 32; ++x) {
+				int t = x + y * gridSize.y;
+
+				uint8_t& countdown = vision.visibilityCountdown[t];
+
+				if (countdown > 0) {
+					--countdown;
+					Vector2Int16 p = Vector2Int16(t % gridSize.x, t >> bitshift);
+					vision.SetExplored(p);
+					timers++;
+				}
+			}
+		}
+
+		vision.timerBuckets.set(b, timers);
+	}
+}
 
 void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
-	const int bitshift = std::log2(gridSize.x);
-	const Vector2Int16 gridSize = this->gridSize;
+	const int bitshift = std::log2(vision.gridSize.x);
+	const Vector2Int16 gridSize = vision.gridSize;
+	const int gridSizeBuckets = gridSize.x >> 5;
 
-	for (const Circle16& circle : vision.ranges) {
+	int end = vision.ranges.size();
+
+	for (int i = 0; i < end; ++i) {
+		const Circle16& circle = vision.ranges[i];
+
 		Vector2Int16 min = circle.position - Vector2Int16(circle.size);
 		Vector2Int16 max = circle.position + Vector2Int16(circle.size);
 
@@ -154,6 +190,11 @@ void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
 		min.y = std::max((short)0, min.y);
 		max.x = std::min((short)(gridSize.x), max.x);
 		max.y = std::min((short)(gridSize.y), max.y);
+
+		int startBucket = (min.x >> 5) + (min.y >> 5) * gridSizeBuckets;
+		int endBucket = (max.x >> 5) + (max.y >> 5) * gridSizeBuckets;
+		vision.timerBuckets.set(startBucket);
+		vision.timerBuckets.set(endBucket);
 
 		int size = circle.size * circle.size;
 
@@ -199,4 +240,5 @@ void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
 			}
 		}
 	}
+	//JobSystem::RunJob(vision.ranges.size(), vision.ranges.size(), UpdatePlayerVisionJob);
 }

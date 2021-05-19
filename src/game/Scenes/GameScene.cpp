@@ -21,7 +21,7 @@ GameScene::~GameScene() {
 }
 
 void GameScene::Start() {
-	Vector2Int16 size = { 128 * 32,128 * 32 };
+	Vector2Int16 size = { 256 * 32,256 * 32 };
 
 	auto& race = RaceDatabase::Terran;
 	race.LoadResourses();

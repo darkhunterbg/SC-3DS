@@ -20,15 +20,15 @@ struct PlayerVision {
 	// Set bit means visiblity is ON.
 	typedef uint32_t VisionCell;
 
+	typedef uint64_t TimerBucket;
+
 	Vector2Int16 gridSize;
 
 	std::vector<Circle16> ranges;
 	std::vector<VisionCell> knoweldge;
 	std::vector<VisionCell> visibility;
 	std::vector<uint8_t> visibilityCountdown;
-	//std::vector<uint16_t> visibilityTimers;
-
-
+	std::bitset<64> timerBuckets; // One bucket is 32x32 tiles
 
 	inline void ClearVisible() {
 		ranges.clear();
@@ -36,11 +36,6 @@ struct PlayerVision {
 	}
 
 	void SetGridSize(Vector2Int16 size);
-
-	inline int GetIndex(Vector2Int16 pos) const {
-		return (pos.x >> 5) + ((pos.y * (int)gridSize.x) >> 5);
-
-	}
 
 	inline bool IsKnown(Vector2Int16 pos) const {
 		if (pos.x < 0 || pos.y < 0 || pos.x >= gridSize.x || pos.y >= gridSize.y)
@@ -118,9 +113,13 @@ private:
 	friend class EntityManager;
 
 	Vector2Int16 gridSize;
+	int playerUpdate = 0;
 	
+	static void UpdatePlayerVisionTimers(PlayerVision& vision);
+	static void UpdatePlayerVision(PlayerVision& vision);
 
-	void UpdatePlayerVision(PlayerVision& vision);
+	static void UpdateNextPlayerVisionJob(int start, int end);
+
 public:
 	void SetSize(Vector2Int16 size);
 
