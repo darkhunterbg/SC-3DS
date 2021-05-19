@@ -307,15 +307,15 @@ void Platform::DrawLine(Vector2Int src, Vector2Int dst, Color color) {
 	SDL_RenderDrawLine(renderer, cmd.src.x, cmd.src.y, cmd.dst.x, cmd.dst.y);
 
 }
-void Platform::DrawRectangle(Rectangle rect, Color color) {
+void Platform::DrawRectangle(const Rectangle& rect, const Color32& color){
 	SDLDrawCommand cmd;
 
 	cmd.type = SDLDrawCommandType::Rectangle;
 	cmd.dst = *(SDL_Rect*)&rect;
-	cmd.r = SDL_FloatToUint8(color.r);
-	cmd.g = SDL_FloatToUint8(color.g);
-	cmd.b = SDL_FloatToUint8(color.b);
-	cmd.a = SDL_FloatToUint8(color.a);
+	cmd.r = color.GetR();
+	cmd.g = color.GetG();
+	cmd.b = color.GetB();
+	cmd.a = color.GetA();
 
 
 	SDL_SetRenderDrawColor(renderer, cmd.r, cmd.g, cmd.b, cmd.a);

@@ -46,4 +46,6 @@ public:
 	void DrawMinimap(Rectangle dst);
 
 	void RedrawMinimap();
+
+	void DrawGrid(const Camera& camera);
 };

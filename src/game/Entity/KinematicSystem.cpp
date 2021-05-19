@@ -106,7 +106,7 @@ void KinematicSystem::DrawColliders(const Camera& camera) {
 			dst.position /= camera.Scale;
 			dst.size /= camera.Scale;
 
-			Platform::DrawRectangle(dst, c);
+			Platform::DrawRectangle(dst, Color32(c));
 		}
 	}
 }
@@ -123,7 +123,7 @@ void KinematicSystem::MoveEntities(EntityManager& em)
 			continue;
 
 		auto& pos = em.PositionComponents[i];
-		pos +=  Vector2Int16(em.MovementArchetype.MovementComponents[i].velocity);
+		pos += Vector2Int16(em.MovementArchetype.MovementComponents[i].velocity);
 
 		em.FlagComponents[i].set(ComponentFlags::PositionChanged, true);
 	}

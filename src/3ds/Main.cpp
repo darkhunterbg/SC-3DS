@@ -12,6 +12,7 @@
 
 #include "NDSAudioChannel.h"
 #include "Audio.h"
+#include "Profiler.h"
 
 C3D_RenderTarget* top;
 C3D_RenderTarget* bottom;
@@ -85,7 +86,9 @@ int main()
 
 		Game::FrameEnd();
 
+
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+
 
 		Game::FrameStart();
 
@@ -93,7 +96,6 @@ int main()
 		C2D_TargetClear(top, color);
 		C2D_TargetClear(bottom, color);
 		Game::Draw();
-
 		C3D_FrameEnd(0);
 	}
 

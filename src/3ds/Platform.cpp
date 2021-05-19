@@ -204,9 +204,8 @@ void Platform::DrawLine(Vector2Int src, Vector2Int dst, Color color) {
 	u32 c = C2D_Color32f(color.r, color.g, color.b, color.a);
 	C2D_DrawLine(src.x, src.y, c, dst.x, dst.y, c, 1, 0);
 }
-void Platform::DrawRectangle(Rectangle rect, Color color) {
-	u32 c = C2D_Color32f(color.r, color.g, color.b, color.a);
-	C2D_DrawRectSolid(rect.position.x, rect.position.y, 0, rect.size.x, rect.size.y, c);
+void Platform::DrawRectangle(const Rectangle& rect,const Color32& color) {
+	C2D_DrawRectSolid(rect.position.x, rect.position.y, 0, rect.size.x, rect.size.y, color.value);
 }
 Image Platform::NewTexture(Vector2Int size, bool pixelFiltering) {
 	C3D_Tex* tex = new C3D_Tex();

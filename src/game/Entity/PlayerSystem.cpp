@@ -113,21 +113,18 @@ void PlayerSystem::UpdateNextPlayerVisionJob(int start, int end) {
 		PlayerVision& vision = *s->playerVision[i];
 
 		s->UpdatePlayerVision(vision);
-	
+
 		s->UpdatePlayerVisionTimers(vision);
 	}
 }
 
 
 bool PlayerSystem::UpdateNextPlayerVision(int players) {
-	SectionProfiler p("UpdatePlayerVision");
-
-	s= this;
+	s = this;
 
 	int max = std::min((int)playerVision.size(), playerUpdate + players);
 
-
-	JobSystem::RunJob( max - playerUpdate, 1, UpdateNextPlayerVisionJob);
+	JobSystem::RunJob(max - playerUpdate, 1, UpdateNextPlayerVisionJob);
 
 	playerUpdate += players;
 	if (playerUpdate >= playerVision.size()) {
@@ -188,8 +185,8 @@ void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
 
 		min.x = std::max((short)0, min.x);
 		min.y = std::max((short)0, min.y);
-		max.x = std::min((short)(gridSize.x), max.x);
-		max.y = std::min((short)(gridSize.y), max.y);
+		max.x = std::min((short)(gridSize.x - 1), max.x);
+		max.y = std::min((short)(gridSize.y - 1), max.y);
 
 		int startBucket = (min.x >> 5) + (min.y >> 5) * gridSizeBuckets;
 		int endBucket = (max.x >> 5) + (max.y >> 5) * gridSizeBuckets;

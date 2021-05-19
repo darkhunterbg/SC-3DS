@@ -38,9 +38,6 @@ struct PlayerVision {
 	void SetGridSize(Vector2Int16 size);
 
 	inline bool IsKnown(Vector2Int16 pos) const {
-		if (pos.x < 0 || pos.y < 0 || pos.x >= gridSize.x || pos.y >= gridSize.y)
-			return false;
-
 		int i = (pos.x >> 5) + ((pos.y * (int)gridSize.x) >> 5);
 
 		const VisionCell& b = knoweldge[i];
@@ -55,13 +52,21 @@ struct PlayerVision {
 	}
 
 	inline bool IsVisible(Vector2Int16 pos) const {
-		if (pos.x < 0 || pos.y < 0 || pos.x >= gridSize.x || pos.y >= gridSize.y)
-			return false;
-
 		int i = (pos.x >> 5) + ((pos.y * (int)gridSize.x) >> 5);
 
 		const VisionCell& b = visibility[i];
 		return  b & (1 << (pos.x % 32)); 
+	}
+
+	inline uint8_t GetState(const Vector2Int16& pos) const {
+		int i = (pos.x >> 5) + ((pos.y * (int)gridSize.x) >> 5);
+
+		const VisionCell& b = visibility[i];
+		const VisionCell& c = knoweldge[i];
+
+		int j = 1 << (pos.x % 32);
+
+		return ((bool)(b & j) + (bool)(c & j));
 	}
 
 	inline void SetVisible(Vector2Int16 pos) {

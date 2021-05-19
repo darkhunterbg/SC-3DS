@@ -133,6 +133,7 @@ private:
 	int8_t updateId = 0;
 public:
 	bool DrawColliders = false;
+	bool DrawGrid = false;
 
 	EntityManager();
 	~EntityManager();

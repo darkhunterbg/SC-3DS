@@ -36,8 +36,6 @@ void MapSystem::SetSize(Vector2Int16 size)
 
 void MapSystem::UpdateMap(EntityManager& em)
 {
-	SectionProfiler p("UpdateMap");
-
 	minimapData.clear();
 
 	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {
@@ -56,11 +54,9 @@ void MapSystem::UpdateMap(EntityManager& em)
 
 void MapSystem::DrawMap(const Camera& camera)
 {
-	//SectionProfiler p("DrawMap");
-
 	Rectangle16 camRect = camera.GetRectangle16();
 
-	short tileSize = 32 * 6;
+	static constexpr const short tileSize = 32 * 6;
 
 	Vector2Int16 start = (camRect.position / tileSize) * tileSize;
 	Vector2Int16 end = (camRect.GetMax() / tileSize + Vector2Int16{ 1, 1 }) * tileSize;
@@ -151,8 +147,6 @@ void MapSystem::RenderMinimapFogOfWar() {
 		minimapFowTexture = Platform::NewTexture({ MinimapTextureSize,MinimapTextureSize });
 	}
 
-	SectionProfiler p("DrawMinimapFoW");
-
 	int mapSizeTiles = (int)mapSize.x / 32;
 	int multiplier = MinimapTextureSize / mapSizeTiles;
 
@@ -162,22 +156,17 @@ void MapSystem::RenderMinimapFogOfWar() {
 	if (vision == nullptr)
 		return;
 
-	Color c = Colors::Transparent;
-	Color sc = Colors::Transparent;
-	sc.a = 0.6f;
-	Platform::ChangeBlendingMode(BlendMode::FullOverride);
+	Color32 colors[2] = { Color32(Color(0,0,0,0.6)), Color32(0) };
 
-	// Collect all  visible and known in sperate list, then draw them in a scanline format
+	Platform::ChangeBlendingMode(BlendMode::FullOverride);
 
 	for (short y = 0; y < mapSizeTiles; ++y) {
 		for (short x = 0; x < mapSizeTiles; ++x) {
-			if (vision->IsVisible({ x,y })) {
-				Rectangle dst = { {x * multiplier, y * multiplier},{ multiplier, multiplier} };
-				Platform::DrawRectangle(dst, c);
-			}
-			else if (vision->IsKnown({ x,y })) {
-				Rectangle dst = { {x * multiplier, y * multiplier},{ multiplier, multiplier} };
-				Platform::DrawRectangle(dst, sc);
+
+			uint8_t state = vision->GetState({ x,y });
+			if (state) {
+				const Color32& c = colors[state - 1];
+				Platform::DrawRectangle({ { x * multiplier, y * multiplier }, { multiplier, multiplier} }, c);
 			}
 		}
 	}
@@ -186,7 +175,6 @@ void MapSystem::RenderMinimapFogOfWar() {
 }
 
 void MapSystem::RedrawMinimap() {
-
 	if (minimapTerrainTexture.textureId == nullptr) {
 		GenerateMiniampTerrainTexture();
 	}
@@ -195,15 +183,13 @@ void MapSystem::RedrawMinimap() {
 		minimapTexture = Platform::NewTexture({ MinimapTextureSize,MinimapTextureSize }, true);
 	}
 
+
 	int mapSizeTiles = (int)mapSize.x / 32;
 	int multiplier = MinimapTextureSize / mapSizeTiles;
 
 	RenderMinimapFogOfWar();
 
-	SectionProfiler p("DrawMinimapItems");
-
 	Platform::DrawOnTexture(minimapTexture.textureId);
-	//Platform::ClearBuffer(Colors::Black);
 
 	Sprite fullMapSprite;
 	fullMapSprite.rect = { {0,0}, Vector2Int16(MinimapTextureSize) };
@@ -220,12 +206,12 @@ void MapSystem::RedrawMinimap() {
 		Rectangle dst;
 		dst.position = (Vector2Int(collider.position)) * multiplier;
 		dst.size = (Vector2Int(collider.size) * 2) * multiplier;
-		if (dst.size.x < multiplier * 2)
-			dst.size.x = multiplier * 2;
-		if (dst.size.y < multiplier * 2)
-			dst.size.y = multiplier * 2;
 
-		Platform::DrawRectangle(dst, Colors::MapFriendly);
+		dst.size.x = std::max(dst.size.x, multiplier << 1);
+		dst.size.y = std::max(dst.size.y, multiplier << 1);
+
+
+		Platform::DrawRectangle(dst, Color32(Colors::MapFriendly));
 	}
 
 	Platform::DrawOnTexture(nullptr);
@@ -242,4 +228,37 @@ void MapSystem::DrawMinimap(Rectangle dst)
 	minimapSprite.image = minimapTexture;
 
 	Platform::Draw(minimapSprite, dst);
+}
+
+void MapSystem::DrawGrid(const Camera& camera)
+{
+	Rectangle camRect = camera.GetRectangle();
+
+	Color color = Colors::White;
+	color.a = 0.5f;
+	Color32 c = Color32(color);
+	Rectangle dst;
+
+
+	Vector2Int pos = ((camRect.position) / 32) * 32;
+	dst.size = { 1, camRect.size.y };
+
+	for (int x = pos.x; x <= pos.x + camRect.size.x + 32; x += 32) {
+
+		dst.position = { x,0 };
+		dst.position.x -= camRect.position.x;
+		dst.position /= camera.Scale;
+		Platform::DrawRectangle(dst, c);
+	}
+
+	dst.size = { camRect.size.x ,1 };
+
+	for (int y = pos.y; y <= pos.y + camRect.size.y + 32; y += 32) {
+
+		dst.position = { 0,y };
+		dst.position.y -= camRect.position.y;
+		dst.position /= camera.Scale;
+		Platform::DrawRectangle(dst, c);
+	}
+
 }
