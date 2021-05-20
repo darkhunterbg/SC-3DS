@@ -28,7 +28,7 @@ void MapSystem::UpdateMap(EntityManager& em)
 		colors[i] = players[i].color;
 	}
 	colors[ActivePlayer] = Color32(Colors::MapFriendly);
-	vision = &em.GetPlayerSystem().GetPlayerVision(ActivePlayer);
+	const auto vision = em.GetPlayerSystem().GetPlayerVision(ActivePlayer);
 
 
 	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {
@@ -43,9 +43,9 @@ void MapSystem::UpdateMap(EntityManager& em)
 			collider.Restrict(Vector2Int16(0, 0), gridSize - Vector2Int16(1, 1));
 			collider.size = collider.size.Max(2, 2);
 
-			bool visible = vision->IsVisible(collider);
+			bool visible = vision.IsVisible(collider);
 
-			if (!visible)
+			if (!visible && FogOfWarVisible)
 				continue;
 
 			minimapData.dst.push_back(collider);
@@ -54,15 +54,10 @@ void MapSystem::UpdateMap(EntityManager& em)
 	}
 }
 
-void MapSystem::UpdateVisibleEntities(EntityManager& em) {
-
-	SectionProfiler p("UpdateVisibleEntities");
-
-	vision = &em.GetPlayerSystem().GetPlayerVision(ActivePlayer);
+void MapSystem::UpdateVisibleRenderEntities(EntityManager& em) {
+	auto& vision = em.GetPlayerSystem().GetPlayerVision(ActivePlayer);
 
 	removedEntities.clear();
-
-	// Detect deleted entities and new entiteis
 
 	for (EntityId id : em.RenderArchetype.Archetype.GetEntities()) {
 		auto dst = em.RenderArchetype.BoundingBoxComponents.GetComponent(id);
@@ -71,19 +66,17 @@ void MapSystem::UpdateVisibleEntities(EntityManager& em) {
 
 		dst.Restrict(Vector2Int16(0, 0), gridSize - Vector2Int16(1, 1));
 
-		bool visible = vision->IsVisible(dst);
+		bool visible =  vision.IsVisible(dst);
 
-		if (!visible) {
+		if (!visible && FogOfWarVisible) {
 			removedEntities.push_back(id);
 		}
 	}
 
-	em.RenderArchetype.Archetype.RemoveEntities(removedEntities);
 
+	addedEntities.clear();
 
-	addedEntiteis.clear();
-
-	for (EntityId id : hiddenEntities) {
+	for (EntityId id : em.HiddenArchetype.Archetype.GetEntities()) {
 		auto dst = em.RenderArchetype.BoundingBoxComponents.GetComponent(id);
 		Vector2Int16 pos = em.PositionComponents.GetComponent(id);
 		dst.SetCenter(pos);
@@ -92,17 +85,73 @@ void MapSystem::UpdateVisibleEntities(EntityManager& em) {
 
 		dst.Restrict(Vector2Int16(0, 0), gridSize - Vector2Int16(1, 1));
 
-		bool visible = vision->IsVisible(dst);
+		bool visible = vision.IsVisible(dst);
 
-		if (visible) {
-			addedEntiteis.push_back(id);
+		if (visible || !FogOfWarVisible) {
+			addedEntities.push_back(id);
+			em.FlagComponents.GetComponent(id).set(ComponentFlags::RenderChanged);
 		}
 	}
 
-	hiddenEntities.RemoveSortedEntities(addedEntiteis);
 
-	em.RenderArchetype.Archetype.AddEntities(addedEntiteis);
-	hiddenEntities.AddSortedEntities(removedEntities);
+	em.RenderArchetype.Archetype.RemoveSortedEntities(removedEntities);
+	em.HiddenArchetype.Archetype.AddSortedEntities(removedEntities);
+	em.HiddenArchetype.Archetype.RemoveSortedEntities(addedEntities);
+	em.RenderArchetype.Archetype.AddSortedEntities(addedEntities);
+}
+void MapSystem::UpdateVisibleRenderUnits(EntityManager& em) {
+	auto& vision = em.GetPlayerSystem().GetPlayerVision(ActivePlayer);
+
+	removedEntities.clear();
+
+	for (EntityId id : em.UnitArchetype.RenderArchetype.Archetype.GetEntities()) {
+		auto dst = em.UnitArchetype.RenderArchetype.BoundingBoxComponents.GetComponent(id);
+		dst.position = dst.position >> 5;
+		dst.size = dst.size >> 5;
+
+		dst.Restrict(Vector2Int16(0, 0), gridSize - Vector2Int16(1, 1));
+
+		bool visible = vision.IsVisible(dst);
+
+		if (!visible && FogOfWarVisible) {
+			removedEntities.push_back(id);
+		}
+	}
+
+
+	addedEntities.clear();
+
+	for (EntityId id : em.UnitArchetype.HiddenArchetype.Archetype.GetEntities()) {
+		auto dst = em.UnitArchetype.RenderArchetype.BoundingBoxComponents.GetComponent(id);
+		Vector2Int16 pos = em.PositionComponents.GetComponent(id);
+		dst.SetCenter(pos);
+		dst.position = dst.position >> 5;
+		dst.size = dst.size >> 5;
+
+		dst.Restrict(Vector2Int16(0, 0), gridSize - Vector2Int16(1, 1));
+
+		bool visible = vision.IsVisible(dst);
+
+		if (visible || !FogOfWarVisible) {
+			addedEntities.push_back(id);
+			em.FlagComponents.GetComponent(id).set(ComponentFlags::RenderChanged);
+		}
+	}
+
+	em.UnitArchetype.RenderArchetype.Archetype.RemoveSortedEntities(removedEntities);
+	for(EntityId id : removedEntities)
+		if(em.UnitArchetype.RenderArchetype.Archetype.HasEntity(id))
+			EXCEPTION("Unit.Render archetype has entity i% after removal!",id);
+	em.UnitArchetype.HiddenArchetype.Archetype.AddSortedEntities(removedEntities);
+	em.UnitArchetype.HiddenArchetype.Archetype.RemoveSortedEntities(addedEntities);
+	em.UnitArchetype.RenderArchetype.Archetype.AddSortedEntities(addedEntities);
+}
+
+void MapSystem::UpdateVisibleEntities(EntityManager& em) {
+	SectionProfiler p("UpdateVisibleEntities");
+
+	UpdateVisibleRenderEntities(em);
+	UpdateVisibleRenderUnits(em);
 }
 
 void MapSystem::DrawMap(const Camera& camera)
@@ -127,7 +176,7 @@ void MapSystem::DrawMap(const Camera& camera)
 }
 
 void MapSystem::DrawFogOfWar(const Camera& camera) {
-	if (!FogOfWarVisible || vision == nullptr)
+	if (!FogOfWarVisible || minimapFowTexture.textureId == nullptr)
 		return;
 
 	static constexpr const int Upscale = 4;
@@ -193,7 +242,7 @@ void MapSystem::GenerateMiniampTerrainTexture() {
 	Platform::DrawOnTexture(nullptr);
 }
 
-void MapSystem::RenderMinimapFogOfWar() {
+void MapSystem::RenderMinimapFogOfWar(const PlayerVision& vision) {
 
 	if (minimapFowTexture.textureId == nullptr) {
 		minimapFowTexture = Platform::NewTexture({ minimapTextureSize,minimapTextureSize });
@@ -205,8 +254,6 @@ void MapSystem::RenderMinimapFogOfWar() {
 	Platform::DrawOnTexture(minimapFowTexture.textureId);
 	Platform::ClearBuffer(Colors::Black);
 
-	if (vision == nullptr)
-		return;
 
 	Color32 colors[2] = { Color32(Color(0,0,0,0.6)), Color32(0) };
 
@@ -215,7 +262,7 @@ void MapSystem::RenderMinimapFogOfWar() {
 	for (short y = 0; y < mapSizeTiles; ++y) {
 		for (short x = 0; x < mapSizeTiles; ++x) {
 
-			uint8_t state = vision->GetState({ x,y });
+			uint8_t state = vision.GetState({ x,y });
 			if (state) {
 				const Color32& c = colors[state - 1];
 				Platform::DrawRectangle({ { x * multiplier, y * multiplier }, { multiplier, multiplier} }, c);
@@ -226,7 +273,9 @@ void MapSystem::RenderMinimapFogOfWar() {
 	Platform::ChangeBlendingMode(BlendMode::Alpha);
 }
 
-void MapSystem::RedrawMinimap() {
+void MapSystem::RedrawMinimap(EntityManager& em) {
+	const PlayerVision& vision = em.GetPlayerSystem().GetPlayerVision(ActivePlayer);
+
 	if (minimapTerrainTexture.textureId == nullptr) {
 		GenerateMiniampTerrainTexture();
 	}
@@ -239,7 +288,7 @@ void MapSystem::RedrawMinimap() {
 	int mapSizeTiles = (int)mapSize.x / 32;
 	int multiplier = minimapTextureSize / mapSizeTiles;
 
-	RenderMinimapFogOfWar();
+	RenderMinimapFogOfWar(vision);
 
 	Platform::DrawOnTexture(minimapTexture.textureId);
 

@@ -55,6 +55,9 @@ const PlayerInfo& PlayerSystem::GetPlayerInfo(PlayerId id) const
 
 const PlayerVision& PlayerSystem::GetPlayerVision(PlayerId id) const
 {
+	if (playerVision.size() <= id)
+		EXCEPTION("Player with id %i/%i not found", id, playerVision.size());
+
 	return *playerVision[id];
 }
 
@@ -111,17 +114,12 @@ static PlayerSystem* s;
 void PlayerSystem::UpdateNextPlayerVisionJob(int start, int end) {
 	for (int i = start; i < end; ++i) {
 		PlayerVision& vision = *s->playerVision[i];
-
 		s->UpdatePlayerVision(vision);
-
 		s->UpdatePlayerVisionTimers(vision);
 	}
 }
 
 bool PlayerSystem::UpdateNextPlayerVision(int players) {
-
-	SectionProfiler p("UpdatePlayerVision");
-
 	s = this;
 
 	int max = std::min((int)playerVision.size(), playerUpdate + players);
@@ -196,9 +194,9 @@ void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
 		max.y = std::min((short)(gridSize.y - 1), max.y);
 
 		Vector2Int16 bucketMin = min >> 5;
-		bucketMin.x = bucketMin.x << bucketBitshift;
+		bucketMin.y = bucketMin.y << bucketBitshift;
 		Vector2Int16 bucketMax = (max >> 5);
-		bucketMax.x = bucketMax.x << bucketBitshift;
+		bucketMax.y = bucketMax.y << bucketBitshift;
 
 		vision.timerBuckets.set(bucketMin.x + bucketMin.y);
 		vision.timerBuckets.set(bucketMax.x + bucketMin.y);

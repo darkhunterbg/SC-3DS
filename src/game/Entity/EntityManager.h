@@ -47,6 +47,7 @@ private:
 
 	std::vector<EntityArchetype*> archetypes;
 	std::vector<EntityId> scratch;
+	std::vector<EntityId> toDelete;
 public:
 
 	ComponentCollection<Vector2Int16> OldPositionComponents;
@@ -65,6 +66,10 @@ public:
 		ComponentCollection<Vector2Int16> DestinationComponents;
 		ComponentCollection<Rectangle16> BoundingBoxComponents;
 	} RenderArchetype;
+
+	struct  {
+		EntityArchetype Archetype = EntityArchetype("Hidden");
+	} HiddenArchetype;
 
 	struct {
 		EntityArchetype Archetype = EntityArchetype("Animation");
@@ -103,6 +108,10 @@ public:
 			ComponentCollection<UnitAnimationComponent> AnimationComponents;
 			ComponentCollection<UnitAnimationTrackerComponent> TrackerComponents;
 		} AnimationArchetype;
+
+		struct {
+			EntityArchetype Archetype = EntityArchetype("Unit.Hidden");
+		} HiddenArchetype;
 
 		ComponentCollection<uint8_t> OrientationComponents;
 		ComponentCollection<UnitMovementComponent> MovementComponents;
@@ -153,8 +162,6 @@ public:
 	void DeleteEntities(const std::vector<EntityId>& entities, bool sorted = false);
 	// NOTE: this will reuse given vector as scratch for performance reasons
 	void DeleteEntitiesSorted(std::vector<EntityId>& entities);
-	void ClearEntityArchetypes(EntityId id);
-	void ClearEntitiesArchetypes(std::vector<EntityId>& entities, bool sorted = false);
 	EntityId NewEntity() { return entities.NewEntity(); }
 	void NewEntities(unsigned size, std::vector<EntityId>& outIds) {
 		entities.NewEntities(size, outIds);

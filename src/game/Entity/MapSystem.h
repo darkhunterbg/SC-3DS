@@ -35,15 +35,15 @@ private:
 	short minimapTextureSize = 0;
 
 	MinimapData minimapData;
-	const PlayerVision* vision = nullptr;
 
-	EntityCollection hiddenEntities;
 	std::vector<EntityId> removedEntities;
-	std::vector<EntityId> addedEntiteis;
+	std::vector<EntityId> addedEntities;
 
 	void GenerateMiniampTerrainTexture();
-	void RenderMinimapFogOfWar();
+	void RenderMinimapFogOfWar(const PlayerVision& vision);
 
+	void UpdateVisibleRenderEntities(EntityManager& em);
+	void UpdateVisibleRenderUnits(EntityManager& em);
 public:
 	bool FogOfWarVisible = true;
 	PlayerId ActivePlayer = 0;
@@ -58,7 +58,7 @@ public:
 
 	void DrawMinimap(Rectangle dst);
 
-	void RedrawMinimap();
+	void RedrawMinimap(EntityManager& em);
 
 	void DrawGrid(const Camera& camera);
 

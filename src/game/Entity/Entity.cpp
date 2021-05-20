@@ -30,7 +30,7 @@ void EntityCollection::AddSortedEntities(const std::vector<EntityId>& outIds, in
 	auto sortEnd = sortedEntities.size();
 	for (int i = 0; i < sortEnd; ++i)
 	{
-		if (sortedEntities[i] < id) {
+		if (sortedEntities[i] > id) {
 			insertAt = i;
 			break;
 		}
@@ -40,6 +40,12 @@ void EntityCollection::AddSortedEntities(const std::vector<EntityId>& outIds, in
 	id = outIds.back();
 	size_t end = std::min(sortedEntities.size(), insertAt + (size_t)id + 1);
 	std::sort(sortedEntities.begin() + insertAt, sortedEntities.begin() + end);
+
+	for (int i = 0; i < sortedEntities.size() - 1; ++i)
+		if (sortedEntities[i] > sortedEntities[i + 1])
+			EXCEPTION("Unsorted collection at %i", i);
+
+
 }
 void EntityCollection::AddEntity(EntityId id) {
 	auto end = sortedEntities.crend();
@@ -210,7 +216,7 @@ void EntityManagerCollection::DeleteEntity(EntityId id) {
 		}
 	}
 
-	if(sortedEntities.RemoveEntity(id))
+	if (sortedEntities.RemoveEntity(id))
 		EXCEPTION("Deleting entity %i was not found!", id);
 
 }

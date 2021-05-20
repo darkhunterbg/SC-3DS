@@ -13,6 +13,7 @@ class TimingSystem {
 		std::vector<EntityId> entities;
 	};
 private:
+	std::vector<EntityId> scratch;
 	std::array< ExpiredTimersUpdate, TimingActionComponent::ActionTypeCount> actionsTable;
 
 	inline constexpr std::vector<EntityId>& GetActionEntityTable(TimerExpiredAction action) {

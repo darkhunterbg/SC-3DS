@@ -51,20 +51,20 @@ static std::vector<EntityId> v;
 
 void PerformanceTestScene::Update() {
 
-	v.clear();
+	//v.clear();
 
-	entityManager.NewEntities(1000, v);
+	//entityManager.NewEntities(1000, v);
 
-	for (int i = 0; i < v.size(); ++i) {
-		UnitEntityUtil::NewUnit(UnitDatabase::Marine, 0, { 0,0 });
-	}
+	//for (int i = 0; i < v.size(); ++i) {
+	//	UnitEntityUtil::NewUnit(UnitDatabase::Marine, 0, { 0,0 });
+	//}
 
-	{
-		SectionProfiler p("Delete");
+	//{
+	//	SectionProfiler p("Delete");
 
-		entityManager.ClearEntitiesArchetypes(v);
-	}
-	entityManager.ClearEntities();
+	//	entityManager.ClearEntitiesArchetypes(v);
+	//}
+	//entityManager.ClearEntities();
 	entityManager.Update();
 }
 

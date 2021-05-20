@@ -6,7 +6,6 @@
 
 #include <algorithm>
 
-static std::vector<EntityId> scratch;
 
 EntityManager::EntityManager() {
 
@@ -19,7 +18,9 @@ EntityManager::EntityManager() {
 	archetypes.push_back(&UnitArchetype.RenderArchetype.Archetype);
 	archetypes.push_back(&UnitArchetype.AnimationArchetype.Archetype);
 	archetypes.push_back(&TimingArchetype.Archetype);
-	archetypes.push_back(&ParentArchetype.Archetype);;
+	archetypes.push_back(&ParentArchetype.Archetype);
+	archetypes.push_back(&HiddenArchetype.Archetype);
+	archetypes.push_back(&UnitArchetype.HiddenArchetype.Archetype);
 	EntityUtil::emInstance = this;
 	UnitEntityUtil::emInstance = this;
 }
@@ -43,7 +44,7 @@ void EntityManager::DeleteEntity(EntityId id) {
 		}
 	}
 
-	entities.DeleteEntity(id);
+	toDelete.push_back(id);
 	for (auto& arch : archetypes) {
 		if (arch->HasEntity(id))
 			arch->RemoveEntity(id);
@@ -67,12 +68,12 @@ void EntityManager::DeleteEntitiesSorted(std::vector<EntityId>& e) {
 	if (e.size() != max)
 		std::sort(e.begin(), e.end());
 
-
 	for (auto& arch : archetypes) {
-		arch->RemoveEntities(e, true);
+		arch->RemoveSortedEntities(e);
 	}
 
-	entities.DeleteSortedEntities(e);
+
+	toDelete.insert(toDelete.end(), e.begin(), e.end());
 }
 void EntityManager::DeleteEntities(const std::vector<EntityId>& e, bool sorted) {
 
@@ -85,42 +86,7 @@ void EntityManager::DeleteEntities(const std::vector<EntityId>& e, bool sorted) 
 	DeleteEntitiesSorted(scratch);
 
 }
-void EntityManager::ClearEntityArchetypes(EntityId id) {
-	for (auto& arch : archetypes) {
-		if (arch->HasEntity(id))
-			arch->RemoveEntity(id);
-	}
 
-	if (ParentArchetype.Archetype.HasEntity(id)) {
-		const auto& cmp = ParentArchetype.ChildComponents.GetComponent(id);
-		for (int i = 0; i < cmp.childCount; ++i) {
-			DeleteEntity(cmp.children[id]);
-		}
-	}
-}
-void EntityManager::ClearEntitiesArchetypes(std::vector<EntityId>& e, bool sorted) {
-	if (!sorted)
-		std::sort(e.begin(), e.end());
-
-	scratch.clear();
-
-	for (EntityId id : e) {
-		if (ParentArchetype.Archetype.HasEntity(id)) {
-			const auto& cmp = ParentArchetype.ChildComponents.GetComponent(id);
-			scratch.insert(scratch.end(), cmp.children.begin(), cmp.children.begin() + cmp.childCount);
-		}
-	}
-
-	if (scratch.size())
-	{
-		std::sort(scratch.begin(), scratch.end());
-		DeleteEntitiesSorted(scratch);
-	}
-
-	for (auto& arch : archetypes) {
-		arch->RemoveEntitiesSorted(e);
-	}
-}
 void EntityManager::ClearEntities()
 {
 	entities.ClearEntities();
@@ -149,6 +115,13 @@ void EntityManager::ApplyEntityChanges() {
 
 	for (auto archetype : archetypes)
 		archetype->CommitChanges();
+
+	if (toDelete.size() > 0)
+	{
+		std::sort(toDelete.begin(), toDelete.end());
+		entities.DeleteSortedEntities(toDelete);
+		toDelete.clear();
+	}
 }
 void EntityManager::UpdateChildrenPosition() {
 	for (EntityId id : ParentArchetype.Archetype.GetEntities()) {
@@ -170,7 +143,6 @@ void EntityManager::UpdateChildrenPosition() {
 
 // Updates 12 per second (60 fps) 
 void EntityManager::Update0() {
-
 	playerSystem.UpdateNextPlayerVision();
 		
 	mapSystem.UpdateMap(*this);
@@ -178,8 +150,6 @@ void EntityManager::Update0() {
 // Updates 24 per second (60 fps) 
 void EntityManager::Update1() {
 	timingSystem.UpdateTimers(*this);
-
-	timingSystem.ApplyTimerActions(*this);
 
 	//navigationSystem.UpdateNavGrid(*this);
 
@@ -197,7 +167,11 @@ void EntityManager::Update1() {
 void EntityManager::Update2() {
 	ready = true;
 
+	timingSystem.ApplyTimerActions(*this);
+
 	kinematicSystem.MoveEntities(*this);
+
+	mapSystem.UpdateVisibleEntities(*this);
 
 	animationSystem.UpdateAnimations();
 
@@ -209,14 +183,14 @@ void EntityManager::Update2() {
 	renderSystem.UpdatePositions(*this, changedData);
 	kinematicSystem.UpdateCollidersPosition(*this, changedData);
 	kinematicSystem.ApplyCollidersChange(*this);
-	mapSystem.UpdateVisibleEntities(*this);
+
 
 	ApplyEntityChanges();
 }
 
 // Draws 12 per second (60 fps) 
 void EntityManager::Draw0(const Camera& camera) {
-	mapSystem.RedrawMinimap();
+	mapSystem.RedrawMinimap(*this);
 }
 // Draws 24 per second (60 fps) 
 void EntityManager::Draw1(const Camera& camera) {

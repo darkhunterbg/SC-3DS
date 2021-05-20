@@ -21,7 +21,7 @@ GameScene::~GameScene() {
 }
 
 void GameScene::Start() {
-	Vector2Int16 size = { 32 * 32,32 * 32 };
+	Vector2Int16 size = { 64 * 32,64 * 32 };
 
 	auto& race = RaceDatabase::Terran;
 	race.LoadResourses();
@@ -59,12 +59,12 @@ void GameScene::Start() {
 	}
 
 	int i = 0;
-	for (int y =  1; y > 0; --y) {
-		for (int x = 1; x > 0; --x) {
+	for (int y = 40; y > 0; --y) {
+		for (int x = 40; x > 0; --x) {
 			Color c = color[(i) % 12];
-			auto& def = *UnitDatabase::Units[(i) % UnitDatabase::Units.size()];
+			auto& def = *UnitDatabase::Units[ i % UnitDatabase::Units.size()];
 			EntityId e = UnitEntityUtil::NewUnit(def, i % totalPlayers,
-				Vector2Int16(Vector2Int{ x * 128 + 16,y * 128 + 16 }));
+				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 + 16 }));
 
 			//entityManager->UnitArchetype.OrientationComponents.GetComponent(e) = 12;
 			EntityUtil::PlayAnimation(e, def.Graphics->AttackAnimations[12]);
@@ -104,6 +104,17 @@ void GameScene::Update() {
 	// TODO: Player input should be feed in the entity manager and on start of secondary update
 	//if (logical)
 	{
+
+		if (Game::Gamepad.IsButtonPressed(GamepadButton::Start)) {
+			entityManager->GetMapSystem().FogOfWarVisible =
+				!entityManager->GetMapSystem().FogOfWarVisible;
+		}
+
+		if (Game::Gamepad.IsButtonPressed(GamepadButton::Select)) {
+			entityManager->DrawGrid =
+				!entityManager->DrawGrid;
+		}
+
 
 		if (tmp.size() > 0)
 		{

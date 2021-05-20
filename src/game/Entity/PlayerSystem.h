@@ -14,6 +14,7 @@
 class EntityManager;
 
 
+typedef std::vector<UnitDataComponent> PlayerUnits;
 
 class PlayerVision {
 public:
