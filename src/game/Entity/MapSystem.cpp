@@ -139,9 +139,6 @@ void MapSystem::UpdateVisibleRenderUnits(EntityManager& em) {
 	}
 
 	em.UnitArchetype.RenderArchetype.Archetype.RemoveSortedEntities(removedEntities);
-	for(EntityId id : removedEntities)
-		if(em.UnitArchetype.RenderArchetype.Archetype.HasEntity(id))
-			EXCEPTION("Unit.Render archetype has entity i% after removal!",id);
 	em.UnitArchetype.HiddenArchetype.Archetype.AddSortedEntities(removedEntities);
 	em.UnitArchetype.HiddenArchetype.Archetype.RemoveSortedEntities(addedEntities);
 	em.UnitArchetype.RenderArchetype.Archetype.AddSortedEntities(addedEntities);
