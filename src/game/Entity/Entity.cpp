@@ -3,36 +3,27 @@
 #include <algorithm>
 #include <cstring>
 
-EntityCollection::EntityCollection()
+
+EntityCollection::EntityCollection(unsigned reserve)
 {
-	freeEntities.reserve(usedEntities.size());
-	sortedEntities.reserve(usedEntities.size());
-
-	memset(usedEntities.data(), false, sizeof(bool) * usedEntities.size());
-
-	EntityId id = usedEntities.size();
-	for (int i = 0; i < usedEntities.size(); i++) {
-		freeEntities.push_back(--id);
-	}
+	if (reserve)
+		sortedEntities.reserve(reserve);
 }
 
-void EntityCollection::NewEntities(unsigned size, std::vector<EntityId>& outIds)
+
+void EntityCollection::reserve(unsigned reserve) {
+	sortedEntities.reserve(reserve);
+}
+
+void EntityCollection::clear()
 {
-	if (freeEntities.size() < size)
-		EXCEPTION("No %i free entities left (% free)!", size, freeEntities.size());
+	sortedEntities.clear();
+}
 
-	unsigned start = outIds.size();
+void EntityCollection::AddSortedEntities(const std::vector<EntityId>& outIds, int start) {
 
-	auto iter = freeEntities.cend();
-
-	for (unsigned i = 0; i < size; ++i) {
-		auto newEntity = --iter;
-		EntityId id = *newEntity;
-		outIds.push_back(*newEntity);
-		usedEntities[Entity::ToIndex(id)] = true;
-	}
-
-	freeEntities.erase(freeEntities.cend() - size, freeEntities.cend());
+	if (!outIds.size())
+		return;
 
 	int insertAt = sortedEntities.size();
 	EntityId id = *(outIds.cbegin() + start);
@@ -49,32 +40,20 @@ void EntityCollection::NewEntities(unsigned size, std::vector<EntityId>& outIds)
 	id = outIds.back();
 	size_t end = std::min(sortedEntities.size(), insertAt + (size_t)id + 1);
 	std::sort(sortedEntities.begin() + insertAt, sortedEntities.begin() + end);
-
 }
-
-EntityId EntityCollection::NewEntity() {
-	if (freeEntities.size() == 0)
-		EXCEPTION("No more free entities left!");
-
-	auto newEntity = freeEntities.end() - 1;
-	EntityId id = *newEntity;
-	freeEntities.erase(newEntity);
-
-	usedEntities[Entity::ToIndex(id)] = true;
-
+void EntityCollection::AddEntity(EntityId id) {
 	auto end = sortedEntities.crend();
 	for (auto i = sortedEntities.crbegin(); i != end; ++i)
 	{
 		if (*i < id) {
 			sortedEntities.insert(i.base(), id);
-			return id;
+			return;
 		}
 	}
 
 	sortedEntities.insert(sortedEntities.begin(), id);
-
-	return id;
 }
+
 
 static const std::vector<EntityId>* s;
 static int iter = 0;
@@ -90,7 +69,82 @@ static bool RemoveIf(EntityId id) {
 
 }
 
-void EntityCollection::DeleteSortedEntities(std::vector<EntityId>& deleteEntities)
+void EntityCollection::RemoveSortedEntities(const std::vector<EntityId>& deleteEntities, int offset) {
+
+	if (!deleteEntities.size())
+		return;
+
+	s = &deleteEntities;
+	iter = offset;
+
+	sortedEntities.erase(std::remove_if(sortedEntities.begin(), sortedEntities.end(), RemoveIf), sortedEntities.end());
+
+}
+bool EntityCollection::RemoveEntity(EntityId id) {
+
+	auto end = sortedEntities.cend();
+	for (auto i = sortedEntities.cbegin(); i != end; ++i)
+	{
+		if (*i == id) {
+			sortedEntities.erase(i);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+EntityManagerCollection::EntityManagerCollection()
+{
+	freeEntities.reserve(usedEntities.size());
+	sortedEntities.reserve(usedEntities.size());
+
+	memset(usedEntities.data(), false, sizeof(bool) * usedEntities.size());
+
+	EntityId id = usedEntities.size();
+	for (int i = 0; i < usedEntities.size(); i++) {
+		freeEntities.push_back(--id);
+	}
+}
+
+void EntityManagerCollection::NewEntities(unsigned size, std::vector<EntityId>& outIds)
+{
+	if (freeEntities.size() < size)
+		EXCEPTION("No %i free entities left (% free)!", size, freeEntities.size());
+
+	int start = outIds.size();
+
+	auto iter = freeEntities.cend();
+
+	for (unsigned i = 0; i < size; ++i) {
+		auto newEntity = --iter;
+		EntityId id = *newEntity;
+		outIds.push_back(*newEntity);
+		usedEntities[Entity::ToIndex(id)] = true;
+	}
+
+	freeEntities.erase(freeEntities.cend() - size, freeEntities.cend());
+
+	sortedEntities.AddSortedEntities(outIds, start);
+}
+
+EntityId EntityManagerCollection::NewEntity() {
+	if (freeEntities.size() == 0)
+		EXCEPTION("No more free entities left!");
+
+	auto newEntity = freeEntities.end() - 1;
+	EntityId id = *newEntity;
+	freeEntities.erase(newEntity);
+
+	usedEntities[Entity::ToIndex(id)] = true;
+
+	sortedEntities.AddEntity(id);
+
+	return id;
+}
+
+void EntityManagerCollection::DeleteSortedEntities(std::vector<EntityId>& deleteEntities)
 {
 	if (deleteEntities.size() == 0)
 		return;
@@ -112,10 +166,7 @@ void EntityCollection::DeleteSortedEntities(std::vector<EntityId>& deleteEntitie
 
 	//======================= Sorted Entities Delete ===========================
 
-	s = &deleteEntities;
-	iter = 0;
-
-	sortedEntities.erase(std::remove_if(sortedEntities.begin(), sortedEntities.end(), RemoveIf), sortedEntities.end());
+	sortedEntities.RemoveSortedEntities(deleteEntities);
 
 	//======================= Free Entities Insert ============================
 
@@ -140,7 +191,7 @@ void EntityCollection::DeleteSortedEntities(std::vector<EntityId>& deleteEntitie
 	std::sort(freeEntities.begin() + insertAt, freeEntities.begin() + end, std::greater<EntityId>());
 }
 
-void EntityCollection::DeleteEntity(EntityId id) {
+void EntityManagerCollection::DeleteEntity(EntityId id) {
 	if (id <= Entity::None || id > Entity::MaxEntities ||
 		!usedEntities[Entity::ToIndex(id)])
 		EXCEPTION("Tried to delete invalid entity id %i!", id);
@@ -159,20 +210,12 @@ void EntityCollection::DeleteEntity(EntityId id) {
 		}
 	}
 
-	auto end = sortedEntities.cend();
-	for (auto i = sortedEntities.cbegin(); i != end; ++i)
-	{
-		if (*i == id) {
-			sortedEntities.erase(i);
-			return;
-		}
-	}
-
-	EXCEPTION("Deleting entity %i was not found!", id);
+	if(sortedEntities.RemoveEntity(id))
+		EXCEPTION("Deleting entity %i was not found!", id);
 
 }
 
-void EntityCollection::ClearEntities()
+void EntityManagerCollection::ClearEntities()
 {
 	sortedEntities.clear();
 

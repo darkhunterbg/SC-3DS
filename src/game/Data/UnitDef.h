@@ -35,7 +35,7 @@ struct UnitDef {
 	UnitDef& operator=(const UnitDef&) = delete;
 
 	inline void SetUseSupply(uint8_t amount, bool half = false) {
-		UseSupplyDoubled = (amount << 2 )+ half;
+		UseSupplyDoubled = (amount << 1)+ half;
 	}
 
 	inline void LoadAllSounds() {

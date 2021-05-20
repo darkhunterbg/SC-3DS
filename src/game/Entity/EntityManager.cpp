@@ -197,7 +197,6 @@ void EntityManager::Update1() {
 void EntityManager::Update2() {
 	ready = true;
 
-
 	kinematicSystem.MoveEntities(*this);
 
 	animationSystem.UpdateAnimations();
@@ -210,7 +209,7 @@ void EntityManager::Update2() {
 	renderSystem.UpdatePositions(*this, changedData);
 	kinematicSystem.UpdateCollidersPosition(*this, changedData);
 	kinematicSystem.ApplyCollidersChange(*this);
-
+	mapSystem.UpdateVisibleEntities(*this);
 
 	ApplyEntityChanges();
 }

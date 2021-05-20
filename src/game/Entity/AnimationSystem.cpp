@@ -133,9 +133,9 @@ void AnimationSystem::TickAnimations(EntityManager& em)
 	e = &em;
 	s = this;
 
-	JobSystem::RunJob(em.AnimationArchetype.Archetype.GetEntities().Size(),
+	JobSystem::RunJob(em.AnimationArchetype.Archetype.GetEntities().size(),
 		JobSystem::DefaultJobSize, TickAnimationsJob);
-	JobSystem::RunJob(em.UnitArchetype.AnimationArchetype.Archetype.GetEntities().Size(),
+	JobSystem::RunJob(em.UnitArchetype.AnimationArchetype.Archetype.GetEntities().size(),
 		JobSystem::DefaultJobSize, TickUnitAnimationsJob);
 
 	

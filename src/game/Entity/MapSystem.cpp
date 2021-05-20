@@ -30,17 +30,6 @@ void MapSystem::UpdateMap(EntityManager& em)
 	colors[ActivePlayer] = Color32(Colors::MapFriendly);
 	vision = &em.GetPlayerSystem().GetPlayerVision(ActivePlayer);
 
-	for (EntityId id : em.RenderArchetype.Archetype.GetEntities()) {
-		auto dst = em.RenderArchetype.BoundingBoxComponents.GetComponent(id);
-		dst.position = dst.position >> 5;
-		dst.size = dst.size >> 5;
-
-		dst.Restrict(Vector2Int16(0, 0), gridSize - Vector2Int16(1, 1));
-
-		bool visible = vision->IsVisible(dst);
-
-		em.FlagComponents.GetComponent(id).set(ComponentFlags::RenderEnabled, visible);
-	}
 
 	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {
 		if (em.FlagComponents.GetComponent(id).test(ComponentFlags::RenderEnabled))
@@ -51,8 +40,8 @@ void MapSystem::UpdateMap(EntityManager& em)
 			collider.position += em.PositionComponents.GetComponent(id);
 			collider.position = collider.position >> 5;
 			collider.size = collider.size >> 5;
-			collider.size.x = std::max(collider.size.x, (short)(2));
-			collider.size.y = std::max(collider.size.y, (short)(2));
+			collider.Restrict(Vector2Int16(0, 0), gridSize - Vector2Int16(1, 1));
+			collider.size = collider.size.Max(2, 2);
 
 			bool visible = vision->IsVisible(collider);
 
@@ -63,6 +52,57 @@ void MapSystem::UpdateMap(EntityManager& em)
 			minimapData.color.push_back(colors[owner]);
 		}
 	}
+}
+
+void MapSystem::UpdateVisibleEntities(EntityManager& em) {
+
+	SectionProfiler p("UpdateVisibleEntities");
+
+	vision = &em.GetPlayerSystem().GetPlayerVision(ActivePlayer);
+
+	removedEntities.clear();
+
+	// Detect deleted entities and new entiteis
+
+	for (EntityId id : em.RenderArchetype.Archetype.GetEntities()) {
+		auto dst = em.RenderArchetype.BoundingBoxComponents.GetComponent(id);
+		dst.position = dst.position >> 5;
+		dst.size = dst.size >> 5;
+
+		dst.Restrict(Vector2Int16(0, 0), gridSize - Vector2Int16(1, 1));
+
+		bool visible = vision->IsVisible(dst);
+
+		if (!visible) {
+			removedEntities.push_back(id);
+		}
+	}
+
+	em.RenderArchetype.Archetype.RemoveEntities(removedEntities);
+
+
+	addedEntiteis.clear();
+
+	for (EntityId id : hiddenEntities) {
+		auto dst = em.RenderArchetype.BoundingBoxComponents.GetComponent(id);
+		Vector2Int16 pos = em.PositionComponents.GetComponent(id);
+		dst.SetCenter(pos);
+		dst.position = dst.position >> 5;
+		dst.size = dst.size >> 5;
+
+		dst.Restrict(Vector2Int16(0, 0), gridSize - Vector2Int16(1, 1));
+
+		bool visible = vision->IsVisible(dst);
+
+		if (visible) {
+			addedEntiteis.push_back(id);
+		}
+	}
+
+	hiddenEntities.RemoveSortedEntities(addedEntiteis);
+
+	em.RenderArchetype.Archetype.AddEntities(addedEntiteis);
+	hiddenEntities.AddSortedEntities(removedEntities);
 }
 
 void MapSystem::DrawMap(const Camera& camera)

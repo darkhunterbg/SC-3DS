@@ -30,7 +30,7 @@ struct EntityChangedData {
 
 class EntityManager {
 private:
-	EntityCollection entities;
+	EntityManagerCollection entities;
 
 	RenderSystem renderSystem;
 	AnimationSystem animationSystem;

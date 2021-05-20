@@ -17,16 +17,7 @@ void EntityArchetype::AddEntity(EntityId id)
 
 	hasEntity[Entity::ToIndex(id)] = true;
 	newEntities.push_back(id);
-	auto end = entities.crend();
-	for (auto i = entities.crbegin(); i != end; ++i)
-	{
-		if (*i < id) {
-			entities.insert(i.base(), id);
-			return;
-		}
-	}
-
-	entities.insert(entities.begin(), id);
+	entities.AddEntity(id);
 }
 void EntityArchetype::AddEntities(std::vector<EntityId>& add, bool sorted) {
 	if (!sorted)
@@ -39,21 +30,8 @@ void EntityArchetype::AddEntities(std::vector<EntityId>& add, bool sorted) {
 		else
 			hasEntity[Entity::ToIndex(id)] = true;
 
-	int insertAt = entities.size();
-	EntityId id = add.front();
-	auto sortEnd = insertAt;
-	for (int i = 0; i < sortEnd; ++i)
-	{
-		if (entities[i] < id) {
-			insertAt = i;
-			break;
-		}
-	}
-
-	entities.insert(entities.cbegin() + insertAt, add.cbegin(), add.cend());
-	id = add.back();
-	size_t end = std::min(entities.size(), insertAt + (size_t)id + 1);
-	std::sort(entities.begin() + insertAt, entities.begin() + end);
+	newEntities.insert(newEntities.end(), add.begin(), add.end());
+	entities.AddSortedEntities(add);
 }
 
 void EntityArchetype::RemoveEntity(EntityId id)
@@ -63,32 +41,10 @@ void EntityArchetype::RemoveEntity(EntityId id)
 
 	hasEntity[Entity::ToIndex(id)] = false;
 	removedEntities.push_back(id);
-	auto end = entities.cend();
-	for (auto i = entities.cbegin(); i != end; ++i)
-	{
-		if (*i == id) {
-			entities.erase(i);
-			return;
-		}
-	}
 
-	EXCEPTION("Deleting entity %id was not found in archetype %s!", id, name);
+	if (!entities.RemoveEntity(id))
+		EXCEPTION("Deleting entity %id was not found in archetype %s!", id, name);
 }
-
-static const std::vector<EntityId>* s;
-static  int iter = 0;
-
-static bool RemoveIf(EntityId id) {
-	auto& sratch = *s;
-	if (iter < sratch.size() && sratch[iter] == id)
-	{
-		++iter;
-		return true;
-	}
-	return false;
-
-}
-
 int EntityArchetype::RemoveEntitiesSorted(std::vector<EntityId>& del) {
 	scratch.clear();
 
@@ -98,24 +54,18 @@ int EntityArchetype::RemoveEntitiesSorted(std::vector<EntityId>& del) {
 		else {
 			scratch.push_back(id);
 			hasEntity[Entity::ToIndex(id)] = false;
-			removedEntities.push_back(id);
 		}
 
 	if (scratch.size() == 0)
 		return 0;
 
+	removedEntities.insert(removedEntities.end(), scratch.begin(), scratch.end());
 
-	s = &scratch;
-	iter = 0;
-
-
-	entities.erase(std::remove_if(entities.begin(), entities.end(), RemoveIf), entities.end());
+	entities.RemoveSortedEntities(scratch);
 
 	return scratch.size();
 }
-
-
-int EntityArchetype::RemoveEntities( std::vector<EntityId>& del, bool sorted) {
+int EntityArchetype::RemoveEntities(std::vector<EntityId>& del, bool sorted) {
 	if (!sorted)
 		std::sort(del.begin(), del.end());
 
@@ -129,7 +79,6 @@ void EntityArchetype::ClearEntities()
 	removedEntities.clear();
 	memset(hasEntity.data(), false, Entity::MaxEntities * sizeof(bool));
 }
-
 void EntityArchetype::CommitChanges()
 {
 	newEntities.clear();

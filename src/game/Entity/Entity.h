@@ -17,19 +17,50 @@ public:
 	static inline constexpr const EntityId ToId(int  index) { return index; }
 };
 
-class EntityCollection
-{
-private:
+
+class EntityCollection {
 	std::vector<EntityId> sortedEntities;
-	std::array<bool, Entity::MaxEntities> usedEntities;
-	std::vector<EntityId> freeEntities;
 public:
 	EntityCollection(const EntityCollection&) = delete;
 	EntityCollection& operator=(const EntityCollection&) = delete;
 
-	EntityCollection();
+	EntityCollection(unsigned reserve = 0);
 
-	inline const Span<EntityId> GetEntities() const { return { sortedEntities.data(),sortedEntities.size() }; }
+	void reserve(unsigned reserve);
+	void clear();
+
+	void AddSortedEntities(const std::vector<EntityId>& outIds, int offset = 0);
+	void AddEntity(EntityId id);
+	bool RemoveEntity(EntityId id);
+	void RemoveSortedEntities(const std::vector<EntityId>& e, int offset = 0);
+
+	inline const std::vector<EntityId>& GetEntities() const { return sortedEntities; }
+	inline EntityId GetEntity(int index) const { return sortedEntities[index]; }
+
+	inline EntityId at(int i)const { return GetEntity(i); };
+	inline size_t size() const { return sortedEntities.size(); }
+	inline EntityId operator[](int i)  const { return GetEntity(i); }
+	inline std::vector<EntityId>::const_iterator begin() const {
+		return sortedEntities.cbegin();
+	}
+	inline  std::vector<EntityId>::const_iterator end() const {
+		return sortedEntities.cend();
+	}
+};
+
+class EntityManagerCollection
+{
+private:
+	EntityCollection sortedEntities;
+	std::array<bool, Entity::MaxEntities> usedEntities;
+	std::vector<EntityId> freeEntities;
+public:
+	EntityManagerCollection(const EntityManagerCollection&) = delete;
+	EntityManagerCollection& operator=(const EntityManagerCollection&) = delete;
+
+	EntityManagerCollection();
+
+	inline const Span<EntityId> GetEntities() const { return { sortedEntities.GetEntities().data(), sortedEntities.GetEntities().size() }; }
 	inline EntityId GetEntity(int index) const { return sortedEntities[index]; }
 
 	void NewEntities(unsigned size, std::vector<EntityId>& outIds);
@@ -52,5 +83,3 @@ public:
 		return  GetEntities().end();
 	}
 };
-
-

@@ -76,7 +76,7 @@ void PlayerSystem::AddGas(PlayerId i, int gas)
 
 void PlayerSystem::UpdatePlayerUnits(const EntityManager& em) {
 	for (PlayerVision* vision : playerVision) {
-		vision->ClearVisible();
+		vision->ranges.clear();
 	}
 
 	for (EntityId id : em.UnitArchetype.Archetype.NewEntities()) {
@@ -174,6 +174,8 @@ void PlayerSystem::UpdatePlayerVisionTimers(PlayerVision& vision) {
 
 void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
 	// WARN: bitshift will not work when map is not power of 2 (192, for example)
+
+	vision.ClearVisibility();
 
 	const int bitshift = std::log2(vision.gridSize.x);
 	const Vector2Int16 gridSize = vision.gridSize;

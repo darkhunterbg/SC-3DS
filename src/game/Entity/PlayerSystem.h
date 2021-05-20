@@ -32,8 +32,7 @@ public:
 	std::bitset<64> timerBuckets; // One bucket is 32x32 tiles
 
 public:
-	inline void ClearVisible() {
-		ranges.clear();
+	inline void ClearVisibility() {
 		memset(visibility.data(), 0, sizeof(VisionCell) * visibility.size());
 	}
 
@@ -107,10 +106,10 @@ struct PlayerInfo {
 	PlayerId id;
 
 	inline int GetCurrentSupply() const {
-		return currentSupplyDoubled >> 2;
+		return currentSupplyDoubled >> 1;
 	}
 	inline int GetMaxSupply() const {
-		return maxSupplyDoubled >> 2;
+		return maxSupplyDoubled >> 1;
 	}
 
 
