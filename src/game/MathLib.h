@@ -85,6 +85,12 @@ struct Vector2T
 	//	return *this;
 	//}
 
+	Vector2T Min(T mx, T my) const {
+		return Vector2T(std::min(x,mx), std::min(y,my)) ;
+	}
+	Vector2T Max(T mx, T my) const {
+		return Vector2T(std::max(x, mx), std::max(y, my));
+	}
 
 	static Vector2T Normalize(const Vector2T& a)
 	{
@@ -117,6 +123,12 @@ struct Vector2T
 	{
 		return Vector2T(x / b.x, y / b.y);
 	}
+	inline Vector2T operator << (int shift) const {
+		return Vector2T( x<< shift,  y << shift);
+	}
+	inline Vector2T operator >> (int shift) const {
+		return Vector2T(x >> shift, y >> shift);
+	}
 	inline  Vector2T& operator+=(const Vector2T& b)
 	{
 		x += b.x;
@@ -141,6 +153,7 @@ struct Vector2T
 		y /= b.y;
 		return *this;
 	}
+
 
 	inline static Vector2T Lerp(const Vector2T<T>& a, const Vector2T& b, float l)
 	{
@@ -330,6 +343,13 @@ struct Rectangle16
 	inline bool Contains(const Vector2Int16& v) const {
 		return v.x <= position.x + size.x && v.x >= position.x &&
 			v.y <= position.y + size.y && v.y >= position.y;
+	}
+
+	void Restrict(Vector2Int16 min, Vector2Int16 max) {
+		position = position.Max(min.x, min.y);
+		Vector2Int16 end = position + size;
+		end = end.Min(max.x, max.y);
+		size = end - position;
 	}
 
 };

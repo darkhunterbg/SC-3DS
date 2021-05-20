@@ -167,8 +167,6 @@ void RenderSystem::UpdateUnitRenderPositionsJob(int start, int end) {
 	}
 }
 
-
-
 void RenderSystem::UpdatePositions(EntityManager& em, const EntityChangedData& changed) {
 	updatePosData.clear();
 	unitUpdatePosData.clear();

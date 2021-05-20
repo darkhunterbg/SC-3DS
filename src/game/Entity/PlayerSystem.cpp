@@ -118,8 +118,10 @@ void PlayerSystem::UpdateNextPlayerVisionJob(int start, int end) {
 	}
 }
 
-
 bool PlayerSystem::UpdateNextPlayerVision(int players) {
+
+	SectionProfiler p("UpdatePlayerVision");
+
 	s = this;
 
 	int max = std::min((int)playerVision.size(), playerUpdate + players);
@@ -171,9 +173,12 @@ void PlayerSystem::UpdatePlayerVisionTimers(PlayerVision& vision) {
 }
 
 void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
+	// WARN: bitshift will not work when map is not power of 2 (192, for example)
+
 	const int bitshift = std::log2(vision.gridSize.x);
 	const Vector2Int16 gridSize = vision.gridSize;
 	const int gridSizeBuckets = gridSize.x >> 5;
+	const int bucketBitshift = std::log2(gridSizeBuckets);
 
 	int end = vision.ranges.size();
 
@@ -188,10 +193,15 @@ void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
 		max.x = std::min((short)(gridSize.x - 1), max.x);
 		max.y = std::min((short)(gridSize.y - 1), max.y);
 
-		int startBucket = (min.x >> 5) + (min.y >> 5) * gridSizeBuckets;
-		int endBucket = (max.x >> 5) + (max.y >> 5) * gridSizeBuckets;
-		vision.timerBuckets.set(startBucket);
-		vision.timerBuckets.set(endBucket);
+		Vector2Int16 bucketMin = min >> 5;
+		bucketMin.x = bucketMin.x << bucketBitshift;
+		Vector2Int16 bucketMax = (max >> 5);
+		bucketMax.x = bucketMax.x << bucketBitshift;
+
+		vision.timerBuckets.set(bucketMin.x + bucketMin.y);
+		vision.timerBuckets.set(bucketMax.x + bucketMin.y);
+		vision.timerBuckets.set(bucketMin.x + bucketMax.y);
+		vision.timerBuckets.set(bucketMax.x + bucketMax.y);
 
 		int size = circle.size * circle.size;
 

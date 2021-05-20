@@ -50,6 +50,8 @@ const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 
 		atlas->AddSprite(s);
 	}
+	C2D_Image img = C2D_SpriteSheetGetImage(sheet, 0);
+	C3D_TexSetWrap(img.tex, GPU_TEXTURE_WRAP_PARAM::GPU_CLAMP_TO_EDGE, GPU_TEXTURE_WRAP_PARAM::GPU_CLAMP_TO_EDGE);
 
 	return atlas;
 }

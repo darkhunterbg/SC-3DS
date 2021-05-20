@@ -15,7 +15,8 @@ class EntityManager;
 
 
 
-struct PlayerVision {
+class PlayerVision {
+public:
 	// Once VisionCell holds 32 cells bits.
 	// Set bit means visiblity is ON.
 	typedef uint32_t VisionCell;
@@ -30,6 +31,7 @@ struct PlayerVision {
 	std::vector<uint8_t> visibilityCountdown;
 	std::bitset<64> timerBuckets; // One bucket is 32x32 tiles
 
+public:
 	inline void ClearVisible() {
 		ranges.clear();
 		memset(visibility.data(), 0, sizeof(VisionCell) * visibility.size());
@@ -55,7 +57,14 @@ struct PlayerVision {
 		int i = (pos.x >> 5) + ((pos.y * (int)gridSize.x) >> 5);
 
 		const VisionCell& b = visibility[i];
-		return  b & (1 << (pos.x % 32)); 
+		return  b & (1 << (pos.x % 32));
+	}
+	inline bool IsVisible(const Rectangle16& rect) const {
+		return  
+			IsVisible(rect.position) ||
+			IsVisible(rect.position + Vector2Int16(rect.size.x, 0)) ||
+			IsVisible(rect.position + Vector2Int16(0, rect.size.y)) ||
+			IsVisible(rect.GetMax());
 	}
 
 	inline uint8_t GetState(const Vector2Int16& pos) const {
@@ -112,19 +121,18 @@ struct PlayerInfo {
 
 class PlayerSystem {
 private:
+	Vector2Int16 gridSize;
+	int playerUpdate = 0;
+
 	std::vector<PlayerInfo> players;
 	std::vector<PlayerVision*> playerVision;
 
-	friend class EntityManager;
-
-	Vector2Int16 gridSize;
-	int playerUpdate = 0;
-	
 	static void UpdatePlayerVisionTimers(PlayerVision& vision);
 	static void UpdatePlayerVision(PlayerVision& vision);
 
 	static void UpdateNextPlayerVisionJob(int start, int end);
 
+	friend class EntityManager;
 public:
 	void SetSize(Vector2Int16 size);
 
@@ -132,6 +140,7 @@ public:
 
 	const PlayerInfo& GetPlayerInfo(PlayerId id) const;
 	const PlayerVision& GetPlayerVision(PlayerId id) const;
+	const std::vector<PlayerInfo>& GetPlayers() const { return players; }
 
 	void AddMinerals(PlayerId player, int minerals);
 	void AddGas(PlayerId player, int gas);
