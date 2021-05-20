@@ -67,7 +67,7 @@ void GameScene::Start() {
 				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 + 16 }));
 
 			//entityManager->UnitArchetype.OrientationComponents.GetComponent(e) = 12;
-			EntityUtil::PlayAnimation(e, def.Graphics->AttackAnimations[12]);
+			//EntityUtil::PlayAnimation(e, def.Graphics->AttackAnimations[12]);
 			//EntityUtil::StartTimer(e, 3, TimerExpiredAction::UnitToggleIdleAnimation, true);
 			//entityManager->GoTo(e, { 1024,1024 });
 
