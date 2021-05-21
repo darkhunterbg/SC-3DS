@@ -11,11 +11,13 @@
 
 struct UnitDef {
 	std::string Name;
-	unsigned Health;
-	uint8_t MovementSpeed;
+	unsigned Health = 100;
+	uint8_t MovementSpeed = 1;
 	uint8_t Acceleration = 0;
-	uint8_t RotationSpeed;
+	uint8_t RotationSpeed = 1;
 	uint8_t Vision = 1;
+	
+	bool IsBuilding = false;
 
 	uint8_t UseSupplyDoubled = 0;
 	uint8_t ProvideSupplyDoubled = 0;

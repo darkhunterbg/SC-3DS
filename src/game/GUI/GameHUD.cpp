@@ -23,7 +23,7 @@ GameHUD::GameHUD(const RaceDef& race, Vector2Int16 mapSize) : race(race) {
 	//cmdIconsAtlas = Platform::LoadAtlas("cmdicons.t3x");
 }
 
-void GameHUD::DrawResource(Sprite icon, Vector2Int pos, const char* fmt, ...) {
+void GameHUD::DrawResource(Sprite icon, Vector2Int pos, Color color, const char* fmt, ...) {
 	va_list args;
 	va_start(args, fmt);
 	stbsp_vsnprintf(textBuffer, sizeof(textBuffer), fmt, args);
@@ -32,7 +32,7 @@ void GameHUD::DrawResource(Sprite icon, Vector2Int pos, const char* fmt, ...) {
 	Platform::Draw(icon, { pos,{ 14, 14} });
 	pos += {16, -2};
 	Platform::DrawText(font, pos + Vector2Int{ 1,1 }, textBuffer, Colors::Black, 0.4f);
-	Platform::DrawText(font, pos, textBuffer, Colors::UIGreen, 0.4f);
+	Platform::DrawText(font, pos, textBuffer, color, 0.4f);
 }
 
 
@@ -65,12 +65,23 @@ void GameHUD::UpperScreenGUI() {
 	UpdateResourceDiff(minerals);
 	UpdateResourceDiff(gas);
 
-	// Supply
-	DrawResource(race.SupplyIcon, { 320,2 }, "%i/%i", supply.current, supply.max);
-	// Gas
-	DrawResource(race.GasIcon, { 240, 2 }, "%i", gas.shown);
+	Color color = Colors::UIGreen;
+
 	// Minerals
-	DrawResource(iconsAtlas->GetSprite(0), { 160, 2 }, "%i", minerals.shown);
+	DrawResource(iconsAtlas->GetSprite(0), { 160, 2 }, color, "%i", minerals.shown);
+	// Gas
+	DrawResource(race.GasIcon, { 240, 2 }, color, "%i", gas.shown);
+	// Supply
+	if (supply.current > supply.max)
+		color = Colors::UIRed;
+	DrawResource(race.SupplyIcon, { 320,2 }, color, "%i", supply.current);
+
+
+	Vector2Int pos = { 320 + 16 , 0 };
+	pos.x += 7.5 * std::strlen(textBuffer);
+	stbsp_snprintf(textBuffer, sizeof(textBuffer), "/%i", supply.max);
+	Platform::DrawText(font, pos + Vector2Int{ 1,1 }, textBuffer, Colors::Black, 0.4f);
+	Platform::DrawText(font, pos, textBuffer, Colors::UIGreen, 0.4f);
 
 	const auto& sprite = race.ConsoleSprite.GetSprite(1);
 	Platform::Draw(sprite, { {0, 240 - sprite.rect.size.y,}, Vector2Int(sprite.rect.size) });

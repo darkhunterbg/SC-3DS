@@ -41,8 +41,9 @@ private:
 	std::vector<EntityId> addedEntities;
 
 	std::vector<EntityId> scratch;
+	std::vector<EntityId> scratch2;
 
-	static void InitFowVisiblleEntitiesJob(int start, int end);
+	static void InitFowVisibleEntitiesJob(int start, int end);
 
 	void GenerateMinimapTerrainTexture();
 	void RenderMinimapFogOfWar(const PlayerVision& vision);

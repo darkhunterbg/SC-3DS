@@ -52,6 +52,7 @@ const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 	}
 	C2D_Image img = C2D_SpriteSheetGetImage(sheet, 0);
 	C3D_TexSetWrap(img.tex, GPU_TEXTURE_WRAP_PARAM::GPU_CLAMP_TO_EDGE, GPU_TEXTURE_WRAP_PARAM::GPU_CLAMP_TO_EDGE);
+	C3D_TexSetFilter(img.tex, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR);
 
 	return atlas;
 }

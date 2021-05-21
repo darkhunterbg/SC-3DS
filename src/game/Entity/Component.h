@@ -184,11 +184,13 @@ struct UnitDataComponent {
 	uint8_t supplyUsage = 0;
 	uint8_t supplyProvides = 0;
 	uint8_t visiion = 1;
+	bool isBuilding = false;
 
 	inline void FromDef(const UnitDef& def) {
 		supplyUsage = def.UseSupplyDoubled;
 		supplyProvides = def.ProvideSupplyDoubled;
 		visiion = def.Vision + 1;
+		isBuilding = def.IsBuilding;
 	}
 };
 

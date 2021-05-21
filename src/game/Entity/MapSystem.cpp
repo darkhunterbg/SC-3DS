@@ -30,8 +30,6 @@ void MapSystem::UpdateMapObjectPositions(EntityManager& em, const EntityChangedD
 
 void MapSystem::UpdateMap(EntityManager& em, const EntityChangedData& changed)
 {
-	SectionProfiler p("UpdateMap");
-
 	UpdateMapObjectPositions(em, changed);
 
 	minimapData.clear();
@@ -146,12 +144,12 @@ void MapSystem::UpdateVisibleRenderUnits(EntityManager& em) {
 static MapSystem* s;
 static EntityManager* e;
 
-void MapSystem::InitFowVisiblleEntitiesJob(int start, int end) {
+void MapSystem::InitFowVisibleEntitiesJob(int start, int end) {
 	MapSystem& system = *s;
 	EntityManager& em = *e;
 
 	for (int i = start; i < end; ++i) {
-		EntityId from = system.removedEntities[i];
+		EntityId from = system.scratch2[i];
 		EntityId id = system.scratch[i];
 
 		em.PositionComponents.CopyComponent(from, id);
@@ -188,21 +186,37 @@ void MapSystem::UpdateFowVisibleUnits(EntityManager& em) {
 
 	em.DeleteEntities(scratch);
 
-	scratch.clear();
-	em.NewEntities(removedEntities.size(), scratch);
-	em.UnitArchetype.RenderArchetype.Archetype.AddSortedEntities(scratch);
-	em.UnitArchetype.FowVisibleArchetype.Archetype.AddSortedEntities(scratch);
+	
+	if (removedEntities.size() > 0)
+	{
 
-	s = this;
-	e = &em;
+		auto& fowVisible = scratch2;
+		fowVisible.clear();
 
-	JobSystem::RunJob(scratch.size(), JobSystem::DefaultJobSize, InitFowVisiblleEntitiesJob);
+		for (EntityId id : removedEntities) {
+			// TODO: optimize at some point
+			if (em.UnitArchetype.DataComponents.GetComponent(id).isBuilding) {
+				fowVisible.push_back(id);
+			}
+		}
+
+		if (fowVisible.size() > 0)
+		{
+			scratch.clear();
+			em.NewEntities(fowVisible.size(), scratch);
+			em.UnitArchetype.RenderArchetype.Archetype.AddSortedEntities(scratch);
+			em.UnitArchetype.FowVisibleArchetype.Archetype.AddSortedEntities(scratch);
+
+			s = this;
+			e = &em;
+
+			JobSystem::RunJob(scratch.size(), JobSystem::DefaultJobSize, InitFowVisibleEntitiesJob);
+		}
+	}
 
 }
 
 void MapSystem::UpdateVisibleEntities(EntityManager& em) {
-	SectionProfiler p("UpdateVisibleEntities");
-
 	UpdateVisibleRenderEntities(em);
 	UpdateVisibleRenderUnits(em);
 	UpdateFowVisibleUnits(em);

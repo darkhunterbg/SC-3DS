@@ -81,7 +81,7 @@ void RenderSystem::DrawEntities(const Camera& camera, const Rectangle16& camRect
 	}
 }
 void RenderSystem::DrawUnits(const Camera& camera, const Rectangle16& camRect) {
-	constexpr const Color32 shadowColor = Color32(0.0f, 0.0f, 0.0f, 0.4f);
+	constexpr const Color32 shadowColor = Color32(0.0f, 0.0f, 0.0f, 0.5f);
 
 	float camMul = 1.0f / camera.Scale;
 

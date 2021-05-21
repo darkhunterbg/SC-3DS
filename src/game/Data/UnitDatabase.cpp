@@ -45,6 +45,7 @@ static void CommandCenterData() {
 	u.RotationSpeed = 0;
 	u.Vision = 10;
 	u.SetPovideSupply(10);
+	u.IsBuilding = true;
 
 	u.Sounds.Death = { "sound/misc/explo4", 1 , true };
 	u.Sounds.What = { "sound/misc/button", 1 , true };

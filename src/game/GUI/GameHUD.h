@@ -2,6 +2,7 @@
 
 #include "../Assets.h"
 #include "../Data/RaceDef.h"
+#include "../Color.h"
 
 class Camera;
 class MapSystem;
@@ -41,7 +42,7 @@ private:
 	Resource gas = { 0,0 };
 	Supply supply = { 0,0 };
 
-	void DrawResource(Sprite icon, Vector2Int pos, const char* text, ...);
+	void DrawResource(Sprite icon, Vector2Int pos, Color color, const char* text, ...);
 	void DrawMinimap(const Camera& camera,  MapSystem& mapSystem);
 	void DrawAbilities();
 
