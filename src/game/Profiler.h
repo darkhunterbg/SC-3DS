@@ -20,4 +20,5 @@ private:
 	 static void FrameStart();
 	 static void FrameEnd();
 	 static void AddStat(const char* name, double timeMs);
+	 static void AddCounter(const char* name, int value);
 };

@@ -45,7 +45,6 @@ void GameScene::Start() {
 	//entityManager->DrawBoundingBoxes = true;
 	//entityManager->DrawGrid = true;
 	//entityManager->DrawColliders = true;
-	//entityManager->GetMapSystem().FogOfWarVisible = false;
 
 	entityManager->Init(size);
 
@@ -59,17 +58,20 @@ void GameScene::Start() {
 		entityManager->GetPlayerSystem().AddPlayer(race, color[p]);
 	}
 
-	EntityId e = UnitEntityUtil::NewUnit(*UnitDatabase::Units[2], 1,
-		Vector2Int16(400,128));
+	entityManager->GetPlayerSystem().SetMapKnown(0);
+	//EntityId e = UnitEntityUtil::NewUnit(*UnitDatabase::Units[2], 1,
+	//	Vector2Int16(400,128));
 
+	EntityId e = UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 0,
+		Vector2Int16(48, 48));
 
 	int i = 0;
-	for (int y = 1; y > 0; --y) {
-		for (int x = 1; x > 0; --x) {
+	for (int y = 40; y > 0; --y) {
+		for (int x = 40; x > 0; --x) {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[0];
-			EntityId e = UnitEntityUtil::NewUnit(def, i % totalPlayers,
-				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 + 16 }));
+			EntityId e = UnitEntityUtil::NewUnit(def, 1 + i % 7,
+				Vector2Int16(Vector2Int{ x * 32 + 200,y * 32 + 200 }));
 
 			//entityManager->UnitArchetype.OrientationComponents.GetComponent(e) = 12;
 			//EntityUtil::PlayAnimation(e, def.Graphics->IdleAnimations[0]);
@@ -81,7 +83,7 @@ void GameScene::Start() {
 		}
 	}
 
-	selection.push_back(1);
+	selection.push_back(0);
 }
 
 int t = 0;
@@ -110,12 +112,12 @@ void GameScene::Update() {
 	//if (logical)
 	{
 
-		if (Game::Gamepad.IsButtonPressed(GamepadButton::Start)) {
+		if (Game::Gamepad.IsButtonPressed(GamepadButton::Select)) {
 			entityManager->GetMapSystem().FogOfWarVisible =
 				!entityManager->GetMapSystem().FogOfWarVisible;
 		}
 
-		if (Game::Gamepad.IsButtonPressed(GamepadButton::Select)) {
+		if (Game::Gamepad.IsButtonPressed(GamepadButton::Start)) {
 			entityManager->DrawGrid =
 				!entityManager->DrawGrid;
 		}
@@ -147,14 +149,14 @@ void GameScene::Update() {
 				}
 		}
 
-		if (Game::Gamepad.IsButtonPressed(GamepadButton::Y)) {
+		if (Game::Gamepad.IsButtonPressed(GamepadButton::B)) {
 
 			for (EntityId id : selection)
 				if (entityManager->NavigationArchetype.Archetype.HasEntity(id)) {
 					entityManager->FlagComponents.GetComponent(id).clear(ComponentFlags::NavigationWork);
 				}
 		}
-		if (Game::Gamepad.IsButtonPressed(GamepadButton::B)) {
+		if (Game::Gamepad.IsButtonPressed(GamepadButton::Y)) {
 			entityManager->UnitArchetype.Archetype.RemoveEntities(selection, false);
 			entityManager->CollisionArchetype.Archetype.RemoveEntities(selection, false);
 			entityManager->NavigationArchetype.Archetype.RemoveEntities(selection, false);

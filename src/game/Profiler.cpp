@@ -113,3 +113,9 @@ void Profiler::AddStat(const char* name, double timeMs) {
 		return;
 	profileData[name] = std::roundf((r * 0.9 + timeMs * 0.1) * 10.0) / 10.0;
 }
+
+void Profiler::AddCounter(const char* name, int  value) {
+	int r = profileData[name];
+
+	profileData[name] = (int)(  value);
+}

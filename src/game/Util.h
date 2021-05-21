@@ -13,4 +13,6 @@ public:
 	static void DrawTransparentRectangle(const Rectangle16& rect, Color c);
 	static void DrawTransparentRectangle(const Rectangle& rect, int thickness, Color c);
 	static void DrawTransparentRectangle(const Rectangle16& rect, int thickness, Color c);
+
+	static void RealTimeStat(const char* stat, int value);
 };

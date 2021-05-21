@@ -6,7 +6,12 @@
 
 void Camera::Update() {
 
-	Scale = Game::Gamepad.IsButtonDown(GamepadButton::R) ? 2 : 1;
+	if (Game::Gamepad.IsButtonPressed(GamepadButton::R)) {
+		if (Scale == 1)
+			Scale = 2;
+		else
+			Scale = 1;
+	}
 
 	if (Game::Gamepad.IsButtonDown(GamepadButton::L))
 	{

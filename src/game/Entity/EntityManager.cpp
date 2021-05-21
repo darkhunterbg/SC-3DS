@@ -3,6 +3,7 @@
 #include "EntityUtil.h"
 
 #include "../Profiler.h"
+#include "../Util.h"
 
 #include <algorithm>
 
@@ -146,8 +147,8 @@ void EntityManager::UpdateChildrenPosition() {
 
 // Updates 12 per second (60 fps) 
 void EntityManager::Update0() {
+
 	playerSystem.UpdateNextPlayerVision();
-		
 
 }
 // Updates 24 per second (60 fps) 
@@ -208,19 +209,26 @@ void EntityManager::Update() {
 
 	switch (updateId)
 	{
-	case 0:
+	case 0: {
+		SectionProfiler p("Update0");
 		Update0();
 		break;
-	case 1:
+	}
+	case 1: {
+		SectionProfiler p("Update1");
 		Update1();
 		break;
-	case 2:
+	}
+	case 2: {
+		SectionProfiler p("Update2");
 		Update2();
 		break;
+	}
 	default:
 		EXCEPTION("Invalid UpdateId %i", updateId);
 	}
 
+	//Util::RealTimeStat("Entities", entities.size());
 }
 
 void EntityManager::Draw(const Camera& camera) {

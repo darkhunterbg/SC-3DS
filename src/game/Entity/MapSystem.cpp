@@ -66,8 +66,6 @@ void MapSystem::UpdateMap(EntityManager& em, const EntityChangedData& changed)
 		PlayerId owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
 		const Rectangle16& dst = em.MapObjectArchetype.DestinationComponents.GetComponent(id);
 
-		bool visible = vision.IsVisible(dst);
-
 		minimapData.dst.push_back(dst);
 		minimapData.color.push_back(colors[owner]);
 	}
@@ -93,8 +91,6 @@ void MapSystem::UpdateVisibleRenderEntities(EntityManager& em) {
 	addedEntities.clear();
 
 	for (EntityId id : em.HiddenArchetype.Archetype.GetEntities()) {
-		if (!em.MapObjectArchetype.Archetype.HasEntity(id))
-			continue;
 
 		const Rectangle16& dst = em.MapObjectArchetype.DestinationComponents.GetComponent(id);
 		bool visible = vision.IsVisible(dst);
@@ -111,6 +107,7 @@ void MapSystem::UpdateVisibleRenderEntities(EntityManager& em) {
 	em.RenderArchetype.Archetype.AddSortedEntities(addedEntities);
 }
 void MapSystem::UpdateVisibleRenderUnits(EntityManager& em) {
+
 	const PlayerVision& vision = em.GetPlayerSystem().GetPlayerVision(ActivePlayer);
 
 	removedEntities.clear();
@@ -130,9 +127,7 @@ void MapSystem::UpdateVisibleRenderUnits(EntityManager& em) {
 	addedEntities.clear();
 
 	for (EntityId id : em.UnitArchetype.HiddenArchetype.Archetype.GetEntities()) {
-		if (!em.MapObjectArchetype.Archetype.HasEntity(id))
-			continue;
-
+	
 		const Rectangle16& dst = em.MapObjectArchetype.DestinationComponents.GetComponent(id);
 		bool visible = vision.IsVisible(dst);
 
@@ -142,18 +137,40 @@ void MapSystem::UpdateVisibleRenderUnits(EntityManager& em) {
 		}
 	}
 
-	UpdateFowVisibleUnits(em, removedEntities, addedEntities);
-
 	em.UnitArchetype.RenderArchetype.Archetype.RemoveSortedEntities(removedEntities);
 	em.UnitArchetype.HiddenArchetype.Archetype.AddSortedEntities(removedEntities);
 	em.UnitArchetype.HiddenArchetype.Archetype.RemoveSortedEntities(addedEntities);
 	em.UnitArchetype.RenderArchetype.Archetype.AddSortedEntities(addedEntities);
 }
 
-static std::vector<EntityId> scratch;
+static MapSystem* s;
+static EntityManager* e;
 
-void MapSystem::UpdateFowVisibleUnits(EntityManager& em,
-	const std::vector<EntityId> hidden, const std::vector<EntityId> shown) {
+void MapSystem::InitFowVisiblleEntitiesJob(int start, int end) {
+	MapSystem& system = *s;
+	EntityManager& em = *e;
+
+	for (int i = start; i < end; ++i) {
+		EntityId from = system.removedEntities[i];
+		EntityId id = system.scratch[i];
+
+		em.PositionComponents.CopyComponent(from, id);
+
+		em.UnitArchetype.RenderArchetype.RenderComponents.CopyComponent(from, id);
+		em.UnitArchetype.RenderArchetype.BoundingBoxComponents.CopyComponent(from, id);
+		em.UnitArchetype.RenderArchetype.OffsetComponents.CopyComponent(from, id);
+		em.UnitArchetype.RenderArchetype.DestinationComponents.CopyComponent(from, id);
+
+		em.UnitArchetype.OwnerComponents.CopyComponent(from, id);
+
+		em.MapObjectArchetype.BoundingBoxComponents.CopyComponent(from, id);
+		em.MapObjectArchetype.DestinationComponents.CopyComponent(from, id);
+
+		em.FlagComponents.GetComponent(id).set(ComponentFlags::RenderEnabled);
+	}
+}
+
+void MapSystem::UpdateFowVisibleUnits(EntityManager& em) {
 
 	const PlayerVision& vision = em.GetPlayerSystem().GetPlayerVision(ActivePlayer);
 
@@ -172,39 +189,23 @@ void MapSystem::UpdateFowVisibleUnits(EntityManager& em,
 	em.DeleteEntities(scratch);
 
 	scratch.clear();
-	em.NewEntities(hidden.size(), scratch);
+	em.NewEntities(removedEntities.size(), scratch);
 	em.UnitArchetype.RenderArchetype.Archetype.AddSortedEntities(scratch);
 	em.UnitArchetype.FowVisibleArchetype.Archetype.AddSortedEntities(scratch);
 
-	for (int i = 0; i < hidden.size(); ++i) {
-		EntityId from = hidden[i];
-		EntityId id = scratch[i];
+	s = this;
+	e = &em;
 
-		em.PositionComponents.CopyComponent(from, id); 
-
-		em.UnitArchetype.RenderArchetype.RenderComponents.CopyComponent(from, id);
-		em.UnitArchetype.RenderArchetype.BoundingBoxComponents.CopyComponent(from, id);
-		em.UnitArchetype.RenderArchetype.OffsetComponents.CopyComponent(from, id);
-		em.UnitArchetype.RenderArchetype.DestinationComponents.CopyComponent(from, id);
-
-		em.UnitArchetype.OwnerComponents.CopyComponent(from, id);
-
-		em.MapObjectArchetype.BoundingBoxComponents.CopyComponent(from, id);
-		em.MapObjectArchetype.DestinationComponents.CopyComponent(from, id);
-
-		em.FlagComponents.GetComponent(id).set(ComponentFlags::RenderEnabled);
-
-	}
-
+	JobSystem::RunJob(scratch.size(), JobSystem::DefaultJobSize, InitFowVisiblleEntitiesJob);
 
 }
-
 
 void MapSystem::UpdateVisibleEntities(EntityManager& em) {
 	SectionProfiler p("UpdateVisibleEntities");
 
 	UpdateVisibleRenderEntities(em);
 	UpdateVisibleRenderUnits(em);
+	UpdateFowVisibleUnits(em);
 }
 
 void MapSystem::DrawMap(const Camera& camera)

@@ -33,8 +33,6 @@ void PlayerSystem::SetSize(Vector2Int16 size)
 {
 	gridSize.x = size.x / 32;
 	gridSize.y = size.y / 32;
-
-
 }
 
 PlayerId PlayerSystem::AddPlayer(const RaceDef& race, Color color)
@@ -46,6 +44,10 @@ PlayerId PlayerSystem::AddPlayer(const RaceDef& race, Color color)
 	playerVision[id]->SetGridSize(gridSize);
 
 	return id;
+}
+void PlayerSystem::SetMapKnown(PlayerId player) {
+	PlayerVision& vision = *playerVision[player];
+	memset(vision.knoweldge.data(), 0xFF, sizeof(PlayerVision::VisionCell) * vision.knoweldge.size());
 }
 
 const PlayerInfo& PlayerSystem::GetPlayerInfo(PlayerId id) const

@@ -40,13 +40,17 @@ private:
 	std::vector<EntityId> removedEntities;
 	std::vector<EntityId> addedEntities;
 
+	std::vector<EntityId> scratch;
+
+	static void InitFowVisiblleEntitiesJob(int start, int end);
+
 	void GenerateMinimapTerrainTexture();
 	void RenderMinimapFogOfWar(const PlayerVision& vision);
 
 	void UpdateVisibleRenderEntities(EntityManager& em);
 	void UpdateVisibleRenderUnits(EntityManager& em);
 
-	void UpdateFowVisibleUnits(EntityManager& em, const std::vector<EntityId> hidden, const std::vector<EntityId> shown);
+	void UpdateFowVisibleUnits(EntityManager& em);
 
 	void UpdateMapObjectPositions(EntityManager& em, const EntityChangedData& changed);
 public:

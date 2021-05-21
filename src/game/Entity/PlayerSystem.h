@@ -137,6 +137,7 @@ public:
 	void SetSize(Vector2Int16 size);
 
 	PlayerId AddPlayer(const RaceDef& race, Color color);
+	void SetMapKnown(PlayerId player);
 
 	const PlayerInfo& GetPlayerInfo(PlayerId id) const;
 	const PlayerVision& GetPlayerVision(PlayerId id) const;
