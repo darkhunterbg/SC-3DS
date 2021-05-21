@@ -67,6 +67,9 @@ public:
 		return hasComponent[Entity::ToIndex(id)];
 	}*/
 
+	inline void CopyComponent(EntityId from, EntityId to) {
+		components[Entity::ToIndex(to)] = components[Entity::ToIndex(from)];
+	}
 	inline TComponent& GetComponent(EntityId id) {
 		return components[Entity::ToIndex(id)];
 	}
@@ -84,6 +87,7 @@ public:
 	inline TComponent& operator[](int i) { return components[i]; }
 	inline const TComponent& operator[](int i) const { return components[i]; }
 	inline size_t size() const { return 0; }
+
 };
 
 typedef uint8_t PlayerId;
@@ -160,7 +164,6 @@ struct RenderUnitDestinationComponent {
 	Vector2Int16 shadowDst;
 };
 
-
 struct NavigationComponent {
 	Vector2Int16 target;
 	uint8_t targetHeading;
@@ -198,7 +201,6 @@ struct UnitMovementComponent {
 		rotationSpeed = def.RotationSpeed;
 	}
 };
-
 
 struct AnimationTrackerComponent {
 	int8_t clipFrame = 0;

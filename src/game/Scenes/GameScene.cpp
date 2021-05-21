@@ -59,13 +59,13 @@ void GameScene::Start() {
 		entityManager->GetPlayerSystem().AddPlayer(race, color[p]);
 	}
 
-	//EntityId e = UnitEntityUtil::NewUnit(*UnitDatabase::Units[2], 1,
-	//	Vector2Int16(400,128));
+	EntityId e = UnitEntityUtil::NewUnit(*UnitDatabase::Units[2], 1,
+		Vector2Int16(400,128));
 
 
 	int i = 0;
-	for (int y = 40; y > 0; --y) {
-		for (int x = 40; x > 0; --x) {
+	for (int y = 1; y > 0; --y) {
+		for (int x = 1; x > 0; --x) {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[0];
 			EntityId e = UnitEntityUtil::NewUnit(def, i % totalPlayers,

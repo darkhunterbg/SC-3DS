@@ -69,6 +69,8 @@ public:
 	static void SetRenderFromAnimationClip(EntityId e, const UnitAnimationClip& clip, uint8_t frame);
 
 	static void SetMapObjectBoundingBoxFromRender(EntityId e);
+
+	static void CopyFlag(EntityId from, EntityId to, ComponentFlags flag);
 };
 
 class UnitEntityUtil {

@@ -22,6 +22,7 @@ EntityManager::EntityManager() {
 	archetypes.push_back(&HiddenArchetype.Archetype);
 	archetypes.push_back(&UnitArchetype.HiddenArchetype.Archetype);
 	archetypes.push_back(&MapObjectArchetype.Archetype);
+	archetypes.push_back(&UnitArchetype.FowVisibleArchetype.Archetype);
 
 	EntityUtil::emInstance = this;
 	UnitEntityUtil::emInstance = this;

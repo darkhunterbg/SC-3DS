@@ -15,9 +15,7 @@ void MapSystem::SetSize(Vector2Int16 size)
 	tile = Game::AssetLoader.LoadAtlas("tileset_tile.t3x")->GetSprite(0);
 }
 
-void MapSystem::UpdateMap(EntityManager& em, const EntityChangedData& changed)
-{
-	SectionProfiler p("UpdateMap");
+void MapSystem::UpdateMapObjectPositions(EntityManager& em, const EntityChangedData& changed) {
 
 	int end = changed.size();
 	for (int i = 0; i < end; ++i) {
@@ -28,6 +26,13 @@ void MapSystem::UpdateMap(EntityManager& em, const EntityChangedData& changed)
 		dst.position += changed.position[i] >> 5;
 		dst.Restrict(Vector2Int16(0, 0), gridSize - Vector2Int16(1, 1));
 	}
+}
+
+void MapSystem::UpdateMap(EntityManager& em, const EntityChangedData& changed)
+{
+	SectionProfiler p("UpdateMap");
+
+	UpdateMapObjectPositions(em, changed);
 
 	minimapData.clear();
 
@@ -38,8 +43,7 @@ void MapSystem::UpdateMap(EntityManager& em, const EntityChangedData& changed)
 		colors[i] = players[i].color;
 	}
 	colors[ActivePlayer] = Color32(Colors::MapFriendly);
-	const auto vision = em.GetPlayerSystem().GetPlayerVision(ActivePlayer);
-
+	const PlayerVision& vision = em.GetPlayerSystem().GetPlayerVision(ActivePlayer);
 
 	for (EntityId id : em.MapObjectArchetype.Archetype.GetEntities()) {
 		if (em.UnitArchetype.Archetype.HasEntity(id) && !em.HiddenArchetype.Archetype.HasEntity(id))
@@ -55,6 +59,17 @@ void MapSystem::UpdateMap(EntityManager& em, const EntityChangedData& changed)
 			minimapData.dst.push_back(dst);
 			minimapData.color.push_back(colors[owner]);
 		}
+	}
+
+	for (EntityId id : em.UnitArchetype.FowVisibleArchetype.Archetype.GetEntities()) {
+
+		PlayerId owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
+		const Rectangle16& dst = em.MapObjectArchetype.DestinationComponents.GetComponent(id);
+
+		bool visible = vision.IsVisible(dst);
+
+		minimapData.dst.push_back(dst);
+		minimapData.color.push_back(colors[owner]);
 	}
 }
 
@@ -96,7 +111,7 @@ void MapSystem::UpdateVisibleRenderEntities(EntityManager& em) {
 	em.RenderArchetype.Archetype.AddSortedEntities(addedEntities);
 }
 void MapSystem::UpdateVisibleRenderUnits(EntityManager& em) {
-	auto& vision = em.GetPlayerSystem().GetPlayerVision(ActivePlayer);
+	const PlayerVision& vision = em.GetPlayerSystem().GetPlayerVision(ActivePlayer);
 
 	removedEntities.clear();
 
@@ -127,11 +142,63 @@ void MapSystem::UpdateVisibleRenderUnits(EntityManager& em) {
 		}
 	}
 
+	UpdateFowVisibleUnits(em, removedEntities, addedEntities);
+
 	em.UnitArchetype.RenderArchetype.Archetype.RemoveSortedEntities(removedEntities);
 	em.UnitArchetype.HiddenArchetype.Archetype.AddSortedEntities(removedEntities);
 	em.UnitArchetype.HiddenArchetype.Archetype.RemoveSortedEntities(addedEntities);
 	em.UnitArchetype.RenderArchetype.Archetype.AddSortedEntities(addedEntities);
 }
+
+static std::vector<EntityId> scratch;
+
+void MapSystem::UpdateFowVisibleUnits(EntityManager& em,
+	const std::vector<EntityId> hidden, const std::vector<EntityId> shown) {
+
+	const PlayerVision& vision = em.GetPlayerSystem().GetPlayerVision(ActivePlayer);
+
+	scratch.clear();
+
+	for (EntityId id : em.UnitArchetype.FowVisibleArchetype.Archetype.GetEntities()) {
+
+		const Rectangle16& dst = em.MapObjectArchetype.DestinationComponents.GetComponent(id);
+		bool visible = vision.IsVisible(dst);
+
+		if (visible || !FogOfWarVisible) {
+			scratch.push_back(id);
+		}
+	}
+
+	em.DeleteEntities(scratch);
+
+	scratch.clear();
+	em.NewEntities(hidden.size(), scratch);
+	em.UnitArchetype.RenderArchetype.Archetype.AddSortedEntities(scratch);
+	em.UnitArchetype.FowVisibleArchetype.Archetype.AddSortedEntities(scratch);
+
+	for (int i = 0; i < hidden.size(); ++i) {
+		EntityId from = hidden[i];
+		EntityId id = scratch[i];
+
+		em.PositionComponents.CopyComponent(from, id); 
+
+		em.UnitArchetype.RenderArchetype.RenderComponents.CopyComponent(from, id);
+		em.UnitArchetype.RenderArchetype.BoundingBoxComponents.CopyComponent(from, id);
+		em.UnitArchetype.RenderArchetype.OffsetComponents.CopyComponent(from, id);
+		em.UnitArchetype.RenderArchetype.DestinationComponents.CopyComponent(from, id);
+
+		em.UnitArchetype.OwnerComponents.CopyComponent(from, id);
+
+		em.MapObjectArchetype.BoundingBoxComponents.CopyComponent(from, id);
+		em.MapObjectArchetype.DestinationComponents.CopyComponent(from, id);
+
+		em.FlagComponents.GetComponent(id).set(ComponentFlags::RenderEnabled);
+
+	}
+
+
+}
+
 
 void MapSystem::UpdateVisibleEntities(EntityManager& em) {
 	SectionProfiler p("UpdateVisibleEntities");
@@ -206,7 +273,7 @@ void MapSystem::DrawFogOfWar(const Camera& camera) {
 	Platform::Draw(fowSprite, { {0,0},{400,240} });
 }
 
-void MapSystem::GenerateMiniampTerrainTexture() {
+void MapSystem::GenerateMinimapTerrainTexture() {
 	Rectangle mapBounds = { {0,0}, Vector2Int(mapSize) };
 
 	minimapTerrainTexture = Platform::NewTexture({ minimapTextureSize,minimapTextureSize });
@@ -263,7 +330,7 @@ void MapSystem::RedrawMinimap(EntityManager& em) {
 	const PlayerVision& vision = em.GetPlayerSystem().GetPlayerVision(ActivePlayer);
 
 	if (minimapTerrainTexture.textureId == nullptr) {
-		GenerateMiniampTerrainTexture();
+		GenerateMinimapTerrainTexture();
 	}
 
 	if (minimapTexture.textureId == nullptr) {

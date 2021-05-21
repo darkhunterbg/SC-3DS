@@ -49,7 +49,7 @@ void EntityArchetype::RemoveEntity(EntityId id)
 	if (!entities.RemoveEntity(id))
 		EXCEPTION("Deleting entity %id was not found in archetype %s!", id, name);
 }
-int EntityArchetype::RemoveSortedEntities(std::vector<EntityId>& del) {
+int EntityArchetype::RemoveSortedEntities(const std::vector<EntityId>& del) {
 	scratch.clear();
 
 	for (EntityId id : del)

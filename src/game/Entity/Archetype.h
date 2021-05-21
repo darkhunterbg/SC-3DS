@@ -36,7 +36,7 @@ public:
 	void AddEntities(std::vector<EntityId>& entities, bool sorted = false);
 	void RemoveEntity(EntityId id);
 	int RemoveEntities(std::vector<EntityId>& del, bool sorted = false);
-	int RemoveSortedEntities(std::vector<EntityId>& del);
+	int RemoveSortedEntities(const std::vector<EntityId>& del);
 	void ClearEntities();
 	void CommitChanges();
 };

@@ -41,7 +41,7 @@ void TimingSystem::ApplyTimerActions(EntityManager& em) {
 void TimingSystem::UnitDeathAfterEffect(std::vector<EntityId>& entities, EntityManager& em) {
 	if (entities.size() > 0) {
 		unsigned total = entities.size();
-		em.DeleteEntities(entities, true);
+	
 		em.NewEntities(total, scratch);
 		em.RenderArchetype.Archetype.AddSortedEntities(scratch);
 		em.AnimationArchetype.Archetype.AddSortedEntities(scratch);
@@ -62,11 +62,15 @@ void TimingSystem::UnitDeathAfterEffect(std::vector<EntityId>& entities, EntityM
 			em.RenderArchetype.BoundingBoxComponents.GetComponent(id)
 				.SetCenter(em.PositionComponents.GetComponent(id));
 
-			EntityUtil::SetMapObjectBoundingBoxFromRender(id);
-
+			em.MapObjectArchetype.BoundingBoxComponents.CopyComponent(old, id);
+			em.MapObjectArchetype.DestinationComponents.CopyComponent(old, id);
 			EntityUtil::StartTimer(id, clip.GetDuration(), TimerExpiredAction::DeleteEntity);
 			EntityUtil::PlayAnimation(id, clip);
+			EntityUtil::CopyFlag(old, id, ComponentFlags::RenderEnabled);
 		}
+
+
+		em.DeleteEntitiesSorted(entities);
 
 		scratch.clear();
 	}

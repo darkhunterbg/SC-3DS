@@ -5,7 +5,7 @@
 #include "../Job.h"
 #include <algorithm>
 
-static constexpr const uint8_t TileVisibilityTimer = 50;
+static constexpr const uint8_t TileVisibilityTimer = 24;
 
 // ================== Player Vision ==================
 

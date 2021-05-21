@@ -131,6 +131,13 @@ void EntityUtil::SetRenderFromAnimationClip(EntityId e, const UnitAnimationClip&
 	f.set(ComponentFlags::RenderChanged);
 }
 
+void EntityUtil::CopyFlag(EntityId from, EntityId to, ComponentFlags flag) {
+	EntityManager& em = GetManager();
+
+	FlagsComponent& f = em.FlagComponents.GetComponent(from);
+	em.FlagComponents.GetComponent(to).set(flag, f.test(flag));
+}
+
 EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2Int16 position, EntityId e) {
 
 	EntityManager& em = GetManager();

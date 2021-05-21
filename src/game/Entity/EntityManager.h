@@ -113,6 +113,10 @@ public:
 			EntityArchetype Archetype = EntityArchetype("Unit.Hidden");
 		} HiddenArchetype;
 
+		struct {
+			EntityArchetype Archetype = EntityArchetype("Unit.FowVisible");
+		} FowVisibleArchetype;
+
 		ComponentCollection<uint8_t> OrientationComponents;
 		ComponentCollection<UnitMovementComponent> MovementComponents;
 		ComponentCollection<UnitComponent> UnitComponents;
@@ -132,6 +136,8 @@ public:
 		ComponentCollection<Rectangle16> BoundingBoxComponents;
 		ComponentCollection<Rectangle16> DestinationComponents;
 	} MapObjectArchetype;
+
+
 private:
 	void CollectEntityChanges();
 	void ApplyEntityChanges();

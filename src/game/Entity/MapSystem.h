@@ -40,11 +40,15 @@ private:
 	std::vector<EntityId> removedEntities;
 	std::vector<EntityId> addedEntities;
 
-	void GenerateMiniampTerrainTexture();
+	void GenerateMinimapTerrainTexture();
 	void RenderMinimapFogOfWar(const PlayerVision& vision);
 
 	void UpdateVisibleRenderEntities(EntityManager& em);
 	void UpdateVisibleRenderUnits(EntityManager& em);
+
+	void UpdateFowVisibleUnits(EntityManager& em, const std::vector<EntityId> hidden, const std::vector<EntityId> shown);
+
+	void UpdateMapObjectPositions(EntityManager& em, const EntityChangedData& changed);
 public:
 	bool FogOfWarVisible = true;
 	PlayerId ActivePlayer = 0;
