@@ -4,12 +4,15 @@
 #include "../Job.h"
 #include "../Camera.h"
 #include "EntityManager.h"
+#include "../Util.h"
 
 #include <algorithm>
 #include <cstring>
 
 void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
 	renderData.clear();
+
+	// TODO: second camera cull for more accurate sprite culling???
 
 	for (EntityId id : em.RenderArchetype.Archetype.GetEntities()) {
 
@@ -78,7 +81,7 @@ void RenderSystem::DrawEntities(const Camera& camera, const Rectangle16& camRect
 	}
 }
 void RenderSystem::DrawUnits(const Camera& camera, const Rectangle16& camRect) {
-	constexpr const Color32 shadowColor = Color32(0.0f, 0.0f, 0.0f, 0.5f);
+	constexpr const Color32 shadowColor = Color32(0.0f, 0.0f, 0.0f, 0.4f);
 
 	float camMul = 1.0f / camera.Scale;
 
@@ -140,6 +143,57 @@ void RenderSystem::Draw(const Camera& camera, EntityManager& em) {
 
 	Platform::BatchDraw({ render.data(),render.size() });
 }
+void RenderSystem::DrawBoundingBoxes(const Camera& camera, EntityManager& em) {
+
+
+	Rectangle16 camRect = camera.GetRectangle16();
+
+	Color c = Colors::UIGreen;
+	c.a = 0.5f;
+
+	for (EntityId id : em.UnitArchetype.RenderArchetype.Archetype.GetEntities()) {
+
+		auto& arch = em.UnitArchetype.RenderArchetype;
+
+		int i = Entity::ToIndex(id);
+
+		if (!em.FlagComponents[i].test(ComponentFlags::RenderEnabled))
+			continue;
+
+		Rectangle16 bb = arch.BoundingBoxComponents[i];
+
+		if (!camRect.Intersects(bb))
+			continue;
+
+		bb.size /= camera.Scale;
+		bb.position -= camRect.position;
+		bb.position /= camera.Scale;
+
+		Util::DrawTransparentRectangle(bb, c);
+	}
+
+	for (EntityId id : em.RenderArchetype.Archetype.GetEntities()) {
+
+		auto& arch = em.RenderArchetype;
+
+		int i = Entity::ToIndex(id);
+
+		if (!em.FlagComponents[i].test(ComponentFlags::RenderEnabled))
+			continue;
+
+		Rectangle16 bb = arch.BoundingBoxComponents[i];
+
+		if (!camRect.Intersects(bb))
+			continue;
+
+		bb.size /= camera.Scale;
+		bb.position -= camRect.position;
+		bb.position /= camera.Scale;
+
+		Util::DrawTransparentRectangle(bb, c);
+	}
+}
+
 
 bool RenderSystem::RenderSort(const BatchDrawCommand& a, const BatchDrawCommand& b) {
 	return a.order < b.order;
@@ -184,7 +238,7 @@ void RenderSystem::UpdatePositions(EntityManager& em, const EntityChangedData& c
 
 		if (!flag.test(ComponentFlags::RenderEnabled))
 			continue;
-		
+
 		auto& arch = em.RenderArchetype;
 
 		if (flag.test(ComponentFlags::RenderChanged)) {

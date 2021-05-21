@@ -26,7 +26,7 @@ void DirectionalAnimationDef::GenerateAnimations(const SpriteFrameAtlas* a, Anim
 	}
 
 	if (MultiDirectional)
-		MultiDirectional = 32;
+		animOffset = 15;
 
 	for (int i = 17; i < 32; ++i) {
 		clips[i].looping = Looping;
@@ -35,7 +35,7 @@ void DirectionalAnimationDef::GenerateAnimations(const SpriteFrameAtlas* a, Anim
 		for (int j = 0; j < FrameCount; ++j) 
 			clips[i].AddFrameCentered(a->GetFrame(FrameStart +  animOffset + j * 17), Vector2Int16(a->FrameSize), true);
 	
-		animOffset += MultiDirectional;
+		animOffset -= MultiDirectional;
 	}
 }
 
@@ -76,7 +76,7 @@ void UnitDirectionalAnimationDef::GenerateAnimations(const SpriteFrameAtlas* a, 
 	}
 
 	if (MultiDirectional)
-		MultiDirectional = 32;
+		animOffset = 15;
 
 	for (int i = 17; i < 32; ++i) {
 		clips[i].looping = Looping;

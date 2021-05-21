@@ -117,6 +117,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\MapSystem.h">
       <Filter>Entity</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -206,5 +207,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\MapSystem.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Util.cpp" />
   </ItemGroup>
 </Project>

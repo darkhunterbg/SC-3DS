@@ -238,8 +238,13 @@ void EntityManager::Draw(const Camera& camera) {
 
 		mapSystem.DrawMap(camera);
 		renderSystem.Draw(camera, *this);
+
+		if (DrawBoundingBoxes)
+			renderSystem.DrawBoundingBoxes(camera, *this);
+
 		if (DrawColliders)
 			kinematicSystem.DrawColliders(camera);
+
 		mapSystem.DrawFogOfWar(camera);
 		if (DrawGrid)
 			mapSystem.DrawGrid(camera);

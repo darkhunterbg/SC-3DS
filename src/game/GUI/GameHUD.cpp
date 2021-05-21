@@ -6,6 +6,7 @@
 #include "../MathLib.h"
 #include "../Entity/PlayerSystem.h"
 #include "../Entity/MapSystem.h"
+#include "../Util.h"
 
 
 //static Rectangle minimapDst = { {4,108},{128,128} };
@@ -106,11 +107,16 @@ void GameHUD::DrawMinimap(const Camera& camera, MapSystem& mapSystem) {
 	max += Vector2(minimapDst.position);
 	Vector2 s = Vector2(camRect.size) / minimapUpscale;
 
+	Rectangle rect;
+	rect.position = Vector2Int(min);
+	rect.size = Vector2Int(max - min);
 
-	Platform::DrawLine(Vector2Int(min), Vector2Int(min + Vector2(s.x, 0)), Colors::White);
-	Platform::DrawLine(Vector2Int(max), Vector2Int(max - Vector2(s.x, 0)), Colors::White);
-	Platform::DrawLine(Vector2Int(min), Vector2Int(min + Vector2(0, s.y)), Colors::White);
-	Platform::DrawLine(Vector2Int(max), Vector2Int(max - Vector2(0, s.y)), Colors::White);
+	Util::DrawTransparentRectangle(rect, Colors::White);
+
+	//Platform::DrawLine(Vector2Int(min), Vector2Int(min + Vector2(s.x, 0)), Colors::White);
+	//Platform::DrawLine(Vector2Int(max), Vector2Int(max - Vector2(s.x, 0)), Colors::White);
+	//Platform::DrawLine(Vector2Int(min), Vector2Int(min + Vector2(0, s.y)), Colors::White);
+	//Platform::DrawLine(Vector2Int(max), Vector2Int(max - Vector2(0, s.y)), Colors::White);
 }
 
 void GameHUD::DrawAbilities() {

@@ -8,6 +8,8 @@ SpriteFrameAtlas* SpriteDatabase::unit_terran_control;
 SpriteFrameAtlas* SpriteDatabase::unit_terran_tccshad;
 SpriteFrameAtlas* SpriteDatabase::unit_terran_scv;
 SpriteFrameAtlas* SpriteDatabase::unit_thingy_tbangs;
+SpriteFrameAtlas* SpriteDatabase::unit_thingy_tbangl;
+SpriteFrameAtlas* SpriteDatabase::unit_thingy_tbangx;
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_marine() {
 	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_terran_marine.t3x");
@@ -933,30 +935,48 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_tbangs() {
 	a->SetOffset(6, Vector2Int(18,14));
 	a->SetOffset(7, Vector2Int(16,15));
 	a->SetOffset(8, Vector2Int(14,21));
-	a->SetOffset(9, Vector2Int(39,57));
-	a->SetOffset(10, Vector2Int(3,39));
-	a->SetOffset(11, Vector2Int(1,38));
-	a->SetOffset(12, Vector2Int(1,38));
-	a->SetOffset(13, Vector2Int(2,33));
-	a->SetOffset(14, Vector2Int(2,34));
-	a->SetOffset(15, Vector2Int(8,28));
-	a->SetOffset(16, Vector2Int(11,23));
-	a->SetOffset(17, Vector2Int(12,22));
-	a->SetOffset(18, Vector2Int(22,27));
-	a->SetOffset(19, Vector2Int(72,63));
-	a->SetOffset(20, Vector2Int(38,46));
-	a->SetOffset(21, Vector2Int(20,35));
-	a->SetOffset(22, Vector2Int(15,29));
-	a->SetOffset(23, Vector2Int(12,14));
-	a->SetOffset(24, Vector2Int(12,13));
-	a->SetOffset(25, Vector2Int(12,17));
-	a->SetOffset(26, Vector2Int(13,15));
-	a->SetOffset(27, Vector2Int(13,12));
-	a->SetOffset(28, Vector2Int(21,10));
-	a->SetOffset(29, Vector2Int(24,9));
-	a->SetOffset(30, Vector2Int(26,12));
-	a->SetOffset(31, Vector2Int(22,23));
-	a->SetOffset(32, Vector2Int(22,21));
+
+	return a;
+}
+
+const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_tbangl() {
+	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_thingy_tbangl.t3x");
+	auto* a = unit_thingy_tbangl = new SpriteFrameAtlas(atlas);
+	a->FrameSize = Vector2Int(200, 200);
+
+	a->SetOffset(0, Vector2Int(39,57));
+	a->SetOffset(1, Vector2Int(3,39));
+	a->SetOffset(2, Vector2Int(1,38));
+	a->SetOffset(3, Vector2Int(1,38));
+	a->SetOffset(4, Vector2Int(2,33));
+	a->SetOffset(5, Vector2Int(2,34));
+	a->SetOffset(6, Vector2Int(8,28));
+	a->SetOffset(7, Vector2Int(11,23));
+	a->SetOffset(8, Vector2Int(12,22));
+	a->SetOffset(9, Vector2Int(22,27));
+
+	return a;
+}
+
+const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_tbangx() {
+	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_thingy_tbangx.t3x");
+	auto* a = unit_thingy_tbangx = new SpriteFrameAtlas(atlas);
+	a->FrameSize = Vector2Int(252, 200);
+
+	a->SetOffset(0, Vector2Int(72,63));
+	a->SetOffset(1, Vector2Int(38,46));
+	a->SetOffset(2, Vector2Int(20,35));
+	a->SetOffset(3, Vector2Int(15,29));
+	a->SetOffset(4, Vector2Int(12,14));
+	a->SetOffset(5, Vector2Int(12,13));
+	a->SetOffset(6, Vector2Int(12,17));
+	a->SetOffset(7, Vector2Int(13,15));
+	a->SetOffset(8, Vector2Int(13,12));
+	a->SetOffset(9, Vector2Int(21,10));
+	a->SetOffset(10, Vector2Int(24,9));
+	a->SetOffset(11, Vector2Int(26,12));
+	a->SetOffset(12, Vector2Int(22,23));
+	a->SetOffset(13, Vector2Int(22,21));
 
 	return a;
 }

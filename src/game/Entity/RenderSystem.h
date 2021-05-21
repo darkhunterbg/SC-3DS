@@ -95,6 +95,7 @@ private:
 	void DrawUnits(const Camera& camera, const Rectangle16& camRect);
 public:
 	void Draw(const Camera& camera, EntityManager& em);
+	void DrawBoundingBoxes(const Camera& camera, EntityManager& em);
 	void UpdatePositions(EntityManager& em, const EntityChangedData& changed);
-	
+
 };

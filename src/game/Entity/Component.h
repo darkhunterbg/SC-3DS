@@ -213,15 +213,14 @@ struct AnimationTrackerComponent {
 	}
 
 	inline void PlayClip(const AnimationClip* clip) {
+		clipFrame = 0;
 		if (clip) {
 			totalFrames = clip->GetFrameCount();
 			looping = clip->looping;
-			frameTime = clip->frameTime;
-			Restart();
+			frameCountdown = frameTime = clip->frameTime;
 		}
 		else {
 			totalFrames = 0;
-			clipFrame = 0;
 		}
 	}
 };
@@ -280,7 +279,7 @@ struct TimingComponent {
 
 enum class TimerExpiredAction : uint8_t {
 	None = 0,
-	UnitRemnantsThenDelete = 1,
+	UnitDeathAfterEffect = 1,
 	DeleteEntity = 2,
 };
 

@@ -36,12 +36,13 @@ void GameScene::Start() {
 	camera.Size = { 400,240 };
 	camera.Limits = { {0,0,}, size };
 
-	UnitDatabase::LoadUnitResources(UnitDatabase::CommandCenter);
+	UnitDatabase::LoadAllUnitResources();
 
 	AudioStream* stream = race.GameMusic[std::rand() % race.GameMusic.size()].Stream;
 	Game::Audio.PlayStream(stream, 0);
 
 	entityManager = new EntityManager();
+	//entityManager->DrawBoundingBoxes = true;
 	//entityManager->DrawGrid = true;
 	//entityManager->DrawColliders = true;
 	//entityManager->GetMapSystem().FogOfWarVisible = false;
@@ -64,7 +65,7 @@ void GameScene::Start() {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[ 2];
 			EntityId e = UnitEntityUtil::NewUnit(def, i % totalPlayers,
-				Vector2Int16(Vector2Int{ x * 64 + 16,y * 64 + 16 }));
+				Vector2Int16(Vector2Int{ x * 256 + 16,y * 256 + 16 }));
 
 			//entityManager->UnitArchetype.OrientationComponents.GetComponent(e) = 12;
 			EntityUtil::PlayAnimation(e, def.Graphics->IdleAnimations[0]);
@@ -165,13 +166,13 @@ void GameScene::Update() {
 					entityManager->ParentArchetype.Archetype.RemoveEntity(id);
 				}
 
-
-				EntityUtil::PlayAnimation(id, def->Graphics->DeathAnimation);
-
-				TimerExpiredAction action = def->Graphics->HasRemnants() ?
-					TimerExpiredAction::UnitRemnantsThenDelete : TimerExpiredAction::DeleteEntity;
-
-				EntityUtil::StartTimer(id, def->Graphics->DeathAnimation.GetDuration(), action);
+				if (def->Graphics->HasDeathAnimation()) {
+					EntityUtil::PlayAnimation(id, def->Graphics->DeathAnimation);
+					EntityUtil::StartTimer(id, def->Graphics->DeathAnimation.GetDuration(), TimerExpiredAction::UnitDeathAfterEffect);
+				}
+				else {
+					EntityUtil::StartTimer(id, 1, TimerExpiredAction::UnitDeathAfterEffect);
+				}
 
 				int i = std::rand() % def->Sounds.Death.TotalClips;
 				Game::Audio.PlayClip(def->Sounds.Death.Clips[i], 1);

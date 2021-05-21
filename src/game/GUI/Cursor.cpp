@@ -3,6 +3,7 @@
 #include "../Game.h"
 #include "../Camera.h"
 #include "../Entity/EntityManager.h"
+#include "../Util.h"
 
 static constexpr const float Speed = 10;
 
@@ -89,25 +90,9 @@ void Cursor::Draw() {
 	Rectangle dst = { Vector2Int(Position + frame.offset ), Vector2Int(frame.sprite.rect.size) };
 	dst.position -= {64, 64};
 
-	Color32 c = Color32(Colors::UIGreen);
 
 	if (regionRect.size.LengthSquaredInt() > 0) {
-		Rectangle rect;
-		rect.position = Vector2Int(regionRect.position);
-		rect.size = Vector2Int(regionRect.size.x + 1, 2);
-		Platform::DrawRectangle(rect, c);
-
-		rect.size = Vector2Int(2, regionRect.size.y + 1);
-		Platform::DrawRectangle(rect, c);
-
-
-		rect.position = { regionRect.position.x , regionRect.GetMax().y - 1 };
-		rect.size = Vector2Int(regionRect.size.x, 2);
-		Platform::DrawRectangle(rect, c);
-
-		rect.position = { regionRect.GetMax().x - 1, regionRect.position.y };
-		rect.size = Vector2Int(2, regionRect.size.y);
-		Platform::DrawRectangle(rect, c);
+		Util::DrawTransparentRectangle(regionRect, Colors::UIGreen);
 	}
 
 	Platform::Draw(frame.sprite, dst);

@@ -42,15 +42,13 @@ struct UnitGraphicsDef {
 		AnimationClip Clip;
 		int Depth = 0;
 
-	} Remnants;
+	} DeathAfterEffect;
 
-	std::function<void()>  LoadResourcesAction;
+	std::function<void()> LoadResourcesAction;
 
 	inline bool HasMovementGlow() const { return MovementGlowAnimationDef.FrameCount > 0; }
-	inline bool HasRemnants() const { return Remnants.Def.FrameCount > 0; };
-	inline bool HasDeathAnimation() const {
-		return DeathAnimationDef.FrameCount > 0;
-	}
+	inline bool HasDeathAfterEffect() const { return DeathAfterEffect.Def.FrameCount > 0; };
+	inline bool HasDeathAnimation() const {return DeathAnimationDef.FrameCount > 0; }
 
 	UnitGraphicsDef() {}
 	UnitGraphicsDef(const UnitGraphicsDef&) = delete;

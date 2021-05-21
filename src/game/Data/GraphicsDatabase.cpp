@@ -23,7 +23,7 @@ static void MarineResources() {
 	d.AttackAnimationDef.UnitColorFrameStart = 229 + d.AttackAnimationDef.FrameStart;
 	d.AttackAnimationDef.GenerateAnimations(a, as, d.AttackAnimations);
 	d.IdleAnimationDef.GenerateAnimations(a, as, d.IdleAnimations);
-	d.Remnants.Def.GenerateAnimation(a, d.Remnants.Clip);
+	d.DeathAfterEffect.Def.GenerateAnimation(a, d.DeathAfterEffect.Clip);
 }
 static void MarineData() {
 	UnitGraphicsDef& d = GraphicsDatabase::Marine;
@@ -42,20 +42,20 @@ static void MarineData() {
 	d.AttackAnimationDef.Looping = true;
 
 	d.IdleAnimationDef.FrameStart = 0;
-	d.IdleAnimationDef.FrameCount = 3;
-	d.IdleAnimationDef.FrameTime = 2;
+	d.IdleAnimationDef.FrameCount = 1;
+	d.IdleAnimationDef.FrameTime = 1;
 	d.IdleAnimationDef.UnitColorFrameStart = 229 + d.IdleAnimationDef.FrameStart;
-	d.IdleAnimationDef.Looping = true;
+	//d.IdleAnimationDef.Looping = true;
 
 	d.DeathAnimationDef.FrameStart = 221;
 	d.DeathAnimationDef.FrameCount = 8;
 	d.DeathAnimationDef.UnitColorFrameStart = -1;
 	d.DeathAnimationDef.FrameTime = 2;
 
-	d.Remnants.Def.FrameStart = 452;
-	d.Remnants.Def.FrameCount = 3;
-	d.Remnants.Def.FrameTime = 48;
-	d.Remnants.Depth = -1;
+	d.DeathAfterEffect.Def.FrameStart = 452;
+	d.DeathAfterEffect.Def.FrameCount = 3;
+	d.DeathAfterEffect.Def.FrameTime = 48;
+	d.DeathAfterEffect.Depth = -1;
 
 	d.LoadResourcesAction = MarineResources;
 }
@@ -69,9 +69,10 @@ static void SCVResources() {
 	UnitGraphicsDef& d = GraphicsDatabase::SCV;
 
 	d.RenderSize = Vector2Int16(a->FrameSize);
-	d.DeathAnimationDef.GenerateAnimation(ad, nullptr, d.DeathAnimation);
+	d.DeathAfterEffect.Def.GenerateAnimation(ad,  d.DeathAfterEffect.Clip);
 	d.MovementAnimationDef.GenerateAnimations(a, a, d.MovementAnimations);
 	d.MovementGlowAnimationDef.GenerateAnimations(a, d.MovementGlowAnimations);
+	d.IdleAnimationDef.GenerateAnimations(a,a, d.IdleAnimations);
 }
 static void SCVData() {
 	UnitGraphicsDef& d = GraphicsDatabase::SCV;
@@ -83,13 +84,17 @@ static void SCVData() {
 	d.MovementAnimationDef.UnitColorFrameStart = 51;
 	d.MovementAnimationDef.ShadowOffset = { -1, 5 };
 
+	d.IdleAnimationDef.FrameStart = 0;
+	d.IdleAnimationDef.FrameCount = 1;
+	d.IdleAnimationDef.UnitColorFrameStart = 51;
+	d.IdleAnimationDef.ShadowOffset = { -1, 5 };
+
 	d.MovementGlowAnimationDef.FrameStart = 102;
 	d.MovementGlowAnimationDef.FrameCount = 4;
 	d.MovementGlowAnimationDef.Looping = true;
 
-	d.DeathAnimationDef.FrameStart = 0;
-	d.DeathAnimationDef.FrameCount = 9;
-	d.DeathAnimationDef.UnitColorFrameStart = -1;
+	d.DeathAfterEffect.Def.FrameStart = 0;
+	d.DeathAfterEffect.Def.FrameCount = 9;
 	d.DeathAnimationDef.FrameTime = 2;
 
 	d.LoadResourcesAction = SCVResources;
@@ -99,13 +104,13 @@ static void SCVData() {
 static void CommandCenterResources() {
 	auto a = SpriteDatabase::Load_unit_terran_control();
 	auto as = SpriteDatabase::Load_unit_terran_tccshad();
-	auto ad = SpriteDatabase::Load_unit_thingy_tbangs();
+	auto ad = SpriteDatabase::Load_unit_thingy_tbangx();
 
 	UnitGraphicsDef& d = GraphicsDatabase::CommandCenter;
 
 	d.RenderSize = Vector2Int16(a->FrameSize);
 	d.IdleAnimationDef.GenerateAnimations(a, as, d.IdleAnimations);
-	d.DeathAnimationDef.GenerateAnimation(ad, nullptr, d.DeathAnimation);
+	d.DeathAfterEffect.Def.GenerateAnimation(ad,  d.DeathAfterEffect.Clip);
 }
 static void CommandCenterData() {
 	UnitGraphicsDef& d = GraphicsDatabase::CommandCenter;
@@ -117,10 +122,9 @@ static void CommandCenterData() {
 	d.IdleAnimationDef.UnitColorFrameStart = 6;
 	d.IdleAnimationDef.MultiDirectional = false;
 
-	d.DeathAnimationDef.FrameStart = 18;
-	d.DeathAnimationDef.FrameCount = 13;
-	d.DeathAnimationDef.UnitColorFrameStart = -1;
-	d.DeathAnimationDef.FrameTime = 2;
+	d.DeathAfterEffect.Def.FrameStart = 0;
+	d.DeathAfterEffect.Def.FrameCount = 13;
+	d.DeathAfterEffect.Def.FrameTime = 2;
 
 	d.LoadResourcesAction = CommandCenterResources;
 }

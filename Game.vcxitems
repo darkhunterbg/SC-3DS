@@ -57,6 +57,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Span.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\stb_sprintf.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\StringLib.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\AssetLoader.cpp" />
@@ -94,5 +95,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\PerformanceTestScene.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\StringLib.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Util.cpp" />
   </ItemGroup>
 </Project>

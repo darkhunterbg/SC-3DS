@@ -31,7 +31,9 @@ namespace AssetBatcher
 			T3SFolders("unit/terran/tccshad");
 
 			T3SFolders("unit/terran/scv","unit/thingy/tscglow");
-			T3SFolders("unit/thingy/tbangs", "unit/thingy/tbangl", "unit/thingy/tbangx");
+			T3SFolders("unit/thingy/tbangs");
+			T3SFolders("unit/thingy/tbangl");
+			T3SFolders("unit/thingy/tbangx");
 			GeneraSourceCode();
 		}
 
@@ -158,43 +160,6 @@ namespace AssetBatcher
 			});
 		}
 
-		static void GenerateT3S(string dir)
-		{
-			foreach (var f in Directory.GetFiles(dir, "*.t3s", SearchOption.TopDirectoryOnly))
-				File.Delete(f);
-
-			var files = Directory.GetFiles(dir, "*.png", SearchOption.AllDirectories);
-			var grouped = files.GroupBy(f => Path.GetDirectoryName(f)).ToDictionary(g => g.Key, g => g.ToList());
-
-			string header = $"--atlas -f {format} -z {compression} -q high";
-
-			foreach (var g in grouped)
-			{
-				string filePath = Path.GetFileNameWithoutExtension(g.Key);
-				if (g.Key != dir)
-					filePath = g.Key.Substring(dir.Length + 1);
-				var fileName = filePath.Replace('\\', '_');
-				string n = Path.GetFileNameWithoutExtension(g.Value[0]);
-				if (g.Value.Count == 1 && !int.TryParse(n, out _))
-				{
-					fileName = filePath.Replace('\\', '_') + "_" + n;
-				}
-				fileName = Path.Combine(dir, fileName) + ".t3s";
-
-				using (StreamWriter s = new StreamWriter(fileName))
-				{
-					string h = $"{header}";
-					s.WriteLine(header);
-					foreach (var p in g.Value)
-					{
-						var f = p.Substring(dir.Length + 1);
-						s.WriteLine(f);
-					}
-				}
-			}
-
-			Console.WriteLine(dir);
-		}
 	}
 
 	class Template

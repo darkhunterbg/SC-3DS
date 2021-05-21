@@ -143,6 +143,7 @@ private:
 public:
 	bool DrawColliders = false;
 	bool DrawGrid = false;
+	bool DrawBoundingBoxes = false;
 
 	EntityManager();
 	~EntityManager();

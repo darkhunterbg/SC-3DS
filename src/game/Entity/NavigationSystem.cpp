@@ -225,6 +225,7 @@ void NavigationSystem::ApplyUnitNavigationJob(int start, int end) {
 
 			if (distance.LengthSquaredInt() < velocity * velocity) {
 				movement.velocity = { 0,0 };
+				EntityUtil::PlayAnimation(id, unit.def->Graphics->IdleAnimations[orientation]);
 				flags.clear(ComponentFlags::NavigationWork);
 
 				if (unit.HasMovementGlow()) {

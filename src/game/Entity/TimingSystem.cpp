@@ -35,14 +35,14 @@ void TimingSystem::UpdateTimers(EntityManager& em)
 
 void TimingSystem::ApplyTimerActions(EntityManager& em) {
 
-	UnitRemnantsThenDelete(GetActionEntityTable(TimerExpiredAction::UnitRemnantsThenDelete), em);
+	UnitDeathAfterEffect(GetActionEntityTable(TimerExpiredAction::UnitDeathAfterEffect), em);
 	DeleteEntities(GetActionEntityTable(TimerExpiredAction::DeleteEntity), em);
 
 	for (auto& t : actionsTable)
 		t.entities.clear();
 }
 
-void TimingSystem::UnitRemnantsThenDelete(std::vector<EntityId>& entities, EntityManager& em) {
+void TimingSystem::UnitDeathAfterEffect(std::vector<EntityId>& entities, EntityManager& em) {
 	if (entities.size() > 0) {
 		unsigned total = entities.size();
 		em.DeleteEntities(entities, true);
@@ -56,13 +56,12 @@ void TimingSystem::UnitRemnantsThenDelete(std::vector<EntityId>& entities, Entit
 			EntityId old = entities[item];
 
 			const auto def = em.UnitArchetype.UnitComponents.GetComponent(old).def;
-			const auto& clip = def->Graphics->Remnants.Clip;
+			const auto& clip = def->Graphics->DeathAfterEffect.Clip;
 
 			em.PositionComponents.NewComponent(id) = em.PositionComponents.GetComponent(old);
-			em.FlagComponents.NewComponent(id).set(ComponentFlags::PositionChanged);
-		
+					
 			EntityUtil::SetRenderFromAnimationClip(id, clip, 0);
-			em.RenderArchetype.RenderComponents.GetComponent(id).depth = def->Graphics->Remnants.Depth;
+			em.RenderArchetype.RenderComponents.GetComponent(id).depth = def->Graphics->DeathAfterEffect.Depth;
 			em.RenderArchetype.BoundingBoxComponents.GetComponent(id)
 				.SetCenter(em.PositionComponents.GetComponent(id));
 
