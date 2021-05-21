@@ -27,9 +27,11 @@ namespace AssetBatcher
 
 			T3SFolders("unit/terran/marine", "unit/terran/tmadeath");
 			T3SFolders("unit/terran/tmashad");
+			T3SFolders("unit/terran/control","unit/terran/controlt");
+			T3SFolders("unit/terran/tccshad");
 
 			T3SFolders("unit/terran/scv","unit/thingy/tscglow");
-			T3SFolders("unit/thingy/tbangs");
+			T3SFolders("unit/thingy/tbangs", "unit/thingy/tbangl", "unit/thingy/tbangx");
 			GeneraSourceCode();
 		}
 

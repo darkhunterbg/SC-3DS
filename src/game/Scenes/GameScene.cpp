@@ -36,7 +36,7 @@ void GameScene::Start() {
 	camera.Size = { 400,240 };
 	camera.Limits = { {0,0,}, size };
 
-	UnitDatabase::LoadAllUnitResources();
+	UnitDatabase::LoadUnitResources(UnitDatabase::CommandCenter);
 
 	AudioStream* stream = race.GameMusic[std::rand() % race.GameMusic.size()].Stream;
 	Game::Audio.PlayStream(stream, 0);
@@ -59,15 +59,15 @@ void GameScene::Start() {
 	}
 
 	int i = 0;
-	for (int y = 40; y > 0; --y) {
-		for (int x = 40; x > 0; --x) {
+	for (int y = 1; y > 0; --y) {
+		for (int x = 1; x > 0; --x) {
 			Color c = color[(i) % 12];
-			auto& def = *UnitDatabase::Units[ i % UnitDatabase::Units.size()];
+			auto& def = *UnitDatabase::Units[ 2];
 			EntityId e = UnitEntityUtil::NewUnit(def, i % totalPlayers,
-				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 + 16 }));
+				Vector2Int16(Vector2Int{ x * 64 + 16,y * 64 + 16 }));
 
 			//entityManager->UnitArchetype.OrientationComponents.GetComponent(e) = 12;
-			//EntityUtil::PlayAnimation(e, def.Graphics->AttackAnimations[12]);
+			EntityUtil::PlayAnimation(e, def.Graphics->IdleAnimations[0]);
 			//EntityUtil::StartTimer(e, 3, TimerExpiredAction::UnitToggleIdleAnimation, true);
 			//entityManager->GoTo(e, { 1024,1024 });
 
@@ -164,6 +164,7 @@ void GameScene::Update() {
 					entityManager->DeleteEntity(unit.movementGlowEntity);
 					entityManager->ParentArchetype.Archetype.RemoveEntity(id);
 				}
+
 
 				EntityUtil::PlayAnimation(id, def->Graphics->DeathAnimation);
 

@@ -6,7 +6,11 @@ void UnitSound::LoadSoundClips()
 {
 	char buffer[128];
 	std::string pattern = SoundPath;
-	pattern += "%02i.wav";
+
+	if (DirectFile)
+		pattern += ".wav";
+	else
+		pattern += "%02i.wav";
 	for (int i = 0; i < TotalClips; ++i) {
 		stbsp_snprintf(buffer, sizeof(buffer), pattern.data(), i);
 		Clips[i] = Game::AssetLoader.LoadAudioClip(buffer);

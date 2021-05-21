@@ -3,10 +3,13 @@
 
 UnitGraphicsDef GraphicsDatabase::Marine;
 UnitGraphicsDef GraphicsDatabase::SCV;
+UnitGraphicsDef GraphicsDatabase::CommandCenter;
 std::vector<const UnitGraphicsDef*> GraphicsDatabase::Units =
 {
-	&Marine, &SCV
+	&Marine, &SCV, &CommandCenter
 };
+
+// ======================= Terran Marine ==========================================
 
 static void MarineResources() {
 	auto a = SpriteDatabase::Load_unit_terran_marine();
@@ -22,7 +25,6 @@ static void MarineResources() {
 	d.IdleAnimationDef.GenerateAnimations(a, as, d.IdleAnimations);
 	d.Remnants.Def.GenerateAnimation(a, d.Remnants.Clip);
 }
-
 static void MarineData() {
 	UnitGraphicsDef& d = GraphicsDatabase::Marine;
 	d.Collider.position = { -9,-10 };
@@ -58,6 +60,8 @@ static void MarineData() {
 	d.LoadResourcesAction = MarineResources;
 }
 
+// ============================ Terran SCV ================================
+
 static void SCVResources() {
 	auto a = SpriteDatabase::Load_unit_terran_scv();
 	auto ad = SpriteDatabase::Load_unit_thingy_tbangs();
@@ -91,10 +95,42 @@ static void SCVData() {
 	d.LoadResourcesAction = SCVResources;
 }
 
+// ============================ Terran Command Center ==========================
+static void CommandCenterResources() {
+	auto a = SpriteDatabase::Load_unit_terran_control();
+	auto as = SpriteDatabase::Load_unit_terran_tccshad();
+	auto ad = SpriteDatabase::Load_unit_thingy_tbangs();
+
+	UnitGraphicsDef& d = GraphicsDatabase::CommandCenter;
+
+	d.RenderSize = Vector2Int16(a->FrameSize);
+	d.IdleAnimationDef.GenerateAnimations(a, as, d.IdleAnimations);
+	d.DeathAnimationDef.GenerateAnimation(ad, nullptr, d.DeathAnimation);
+}
+static void CommandCenterData() {
+	UnitGraphicsDef& d = GraphicsDatabase::CommandCenter;
+	d.Collider.position = { -58,-41 };
+	d.Collider.size = { 116,82 };
+
+	d.IdleAnimationDef.FrameStart = 0;
+	d.IdleAnimationDef.FrameCount = 1;
+	d.IdleAnimationDef.UnitColorFrameStart = 6;
+	d.IdleAnimationDef.MultiDirectional = false;
+
+	d.DeathAnimationDef.FrameStart = 18;
+	d.DeathAnimationDef.FrameCount = 13;
+	d.DeathAnimationDef.UnitColorFrameStart = -1;
+	d.DeathAnimationDef.FrameTime = 2;
+
+	d.LoadResourcesAction = CommandCenterResources;
+}
+// ==============================================================================
+
 void GraphicsDatabase::Init()
 {
 	MarineData();
 	SCVData();
+	CommandCenterData();
 }
 
 void GraphicsDatabase::LoadAllGraphicsResources()

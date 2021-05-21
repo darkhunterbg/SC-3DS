@@ -48,6 +48,9 @@ struct UnitGraphicsDef {
 
 	inline bool HasMovementGlow() const { return MovementGlowAnimationDef.FrameCount > 0; }
 	inline bool HasRemnants() const { return Remnants.Def.FrameCount > 0; };
+	inline bool HasDeathAnimation() const {
+		return DeathAnimationDef.FrameCount > 0;
+	}
 
 	UnitGraphicsDef() {}
 	UnitGraphicsDef(const UnitGraphicsDef&) = delete;

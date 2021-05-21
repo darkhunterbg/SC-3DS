@@ -37,6 +37,10 @@ struct UnitDef {
 	inline void SetUseSupply(uint8_t amount, bool half = false) {
 		UseSupplyDoubled = (amount << 1)+ half;
 	}
+	inline void SetPovideSupply(uint8_t amount, bool half = false) {
+		ProvideSupplyDoubled = (amount << 1) + half;
+	}
+
 
 	inline void LoadAllSounds() {
 

@@ -4,8 +4,9 @@
 
 UnitDef UnitDatabase::Marine;
 UnitDef UnitDatabase::SCV;
+UnitDef UnitDatabase::CommandCenter;
 std::vector<UnitDef*> UnitDatabase::Units = {
-	&Marine, &SCV
+	&Marine, &SCV, &CommandCenter
 };
 
 static void MarineData() {
@@ -22,7 +23,6 @@ static void MarineData() {
 	u.Sounds.Yes = { "sound/terran/marine/tmayes", 4 };
 	u.Graphics = &GraphicsDatabase::Marine;
 }
-
 static void SCVData() {
 	UnitDef& u = UnitDatabase::SCV;
 	u.Name = "Terran SCV";
@@ -36,22 +36,37 @@ static void SCVData() {
 	u.Sounds.What = { "sound/terran/scv/tscwht", 4 };
 	u.Sounds.Yes = { "sound/terran/scv/tscyes", 4 };
 	u.Graphics = &GraphicsDatabase::SCV;
-
 }
+static void CommandCenterData() {
+	UnitDef& u = UnitDatabase::CommandCenter;
+	u.Name = "Terran Command Center";
+	u.Health = 1500;
+	u.MovementSpeed = 0;
+	u.RotationSpeed = 0;
+	u.Vision = 10;
+	u.SetPovideSupply(10);
 
+	u.Sounds.Death = { "sound/misc/explo4", 1 , true };
+	u.Sounds.What = { "sound/misc/button", 1 , true };
+	u.Graphics = &GraphicsDatabase::CommandCenter;
+}
 
 void UnitDatabase::Init()
 {
 	MarineData();
 	SCVData();
+	CommandCenterData();
+}
+
+void UnitDatabase::LoadUnitResources(UnitDef& def) {
+	def.Graphics->LoadResourcesAction();
+	def.LoadAllSounds();
 }
 
 void UnitDatabase::LoadAllUnitResources()
 {
-	
+	for (auto unit : Units) {
 
-	for (auto& unit : Units) {
-		unit->Graphics->LoadResourcesAction();
-		unit->LoadAllSounds();
+		LoadUnitResources(*unit);
 	}
 }

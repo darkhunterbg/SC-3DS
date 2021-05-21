@@ -23,6 +23,7 @@ struct DirectionalAnimationDef {
 	int FrameCount = 0;
 	int FrameTime = 1;
 	bool Looping = false;
+	bool MultiDirectional = true;
 
 	DirectionalAnimationDef() {}
 	DirectionalAnimationDef(const DirectionalAnimationDef&) = delete;
@@ -37,6 +38,7 @@ struct UnitAnimationDef {
 	int FrameTime = 1;
 	int UnitColorFrameStart = 0;
 	bool Looping = false;
+
 	Vector2Int16 ShadowAdditionalOffset;
 
 	UnitAnimationDef() {}
@@ -52,6 +54,7 @@ struct UnitDirectionalAnimationDef {
 	int FrameTime = 1;
 	int UnitColorFrameStart = 0;
 	bool Looping = false;
+	bool MultiDirectional = true;
 	Vector2Int16 ShadowOffset;
 
 	UnitDirectionalAnimationDef() {}

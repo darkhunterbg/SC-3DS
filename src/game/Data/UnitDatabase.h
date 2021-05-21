@@ -11,9 +11,11 @@ private:
 	~UnitDatabase() = delete;
 public:
 	static UnitDef Marine, SCV;
+	static UnitDef CommandCenter;
 
 	static std::vector<UnitDef*> Units;
 
 	static void Init();
 	static void LoadAllUnitResources();
+	static void LoadUnitResources(UnitDef& def);
 };
