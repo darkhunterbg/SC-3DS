@@ -59,16 +59,20 @@ void GameScene::Start() {
 		entityManager->GetPlayerSystem().AddPlayer(race, color[p]);
 	}
 
+	EntityId e = UnitEntityUtil::NewUnit(*UnitDatabase::Units[2], 1,
+		Vector2Int16(400,128));
+
+
 	int i = 0;
 	for (int y = 1; y > 0; --y) {
 		for (int x = 1; x > 0; --x) {
 			Color c = color[(i) % 12];
-			auto& def = *UnitDatabase::Units[ 2];
+			auto& def = *UnitDatabase::Units[ i % UnitDatabase::Units.size()];
 			EntityId e = UnitEntityUtil::NewUnit(def, i % totalPlayers,
-				Vector2Int16(Vector2Int{ x * 256 + 16,y * 256 + 16 }));
+				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 + 16 }));
 
 			//entityManager->UnitArchetype.OrientationComponents.GetComponent(e) = 12;
-			EntityUtil::PlayAnimation(e, def.Graphics->IdleAnimations[0]);
+			//EntityUtil::PlayAnimation(e, def.Graphics->IdleAnimations[0]);
 			//EntityUtil::StartTimer(e, 3, TimerExpiredAction::UnitToggleIdleAnimation, true);
 			//entityManager->GoTo(e, { 1024,1024 });
 
@@ -77,7 +81,7 @@ void GameScene::Start() {
 		}
 	}
 
-	selection.push_back(0);
+	selection.push_back(1);
 }
 
 int t = 0;
@@ -136,8 +140,10 @@ void GameScene::Update() {
 
 					auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
 
-					int i = std::rand() % def->Sounds.Yes.TotalClips;
-					Game::Audio.PlayClip(def->Sounds.Yes.Clips[i], 1);
+					if (def->Sounds.Yes.TotalClips) {
+						int i = std::rand() % def->Sounds.Yes.TotalClips;
+						Game::Audio.PlayClip(def->Sounds.Yes.Clips[i], 1);
+					}
 				}
 		}
 

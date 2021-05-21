@@ -109,11 +109,6 @@ void GameHUD::DrawMinimap(const Camera& camera, MapSystem& mapSystem) {
 	rect.size = Vector2Int(s);
 
 	Util::DrawTransparentRectangle(rect, 1, Colors::White);
-
-	//Platform::DrawLine(Vector2Int(min), Vector2Int(min + Vector2(s.x, 0)), Colors::White);
-	//Platform::DrawLine(Vector2Int(max), Vector2Int(max - Vector2(s.x, 0)), Colors::White);
-	//Platform::DrawLine(Vector2Int(min), Vector2Int(min + Vector2(0, s.y)), Colors::White);
-	//Platform::DrawLine(Vector2Int(max), Vector2Int(max - Vector2(0, s.y)), Colors::White);
 }
 
 void GameHUD::DrawAbilities() {

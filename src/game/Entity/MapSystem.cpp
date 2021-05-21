@@ -32,23 +32,25 @@ void MapSystem::UpdateMap(EntityManager& em)
 
 
 	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {
-		if (em.FlagComponents.GetComponent(id).test(ComponentFlags::RenderEnabled))
+		if (em.FlagComponents.GetComponent(id).test(ComponentFlags::RenderEnabled) &&
+			(!em.HiddenArchetype.Archetype.HasEntity(id)))
 		{
-			auto collider = em.CollisionArchetype.ColliderComponents.GetComponent(id).collider;
+			const auto& def = em.UnitArchetype.UnitComponents.GetComponent(id).def;
+
+			Rectangle16 dst;
+			dst.position += em.PositionComponents.GetComponent(id);
+			dst.position = (dst.position >> 5) + def->Graphics->MinimapBB.position;
+			dst.size = def->Graphics->MinimapBB.size;
+			dst.Restrict(Vector2Int16(0, 0), gridSize - Vector2Int16(1, 1));
+
 			PlayerId owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
 
-			collider.position += em.PositionComponents.GetComponent(id);
-			collider.position = collider.position >> 5;
-			collider.size = collider.size >> 5;
-			collider.Restrict(Vector2Int16(0, 0), gridSize - Vector2Int16(1, 1));
-			collider.size = collider.size.Max(2, 2);
-
-			bool visible = vision.IsVisible(collider);
+			bool visible = vision.IsVisible(dst);
 
 			if (!visible && FogOfWarVisible)
 				continue;
 
-			minimapData.dst.push_back(collider);
+			minimapData.dst.push_back(dst);
 			minimapData.color.push_back(colors[owner]);
 		}
 	}
@@ -281,10 +283,6 @@ void MapSystem::RedrawMinimap(EntityManager& em) {
 		minimapTexture = Platform::NewTexture({ minimapTextureSize,minimapTextureSize }, true);
 	}
 
-
-	int mapSizeTiles = (int)mapSize.x / 32;
-	int multiplier = minimapTextureSize / mapSizeTiles;
-
 	RenderMinimapFogOfWar(vision);
 
 	Platform::DrawOnTexture(minimapTexture.textureId);
@@ -294,26 +292,18 @@ void MapSystem::RedrawMinimap(EntityManager& em) {
 	fullMapSprite.image = minimapTerrainTexture;
 	Platform::Draw(fullMapSprite, { {0,0}, Vector2Int(minimapTextureSize) });
 
+	if (FogOfWarVisible) {
+		fullMapSprite.image = minimapFowTexture;
+		Platform::Draw(fullMapSprite, { {0,0}, Vector2Int(minimapTextureSize) });
+	}
 
-	//Platform::DrawRectangle({ {16,4},{4,4} }, Colors::MapFriendly);
 	int end = minimapData.size();
 	for (int i = 0; i < end; ++i) {
 		const Rectangle16& collider = minimapData.dst[i];
 		const Color32& color = minimapData.color[i];
 
-		Rectangle dst;
-		dst.position = (Vector2Int(collider.position)) * multiplier;
-		dst.size = (Vector2Int(collider.size) << 1) * multiplier;
-
-
+		Rectangle dst = { Vector2Int(collider.position), Vector2Int(collider.size) };
 		Platform::DrawRectangle(dst, color);
-
-	}
-
-
-	if (FogOfWarVisible) {
-		fullMapSprite.image = minimapFowTexture;
-		Platform::Draw(fullMapSprite, { {0,0}, Vector2Int(minimapTextureSize) });
 	}
 
 	Platform::DrawOnTexture(nullptr);

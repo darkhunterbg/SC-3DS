@@ -136,14 +136,14 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 
 	em.UnitArchetype.RenderArchetype.RenderComponents.NewComponent(e, {
 		player.color,
-		def.Graphics->MovementAnimations[0].GetFrame(0).sprite.image,
-		def.Graphics->MovementAnimations[0].GetFrame(0).shadowSprite.image,
-		def.Graphics->MovementAnimations[0].GetFrame(0).colorSprite.image,
+		def.Graphics->IdleAnimations[0].GetFrame(0).sprite.image,
+		def.Graphics->IdleAnimations[0].GetFrame(0).shadowSprite.image,
+		def.Graphics->IdleAnimations[0].GetFrame(0).colorSprite.image,
 		});
 
 	em.UnitArchetype.RenderArchetype.OffsetComponents.NewComponent(e, {
-	 Vector2Int16(def.Graphics->MovementAnimations[0].GetFrame(0).offset),
-		Vector2Int16(def.Graphics->MovementAnimations[0].GetFrame(0).shadowOffset)
+	 Vector2Int16(def.Graphics->IdleAnimations[0].GetFrame(0).offset),
+		Vector2Int16(def.Graphics->IdleAnimations[0].GetFrame(0).shadowOffset)
 		});
 
 	em.UnitArchetype.RenderArchetype.DestinationComponents.NewComponent(e);
@@ -163,8 +163,10 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 	em.CollisionArchetype.ColliderComponents.NewComponent(e).collider = def.Graphics->Collider;
 	em.CollisionArchetype.Archetype.AddEntity(e);
 
-	em.MovementArchetype.MovementComponents.NewComponent(e);
-	em.MovementArchetype.Archetype.AddEntity(e);
+	if (def.MovementSpeed > 0) {
+		em.MovementArchetype.MovementComponents.NewComponent(e);
+		em.MovementArchetype.Archetype.AddEntity(e);
+	}
 
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::PositionChanged);
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::RenderEnabled);

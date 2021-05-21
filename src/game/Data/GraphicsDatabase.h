@@ -11,7 +11,7 @@ private:
 public:
 	static UnitGraphicsDef Marine, SCV, CommandCenter;
 
-	static std::vector<const UnitGraphicsDef*> Units;
+	static std::vector<UnitGraphicsDef*> Units;
 
 	static void Init();
 	static void LoadAllGraphicsResources();
