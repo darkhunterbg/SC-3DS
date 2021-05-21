@@ -21,6 +21,8 @@ EntityManager::EntityManager() {
 	archetypes.push_back(&ParentArchetype.Archetype);
 	archetypes.push_back(&HiddenArchetype.Archetype);
 	archetypes.push_back(&UnitArchetype.HiddenArchetype.Archetype);
+	archetypes.push_back(&MapObjectArchetype.Archetype);
+
 	EntityUtil::emInstance = this;
 	UnitEntityUtil::emInstance = this;
 }
@@ -145,7 +147,7 @@ void EntityManager::UpdateChildrenPosition() {
 void EntityManager::Update0() {
 	playerSystem.UpdateNextPlayerVision();
 		
-	mapSystem.UpdateMap(*this);
+
 }
 // Updates 24 per second (60 fps) 
 void EntityManager::Update1() {
@@ -180,10 +182,10 @@ void EntityManager::Update2() {
 	CollectEntityChanges();
 
 	playerSystem.UpdatePlayerUnits(*this);
+	mapSystem.UpdateMap(*this, changedData);
 	renderSystem.UpdatePositions(*this, changedData);
 	kinematicSystem.UpdateCollidersPosition(*this, changedData);
 	kinematicSystem.ApplyCollidersChange(*this);
-
 
 	ApplyEntityChanges();
 }

@@ -10,6 +10,7 @@
 class EntityManager;
 class Camera;
 class PlayerVision;
+class EntityChangedData;
 
 class MapSystem {
 	struct MinimapData {
@@ -50,7 +51,7 @@ public:
 
 	void SetSize(Vector2Int16 size);
 
-	void UpdateMap(EntityManager& em);
+	void UpdateMap(EntityManager& em, const EntityChangedData& changed);
 
 	void DrawMap(const Camera& camera);
 

@@ -4,8 +4,6 @@
 
 #include "../Profiler.h"
 
-
-
 void TimingSystem::UpdateTimers(EntityManager& em)
 {
 	for (EntityId id : em.TimingArchetype.Archetype.GetEntities()) {
@@ -31,8 +29,6 @@ void TimingSystem::UpdateTimers(EntityManager& em)
 	}
 }
 
-
-
 void TimingSystem::ApplyTimerActions(EntityManager& em) {
 
 	UnitDeathAfterEffect(GetActionEntityTable(TimerExpiredAction::UnitDeathAfterEffect), em);
@@ -47,8 +43,9 @@ void TimingSystem::UnitDeathAfterEffect(std::vector<EntityId>& entities, EntityM
 		unsigned total = entities.size();
 		em.DeleteEntities(entities, true);
 		em.NewEntities(total, scratch);
-		em.RenderArchetype.Archetype.AddEntities(scratch, true);
-		em.AnimationArchetype.Archetype.AddEntities(scratch, true);
+		em.RenderArchetype.Archetype.AddSortedEntities(scratch);
+		em.AnimationArchetype.Archetype.AddSortedEntities(scratch);
+		em.MapObjectArchetype.Archetype.AddSortedEntities(scratch);
 
 		for (unsigned item = 0; item < total; ++item)
 		{
@@ -64,6 +61,8 @@ void TimingSystem::UnitDeathAfterEffect(std::vector<EntityId>& entities, EntityM
 			em.RenderArchetype.RenderComponents.GetComponent(id).depth = def->Graphics->DeathAfterEffect.Depth;
 			em.RenderArchetype.BoundingBoxComponents.GetComponent(id)
 				.SetCenter(em.PositionComponents.GetComponent(id));
+
+			EntityUtil::SetMapObjectBoundingBoxFromRender(id);
 
 			EntityUtil::StartTimer(id, clip.GetDuration(), TimerExpiredAction::DeleteEntity);
 			EntityUtil::PlayAnimation(id, clip);

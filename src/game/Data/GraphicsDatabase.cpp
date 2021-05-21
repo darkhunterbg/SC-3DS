@@ -136,18 +136,7 @@ void GraphicsDatabase::Init()
 	SCVData();
 	CommandCenterData();
 
-	for (auto unit : Units) {
-		Vector2Int16 size = unit->Collider.size;
-		if (size.x % 32 != 0)
-			size.x += 32;
-
-		if (size.y % 32 != 0)
-			size.y += 32;
-
-		unit->MinimapBB.size = Vector2Int16(size >> 5);
-		unit->MinimapBB.size = unit->MinimapBB.size.Max(2, 2);
-		unit->MinimapBB.position -= unit->MinimapBB.size / 2;
-	}
+	
 }
 
 void GraphicsDatabase::LoadAllGraphicsResources()

@@ -15,9 +15,19 @@ void MapSystem::SetSize(Vector2Int16 size)
 	tile = Game::AssetLoader.LoadAtlas("tileset_tile.t3x")->GetSprite(0);
 }
 
-void MapSystem::UpdateMap(EntityManager& em)
+void MapSystem::UpdateMap(EntityManager& em, const EntityChangedData& changed)
 {
 	SectionProfiler p("UpdateMap");
+
+	int end = changed.size();
+	for (int i = 0; i < end; ++i) {
+		EntityId id = changed.entity[i];
+		const auto& bb = em.MapObjectArchetype.BoundingBoxComponents.GetComponent(id);
+		auto& dst = em.MapObjectArchetype.DestinationComponents.GetComponent(id);
+		dst = bb;
+		dst.position += changed.position[i] >> 5;
+		dst.Restrict(Vector2Int16(0, 0), gridSize - Vector2Int16(1, 1));
+	}
 
 	minimapData.clear();
 
@@ -31,19 +41,11 @@ void MapSystem::UpdateMap(EntityManager& em)
 	const auto vision = em.GetPlayerSystem().GetPlayerVision(ActivePlayer);
 
 
-	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {
-		if (em.FlagComponents.GetComponent(id).test(ComponentFlags::RenderEnabled) &&
-			(!em.HiddenArchetype.Archetype.HasEntity(id)))
+	for (EntityId id : em.MapObjectArchetype.Archetype.GetEntities()) {
+		if (em.UnitArchetype.Archetype.HasEntity(id) && !em.HiddenArchetype.Archetype.HasEntity(id))
 		{
-			const auto& def = em.UnitArchetype.UnitComponents.GetComponent(id).def;
-
-			Rectangle16 dst;
-			dst.position += em.PositionComponents.GetComponent(id);
-			dst.position = (dst.position >> 5) + def->Graphics->MinimapBB.position;
-			dst.size = def->Graphics->MinimapBB.size;
-			dst.Restrict(Vector2Int16(0, 0), gridSize - Vector2Int16(1, 1));
-
 			PlayerId owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
+			const Rectangle16& dst = em.MapObjectArchetype.DestinationComponents.GetComponent(id);
 
 			bool visible = vision.IsVisible(dst);
 
@@ -62,31 +64,24 @@ void MapSystem::UpdateVisibleRenderEntities(EntityManager& em) {
 	removedEntities.clear();
 
 	for (EntityId id : em.RenderArchetype.Archetype.GetEntities()) {
-		auto dst = em.RenderArchetype.BoundingBoxComponents.GetComponent(id);
-		dst.position = dst.position >> 5;
-		dst.size = dst.size >> 5;
+		if (!em.MapObjectArchetype.Archetype.HasEntity(id))
+			continue;
 
-		dst.Restrict(Vector2Int16(0, 0), gridSize - Vector2Int16(1, 1));
-
-		bool visible =  vision.IsVisible(dst);
+		const Rectangle16& dst = em.MapObjectArchetype.DestinationComponents.GetComponent(id);
+		bool visible = vision.IsVisible(dst);
 
 		if (!visible && FogOfWarVisible) {
 			removedEntities.push_back(id);
 		}
 	}
 
-
 	addedEntities.clear();
 
 	for (EntityId id : em.HiddenArchetype.Archetype.GetEntities()) {
-		auto dst = em.RenderArchetype.BoundingBoxComponents.GetComponent(id);
-		Vector2Int16 pos = em.PositionComponents.GetComponent(id);
-		dst.SetCenter(pos);
-		dst.position = dst.position >> 5;
-		dst.size = dst.size >> 5;
+		if (!em.MapObjectArchetype.Archetype.HasEntity(id))
+			continue;
 
-		dst.Restrict(Vector2Int16(0, 0), gridSize - Vector2Int16(1, 1));
-
+		const Rectangle16& dst = em.MapObjectArchetype.DestinationComponents.GetComponent(id);
 		bool visible = vision.IsVisible(dst);
 
 		if (visible || !FogOfWarVisible) {
@@ -94,7 +89,6 @@ void MapSystem::UpdateVisibleRenderEntities(EntityManager& em) {
 			em.FlagComponents.GetComponent(id).set(ComponentFlags::RenderChanged);
 		}
 	}
-
 
 	em.RenderArchetype.Archetype.RemoveSortedEntities(removedEntities);
 	em.HiddenArchetype.Archetype.AddSortedEntities(removedEntities);
@@ -107,12 +101,10 @@ void MapSystem::UpdateVisibleRenderUnits(EntityManager& em) {
 	removedEntities.clear();
 
 	for (EntityId id : em.UnitArchetype.RenderArchetype.Archetype.GetEntities()) {
-		auto dst = em.UnitArchetype.RenderArchetype.BoundingBoxComponents.GetComponent(id);
-		dst.position = dst.position >> 5;
-		dst.size = dst.size >> 5;
+		if (!em.MapObjectArchetype.Archetype.HasEntity(id))
+			continue;
 
-		dst.Restrict(Vector2Int16(0, 0), gridSize - Vector2Int16(1, 1));
-
+		const Rectangle16& dst = em.MapObjectArchetype.DestinationComponents.GetComponent(id);
 		bool visible = vision.IsVisible(dst);
 
 		if (!visible && FogOfWarVisible) {
@@ -120,18 +112,13 @@ void MapSystem::UpdateVisibleRenderUnits(EntityManager& em) {
 		}
 	}
 
-
 	addedEntities.clear();
 
 	for (EntityId id : em.UnitArchetype.HiddenArchetype.Archetype.GetEntities()) {
-		auto dst = em.UnitArchetype.RenderArchetype.BoundingBoxComponents.GetComponent(id);
-		Vector2Int16 pos = em.PositionComponents.GetComponent(id);
-		dst.SetCenter(pos);
-		dst.position = dst.position >> 5;
-		dst.size = dst.size >> 5;
+		if (!em.MapObjectArchetype.Archetype.HasEntity(id))
+			continue;
 
-		dst.Restrict(Vector2Int16(0, 0), gridSize - Vector2Int16(1, 1));
-
+		const Rectangle16& dst = em.MapObjectArchetype.DestinationComponents.GetComponent(id);
 		bool visible = vision.IsVisible(dst);
 
 		if (visible || !FogOfWarVisible) {

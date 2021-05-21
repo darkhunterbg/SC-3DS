@@ -126,6 +126,12 @@ public:
 		ComponentCollection<TimingComponent> TimingComponents;
 		ComponentCollection<TimingActionComponent> ActionComponents;
 	} TimingArchetype;
+
+	struct {
+		EntityArchetype Archetype = EntityArchetype("MapObject");
+		ComponentCollection<Rectangle16> BoundingBoxComponents;
+		ComponentCollection<Rectangle16> DestinationComponents;
+	} MapObjectArchetype;
 private:
 	void CollectEntityChanges();
 	void ApplyEntityChanges();

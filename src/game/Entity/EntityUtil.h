@@ -67,6 +67,8 @@ public:
 	/// Set render to show a frame from unit animation clip
 	/// </summary>
 	static void SetRenderFromAnimationClip(EntityId e, const UnitAnimationClip& clip, uint8_t frame);
+
+	static void SetMapObjectBoundingBoxFromRender(EntityId e);
 };
 
 class UnitEntityUtil {

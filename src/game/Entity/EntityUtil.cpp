@@ -58,7 +58,7 @@ void EntityUtil::PlayAnimation(EntityId e, const AnimationClip& clip) {
 	AnimationComponent& a = em.AnimationArchetype.AnimationComponents.GetComponent(e);
 	AnimationTrackerComponent& t = em.AnimationArchetype.TrackerComponents.GetComponent(e);
 	FlagsComponent& f = em.FlagComponents.GetComponent(e);
-	
+
 	a.clip = &clip;
 	t.PlayClip(&clip);
 	f.set(ComponentFlags::AnimationEnabled);
@@ -92,9 +92,25 @@ void EntityUtil::SetRenderFromAnimationClip(EntityId e, const AnimationClip& cli
 	render.SetSpriteFrame(frame);
 	offset = frame.offset;
 	bb.size = clip.GetFrameSize();
-	
+
 	f.set(ComponentFlags::RenderEnabled);
 	f.set(ComponentFlags::RenderChanged);
+}
+
+void EntityUtil::SetMapObjectBoundingBoxFromRender(EntityId e)
+{
+	EntityManager& em = GetManager();
+
+	Rectangle16& mapBB = em.MapObjectArchetype.BoundingBoxComponents.GetComponent(e);
+	const Rectangle16& renderBB = em.RenderArchetype.BoundingBoxComponents.GetComponent(e);
+
+	Vector2Int16 size = renderBB.size;
+	if (size.x % 32) size.x += 32;
+	if (size.y % 32) size.y += 32;
+
+	mapBB.size = Vector2Int16(size >> 5);
+	mapBB.size = mapBB.size.Max(2, 2);
+	mapBB.position -= mapBB.size / 2;
 }
 
 void EntityUtil::SetRenderFromAnimationClip(EntityId e, const UnitAnimationClip& clip, uint8_t i) {
@@ -115,7 +131,7 @@ void EntityUtil::SetRenderFromAnimationClip(EntityId e, const UnitAnimationClip&
 	f.set(ComponentFlags::RenderChanged);
 }
 
-EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2Int16 position,  EntityId e) {
+EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2Int16 position, EntityId e) {
 
 	EntityManager& em = GetManager();
 
@@ -131,7 +147,7 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 	em.UnitArchetype.OrientationComponents.NewComponent(e);
 	em.UnitArchetype.MovementComponents.NewComponent(e).FromDef(def);
 	em.UnitArchetype.DataComponents.NewComponent(e).FromDef(def);
-	em.UnitArchetype.OwnerComponents.NewComponent(e, player.id );
+	em.UnitArchetype.OwnerComponents.NewComponent(e, player.id);
 	em.UnitArchetype.Archetype.AddEntity(e);
 
 	em.UnitArchetype.RenderArchetype.RenderComponents.NewComponent(e, {
@@ -162,6 +178,19 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 
 	em.CollisionArchetype.ColliderComponents.NewComponent(e).collider = def.Graphics->Collider;
 	em.CollisionArchetype.Archetype.AddEntity(e);
+
+	Rectangle16 mapBB;
+
+	Vector2Int16 size = def.Graphics->Collider.size;
+	if (size.x % 32) size.x += 32;
+	if (size.y % 32) size.y += 32;
+
+	mapBB.size = Vector2Int16(size >> 5);
+	mapBB.size = mapBB.size.Max(2, 2);
+	mapBB.position -= mapBB.size / 2;
+
+	em.MapObjectArchetype.BoundingBoxComponents.NewComponent(e, mapBB);
+	em.MapObjectArchetype.Archetype.AddEntity(e);
 
 	if (def.MovementSpeed > 0) {
 		em.MovementArchetype.MovementComponents.NewComponent(e);

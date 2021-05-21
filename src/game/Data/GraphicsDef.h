@@ -23,7 +23,6 @@ struct SpriteAtlasDef {
 struct UnitGraphicsDef {
 	Vector2Int16 RenderSize;
 	Rectangle16 Collider;
-	Rectangle16 MinimapBB;
 
 	UnitDirectionalAnimationDef MovementAnimationDef;
 	UnitDirectionalAnimationDef IdleAnimationDef;
