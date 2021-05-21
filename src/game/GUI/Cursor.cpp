@@ -87,12 +87,16 @@ void Cursor::Draw() {
 
 	const SpriteFrame& frame = currentClip->GetFrame(clipFrame);
 
-	Rectangle dst = { Vector2Int(Position + frame.offset ), Vector2Int(frame.sprite.rect.size) };
+	Rectangle dst = { Vector2Int(Position + frame.offset), Vector2Int(frame.sprite.rect.size) };
 	dst.position -= {64, 64};
 
 
 	if (regionRect.size.LengthSquaredInt() > 0) {
-		Util::DrawTransparentRectangle(regionRect, Colors::UIGreen);
+
+		regionRect.position -= {1, 1};
+		regionRect.size += {2,2};
+
+		Util::DrawTransparentRectangle(regionRect, 2, Colors::UIGreen);
 	}
 
 	Platform::Draw(frame.sprite, dst);

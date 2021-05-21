@@ -101,17 +101,14 @@ void GameHUD::DrawMinimap(const Camera& camera, MapSystem& mapSystem) {
 	Rectangle camRect = camera.GetRectangle();
 	Vector2 min = Vector2(camRect.GetMin());
 	min /= minimapUpscale;
-	Vector2 max = Vector2(camRect.GetMax());
-	max /= minimapUpscale;
 	min += Vector2(minimapDst.position);
-	max += Vector2(minimapDst.position);
 	Vector2 s = Vector2(camRect.size) / minimapUpscale;
 
 	Rectangle rect;
 	rect.position = Vector2Int(min);
-	rect.size = Vector2Int(max - min);
+	rect.size = Vector2Int(s);
 
-	Util::DrawTransparentRectangle(rect, Colors::White);
+	Util::DrawTransparentRectangle(rect, 1, Colors::White);
 
 	//Platform::DrawLine(Vector2Int(min), Vector2Int(min + Vector2(s.x, 0)), Colors::White);
 	//Platform::DrawLine(Vector2Int(max), Vector2Int(max - Vector2(s.x, 0)), Colors::White);

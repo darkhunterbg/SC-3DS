@@ -202,7 +202,6 @@ void Platform::DrawText(const Font& font, Vector2Int position, const char* text,
 	C2D_DrawText(&t, C2D_WithColor, position.x, position.y, 0, scale, scale, c);
 }
 void Platform::DrawLine(Vector2Int src, Vector2Int dst, Color color) {
-
 	u32 c = C2D_Color32f(color.r, color.g, color.b, color.a);
 	C2D_DrawLine(src.x, src.y, c, dst.x, dst.y, c, 1, 0);
 }
