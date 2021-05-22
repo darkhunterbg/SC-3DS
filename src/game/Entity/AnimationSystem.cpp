@@ -55,13 +55,54 @@ void AnimationSystem::UpdateAnimationsJob(int start, int end) {
 	}
 }
 
-void AnimationSystem::UpdateAnimations() {
-	s = this;
-	JobSystem::RunJob(unitData.size(), JobSystem::DefaultJobSize, UpdateUnitAnimationsJob);
-	JobSystem::RunJob(data.size(), JobSystem::DefaultJobSize, UpdateAnimationsJob);
-
+void AnimationSystem::UpdateAnimations(EntityManager& em) {
 	data.clear();
 	unitData.clear();
+
+	s = this;
+
+	for (EntityId id : em.AnimationArchetype.Archetype.GetEntities()) {
+		int i = Entity::ToIndex(id);
+		auto& f = em.FlagComponents[i];
+
+		if (f.test(ComponentFlags::AnimationEnabled))
+		{
+			if (f.test(ComponentFlags::AnimationFrameChanged)) {
+				f.clear(ComponentFlags::AnimationFrameChanged);
+
+				if (em.RenderArchetype.Archetype.HasEntity(id)) {
+					data.animation.push_back(em.AnimationArchetype.AnimationComponents[i]);
+					data.tracker.push_back(em.AnimationArchetype.TrackerComponents[i]);
+					data.ren.push_back(&em.RenderArchetype.RenderComponents[i]);
+					data.offset.push_back(&em.RenderArchetype.OffsetComponents[i]);
+					data.flags.push_back(&f);
+				}
+			}
+		}
+	}
+
+	for (EntityId id : em.UnitArchetype.AnimationArchetype.Archetype.GetEntities()) {
+		int i = Entity::ToIndex(id);
+		auto& f = em.FlagComponents[i];
+
+		if (f.test(ComponentFlags::AnimationEnabled))
+		{
+			if (f.test(ComponentFlags::AnimationFrameChanged)) {
+				f.clear(ComponentFlags::AnimationFrameChanged);
+
+				if (em.UnitArchetype.RenderArchetype.Archetype.HasEntity(id)) {
+					unitData.animation.push_back(em.UnitArchetype.AnimationArchetype.AnimationComponents[i]);
+					unitData.tracker.push_back(em.UnitArchetype.AnimationArchetype.TrackerComponents[i]);
+					unitData.ren.push_back(&em.UnitArchetype.RenderArchetype.RenderComponents[i]);
+					unitData.offset.push_back(&em.UnitArchetype.RenderArchetype.OffsetComponents[i]);
+					unitData.flags.push_back(&f);
+				}
+			}
+		}
+	}
+
+	JobSystem::RunJob(unitData.size(), JobSystem::DefaultJobSize, UpdateUnitAnimationsJob);
+	JobSystem::RunJob(data.size(), JobSystem::DefaultJobSize, UpdateAnimationsJob);
 }
 
 void AnimationSystem::TickUnitAnimationsJob(int start, int end) {
@@ -138,75 +179,4 @@ void AnimationSystem::TickAnimations(EntityManager& em)
 	JobSystem::RunJob(em.UnitArchetype.AnimationArchetype.Archetype.GetEntities().size(),
 		JobSystem::DefaultJobSize, TickUnitAnimationsJob);
 
-	
-	for (EntityId id : em.AnimationArchetype.Archetype.GetEntities()) {
-		int i = Entity::ToIndex(id);
-		auto& f = em.FlagComponents[i];
-
-		if (f.test(ComponentFlags::AnimationEnabled))
-		{
-			if (f.test(ComponentFlags::AnimationFrameChanged)) {
-				f.clear(ComponentFlags::AnimationFrameChanged);
-
-				if (em.RenderArchetype.Archetype.HasEntity(id)) {
-					data.animation.push_back(em.AnimationArchetype.AnimationComponents[i]);
-					data.tracker.push_back(em.AnimationArchetype.TrackerComponents[i]);
-					data.ren.push_back(&em.RenderArchetype.RenderComponents[i]);
-					data.offset.push_back(&em.RenderArchetype.OffsetComponents[i]);
-					data.flags.push_back(&f);
-				}
-			}
-		}
-	}
-	
-
-	for (EntityId id : em.UnitArchetype.AnimationArchetype.Archetype.GetEntities()) {
-		int i = Entity::ToIndex(id);
-		auto& f = em.FlagComponents[i];
-
-		if (f.test(ComponentFlags::AnimationEnabled))
-		{
-			if (f.test(ComponentFlags::AnimationFrameChanged)) {
-				f.clear(ComponentFlags::AnimationFrameChanged);
-
-				if (em.UnitArchetype.RenderArchetype.Archetype.HasEntity(id)) {
-					unitData.animation.push_back(em.UnitArchetype.AnimationArchetype.AnimationComponents[i]);
-					unitData.tracker.push_back(em.UnitArchetype.AnimationArchetype.TrackerComponents[i]);
-					unitData.ren.push_back(&em.UnitArchetype.RenderArchetype.RenderComponents[i]);
-					unitData.offset.push_back(&em.UnitArchetype.RenderArchetype.OffsetComponents[i]);
-					unitData.flags.push_back(&f);
-				}
-			}
-		}
-	}
-}
-
-void AnimationSystem::SetUnitOrientationAnimations(EntityManager& em) {
-	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {
-		int i = Entity::ToId(id);
-		auto& f = em.FlagComponents[i];
-
-		if (f.test(ComponentFlags::UnitOrientationChanged))
-		{
-			f.clear(ComponentFlags::UnitOrientationChanged);
-
-			const auto& unit = em.UnitArchetype.UnitComponents[i];
-			auto& anim = em.UnitArchetype.AnimationArchetype.AnimationComponents[i];
-			auto& animTracker = em.UnitArchetype.AnimationArchetype.TrackerComponents[i];
-			const auto& orientation = em.UnitArchetype.OrientationComponents[i];
-
-			anim.clip = &unit.def->Graphics->MovementAnimations[orientation];
-			f.set(ComponentFlags::AnimationFrameChanged);
-			animTracker.PlayClip(anim.clip);
-			f.set(ComponentFlags::AnimationEnabled);
-		}
-		else {
-			//static const  Vector2Int8 zero = Vector2Int8{ 0,0 };
-
-			//if (em.MovementArchetype.MovementComponents[i].velocity == zero) {
-
-			//	em.AnimationArchetype.EnableComponents[i].pause = true;
-			//}
-		}
-	}
 }

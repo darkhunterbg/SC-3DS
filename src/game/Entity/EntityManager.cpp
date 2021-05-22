@@ -161,8 +161,6 @@ void EntityManager::Update1() {
 
 	navigationSystem.ApplyUnitNavigaion(*this);
 
-	animationSystem.SetUnitOrientationAnimations(*this);
-
 	animationSystem.TickAnimations(*this);
 
 	renderSystem.UpdatePositions(*this, changedData);
@@ -173,11 +171,13 @@ void EntityManager::Update2() {
 
 	timingSystem.ApplyTimerActions(*this);
 
+	unitSystem.ApplyUnitState(*this);
+
 	kinematicSystem.MoveEntities(*this);
 
 	mapSystem.UpdateVisibleEntities(*this);
 
-	animationSystem.UpdateAnimations();
+	animationSystem.UpdateAnimations(*this);
 
 	UpdateChildrenPosition();
 

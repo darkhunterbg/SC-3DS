@@ -101,7 +101,7 @@ enum class ComponentFlags {
 	AnimationFrameChanged = 5,
 	NavigationWork = 6,
 	UpdateTimers = 7,
-
+	UnitStateChanged = 8,
 };
 
 struct FlagsComponent {
@@ -172,6 +172,15 @@ struct NavigationComponent {
 struct MovementComponent {
 	Vector2Int8 velocity;
 };
+
+enum class UnitState : uint8_t {
+	Idle = 0,
+	Movement = 1,
+	Turning = 2,
+	Attacking = 3,
+};
+
+
 
 struct UnitComponent {
 	const UnitDef* def;
@@ -245,12 +254,13 @@ struct UnitAnimationTrackerComponent {
 		if (clip) {
 			totalFrames = clip->GetFrameCount();
 			looping = clip->looping;
-			clipFrame = -1;
+			clipFrame = 0;
 			frameCountdown = frameTime = clip->frameTime;
 		}
 		else {
 			totalFrames = 0;
 			clipFrame = 0;
+			frameCountdown = 1;
 		}
 	}
 };
@@ -290,7 +300,7 @@ enum class TimerExpiredAction : uint8_t {
 
 struct TimingActionComponent {
 	TimerExpiredAction action = TimerExpiredAction::None;
-	
+
 	static constexpr const int ActionTypeCount = 3;
 };
 

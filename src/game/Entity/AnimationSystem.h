@@ -50,7 +50,5 @@ private:
 	static void TickUnitAnimationsJob(int start, int end);
 public:
 	void TickAnimations(EntityManager& entityManager);
-	void UpdateAnimations();
-
-	void SetUnitOrientationAnimations(EntityManager& entityManager);
+	void UpdateAnimations(EntityManager& entityManager);
 };

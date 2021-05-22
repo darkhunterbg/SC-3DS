@@ -14,6 +14,7 @@
 #include "TimingSystem.h"
 #include "PlayerSystem.h"
 #include "MapSystem.h"
+#include "UnitSystem.h"
 
 #include "../Data/UnitDef.h"
 #include "../Camera.h"
@@ -39,6 +40,7 @@ private:
 	TimingSystem timingSystem;
 	PlayerSystem playerSystem;
 	MapSystem mapSystem;
+	UnitSystem unitSystem;
 
 	bool ready = false;
 	bool doneUpdatingVision = false;
@@ -122,6 +124,7 @@ public:
 		ComponentCollection<UnitComponent> UnitComponents;
 		ComponentCollection<UnitDataComponent> DataComponents;
 		ComponentCollection<PlayerId> OwnerComponents;
+		ComponentCollection<UnitState> StateComponents;
 	} UnitArchetype;
 
 

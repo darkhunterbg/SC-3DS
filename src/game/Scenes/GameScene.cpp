@@ -42,9 +42,9 @@ void GameScene::Start() {
 	Game::Audio.PlayStream(stream, 0);
 
 	entityManager = new EntityManager();
-	entityManager->DrawBoundingBoxes = true;
-	entityManager->DrawGrid = true;
-	entityManager->DrawColliders = true;
+	//entityManager->DrawBoundingBoxes = true;
+	//entityManager->DrawGrid = true;
+	//entityManager->DrawColliders = true;
 
 	entityManager->Init(size);
 
@@ -73,12 +73,12 @@ void GameScene::Start() {
 	//	Vector2Int16(48, 48));
 	EntityId e = 0;
 	int i = 0;
-	for (int y = 1; y > 0; --y) {
+	for (int y = 2; y > 0; --y) {
 		for (int x = 1; x > 0; --x) {
 			Color c = color[(i) % 12];
-			auto& def = *UnitDatabase::Units[0];
-			e = UnitEntityUtil::NewUnit(def, 1 + i % totalPlayers,
-				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 + 16 }));
+			auto& def = *UnitDatabase::Units[i % 2];
+			e = UnitEntityUtil::NewUnit(def, 1,// 1 + i % totalPlayers,
+				Vector2Int16(Vector2Int{ x * 64 + 16,y * 64 + 16 }));
 
 			//entityManager->UnitArchetype.OrientationComponents.GetComponent(e) = 12;
 			//EntityUtil::PlayAnimation(e, def.Graphics->IdleAnimations[0]);
@@ -127,8 +127,7 @@ void GameScene::Update() {
 		}
 
 		if (Game::Gamepad.IsButtonPressed(GamepadButton::Start)) {
-			entityManager->DrawGrid =
-				!entityManager->DrawGrid;
+			entityManager->DrawGrid = !entityManager->DrawGrid;
 		}
 
 
@@ -161,8 +160,14 @@ void GameScene::Update() {
 		if (Game::Gamepad.IsButtonPressed(GamepadButton::B)) {
 
 			for (EntityId id : selection)
-				if (entityManager->NavigationArchetype.Archetype.HasEntity(id)) {
-					entityManager->FlagComponents.GetComponent(id).clear(ComponentFlags::NavigationWork);
+				if (entityManager->UnitArchetype.Archetype.HasEntity(id)) {
+
+					entityManager->UnitArchetype.StateComponents.GetComponent(id) =
+						UnitState::Idle;
+					entityManager->FlagComponents.GetComponent(id)
+						.set(ComponentFlags::UnitStateChanged);
+					entityManager->FlagComponents.GetComponent(id)
+						.clear(ComponentFlags::NavigationWork);
 				}
 		}
 		if (Game::Gamepad.IsButtonPressed(GamepadButton::Y)) {

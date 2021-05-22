@@ -178,16 +178,6 @@ void NavigationSystem::ApplyUnitNavigationJob(int start, int end) {
 
 		const auto& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
 
-
-		if (unit.HasMovementGlow() ) {
-			EntityId glow = unit.movementGlowEntity;
-			if (!em.FlagComponents.GetComponent(glow).test(ComponentFlags::AnimationEnabled)) {
-				EntityUtil::SetRenderFromAnimationClip(glow,
-					unit.def->Graphics->MovementGlowAnimations[orientation], 0);
-				EntityUtil::PlayAnimation(glow, unit.def->Graphics->MovementGlowAnimations[orientation]);
-			}
-		}
-
 		if (diff != 0) {
 
 			if (nav.targetHeading != 255) {
@@ -205,16 +195,10 @@ void NavigationSystem::ApplyUnitNavigationJob(int start, int end) {
 				else {
 					orientation = nav.targetHeading;
 				}
-
-				if (unit.HasMovementGlow()) {
-					EntityId glow = unit.movementGlowEntity;
-					EntityUtil::SetRenderFromAnimationClip(glow,
-						unit.def->Graphics->MovementGlowAnimations[orientation], 0);
-					EntityUtil::PlayAnimation(glow, unit.def->Graphics->MovementGlowAnimations[orientation]);
-				}
 			}
-			flags.set(ComponentFlags::UnitOrientationChanged);
-			movement.velocity = { 0,0 };
+
+			flags.set(ComponentFlags::UnitStateChanged);
+			em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Turning;
 		}
 		else {
 			const auto& position = em.PositionComponents[i];
@@ -224,18 +208,18 @@ void NavigationSystem::ApplyUnitNavigationJob(int start, int end) {
 			Vector2Int distance = Vector2Int(nav.target - position);
 
 			if (distance.LengthSquaredInt() < velocity * velocity) {
-				movement.velocity = { 0,0 };
-				EntityUtil::PlayAnimation(id, unit.def->Graphics->IdleAnimations[orientation]);
-				flags.clear(ComponentFlags::NavigationWork);
 
-				if (unit.HasMovementGlow()) {
-					EntityId glow = unit.movementGlowEntity;
-					em.FlagComponents.GetComponent(glow).clear(ComponentFlags::AnimationEnabled);
-					em.FlagComponents.GetComponent(glow).clear(ComponentFlags::RenderEnabled);
-				}
+				flags.set(ComponentFlags::UnitStateChanged);
+				em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Idle;
 			}
 			else {
 				movement.velocity = Vector2Int8(movementTable32[orientation] * velocity);
+
+				if (em.UnitArchetype.StateComponents.GetComponent(id) != UnitState::Movement)
+				{
+					flags.set(ComponentFlags::UnitStateChanged);
+					em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Movement;
+				}
 			}
 		}
 	}

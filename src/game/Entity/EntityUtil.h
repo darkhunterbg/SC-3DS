@@ -85,4 +85,5 @@ private:
 	static inline  EntityManager& GetManager() { return *emInstance; }
 public:
 	static EntityId NewUnit(const UnitDef& def, PlayerId player, Vector2Int16 position, EntityId id = Entity::None);
+
 };

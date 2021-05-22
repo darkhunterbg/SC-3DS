@@ -176,9 +176,10 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 
 	em.UnitArchetype.AnimationArchetype.Archetype.AddEntity(e);
 
-	em.NavigationArchetype.NavigationComponents.NewComponent(e);
-
-	em.NavigationArchetype.Archetype.AddEntity(e);
+	if (def.MovementSpeed > 0) {
+		em.NavigationArchetype.NavigationComponents.NewComponent(e);
+		em.NavigationArchetype.Archetype.AddEntity(e);
+	}
 
 	em.CollisionArchetype.ColliderComponents.NewComponent(e).collider = def.Graphics->Collider;
 	em.CollisionArchetype.Archetype.AddEntity(e);
@@ -207,11 +208,13 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 		em.MovementArchetype.Archetype.AddEntity(e);
 	}
 
+	em.UnitArchetype.StateComponents.NewComponent(e);
+
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::PositionChanged);
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::RenderEnabled);
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::RenderChanged);
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::AnimationFrameChanged);
-	
+	em.FlagComponents.GetComponent(e).set(ComponentFlags::UnitStateChanged);
 
 	if (def.Graphics->HasMovementGlow()) {
 
