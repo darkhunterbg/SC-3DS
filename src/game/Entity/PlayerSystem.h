@@ -114,7 +114,6 @@ struct PlayerInfo {
 	}
 
 
-
 	PlayerInfo(Color32 color, RaceType race, PlayerId id) :
 		color(color), race(race), id(id) {}
 };
@@ -134,11 +133,14 @@ private:
 
 	friend class EntityManager;
 public:
+	PlayerSystem();
+
 	void SetSize(Vector2Int16 size);
 
 	PlayerId AddPlayer(const RaceDef& race, Color color);
 	void SetMapKnown(PlayerId player);
 
+	const PlayerInfo& GetNeutralPlayer() const;
 	const PlayerInfo& GetPlayerInfo(PlayerId id) const;
 	const PlayerVision& GetPlayerVision(PlayerId id) const;
 	const std::vector<PlayerInfo>& GetPlayers() const { return players; }

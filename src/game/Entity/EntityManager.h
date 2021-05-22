@@ -135,6 +135,7 @@ public:
 		EntityArchetype Archetype = EntityArchetype("MapObject");
 		ComponentCollection<Rectangle16> BoundingBoxComponents;
 		ComponentCollection<Rectangle16> DestinationComponents;
+		ComponentCollection<uint8_t> MinimapColorId;
 	} MapObjectArchetype;
 
 
@@ -181,9 +182,11 @@ public:
 	}
 	void ClearEntities();
 
-	void Update();
+	void FrameUpdate();
 
 	void Draw(const Camera& camera);
+
+	void FullUpdate();
 
 	void GoTo(EntityId e, Vector2Int16 pos);
 

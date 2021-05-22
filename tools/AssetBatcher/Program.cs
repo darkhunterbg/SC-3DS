@@ -34,6 +34,16 @@ namespace AssetBatcher
 			T3SFolders("unit/thingy/tbangs");
 			T3SFolders("unit/thingy/tbangl");
 			T3SFolders("unit/thingy/tbangx");
+
+			T3SFolders(
+				"unit/neutral/min01",
+				"unit/neutral/min02",
+				"unit/neutral/min03");
+
+			T3SFolders(
+				"unit/neutral/min01sha",
+				"unit/neutral/min02sha",
+				"unit/neutral/min03sha");
 			GeneraSourceCode();
 		}
 

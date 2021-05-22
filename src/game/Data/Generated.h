@@ -20,6 +20,8 @@ public:
 	static SpriteFrameAtlas* unit_thingy_tbangs;
 	static SpriteFrameAtlas* unit_thingy_tbangl;
 	static SpriteFrameAtlas* unit_thingy_tbangx;
+	static SpriteFrameAtlas* unit_neutral_min01;
+	static SpriteFrameAtlas* unit_neutral_min01sha;
 
 	static const SpriteFrameAtlas* Load_unit_terran_marine();
 	static const SpriteFrameAtlas* Load_unit_terran_tmashad();
@@ -29,4 +31,6 @@ public:
 	static const SpriteFrameAtlas* Load_unit_thingy_tbangs();
 	static const SpriteFrameAtlas* Load_unit_thingy_tbangl();
 	static const SpriteFrameAtlas* Load_unit_thingy_tbangx();
+	static const SpriteFrameAtlas* Load_unit_neutral_min01();
+	static const SpriteFrameAtlas* Load_unit_neutral_min01sha();
 };

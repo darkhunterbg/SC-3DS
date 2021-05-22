@@ -5,7 +5,7 @@
 #include "../Job.h"
 #include <algorithm>
 
-static constexpr const uint8_t TileVisibilityTimer = 24;
+static constexpr const uint8_t TileVisibilityTimer = 20;
 
 // ================== Player Vision ==================
 
@@ -29,10 +29,25 @@ void PlayerVision::SetGridSize(Vector2Int16 size) {
 
 // ================== Player System ==================
 
+PlayerSystem::PlayerSystem() {
+	
+}
+
 void PlayerSystem::SetSize(Vector2Int16 size)
 {
 	gridSize.x = size.x / 32;
 	gridSize.y = size.y / 32;
+
+
+	players.clear();
+
+	// Add neutral player
+
+	PlayerId id = 0;
+
+	players.push_back(PlayerInfo(Color32(Colors::SCNeutral), RaceType::Neutral, id));
+	playerVision.push_back(new PlayerVision());
+	playerVision[id]->SetGridSize(gridSize);
 }
 
 PlayerId PlayerSystem::AddPlayer(const RaceDef& race, Color color)
@@ -123,7 +138,7 @@ void PlayerSystem::UpdateNextPlayerVisionJob(int start, int end) {
 
 bool PlayerSystem::UpdateNextPlayerVision(int players) {
 	s = this;
-
+	
 	int max = std::min((int)playerVision.size(), playerUpdate + players);
 
 	JobSystem::RunJob(max - playerUpdate, 1, UpdateNextPlayerVisionJob);

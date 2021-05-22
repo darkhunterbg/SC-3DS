@@ -56,7 +56,7 @@ private:
 	void UpdateMapObjectPositions(EntityManager& em, const EntityChangedData& changed);
 public:
 	bool FogOfWarVisible = true;
-	PlayerId ActivePlayer = 0;
+	PlayerId ActivePlayer = 1;
 
 	void SetSize(Vector2Int16 size);
 

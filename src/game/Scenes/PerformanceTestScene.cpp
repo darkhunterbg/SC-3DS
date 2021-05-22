@@ -65,7 +65,7 @@ void PerformanceTestScene::Update() {
 	//	entityManager.ClearEntitiesArchetypes(v);
 	//}
 	//entityManager.ClearEntities();
-	entityManager.Update();
+	entityManager.FrameUpdate();
 }
 
 

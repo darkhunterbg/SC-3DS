@@ -10,6 +10,8 @@ SpriteFrameAtlas* SpriteDatabase::unit_terran_scv;
 SpriteFrameAtlas* SpriteDatabase::unit_thingy_tbangs;
 SpriteFrameAtlas* SpriteDatabase::unit_thingy_tbangl;
 SpriteFrameAtlas* SpriteDatabase::unit_thingy_tbangx;
+SpriteFrameAtlas* SpriteDatabase::unit_neutral_min01;
+SpriteFrameAtlas* SpriteDatabase::unit_neutral_min01sha;
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_marine() {
 	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_terran_marine.t3x");
@@ -977,6 +979,48 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_tbangx() {
 	a->SetOffset(11, Vector2Int(26,12));
 	a->SetOffset(12, Vector2Int(22,23));
 	a->SetOffset(13, Vector2Int(22,21));
+
+	return a;
+}
+
+const SpriteFrameAtlas* SpriteDatabase::Load_unit_neutral_min01() {
+	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_neutral_min01.t3x");
+	auto* a = unit_neutral_min01 = new SpriteFrameAtlas(atlas);
+	a->FrameSize = Vector2Int(64, 96);
+
+	a->SetOffset(0, Vector2Int(0,17));
+	a->SetOffset(1, Vector2Int(0,20));
+	a->SetOffset(2, Vector2Int(0,29));
+	a->SetOffset(3, Vector2Int(5,36));
+	a->SetOffset(4, Vector2Int(0,18));
+	a->SetOffset(5, Vector2Int(0,25));
+	a->SetOffset(6, Vector2Int(0,32));
+	a->SetOffset(7, Vector2Int(1,41));
+	a->SetOffset(8, Vector2Int(0,17));
+	a->SetOffset(9, Vector2Int(1,27));
+	a->SetOffset(10, Vector2Int(2,30));
+	a->SetOffset(11, Vector2Int(3,37));
+
+	return a;
+}
+
+const SpriteFrameAtlas* SpriteDatabase::Load_unit_neutral_min01sha() {
+	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_neutral_min01sha.t3x");
+	auto* a = unit_neutral_min01sha = new SpriteFrameAtlas(atlas);
+	a->FrameSize = Vector2Int(128, 96);
+
+	a->SetOffset(0, Vector2Int(22,15));
+	a->SetOffset(1, Vector2Int(23,20));
+	a->SetOffset(2, Vector2Int(26,31));
+	a->SetOffset(3, Vector2Int(30,36));
+	a->SetOffset(4, Vector2Int(24,16));
+	a->SetOffset(5, Vector2Int(26,21));
+	a->SetOffset(6, Vector2Int(26,26));
+	a->SetOffset(7, Vector2Int(26,38));
+	a->SetOffset(8, Vector2Int(27,13));
+	a->SetOffset(9, Vector2Int(27,23));
+	a->SetOffset(10, Vector2Int(27,28));
+	a->SetOffset(11, Vector2Int(31,35));
 
 	return a;
 }

@@ -18,6 +18,7 @@ struct UnitDef {
 	uint8_t Vision = 1;
 	
 	bool IsBuilding = false;
+	bool IsResourceContainer = false;
 
 	uint8_t UseSupplyDoubled = 0;
 	uint8_t ProvideSupplyDoubled = 0;

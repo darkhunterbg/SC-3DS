@@ -4,9 +4,10 @@
 UnitGraphicsDef GraphicsDatabase::Marine;
 UnitGraphicsDef GraphicsDatabase::SCV;
 UnitGraphicsDef GraphicsDatabase::CommandCenter;
+UnitGraphicsDef GraphicsDatabase::Minerals1;
 std::vector<UnitGraphicsDef*> GraphicsDatabase::Units =
 {
-	&Marine, &SCV, &CommandCenter
+	&Marine, &SCV, &CommandCenter, & Minerals1
 };
 
 // ======================= Terran Marine ==========================================
@@ -31,23 +32,27 @@ static void MarineData() {
 	d.Collider.size = { 17,20 };
 
 	d.MovementAnimationDef.FrameStart = 68;
+	d.MovementAnimationDef.ShadowFrameStart = 68;
 	d.MovementAnimationDef.FrameCount = 9;
 	d.MovementAnimationDef.Looping = true;
 	d.MovementAnimationDef.UnitColorFrameStart = 229 + d.MovementAnimationDef.FrameStart;
 
 	d.AttackAnimationDef.FrameStart = 51;
+	d.AttackAnimationDef.ShadowFrameStart = 51;
 	d.AttackAnimationDef.FrameCount = 1;
 	d.AttackAnimationDef.UnitColorFrameStart = 229 + d.AttackAnimationDef.FrameStart;
 	d.AttackAnimationDef.FrameTime = 2;
 	d.AttackAnimationDef.Looping = true;
 
 	d.IdleAnimationDef.FrameStart = 0;
+	d.IdleAnimationDef.ShadowFrameStart = 0;
 	d.IdleAnimationDef.FrameCount = 1;
 	d.IdleAnimationDef.FrameTime = 1;
 	d.IdleAnimationDef.UnitColorFrameStart = 229 + d.IdleAnimationDef.FrameStart;
 	//d.IdleAnimationDef.Looping = true;
 
 	d.DeathAnimationDef.FrameStart = 221;
+	d.DeathAnimationDef.ShadowFrameStart = 221;
 	d.DeathAnimationDef.FrameCount = 8;
 	d.DeathAnimationDef.UnitColorFrameStart = -1;
 	d.DeathAnimationDef.FrameTime = 2;
@@ -101,6 +106,7 @@ static void SCVData() {
 }
 
 // ============================ Terran Command Center ==========================
+
 static void CommandCenterResources() {
 	auto a = SpriteDatabase::Load_unit_terran_control();
 	auto as = SpriteDatabase::Load_unit_terran_tccshad();
@@ -118,6 +124,7 @@ static void CommandCenterData() {
 	d.Collider.size = { 116,82 };
 
 	d.IdleAnimationDef.FrameStart = 0;
+	d.IdleAnimationDef.ShadowFrameStart = 0;
 	d.IdleAnimationDef.FrameCount = 1;
 	d.IdleAnimationDef.UnitColorFrameStart = 6;
 	d.IdleAnimationDef.MultiDirectional = false;
@@ -128,6 +135,33 @@ static void CommandCenterData() {
 
 	d.LoadResourcesAction = CommandCenterResources;
 }
+
+// ============================ Mineral Fields ===============================
+
+static void MineralsResources() {
+	auto a = SpriteDatabase::Load_unit_neutral_min01();
+	auto as = SpriteDatabase::Load_unit_neutral_min01sha();
+
+	UnitGraphicsDef& d = GraphicsDatabase::Minerals1;
+
+	d.RenderSize = Vector2Int16(as->FrameSize);
+	d.IdleAnimationDef.GenerateAnimations(a, as, d.IdleAnimations);
+}
+
+static void MineralsData() {
+	UnitGraphicsDef& d = GraphicsDatabase::Minerals1;
+	d.Collider.position = { -32,-16 };
+	d.Collider.size = { 63,31 };
+
+	d.IdleAnimationDef.FrameStart = 0;
+	d.IdleAnimationDef.ShadowFrameStart = 0;
+	d.IdleAnimationDef.FrameCount = 1;
+	d.IdleAnimationDef.UnitColorFrameStart = -1;
+	d.IdleAnimationDef.MultiDirectional = false;
+
+	d.LoadResourcesAction = MineralsResources;
+}
+
 // ==============================================================================
 
 void GraphicsDatabase::Init()
@@ -135,8 +169,7 @@ void GraphicsDatabase::Init()
 	MarineData();
 	SCVData();
 	CommandCenterData();
-
-	
+	MineralsData();
 }
 
 void GraphicsDatabase::LoadAllGraphicsResources()

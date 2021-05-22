@@ -12,6 +12,7 @@ private:
 public:
 	static UnitDef Marine, SCV;
 	static UnitDef CommandCenter;
+	static UnitDef MineralField1;
 
 	static std::vector<UnitDef*> Units;
 

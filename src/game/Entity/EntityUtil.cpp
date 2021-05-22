@@ -105,10 +105,7 @@ void EntityUtil::SetMapObjectBoundingBoxFromRender(EntityId e)
 	const Rectangle16& renderBB = em.RenderArchetype.BoundingBoxComponents.GetComponent(e);
 
 	Vector2Int16 size = renderBB.size;
-	if (size.x % 32) size.x += 32;
-	if (size.y % 32) size.y += 32;
-
-	mapBB.size = Vector2Int16(size >> 5);
+	mapBB.size = Vector2Int16(size >> 6) << 1;
 	mapBB.size = mapBB.size.Max(2, 2);
 	mapBB.position -= mapBB.size / 2;
 }
@@ -188,16 +185,22 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 
 	Rectangle16 mapBB;
 
-	Vector2Int16 size = def.Graphics->Collider.size;
-	if (size.x % 32) size.x += 32;
-	if (size.y % 32) size.y += 32;
-
-	mapBB.size = Vector2Int16(size >> 5);
+	Vector2Int16 size = def.Graphics->RenderSize;
+	mapBB.size = Vector2Int16(size >> 6) << 1;
 	mapBB.size = mapBB.size.Max(2, 2);
 	mapBB.position -= mapBB.size / 2;
 
+	if (playerId == 0 & def.IsResourceContainer) {
+		em.MapObjectArchetype.MinimapColorId.NewComponent(e, 15);
+	}
+	else {
+		em.MapObjectArchetype.MinimapColorId.NewComponent(e, playerId);
+	}
+
+
 	em.MapObjectArchetype.BoundingBoxComponents.NewComponent(e, mapBB);
 	em.MapObjectArchetype.Archetype.AddEntity(e);
+
 
 	if (def.MovementSpeed > 0) {
 		em.MovementArchetype.MovementComponents.NewComponent(e);
@@ -208,7 +211,7 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::RenderEnabled);
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::RenderChanged);
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::AnimationFrameChanged);
-
+	
 
 	if (def.Graphics->HasMovementGlow()) {
 

@@ -40,13 +40,14 @@ void MapSystem::UpdateMap(EntityManager& em, const EntityChangedData& changed)
 	for (int i = 0; i < players.size(); ++i) {
 		colors[i] = players[i].color;
 	}
+	colors[15] = Color32(Colors::MapResource);
 	colors[ActivePlayer] = Color32(Colors::MapFriendly);
 	const PlayerVision& vision = em.GetPlayerSystem().GetPlayerVision(ActivePlayer);
 
 	for (EntityId id : em.MapObjectArchetype.Archetype.GetEntities()) {
 		if (em.UnitArchetype.Archetype.HasEntity(id) && !em.HiddenArchetype.Archetype.HasEntity(id))
 		{
-			PlayerId owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
+			uint8_t colorId = em.MapObjectArchetype.MinimapColorId.GetComponent(id);
 			const Rectangle16& dst = em.MapObjectArchetype.DestinationComponents.GetComponent(id);
 
 			bool visible = vision.IsVisible(dst);
@@ -55,7 +56,7 @@ void MapSystem::UpdateMap(EntityManager& em, const EntityChangedData& changed)
 				continue;
 
 			minimapData.dst.push_back(dst);
-			minimapData.color.push_back(colors[owner]);
+			minimapData.color.push_back(colors[colorId]);
 		}
 	}
 
@@ -114,6 +115,12 @@ void MapSystem::UpdateVisibleRenderUnits(EntityManager& em) {
 		if (!em.MapObjectArchetype.Archetype.HasEntity(id))
 			continue;
 
+		// TODO: culling by MapObjectDestination is not very accurate for items that extend beyound shadows,
+		// While culling by RenderBoundingBox is not very accurate when to reveal hidden units due proximity
+
+		// Accurate culling: renderBB-> mapBB-> spriteBB
+		// Or when unit becomes visible by renderBB, render only portion that is in los (slow)
+
 		const Rectangle16& dst = em.MapObjectArchetype.DestinationComponents.GetComponent(id);
 		bool visible = vision.IsVisible(dst);
 
@@ -163,6 +170,7 @@ void MapSystem::InitFowVisibleEntitiesJob(int start, int end) {
 
 		em.MapObjectArchetype.BoundingBoxComponents.CopyComponent(from, id);
 		em.MapObjectArchetype.DestinationComponents.CopyComponent(from, id);
+		em.MapObjectArchetype.MinimapColorId.CopyComponent(from, id);
 
 		em.FlagComponents.GetComponent(id).set(ComponentFlags::RenderEnabled);
 	}

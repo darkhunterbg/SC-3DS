@@ -42,9 +42,9 @@ void GameScene::Start() {
 	Game::Audio.PlayStream(stream, 0);
 
 	entityManager = new EntityManager();
-	//entityManager->DrawBoundingBoxes = true;
-	//entityManager->DrawGrid = true;
-	//entityManager->DrawColliders = true;
+	entityManager->DrawBoundingBoxes = true;
+	entityManager->DrawGrid = true;
+	entityManager->DrawColliders = true;
 
 	entityManager->Init(size);
 
@@ -58,11 +58,15 @@ void GameScene::Start() {
 		entityManager->GetPlayerSystem().AddPlayer(race, color[p]);
 	}
 
-	UnitEntityUtil::NewUnit(*UnitDatabase::Units[2], 1,
-		Vector2Int16(400,128));
+
+	UnitEntityUtil::NewUnit(UnitDatabase::MineralField1, 0,
+		Vector2Int16(128, 256));
+
+	UnitEntityUtil::NewUnit(*UnitDatabase::Units[2], 2,
+		Vector2Int16(400, 128));
 
 
-	UnitEntityUtil::NewUnit(*UnitDatabase::Units[1], 1,
+	UnitEntityUtil::NewUnit(*UnitDatabase::Units[1], 2,
 		Vector2Int16(400, 300));
 
 	//EntityId e = UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 0,
@@ -73,7 +77,7 @@ void GameScene::Start() {
 		for (int x = 1; x > 0; --x) {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[0];
-			EntityId e = UnitEntityUtil::NewUnit(def, i % totalPlayers,
+			e = UnitEntityUtil::NewUnit(def, 1 + i % totalPlayers,
 				Vector2Int16(Vector2Int{ x * 32 + 16,y * 32 + 16 }));
 
 			//entityManager->UnitArchetype.OrientationComponents.GetComponent(e) = 12;
@@ -87,6 +91,8 @@ void GameScene::Start() {
 	}
 
 	selection.push_back(e);
+
+	entityManager->FullUpdate();
 }
 
 int t = 0;
@@ -94,13 +100,13 @@ int t = 0;
 
 void GameScene::Update() {
 
-	entityManager->Update();
+	entityManager->FrameUpdate();
 
 	t++;
 
 	if (t % 60 == 0) {
-		entityManager->GetPlayerSystem().AddMinerals(0, 8);
-		entityManager->GetPlayerSystem().AddGas(0, 8);
+		entityManager->GetPlayerSystem().AddMinerals(1, 8);
+		entityManager->GetPlayerSystem().AddGas(1, 8);
 	}
 
 
@@ -172,6 +178,9 @@ void GameScene::Update() {
 
 				auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
 
+				if (def->IsResourceContainer)
+					continue;
+
 				if (unit.HasMovementGlow()) {
 					entityManager->DeleteEntity(unit.movementGlowEntity);
 					entityManager->ParentArchetype.Archetype.RemoveEntity(id);
@@ -198,7 +207,7 @@ void GameScene::Update() {
 }
 
 void GameScene::Draw() {
-	const PlayerInfo& playerInfo = entityManager->GetPlayerSystem().GetPlayerInfo(0);
+	const PlayerInfo& playerInfo = entityManager->GetPlayerSystem().GetPlayerInfo(1);
 
 	hud->UpdateInfo(playerInfo);
 

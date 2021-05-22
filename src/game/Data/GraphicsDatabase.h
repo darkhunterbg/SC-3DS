@@ -9,7 +9,7 @@ private:
 	GraphicsDatabase() = delete;
 	~GraphicsDatabase() = delete;
 public:
-	static UnitGraphicsDef Marine, SCV, CommandCenter;
+	static UnitGraphicsDef Marine, SCV, CommandCenter, Minerals1;
 
 	static std::vector<UnitGraphicsDef*> Units;
 

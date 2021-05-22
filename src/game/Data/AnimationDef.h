@@ -37,6 +37,7 @@ struct UnitAnimationDef {
 	int FrameCount = 0;
 	int FrameTime = 1;
 	int UnitColorFrameStart = 0;
+	int ShadowFrameStart = 0;
 	bool Looping = false;
 
 	Vector2Int16 ShadowAdditionalOffset;
@@ -53,6 +54,7 @@ struct UnitDirectionalAnimationDef {
 	int FrameCount = 0;
 	int FrameTime = 1;
 	int UnitColorFrameStart = 0;
+	int ShadowFrameStart = 0;
 	bool Looping = false;
 	bool MultiDirectional = true;
 	Vector2Int16 ShadowOffset;

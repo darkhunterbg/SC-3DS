@@ -5,8 +5,10 @@
 UnitDef UnitDatabase::Marine;
 UnitDef UnitDatabase::SCV;
 UnitDef UnitDatabase::CommandCenter;
+UnitDef UnitDatabase::MineralField1;
+
 std::vector<UnitDef*> UnitDatabase::Units = {
-	&Marine, &SCV, &CommandCenter
+	&Marine, &SCV, &CommandCenter, &MineralField1
 };
 
 static void MarineData() {
@@ -51,12 +53,27 @@ static void CommandCenterData() {
 	u.Sounds.What = { "sound/misc/button", 1 , true };
 	u.Graphics = &GraphicsDatabase::CommandCenter;
 }
+static void MineralField1Data() {
+	UnitDef& u = UnitDatabase::MineralField1;
+	u.Name = "Mineral Field";
+	u.Health = 100000;
+	u.MovementSpeed = 0;
+	u.RotationSpeed = 0;
+	u.Vision = 0;
+
+	u.IsBuilding = true;
+	u.IsResourceContainer = true;
+
+	u.Sounds.What = { "sound/misc/button", 1 , true };
+	u.Graphics = &GraphicsDatabase::Minerals1;
+}
 
 void UnitDatabase::Init()
 {
 	MarineData();
 	SCVData();
 	CommandCenterData();
+	MineralField1Data();
 }
 
 void UnitDatabase::LoadUnitResources(UnitDef& def) {

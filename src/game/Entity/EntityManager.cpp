@@ -205,7 +205,7 @@ void EntityManager::Draw2(const Camera& camera) {
 
 }
 
-void EntityManager::Update() {
+void EntityManager::FrameUpdate() {
 
 	switch (updateId)
 	{
@@ -229,6 +229,12 @@ void EntityManager::Update() {
 	}
 
 	//Util::RealTimeStat("Entities", entities.size());
+}
+
+void EntityManager::FullUpdate() {
+	Update0();
+	Update1();
+	Update2();
 }
 
 void EntityManager::Draw(const Camera& camera) {

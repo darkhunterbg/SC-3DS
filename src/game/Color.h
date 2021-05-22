@@ -102,6 +102,7 @@ namespace Colors {
 
 	constexpr Color UIGreen = { 0x10fc18ff };
 	constexpr Color UIRed = { 0xc81818ff };
+	
 
 	constexpr Color SCRed = { 0xf40404ff };
 	constexpr Color SCBlue = { 0x0c48ccff };
@@ -115,8 +116,10 @@ namespace Colors {
 	constexpr Color SCTeal = { 0xecc4b0ff };
 	constexpr Color SCYellow = { 0xfcfc38ff };
 	constexpr Color SCLightBlue = { 0x4068d4ff };
+	constexpr Color SCNeutral = { 0x4068d4ff };
 
 	constexpr Color MapFriendly = { 0x0dff16ff };
-	constexpr Color MapResource = { 0x0dff16ff };
+	constexpr Color MapResource = { 0x00e4fcff };
+
 
 }
