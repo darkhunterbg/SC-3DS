@@ -55,6 +55,7 @@ public:
 	ComponentCollection<Vector2Int16> OldPositionComponents;
 	ComponentCollection<Vector2Int16> PositionComponents;
 	ComponentCollection<FlagsComponent> FlagComponents;
+	ComponentCollection<uint8_t> OrientationComponents;
 
 	struct {
 		EntityArchetype Archetype = EntityArchetype("Parent");
@@ -77,6 +78,11 @@ public:
 		EntityArchetype Archetype = EntityArchetype("Animation");
 		ComponentCollection<AnimationComponent> AnimationComponents;
 		ComponentCollection<AnimationTrackerComponent> TrackerComponents;
+
+		struct {
+			EntityArchetype Archetype = EntityArchetype("Animation.Orientation");
+			ComponentCollection< AnimationOrientationComponent> AnimOrientationComponents;
+		} OrientationArchetype;
 	} AnimationArchetype;
 
 	struct {
@@ -108,8 +114,14 @@ public:
 		struct {
 			EntityArchetype Archetype = EntityArchetype("Unit.Animation");
 			ComponentCollection<UnitAnimationComponent> AnimationComponents;
-			ComponentCollection<UnitAnimationTrackerComponent> TrackerComponents;
+
+			struct {
+				EntityArchetype Archetype = EntityArchetype("Unit.Animation.Orientation");
+				ComponentCollection<UnitAnimationOrientationComponent> AnimOrientationComponents;
+			} OrientationArchetype;
+
 		} AnimationArchetype;
+
 
 		struct {
 			EntityArchetype Archetype = EntityArchetype("Unit.Hidden");
@@ -119,7 +131,6 @@ public:
 			EntityArchetype Archetype = EntityArchetype("Unit.FowVisible");
 		} FowVisibleArchetype;
 
-		ComponentCollection<uint8_t> OrientationComponents;
 		ComponentCollection<UnitMovementComponent> MovementComponents;
 		ComponentCollection<UnitComponent> UnitComponents;
 		ComponentCollection<UnitDataComponent> DataComponents;
@@ -145,7 +156,7 @@ public:
 private:
 	void CollectEntityChanges();
 	void ApplyEntityChanges();
-	void UpdateChildrenPosition();
+	void UpdateChildren();
 
 	void Update0();
 	void Update1();

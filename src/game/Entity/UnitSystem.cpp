@@ -24,7 +24,6 @@ void UnitSystem::ApplyUnitState(EntityManager& em) {
 		EntityId id = scratch[i];
 
 		UnitState state = em.UnitArchetype.StateComponents.GetComponent(id);
-		uint8_t orientation = em.UnitArchetype.OrientationComponents.GetComponent(id);
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
 
 		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
@@ -32,16 +31,14 @@ void UnitSystem::ApplyUnitState(EntityManager& em) {
 		switch (state) {
 		case UnitState::Idle: {
 
+			em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
+				.GetComponent(id).CopyArray(unit.def->Graphics->IdleAnimations);
+
 			em.MovementArchetype.MovementComponents.GetComponent(id).velocity = { 0,0 };
-
-			const UnitAnimationClip& clip = unit.def->Graphics->IdleAnimations[orientation];
-
-			em.UnitArchetype.AnimationArchetype.AnimationComponents.GetComponent(id).clip = &clip;
-			em.UnitArchetype.AnimationArchetype.TrackerComponents.GetComponent(id).PlayClip(&clip);
 
 			flags.clear(ComponentFlags::NavigationWork);
 			flags.set(ComponentFlags::AnimationEnabled);
-			flags.set(ComponentFlags::AnimationFrameChanged);
+			flags.set(ComponentFlags::OrientationChanged);
 
 			if (unit.HasMovementGlow()) {
 				EntityId glow = unit.movementGlowEntity;
@@ -55,48 +52,33 @@ void UnitSystem::ApplyUnitState(EntityManager& em) {
 
 			em.MovementArchetype.MovementComponents.GetComponent(id).velocity = { 0,0 };
 
-			const UnitAnimationClip& clip = unit.def->Graphics->IdleAnimations[orientation];
-			em.UnitArchetype.AnimationArchetype.AnimationComponents.GetComponent(id).clip = &clip;
-			em.UnitArchetype.AnimationArchetype.TrackerComponents.GetComponent(id).PlayClip(&clip);
-
 			flags.set(ComponentFlags::AnimationEnabled);
-			flags.set(ComponentFlags::AnimationFrameChanged);
 
 			if (unit.HasMovementGlow()) {
 				EntityId glow = unit.movementGlowEntity;
-				
-				const AnimationClip& clip = unit.def->Graphics->MovementGlowAnimations[orientation];
-
-				em.AnimationArchetype.AnimationComponents.GetComponent(glow).clip = &clip;
-				em.AnimationArchetype.TrackerComponents.GetComponent(glow).PlayClip(&clip);
-
 
 				em.FlagComponents.GetComponent(glow).set(ComponentFlags::AnimationEnabled);
-				em.FlagComponents.GetComponent(glow).set(ComponentFlags::AnimationFrameChanged);
+				em.FlagComponents.GetComponent(glow).set(ComponentFlags::OrientationChanged);
 				em.FlagComponents.GetComponent(glow).set(ComponentFlags::RenderEnabled);
 			}
 
 			break;
 		}
 		case UnitState::Movement: {
-			const UnitAnimationClip& clip = unit.def->Graphics->MovementAnimations[orientation];
-			em.UnitArchetype.AnimationArchetype.AnimationComponents.GetComponent(id).clip = &clip;
-			em.UnitArchetype.AnimationArchetype.TrackerComponents.GetComponent(id).PlayClip(&clip);
 
+			em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
+				.GetComponent(id).CopyArray(unit.def->Graphics->MovementAnimations);
+
+
+			flags.set(ComponentFlags::OrientationChanged);
 			flags.set(ComponentFlags::AnimationEnabled);
-			flags.set(ComponentFlags::AnimationFrameChanged);
 
 			if (unit.HasMovementGlow()) {
 				EntityId glow = unit.movementGlowEntity;
-
-				const AnimationClip& clip = unit.def->Graphics->MovementGlowAnimations[orientation];
-
-				em.AnimationArchetype.AnimationComponents.GetComponent(glow).clip = &clip;
-				em.AnimationArchetype.TrackerComponents.GetComponent(glow).PlayClip(&clip);
-
 				em.FlagComponents.GetComponent(glow).set(ComponentFlags::AnimationEnabled);
 				em.FlagComponents.GetComponent(glow).set(ComponentFlags::AnimationFrameChanged);
 				em.FlagComponents.GetComponent(glow).set(ComponentFlags::RenderEnabled);
+				em.FlagComponents.GetComponent(glow).set(ComponentFlags::OrientationChanged);
 			}
 
 			break;

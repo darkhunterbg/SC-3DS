@@ -92,7 +92,7 @@ void AnimationSystem::UpdateAnimations(EntityManager& em) {
 
 				if (em.UnitArchetype.RenderArchetype.Archetype.HasEntity(id)) {
 					unitData.animation.push_back(em.UnitArchetype.AnimationArchetype.AnimationComponents[i]);
-					unitData.tracker.push_back(em.UnitArchetype.AnimationArchetype.TrackerComponents[i]);
+					unitData.tracker.push_back(em.AnimationArchetype.TrackerComponents[i]);
 					unitData.ren.push_back(&em.UnitArchetype.RenderArchetype.RenderComponents[i]);
 					unitData.offset.push_back(&em.UnitArchetype.RenderArchetype.OffsetComponents[i]);
 					unitData.flags.push_back(&f);
@@ -119,7 +119,7 @@ void AnimationSystem::TickUnitAnimationsJob(int start, int end) {
 		if (!f.test(ComponentFlags::AnimationEnabled))
 			continue;
 
-		auto& tracker = em.UnitArchetype.AnimationArchetype.TrackerComponents[i];
+		auto& tracker = em.AnimationArchetype.TrackerComponents[i];
 
 		tracker.frameCountdown--;
 		if (tracker.frameCountdown > 0)
@@ -179,4 +179,46 @@ void AnimationSystem::TickAnimations(EntityManager& em)
 	JobSystem::RunJob(em.UnitArchetype.AnimationArchetype.Archetype.GetEntities().size(),
 		JobSystem::DefaultJobSize, TickUnitAnimationsJob);
 
+}
+
+
+
+void AnimationSystem::UpdateAnimationsForOrientation(EntityManager& entityManager) {
+
+	for (EntityId id : entityManager.AnimationArchetype.OrientationArchetype.Archetype.GetEntities()) {
+		FlagsComponent& flags = entityManager.FlagComponents.GetComponent(id);
+		if (flags.test(ComponentFlags::OrientationChanged)) {
+			flags.clear(ComponentFlags::OrientationChanged);
+
+			const auto& animOrin = entityManager.AnimationArchetype.OrientationArchetype
+				.AnimOrientationComponents.GetComponent(id);
+
+			auto& anim = entityManager.AnimationArchetype.AnimationComponents.GetComponent(id);
+			auto& animTrack = entityManager.AnimationArchetype.TrackerComponents.GetComponent(id);
+			uint8_t orientation = entityManager.OrientationComponents.GetComponent(id);
+			anim.clip = animOrin.clips[orientation];
+			animTrack.PlayClip(anim.clip);
+
+			flags.set(ComponentFlags::AnimationFrameChanged);
+		}
+	}
+
+	for (EntityId id : entityManager.UnitArchetype.AnimationArchetype.OrientationArchetype
+		.Archetype.GetEntities()) {
+		FlagsComponent& flags = entityManager.FlagComponents.GetComponent(id);
+		if (flags.test(ComponentFlags::OrientationChanged)) {
+			flags.clear(ComponentFlags::OrientationChanged);
+
+			const auto& animOrin = entityManager.UnitArchetype.AnimationArchetype
+				.OrientationArchetype.AnimOrientationComponents.GetComponent(id);
+
+			auto& anim = entityManager.UnitArchetype.AnimationArchetype.AnimationComponents.GetComponent(id);
+			auto& animTrack = entityManager.AnimationArchetype.TrackerComponents.GetComponent(id);
+			uint8_t orientation = entityManager.OrientationComponents.GetComponent(id);
+			anim.clip = animOrin.clips[orientation];
+			animTrack.PlayClip(anim.clip);
+
+			flags.set(ComponentFlags::AnimationFrameChanged);
+		}
+	}
 }

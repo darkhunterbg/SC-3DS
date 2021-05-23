@@ -70,7 +70,7 @@ void EntityUtil::PlayAnimation(EntityId e, const UnitAnimationClip& clip) {
 	EntityManager& em = GetManager();
 
 	UnitAnimationComponent& a = em.UnitArchetype.AnimationArchetype.AnimationComponents.GetComponent(e);
-	UnitAnimationTrackerComponent& t = em.UnitArchetype.AnimationArchetype.TrackerComponents.GetComponent(e);
+	AnimationTrackerComponent& t = em.AnimationArchetype.TrackerComponents.GetComponent(e);
 	FlagsComponent& f = em.FlagComponents.GetComponent(e);
 
 	a.clip = &clip;
@@ -145,14 +145,16 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 		e = em.NewEntity();
 	em.PositionComponents.NewComponent(e, position);
 	em.OldPositionComponents.NewComponent(e, position);
+	em.OrientationComponents.NewComponent(e, 0);
 
 	em.FlagComponents.NewComponent(e);
 	em.UnitArchetype.UnitComponents.NewComponent(e, { &def });
-	em.UnitArchetype.OrientationComponents.NewComponent(e);
+
 	em.UnitArchetype.MovementComponents.NewComponent(e).FromDef(def);
 	em.UnitArchetype.DataComponents.NewComponent(e).FromDef(def);
 	em.UnitArchetype.OwnerComponents.NewComponent(e, player.id);
 	em.UnitArchetype.Archetype.AddEntity(e);
+
 
 	em.UnitArchetype.RenderArchetype.RenderComponents.NewComponent(e, {
 		player.color,
@@ -161,10 +163,10 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 		def.Graphics->IdleAnimations[0].GetFrame(0).colorSprite.image,
 		});
 
-	em.UnitArchetype.RenderArchetype.OffsetComponents.NewComponent(e, {
-	 Vector2Int16(def.Graphics->IdleAnimations[0].GetFrame(0).offset),
-		Vector2Int16(def.Graphics->IdleAnimations[0].GetFrame(0).shadowOffset)
-		});
+	//em.UnitArchetype.RenderArchetype.OffsetComponents.NewComponent(e, {
+	// Vector2Int16(def.Graphics->IdleAnimations[0].GetFrame(0).offset),
+	//	Vector2Int16(def.Graphics->IdleAnimations[0].GetFrame(0).shadowOffset)
+	//	});
 
 	em.UnitArchetype.RenderArchetype.DestinationComponents.NewComponent(e);
 	em.UnitArchetype.RenderArchetype.BoundingBoxComponents.NewComponent(e, { {0,0}, def.Graphics->RenderSize });
@@ -172,9 +174,11 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 	em.UnitArchetype.RenderArchetype.Archetype.AddEntity(e);
 
 	em.UnitArchetype.AnimationArchetype.AnimationComponents.NewComponent(e);
-	em.UnitArchetype.AnimationArchetype.TrackerComponents.NewComponent(e).PlayClip(&def.Graphics->MovementAnimations[0]);
 
 	em.UnitArchetype.AnimationArchetype.Archetype.AddEntity(e);
+	em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents.NewComponent(e)
+		.CopyArray(def.Graphics->IdleAnimations);
+	em.UnitArchetype.AnimationArchetype.OrientationArchetype.Archetype.AddEntity(e);
 
 	if (def.MovementSpeed > 0) {
 		em.NavigationArchetype.NavigationComponents.NewComponent(e);
@@ -212,9 +216,8 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::PositionChanged);
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::RenderEnabled);
-	em.FlagComponents.GetComponent(e).set(ComponentFlags::RenderChanged);
-	em.FlagComponents.GetComponent(e).set(ComponentFlags::AnimationFrameChanged);
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::UnitStateChanged);
+	em.FlagComponents.GetComponent(e).set(ComponentFlags::OrientationChanged);
 
 	if (def.Graphics->HasMovementGlow()) {
 
@@ -224,6 +227,9 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 		em.RenderArchetype.RenderComponents.GetComponent(e2).depth = 1;
 		em.RenderArchetype.Archetype.AddEntity(e2);
 		em.AnimationArchetype.Archetype.AddEntity(e2);
+		em.AnimationArchetype.OrientationArchetype.Archetype.AddEntity(e2);
+		em.AnimationArchetype.OrientationArchetype.AnimOrientationComponents.GetComponent(e2)
+			.CopyArray(def.Graphics->MovementGlowAnimations);
 
 		em.ParentArchetype.Archetype.AddEntity(e);
 		em.ParentArchetype.ChildComponents.NewComponent(e).AddChild(e2);

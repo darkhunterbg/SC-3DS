@@ -24,6 +24,8 @@ EntityManager::EntityManager() {
 	archetypes.push_back(&UnitArchetype.HiddenArchetype.Archetype);
 	archetypes.push_back(&MapObjectArchetype.Archetype);
 	archetypes.push_back(&UnitArchetype.FowVisibleArchetype.Archetype);
+	archetypes.push_back(&AnimationArchetype.OrientationArchetype.Archetype);
+	archetypes.push_back(&UnitArchetype.AnimationArchetype.OrientationArchetype.Archetype);
 
 	EntityUtil::emInstance = this;
 	UnitEntityUtil::emInstance = this;
@@ -127,7 +129,7 @@ void EntityManager::ApplyEntityChanges() {
 		toDelete.clear();
 	}
 }
-void EntityManager::UpdateChildrenPosition() {
+void EntityManager::UpdateChildren() {
 	for (EntityId id : ParentArchetype.Archetype.GetEntities()) {
 
 		if (FlagComponents.GetComponent(id).test(ComponentFlags::PositionChanged)) {
@@ -140,6 +142,19 @@ void EntityManager::UpdateChildrenPosition() {
 
 				PositionComponents.GetComponent(child) = pos;
 				FlagComponents.GetComponent(child).set(ComponentFlags::PositionChanged);
+			}
+		}
+
+		if (FlagComponents.GetComponent(id).test(ComponentFlags::OrientationChanged)) {
+			auto& childComp = ParentArchetype.ChildComponents.GetComponent(id);
+
+			const uint8_t& orientation = OrientationComponents.GetComponent(id);
+
+			for (int i = 0; i < childComp.childCount; ++i) {
+				EntityId child = childComp.children[i];
+
+				OrientationComponents.GetComponent(child) = orientation;
+				FlagComponents.GetComponent(child).set(ComponentFlags::OrientationChanged);
 			}
 		}
 	}
@@ -175,11 +190,14 @@ void EntityManager::Update2() {
 
 	kinematicSystem.MoveEntities(*this);
 
+	UpdateChildren();
+
+	animationSystem.UpdateAnimationsForOrientation(*this);
+
 	mapSystem.UpdateVisibleEntities(*this);
 
 	animationSystem.UpdateAnimations(*this);
 
-	UpdateChildrenPosition();
 
 	CollectEntityChanges();
 
@@ -232,6 +250,12 @@ void EntityManager::FrameUpdate() {
 }
 
 void EntityManager::FullUpdate() {
+
+	// Hack
+	playerSystem.UpdatePlayerUnits(*this);
+
+	ApplyEntityChanges();
+
 	Update0();
 	Update1();
 	Update2();

@@ -39,7 +39,7 @@ static  int Evaluate(uint8_t d, uint8_t v, Vector2Int16 pos, const Rectangle16& 
 	Rectangle16 c = collider;
 	c.position += pos;
 
-	if (!e->CollidesWithAny(c, entity))
+	//if (!e->CollidesWithAny(c, entity))
 	{
 		int dist = ((nav.target - pos)).LengthSquaredInt();
 
@@ -139,7 +139,7 @@ void NavigationSystem::UpdateNavigation(EntityManager& em)
 				auto& nav = em.NavigationArchetype.NavigationComponents[i];
 
 				if (nav.targetHeading == 255 ||
-					em.UnitArchetype.OrientationComponents[i] ==
+					em.OrientationComponents[i] ==
 					nav.targetHeading) {
 
 
@@ -168,7 +168,7 @@ void NavigationSystem::ApplyUnitNavigationJob(int start, int end) {
 		int i = Entity::ToIndex(id);
 
 		const auto& nav = em.NavigationArchetype.NavigationComponents[i];
-		auto& orientation = em.UnitArchetype.OrientationComponents[i];
+		auto& orientation = em.OrientationComponents[i];
 		const auto& unitMove = em.UnitArchetype.MovementComponents[i];;
 
 		auto& flags = em.FlagComponents[i];
@@ -195,10 +195,14 @@ void NavigationSystem::ApplyUnitNavigationJob(int start, int end) {
 				else {
 					orientation = nav.targetHeading;
 				}
+
+				flags.set(ComponentFlags::OrientationChanged);
+
+				flags.set(ComponentFlags::UnitStateChanged);
+				em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Turning;
 			}
 
-			flags.set(ComponentFlags::UnitStateChanged);
-			em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Turning;
+	
 		}
 		else {
 			const auto& position = em.PositionComponents[i];

@@ -9,7 +9,7 @@ class EntityManager;
 class AnimationSystem {
 	struct UnitAnimationData {
 		std::vector<UnitAnimationComponent> animation;
-		std::vector<UnitAnimationTrackerComponent> tracker;
+		std::vector<AnimationTrackerComponent> tracker;
 		std::vector<RenderUnitComponent*> ren;
 		std::vector<RenderUnitOffsetComponent*> offset;
 		std::vector<FlagsComponent*> flags;
@@ -51,4 +51,6 @@ private:
 public:
 	void TickAnimations(EntityManager& entityManager);
 	void UpdateAnimations(EntityManager& entityManager);
+
+	void UpdateAnimationsForOrientation(EntityManager& entityManager);
 };

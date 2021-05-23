@@ -96,7 +96,7 @@ enum class ComponentFlags {
 	PositionChanged = 0,
 	RenderEnabled = 1,
 	RenderChanged = 2,
-	UnitOrientationChanged = 3,
+	OrientationChanged = 3,
 	AnimationEnabled = 4,
 	AnimationFrameChanged = 5,
 	NavigationWork = 6,
@@ -213,6 +213,20 @@ struct UnitMovementComponent {
 	}
 };
 
+struct AnimationOrientationComponent {
+	std::array<const AnimationClip*, 32> clips;
+	inline const AnimationClip& GetClip(int pos) const { return *clips[pos]; }
+
+	inline void CopyArray(const AnimationClip(&a)[32]) {
+		for (int i = 0; i < 32; ++i) {
+			clips[i] = &a[i];
+		}
+	}
+
+	static_assert(sizeof(clips) == 32 * sizeof(const AnimationClip*),
+		"AnimationOrientationComponent Assert fail");
+};
+
 struct AnimationTrackerComponent {
 	int8_t clipFrame = 0;
 	uint8_t frameCountdown = 1;
@@ -222,32 +236,22 @@ struct AnimationTrackerComponent {
 
 	inline void Restart() {
 		clipFrame = -1;
-		frameCountdown = 1;
+		frameCountdown = frameTime;
 	}
 
+
 	inline void PlayClip(const AnimationClip* clip) {
-		clipFrame = 0;
 		if (clip) {
 			totalFrames = clip->GetFrameCount();
 			looping = clip->looping;
+			clipFrame = 0;
 			frameCountdown = frameTime = clip->frameTime;
 		}
 		else {
 			totalFrames = 0;
+			clipFrame = 0;
+			frameCountdown = 1;
 		}
-	}
-};
-
-struct UnitAnimationTrackerComponent {
-	int8_t clipFrame = 0;
-	uint8_t frameCountdown = 1;
-	uint8_t totalFrames = 0;
-	uint8_t frameTime = 1;
-	bool looping = false;
-
-	inline void Restart() {
-		clipFrame = -1;
-		frameCountdown = frameTime;
 	}
 
 	inline void PlayClip(const UnitAnimationClip* clip) {
@@ -264,6 +268,17 @@ struct UnitAnimationTrackerComponent {
 		}
 	}
 };
+
+struct UnitAnimationOrientationComponent {
+	std::array<const UnitAnimationClip*, 32> clips;
+	inline const UnitAnimationClip& GetClip(int pos) const { return *clips[pos]; }
+	inline void CopyArray( const UnitAnimationClip (&a)[32]) {
+		for (int i = 0; i < 32; ++i) {
+			clips[i] = &a[i];
+		}
+	}
+};
+
 
 struct UnitAnimationComponent {
 	const UnitAnimationClip* clip;
