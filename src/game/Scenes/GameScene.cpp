@@ -73,10 +73,10 @@ void GameScene::Start() {
 	//	Vector2Int16(48, 48));
 	EntityId e = 0;
 	int i = 0;
-	for (int y = 2; y > 0; --y) {
-		for (int x = 1; x > 0; --x) {
+	for (int y = 40; y > 0; --y) {
+		for (int x = 40; x > 0; --x) {
 			Color c = color[(i) % 12];
-			auto& def = *UnitDatabase::Units[i % 2];
+			auto& def = *UnitDatabase::Units[i % 1];
 			e = UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
 				Vector2Int16(Vector2Int{ x * 32 + 48,y * 32 + 48 }));
 
@@ -162,7 +162,7 @@ void GameScene::Update() {
 		if (Game::Gamepad.IsButtonPressed(GamepadButton::B)) {
 
 			for (EntityId id : selection) {
-				uint8_t t = EntityUtil::GetOrientationToPosition(id, cursor->Position);
+				uint8_t t = EntityUtil::GetOrientationToPosition(id, camera.ScreenToWorld(cursor->Position));
 
 				auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
 
