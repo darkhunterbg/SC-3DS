@@ -23,6 +23,8 @@ void EntityUtil::StartTimer(EntityId e, uint16_t time, TimerExpiredAction action
 	a.action = action;
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::UpdateTimers);
 }
+
+
 void EntityUtil::SetPosition(EntityId e, Vector2Int16 pos) {
 	EntityManager& em = GetManager();
 
@@ -168,6 +170,9 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 	em.UnitArchetype.OwnerComponents.NewComponent(e, player.id);
 	em.UnitArchetype.Archetype.AddEntity(e);
 
+	em.UnitArchetype.PrevStateComponents.NewComponent(e);
+
+	em.TimingArchetype.Archetype.AddEntity(e);
 
 	em.UnitArchetype.RenderArchetype.RenderComponents.NewComponent(e, {
 		player.color,

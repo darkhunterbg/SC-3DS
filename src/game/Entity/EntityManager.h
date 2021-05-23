@@ -135,6 +135,8 @@ public:
 		ComponentCollection<UnitComponent> UnitComponents;
 		ComponentCollection<UnitDataComponent> DataComponents;
 		ComponentCollection<PlayerId> OwnerComponents;
+
+		ComponentCollection<UnitState> PrevStateComponents;
 		ComponentCollection<UnitState> StateComponents;
 	} UnitArchetype;
 

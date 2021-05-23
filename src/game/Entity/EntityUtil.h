@@ -38,6 +38,8 @@ public:
 	/// </summary>
 	static void StartTimer(EntityId e, uint16_t time, TimerExpiredAction action, bool looping = false);
 
+	static void StartTimerMT(EntityId e, uint16_t time, TimerExpiredAction action, bool looping = false);
+
 	/// <summary>
 	/// Set current position (will cause render update)
 	/// </summary>

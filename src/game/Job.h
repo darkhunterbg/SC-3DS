@@ -49,6 +49,7 @@ public:
 	}
 
 	static constexpr const int DefaultJobSize = 128;
+	static constexpr const int SingleThreadJobSize = 0x7FFFFFFF;
 };
 
 extern thread_local int CurrentThreadId;

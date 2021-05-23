@@ -176,11 +176,13 @@ struct MovementComponent {
 
 enum class UnitState : uint8_t {
 	Idle = 0,
-	Movement = 1,
-	Turning = 2,
+	Turning = 1,
+	Movement = 2,
 	Attacking = 3,
 	Death = 4,
 };
+
+static constexpr const int UnitStatesCount = 5;
 
 
 struct UnitComponent {

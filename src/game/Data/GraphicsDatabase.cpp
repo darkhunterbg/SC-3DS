@@ -86,8 +86,8 @@ static void SCVResources() {
 
 
 	d.AttackAnimationDef.GenerateAnimations(a, a, d.AttackAnimations);
-	//d.AttackAnimationDef.FrameCount = 1;
-	//d.AttackAnimationDef.GenerateAnimations(a, a, d.AttackAnimations);
+	d.AttackAnimationDef.FrameCount = 1;
+	d.AttackAnimationDef.GenerateAnimations(a, a, d.AttackAnimations);
 }
 static void SCVData() {
 	UnitGraphicsDef& d = GraphicsDatabase::SCV;
