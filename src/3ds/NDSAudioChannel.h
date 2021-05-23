@@ -5,6 +5,7 @@
 
 struct NDSAudioChannel {
 	bool enabled;
+	uint8_t id = 0;
 	AudioChannelState* state = nullptr;
 	ndspWaveBuf waveBuff[2];
 	ndspWaveBuf* freeBuff = nullptr;

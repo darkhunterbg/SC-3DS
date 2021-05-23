@@ -436,7 +436,6 @@ void Platform::EnableChannel(const AudioChannelState& channel, bool enabled) {
 		SDL_PauseAudioDevice(channel.handle, enabled ? 0 : 1);
 }
 
-
 static std::function<void(int)> threadWorkFunc;
 int Platform::StartThreads(std::function<void(int)> threadWork) {
 	if (noThreading)
@@ -483,7 +482,10 @@ static 	void AudioCallback(void* userdata, Uint8* stream, int len) {
 
 	len = (len > size ? size : len);
 
-	SDL_MixAudioFormat(stream, clip->PlayFrom(), AUDIO_S16LSB, len, SDL_MIX_MAXVOLUME / 2);
+	int volume = (SDL_MIX_MAXVOLUME * state->volume) / 2;
+
+	
+	SDL_MixAudioFormat(stream, clip->PlayFrom(), AUDIO_S16LSB, len, volume);
 
 	clip->playPos += len;
 

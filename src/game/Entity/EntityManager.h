@@ -15,6 +15,7 @@
 #include "PlayerSystem.h"
 #include "MapSystem.h"
 #include "UnitSystem.h"
+#include "SoundSystem.h"
 
 #include "../Data/UnitDef.h"
 #include "../Camera.h"
@@ -41,6 +42,7 @@ private:
 	PlayerSystem playerSystem;
 	MapSystem mapSystem;
 	UnitSystem unitSystem;
+	SoundSystem soundSystem;
 
 	bool ready = false;
 	bool doneUpdatingVision = false;
@@ -184,6 +186,9 @@ public:
 	}
 	inline MapSystem& GetMapSystem() {
 		return mapSystem;
+	}
+	inline SoundSystem& GetSoundSystem() {
+		return soundSystem;
 	}
 	inline const Span<EntityId> GetEntities() const {
 		return entities.GetEntities();

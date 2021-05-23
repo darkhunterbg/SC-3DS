@@ -139,10 +139,10 @@ Sprite Platform::NewSprite(Image image, Rectangle16 src) {
 	auto* s2 = new Tex3DS_SubTexture();
 
 
-	s2->width = src.size.x ;
-	s2->height = src.size.y ;
+	s2->width = src.size.x;
+	s2->height = src.size.y;
 	s2->top = 1 - (float)src.position.y / (float)s->height;
-	s2->bottom = 1- (float)(src.position.y + src.size.y) / (float)s->height;
+	s2->bottom = 1 - (float)(src.position.y + src.size.y) / (float)s->height;
 	s2->left = (float)src.position.x / (float)s->width;
 	s2->right = (float)(src.position.x + src.size.x) / (float)s->width;
 
@@ -206,7 +206,7 @@ void Platform::DrawLine(Vector2Int src, Vector2Int dst, Color color) {
 	u32 c = C2D_Color32f(color.r, color.g, color.b, color.a);
 	C2D_DrawLine(src.x, src.y, c, dst.x, dst.y, c, 1, 0);
 }
-void Platform::DrawRectangle(const Rectangle& rect,const Color32& color) {
+void Platform::DrawRectangle(const Rectangle& rect, const Color32& color) {
 	C2D_DrawRectSolid(rect.position.x, rect.position.y, 0, rect.size.x, rect.size.y, color.value);
 }
 Image Platform::NewTexture(Vector2Int size, bool pixelFiltering) {
@@ -301,9 +301,10 @@ void Platform::CreateChannel(AudioChannelState& channel) {
 	ndspChnSetFormat(channelId, channel.mono ? NDSP_FORMAT_MONO_PCM16 : NDSP_FORMAT_STEREO_PCM16);
 	float volume[12];
 	for (int i = 0; i < 12; ++i)
-		volume[i] = 0.8f;
+		volume[i] = channel.volume * 0.8f;
 	ndspChnSetMix(channelId, volume);
 	NDSAudioChannel* platformChannel = new NDSAudioChannel();
+	platformChannel->id = channelId;
 	platformChannel->state = &channel;
 	platformChannel->enabled = false;
 
@@ -365,7 +366,7 @@ int Platform::StartThreads(std::function<void(int)> threadWork) {
 
 	//EXCEPTION("Created threads on cores %s, %i threads", coreIds.data(), cores.size());
 
-	return threads;
+	return 0;// threads;
 }
 Semaphore Platform::CreateSemaphore() {
 	Handle* h = new Handle(0);

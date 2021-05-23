@@ -212,6 +212,8 @@ void EntityManager::Update2() {
 // Draws 12 per second (60 fps) 
 void EntityManager::Draw0(const Camera& camera) {
 	mapSystem.RedrawMinimap(*this);
+
+	soundSystem.UpdateEntityAudio(camera);
 }
 // Draws 24 per second (60 fps) 
 void EntityManager::Draw1(const Camera& camera) {
@@ -291,6 +293,7 @@ void EntityManager::Draw(const Camera& camera) {
 
 	}
 
+	soundSystem.UpdateChatRequest(*this);
 
 	frameCounter++;
 	updateId = (frameCounter % 5);

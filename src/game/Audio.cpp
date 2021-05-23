@@ -2,18 +2,29 @@
 #include "Platform.h"
 
 static constexpr const int AudioChannelBufferSize = 4096 ;
+static constexpr const int MonoChannels = 5;
 
 void AudioSystem::Init() {
-	channels[1].mono = true;
+
+	AudioChannelState channel;
+	channel.mono = false;
+
+	channels.push_back(channel);
+	
+	channel.mono = true;
+	for (int i = 0; i < MonoChannels; ++i) {
+		channels.push_back(channel);
+	}
 
 	for (int i = 0; i < channels.size(); i++) {
 		channels[i].bufferSize = AudioChannelBufferSize / (channels[i].mono ? 2 : 1);
+		channels[i].ChannelId = i;
 		Platform::CreateChannel(channels[i]);
 		Platform::EnableChannel(channels[i], false);
 	}
 }
 
-void AudioSystem::PlayClip(AudioClip clip, int c) {
+void AudioSystem::PlayClip(const AudioClip& clip, int c) {
 	auto& channel = channels[c];
 	channel.stream = nullptr;
 	channel.ClearQueue();
@@ -33,6 +44,11 @@ void AudioSystem::PlayStream(AudioStream* stream, int c)
 	channel.QueueClip({ stream->GetData(),0 });
 
 	Platform::EnableChannel(channel, true);
+}
+
+void AudioSystem::SetChannelVolume(int c, float volume)
+{
+	channels[c].volume = std::min(1.0f, std::max(0.0f, volume));
 }
 
 void AudioSystem::UpdateAudio() {

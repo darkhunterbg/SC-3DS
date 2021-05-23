@@ -43,6 +43,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\NavigationSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\PlayerSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\RenderSystem.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\SoundSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\TimingSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitStateMachine.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitSystem.h" />
@@ -88,6 +89,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\NavigationSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\PlayerSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\RenderSystem.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\SoundSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\TimingSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitStateMachine.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitSystem.cpp" />

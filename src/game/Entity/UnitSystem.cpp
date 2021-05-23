@@ -5,13 +5,9 @@
 #include "../Game.h"
 #include "../Job.h"
 
-
 // =============================== Unit System =================================
 
-
 void UnitSystem::ApplyUnitState(EntityManager& em) {
-	SectionProfiler p("ApplyUnitState");
-
 	for (auto& data : exitStateData)
 		data.clear();
 	for (auto& data : enterStateData)

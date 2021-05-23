@@ -38,6 +38,9 @@ struct AudioChannelState {
 
 	bool mono = false;
 
+	int ChannelId = 0;
+	float volume = 1.0f;
+
 	AudioChannelHandle handle = -1;
 	unsigned bufferSize = 0;
 
@@ -54,7 +57,10 @@ struct AudioChannelState {
 		queueSize = 0;
 	}
 
-	bool IsQueueFull() { return queueSize == QueueSize; }
+	bool IsDone() const { return queueSize == 0; }
+
+	bool IsQueueFull() const  { return queueSize == QueueSize; }
+
 
 	bool QueueClip(AudioChannelClip clip) {
 		if (queueSize == QueueSize)
@@ -85,9 +91,16 @@ public:
 	AudioSystem(const AudioSystem&) = delete;
 	AudioSystem& operator=(const AudioSystem&) = delete;
 	void Init();
-	void PlayClip(AudioClip clip, int channel);
+	void PlayClip(const AudioClip&, int channel);
 	void PlayStream(AudioStream* stream, int channel);
+
+	void SetChannelVolume(int channel, float volume);
+
 	void UpdateAudio();
+
+	inline const Span<AudioChannelState> GetAudioChannes() const {
+		return { channels.data(), channels.size() };
+	}
 private:
-	std::array< AudioChannelState,2> channels;
+	std::vector<AudioChannelState> channels;
 };

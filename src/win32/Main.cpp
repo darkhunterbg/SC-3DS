@@ -65,13 +65,13 @@ int main(int argc, char** argv) {
 
 	Game::Start();
 
-	if (argc > 1) {
+	/*if (argc > 1) {
 		std::string a = argv[1];
 		if (a == "-mute")
 		{
 			mute = true;
 		}
-	}
+	}*/
 
 	while (!done) {
 

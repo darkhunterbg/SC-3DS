@@ -130,6 +130,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitStateMachine.h">
       <Filter>Entity</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\SoundSystem.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -227,6 +230,9 @@
       <Filter>Data</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitStateMachine.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\SoundSystem.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
   </ItemGroup>

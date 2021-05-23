@@ -138,10 +138,7 @@ void GameScene::Update() {
 			selection.clear();
 			selection.insert(selection.begin(), tmp.begin(), tmp.end());
 
-			auto& def = entityManager->UnitArchetype.UnitComponents[selection[0]].def;
-			int i = std::rand() % def->Sounds.What.TotalClips;
-
-			Game::Audio.PlayClip(def->Sounds.What.Clips[i], 1);
+			entityManager->GetSoundSystem().PlayUnitChatSelect(selection[0]);
 		}
 
 		if (Game::Gamepad.IsButtonPressed(GamepadButton::X)) {
@@ -150,12 +147,7 @@ void GameScene::Update() {
 				if (entityManager->UnitArchetype.Archetype.HasEntity(id)) {
 					entityManager->GoTo(id, Vector2Int16(camera.ScreenToWorld(cursor->Position)));
 
-					auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
-
-					if (def->Sounds.Yes.TotalClips) {
-						int i = std::rand() % def->Sounds.Yes.TotalClips;
-						Game::Audio.PlayClip(def->Sounds.Yes.Clips[i], 1);
-					}
+					entityManager->GetSoundSystem().PlayUnitChatCommand(id);
 				}
 		}
 
@@ -177,10 +169,7 @@ void GameScene::Update() {
 					.clear(ComponentFlags::NavigationWork);
 
 
-				if (def->Sounds.Yes.TotalClips) {
-					int i = std::rand() % def->Sounds.Yes.TotalClips;
-					Game::Audio.PlayClip(def->Sounds.Yes.Clips[i], 1);
-				}
+				entityManager->GetSoundSystem().PlayUnitChatCommand(id);
 			}
 			/*	if (entityManager->UnitArchetype.Archetype.HasEntity(id)) {
 

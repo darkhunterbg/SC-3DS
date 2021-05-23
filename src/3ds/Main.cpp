@@ -26,6 +26,7 @@ void Init();
 void Uninit();
 void UpdateAudioChannel(NDSAudioChannel& channel);
 
+
 void FatalError(const char* error, ...) {
 	consoleInit(GFX_BOTTOM, nullptr);
 
@@ -72,12 +73,14 @@ int main()
 		if (kDown & KEY_START)
 			break;
 
+
 		for (auto channel : audioChannels) {
 			if (!channel->enabled)
 				continue;
 
 			UpdateAudioChannel(*channel);
 		}
+
 
 		bool done = !Game::Update();
 
@@ -148,7 +151,6 @@ void Uninit() {
 	romfsExit();
 }
 
-
 void UpdateAudioChannel(NDSAudioChannel& channel) {
 
 	// TODO: on update check if clip has changed and if so, clear chain and start over 
@@ -169,6 +171,11 @@ void UpdateAudioChannel(NDSAudioChannel& channel) {
 		return;
 	}
 
+	float volume[12];
+	for (int i = 0; i < 12; ++i)
+		volume[i] = state->volume * 0.8f;
+	ndspChnSetMix(state->handle, volume);
+
 	auto _audioBuffer = (u8*)freeBuff.data_vaddr;
 	unsigned len = state->bufferSize;
 	len = (len > size ? size : len);
@@ -179,6 +186,7 @@ void UpdateAudioChannel(NDSAudioChannel& channel) {
 		unsigned silenceSize = state->bufferSize - len;
 		memset(_audioBuffer + len, 0, silenceSize);
 	}
+
 
 	DSP_FlushDataCache(_audioBuffer, state->bufferSize);
 	ndspChnWaveBufAdd(state->handle, &freeBuff);
