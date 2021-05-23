@@ -3,25 +3,26 @@
 #include "EntityManager.h"
 #include "EntityUtil.h"
 
-
 void UnitSystem::ApplyUnitState(EntityManager& em) {
-
-	scratch.clear();
+	stateChanged.clear();
 
 	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {
+
 		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
 		if (flags.test(ComponentFlags::UnitStateChanged)) {
 			flags.clear(ComponentFlags::UnitStateChanged);
 
-			scratch.push_back(id);
+			stateChanged.push_back(id);
+			continue;
 		}
 	}
 
+
 	int start = 0;
-	int end = scratch.size();
+	int end = stateChanged.size();
 
 	for (int i = start; i < end; ++i) {
-		EntityId id = scratch[i];
+		EntityId id = stateChanged[i];
 
 		UnitState state = em.UnitArchetype.StateComponents.GetComponent(id);
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
@@ -38,7 +39,7 @@ void UnitSystem::ApplyUnitState(EntityManager& em) {
 
 			flags.clear(ComponentFlags::NavigationWork);
 			flags.set(ComponentFlags::AnimationEnabled);
-			flags.set(ComponentFlags::OrientationChanged);
+			flags.set(ComponentFlags::AnimationSetChanged);
 
 			if (unit.HasMovementGlow()) {
 				EntityId glow = unit.movementGlowEntity;
@@ -58,7 +59,6 @@ void UnitSystem::ApplyUnitState(EntityManager& em) {
 				EntityId glow = unit.movementGlowEntity;
 
 				em.FlagComponents.GetComponent(glow).set(ComponentFlags::AnimationEnabled);
-				em.FlagComponents.GetComponent(glow).set(ComponentFlags::OrientationChanged);
 				em.FlagComponents.GetComponent(glow).set(ComponentFlags::RenderEnabled);
 			}
 
@@ -69,8 +69,7 @@ void UnitSystem::ApplyUnitState(EntityManager& em) {
 			em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
 				.GetComponent(id).CopyArray(unit.def->Graphics->MovementAnimations);
 
-
-			flags.set(ComponentFlags::OrientationChanged);
+			flags.set(ComponentFlags::AnimationSetChanged);
 			flags.set(ComponentFlags::AnimationEnabled);
 
 			if (unit.HasMovementGlow()) {
@@ -79,6 +78,22 @@ void UnitSystem::ApplyUnitState(EntityManager& em) {
 				em.FlagComponents.GetComponent(glow).set(ComponentFlags::AnimationFrameChanged);
 				em.FlagComponents.GetComponent(glow).set(ComponentFlags::RenderEnabled);
 				em.FlagComponents.GetComponent(glow).set(ComponentFlags::OrientationChanged);
+			}
+
+			break;
+		}
+		case UnitState::Attacking: {
+
+			em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
+				.GetComponent(id).CopyArray(unit.def->Graphics->AttackAnimations);
+
+			flags.set(ComponentFlags::AnimationSetChanged);
+			flags.set(ComponentFlags::AnimationEnabled);
+
+			if (unit.HasMovementGlow()) {
+				EntityId glow = unit.movementGlowEntity;
+				em.FlagComponents.GetComponent(glow).clear(ComponentFlags::AnimationEnabled);
+				em.FlagComponents.GetComponent(glow).clear(ComponentFlags::RenderEnabled);
 			}
 
 			break;

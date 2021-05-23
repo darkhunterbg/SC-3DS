@@ -8,7 +8,7 @@ class UnitSystem {
 
 private:
 	
-	std::vector<EntityId> scratch;
+	std::vector<EntityId> stateChanged;
 
 public:
 	void ApplyUnitState(EntityManager& em);

@@ -223,6 +223,7 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 
 		auto e2 = em.NewEntity();
 		em.OldPositionComponents.NewComponent(e2, position);
+		//em.OrientationComponents.NewComponent(e2);
 		em.FlagComponents.NewComponent(e2);
 		em.RenderArchetype.RenderComponents.GetComponent(e2).depth = 1;
 		em.RenderArchetype.Archetype.AddEntity(e2);

@@ -198,7 +198,6 @@ void EntityManager::Update2() {
 
 	animationSystem.UpdateAnimations(*this);
 
-
 	CollectEntityChanges();
 
 	playerSystem.UpdatePlayerUnits(*this);
@@ -252,9 +251,9 @@ void EntityManager::FrameUpdate() {
 void EntityManager::FullUpdate() {
 
 	// Hack
-	playerSystem.UpdatePlayerUnits(*this);
+	//playerSystem.UpdatePlayerUnits(*this);
 
-	ApplyEntityChanges();
+	//ApplyEntityChanges();
 
 	Update0();
 	Update1();

@@ -39,7 +39,7 @@ static  int Evaluate(uint8_t d, uint8_t v, Vector2Int16 pos, const Rectangle16& 
 	Rectangle16 c = collider;
 	c.position += pos;
 
-	//if (!e->CollidesWithAny(c, entity))
+	if (!e->CollidesWithAny(c, entity))
 	{
 		int dist = ((nav.target - pos)).LengthSquaredInt();
 
@@ -197,12 +197,10 @@ void NavigationSystem::ApplyUnitNavigationJob(int start, int end) {
 				}
 
 				flags.set(ComponentFlags::OrientationChanged);
-
 				flags.set(ComponentFlags::UnitStateChanged);
 				em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Turning;
 			}
 
-	
 		}
 		else {
 			const auto& position = em.PositionComponents[i];

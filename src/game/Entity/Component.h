@@ -97,11 +97,12 @@ enum class ComponentFlags {
 	RenderEnabled = 1,
 	RenderChanged = 2,
 	OrientationChanged = 3,
-	AnimationEnabled = 4,
-	AnimationFrameChanged = 5,
-	NavigationWork = 6,
-	UpdateTimers = 7,
-	UnitStateChanged = 8,
+	AnimationSetChanged = 4,
+	AnimationEnabled = 5,
+	AnimationFrameChanged = 6,
+	NavigationWork = 7,
+	UpdateTimers = 8,
+	UnitStateChanged = 9,
 };
 
 struct FlagsComponent {

@@ -52,7 +52,7 @@ void GameScene::Start() {
 	 Colors::SCOrange, Colors::SCGreen, Colors::SCBrown, Colors::SCLightYellow, Colors::SCWhite,
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
-	int totalPlayers = 4;
+	int totalPlayers = 8;
 
 	for (int p = 0; p < totalPlayers; ++p) {
 		entityManager->GetPlayerSystem().AddPlayer(race, color[p]);
@@ -73,8 +73,8 @@ void GameScene::Start() {
 	//	Vector2Int16(48, 48));
 	EntityId e = 0;
 	int i = 0;
-	for (int y = 30; y > 0; --y) {
-		for (int x = 30; x > 0; --x) {
+	for (int y = 1; y > 0; --y) {
+		for (int x = 1; x > 0; --x) {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[i % 2];
 			e = UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
@@ -91,6 +91,8 @@ void GameScene::Start() {
 	}
 
 	selection.push_back(e);
+
+	entityManager->UnitArchetype.StateComponents.GetComponent(e) = UnitState::Attacking;
 
 	entityManager->FullUpdate();
 }

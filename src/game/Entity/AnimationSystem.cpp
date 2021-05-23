@@ -33,7 +33,7 @@ void AnimationSystem::UpdateUnitAnimationsJob(int start, int end) {
 
 		flags.set(ComponentFlags::RenderChanged);
 	}
-	
+
 }
 void AnimationSystem::UpdateAnimationsJob(int start, int end) {
 	AnimationData& data = s->data;
@@ -70,13 +70,12 @@ void AnimationSystem::UpdateAnimations(EntityManager& em) {
 			if (f.test(ComponentFlags::AnimationFrameChanged)) {
 				f.clear(ComponentFlags::AnimationFrameChanged);
 
-				if (em.RenderArchetype.Archetype.HasEntity(id)) {
-					data.animation.push_back(em.AnimationArchetype.AnimationComponents[i]);
-					data.tracker.push_back(em.AnimationArchetype.TrackerComponents[i]);
-					data.ren.push_back(&em.RenderArchetype.RenderComponents[i]);
-					data.offset.push_back(&em.RenderArchetype.OffsetComponents[i]);
-					data.flags.push_back(&f);
-				}
+				data.animation.push_back(em.AnimationArchetype.AnimationComponents[i]);
+				data.tracker.push_back(em.AnimationArchetype.TrackerComponents[i]);
+				data.ren.push_back(&em.RenderArchetype.RenderComponents[i]);
+				data.offset.push_back(&em.RenderArchetype.OffsetComponents[i]);
+				data.flags.push_back(&f);
+
 			}
 		}
 	}
@@ -90,13 +89,12 @@ void AnimationSystem::UpdateAnimations(EntityManager& em) {
 			if (f.test(ComponentFlags::AnimationFrameChanged)) {
 				f.clear(ComponentFlags::AnimationFrameChanged);
 
-				if (em.UnitArchetype.RenderArchetype.Archetype.HasEntity(id)) {
-					unitData.animation.push_back(em.UnitArchetype.AnimationArchetype.AnimationComponents[i]);
-					unitData.tracker.push_back(em.AnimationArchetype.TrackerComponents[i]);
-					unitData.ren.push_back(&em.UnitArchetype.RenderArchetype.RenderComponents[i]);
-					unitData.offset.push_back(&em.UnitArchetype.RenderArchetype.OffsetComponents[i]);
-					unitData.flags.push_back(&f);
-				}
+				unitData.animation.push_back(em.UnitArchetype.AnimationArchetype.AnimationComponents[i]);
+				unitData.tracker.push_back(em.AnimationArchetype.TrackerComponents[i]);
+				unitData.ren.push_back(&em.UnitArchetype.RenderArchetype.RenderComponents[i]);
+				unitData.offset.push_back(&em.UnitArchetype.RenderArchetype.OffsetComponents[i]);
+				unitData.flags.push_back(&f);
+
 			}
 		}
 	}
@@ -178,7 +176,6 @@ void AnimationSystem::TickAnimations(EntityManager& em)
 		JobSystem::DefaultJobSize, TickAnimationsJob);
 	JobSystem::RunJob(em.UnitArchetype.AnimationArchetype.Archetype.GetEntities().size(),
 		JobSystem::DefaultJobSize, TickUnitAnimationsJob);
-
 }
 
 
@@ -187,8 +184,9 @@ void AnimationSystem::UpdateAnimationsForOrientation(EntityManager& entityManage
 
 	for (EntityId id : entityManager.AnimationArchetype.OrientationArchetype.Archetype.GetEntities()) {
 		FlagsComponent& flags = entityManager.FlagComponents.GetComponent(id);
-		if (flags.test(ComponentFlags::OrientationChanged)) {
+		if (flags.test(ComponentFlags::OrientationChanged) || flags.test(ComponentFlags::AnimationSetChanged)) {
 			flags.clear(ComponentFlags::OrientationChanged);
+			flags.clear(ComponentFlags::AnimationSetChanged);
 
 			const auto& animOrin = entityManager.AnimationArchetype.OrientationArchetype
 				.AnimOrientationComponents.GetComponent(id);
@@ -206,8 +204,10 @@ void AnimationSystem::UpdateAnimationsForOrientation(EntityManager& entityManage
 	for (EntityId id : entityManager.UnitArchetype.AnimationArchetype.OrientationArchetype
 		.Archetype.GetEntities()) {
 		FlagsComponent& flags = entityManager.FlagComponents.GetComponent(id);
-		if (flags.test(ComponentFlags::OrientationChanged)) {
+		if (flags.test(ComponentFlags::OrientationChanged) || flags.test(ComponentFlags::AnimationSetChanged)) {
+
 			flags.clear(ComponentFlags::OrientationChanged);
+			flags.clear(ComponentFlags::AnimationSetChanged);
 
 			const auto& animOrin = entityManager.UnitArchetype.AnimationArchetype
 				.OrientationArchetype.AnimOrientationComponents.GetComponent(id);
