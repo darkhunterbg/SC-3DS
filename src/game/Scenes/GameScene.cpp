@@ -73,7 +73,7 @@ void GameScene::Start() {
 	//	Vector2Int16(48, 48));
 	EntityId e = 0;
 	int i = 0;
-	for (int y = 1; y > 0; --y) {
+	for (int y = 2; y > 0; --y) {
 		for (int x = 1; x > 0; --x) {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[i % 2];
@@ -92,7 +92,7 @@ void GameScene::Start() {
 
 	selection.push_back(e);
 
-	entityManager->UnitArchetype.StateComponents.GetComponent(e) = UnitState::Attacking;
+	//entityManager->UnitArchetype.StateComponents.GetComponent(e) = UnitState::Attacking;
 
 	entityManager->FullUpdate();
 }
@@ -161,8 +161,28 @@ void GameScene::Update() {
 
 		if (Game::Gamepad.IsButtonPressed(GamepadButton::B)) {
 
-			for (EntityId id : selection)
-				if (entityManager->UnitArchetype.Archetype.HasEntity(id)) {
+			for (EntityId id : selection) {
+				uint8_t t = EntityUtil::GetOrientationToPosition(id, cursor->Position);
+
+				auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
+
+				entityManager->UnitArchetype.Archetype.HasEntity(id);
+				entityManager->UnitArchetype.StateComponents.GetComponent(id) =
+					UnitState::Attacking;
+				entityManager->OrientationComponents.GetComponent(id) = t;
+				entityManager->FlagComponents.GetComponent(id).set(ComponentFlags::OrientationChanged);
+				entityManager->FlagComponents.GetComponent(id)
+					.set(ComponentFlags::UnitStateChanged);
+				entityManager->FlagComponents.GetComponent(id)
+					.clear(ComponentFlags::NavigationWork);
+
+
+				if (def->Sounds.Yes.TotalClips) {
+					int i = std::rand() % def->Sounds.Yes.TotalClips;
+					Game::Audio.PlayClip(def->Sounds.Yes.Clips[i], 1);
+				}
+			}
+			/*	if (entityManager->UnitArchetype.Archetype.HasEntity(id)) {
 
 					entityManager->UnitArchetype.StateComponents.GetComponent(id) =
 						UnitState::Idle;
@@ -170,40 +190,21 @@ void GameScene::Update() {
 						.set(ComponentFlags::UnitStateChanged);
 					entityManager->FlagComponents.GetComponent(id)
 						.clear(ComponentFlags::NavigationWork);
-				}
+				}*/
 		}
 		if (Game::Gamepad.IsButtonPressed(GamepadButton::Y)) {
-			entityManager->UnitArchetype.Archetype.RemoveEntities(selection, false);
-			entityManager->CollisionArchetype.Archetype.RemoveEntities(selection, false);
-			entityManager->NavigationArchetype.Archetype.RemoveEntities(selection, false);
-			entityManager->MovementArchetype.Archetype.RemoveEntities(selection, false);
-
-
+		
 			for (EntityId id : selection)
 			{
-				auto& unit = entityManager->UnitArchetype.UnitComponents[id];
-
 				auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
 
 				if (def->IsResourceContainer)
 					continue;
-
-				if (unit.HasMovementGlow()) {
-					entityManager->DeleteEntity(unit.movementGlowEntity);
-					entityManager->ParentArchetype.Archetype.RemoveEntity(id);
-				}
-
-				if (def->Graphics->HasDeathAnimation()) {
-					EntityUtil::PlayAnimation(id, def->Graphics->DeathAnimation);
-					EntityUtil::StartTimer(id, def->Graphics->DeathAnimation.GetDuration(), TimerExpiredAction::UnitDeathAfterEffect);
-				}
-				else {
-					EntityUtil::StartTimer(id, 1, TimerExpiredAction::UnitDeathAfterEffect);
-				}
-
-				int i = std::rand() % def->Sounds.Death.TotalClips;
-				Game::Audio.PlayClip(def->Sounds.Death.Clips[i], 1);
-
+				entityManager->UnitArchetype.StateComponents.GetComponent(id) =
+					UnitState::Death;
+				entityManager->FlagComponents.GetComponent(id)
+					.set(ComponentFlags::UnitStateChanged);
+				
 			}
 
 			selection.clear();

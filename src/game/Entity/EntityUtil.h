@@ -71,6 +71,8 @@ public:
 	static void SetMapObjectBoundingBoxFromRender(EntityId e);
 
 	static void CopyFlag(EntityId from, EntityId to, ComponentFlags flag);
+
+	static uint8_t GetOrientationToPosition(EntityId id, Vector2Int16 pos);
 };
 
 class UnitEntityUtil {

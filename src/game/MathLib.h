@@ -99,6 +99,10 @@ struct Vector2T
 		return b;
 	}
 
+	static T Dot(const Vector2T& a, const Vector2T& b) {
+		return a.x * a.y + b.x* b.y;
+	}
+
 	inline bool operator == (const Vector2T& b) const {
 		return !(x - b.x) && !(y - b.y);
 	}

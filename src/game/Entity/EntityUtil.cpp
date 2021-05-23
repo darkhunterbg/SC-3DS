@@ -110,6 +110,19 @@ void EntityUtil::SetMapObjectBoundingBoxFromRender(EntityId e)
 	mapBB.position -= mapBB.size / 2;
 }
 
+uint8_t EntityUtil::GetOrientationToPosition(EntityId id, Vector2Int16 target) {
+	EntityManager& em = GetManager();
+	Vector2Int16 pos = em.PositionComponents.GetComponent(id);
+	//float dot = Vector2::Dot(Vector2(pos), Vector2(target));
+	Vector2Int16 dir = target - pos;
+	double angle = atan2(dir.y, dir.x);
+	angle += PI;
+	uint8_t result = (angle * 16.0 / PI);
+	result = (result + 24) % 32;
+
+	return result;
+}
+
 void EntityUtil::SetRenderFromAnimationClip(EntityId e, const UnitAnimationClip& clip, uint8_t i) {
 	EntityManager& em = GetManager();
 
@@ -240,3 +253,4 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 
 	return e;
 }
+

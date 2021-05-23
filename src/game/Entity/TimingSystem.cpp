@@ -31,11 +31,21 @@ void TimingSystem::UpdateTimers(EntityManager& em)
 
 void TimingSystem::ApplyTimerActions(EntityManager& em) {
 
+	WeaponAttack(GetActionEntityTable(TimerExpiredAction::WeaponAttack), em);
 	UnitDeathAfterEffect(GetActionEntityTable(TimerExpiredAction::UnitDeathAfterEffect), em);
 	DeleteEntities(GetActionEntityTable(TimerExpiredAction::DeleteEntity), em);
 
 	for (auto& t : actionsTable)
 		t.entities.clear();
+}
+
+void TimingSystem::WeaponAttack(std::vector<EntityId>& entities, EntityManager& em) {
+	if (entities.size() > 0) {
+		for (EntityId id : entities) {
+			em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Attacking;
+			em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
+		}
+	}
 }
 
 void TimingSystem::UnitDeathAfterEffect(std::vector<EntityId>& entities, EntityManager& em) {

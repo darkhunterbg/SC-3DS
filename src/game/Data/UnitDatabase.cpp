@@ -1,6 +1,7 @@
 #include "UnitDatabase.h"
 #include "Platform.h"
 #include "GraphicsDatabase.h"
+#include "WeaponDatabase.h"
 
 UnitDef UnitDatabase::Marine;
 UnitDef UnitDatabase::SCV;
@@ -19,6 +20,7 @@ static void MarineData() {
 	u.RotationSpeed = 1;
 	u.SetUseSupply(1);
 	u.Vision = 7;
+	u.Weapon = &WeaponDatabase::GaussRifle;
 
 	u.Sounds.Death = { "sound/terran/marine/tmadth", 2 };
 	u.Sounds.What = { "sound/terran/marine/tmawht", 4 };
@@ -33,6 +35,7 @@ static void SCVData() {
 	u.RotationSpeed = 1;
 	u.SetUseSupply(1);
 	u.Vision = 7;
+	u.Weapon = &WeaponDatabase::FusionCutter;
 
 	u.Sounds.Death = { "sound/terran/scv/tscdth", 1 };
 	u.Sounds.What = { "sound/terran/scv/tscwht", 4 };

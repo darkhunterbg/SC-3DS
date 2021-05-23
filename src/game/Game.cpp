@@ -10,6 +10,7 @@
 #include "Data/UnitDatabase.h"
 #include "Data/GraphicsDatabase.h"
 #include "Data/RaceDatabase.h"
+#include "Data//WeaponDatabase.h"
 #include "Job.h"
 
 static Scene* currentScene;
@@ -59,6 +60,7 @@ void Game::Start() {
 	Audio.Init();
 
 	GraphicsDatabase::Init();
+	WeaponDatabase::Init();
 	UnitDatabase::Init();
 	RaceDatabase::Init();
 	//frameLoad.push_back(0);

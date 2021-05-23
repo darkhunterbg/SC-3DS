@@ -179,8 +179,8 @@ enum class UnitState : uint8_t {
 	Movement = 1,
 	Turning = 2,
 	Attacking = 3,
+	Death = 4,
 };
-
 
 
 struct UnitComponent {
@@ -273,7 +273,7 @@ struct AnimationTrackerComponent {
 struct UnitAnimationOrientationComponent {
 	std::array<const UnitAnimationClip*, 32> clips;
 	inline const UnitAnimationClip& GetClip(int pos) const { return *clips[pos]; }
-	inline void CopyArray( const UnitAnimationClip (&a)[32]) {
+	inline void CopyArray(const UnitAnimationClip(&a)[32]) {
 		for (int i = 0; i < 32; ++i) {
 			clips[i] = &a[i];
 		}
@@ -305,18 +305,21 @@ struct TimingComponent {
 		timer = duration;
 		nextTimer = looping * duration;
 	}
+
 };
 
 enum class TimerExpiredAction : uint8_t {
 	None = 0,
-	UnitDeathAfterEffect = 1,
-	DeleteEntity = 2,
+	WeaponAttack = 1,
+	UnitDeathAfterEffect = 2,
+	DeleteEntity = 3,
+
 };
 
 
 struct TimingActionComponent {
 	TimerExpiredAction action = TimerExpiredAction::None;
 
-	static constexpr const int ActionTypeCount = 3;
+	static constexpr const int ActionTypeCount = 4;
 };
 

@@ -8,6 +8,7 @@
 #include "AnimationDef.h"
 #include "SoundDef.h"
 #include "GraphicsDef.h"
+#include "WeaponDef.h"
 
 struct UnitDef {
 	std::string Name;
@@ -32,6 +33,7 @@ struct UnitDef {
 	} Sounds;
 
 	const UnitGraphicsDef* Graphics = nullptr;
+	const WeaponDef* Weapon = nullptr;
 
 	UnitDef() {  }
 	UnitDef(const UnitDef&) = delete;

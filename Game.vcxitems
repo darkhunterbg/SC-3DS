@@ -28,6 +28,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\SoundDef.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\UnitDatabase.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\UnitDef.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\WeaponDatabase.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\WeaponDef.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Debug.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\Archetype.h" />
@@ -73,6 +75,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\RaceDef.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\SoundDef.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\UnitDatabase.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\WeaponDatabase.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\Archetype.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\Entity.cpp" />

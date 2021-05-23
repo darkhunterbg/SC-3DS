@@ -19,10 +19,15 @@ static void MarineResources() {
 	d.RenderSize = Vector2Int16(a->FrameSize);
 	d.DeathAnimationDef.GenerateAnimation(a, nullptr, d.DeathAnimation);
 	d.MovementAnimationDef.GenerateAnimations(a, as, d.MovementAnimations);
-	d.AttackAnimationDef.GenerateAnimations(a, as, d.AttackAnimations);
-	d.AttackAnimationDef.FrameStart = 34;
-	d.AttackAnimationDef.UnitColorFrameStart = 229 + d.AttackAnimationDef.FrameStart;
-	d.AttackAnimationDef.GenerateAnimations(a, as, d.AttackAnimations);
+
+	for (int i = 0; i < 2; ++i) {
+		d.AttackAnimationDef.GenerateAnimations(a, as, d.AttackAnimations);
+		d.AttackAnimationDef.FrameStart = 34;
+		d.AttackAnimationDef.UnitColorFrameStart = 229 + d.AttackAnimationDef.FrameStart;
+		d.AttackAnimationDef.GenerateAnimations(a, as, d.AttackAnimations);
+		d.AttackAnimationDef.FrameStart = 51;
+		d.AttackAnimationDef.UnitColorFrameStart = 229 + d.AttackAnimationDef.FrameStart;
+	}
 	d.IdleAnimationDef.GenerateAnimations(a, as, d.IdleAnimations);
 	d.DeathAfterEffect.Def.GenerateAnimation(a, d.DeathAfterEffect.Clip);
 }
@@ -42,7 +47,7 @@ static void MarineData() {
 	d.AttackAnimationDef.FrameCount = 1;
 	d.AttackAnimationDef.UnitColorFrameStart = 229 + d.AttackAnimationDef.FrameStart;
 	d.AttackAnimationDef.FrameTime = 2;
-	d.AttackAnimationDef.Looping = true;
+	//d.AttackAnimationDef.Looping = true;
 
 	d.IdleAnimationDef.FrameStart = 0;
 	d.IdleAnimationDef.ShadowFrameStart = 0;
@@ -78,6 +83,11 @@ static void SCVResources() {
 	d.MovementAnimationDef.GenerateAnimations(a, a, d.MovementAnimations);
 	d.MovementGlowAnimationDef.GenerateAnimations(a, d.MovementGlowAnimations);
 	d.IdleAnimationDef.GenerateAnimations(a,a, d.IdleAnimations);
+
+
+	d.AttackAnimationDef.GenerateAnimations(a, a, d.AttackAnimations);
+	//d.AttackAnimationDef.FrameCount = 1;
+	//d.AttackAnimationDef.GenerateAnimations(a, a, d.AttackAnimations);
 }
 static void SCVData() {
 	UnitGraphicsDef& d = GraphicsDatabase::SCV;
@@ -97,6 +107,13 @@ static void SCVData() {
 	d.MovementGlowAnimationDef.FrameStart = 102;
 	d.MovementGlowAnimationDef.FrameCount = 4;
 	d.MovementGlowAnimationDef.Looping = true;
+
+	d.AttackAnimationDef.FrameStart = 17;
+	d.AttackAnimationDef.FrameCount = 2;
+	d.AttackAnimationDef.UnitColorFrameStart = 51 + d.AttackAnimationDef.FrameStart;
+	d.AttackAnimationDef.FrameTime = 2;
+	d.AttackAnimationDef.ShadowOffset = { -1, 5 };
+
 
 	d.DeathAfterEffect.Def.FrameStart = 0;
 	d.DeathAfterEffect.Def.FrameCount = 9;
