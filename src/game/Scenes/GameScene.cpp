@@ -153,11 +153,14 @@ void GameScene::Update() {
 
 		if (Game::Gamepad.IsButtonPressed(GamepadButton::B)) {
 
+			Vector2Int16 pos = camera.ScreenToWorld(cursor->Position);
+
 			for (EntityId id : selection) {
-				uint8_t t = EntityUtil::GetOrientationToPosition(id, camera.ScreenToWorld(cursor->Position));
+				uint8_t t = EntityUtil::GetOrientationToPosition(id, pos);
 
 				auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
 
+				entityManager->UnitArchetype.StateDataComponents.GetComponent(id).target.position = pos;
 				entityManager->UnitArchetype.Archetype.HasEntity(id);
 				entityManager->UnitArchetype.StateComponents.GetComponent(id) =
 					UnitState::Attacking;
@@ -169,7 +172,10 @@ void GameScene::Update() {
 					.clear(ComponentFlags::NavigationWork);
 
 
+				//t = (t + 16) % 32;
+
 				entityManager->GetSoundSystem().PlayUnitChatCommand(id);
+
 			}
 			/*	if (entityManager->UnitArchetype.Archetype.HasEntity(id)) {
 

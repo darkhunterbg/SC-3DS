@@ -81,7 +81,7 @@ void Cursor::Draw() {
 	clipCountdown--;
 
 	if (clipCountdown <= 0) {
-		clipCountdown = 10;
+		clipCountdown = 6;
 		clipFrame = (++clipFrame) % currentClip->GetFrameCount();
 	}
 
@@ -201,7 +201,7 @@ void Cursor::Update(Camera& camera, EntityManager& entityManager, std::vector<En
 	if (newClip != currentClip) {
 		currentClip = newClip;
 		clipFrame = 0;
-		clipCountdown = 10;
+		clipCountdown = 6;
 	}
 
 }

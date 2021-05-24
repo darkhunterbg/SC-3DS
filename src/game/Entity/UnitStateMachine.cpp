@@ -2,8 +2,12 @@
 #include "EntityManager.h"
 #include "EntityUtil.h"
 #include "../Game.h"
+#include "../Profiler.h"
 
 #include <algorithm>
+
+static std::vector<EntityId> scratch;
+
 
 // ============================ Idle State ====================================
 
@@ -127,6 +131,18 @@ void UnitMovingState::ExitState(
 void UnitAttackingState::EnterState(
 	UnitStateMachinChangeData& data, EntityManager& em)
 {
+	SectionProfiler p("AttackState");
+
+	scratch.clear();
+
+	em.NewEntities(data.entities.size(), scratch);
+	em.RenderArchetype.Archetype.AddSortedEntities(scratch);
+	em.AnimationArchetype.Archetype.AddSortedEntities(scratch);
+	em.MapObjectArchetype.Archetype.AddSortedEntities(scratch);
+	em.TimingArchetype.Archetype.AddSortedEntities(scratch);
+
+	int i = 0;
+
 	for (EntityId id : data.entities) {
 
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
@@ -160,6 +176,22 @@ void UnitAttackingState::EnterState(
 		timer.NewTimer(unit.def->Weapon->Cooldown);
 		timerAction.action = TimerExpiredAction::WeaponAttack;
 		flags.set(ComponentFlags::UpdateTimers);
+
+		// Particle Effect
+
+		const auto& stateData = em.UnitArchetype.StateDataComponents.GetComponent(id);
+
+		EntityId e = scratch[i];
+		em.PositionComponents.NewComponent(e, stateData.target.position);
+		em.FlagComponents.NewComponent(e).set(ComponentFlags::PositionChanged);
+
+		EntityUtil::PlayAnimation(e, unit.def->Weapon->TargetEffect[0]);
+		EntityUtil::SetRenderFromAnimationClip(e, unit.def->Weapon->TargetEffect[0], 0);
+		EntityUtil::SetMapObjectBoundingBoxFromRender(e);
+
+
+		EntityUtil::StartTimerMT(e, unit.def->Weapon->TargetEffect[0].GetDuration(), TimerExpiredAction::DeleteEntity);
+		++i;
 	}
 
 }

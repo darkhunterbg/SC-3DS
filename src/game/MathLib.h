@@ -85,10 +85,10 @@ struct Vector2T
 	//	return *this;
 	//}
 
-	Vector2T Min(T mx, T my) const {
+	Vector2T Max(T mx, T my) const {
 		return Vector2T(std::min(x,mx), std::min(y,my)) ;
 	}
-	Vector2T Max(T mx, T my) const {
+	Vector2T Min(T mx, T my) const {
 		return Vector2T(std::max(x, mx), std::max(y, my));
 	}
 
@@ -350,9 +350,9 @@ struct Rectangle16
 	}
 
 	void Restrict(Vector2Int16 min, Vector2Int16 max) {
-		position = position.Max(min.x, min.y);
+		position = position.Min(min.x, min.y);
 		Vector2Int16 end = position + size;
-		end = end.Min(max.x, max.y);
+		end = end.Max(max.x, max.y);
 		size = end - position;
 	}
 

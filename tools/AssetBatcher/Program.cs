@@ -44,7 +44,13 @@ namespace AssetBatcher
 				"unit/neutral/min01sha",
 				"unit/neutral/min02sha",
 				"unit/neutral/min03sha");
+
+
+			T3SFolders("unit/bullet/tspark");
+
 			GeneraSourceCode();
+
+	
 		}
 
 		static void GeneraSourceCode()

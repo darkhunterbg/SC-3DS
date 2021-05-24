@@ -4,6 +4,9 @@
 clear
 
 palette Units
+unit\bullet\*.grp
+
+palette Units
 unit\terran\*.grp
 unit\protoss\*.grp
 unit\neutral\*.grp

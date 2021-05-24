@@ -140,6 +140,7 @@ public:
 
 		ComponentCollection<UnitState> PrevStateComponents;
 		ComponentCollection<UnitState> StateComponents;
+		ComponentCollection<UnitStateDataComponent> StateDataComponents;
 	} UnitArchetype;
 
 

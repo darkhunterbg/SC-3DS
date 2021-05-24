@@ -23,7 +23,7 @@ struct DirectionalAnimationDef {
 	int FrameCount = 0;
 	int FrameTime = 1;
 	bool Looping = false;
-	bool MultiDirectional = true;
+	int Directions = 16;
 
 	DirectionalAnimationDef() {}
 	DirectionalAnimationDef(const DirectionalAnimationDef&) = delete;

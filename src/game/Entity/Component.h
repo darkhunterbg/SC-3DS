@@ -184,8 +184,16 @@ enum class UnitState : uint8_t {
 	Death = 4,
 };
 
+
 static constexpr const int UnitStatesCount = 5;
 
+struct UnitStateDataComponent {
+	union {
+		EntityId entityId;
+		Vector2Int16 position;
+	} target = { 0 };
+
+};
 
 struct UnitComponent {
 	const UnitDef* def;
