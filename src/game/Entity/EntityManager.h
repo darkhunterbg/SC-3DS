@@ -201,6 +201,9 @@ public:
 	inline SoundSystem& GetSoundSystem() {
 		return soundSystem;
 	}
+	inline KinematicSystem& GetKinematicSystem() {
+		return kinematicSystem;
+	}
 	inline const Span<EntityId> GetEntities() const {
 		return entities.GetEntities();
 	}

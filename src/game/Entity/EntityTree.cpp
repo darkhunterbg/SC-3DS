@@ -178,6 +178,28 @@ void EntityTree::RectCastCollider(const Rectangle16& region, EntityTreeCellId ce
 		}
 	}
 }
+void EntityTree::CircleCastEntity(const Circle16& region, EntityTreeCellId cellId, std::vector<EntityId>& result) const {
+	auto& cell = GetCell(cellId);
+
+	if (cell.region.Intersects(region)) {
+		auto end = cell.colliders.size();
+
+		for (unsigned i = 0; i < end; ++i) {
+			if (cell.colliders[i].Intersects(region)) {
+				result.push_back(cell.entities[i]);
+			}
+		}
+
+		if (cell.leafStart)
+		{
+			CircleCastEntity(region, cell.leafStart, result);
+			CircleCastEntity(region, cell.leafStart + 1, result);
+			CircleCastEntity(region, cell.leafStart + 2, result);
+			CircleCastEntity(region, cell.leafStart + 3, result);
+		}
+	}
+}
+
 bool EntityTree::CollidesWithAny(const Rectangle16& region, EntityId ignore, EntityTreeCellId cellId) const
 {
 	auto& cell = GetCell(cellId);

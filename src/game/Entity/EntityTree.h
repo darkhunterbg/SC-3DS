@@ -23,6 +23,7 @@ private:
 	EntityTreeCellId GetCellIdForCollider(const Rectangle16& collider, EntityTreeCellId cellId) const;
 	void RectCastEntity(const Rectangle16& region, EntityTreeCellId cellId, std::vector<EntityId>& result) const;
 	void RectCastCollider(const Rectangle16& region, EntityTreeCellId cellId, std::vector<Rectangle16>& result) const;
+	void CircleCastEntity(const Circle16& circle, EntityTreeCellId cellId, std::vector<EntityId>& result) const;
 
 	EntityId PointCastEntity(Vector2Int16 point, EntityTreeCellId cellId) const;
 
@@ -39,11 +40,14 @@ public:
 	inline void RectCastCollider(const Rectangle16& rect, std::vector<Rectangle16>& result)  const {
 		RectCastCollider(rect, 0, result);
 	}
+	inline void CircleCastEntity(const Circle16& circle, std::vector<EntityId>& result) const {
+		CircleCastEntity(circle, 0, result);
+	}
 	inline EntityId PointCastEntity(Vector2Int16 point) const {
 		return PointCastEntity(point, 0);
 	}
 	inline bool CollidesWithAny(const Rectangle16& region, EntityId ignore) const {
-		return CollidesWithAny(region, ignore, 0 );
+		return CollidesWithAny(region, ignore, 0);
 	}
 	inline EntityTreeCellId GetCellIdForCollider(const Rectangle16& collider) const {
 		if (GetCell(0).region.Contains(collider.position))

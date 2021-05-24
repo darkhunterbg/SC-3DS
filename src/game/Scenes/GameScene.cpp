@@ -62,8 +62,8 @@ void GameScene::Start() {
 	//UnitEntityUtil::NewUnit(UnitDatabase::MineralField1, 0,
 	//	Vector2Int16(128, 256));
 
-	//UnitEntityUtil::NewUnit(*UnitDatabase::Units[2], 2,
-	//	Vector2Int16(400, 128));
+	//UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 2,
+	//	Vector2Int16(256, 128));
 
 
 	//UnitEntityUtil::NewUnit(*UnitDatabase::Units[1], 2,
@@ -73,11 +73,11 @@ void GameScene::Start() {
 	//	Vector2Int16(48, 48));
 	EntityId e = 0;
 	int i = 0;
-	for (int y = 1; y > 0; --y) {
-		for (int x = 1; x > 0; --x) {
+	for (int y = 10; y > 0; --y) {
+		for (int x = 10; x > 0; --x) {
 			Color c = color[(i) % 12];
-			auto& def = *UnitDatabase::Units[i % 2];
-			e = UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
+			auto& def = *UnitDatabase::Units[0];
+			e = UnitEntityUtil::NewUnit(def, 1 + i / 50,// 1 + i % totalPlayers,
 				Vector2Int16(Vector2Int{ x * 32 + 48,y * 32 + 48 }));
 
 			//entityManager->UnitArchetype.OrientationComponents.GetComponent(e) = 12;

@@ -9,11 +9,13 @@ struct UnitAIStateMachineData {
 	std::vector<EntityId> entities;
 	std::vector<UnitAIStateDataComponent> stateData;
 	std::vector<Vector2Int16> position;
+	std::vector<PlayerId> owner;
 
 	inline void clear() {
 		entities.clear();
 		stateData.clear();
 		position.clear();
+		owner.clear();
 	}
 	inline size_t size() const { return entities.size(); }
 };
@@ -47,6 +49,12 @@ public:
 
 
 class UnitAIGoToState : public  IUnitAIState {
+public:
+	virtual void Think(UnitAIStateMachineData& data, EntityManager& em) override;
+};
+
+
+class UnitAIGoToAttackState : public  IUnitAIState {
 public:
 	virtual void Think(UnitAIStateMachineData& data, EntityManager& em) override;
 };

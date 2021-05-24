@@ -292,6 +292,14 @@ struct Rectangle
 	}
 };
 
+struct Circle16 {
+	Vector2Int16 position;
+	short size;
+
+	inline bool Contains(const Vector2Int16& v) const {
+		return (position - v).LengthSquaredInt() < (size * size);
+	}
+};
 
 
 struct Rectangle16
@@ -346,6 +354,23 @@ struct Rectangle16
 		return r.position.x < position.x + size.x && position.x < r.position.x + r.size.x &&
 			r.position.y < position.y + size.y && position.y < r.position.y + r.size.y;
 	}
+	bool Intersects(const Circle16& r) const
+	{
+		if (Contains(r.position))
+			return true;
+
+		Vector2Int16 test;
+		if (r.position.x < position.x)  test.x = position.x;
+		else if (r.position.x > position.x + size.x)  test.x = position.x + size.x;
+
+		if (r.position.y < position.y)  test.x = position.y;
+		else if (r.position.y > position.y + size.y)  test.y = position.y + size.y;
+
+		Vector2Int16 dist = r.position - test;
+		int radius = (int)r.size * (int)r.size;
+		return dist.LengthSquaredInt() <= radius;
+	}
+
 	inline bool Contains(const Vector2Int16& v) const {
 		return v.x <= position.x + size.x && v.x >= position.x &&
 			v.y <= position.y + size.y && v.y >= position.y;
@@ -360,14 +385,6 @@ struct Rectangle16
 
 };
 
-struct Circle16 {
-	Vector2Int16 position;
-	short size;
-
-	inline bool Contains(const Vector2Int16& v) const {
-		return (position - v).LengthSquaredInt() < (size*size);
-	}
-};
 
 
 inline Vector2Int Vector2Int_Ceil(const Vector2& v) {

@@ -61,6 +61,10 @@ public:
 		return collidersTree.RectCastEntity(collider, result);
 	}
 
+	inline void CircleCast(const Circle16& circle, std::vector<EntityId>& result) const {
+		return collidersTree.CircleCastEntity(circle, result);
+	}
+
 	inline EntityId PointCast(Vector2Int16 point) const {
 		return collidersTree.PointCastEntity(point);
 	}

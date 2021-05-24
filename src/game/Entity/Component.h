@@ -176,6 +176,7 @@ enum class UnitAIState :uint8_t {
 	Idle = 0,
 	AttackTarget = 1,
 	GoToPosition = 2,
+	GoToAttack = 3,
 };
 
 struct UnitAIStateDataComponent {
