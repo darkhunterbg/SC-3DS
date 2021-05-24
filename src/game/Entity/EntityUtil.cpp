@@ -206,8 +206,10 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 
 	em.UnitArchetype.AnimationArchetype.Archetype.AddEntity(e);
 	em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents.NewComponent(e)
-		.CopyArray(def.Graphics->IdleAnimations);
+		.clips = def.Graphics->IdleAnimations;
 	em.UnitArchetype.AnimationArchetype.OrientationArchetype.Archetype.AddEntity(e);
+
+	em.UnitArchetype.WeaponComponents.NewComponent(e).FromDef(*def.Weapon);
 
 	if (def.MovementSpeed > 0) {
 		em.NavigationArchetype.NavigationComponents.NewComponent(e);
@@ -261,7 +263,7 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 		em.AnimationArchetype.Archetype.AddEntity(e2);
 		em.AnimationArchetype.OrientationArchetype.Archetype.AddEntity(e2);
 		em.AnimationArchetype.OrientationArchetype.AnimOrientationComponents.GetComponent(e2)
-			.CopyArray(def.Graphics->MovementGlowAnimations);
+			.clips = def.Graphics->MovementGlowAnimations;
 
 		em.ParentArchetype.Archetype.AddEntity(e);
 		em.ParentArchetype.ChildComponents.NewComponent(e).AddChild(e2);
@@ -270,5 +272,20 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 	}
 
 	return e;
+}
+
+void UnitEntityUtil::AttackPosition(EntityId id, Vector2Int16 pos)
+{
+	EntityManager& em = GetManager();
+
+	uint8_t t = EntityUtil::GetOrientationToPosition(id, pos);
+
+	em.UnitArchetype.StateDataComponents.GetComponent(id).target.position = pos;
+	em.UnitArchetype.StateComponents.GetComponent(id) =UnitState::Attacking;
+	em.OrientationComponents.GetComponent(id) = t;
+	em.FlagComponents.GetComponent(id).set(ComponentFlags::OrientationChanged);
+	em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
+	em.FlagComponents.GetComponent(id).clear(ComponentFlags::NavigationWork);
+
 }
 

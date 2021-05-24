@@ -95,6 +95,10 @@ void GameScene::Start() {
 	//entityManager->UnitArchetype.StateComponents.GetComponent(e) = UnitState::Attacking;
 
 	entityManager->FullUpdate(camera);
+
+	//for (EntityId id : entityManager->UnitArchetype.Archetype.GetEntities()) {
+	//	UnitEntityUtil::AttackPosition(id, { 64,64 });
+	//}
 }
 
 int t = 0;
@@ -156,39 +160,14 @@ void GameScene::Update() {
 			Vector2Int16 pos = camera.ScreenToWorld(cursor->Position);
 
 			for (EntityId id : selection) {
-				uint8_t t = EntityUtil::GetOrientationToPosition(id, pos);
+				UnitEntityUtil::AttackPosition(id, pos);
 
-				auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
-
-				entityManager->UnitArchetype.StateDataComponents.GetComponent(id).target.position = pos;
-				entityManager->UnitArchetype.Archetype.HasEntity(id);
-				entityManager->UnitArchetype.StateComponents.GetComponent(id) =
-					UnitState::Attacking;
-				entityManager->OrientationComponents.GetComponent(id) = t;
-				entityManager->FlagComponents.GetComponent(id).set(ComponentFlags::OrientationChanged);
-				entityManager->FlagComponents.GetComponent(id)
-					.set(ComponentFlags::UnitStateChanged);
-				entityManager->FlagComponents.GetComponent(id)
-					.clear(ComponentFlags::NavigationWork);
-
-
-				//t = (t + 16) % 32;
 
 				entityManager->GetSoundSystem().PlayUnitChatCommand(id);
-
 			}
-			/*	if (entityManager->UnitArchetype.Archetype.HasEntity(id)) {
-
-					entityManager->UnitArchetype.StateComponents.GetComponent(id) =
-						UnitState::Idle;
-					entityManager->FlagComponents.GetComponent(id)
-						.set(ComponentFlags::UnitStateChanged);
-					entityManager->FlagComponents.GetComponent(id)
-						.clear(ComponentFlags::NavigationWork);
-				}*/
 		}
 		if (Game::Gamepad.IsButtonPressed(GamepadButton::Y)) {
-		
+
 			for (EntityId id : selection)
 			{
 				auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
@@ -199,7 +178,7 @@ void GameScene::Update() {
 					UnitState::Death;
 				entityManager->FlagComponents.GetComponent(id)
 					.set(ComponentFlags::UnitStateChanged);
-				
+
 			}
 
 			selection.clear();

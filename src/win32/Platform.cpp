@@ -443,7 +443,7 @@ int Platform::StartThreads(std::function<void(int)> threadWork) {
 
 	threadWorkFunc = threadWork;
 
-	numberOfThreads = SDL_GetCPUCount();
+	int numberOfThreads = SDL_GetCPUCount();
 
 	for (int i = 1; i < numberOfThreads; ++i) {
 		std::string name = "WorkerThread" + std::to_string(i);

@@ -194,7 +194,7 @@ void AnimationSystem::UpdateAnimationsForOrientation(EntityManager& entityManage
 			auto& anim = entityManager.AnimationArchetype.AnimationComponents.GetComponent(id);
 			auto& animTrack = entityManager.AnimationArchetype.TrackerComponents.GetComponent(id);
 			uint8_t orientation = entityManager.OrientationComponents.GetComponent(id);
-			anim.clip = animOrin.clips[orientation];
+			anim.clip = &animOrin.GetClip(orientation);
 			animTrack.PlayClip(anim.clip);
 
 			flags.set(ComponentFlags::AnimationFrameChanged);
@@ -215,7 +215,7 @@ void AnimationSystem::UpdateAnimationsForOrientation(EntityManager& entityManage
 			auto& anim = entityManager.UnitArchetype.AnimationArchetype.AnimationComponents.GetComponent(id);
 			auto& animTrack = entityManager.AnimationArchetype.TrackerComponents.GetComponent(id);
 			uint8_t orientation = entityManager.OrientationComponents.GetComponent(id);
-			anim.clip = animOrin.clips[orientation];
+			anim.clip = &animOrin.GetClip(orientation);
 			animTrack.PlayClip(anim.clip);
 
 			flags.set(ComponentFlags::AnimationFrameChanged);

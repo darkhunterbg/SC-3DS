@@ -41,11 +41,6 @@ void EntityCollection::AddSortedEntities(const std::vector<EntityId>& outIds, in
 	size_t end = std::min(sortedEntities.size(), insertAt + (size_t)id + 1);
 	std::sort(sortedEntities.begin() + insertAt, sortedEntities.begin() + end);
 
-	for (int i = 0; i < sortedEntities.size() - 1; ++i)
-		if (sortedEntities[i] > sortedEntities[i + 1])
-			EXCEPTION("Unsorted collection at %i", i);
-
-
 }
 void EntityCollection::AddEntity(EntityId id) {
 	auto end = sortedEntities.crend();
@@ -117,7 +112,7 @@ EntityManagerCollection::EntityManagerCollection()
 void EntityManagerCollection::NewEntities(unsigned size, std::vector<EntityId>& outIds)
 {
 	if (freeEntities.size() < size)
-		EXCEPTION("No %i free entities left (% free)!", size, freeEntities.size());
+		EXCEPTION("No %i free entities left (%i free)!", size, freeEntities.size());
 
 	int start = outIds.size();
 

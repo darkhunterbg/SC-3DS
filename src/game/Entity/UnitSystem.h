@@ -9,8 +9,8 @@ class EntityManager;
 
 class UnitSystem {
 private:
-	std::array<UnitStateMachinChangeData, UnitStatesCount> exitStateData;
-	std::array<UnitStateMachinChangeData, UnitStatesCount> enterStateData;
+	std::array<UnitStateMachineChangeData, UnitStatesCount> exitStateData;
+	std::array<UnitStateMachineChangeData, UnitStatesCount> enterStateData;
 public:
 	void ApplyUnitState(EntityManager& em);
 };

@@ -16,7 +16,6 @@ uint64_t mainTimer;
 Rectangle touchScreenLocation;
 bool mute = false;
 bool noThreading = true;
-int numberOfThreads = 3;
 
 void Init();
 void Uninit();

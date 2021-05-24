@@ -3,31 +3,34 @@
 #include "EntityUtil.h"
 #include "../Game.h"
 #include "../Profiler.h"
+#include "../Job.h"
 
 #include <algorithm>
 
 static std::vector<EntityId> scratch;
+static UnitStateMachineChangeData* _d;
+static EntityManager* _e;
 
 
 // ============================ Idle State ====================================
 
 std::array<IUnitState*, UnitStatesCount> UnitStateMachine::States = {
 	new UnitIdleState(),
-	new UnitTurningState(), 
+	new UnitTurningState(),
 	new UnitMovingState(),
-	new UnitAttackingState(), 
+	new UnitAttackingState(),
 	new UnitDeathState()
 };
 
 void UnitIdleState::EnterState(
-	UnitStateMachinChangeData& data, EntityManager& em)
+	UnitStateMachineChangeData& data, EntityManager& em)
 {
 	for (EntityId id : data.entities) {
 
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
 
 		em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
-			.GetComponent(id).CopyArray(unit.def->Graphics->IdleAnimations);
+			.GetComponent(id).clips = unit.def->Graphics->IdleAnimations;
 
 		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
 
@@ -36,7 +39,7 @@ void UnitIdleState::EnterState(
 	}
 }
 void UnitIdleState::ExitState(
-	UnitStateMachinChangeData& data, EntityManager& em)
+	UnitStateMachineChangeData& data, EntityManager& em)
 {
 	// Nothing for exiting idle state
 }
@@ -45,14 +48,14 @@ void UnitIdleState::ExitState(
 // ============================ Turning State ====================================
 
 void UnitTurningState::EnterState(
-	UnitStateMachinChangeData& data, EntityManager& em)
+	UnitStateMachineChangeData& data, EntityManager& em)
 {
 	for (EntityId id : data.entities) {
 
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
 
 		em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
-			.GetComponent(id).CopyArray(unit.def->Graphics->IdleAnimations);
+			.GetComponent(id).clips = unit.def->Graphics->IdleAnimations;
 
 		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
 
@@ -69,7 +72,7 @@ void UnitTurningState::EnterState(
 	}
 }
 void UnitTurningState::ExitState(
-	UnitStateMachinChangeData& data, EntityManager& em)
+	UnitStateMachineChangeData& data, EntityManager& em)
 {
 	for (EntityId id : data.entities) {
 		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
@@ -86,7 +89,7 @@ void UnitTurningState::ExitState(
 // ============================ Movement State ====================================
 
 void UnitMovingState::EnterState(
-	UnitStateMachinChangeData& data, EntityManager& em)
+	UnitStateMachineChangeData& data, EntityManager& em)
 {
 	for (EntityId id : data.entities) {
 
@@ -94,7 +97,7 @@ void UnitMovingState::EnterState(
 		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
 
 		em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
-			.GetComponent(id).CopyArray(unit.def->Graphics->MovementAnimations);
+			.GetComponent(id).clips = unit.def->Graphics->MovementAnimations;
 
 		flags.set(ComponentFlags::NavigationWork);
 		flags.set(ComponentFlags::AnimationSetChanged);
@@ -111,7 +114,7 @@ void UnitMovingState::EnterState(
 }
 
 void UnitMovingState::ExitState(
-	UnitStateMachinChangeData& data, EntityManager& em)
+	UnitStateMachineChangeData& data, EntityManager& em)
 {
 	for (EntityId id : data.entities) {
 		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
@@ -128,28 +131,21 @@ void UnitMovingState::ExitState(
 
 // ============================ Attack State ====================================
 
-void UnitAttackingState::EnterState(
-	UnitStateMachinChangeData& data, EntityManager& em)
-{
-	SectionProfiler p("AttackState");
 
-	scratch.clear();
 
-	em.NewEntities(data.entities.size(), scratch);
-	em.RenderArchetype.Archetype.AddSortedEntities(scratch);
-	em.AnimationArchetype.Archetype.AddSortedEntities(scratch);
-	em.MapObjectArchetype.Archetype.AddSortedEntities(scratch);
-	em.TimingArchetype.Archetype.AddSortedEntities(scratch);
+static void  UnitAttackingEnterStateJob(int start, int end) {
+	auto& data = *_d;
+	auto& em = *_e;
 
-	int i = 0;
+	for (int i = start; i < end; ++i) {
+		EntityId id = data.entities[i];
 
-	for (EntityId id : data.entities) {
 
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
 		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
 
 		em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
-			.GetComponent(id).CopyArray(unit.def->Graphics->AttackAnimations);
+			.GetComponent(id).clips = unit.def->Graphics->AttackAnimations;
 
 		flags.set(ComponentFlags::AnimationSetChanged);
 		flags.set(ComponentFlags::AnimationEnabled);
@@ -163,17 +159,17 @@ void UnitAttackingState::EnterState(
 		if (unit.def->Weapon->Sound.TotalClips > 0) {
 			int i = std::rand() % unit.def->Weapon->Sound.TotalClips;
 
-			em.SoundArchetype.SourceComponents.GetComponent(id).clip = unit.def->Weapon->Sound.Clips[i];
+			em.SoundArchetype.SourceComponents.GetComponent(id).clip = &unit.def->Weapon->Sound.Clips[i];
 			em.SoundArchetype.SourceComponents.GetComponent(id).priority = unit.def->AudioPriority;
-			em.FlagComponents.GetComponent(id).set(ComponentFlags::SoundTrigger);
-
-			//Game::Audio.PlayClip(unit.def->Weapon->Sound.Clips[0], 1);
+			flags.set(ComponentFlags::SoundTrigger);
 		}
+
+		const UnitWeaponComponent& weapon = em.UnitArchetype.WeaponComponents.GetComponent(id);
 
 		TimingComponent& timer = em.TimingArchetype.TimingComponents.GetComponent(id);
 		TimingActionComponent& timerAction = em.TimingArchetype.ActionComponents.GetComponent(id);
 
-		timer.NewTimer(unit.def->Weapon->Cooldown);
+		timer.NewTimer(weapon.cooldown );
 		timerAction.action = TimerExpiredAction::WeaponAttack;
 		flags.set(ComponentFlags::UpdateTimers);
 
@@ -182,21 +178,39 @@ void UnitAttackingState::EnterState(
 		const auto& stateData = em.UnitArchetype.StateDataComponents.GetComponent(id);
 
 		EntityId e = scratch[i];
+
+		em.TimingArchetype.TimingComponents.GetComponent(e).NewTimer(unit.def->Weapon->TargetEffect[0].GetDuration());
+		em.TimingArchetype.ActionComponents.GetComponent(e).action = TimerExpiredAction::DeleteEntity;
+		em.FlagComponents.NewComponent(e).set(ComponentFlags::UpdateTimers);
+		em.FlagComponents.GetComponent(e).set(ComponentFlags::PositionChanged);
+
 		em.PositionComponents.NewComponent(e, stateData.target.position);
-		em.FlagComponents.NewComponent(e).set(ComponentFlags::PositionChanged);
 
 		EntityUtil::PlayAnimation(e, unit.def->Weapon->TargetEffect[0]);
 		EntityUtil::SetRenderFromAnimationClip(e, unit.def->Weapon->TargetEffect[0], 0);
 		EntityUtil::SetMapObjectBoundingBoxFromRender(e);
 
-
-		EntityUtil::StartTimerMT(e, unit.def->Weapon->TargetEffect[0].GetDuration(), TimerExpiredAction::DeleteEntity);
-		++i;
 	}
+}
+
+void UnitAttackingState::EnterState(
+	UnitStateMachineChangeData& data, EntityManager& em)
+{
+	scratch.clear();
+
+	em.NewEntities(data.entities.size(), scratch);
+	em.RenderArchetype.Archetype.AddSortedEntities(scratch);
+	em.AnimationArchetype.Archetype.AddSortedEntities(scratch);
+	em.MapObjectArchetype.Archetype.AddSortedEntities(scratch);
+	em.TimingArchetype.Archetype.AddSortedEntities(scratch);
+
+	_d = &data;
+	_e = &em;
+	JobSystem::RunJob(data.size(), JobSystem::DefaultJobSize, UnitAttackingEnterStateJob);
 
 }
 void UnitAttackingState::ExitState(
-	UnitStateMachinChangeData& data, EntityManager& em)
+	UnitStateMachineChangeData& data, EntityManager& em)
 {
 	for (EntityId id : data.entities) {
 		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
@@ -207,7 +221,7 @@ void UnitAttackingState::ExitState(
 // ============================ Death State ====================================
 
 void UnitDeathState::EnterState(
-	UnitStateMachinChangeData& data, EntityManager& em)
+	UnitStateMachineChangeData& data, EntityManager& em)
 {
 
 	em.UnitArchetype.Archetype.RemoveSortedEntities(data.entities);
@@ -235,14 +249,14 @@ void UnitDeathState::EnterState(
 		int i = std::rand() % unit.def->Sounds.Death.TotalClips;
 		const auto& clip = unit.def->Sounds.Death.Clips[i];
 
-		em.SoundArchetype.SourceComponents.GetComponent(id).clip = clip;
+		em.SoundArchetype.SourceComponents.GetComponent(id).clip = &clip;
 		em.SoundArchetype.SourceComponents.GetComponent(id).priority = 100 + unit.def->AudioPriority;
 		em.FlagComponents.GetComponent(id).set(ComponentFlags::SoundTrigger);
 	}
 }
 
 void UnitDeathState::ExitState(
-	UnitStateMachinChangeData& data,  EntityManager& em)
+	UnitStateMachineChangeData& data, EntityManager& em)
 {
 	EXCEPTION("Cannot exit UnitDeathState!");
 }

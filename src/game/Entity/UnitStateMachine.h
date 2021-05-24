@@ -4,7 +4,7 @@
 
 class EntityManager;
 
-struct UnitStateMachinChangeData {
+struct UnitStateMachineChangeData {
 	std::vector<EntityId> entities;
 
 	inline void clear() { entities.clear(); }
@@ -13,8 +13,8 @@ struct UnitStateMachinChangeData {
 
 class IUnitState {
 public:
-	virtual void EnterState(UnitStateMachinChangeData& data, EntityManager& em) = 0;
-	virtual void ExitState(UnitStateMachinChangeData& data, EntityManager& em) = 0;
+	virtual void EnterState(UnitStateMachineChangeData& data, EntityManager& em) = 0;
+	virtual void ExitState(UnitStateMachineChangeData& data, EntityManager& em) = 0;
 };
 
 class UnitStateMachine {
@@ -29,30 +29,30 @@ public:
 
 class UnitIdleState : public  IUnitState {
 public:
-	virtual void EnterState(UnitStateMachinChangeData& data, EntityManager& em) override;
-	virtual void ExitState(UnitStateMachinChangeData& data, EntityManager& em) override;
+	virtual void EnterState(UnitStateMachineChangeData& data, EntityManager& em) override;
+	virtual void ExitState(UnitStateMachineChangeData& data, EntityManager& em) override;
 };
 
 class UnitTurningState : public  IUnitState {
 public:
-	virtual void EnterState(UnitStateMachinChangeData& data, EntityManager& em) override;
-	virtual void ExitState(UnitStateMachinChangeData& data, EntityManager& em) override;
+	virtual void EnterState(UnitStateMachineChangeData& data, EntityManager& em) override;
+	virtual void ExitState(UnitStateMachineChangeData& data, EntityManager& em) override;
 };
 
 class UnitMovingState : public  IUnitState {
 public:
-	virtual void EnterState(UnitStateMachinChangeData& data, EntityManager& em) override;
-	virtual void ExitState(UnitStateMachinChangeData& data, EntityManager& em) override;
+	virtual void EnterState(UnitStateMachineChangeData& data, EntityManager& em) override;
+	virtual void ExitState(UnitStateMachineChangeData& data, EntityManager& em) override;
 };
 
 class UnitAttackingState : public  IUnitState {
 public:
-	virtual void EnterState(UnitStateMachinChangeData& data, EntityManager& em) override;
-	virtual void ExitState(UnitStateMachinChangeData& data,  EntityManager& em) override;
+	virtual void EnterState(UnitStateMachineChangeData& data, EntityManager& em) override;
+	virtual void ExitState(UnitStateMachineChangeData& data,  EntityManager& em) override;
 };
 
 class UnitDeathState : public  IUnitState {
 public:
-	virtual void EnterState(UnitStateMachinChangeData& data, EntityManager& em) override;
-	virtual void ExitState(UnitStateMachinChangeData& data, EntityManager& em) override;
+	virtual void EnterState(UnitStateMachineChangeData& data, EntityManager& em) override;
+	virtual void ExitState(UnitStateMachineChangeData& data, EntityManager& em) override;
 };

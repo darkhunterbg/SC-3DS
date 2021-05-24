@@ -133,6 +133,7 @@ public:
 			EntityArchetype Archetype = EntityArchetype("Unit.FowVisible");
 		} FowVisibleArchetype;
 
+
 		ComponentCollection<UnitMovementComponent> MovementComponents;
 		ComponentCollection<UnitComponent> UnitComponents;
 		ComponentCollection<UnitDataComponent> DataComponents;
@@ -141,6 +142,8 @@ public:
 		ComponentCollection<UnitState> PrevStateComponents;
 		ComponentCollection<UnitState> StateComponents;
 		ComponentCollection<UnitStateDataComponent> StateDataComponents;
+
+		ComponentCollection< UnitWeaponComponent> WeaponComponents;
 	} UnitArchetype;
 
 

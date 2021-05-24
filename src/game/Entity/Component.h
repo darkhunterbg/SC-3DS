@@ -226,18 +226,17 @@ struct UnitMovementComponent {
 	}
 };
 
-struct AnimationOrientationComponent {
-	std::array<const AnimationClip*, 32> clips;
-	inline const AnimationClip& GetClip(int pos) const { return *clips[pos]; }
+struct UnitWeaponComponent {
+	uint8_t cooldown = 0;
 
-	inline void CopyArray(const AnimationClip(&a)[32]) {
-		for (int i = 0; i < 32; ++i) {
-			clips[i] = &a[i];
-		}
+	inline void FromDef(const WeaponDef& def) {
+		cooldown = def.Cooldown;
 	}
+};
 
-	static_assert(sizeof(clips) == 32 * sizeof(const AnimationClip*),
-		"AnimationOrientationComponent Assert fail");
+struct AnimationOrientationComponent {
+	const AnimationClip* clips;
+	inline const AnimationClip& GetClip(int pos) const { return clips[pos]; }
 };
 
 struct AnimationTrackerComponent {
@@ -283,13 +282,8 @@ struct AnimationTrackerComponent {
 };
 
 struct UnitAnimationOrientationComponent {
-	std::array<const UnitAnimationClip*, 32> clips;
-	inline const UnitAnimationClip& GetClip(int pos) const { return *clips[pos]; }
-	inline void CopyArray(const UnitAnimationClip(&a)[32]) {
-		for (int i = 0; i < 32; ++i) {
-			clips[i] = &a[i];
-		}
-	}
+	const UnitAnimationClip* clips;
+	inline const UnitAnimationClip& GetClip(int pos) const { return clips[pos]; }
 };
 
 
@@ -337,6 +331,6 @@ struct TimingActionComponent {
 
 
 struct SoundSourceComponent {
-	AudioClip clip;
+	const AudioClip* clip;
 	uint16_t priority = 0;
 };

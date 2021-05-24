@@ -45,7 +45,7 @@ void SoundSystem::CollectAudioFromSources(const Camera& camera, EntityManager& e
 
 		const SoundSourceComponent& src = em.SoundArchetype.SourceComponents.GetComponent(id);
 
-		if (src.clip.id == 0)
+		if (src.clip->id == 0)
 			continue;
 
 		const Vector2Int16& pos = em.PositionComponents.GetComponent(id);
@@ -58,7 +58,7 @@ void SoundSystem::CollectAudioFromSources(const Camera& camera, EntityManager& e
 
 			int i = 0;
 			for (const auto& clip : entityUniqueAudio) {
-				if (clip.id == src.clip.id)
+				if (clip.id == src.clip->id)
 				{
 					foundIndex = i;
 					break;
@@ -67,7 +67,7 @@ void SoundSystem::CollectAudioFromSources(const Camera& camera, EntityManager& e
 			}
 
 			if (foundIndex < 0) {
-				entityUniqueAudio.push_back(src.clip);
+				entityUniqueAudio.push_back(*src.clip);
 				uint16_t priority = src.priority;
 				float volume = isFullAudio ? 1.0f : 0.5f;
 				entityAudioPriority.push_back({ priority,  (uint16_t)entityAudioPriority.size(), volume });
