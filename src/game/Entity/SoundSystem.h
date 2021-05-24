@@ -11,8 +11,6 @@ struct AudioChannelState;
 
 
 class SoundSystem {
-	typedef uint8_t* AudioClipId;
-
 	enum UnitChatType {
 		None = 0,
 		Select = 1,
@@ -24,30 +22,38 @@ class SoundSystem {
 		EntityId id;
 	};
 
-	struct WorldAudioSetting {
+	struct EntityAudio {
 		AudioClip clip;
 		float volume = 1.0f;
+		uint16_t priority = 0;
 	};
 
-	struct EntityAudio {
+	struct EntityPriorityAudio {
 		uint16_t priority = 0;
 		uint16_t clipIndex = 0;
 	};
 
+	struct EntityAudioChannel {
+		const AudioChannelState* channel = nullptr;
+		uint16_t clipId;
+		uint16_t clipPriority;
+		bool queued = false;
+	};
+
 private:
-	std::vector<const AudioChannelState*> audioChannels;
+	std::vector<EntityAudioChannel> audioChannels;
 
 	std::vector<AudioClip> entityUniqueAudio;
-	std::vector<EntityAudio> entityAudioPriority;
+	std::vector<EntityPriorityAudio> entityAudioPriority;
 
-	std::vector<WorldAudioSetting> playWorldAudio;
+	std::vector<EntityAudio> playWorldAudio;
 
 	UnitChatRequest newChatRequest = { UnitChatType::None, Entity::None };
 	UnitChatRequest currentChat = { UnitChatType::None, Entity::None };
 
 	void CollectAudioFromSources(const Camera& camera, EntityManager& em);
 
-	static bool EntityAudioSort(const EntityAudio& a, EntityAudio& b);
+	static bool EntityAudioSort(const EntityPriorityAudio& a, EntityPriorityAudio& b);
 public:
 	SoundSystem();
 

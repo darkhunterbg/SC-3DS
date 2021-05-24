@@ -65,8 +65,10 @@ struct AudioInfo {
 
 
 struct AudioClip {
+
 	AudioInfo info;
 	uint8_t* data;
+	uint16_t id = 0;
 
 	Span< uint8_t> GetData() const {
 		return { data, (unsigned)info.GetTotalSize() };

@@ -96,7 +96,7 @@ public:
 	void Init();
 	void PlayClip(const AudioClip&, int channel);
 	void PlayStream(AudioStream* stream, int channel);
-
+	void StopChannel(int channel);
 	void SetChannelVolume(int channel, float volume);
 
 	void UpdateAudio();

@@ -46,6 +46,12 @@ void AudioSystem::PlayStream(AudioStream* stream, int c)
 	Platform::EnableChannel(channel, true);
 }
 
+void AudioSystem::StopChannel(int c)
+{
+	auto& channel = channels[c];
+	Platform::EnableChannel(channel, false);
+}
+
 void AudioSystem::SetChannelVolume(int c, float volume)
 {
 	channels[c].volume = std::min(1.0f, std::max(0.0f, volume));

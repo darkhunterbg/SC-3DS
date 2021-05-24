@@ -203,6 +203,7 @@ void UnitDeathState::EnterState(
 		const auto& clip = unit.def->Sounds.Death.Clips[i];
 
 		em.SoundArchetype.SourceComponents.GetComponent(id).clip = clip;
+		em.SoundArchetype.SourceComponents.GetComponent(id).priority = 100;
 		em.FlagComponents.GetComponent(id).set(ComponentFlags::SoundTrigger);
 	}
 }

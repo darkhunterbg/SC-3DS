@@ -91,6 +91,8 @@ AudioStream* AssetLoader::LoadAudioStream(const char* path)
 }
 
 
+static uint16_t audioClipId = 0;
+
 static AudioClip LoadAudioClipFromFile(const char* path) {
 	FILE* f = Platform::OpenAsset(path);
 
@@ -107,7 +109,7 @@ static AudioClip LoadAudioClipFromFile(const char* path) {
 	if (!WaveLoader::LoadWAVData(f, { data, (unsigned)info.GetTotalSize() }, info))
 		EXCEPTION("Failed to load WAV data in '%s'!", path);
 
-	AudioClip clip = { info, data };
+	AudioClip clip = { info, data, ++audioClipId };
 
 	fclose(f);
 
