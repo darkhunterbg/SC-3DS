@@ -103,6 +103,7 @@ enum class ComponentFlags {
 	NavigationWork = 7,
 	UpdateTimers = 8,
 	UnitStateChanged = 9,
+	SoundTrigger = 10,
 };
 
 struct FlagsComponent {
@@ -325,3 +326,7 @@ struct TimingActionComponent {
 	static constexpr const int ActionTypeCount = 4;
 };
 
+
+struct SoundSourceComponent {
+	AudioClip clip;
+};

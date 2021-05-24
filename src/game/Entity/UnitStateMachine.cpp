@@ -146,7 +146,9 @@ void UnitAttackingState::EnterState(
 
 		if (unit.def->Weapon->Sound.TotalClips > 0) {
 			int i = std::rand() % unit.def->Weapon->Sound.TotalClips;
-			em.GetSoundSystem().PlayWorldAudioClip(unit.def->Weapon->Sound.Clips[i], em.PositionComponents.GetComponent(id));
+
+			em.SoundArchetype.SourceComponents.GetComponent(id).clip = unit.def->Weapon->Sound.Clips[i];
+			em.FlagComponents.GetComponent(id).set(ComponentFlags::SoundTrigger);
 
 			//Game::Audio.PlayClip(unit.def->Weapon->Sound.Clips[0], 1);
 		}
@@ -198,8 +200,10 @@ void UnitDeathState::EnterState(
 		}
 
 		int i = std::rand() % unit.def->Sounds.Death.TotalClips;
-		em.GetSoundSystem().PlayWorldAudioClip(unit.def->Sounds.Death.Clips[i], em.PositionComponents.GetComponent(id));
-		//Game::Audio.PlayClip(unit.def->Sounds.Death.Clips[i], 1);
+		const auto& clip = unit.def->Sounds.Death.Clips[i];
+
+		em.SoundArchetype.SourceComponents.GetComponent(id).clip = clip;
+		em.FlagComponents.GetComponent(id).set(ComponentFlags::SoundTrigger);
 	}
 }
 

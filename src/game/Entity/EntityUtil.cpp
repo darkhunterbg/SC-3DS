@@ -232,6 +232,8 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 
 	em.UnitArchetype.StateComponents.NewComponent(e);
 
+	em.SoundArchetype.Archetype.AddEntity(e);
+
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::PositionChanged);
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::RenderEnabled);
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::UnitStateChanged);

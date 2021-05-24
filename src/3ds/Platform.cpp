@@ -358,15 +358,13 @@ int Platform::StartThreads(std::function<void(int)> threadWork) {
 		}
 	}
 
-
-
 	//std::string coreIds;
 	//for (int i : cores)
 	//	coreIds += std::to_string(i) + ",";
 
 	//EXCEPTION("Created threads on cores %s, %i threads", coreIds.data(), cores.size());
 
-	return 0;// threads;
+	return threads;
 }
 Semaphore Platform::CreateSemaphore() {
 	Handle* h = new Handle(0);

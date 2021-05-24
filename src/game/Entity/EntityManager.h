@@ -155,7 +155,11 @@ public:
 		ComponentCollection<Rectangle16> DestinationComponents;
 		ComponentCollection<uint8_t> MinimapColorId;
 	} MapObjectArchetype;
-
+	
+	struct {
+		EntityArchetype Archetype = EntityArchetype("Sound");
+		ComponentCollection<SoundSourceComponent> SourceComponents;
+	} SoundArchetype;
 
 private:
 	void CollectEntityChanges();

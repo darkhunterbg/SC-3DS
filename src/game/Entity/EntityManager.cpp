@@ -26,6 +26,7 @@ EntityManager::EntityManager() {
 	archetypes.push_back(&UnitArchetype.FowVisibleArchetype.Archetype);
 	archetypes.push_back(&AnimationArchetype.OrientationArchetype.Archetype);
 	archetypes.push_back(&UnitArchetype.AnimationArchetype.OrientationArchetype.Archetype);
+	archetypes.push_back(&SoundArchetype.Archetype);
 
 	EntityUtil::emInstance = this;
 	UnitEntityUtil::emInstance = this;
@@ -213,7 +214,7 @@ void EntityManager::Update2() {
 void EntityManager::Draw0(const Camera& camera) {
 	mapSystem.RedrawMinimap(*this);
 
-	soundSystem.UpdateEntityAudio(camera);
+	soundSystem.UpdateEntityAudio(camera, *this);
 }
 // Draws 24 per second (60 fps) 
 void EntityManager::Draw1(const Camera& camera) {

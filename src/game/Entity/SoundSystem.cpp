@@ -4,6 +4,8 @@
 #include "EntityManager.h"
 #include "../Profiler.h"
 
+#include <algorithm>
+
 SoundSystem::SoundSystem()
 {
 	for (const auto& channel : Game::Audio.GetAudioChannes()) {
@@ -12,49 +14,78 @@ SoundSystem::SoundSystem()
 	}
 }
 
-void SoundSystem::UpdateEntityAudio(const Camera& camera)
-{
-	SectionProfiler p("EntityAudio");
-	
+bool SoundSystem::EntityAudioSort(const EntityAudio& a, EntityAudio& b) {
+	return a.priority > b.priority;
+}
+
+void SoundSystem::CollectAudioFromSources(const Camera& camera, EntityManager& em) {
+	playWorldAudio.clear();
+	entityUniqueAudio.clear();
+	entityAudioPriority.clear();
 
 	Rectangle16 camRect = camera.GetRectangle16();
 	Rectangle16 extendedCamRect = camRect;
 	extendedCamRect.size = (extendedCamRect.size * 3) / 2;
 	extendedCamRect.SetCenter(camRect.GetCenter());
 
-	playWorldAudio.clear();
+	for (EntityId id : em.SoundArchetype.Archetype.GetEntities()) {
 
-	for (int i = 0; i < queuedAudioClips.size(); ++i) {
-		auto& queue = queuedAudioPositions[i];
-
-
-
-		if (queue.size() == 0)
+		auto& flags = em.FlagComponents.GetComponent(id);
+		if (!flags.test(ComponentFlags::SoundTrigger))
 			continue;
 
-		float volume = 0.0f;
+		flags.clear(ComponentFlags::SoundTrigger);
 
-		for (const Vector2Int16& pos : queue) {
-			if (extendedCamRect.Contains(pos)) {
-				volume = 0.5f;
+		const SoundSourceComponent& src = em.SoundArchetype.SourceComponents.GetComponent(id);
+		const Vector2Int16& pos = em.PositionComponents.GetComponent(id);
 
-				if (camRect.Contains(pos)) {
-					volume = 1.0f;
+		if (extendedCamRect.Contains(pos)) {
+
+			bool isFullAudio = camRect.Contains(pos);
+
+			int foundIndex = -1;
+
+			int i = 0;
+			for (const auto& clip : entityUniqueAudio) {
+				if (clip.data == src.clip.data)
+				{
+					foundIndex = i;
 					break;
 				}
+				++i;
+			}
+
+			if (foundIndex < 0) {
+				entityUniqueAudio.push_back(src.clip);
+				uint16_t priority = isFullAudio;
+				entityAudioPriority.push_back({ priority, (uint16_t)entityAudioPriority.size() });
+			}
+			else if (isFullAudio) {
+				entityAudioPriority[foundIndex].priority = isFullAudio;
 			}
 		}
-
-		if (volume > 0) {
-			playWorldAudio.push_back({ queuedAudioClips[i], volume });
-		}
-
-		queue.clear();
 	}
 
-	int max = std::min(playWorldAudio.size(), audioChannels.size() - 1);
+	std::sort(entityAudioPriority.begin(), entityAudioPriority.end(), EntityAudioSort);
 
-	// TODO: Priority for sounds 
+	int max = std::min(entityUniqueAudio.size(), audioChannels.size() - 1);
+
+	for (int i = 0; i < max; ++i) {
+		int index = entityAudioPriority[i].clipIndex;
+		const AudioClip& clip = entityUniqueAudio[index];
+		float volume = entityAudioPriority[i].priority > 0 ? 1 : 0.5f;
+		playWorldAudio.push_back({ clip,volume });
+	}
+
+}
+
+void SoundSystem::UpdateEntityAudio(const Camera& camera, EntityManager& em)
+{
+	SectionProfiler p("EntityAudio");
+
+	CollectAudioFromSources(camera, em);
+
+	int max = std::min(playWorldAudio.size(), audioChannels.size() - 1);
 
 	for (int i = 0; i < max; ++i) {
 		auto channel = audioChannels[i];
@@ -75,33 +106,6 @@ void SoundSystem::UpdateEntityAudio(const Camera& camera)
 	}
 }
 
-
-void SoundSystem::PlayWorldAudioClip(const AudioClip& clip, const Vector2Int16& worldPosition)
-{
-	AudioClipId id = clip.data;
-
-	for (int i = 0; i < queuedAudioIds.size(); ++i) {
-		if (queuedAudioIds[i] == id) {
-			queuedAudioPositions[i].push_back(worldPosition);
-			return;
-		}
-	}
-
-	queuedAudioIds.push_back(id);
-	queuedAudioClips.push_back(clip);
-	queuedAudioPositions.push_back(WorldAudioClipQueue());
-	queuedAudioPositions.back().push_back(worldPosition);
-}
-
-void SoundSystem::PlayWorldAudioClips(const std::vector<AudioClip>& clips, const std::vector<Vector2Int16>& positions)
-{
-	for (int j = 0; j < clips.size(); ++j) {
-		const AudioClip& clip = clips[j];
-		const Vector2Int16& pos = positions[j];
-
-		PlayWorldAudioClip(clip, pos);
-	}
-}
 
 void SoundSystem::PlayUnitChatSelect(EntityId id)
 {

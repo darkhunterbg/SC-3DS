@@ -37,6 +37,7 @@ struct AudioChannelState {
 	static constexpr const int QueueSize = 2;
 
 	bool mono = false;
+	bool playbackCompleted = true;
 
 	int ChannelId = 0;
 	float volume = 1.0f;
@@ -55,12 +56,12 @@ struct AudioChannelState {
 
 	void ClearQueue() {
 		queueSize = 0;
+		playbackCompleted = true;
 	}
 
-	bool IsDone() const { return queueSize == 0; }
+	bool IsDone() const { return queueSize == 0 && playbackCompleted; }
 
 	bool IsQueueFull() const  { return queueSize == QueueSize; }
-
 
 	bool QueueClip(AudioChannelClip clip) {
 		if (queueSize == QueueSize)
@@ -70,6 +71,7 @@ struct AudioChannelState {
 		return true;
 	}
 	void DequeueClip() {
+		playbackCompleted = true;
 		if (queueSize == 0)
 			return;
 
@@ -77,9 +79,10 @@ struct AudioChannelState {
 		if (queueSize == 0)
 			return;
 
-		auto clip = clipQueue[queueSize];
+		const auto& clip = clipQueue[queueSize];
 
 		clipQueue[queueSize - 1] = clip;
+		playbackCompleted = false;
 	}
 	bool IsValid() const { return handle != -1; }
 };
