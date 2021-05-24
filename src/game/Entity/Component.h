@@ -14,17 +14,10 @@
 
 #include "Debug.h"
 
-////template <unsigned id>
-//struct IComponent {
-//	//static constexpr const unsigned ComponentId = id;
-//};
-
-
 template <class TComponent, unsigned MaxComponents = Entity::MaxEntities>
 class ComponentCollection
 {
 private:
-	//std::array<bool, MaxComponents> hasComponent;
 	std::array<TComponent, MaxComponents> components;
 public:
 
@@ -55,17 +48,6 @@ public:
 		return components[index];
 	}
 
-	/*void RemoveComponent(EntityId id) {
-		int index = Entity::ToIndex(id);
-		if (!hasComponent[index])
-			EXCEPTION("Entity %i does not have component!", id);
-
-		hasComponent[index] = false;
-
-	}
-	inline bool HasComponent(EntityId id) const {
-		return hasComponent[Entity::ToIndex(id)];
-	}*/
 
 	inline void CopyComponent(EntityId from, EntityId to) {
 		components[Entity::ToIndex(to)] = components[Entity::ToIndex(from)];
@@ -76,11 +58,6 @@ public:
 	inline const TComponent& GetComponent(EntityId id) const {
 		return components[Entity::ToIndex(id)];
 	}
-	/*inline const TComponent* TryGetComponent(EntityId id) const {
-		if (!hasComponent[Entity::ToIndex(id)])
-			return nullptr;
-		return components[Entity::ToIndex(id)];
-	}*/
 
 	inline TComponent& at(int i) { return components[i]; };
 	inline const TComponent& at(int i) const { return components[i]; }
@@ -105,6 +82,7 @@ enum class ComponentFlags {
 	UnitStateChanged = 9,
 	SoundTrigger = 10,
 	SoundMuted = 11,
+	UnitAIPaused = 12,
 };
 
 struct FlagsComponent {
@@ -192,8 +170,21 @@ struct UnitStateDataComponent {
 		EntityId entityId;
 		Vector2Int16 position;
 	} target = { 0 };
-
 };
+
+enum class UnitAIState :uint8_t {
+	Idle = 0,
+	AttackTarget = 1,
+	GoToPosition = 2,
+};
+
+struct UnitAIStateDataComponent {
+	union {
+		EntityId entityId;
+		Vector2Int16 position;
+	} target = { 0 };
+};
+
 
 struct UnitComponent {
 	const UnitDef* def;
@@ -227,11 +218,20 @@ struct UnitMovementComponent {
 };
 
 struct UnitWeaponComponent {
-	uint8_t cooldown = 0;
+	uint8_t maxRange = 1;
+	uint8_t cooldown = 1;
+
+	uint8_t remainingCooldown = 0;
 
 	inline void FromDef(const WeaponDef& def) {
+		maxRange = def.MaxRange;
 		cooldown = def.Cooldown;
 	}
+
+	inline void StartCooldown() {
+		remainingCooldown = cooldown;
+	}
+	inline bool IsReady() const { return remainingCooldown == 0; }
 };
 
 struct AnimationOrientationComponent {

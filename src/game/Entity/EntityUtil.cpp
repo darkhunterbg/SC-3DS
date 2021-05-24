@@ -245,6 +245,9 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 
 	em.UnitArchetype.StateComponents.NewComponent(e);
 
+	em.UnitArchetype.AIStateComponents.NewComponent(e, UnitAIState::Idle);
+	em.UnitArchetype.AIStateDataComponents.NewComponent(e);
+
 	em.SoundArchetype.Archetype.AddEntity(e);
 
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::PositionChanged);
@@ -281,11 +284,20 @@ void UnitEntityUtil::AttackPosition(EntityId id, Vector2Int16 pos)
 	uint8_t t = EntityUtil::GetOrientationToPosition(id, pos);
 
 	em.UnitArchetype.StateDataComponents.GetComponent(id).target.position = pos;
-	em.UnitArchetype.StateComponents.GetComponent(id) =UnitState::Attacking;
+	em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Attacking;
 	em.OrientationComponents.GetComponent(id) = t;
 	em.FlagComponents.GetComponent(id).set(ComponentFlags::OrientationChanged);
 	em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
 	em.FlagComponents.GetComponent(id).clear(ComponentFlags::NavigationWork);
 
+}
+
+void UnitEntityUtil::GoTo(EntityId id, Vector2Int16 pos)
+{
+	EntityManager& em = GetManager();
+
+	em.FlagComponents.GetComponent(id).set(ComponentFlags::NavigationWork);
+	em.NavigationArchetype.NavigationComponents.GetComponent(id).target = pos;
+	em.NavigationArchetype.NavigationComponents.GetComponent(id).targetHeading = 255;
 }
 

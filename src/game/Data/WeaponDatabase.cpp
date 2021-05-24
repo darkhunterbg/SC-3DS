@@ -9,6 +9,8 @@ static void GaussRifleData() {
 	auto& d = WeaponDatabase::GaussRifle;
 	d.Name = "Gauss Rifle";
 	d.Cooldown = 15;
+	d.MaxRange = 4;
+	d.Damage = 6;
 	d.Sound = { "sound/bullet/tmafir00", 1 , true };
 
 	d.TargetEffectDef.FrameCount = 15;
@@ -27,6 +29,8 @@ static void FusionCutterData() {
 	auto& d = WeaponDatabase::FusionCutter;
 	d.Name = "Fusion Cutter";
 	d.Cooldown = 15;
+	d.MaxRange = 0;
+	d.Damage = 5;
 	d.Sound = { "sound/terran/scv/edrrep", 5  };
 
 	d.TargetEffectDef.FrameCount = 15;

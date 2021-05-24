@@ -44,16 +44,14 @@ struct Vector2T
 	constexpr Vector2T() {
 		x = 0, y = 0;
 	}
-	constexpr Vector2T(T x, T y) { this->x = x; this->y = y; }
-	Vector2T(const Vector2T& o) { x = o.x, y = o.y; }
+	constexpr Vector2T(T x, T y) : x(x), y(y) {}
+	Vector2T(const Vector2T& o) = default;
 	template<class T2>
 	constexpr explicit Vector2T(const Vector2T<T2>& a) {
 		x = (T)a.x;
 		y = (T)a.y;
 	}
-	constexpr Vector2T(T all) {
-		x = all, y = all;
-	}
+	constexpr Vector2T(T all) : x(all), y(all) {}
 
 	constexpr inline float Length() const
 	{
@@ -68,6 +66,10 @@ struct Vector2T
 	constexpr inline unsigned LengthSquaredInt() const
 	{
 		return x * (unsigned)x + y * (unsigned)y;
+	}
+
+	constexpr inline unsigned SumLengthInt() const {
+		return std::abs(x) + std::abs(y);
 	}
 
 	constexpr inline void Normalize()

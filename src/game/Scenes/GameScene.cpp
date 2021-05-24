@@ -73,8 +73,8 @@ void GameScene::Start() {
 	//	Vector2Int16(48, 48));
 	EntityId e = 0;
 	int i = 0;
-	for (int y = 40; y > 0; --y) {
-		for (int x = 40; x > 0; --x) {
+	for (int y = 1; y > 0; --y) {
+		for (int x = 1; x > 0; --x) {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[i % 2];
 			e = UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
@@ -147,9 +147,15 @@ void GameScene::Update() {
 
 		if (Game::Gamepad.IsButtonPressed(GamepadButton::X)) {
 
+			Vector2Int16 pos = camera.ScreenToWorld(cursor->Position);
+
 			for (EntityId id : selection)
 				if (entityManager->UnitArchetype.Archetype.HasEntity(id)) {
-					entityManager->GoTo(id, Vector2Int16(camera.ScreenToWorld(cursor->Position)));
+					entityManager->UnitArchetype.AIStateComponents.GetComponent(id)
+						= UnitAIState::GoToPosition;
+
+					entityManager->UnitArchetype.AIStateDataComponents.GetComponent(id)
+						.target.position = pos;
 
 					entityManager->GetSoundSystem().PlayUnitChatCommand(id);
 				}
@@ -160,7 +166,14 @@ void GameScene::Update() {
 			Vector2Int16 pos = camera.ScreenToWorld(cursor->Position);
 
 			for (EntityId id : selection) {
-				UnitEntityUtil::AttackPosition(id, pos);
+
+				entityManager->UnitArchetype.AIStateComponents.GetComponent(id)
+					= UnitAIState::AttackTarget;
+
+				entityManager->UnitArchetype.AIStateDataComponents.GetComponent(id)
+					.target.position = pos;
+
+				//UnitEntityUtil::AttackPosition(id, pos);
 
 
 				entityManager->GetSoundSystem().PlayUnitChatCommand(id);

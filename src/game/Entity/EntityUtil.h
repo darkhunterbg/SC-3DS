@@ -91,4 +91,6 @@ public:
 	static EntityId NewUnit(const UnitDef& def, PlayerId player, Vector2Int16 position, EntityId id = Entity::None);
 
 	static void AttackPosition(EntityId id, Vector2Int16 pos);
+
+	static void GoTo(EntityId id, Vector2Int16 pos);
 };

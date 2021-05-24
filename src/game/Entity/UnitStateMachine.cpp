@@ -164,14 +164,17 @@ static void  UnitAttackingEnterStateJob(int start, int end) {
 			flags.set(ComponentFlags::SoundTrigger);
 		}
 
-		const UnitWeaponComponent& weapon = em.UnitArchetype.WeaponComponents.GetComponent(id);
+		UnitWeaponComponent& weapon = em.UnitArchetype.WeaponComponents.GetComponent(id);
+		weapon.StartCooldown();
 
 		TimingComponent& timer = em.TimingArchetype.TimingComponents.GetComponent(id);
 		TimingActionComponent& timerAction = em.TimingArchetype.ActionComponents.GetComponent(id);
 
-		timer.NewTimer(weapon.cooldown );
+		// TODO: from weapon component because speed can be modified
+		timer.NewTimer(unit.def->Graphics->AttackAnimations[0].GetDuration());
 		timerAction.action = TimerExpiredAction::WeaponAttack;
 		flags.set(ComponentFlags::UpdateTimers);
+		flags.set(ComponentFlags::UnitAIPaused);
 
 		// Particle Effect
 

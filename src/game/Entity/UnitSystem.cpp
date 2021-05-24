@@ -7,6 +7,52 @@
 
 // =============================== Unit System =================================
 
+UnitSystem::UnitSystem()
+{
+	for (int i = 0; i < UnitAIStateMachine::States.size(); ++i) {
+		aiThinkData.push_back(UnitAIStateMachineData());
+	}
+}
+
+void UnitSystem::UnitAIUpdate(EntityManager& em) {
+	for (auto& data : aiThinkData) {
+		data.clear();
+	}
+
+	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {
+
+		if (em.FlagComponents.GetComponent(id).test(ComponentFlags::UnitAIPaused))
+			continue;
+
+		UnitAIState state = em.UnitArchetype.AIStateComponents.GetComponent(id);
+		const auto& stateData = em.UnitArchetype.AIStateDataComponents.GetComponent(id);
+		const auto& position = em.PositionComponents.GetComponent(id);
+
+		auto& thinkData = aiThinkData[(int)state];
+
+		thinkData.entities.push_back(id);
+		thinkData.stateData.push_back(stateData);
+		thinkData.position.push_back(position);
+	}
+
+	for (int i = 0; i < UnitAIStateMachine::States.size(); ++i) {
+		auto& state = *UnitAIStateMachine::States[i];
+		auto& data = aiThinkData[i];
+		if (data.size())
+			state.Think(data, em);
+	}
+
+}
+
+void UnitSystem::UpdateUnitCooldowns(EntityManager& em)
+{
+	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {
+		auto& weapon = em.UnitArchetype.WeaponComponents.GetComponent(id);
+		if (!weapon.IsReady())
+			--weapon.remainingCooldown;
+	}
+}
+
 void UnitSystem::ApplyUnitState(EntityManager& em) {
 	for (auto& data : exitStateData)
 		data.clear();

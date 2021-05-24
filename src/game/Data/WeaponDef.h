@@ -10,6 +10,7 @@ struct WeaponDef {
 	std::string Name;
 
 	uint16_t Damage = 1;
+	uint8_t MaxRange = 1;
 	uint8_t Cooldown = 1;
 
 	UnitSound Sound;

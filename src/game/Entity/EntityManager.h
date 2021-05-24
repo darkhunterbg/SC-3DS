@@ -144,6 +144,9 @@ public:
 		ComponentCollection<UnitStateDataComponent> StateDataComponents;
 
 		ComponentCollection< UnitWeaponComponent> WeaponComponents;
+
+		ComponentCollection<UnitAIState> AIStateComponents;
+		ComponentCollection<UnitAIStateDataComponent> AIStateDataComponents;
 	} UnitArchetype;
 
 
@@ -216,8 +219,6 @@ public:
 	void Draw(const Camera& camera);
 
 	void FullUpdate(const Camera& camera);
-
-	void GoTo(EntityId e, Vector2Int16 pos);
 
 	inline bool CollidesWithAny(const Rectangle16& collider, EntityId skip) {
 

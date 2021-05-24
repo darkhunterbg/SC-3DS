@@ -171,9 +171,13 @@ void EntityManager::Update0(const Camera& camera) {
 }
 // Updates 24 per second (60 fps) 
 void EntityManager::Update1(const Camera& camera) {
+
 	timingSystem.UpdateTimers(*this);
 
 	//navigationSystem.UpdateNavGrid(*this);
+	unitSystem.UpdateUnitCooldowns(*this);
+
+	unitSystem.UnitAIUpdate(*this);
 
 	navigationSystem.UpdateNavigation(*this);
 
@@ -181,7 +185,7 @@ void EntityManager::Update1(const Camera& camera) {
 
 	animationSystem.TickAnimations(*this);
 
-	renderSystem.UpdatePositions(*this, changedData);
+	//renderSystem.UpdatePositions(*this, changedData);
 }
 // Update 24 per second (60 fps) 
 void EntityManager::Update2(const Camera& camera) {
@@ -302,9 +306,3 @@ void EntityManager::Draw(const Camera& camera) {
 		updateId = (updateId + 1) / 2;
 }
 
-void EntityManager::GoTo(EntityId e, Vector2Int16 pos) {
-
-	FlagComponents.GetComponent(e).set(ComponentFlags::NavigationWork);
-	NavigationArchetype.NavigationComponents.GetComponent(e).target = pos;
-	NavigationArchetype.NavigationComponents.GetComponent(e).targetHeading = 255;
-}
