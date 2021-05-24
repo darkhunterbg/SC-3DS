@@ -162,13 +162,15 @@ void EntityManager::UpdateChildren() {
 }
 
 // Updates 12 per second (60 fps) 
-void EntityManager::Update0() {
+void EntityManager::Update0(const Camera& camera) {
 
 	playerSystem.UpdateNextPlayerVision();
 
+	soundSystem.UpdateEntityAudio(camera, *this);
+
 }
 // Updates 24 per second (60 fps) 
-void EntityManager::Update1() {
+void EntityManager::Update1(const Camera& camera) {
 	timingSystem.UpdateTimers(*this);
 
 	//navigationSystem.UpdateNavGrid(*this);
@@ -182,7 +184,7 @@ void EntityManager::Update1() {
 	renderSystem.UpdatePositions(*this, changedData);
 }
 // Update 24 per second (60 fps) 
-void EntityManager::Update2() {
+void EntityManager::Update2(const Camera& camera) {
 	ready = true;
 
 	timingSystem.ApplyTimerActions(*this);
@@ -213,8 +215,6 @@ void EntityManager::Update2() {
 // Draws 12 per second (60 fps) 
 void EntityManager::Draw0(const Camera& camera) {
 	mapSystem.RedrawMinimap(*this);
-
-	soundSystem.UpdateEntityAudio(camera, *this);
 }
 // Draws 24 per second (60 fps) 
 void EntityManager::Draw1(const Camera& camera) {
@@ -225,23 +225,23 @@ void EntityManager::Draw2(const Camera& camera) {
 
 }
 
-void EntityManager::FrameUpdate() {
+void EntityManager::FrameUpdate(const Camera& camera) {
 
 	switch (updateId)
 	{
 	case 0: {
 		SectionProfiler p("Update0");
-		Update0();
+		Update0(camera);
 		break;
 	}
 	case 1: {
 		SectionProfiler p("Update1");
-		Update1();
+		Update1(camera);
 		break;
 	}
 	case 2: {
 		SectionProfiler p("Update2");
-		Update2();
+		Update2(camera);
 		break;
 	}
 	default:
@@ -251,16 +251,16 @@ void EntityManager::FrameUpdate() {
 	//Util::RealTimeStat("Entities", entities.size());
 }
 
-void EntityManager::FullUpdate() {
+void EntityManager::FullUpdate(const Camera& camera) {
 
 	// Hack
 	//playerSystem.UpdatePlayerUnits(*this);
 
 	//ApplyEntityChanges();
 
-	Update0();
-	Update1();
-	Update2();
+	Update0(camera);
+	Update1(camera);
+	Update2(camera);
 }
 
 void EntityManager::Draw(const Camera& camera) {

@@ -23,6 +23,7 @@ struct UnitDef {
 
 	uint8_t UseSupplyDoubled = 0;
 	uint8_t ProvideSupplyDoubled = 0;
+	uint16_t AudioPriority = 0;
 
 	struct {
 		UnitSound Ready;

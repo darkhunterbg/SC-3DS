@@ -104,6 +104,7 @@ enum class ComponentFlags {
 	UpdateTimers = 8,
 	UnitStateChanged = 9,
 	SoundTrigger = 10,
+	SoundMuted = 11,
 };
 
 struct FlagsComponent {

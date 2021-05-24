@@ -26,6 +26,8 @@ static void MarineData() {
 	u.Sounds.What = { "sound/terran/marine/tmawht", 4 };
 	u.Sounds.Yes = { "sound/terran/marine/tmayes", 4 };
 	u.Graphics = &GraphicsDatabase::Marine;
+
+	u.AudioPriority = 1;
 }
 static void SCVData() {
 	UnitDef& u = UnitDatabase::SCV;

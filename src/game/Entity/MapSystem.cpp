@@ -126,6 +126,7 @@ void MapSystem::UpdateVisibleRenderUnits(EntityManager& em) {
 
 		if (!visible && FogOfWarVisible) {
 			removedEntities.push_back(id);
+			em.FlagComponents.GetComponent(id).set(ComponentFlags::SoundMuted);
 		}
 	}
 
@@ -139,6 +140,7 @@ void MapSystem::UpdateVisibleRenderUnits(EntityManager& em) {
 		if (visible || !FogOfWarVisible) {
 			addedEntities.push_back(id);
 			em.FlagComponents.GetComponent(id).set(ComponentFlags::RenderChanged);
+			em.FlagComponents.GetComponent(id).clear(ComponentFlags::SoundMuted);
 		}
 	}
 

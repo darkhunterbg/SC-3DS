@@ -94,7 +94,7 @@ void GameScene::Start() {
 
 	//entityManager->UnitArchetype.StateComponents.GetComponent(e) = UnitState::Attacking;
 
-	entityManager->FullUpdate();
+	entityManager->FullUpdate(camera);
 }
 
 int t = 0;
@@ -102,7 +102,7 @@ int t = 0;
 
 void GameScene::Update() {
 
-	entityManager->FrameUpdate();
+	entityManager->FrameUpdate(camera);
 
 	t++;
 

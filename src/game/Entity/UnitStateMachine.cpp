@@ -148,6 +148,7 @@ void UnitAttackingState::EnterState(
 			int i = std::rand() % unit.def->Weapon->Sound.TotalClips;
 
 			em.SoundArchetype.SourceComponents.GetComponent(id).clip = unit.def->Weapon->Sound.Clips[i];
+			em.SoundArchetype.SourceComponents.GetComponent(id).priority = unit.def->AudioPriority;
 			em.FlagComponents.GetComponent(id).set(ComponentFlags::SoundTrigger);
 
 			//Game::Audio.PlayClip(unit.def->Weapon->Sound.Clips[0], 1);
@@ -203,7 +204,7 @@ void UnitDeathState::EnterState(
 		const auto& clip = unit.def->Sounds.Death.Clips[i];
 
 		em.SoundArchetype.SourceComponents.GetComponent(id).clip = clip;
-		em.SoundArchetype.SourceComponents.GetComponent(id).priority = 100;
+		em.SoundArchetype.SourceComponents.GetComponent(id).priority = 100 + unit.def->AudioPriority;
 		em.FlagComponents.GetComponent(id).set(ComponentFlags::SoundTrigger);
 	}
 }

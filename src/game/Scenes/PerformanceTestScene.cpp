@@ -21,6 +21,8 @@ void PerformanceTestScene::Start() {
 	entityManager.Init({ 128 * 32,128 * 32 });
 	entityManager.GetPlayerSystem().AddPlayer(RaceDatabase::Terran, Colors::White);
 
+
+
 	//entityManager.DrawColliders = true;
 
 	//for (int i = 0; i < 5000; ++i) {
@@ -42,6 +44,8 @@ void PerformanceTestScene::Start() {
 
 	//	//entityManager.GoTo(i, { 1024,1024 });
 	//}
+
+	entityManager.FullUpdate(camera);
 }
 static int t = 0;
 static int c = 0;
@@ -65,7 +69,7 @@ void PerformanceTestScene::Update() {
 	//	entityManager.ClearEntitiesArchetypes(v);
 	//}
 	//entityManager.ClearEntities();
-	entityManager.FrameUpdate();
+	entityManager.FrameUpdate(camera);
 }
 
 

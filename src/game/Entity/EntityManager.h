@@ -166,9 +166,9 @@ private:
 	void ApplyEntityChanges();
 	void UpdateChildren();
 
-	void Update0();
-	void Update1();
-	void Update2();
+	void Update0(const Camera& camera);
+	void Update1(const Camera& camera);
+	void Update2(const Camera& camera);
 	void Draw0(const Camera& camera);
 	void Draw1(const Camera& camera);
 	void Draw2(const Camera& camera);
@@ -207,11 +207,11 @@ public:
 	}
 	void ClearEntities();
 
-	void FrameUpdate();
+	void FrameUpdate(const Camera& camera);
 
 	void Draw(const Camera& camera);
 
-	void FullUpdate();
+	void FullUpdate(const Camera& camera);
 
 	void GoTo(EntityId e, Vector2Int16 pos);
 

@@ -6,7 +6,6 @@
 
 #include <algorithm>
 
-static constexpr const uint16_t FullAudioPriority = 0xFE00;
 
 SoundSystem::SoundSystem()
 {
@@ -41,6 +40,9 @@ void SoundSystem::CollectAudioFromSources(const Camera& camera, EntityManager& e
 
 		flags.clear(ComponentFlags::SoundTrigger);
 
+		if (flags.test(ComponentFlags::SoundMuted))
+			continue;
+
 		const SoundSourceComponent& src = em.SoundArchetype.SourceComponents.GetComponent(id);
 
 		if (src.clip.id == 0)
@@ -50,7 +52,7 @@ void SoundSystem::CollectAudioFromSources(const Camera& camera, EntityManager& e
 
 		if (extendedCamRect.Contains(pos)) {
 
-			bool isFullAudio = camRect.Contains(pos);
+			float isFullAudio = camRect.Contains(pos);
 
 			int foundIndex = -1;
 
@@ -66,12 +68,14 @@ void SoundSystem::CollectAudioFromSources(const Camera& camera, EntityManager& e
 
 			if (foundIndex < 0) {
 				entityUniqueAudio.push_back(src.clip);
-				uint16_t priority = (FullAudioPriority * isFullAudio) + src.priority;
-				entityAudioPriority.push_back({ priority, (uint16_t)entityAudioPriority.size() });
+				uint16_t priority = src.priority;
+				float volume = isFullAudio ? 1.0f : 0.5f;
+				entityAudioPriority.push_back({ priority,  (uint16_t)entityAudioPriority.size(), volume });
 			}
 			else if (isFullAudio) {
-				uint16_t priority = FullAudioPriority + src.priority;;
-				entityAudioPriority[foundIndex].priority = priority;
+
+				entityAudioPriority[foundIndex].priority = src.priority;
+				entityAudioPriority[foundIndex].volume = 1.0f;
 			}
 		}
 	}
@@ -84,16 +88,15 @@ void SoundSystem::CollectAudioFromSources(const Camera& camera, EntityManager& e
 		int index = entityAudioPriority[i].clipIndex;
 		const AudioClip& clip = entityUniqueAudio[index];
 		uint16_t priority = entityAudioPriority[i].priority;
-		float volume = (priority >= FullAudioPriority) ? 1 : 0.5f;
-		playWorldAudio.push_back({ clip,volume , priority });
+		float volume = entityAudioPriority[i].volume;
+
+		playWorldAudio.push_back({ clip,volume, priority });
 	}
 
 }
 
 void SoundSystem::UpdateEntityAudio(const Camera& camera, EntityManager& em)
 {
-	SectionProfiler p("EntityAudio");
-
 	CollectAudioFromSources(camera, em);
 
 	int max = std::min(playWorldAudio.size(), audioChannels.size() - 1);
@@ -156,7 +159,7 @@ void SoundSystem::UpdateEntityAudio(const Camera& camera, EntityManager& em)
 		}
 	}
 
-	
+
 }
 
 
@@ -225,7 +228,7 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 	}
 
 	if (currentChat.id != Entity::None && channel.channel->IsDone()) {
-		
+
 	}
 }
 

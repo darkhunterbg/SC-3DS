@@ -31,6 +31,7 @@ class SoundSystem {
 	struct EntityPriorityAudio {
 		uint16_t priority = 0;
 		uint16_t clipIndex = 0;
+		float volume = 0;
 	};
 
 	struct EntityAudioChannel {
