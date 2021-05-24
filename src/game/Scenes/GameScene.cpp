@@ -14,6 +14,7 @@ static std::vector<EntityId> selection;
 
 GameScene::GameScene() {
 
+
 }
 
 GameScene::~GameScene() {
@@ -62,9 +63,10 @@ void GameScene::Start() {
 	//UnitEntityUtil::NewUnit(UnitDatabase::MineralField1, 0,
 	//	Vector2Int16(128, 256));
 
-	//UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 2,
-	//	Vector2Int16(256, 128));
-
+	for (int i = 0; i < 5; ++i) {
+		UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 2,
+			Vector2Int16(600, 32 * i+32));
+	}
 
 	//UnitEntityUtil::NewUnit(*UnitDatabase::Units[1], 2,
 	//	Vector2Int16(400, 300));
@@ -73,11 +75,11 @@ void GameScene::Start() {
 	//	Vector2Int16(48, 48));
 	EntityId e = 0;
 	int i = 0;
-	for (int y = 10; y > 0; --y) {
-		for (int x = 10; x > 0; --x) {
+	for (int y = 4; y > 0; --y) {
+		for (int x = 4; x > 0; --x) {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[0];
-			e = UnitEntityUtil::NewUnit(def, 1 + i / 50,// 1 + i % totalPlayers,
+			e = UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
 				Vector2Int16(Vector2Int{ x * 32 + 48,y * 32 + 48 }));
 
 			//entityManager->UnitArchetype.OrientationComponents.GetComponent(e) = 12;

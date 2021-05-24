@@ -16,10 +16,13 @@ void UnitAIIdleState::Think(UnitAIStateMachineData& data, EntityManager& em)
 	for (int i = start; i < end; ++i) {
 		scratch.clear();
 
+
 		EntityId id = data.entities[i];
 		const auto& stateData = data.stateData[i];
 		const auto& pos = data.position[i];
 		const auto& owner = data.owner[i];
+
+		em.MovementArchetype.MovementComponents.GetComponent(id).velocity = { 0,0 };
 
 		const auto& unitData = em.UnitArchetype.DataComponents.GetComponent(id);
 
@@ -40,7 +43,7 @@ void UnitAIIdleState::Think(UnitAIStateMachineData& data, EntityManager& em)
 
 				if (em.UnitArchetype.OwnerComponents.GetComponent(e) != owner) {
 
-					int t = em.PositionComponents.GetComponent(e).LengthSquaredInt();
+					int t = (em.PositionComponents.GetComponent(e) - pos).LengthSquaredInt();
 					if (t < nearest)
 					{
 						nearest = t;
@@ -85,7 +88,7 @@ void UnitAIAttackTargetState::Think(UnitAIStateMachineData& data, EntityManager&
 		if (distance.LengthSquaredInt() <= range * range) {
 
 			if (weapon.IsReady())
-				UnitEntityUtil::AttackPosition(id, targetPos);
+				UnitEntityUtil::AttackTarget(id, target);
 		}
 		else {
 			UnitEntityUtil::GoTo(id, targetPos);
@@ -108,7 +111,17 @@ void UnitAIGoToState::Think(UnitAIStateMachineData& data, EntityManager& em)
 			em.UnitArchetype.AIStateComponents.GetComponent(id) = UnitAIState::Idle;
 			em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
 		}
-		else {
+		else if (distance.LengthSquaredInt() < 128) {
+
+			scratch.clear();
+			em.GetKinematicSystem().RectCast({ stateData.target.position, {32,32} }, scratch);
+			if (scratch.size()) {
+				em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Idle;
+				em.UnitArchetype.AIStateComponents.GetComponent(id) = UnitAIState::Idle;
+				em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
+			}
+		}
+		else{
 			em.FlagComponents.GetComponent(id).set(ComponentFlags::NavigationWork);
 			em.NavigationArchetype.NavigationComponents.GetComponent(id).target = stateData.target.position;
 

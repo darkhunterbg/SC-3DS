@@ -6,8 +6,10 @@
 
 void TimingSystem::UpdateTimers(EntityManager& em)
 {
+	int x = -1;
 	for (EntityId id : em.TimingArchetype.Archetype.GetEntities()) {
 		int i = Entity::ToIndex(id);
+		x++;
 
 		auto& f = em.FlagComponents[i];
 		if (!f.test(ComponentFlags::UpdateTimers))
@@ -18,6 +20,16 @@ void TimingSystem::UpdateTimers(EntityManager& em)
 		if (t.timer == 0) {
 			auto& a = em.TimingArchetype.ActionComponents[i];
 			GetActionEntityTable(a.action).push_back(id);
+
+
+		/*	auto& table = GetActionEntityTable(a.action);
+				for (int i = 0; i < table.size(); ++i) {
+					for (int j = i + 1; j < table.size(); ++j) {
+						if (table[i] >= table[j])
+							EXCEPTION("UNSORTED ACTION TABLE!");
+					}
+				}*/
+			
 
 			if (t.nextTimer > 0) {
 				t.timer = t.nextTimer;
@@ -50,7 +62,7 @@ void TimingSystem::WeaponAttack(std::vector<EntityId>& entities, EntityManager& 
 void TimingSystem::UnitDeathAfterEffect(std::vector<EntityId>& entities, EntityManager& em) {
 	if (entities.size() > 0) {
 		unsigned total = entities.size();
-	
+
 		em.NewEntities(total, scratch);
 		em.RenderArchetype.Archetype.AddSortedEntities(scratch);
 		em.AnimationArchetype.Archetype.AddSortedEntities(scratch);
@@ -65,7 +77,7 @@ void TimingSystem::UnitDeathAfterEffect(std::vector<EntityId>& entities, EntityM
 			const auto& clip = def->Graphics->DeathAfterEffect.Clip;
 
 			em.PositionComponents.NewComponent(id) = em.PositionComponents.GetComponent(old);
-					
+
 			EntityUtil::SetRenderFromAnimationClip(id, clip, 0);
 			em.RenderArchetype.RenderComponents.GetComponent(id).depth = def->Graphics->DeathAfterEffect.Depth;
 			em.RenderArchetype.BoundingBoxComponents.GetComponent(id)

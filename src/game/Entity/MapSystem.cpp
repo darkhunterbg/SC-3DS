@@ -83,6 +83,12 @@ void MapSystem::UpdateVisibleRenderEntities(EntityManager& em) {
 		bool visible = vision.IsVisible(dst);
 
 		if (!visible && FogOfWarVisible) {
+		/*	for (int i = 0; i < removedEntities.size(); ++i)
+			{
+				if (removedEntities[i] == id)
+					EXCEPTION("DUPLICATED ENTITIES!");
+			}*/
+
 			removedEntities.push_back(id);
 		}
 	}
@@ -99,6 +105,15 @@ void MapSystem::UpdateVisibleRenderEntities(EntityManager& em) {
 			em.FlagComponents.GetComponent(id).set(ComponentFlags::RenderChanged);
 		}
 	}
+
+	for (int i = 0; i < removedEntities.size() ; ++i)
+	{
+		for (int j = i + 1; j < removedEntities.size(); ++j) {
+			if (removedEntities[i] == removedEntities[j])
+				EXCEPTION("DUPLICATED ENTITIES!");
+		}
+	}
+
 
 	em.RenderArchetype.Archetype.RemoveSortedEntities(removedEntities);
 	em.HiddenArchetype.Archetype.AddSortedEntities(removedEntities);
@@ -133,7 +148,7 @@ void MapSystem::UpdateVisibleRenderUnits(EntityManager& em) {
 	addedEntities.clear();
 
 	for (EntityId id : em.UnitArchetype.HiddenArchetype.Archetype.GetEntities()) {
-	
+
 		const Rectangle16& dst = em.MapObjectArchetype.DestinationComponents.GetComponent(id);
 		bool visible = vision.IsVisible(dst);
 
@@ -196,7 +211,7 @@ void MapSystem::UpdateFowVisibleUnits(EntityManager& em) {
 
 	em.DeleteEntities(scratch);
 
-	
+
 	if (removedEntities.size() > 0)
 	{
 

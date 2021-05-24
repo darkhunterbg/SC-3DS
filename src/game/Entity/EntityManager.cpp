@@ -172,16 +172,19 @@ void EntityManager::Update0(const Camera& camera) {
 // Updates 24 per second (60 fps) 
 void EntityManager::Update1(const Camera& camera) {
 
+	playerSystem.UpdateNextPlayerVision();
+
 	timingSystem.UpdateTimers(*this);
 
 	//navigationSystem.UpdateNavGrid(*this);
 	unitSystem.UpdateUnitCooldowns(*this);
 
-	unitSystem.UnitAIUpdate(*this);
 
 	navigationSystem.UpdateNavigation(*this);
 
 	navigationSystem.ApplyUnitNavigaion(*this);
+
+	unitSystem.UnitAIUpdate(*this);
 
 	animationSystem.TickAnimations(*this);
 
@@ -189,9 +192,9 @@ void EntityManager::Update1(const Camera& camera) {
 }
 // Update 24 per second (60 fps) 
 void EntityManager::Update2(const Camera& camera) {
-	ready = true;
-
 	timingSystem.ApplyTimerActions(*this);
+
+	unitSystem.UpdateUnitStats(*this);
 
 	unitSystem.ApplyUnitState(*this);
 
@@ -229,39 +232,54 @@ void EntityManager::Draw2(const Camera& camera) {
 
 }
 
+static int updates[3] = { 0,0,0 };
+
+int last = -1;
+
 void EntityManager::FrameUpdate(const Camera& camera) {
+
+	ready = true;
+	//FullUpdate(camera);
+
+	if (updateId == last)
+		EXCEPTION("TRIED TO UPDATE TWICE");
 
 	switch (updateId)
 	{
 	case 0: {
 		SectionProfiler p("Update0");
+
 		Update0(camera);
+
+		updates[0]++;
 		break;
 	}
 	case 1: {
 		SectionProfiler p("Update1");
 		Update1(camera);
+
+		updates[1]++;
 		break;
 	}
 	case 2: {
 		SectionProfiler p("Update2");
 		Update2(camera);
+
+
+		updates[2]++;
 		break;
 	}
 	default:
 		EXCEPTION("Invalid UpdateId %i", updateId);
 	}
 
+
+	last = updateId;
+
 	//Util::RealTimeStat("Entities", entities.size());
 }
 
 void EntityManager::FullUpdate(const Camera& camera) {
-
-	// Hack
-	//playerSystem.UpdatePlayerUnits(*this);
-
-	//ApplyEntityChanges();
-
 	Update0(camera);
 	Update1(camera);
 	Update2(camera);
@@ -296,13 +314,14 @@ void EntityManager::Draw(const Camera& camera) {
 		if (DrawGrid)
 			mapSystem.DrawGrid(camera);
 
+
+
+		soundSystem.UpdateChatRequest(*this);
+
+		frameCounter++;
+		updateId = (frameCounter % 5);
+		if (updateId > 2)
+			updateId = updateId % 3 + 1;
 	}
-
-	soundSystem.UpdateChatRequest(*this);
-
-	frameCounter++;
-	updateId = (frameCounter % 5);
-	if (updateId > 0)
-		updateId = (updateId + 1) / 2;
 }
 

@@ -175,6 +175,7 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 
 	em.FlagComponents.NewComponent(e);
 	em.UnitArchetype.UnitComponents.NewComponent(e, { &def });
+	em.UnitArchetype.HealthComponents.NewComponent(e).FromDef(def);
 
 	em.UnitArchetype.MovementComponents.NewComponent(e).FromDef(def);
 	em.UnitArchetype.DataComponents.NewComponent(e).FromDef(def);
@@ -277,19 +278,14 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 	return e;
 }
 
-void UnitEntityUtil::AttackPosition(EntityId id, Vector2Int16 pos)
+void UnitEntityUtil::AttackTarget(EntityId id, EntityId e)
 {
 	EntityManager& em = GetManager();
 
-	uint8_t t = EntityUtil::GetOrientationToPosition(id, pos);
-
-	em.UnitArchetype.StateDataComponents.GetComponent(id).target.position = pos;
+	em.UnitArchetype.StateDataComponents.GetComponent(id).target.entityId = e;
 	em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Attacking;
-	em.OrientationComponents.GetComponent(id) = t;
-	em.FlagComponents.GetComponent(id).set(ComponentFlags::OrientationChanged);
 	em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
-	em.FlagComponents.GetComponent(id).clear(ComponentFlags::NavigationWork);
-
+	em.MovementArchetype.MovementComponents.GetComponent(id).velocity = { 0,0 };
 }
 
 void UnitEntityUtil::GoTo(EntityId id, Vector2Int16 pos)

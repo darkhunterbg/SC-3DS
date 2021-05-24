@@ -20,13 +20,14 @@ void EntityCollection::clear()
 	sortedEntities.clear();
 }
 
-void EntityCollection::AddSortedEntities(const std::vector<EntityId>& outIds, int start) {
+void EntityCollection::AddSortedEntities(const std::vector<EntityId>& entities, int start) {
 
-	if (!outIds.size())
+	if (!entities.size())
 		return;
 
+
 	int insertAt = sortedEntities.size();
-	EntityId id = *(outIds.cbegin() + start);
+	EntityId id = *(entities.cbegin() + start);
 	auto sortEnd = sortedEntities.size();
 	for (int i = 0; i < sortEnd; ++i)
 	{
@@ -36,8 +37,8 @@ void EntityCollection::AddSortedEntities(const std::vector<EntityId>& outIds, in
 		}
 	}
 
-	sortedEntities.insert(sortedEntities.cbegin() + insertAt, outIds.cbegin() + start, outIds.cend());
-	id = outIds.back();
+	sortedEntities.insert(sortedEntities.cbegin() + insertAt, entities.cbegin() + start, entities.cend());
+	id = entities.back();
 	size_t end = std::min(sortedEntities.size(), insertAt + (size_t)id + 1);
 	std::sort(sortedEntities.begin() + insertAt, sortedEntities.begin() + end);
 

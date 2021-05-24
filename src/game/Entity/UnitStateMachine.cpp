@@ -139,16 +139,24 @@ static void  UnitAttackingEnterStateJob(int start, int end) {
 
 	for (int i = start; i < end; ++i) {
 		EntityId id = data.entities[i];
+		const auto& stateData = em.UnitArchetype.StateDataComponents.GetComponent(id);
+		Vector2Int16 targetPos = em.PositionComponents.GetComponent(stateData.target.entityId);
 
 
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
 		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
+
+		uint8_t orientation = EntityUtil::GetOrientationToPosition(id, targetPos);
+		em.OrientationComponents.GetComponent(id) = orientation;
+
 
 		em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
 			.GetComponent(id).clips = unit.def->Graphics->AttackAnimations;
 
 		flags.set(ComponentFlags::AnimationSetChanged);
 		flags.set(ComponentFlags::AnimationEnabled);
+		flags.set(ComponentFlags::OrientationChanged);
+
 
 		if (unit.HasMovementGlow()) {
 			EntityId glow = unit.movementGlowEntity;
@@ -166,6 +174,8 @@ static void  UnitAttackingEnterStateJob(int start, int end) {
 
 		UnitWeaponComponent& weapon = em.UnitArchetype.WeaponComponents.GetComponent(id);
 		weapon.StartCooldown();
+		em.UnitArchetype.HealthComponents.GetComponent(stateData.target.entityId).Reduce(weapon.damage);
+
 
 		TimingComponent& timer = em.TimingArchetype.TimingComponents.GetComponent(id);
 		TimingActionComponent& timerAction = em.TimingArchetype.ActionComponents.GetComponent(id);
@@ -176,18 +186,18 @@ static void  UnitAttackingEnterStateJob(int start, int end) {
 		flags.set(ComponentFlags::UpdateTimers);
 		flags.set(ComponentFlags::UnitAIPaused);
 
+	
 		// Particle Effect
 
-		const auto& stateData = em.UnitArchetype.StateDataComponents.GetComponent(id);
-
 		EntityId e = scratch[i];
+
 
 		em.TimingArchetype.TimingComponents.GetComponent(e).NewTimer(unit.def->Weapon->TargetEffect[0].GetDuration());
 		em.TimingArchetype.ActionComponents.GetComponent(e).action = TimerExpiredAction::DeleteEntity;
 		em.FlagComponents.NewComponent(e).set(ComponentFlags::UpdateTimers);
 		em.FlagComponents.GetComponent(e).set(ComponentFlags::PositionChanged);
 
-		em.PositionComponents.NewComponent(e, stateData.target.position);
+		em.PositionComponents.NewComponent(e, targetPos);
 
 		EntityUtil::PlayAnimation(e, unit.def->Weapon->TargetEffect[0]);
 		EntityUtil::SetRenderFromAnimationClip(e, unit.def->Weapon->TargetEffect[0], 0);

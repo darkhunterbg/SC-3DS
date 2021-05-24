@@ -91,3 +91,15 @@ void UnitSystem::ApplyUnitState(EntityManager& em) {
 			state.EnterState(data, em);
 	}
 }
+
+void UnitSystem::UpdateUnitStats(EntityManager& em)
+{
+	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {
+
+		if (em.UnitArchetype.HealthComponents.GetComponent(id).IsDead()) {
+			em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Death;
+			em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
+		}
+	}
+
+}

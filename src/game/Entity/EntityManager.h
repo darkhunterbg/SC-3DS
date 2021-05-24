@@ -147,6 +147,7 @@ public:
 
 		ComponentCollection<UnitAIState> AIStateComponents;
 		ComponentCollection<UnitAIStateDataComponent> AIStateDataComponents;
+		ComponentCollection<UnitHealthComponent> HealthComponents;
 	} UnitArchetype;
 
 

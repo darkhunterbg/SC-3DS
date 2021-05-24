@@ -363,7 +363,7 @@ struct Rectangle16
 		if (r.position.x < position.x)  test.x = position.x;
 		else if (r.position.x > position.x + size.x)  test.x = position.x + size.x;
 
-		if (r.position.y < position.y)  test.x = position.y;
+		if (r.position.y < position.y)  test.y = position.y;
 		else if (r.position.y > position.y + size.y)  test.y = position.y + size.y;
 
 		Vector2Int16 dist = r.position - test;

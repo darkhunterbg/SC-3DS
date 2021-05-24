@@ -30,20 +30,12 @@ public:
 
 	TComponent& NewComponent(EntityId id) {
 		int index = Entity::ToIndex(id);
-		/*if (hasComponent[index])
-			EXCEPTION("Entity %i already has component!", id);
-
-		hasComponent[index] = true;*/
 		components[index] = TComponent();
 		return components[index];
 	}
 
 	TComponent& NewComponent(EntityId id, const TComponent& component) {
 		int index = Entity::ToIndex(id);
-		//if (hasComponent[index])
-		//	EXCEPTION("Entity %i already has component!", id);
-
-		//hasComponent[index] = true;
 		components[index] = component;
 		return components[index];
 	}
@@ -208,6 +200,20 @@ struct UnitDataComponent {
 	}
 };
 
+struct UnitHealthComponent {
+	uint16_t current = 1;
+	uint16_t max = 1;
+
+	inline void Reduce(uint16_t value) {
+		current -= std::min(value, current);
+	}
+
+	inline bool IsDead() const { return current == 0; }
+	inline void FromDef(const UnitDef& def) {
+		current = max = def.Health;
+	}
+};
+
 struct UnitMovementComponent {
 	uint8_t movementSpeed;
 	uint8_t rotationSpeed;
@@ -219,6 +225,8 @@ struct UnitMovementComponent {
 };
 
 struct UnitWeaponComponent {
+	uint16_t damage = 1;
+
 	uint8_t maxRange = 1;
 	uint8_t cooldown = 1;
 
@@ -227,6 +235,7 @@ struct UnitWeaponComponent {
 	inline void FromDef(const WeaponDef& def) {
 		maxRange = def.MaxRange;
 		cooldown = def.Cooldown;
+		damage = def.Damage;
 	}
 
 	inline void StartCooldown() {
