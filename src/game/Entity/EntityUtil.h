@@ -95,8 +95,9 @@ public:
 	static void GoTo(EntityId id, Vector2Int16 pos);
 
 	static void SetAIState(EntityId id, UnitAIState state);
-
 	static void SetAIState(EntityId id, UnitAIState state, Vector2Int16 target);
-
 	static void SetAIState(EntityId id, UnitAIState state, EntityId target);
+
+	static bool IsAlly(PlayerId player, EntityId id);
+	static bool IsEnemy(PlayerId player, EntityId id);
 };

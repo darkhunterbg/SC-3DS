@@ -3,6 +3,7 @@
 #include "../Assets.h"
 #include <vector>
 #include "../Entity/Entity.h"
+#include "../Entity/Common.h"
 
 class Camera;
 class EntityManager;
@@ -20,6 +21,8 @@ private:
 	Vector2Int16 holdStart = { 0,0 };
 	Rectangle16 regionRect;
 public:
+	PlayerId Player = 1;
+
 	void Draw();
 	void Update(Camera& camera, EntityManager& entityManager, std::vector<EntityId>& outSelection);
 };

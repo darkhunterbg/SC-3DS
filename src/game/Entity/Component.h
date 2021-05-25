@@ -12,6 +12,8 @@
 #include "../Assets.h"
 #include "../Data/UnitDef.h"
 
+#include "Common.h"
+
 #include "Debug.h"
 
 template <class TComponent, unsigned MaxComponents = Entity::MaxEntities>
@@ -59,7 +61,6 @@ public:
 
 };
 
-typedef uint8_t PlayerId;
 
 enum class ComponentFlags {
 	PositionChanged = 0,
@@ -147,17 +148,6 @@ struct MovementComponent {
 	Vector2Int8 velocity;
 };
 
-enum class UnitState : uint8_t {
-	Idle = 0,
-	Turning = 1,
-	Movement = 2,
-	Attacking = 3,
-	Death = 4,
-};
-
-
-static constexpr const int UnitStatesCount = 5;
-
 struct UnitStateDataComponent {
 	union {
 		EntityId entityId;
@@ -165,12 +155,6 @@ struct UnitStateDataComponent {
 	} target = { 0 };
 };
 
-enum class UnitAIState :uint8_t {
-	Idle = 0,
-	AttackTarget = 1,
-	GoToPosition = 2,
-	GoToAttack = 3,
-};
 
 struct UnitAIStateDataComponent {
 	union {
@@ -262,7 +246,6 @@ struct AnimationTrackerComponent {
 		frameCountdown = frameTime;
 	}
 
-
 	inline void PlayClip(const AnimationClip* clip) {
 		if (clip) {
 			totalFrames = clip->GetFrameCount();
@@ -325,19 +308,9 @@ struct TimingComponent {
 
 };
 
-enum class TimerExpiredAction : uint8_t {
-	None = 0,
-	WeaponAttack = 1,
-	UnitDeathAfterEffect = 2,
-	DeleteEntity = 3,
-
-};
-
 
 struct TimingActionComponent {
 	TimerExpiredAction action = TimerExpiredAction::None;
-
-	static constexpr const int ActionTypeCount = 4;
 };
 
 

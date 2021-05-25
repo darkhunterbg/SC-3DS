@@ -10,8 +10,8 @@ class EntityManager;
 
 class UnitSystem {
 private:
-	std::array<UnitStateMachineChangeData, UnitStatesCount> exitStateData;
-	std::array<UnitStateMachineChangeData, UnitStatesCount> enterStateData;
+	std::vector<UnitStateMachineChangeData> exitStateData;
+	std::vector<UnitStateMachineChangeData> enterStateData;
 
 
 	std::vector<UnitAIEnterStateData> aiEnterStateData;

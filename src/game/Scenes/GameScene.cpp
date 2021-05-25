@@ -58,10 +58,10 @@ void GameScene::Start() {
 	//UnitEntityUtil::NewUnit(UnitDatabase::MineralField1, 0,
 	//	Vector2Int16(128, 256));
 
-	/*for (int i = 0; i < 5; ++i) {
+	for (int i = 0; i < 1; ++i) {
 		UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 2,
 			Vector2Int16(600, 32 * i + 32));
-	}*/
+	}
 
 	//UnitEntityUtil::NewUnit(*UnitDatabase::Units[1], 2,
 	//	Vector2Int16(400, 300));
@@ -70,8 +70,8 @@ void GameScene::Start() {
 	//	Vector2Int16(48, 48));
 	EntityId e = 0;
 	int i = 0;
-	for (int y = 40; y > 0; --y) {
-		for (int x = 40; x > 0; --x) {
+	for (int y = 1; y > 0; --y) {
+		for (int x = 1; x > 0; --x) {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[0];
 			e = UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
@@ -152,6 +152,10 @@ void GameScene::Update() {
 
 				entityManager->GetSoundSystem().PlayUnitChatCommand(id);
 			}
+
+			if (selection.size()) {
+				hud->NewActionMarker(pos);
+			}
 		}
 
 		if (Game::Gamepad.IsButtonPressed(GamepadButton::B)) {
@@ -180,6 +184,10 @@ void GameScene::Update() {
 					entityManager->GetSoundSystem().PlayUnitChatCommand(id);
 				}
 			}
+
+	
+			hud->NewActionMarker(pos);
+			
 
 		}
 		if (Game::Gamepad.IsButtonPressed(GamepadButton::Y)) {
@@ -215,7 +223,7 @@ void GameScene::Draw() {
 
 	entityManager->Draw(camera);
 
-	hud->UpperScreenGUI();
+	hud->UpperScreenGUI(camera);
 
 	cursor->Draw();
 

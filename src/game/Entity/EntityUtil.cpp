@@ -318,3 +318,16 @@ void UnitEntityUtil::SetAIState(EntityId id, UnitAIState state, EntityId target)
 	em.UnitArchetype.AIStateDataComponents.GetComponent(id).target.entityId = target;
 }
 
+bool UnitEntityUtil::IsAlly(PlayerId player, EntityId id)
+{
+	EntityManager& em = GetManager();
+	return em.UnitArchetype.OwnerComponents.GetComponent(id) == player;
+}
+
+bool UnitEntityUtil::IsEnemy(PlayerId player, EntityId id)
+{
+	EntityManager& em = GetManager();
+	auto owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
+	return owner !=0 && owner != player;
+}
+

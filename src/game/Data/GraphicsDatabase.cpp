@@ -5,10 +5,62 @@ UnitGraphicsDef GraphicsDatabase::Marine;
 UnitGraphicsDef GraphicsDatabase::SCV;
 UnitGraphicsDef GraphicsDatabase::CommandCenter;
 UnitGraphicsDef GraphicsDatabase::Minerals1;
+CursorGraphics GraphicsDatabase::Cursor;
+
 std::vector<UnitGraphicsDef*> GraphicsDatabase::Units =
 {
 	&Marine, &SCV, &CommandCenter, & Minerals1
 };
+
+// ============================= Cursor ===========================================
+
+static int cursorAtlasCounter = 0;
+
+static void InitCursorAnimation(const SpriteFrameAtlas* atlas, AnimationClip& clip, int frames) {
+
+	for (int i = cursorAtlasCounter; i < cursorAtlasCounter + frames; ++i) {
+		clip.AddFrameCentered(atlas->GetFrame(i), Vector2Int16(atlas->FrameSize));
+	}
+	cursorAtlasCounter += frames;
+	clip.looping = true;
+}
+
+void CursorGraphics::Load() {
+	const auto atlas = SpriteDatabase::Load_cursor();
+
+	cursorAtlasCounter = 0;
+
+	InitCursorAnimation(atlas, arrow, 5);
+	InitCursorAnimation(atlas, drag, 4);
+	InitCursorAnimation(atlas, illegal, 5);
+	InitCursorAnimation(atlas, magg, 14);
+	InitCursorAnimation(atlas, magr, 14);
+	InitCursorAnimation(atlas, magy, 14);
+
+
+	InitCursorAnimation(atlas, scrolld, 2);
+	InitCursorAnimation(atlas, scrolldl, 2);
+	InitCursorAnimation(atlas, scrolldr, 2);
+	InitCursorAnimation(atlas, scrolll, 2);
+	InitCursorAnimation(atlas, scrollr, 2);
+	InitCursorAnimation(atlas, scrollu, 2);
+	InitCursorAnimation(atlas, scrollul, 2);
+	InitCursorAnimation(atlas, scrollur, 2);
+	InitCursorAnimation(atlas, targg, 2);
+	InitCursorAnimation(atlas, targn, 1);
+	InitCursorAnimation(atlas, targr, 2);
+	InitCursorAnimation(atlas, targy, 2);
+
+	scrollAnim[0] = &scrollul;
+	scrollAnim[1] = &scrollu;
+	scrollAnim[2] = &scrollur;
+	scrollAnim[3] = &scrolll;
+	scrollAnim[4] = nullptr;;
+	scrollAnim[5] = &scrollr;
+	scrollAnim[6] = &scrolldl;
+	scrollAnim[7] = &scrolld;
+	scrollAnim[8] = &scrolldr;
+}
 
 // ======================= Terran Marine ==========================================
 
@@ -187,6 +239,8 @@ void GraphicsDatabase::Init()
 	SCVData();
 	CommandCenterData();
 	MineralsData();
+
+	Cursor.Load();
 }
 
 void GraphicsDatabase::LoadAllGraphicsResources()

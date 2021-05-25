@@ -8,11 +8,12 @@
 #include "../Entity/MapSystem.h"
 #include "../Util.h"
 
+#include "../Data/GraphicsDatabase.h"
 
 //static Rectangle minimapDst = { {4,108},{128,128} };
 static Rectangle minimapDst = { {4,124},{113,113} };
 
-
+static constexpr const int MarkerTimer = 16;
 
 GameHUD::GameHUD(const RaceDef& race, Vector2Int16 mapSize) : race(race) {
 
@@ -43,6 +44,16 @@ void GameHUD::UpdateInfo(const PlayerInfo& info) {
 	supply.max = info.GetMaxSupply();
 }
 
+void GameHUD::NewActionMarker(Vector2Int16 pos)
+{
+	GUIActionMarker marker;
+	marker.pos = pos;
+	marker.timer = MarkerTimer;
+
+	markers.clear();
+	markers.push_back(marker);
+}
+
 static const  int GetResourceUpdate(int change) {
 	return std::max(1, (int)std::ceil(std::sqrt(change)) / 2);
 }
@@ -60,7 +71,9 @@ void GameHUD::UpdateResourceDiff(GameHUD::Resource& r) {
 	r.shown += mod;
 }
 
-void GameHUD::UpperScreenGUI() {
+void GameHUD::UpperScreenGUI(const Camera& camera) {
+
+	DrawMarkers(camera);
 
 	UpdateResourceDiff(minerals);
 	UpdateResourceDiff(gas);
@@ -101,6 +114,55 @@ void GameHUD::ApplyInput(Camera& camera) {
 		if (minimapDst.Contains(Game::Pointer.Position())) {
 			Vector2Int pos = Game::Pointer.Position() - Vector2Int(minimapDst.position);
 			camera.Position = Vector2Int16(Vector2(pos) * minimapUpscale);
+		}
+	}
+}
+
+void GameHUD::DrawMarkers(const Camera& camera) {
+	Rectangle16 camRect = camera.GetRectangle16();
+
+	for (GUIActionMarker& marker : markers) {
+
+		if (!camRect.Contains(marker.pos))
+			continue;
+
+		const SpriteFrame& frame = GraphicsDatabase::Cursor.targg.GetFrame(1);
+
+		Rectangle dst = { {0,0},  Vector2Int(frame.sprite.rect.size) };
+
+
+		if (marker.state == 0)
+		{
+			float scale = 1;
+			if (marker.timer < MarkerTimer / 2) {
+				scale = (float)(marker.timer) / ((float)MarkerTimer);
+			}
+			else {
+				scale = (float)(MarkerTimer - marker.timer) / ((float)MarkerTimer);
+
+			}
+			scale = 1 + scale;
+			dst.size = Vector2Int(Vector2(dst.size) * scale);
+		}
+
+		
+		Vector2Int16 p = camera.WorldToScreen(marker.pos);
+		dst.SetCenter(Vector2Int(p));
+
+		Platform::Draw(frame.sprite, dst);
+	}
+
+	for (int i = 0; i < markers.size(); ++i) {
+		markers[i].timer--;
+		if (markers[i].timer == 0) {
+			if (markers[i].state == 0) {
+				++markers[i].state;
+				markers[i].timer = MarkerTimer;
+			}
+			else {
+				markers.erase(markers.begin() + i);
+				--i;
+			}
 		}
 	}
 }

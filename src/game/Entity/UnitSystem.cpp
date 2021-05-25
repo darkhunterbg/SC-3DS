@@ -13,6 +13,11 @@ UnitSystem::UnitSystem()
 		aiThinkData.push_back(UnitAIThinkData());
 		aiEnterStateData.push_back(UnitAIEnterStateData());
 	}
+
+	for (int i = 0; i < UnitStateMachine::States.size(); ++i) {
+		exitStateData.push_back(UnitStateMachineChangeData());
+		enterStateData.push_back(UnitStateMachineChangeData());
+	}
 }
 
 void UnitSystem::UnitAIUpdate(EntityManager& em) {

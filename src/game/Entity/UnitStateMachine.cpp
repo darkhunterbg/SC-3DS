@@ -11,17 +11,15 @@ static std::vector<EntityId> scratch;
 static UnitStateMachineChangeData* _d;
 static EntityManager* _e;
 
-
-// ============================ Idle State ====================================
-
-
-std::array<IUnitState*, UnitStatesCount> UnitStateMachine::States = {
+std::vector<IUnitState*> UnitStateMachine::States = {
 	new UnitIdleState(),
 	new UnitTurningState(),
 	new UnitMovingState(),
 	new UnitAttackingState(),
 	new UnitDeathState()
 };
+
+// ============================ Idle State ====================================
 
 void UnitIdleState::EnterState(
 	UnitStateMachineChangeData& data, EntityManager& em)
@@ -200,7 +198,7 @@ static void  UnitAttackingEnterStateJob(int start, int end) {
 		em.TimingArchetype.ActionComponents.GetComponent(e).action = TimerExpiredAction::DeleteEntity;
 		em.FlagComponents.NewComponent(e).set(ComponentFlags::UpdateTimers);
 		em.FlagComponents.GetComponent(e).set(ComponentFlags::PositionChanged);
-
+		em.RenderArchetype.RenderComponents.GetComponent(e).depth = 1;
 		em.PositionComponents.NewComponent(e, targetPos);
 
 		EntityUtil::PlayAnimation(e, unit.def->Weapon->TargetEffect[0]);

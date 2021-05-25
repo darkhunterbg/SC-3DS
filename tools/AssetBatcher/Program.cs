@@ -27,10 +27,10 @@ namespace AssetBatcher
 
 			T3SFolders("unit/terran/marine", "unit/terran/tmadeath");
 			T3SFolders("unit/terran/tmashad");
-			T3SFolders("unit/terran/control","unit/terran/controlt");
+			T3SFolders("unit/terran/control", "unit/terran/controlt");
 			T3SFolders("unit/terran/tccshad");
 
-			T3SFolders("unit/terran/scv","unit/thingy/tscglow");
+			T3SFolders("unit/terran/scv", "unit/thingy/tscglow");
 			T3SFolders("unit/thingy/tbangs");
 			T3SFolders("unit/thingy/tbangl");
 			T3SFolders("unit/thingy/tbangx");
@@ -48,9 +48,17 @@ namespace AssetBatcher
 
 			T3SFolders("unit/bullet/tspark");
 
+
+			List<string> cursor = new List<string>();
+			foreach (var d in Directory.GetDirectories("../../data_out/cursor"))
+			{
+				cursor.Add(d.Substring("../../data_out/".Length));
+			}
+			T3SFoldersWithName("cursor", cursor.ToArray());
+
 			GeneraSourceCode();
 
-	
+
 		}
 
 		static void GeneraSourceCode()
@@ -106,7 +114,7 @@ namespace AssetBatcher
 						info = File.ReadAllLines(Path.Combine(path, "info.txt")); ;
 						spl = info[0].Split(' ');
 
-					
+
 						foreach (string i in info.Skip(1))
 						{
 							var split = i.Split(' ');
@@ -139,9 +147,13 @@ namespace AssetBatcher
 
 		static void T3SFolders(params string[] folders)
 		{
+			T3SFoldersWithName(null, folders);
+		}
 
-			string name = folders[0].Replace('/', '_');
-
+		static void T3SFoldersWithName(string name, params string[] folders)
+		{
+			if (string.IsNullOrEmpty(name))
+				name = folders[0].Replace('/', '_').Replace('\\', '_');
 
 			string root = Path.GetFullPath("../../data_out");
 

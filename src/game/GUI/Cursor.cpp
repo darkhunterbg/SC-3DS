@@ -4,76 +4,16 @@
 #include "../Camera.h"
 #include "../Entity/EntityManager.h"
 #include "../Util.h"
+#include "../Entity/EntityUtil.h"
+#include "../Data/GraphicsDatabase.h"
 
 static constexpr const float Speed = 10;
-
-static AnimationClip arrow, drag, illegal, magg, magr, magy, scrolld, scrolldl, scrolldr, scrolll, scrollr, scrollu, scrollul, scrollur, targg, targn, targr, targy;
-
-static int atlasCounter = 0;
-
-static AnimationClip* scrollAnim[9];
-
-static void InitAnimation(const SpriteAtlas* atlas, AnimationClip& clip, int frames, Vector2Int offset = { 0,0 }) {
-	clip.AddSpritesFromAtlas(atlas, atlasCounter, frames, offset);
-	atlasCounter += frames;
-	clip.looping = true;
-
-}
+static constexpr const int AnimFrameCount = 6;
 
 Cursor::Cursor() {
+	;
 	atlas = Game::AssetLoader.LoadAtlas("cursor.t3x");
-	currentClip = &arrow;
-	InitAnimation(atlas, arrow, 5, { 63,63 });
-	InitAnimation(atlas, drag, 4, { 55,53 });
-	InitAnimation(atlas, illegal, 5, { 56,60 });
-	InitAnimation(atlas, magg, 14);
-	InitAnimation(atlas, magr, 14);
-	InitAnimation(atlas, magy, 14);
-
-	for (int i = 0; i < 4; ++i) {
-		magg.SetFrameOffset(i, { 44,51 });
-	}
-
-	magg.SetFrameOffset(4, { 48,51 });
-
-	for (int i = 5; i < 7; ++i) {
-		magg.SetFrameOffset(i, { 51,51 });
-	}
-	magg.SetFrameOffset(7, { 51,52 });
-	magg.SetFrameOffset(8, { 48,55 });
-
-	for (int i = 9; i < 11; ++i) {
-		magg.SetFrameOffset(i, { 44,56 });
-	}
-
-	magg.SetFrameOffset(11, { 44,55 });
-	magg.SetFrameOffset(12, { 44,52 });
-	magg.SetFrameOffset(13, { 44,51 });
-
-	InitAnimation(atlas, scrolld, 2, { 46,43 });
-	InitAnimation(atlas, scrolldl, 2, { 63,36 });
-	InitAnimation(atlas, scrolldr, 2, { 35,36 });
-	InitAnimation(atlas, scrolll, 2, { 63,46 });
-	InitAnimation(atlas, scrollr, 2, { 43,45 });
-	InitAnimation(atlas, scrollu, 2, { 45,63 });
-	InitAnimation(atlas, scrollul, 2, { 63,63 });
-	InitAnimation(atlas, scrollur, 2, { 35,63 });
-	InitAnimation(atlas, targg, 2);
-	InitAnimation(atlas, targn, 1, { 51,57 });
-	InitAnimation(atlas, targr, 2);
-	InitAnimation(atlas, targy, 2);
-
-	scrollAnim[0] = &scrollul;
-	scrollAnim[1] = &scrollu;
-	scrollAnim[2] = &scrollur;
-	scrollAnim[3] = &scrolll;
-	scrollAnim[4] = nullptr;;
-	scrollAnim[5] = &scrollr;
-	scrollAnim[6] = &scrolldl;
-	scrollAnim[7] = &scrolld;
-	scrollAnim[8] = &scrolldr;
-
-
+	currentClip = &GraphicsDatabase::Cursor.arrow;
 }
 
 void Cursor::Draw() {
@@ -81,20 +21,18 @@ void Cursor::Draw() {
 	clipCountdown--;
 
 	if (clipCountdown <= 0) {
-		clipCountdown = 6;
+		clipCountdown = AnimFrameCount;
 		clipFrame = (++clipFrame) % currentClip->GetFrameCount();
 	}
 
 	const SpriteFrame& frame = currentClip->GetFrame(clipFrame);
 
 	Rectangle dst = { Vector2Int(Position + frame.offset), Vector2Int(frame.sprite.rect.size) };
-	dst.position -= {64, 64};
-
 
 	if (regionRect.size.LengthSquaredInt() > 0) {
 
 		regionRect.position -= {1, 1};
-		regionRect.size += {2,2};
+		regionRect.size += {2, 2};
 
 		Util::DrawTransparentRectangle(regionRect, 2, Colors::UIGreen);
 	}
@@ -102,7 +40,7 @@ void Cursor::Draw() {
 	Platform::Draw(frame.sprite, dst);
 }
 
-void Cursor::Update(Camera& camera, EntityManager& entityManager, std::vector<EntityId>& outSelection) {
+void Cursor::Update(Camera& camera, EntityManager& em, std::vector<EntityId>& outSelection) {
 
 	Vector2Int corner = { 0,0 };
 
@@ -142,19 +80,25 @@ void Cursor::Update(Camera& camera, EntityManager& entityManager, std::vector<En
 	}
 
 	Vector2Int16 worldPos = camera.ScreenToWorld(Position);
-	EntityId hover = entityManager.PointCast(worldPos);
+	EntityId hover = em.PointCast(worldPos);
+	if (hover != Entity::None &&
+		(!em.UnitArchetype.Archetype.HasEntity(hover) ||
+		em.UnitArchetype.HiddenArchetype.Archetype.HasEntity(hover))) {
+
+		hover = Entity::None;
+	}
 	bool dragging = (worldPos - holdStart).LengthSquared() != 0;
 
-	if (holding && dragging) {
-		Vector2Int16 start = camera.WorldToScreen(holdStart);
-		Vector2Int16 end = camera.WorldToScreen(worldPos);
+		if (holding && dragging) {
+			Vector2Int16 start = camera.WorldToScreen(holdStart);
+				Vector2Int16 end = camera.WorldToScreen(worldPos);
 
-		regionRect.size = (end - start);
-		regionRect.size.x = std::abs(regionRect.size.x);
-		regionRect.size.y = std::abs(regionRect.size.y);
-		regionRect.position.x = std::min(start.x, end.x);
-		regionRect.position.y = std::min(start.y, end.y);
-	}
+				regionRect.size = (end - start);
+				regionRect.size.x = std::abs(regionRect.size.x);
+			regionRect.size.y = std::abs(regionRect.size.y);
+			regionRect.position.x = std::min(start.x, end.x);
+			regionRect.position.y = std::min(start.y, end.y);
+		}
 
 	if (Game::Gamepad.IsButtonReleased(GamepadButton::A)) {
 		if (!dragging && hover != Entity::None) {
@@ -172,7 +116,7 @@ void Cursor::Update(Camera& camera, EntityManager& entityManager, std::vector<En
 			rect.position.x = std::min(start.x, end.x);
 			rect.position.y = std::min(start.y, end.y);
 
-			entityManager.RectCast(rect, outSelection);
+			em.RectCast(rect, outSelection);
 			holdStart = { 0,0 };
 			regionRect = { {0,0},{0,0} };
 
@@ -183,17 +127,31 @@ void Cursor::Update(Camera& camera, EntityManager& entityManager, std::vector<En
 
 	if (corner.LengthSquared() != 0) {
 		int index = (corner.x + 1) + (corner.y + 1) * 3;
-		newClip = scrollAnim[index];
+		newClip = GraphicsDatabase::Cursor.scrollAnim[index];
 		Vector2 v = Vector2::Normalize(Vector2(corner));
 		camera.Position += Vector2Int16(v * camera.GetCameraSpeed());
 	}
 	else {
 		if (!holding || !dragging)
 		{
-			newClip = hover != Entity::None ? &magg : &arrow;
+			if (hover == Entity::None) {
+				newClip = &GraphicsDatabase::Cursor.arrow;
+			}
+			else {
+				if (UnitEntityUtil::IsAlly(Player, hover)) {
+					newClip = &GraphicsDatabase::Cursor.magg;
+				}
+				else if (UnitEntityUtil::IsEnemy(Player, hover)) {
+					newClip = &GraphicsDatabase::Cursor.magr;
+				}
+				else {
+					newClip = &GraphicsDatabase::Cursor.magy;
+				}
+
+			}
 		}
 		else {
-			newClip = &drag;
+			newClip = &GraphicsDatabase::Cursor.drag;
 
 		}
 	}
@@ -201,7 +159,7 @@ void Cursor::Update(Camera& camera, EntityManager& entityManager, std::vector<En
 	if (newClip != currentClip) {
 		currentClip = newClip;
 		clipFrame = 0;
-		clipCountdown = 6;
+		clipCountdown = AnimFrameCount;
 	}
 
 }

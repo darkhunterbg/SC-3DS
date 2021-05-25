@@ -13,6 +13,7 @@ SpriteFrameAtlas* SpriteDatabase::unit_thingy_tbangx;
 SpriteFrameAtlas* SpriteDatabase::unit_neutral_min01;
 SpriteFrameAtlas* SpriteDatabase::unit_neutral_min01sha;
 SpriteFrameAtlas* SpriteDatabase::unit_bullet_tspark;
+SpriteFrameAtlas* SpriteDatabase::cursor;
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_marine() {
 	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_terran_marine.t3x");
@@ -1166,6 +1167,95 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_bullet_tspark() {
 	a->SetOffset(132, Vector2Int(10,6));
 	a->SetOffset(133, Vector2Int(10,6));
 	a->SetOffset(134, Vector2Int(10,6));
+
+	return a;
+}
+
+const SpriteFrameAtlas* SpriteDatabase::Load_cursor() {
+	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("cursor.t3x");
+	auto* a = cursor = new SpriteFrameAtlas(atlas);
+	a->FrameSize = Vector2Int(128, 128);
+
+	a->SetOffset(0, Vector2Int(63,63));
+	a->SetOffset(1, Vector2Int(63,63));
+	a->SetOffset(2, Vector2Int(63,63));
+	a->SetOffset(3, Vector2Int(63,63));
+	a->SetOffset(4, Vector2Int(63,63));
+	a->SetOffset(5, Vector2Int(55,53));
+	a->SetOffset(6, Vector2Int(55,53));
+	a->SetOffset(7, Vector2Int(55,53));
+	a->SetOffset(8, Vector2Int(55,53));
+	a->SetOffset(9, Vector2Int(56,60));
+	a->SetOffset(10, Vector2Int(56,60));
+	a->SetOffset(11, Vector2Int(56,60));
+	a->SetOffset(12, Vector2Int(56,60));
+	a->SetOffset(13, Vector2Int(56,60));
+	a->SetOffset(14, Vector2Int(44,51));
+	a->SetOffset(15, Vector2Int(44,51));
+	a->SetOffset(16, Vector2Int(44,51));
+	a->SetOffset(17, Vector2Int(44,51));
+	a->SetOffset(18, Vector2Int(48,51));
+	a->SetOffset(19, Vector2Int(51,51));
+	a->SetOffset(20, Vector2Int(51,51));
+	a->SetOffset(21, Vector2Int(51,52));
+	a->SetOffset(22, Vector2Int(48,55));
+	a->SetOffset(23, Vector2Int(44,56));
+	a->SetOffset(24, Vector2Int(44,56));
+	a->SetOffset(25, Vector2Int(44,55));
+	a->SetOffset(26, Vector2Int(44,52));
+	a->SetOffset(27, Vector2Int(44,51));
+	a->SetOffset(28, Vector2Int(44,51));
+	a->SetOffset(29, Vector2Int(44,51));
+	a->SetOffset(30, Vector2Int(44,51));
+	a->SetOffset(31, Vector2Int(44,51));
+	a->SetOffset(32, Vector2Int(48,51));
+	a->SetOffset(33, Vector2Int(51,51));
+	a->SetOffset(34, Vector2Int(51,51));
+	a->SetOffset(35, Vector2Int(51,52));
+	a->SetOffset(36, Vector2Int(48,55));
+	a->SetOffset(37, Vector2Int(44,56));
+	a->SetOffset(38, Vector2Int(44,56));
+	a->SetOffset(39, Vector2Int(44,55));
+	a->SetOffset(40, Vector2Int(44,52));
+	a->SetOffset(41, Vector2Int(44,51));
+	a->SetOffset(42, Vector2Int(44,51));
+	a->SetOffset(43, Vector2Int(44,51));
+	a->SetOffset(44, Vector2Int(44,51));
+	a->SetOffset(45, Vector2Int(44,51));
+	a->SetOffset(46, Vector2Int(48,51));
+	a->SetOffset(47, Vector2Int(51,51));
+	a->SetOffset(48, Vector2Int(51,51));
+	a->SetOffset(49, Vector2Int(51,52));
+	a->SetOffset(50, Vector2Int(48,55));
+	a->SetOffset(51, Vector2Int(44,56));
+	a->SetOffset(52, Vector2Int(44,56));
+	a->SetOffset(53, Vector2Int(44,55));
+	a->SetOffset(54, Vector2Int(44,52));
+	a->SetOffset(55, Vector2Int(44,51));
+	a->SetOffset(56, Vector2Int(46,43));
+	a->SetOffset(57, Vector2Int(46,43));
+	a->SetOffset(58, Vector2Int(63,36));
+	a->SetOffset(59, Vector2Int(63,36));
+	a->SetOffset(60, Vector2Int(35,36));
+	a->SetOffset(61, Vector2Int(35,36));
+	a->SetOffset(62, Vector2Int(63,46));
+	a->SetOffset(63, Vector2Int(63,46));
+	a->SetOffset(64, Vector2Int(43,45));
+	a->SetOffset(65, Vector2Int(43,45));
+	a->SetOffset(66, Vector2Int(45,63));
+	a->SetOffset(67, Vector2Int(45,63));
+	a->SetOffset(68, Vector2Int(63,63));
+	a->SetOffset(69, Vector2Int(63,63));
+	a->SetOffset(70, Vector2Int(35,63));
+	a->SetOffset(71, Vector2Int(35,63));
+	a->SetOffset(72, Vector2Int(50,54));
+	a->SetOffset(73, Vector2Int(51,55));
+	a->SetOffset(74, Vector2Int(51,55));
+	a->SetOffset(75, Vector2Int(50,54));
+	a->SetOffset(76, Vector2Int(51,55));
+	a->SetOffset(77, Vector2Int(50,54));
+	a->SetOffset(78, Vector2Int(51,55));
+	a->SetOffset(79, Vector2Int(40,53));
 
 	return a;
 }

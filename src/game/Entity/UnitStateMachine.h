@@ -23,7 +23,7 @@ private:
 	UnitStateMachine() = delete;
 	~UnitStateMachine() = delete;
 public:
-	static std::array<IUnitState*, UnitStatesCount> States;
+	static std::vector<IUnitState*> States;
 };
 
 

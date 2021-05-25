@@ -20,10 +20,10 @@ public:
 		return Rectangle{ Vector2Int( Position - (Size * Scale) / 2), Vector2Int( Size * Scale) };
 	}
 
-	inline Vector2Int16 ScreenToWorld(Vector2Int16 p) {
+	inline Vector2Int16 ScreenToWorld(Vector2Int16 p) const {
 		return p * Scale + Position - (Size * Scale) / 2;
 	}
-	inline Vector2Int16 WorldToScreen(Vector2Int16 p) {
+	inline Vector2Int16 WorldToScreen(Vector2Int16 p) const {
 		return (p - Position + (Size * Scale) / 2) / Scale;
 	}
 
