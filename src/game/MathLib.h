@@ -400,20 +400,17 @@ struct Rectangle16
 		return r.position.x < position.x + size.x && position.x < r.position.x + r.size.x &&
 			r.position.y < position.y + size.y && position.y < r.position.y + r.size.y;
 	}
-	bool Intersects(const Circle16& r) const
+	bool Intersects(const Circle16& c) const
 	{
-		if (Contains(r.position))
-			return true;
+		Vector2Int16 test = c.position;
+		if (c.position.x < position.x)  test.x = position.x;
+		else if (c.position.x > position.x + size.x)  test.x = position.x + size.x;
 
-		Vector2Int16 test;
-		if (r.position.x < position.x)  test.x = position.x;
-		else if (r.position.x > position.x + size.x)  test.x = position.x + size.x;
+		if (c.position.y < position.y)  test.y = position.y;
+		else if (c.position.y > position.y + size.y)  test.y = position.y + size.y;
 
-		if (r.position.y < position.y)  test.y = position.y;
-		else if (r.position.y > position.y + size.y)  test.y = position.y + size.y;
-
-		Vector2Int16 dist = r.position - test;
-		int radius = (int)r.size * (int)r.size;
+		Vector2Int16 dist = c.position - test;
+		int radius = (int)c.size * (int)c.size;
 		return dist.LengthSquaredInt() <= radius;
 	}
 

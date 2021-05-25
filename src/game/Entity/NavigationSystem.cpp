@@ -54,26 +54,6 @@ static  int Evaluate(uint8_t d, uint8_t v, Vector2Int16 pos, const Rectangle16& 
 
 	return  std::numeric_limits<int>::max();
 }
-
-static inline int EvaluateNavGrid(uint8_t d, Vector2Int16 pos, Vector2Int16 trg) {
-	Vector2Int16 p = pos;
-	p.x = p.x >> 5;
-	p.y = p.y >> 5;
-	p += movementTableNavGrid[d];
-
-
-	if (s->IsPassable(p.x, p.y)) {
-		Vector2Int16 t = trg;
-		t.x = t.x >> 5;
-		t.y = t.y >> 5;
-
-		int dist = (t - p).LengthSquaredInt();
-		return dist;
-	}
-
-	return std::numeric_limits<int>::max();
-}
-
 void NavigationSystem::SetSize(Vector2Int16 size)
 {
 	gridSize = size / 32;
