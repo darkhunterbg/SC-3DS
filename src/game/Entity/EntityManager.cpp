@@ -179,16 +179,15 @@ void EntityManager::Update1(const Camera& camera) {
 	//navigationSystem.UpdateNavGrid(*this);
 	unitSystem.UpdateUnitCooldowns(*this);
 
+	unitSystem.UnitAIUpdate(*this);
 
 	navigationSystem.UpdateNavigation(*this);
 
 	navigationSystem.ApplyUnitNavigaion(*this);
 
-	unitSystem.UnitAIUpdate(*this);
-
 	animationSystem.TickAnimations(*this);
 
-	//renderSystem.UpdatePositions(*this, changedData);
+	renderSystem.UpdatePositions(*this, changedData);
 }
 // Update 24 per second (60 fps) 
 void EntityManager::Update2(const Camera& camera) {

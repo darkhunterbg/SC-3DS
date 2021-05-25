@@ -10,12 +10,16 @@
 UnitSystem::UnitSystem()
 {
 	for (int i = 0; i < UnitAIStateMachine::States.size(); ++i) {
-		aiThinkData.push_back(UnitAIStateMachineData());
+		aiThinkData.push_back(UnitAIThinkData());
+		aiEnterStateData.push_back(UnitAIEnterStateData());
 	}
 }
 
 void UnitSystem::UnitAIUpdate(EntityManager& em) {
 	for (auto& data : aiThinkData) {
+		data.clear();
+	}
+	for (auto& data : aiEnterStateData) {
 		data.clear();
 	}
 
@@ -25,9 +29,14 @@ void UnitSystem::UnitAIUpdate(EntityManager& em) {
 			continue;
 
 		UnitAIState state = em.UnitArchetype.AIStateComponents.GetComponent(id);
+
+		if (em.FlagComponents.GetComponent(id).test(ComponentFlags::UnitAIStateChanged))
+			aiEnterStateData[(int)state].entities.push_back(id);
+
 		const auto& stateData = em.UnitArchetype.AIStateDataComponents.GetComponent(id);
 		const auto& position = em.PositionComponents.GetComponent(id);
 		PlayerId owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
+
 
 		auto& thinkData = aiThinkData[(int)state];
 
@@ -37,11 +46,18 @@ void UnitSystem::UnitAIUpdate(EntityManager& em) {
 		thinkData.owner.push_back(owner);
 	}
 
+
+
 	for (int i = 0; i < UnitAIStateMachine::States.size(); ++i) {
 		auto& state = *UnitAIStateMachine::States[i];
-		auto& data = aiThinkData[i];
-		if (data.size())
-			state.Think(data, em);
+		auto& enterStateData = aiEnterStateData[i];
+		auto& thinkData = aiThinkData[i];
+
+		if (enterStateData.size())
+			state.EnterState(enterStateData, em);
+
+		if (thinkData.size())
+			state.Think(thinkData, em);
 	}
 
 }

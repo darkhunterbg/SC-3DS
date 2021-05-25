@@ -51,7 +51,7 @@ struct Vector2T
 		x = (T)a.x;
 		y = (T)a.y;
 	}
-	constexpr Vector2T(T all) : x(all), y(all) {}
+	constexpr explicit Vector2T(T all) : x(all), y(all) {}
 
 	constexpr inline float Length() const
 	{
@@ -129,12 +129,33 @@ struct Vector2T
 	{
 		return Vector2T(x / b.x, y / b.y);
 	}
+
+
+	inline Vector2T operator+(const T& b) const
+	{
+		return Vector2T(x + b, y + b);
+	}
+	inline Vector2T operator-(const T& b) const
+	{
+		return Vector2T(x - b, y - b);
+	}
+	inline Vector2T operator*(const T& b) const
+	{
+		return Vector2T(x * b, y * b);
+	}
+	inline Vector2T operator/(const T& b) const
+	{
+		return Vector2T(x / b, y / b);
+	}
+
+
 	inline Vector2T operator << (int shift) const {
 		return Vector2T( x<< shift,  y << shift);
 	}
 	inline Vector2T operator >> (int shift) const {
 		return Vector2T(x >> shift, y >> shift);
 	}
+
 	inline  Vector2T& operator+=(const Vector2T& b)
 	{
 		x += b.x;
@@ -160,6 +181,31 @@ struct Vector2T
 		return *this;
 	}
 
+
+	inline  Vector2T& operator+=(const T& b)
+	{
+		x += b;
+		y += b;
+		return *this;
+	}
+	inline Vector2T& operator-=(const T& b)
+	{
+		x -= b;
+		y -= b;
+		return *this;
+	}
+	inline  Vector2T& operator*=(const T& b)
+	{
+		x *= b;
+		y *= b;
+		return *this;
+	}
+	inline Vector2T& operator/=(const T& b)
+	{
+		x /= b;
+		y /= b;
+		return *this;
+	}
 
 	inline static Vector2T Lerp(const Vector2T<T>& a, const Vector2T& b, float l)
 	{

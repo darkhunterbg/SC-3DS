@@ -7,10 +7,16 @@ std::vector<IUnitAIState*> UnitAIStateMachine::States = {
 	new UnitAIIdleState(), new UnitAIAttackTargetState(), new UnitAIGoToState(), new UnitAIGoToAttackState(),
 };
 
-
 static std::vector<EntityId> scratch;
 
-void UnitAIIdleState::Think(UnitAIStateMachineData& data, EntityManager& em)
+void UnitAIIdleState::EnterState(UnitAIEnterStateData& data, EntityManager& em)
+{
+	for (EntityId id : data.entities) {
+		em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Idle;
+		em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
+	}
+}
+void UnitAIIdleState::Think(UnitAIThinkData& data, EntityManager& em)
 {
 	int start = 0, end = data.size();
 	for (int i = start; i < end; ++i) {
@@ -21,8 +27,6 @@ void UnitAIIdleState::Think(UnitAIStateMachineData& data, EntityManager& em)
 		const auto& stateData = data.stateData[i];
 		const auto& pos = data.position[i];
 		const auto& owner = data.owner[i];
-
-		em.MovementArchetype.MovementComponents.GetComponent(id).velocity = { 0,0 };
 
 		const auto& unitData = em.UnitArchetype.DataComponents.GetComponent(id);
 
@@ -53,14 +57,16 @@ void UnitAIIdleState::Think(UnitAIStateMachineData& data, EntityManager& em)
 			}
 
 			if (result != Entity::None) {
-				em.UnitArchetype.AIStateComponents.GetComponent(id) = UnitAIState::AttackTarget;
-				em.UnitArchetype.AIStateDataComponents.GetComponent(id).target.entityId = result;
+				UnitEntityUtil::SetAIState(id, UnitAIState::AttackTarget, result);
 			}
 		}
 	}
 }
 
-void UnitAIAttackTargetState::Think(UnitAIStateMachineData& data, EntityManager& em)
+void UnitAIAttackTargetState::EnterState(UnitAIEnterStateData& data, EntityManager& em)
+{
+}
+void UnitAIAttackTargetState::Think(UnitAIThinkData& data, EntityManager& em)
 {
 	int start = 0, end = data.size();
 	for (int i = start; i < end; ++i) {
@@ -73,9 +79,7 @@ void UnitAIAttackTargetState::Think(UnitAIStateMachineData& data, EntityManager&
 
 		if (!em.UnitArchetype.Archetype.HasEntity(target))
 		{
-			em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Idle;
-			em.UnitArchetype.AIStateComponents.GetComponent(id) = UnitAIState::Idle;
-			em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
+			UnitEntityUtil::SetAIState(id, UnitAIState::Idle);
 			continue;
 		}
 
@@ -96,7 +100,10 @@ void UnitAIAttackTargetState::Think(UnitAIStateMachineData& data, EntityManager&
 	}
 }
 
-void UnitAIGoToState::Think(UnitAIStateMachineData& data, EntityManager& em)
+void UnitAIGoToState::EnterState(UnitAIEnterStateData& data, EntityManager& em)
+{
+}
+void UnitAIGoToState::Think(UnitAIThinkData& data, EntityManager& em)
 {
 	int start = 0, end = data.size();
 	for (int i = start; i < end; ++i) {
@@ -107,29 +114,27 @@ void UnitAIGoToState::Think(UnitAIStateMachineData& data, EntityManager& em)
 		Vector2Int16 distance = stateData.target.position - pos;
 
 		if (distance.LengthSquaredInt() < 32) {
-			em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Idle;
-			em.UnitArchetype.AIStateComponents.GetComponent(id) = UnitAIState::Idle;
-			em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
+			UnitEntityUtil::SetAIState(id, UnitAIState::Idle);
 		}
 		else if (distance.LengthSquaredInt() < 128) {
 
 			scratch.clear();
 			em.GetKinematicSystem().RectCast({ stateData.target.position, {32,32} }, scratch);
 			if (scratch.size()) {
-				em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Idle;
-				em.UnitArchetype.AIStateComponents.GetComponent(id) = UnitAIState::Idle;
-				em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
+				UnitEntityUtil::SetAIState(id, UnitAIState::Idle);
 			}
 		}
 		else{
 			em.FlagComponents.GetComponent(id).set(ComponentFlags::NavigationWork);
 			em.NavigationArchetype.NavigationComponents.GetComponent(id).target = stateData.target.position;
-
 		}
 	}
 }
 
-void UnitAIGoToAttackState::Think(UnitAIStateMachineData& data, EntityManager& em)
+void UnitAIGoToAttackState::EnterState(UnitAIEnterStateData& data, EntityManager& em)
+{
+}
+void UnitAIGoToAttackState::Think(UnitAIThinkData& data, EntityManager& em)
 {
 	int start = 0, end = data.size();
 	for (int i = start; i < end; ++i) {

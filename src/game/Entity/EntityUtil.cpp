@@ -285,7 +285,7 @@ void UnitEntityUtil::AttackTarget(EntityId id, EntityId e)
 	em.UnitArchetype.StateDataComponents.GetComponent(id).target.entityId = e;
 	em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Attacking;
 	em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
-	em.MovementArchetype.MovementComponents.GetComponent(id).velocity = { 0,0 };
+	em.FlagComponents.GetComponent(id).clear(ComponentFlags::NavigationWork);
 }
 
 void UnitEntityUtil::GoTo(EntityId id, Vector2Int16 pos)
@@ -295,5 +295,26 @@ void UnitEntityUtil::GoTo(EntityId id, Vector2Int16 pos)
 	em.FlagComponents.GetComponent(id).set(ComponentFlags::NavigationWork);
 	em.NavigationArchetype.NavigationComponents.GetComponent(id).target = pos;
 	em.NavigationArchetype.NavigationComponents.GetComponent(id).targetHeading = 255;
+}
+
+void UnitEntityUtil::SetAIState(EntityId id, UnitAIState state)
+{
+	EntityManager& em = GetManager();
+	em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitAIStateChanged);
+	em.UnitArchetype.AIStateComponents.GetComponent(id) = state;
+}
+void UnitEntityUtil::SetAIState(EntityId id, UnitAIState state, Vector2Int16 target)
+{
+	EntityManager& em = GetManager();
+	em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitAIStateChanged);
+	em.UnitArchetype.AIStateComponents.GetComponent(id) = state;
+	em.UnitArchetype.AIStateDataComponents.GetComponent(id).target.position = target;
+}
+void UnitEntityUtil::SetAIState(EntityId id, UnitAIState state, EntityId target)
+{
+	EntityManager& em = GetManager();
+	em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitAIStateChanged);
+	em.UnitArchetype.AIStateComponents.GetComponent(id) = state;
+	em.UnitArchetype.AIStateDataComponents.GetComponent(id).target.entityId = target;
 }
 

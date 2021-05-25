@@ -5,7 +5,15 @@
 
 class EntityManager;
 
-struct UnitAIStateMachineData {
+struct UnitAIEnterStateData {
+	std::vector<EntityId> entities;
+	inline void clear() {
+		entities.clear();
+	}
+	inline size_t size() const { return entities.size(); }
+};
+
+struct UnitAIThinkData {
 	std::vector<EntityId> entities;
 	std::vector<UnitAIStateDataComponent> stateData;
 	std::vector<Vector2Int16> position;
@@ -22,7 +30,8 @@ struct UnitAIStateMachineData {
 
 class IUnitAIState {
 public:
-	virtual void Think(UnitAIStateMachineData& data, EntityManager& em) = 0;
+	virtual void EnterState(UnitAIEnterStateData& data, EntityManager& em) = 0;
+	virtual void Think(UnitAIThinkData& data, EntityManager& em) = 0;
 };
 
 
@@ -38,23 +47,27 @@ public:
 
 class UnitAIIdleState : public  IUnitAIState {
 public:
-	virtual void Think(UnitAIStateMachineData& data, EntityManager& em) override;
+	virtual void EnterState(UnitAIEnterStateData& data, EntityManager& em) override;
+	virtual void Think(UnitAIThinkData& data, EntityManager& em) override;
 };
 
 
 class UnitAIAttackTargetState : public  IUnitAIState {
 public:
-	virtual void Think(UnitAIStateMachineData& data, EntityManager& em) override;
+	virtual void EnterState(UnitAIEnterStateData& data, EntityManager& em) override;
+	virtual void Think(UnitAIThinkData& data, EntityManager& em) override;
 };
 
 
 class UnitAIGoToState : public  IUnitAIState {
 public:
-	virtual void Think(UnitAIStateMachineData& data, EntityManager& em) override;
+	virtual void EnterState(UnitAIEnterStateData& data, EntityManager& em) override;
+	virtual void Think(UnitAIThinkData& data, EntityManager& em) override;
 };
 
 
 class UnitAIGoToAttackState : public  IUnitAIState {
 public:
-	virtual void Think(UnitAIStateMachineData& data, EntityManager& em) override;
+	virtual void EnterState(UnitAIEnterStateData& data, EntityManager& em) override;
+	virtual void Think(UnitAIThinkData& data, EntityManager& em) override;
 };

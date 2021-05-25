@@ -14,6 +14,7 @@ static EntityManager* _e;
 
 // ============================ Idle State ====================================
 
+
 std::array<IUnitState*, UnitStatesCount> UnitStateMachine::States = {
 	new UnitIdleState(),
 	new UnitTurningState(),
@@ -46,6 +47,7 @@ void UnitIdleState::ExitState(
 
 
 // ============================ Turning State ====================================
+
 
 void UnitTurningState::EnterState(
 	UnitStateMachineChangeData& data, EntityManager& em)
@@ -86,7 +88,9 @@ void UnitTurningState::ExitState(
 	}
 }
 
+
 // ============================ Movement State ====================================
+
 
 void UnitMovingState::EnterState(
 	UnitStateMachineChangeData& data, EntityManager& em)
@@ -129,8 +133,8 @@ void UnitMovingState::ExitState(
 	}
 }
 
-// ============================ Attack State ====================================
 
+// ============================ Attack State ====================================
 
 
 static void  UnitAttackingEnterStateJob(int start, int end) {
@@ -231,7 +235,9 @@ void UnitAttackingState::ExitState(
 	}
 }
 
+
 // ============================ Death State ====================================
+
 
 void UnitDeathState::EnterState(
 	UnitStateMachineChangeData& data, EntityManager& em)

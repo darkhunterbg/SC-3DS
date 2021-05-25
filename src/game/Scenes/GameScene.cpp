@@ -12,14 +12,9 @@
 
 static std::vector<EntityId> selection;
 
-GameScene::GameScene() {
+GameScene::GameScene() {}
 
-
-}
-
-GameScene::~GameScene() {
-
-}
+GameScene::~GameScene() {}
 
 void GameScene::Start() {
 	Vector2Int16 size = { 64 * 32,64 * 32 };
@@ -63,10 +58,10 @@ void GameScene::Start() {
 	//UnitEntityUtil::NewUnit(UnitDatabase::MineralField1, 0,
 	//	Vector2Int16(128, 256));
 
-	for (int i = 0; i < 5; ++i) {
-		UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 2,
-			Vector2Int16(600, 32 * i+32));
-	}
+	//for (int i = 0; i < 5; ++i) {
+	//	UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 2,
+	//		Vector2Int16(600, 32 * i + 32));
+	//}
 
 	//UnitEntityUtil::NewUnit(*UnitDatabase::Units[1], 2,
 	//	Vector2Int16(400, 300));
@@ -75,8 +70,8 @@ void GameScene::Start() {
 	//	Vector2Int16(48, 48));
 	EntityId e = 0;
 	int i = 0;
-	for (int y = 4; y > 0; --y) {
-		for (int x = 4; x > 0; --x) {
+	for (int y = 1; y > 0; --y) {
+		for (int x = 1; x > 0; --x) {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[0];
 			e = UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
@@ -153,11 +148,7 @@ void GameScene::Update() {
 
 			for (EntityId id : selection)
 				if (entityManager->UnitArchetype.Archetype.HasEntity(id)) {
-					entityManager->UnitArchetype.AIStateComponents.GetComponent(id)
-						= UnitAIState::GoToPosition;
-
-					entityManager->UnitArchetype.AIStateDataComponents.GetComponent(id)
-						.target.position = pos;
+					UnitEntityUtil::SetAIState(id, UnitAIState::GoToPosition, pos);
 
 					entityManager->GetSoundSystem().PlayUnitChatCommand(id);
 				}
@@ -167,36 +158,41 @@ void GameScene::Update() {
 
 			Vector2Int16 pos = camera.ScreenToWorld(cursor->Position);
 
-			for (EntityId id : selection) {
 
-				entityManager->UnitArchetype.AIStateComponents.GetComponent(id)
-					= UnitAIState::AttackTarget;
+			EntityId target = entityManager->GetKinematicSystem().PointCast(pos);
 
-				entityManager->UnitArchetype.AIStateDataComponents.GetComponent(id)
-					.target.position = pos;
+			if (target != Entity::None)
+			{
+				for (EntityId id : selection) {
 
-				//UnitEntityUtil::AttackPosition(id, pos);
+					if (target == id)
+						continue;
 
 
-				entityManager->GetSoundSystem().PlayUnitChatCommand(id);
+					UnitEntityUtil::SetAIState(id, UnitAIState::AttackTarget, target);
+
+					entityManager->GetSoundSystem().PlayUnitChatCommand(id);
+				}
 			}
 		}
 		if (Game::Gamepad.IsButtonPressed(GamepadButton::Y)) {
 
 			for (EntityId id : selection)
 			{
-				auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
+				UnitEntityUtil::SetAIState(id, UnitAIState::Idle);
+
+				/*auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
 
 				if (def->IsResourceContainer)
 					continue;
 				entityManager->UnitArchetype.StateComponents.GetComponent(id) =
 					UnitState::Death;
 				entityManager->FlagComponents.GetComponent(id)
-					.set(ComponentFlags::UnitStateChanged);
+					.set(ComponentFlags::UnitStateChanged);*/
 
 			}
 
-			selection.clear();
+			//selection.clear();
 		}
 	}
 

@@ -13,7 +13,9 @@ private:
 	std::array<UnitStateMachineChangeData, UnitStatesCount> exitStateData;
 	std::array<UnitStateMachineChangeData, UnitStatesCount> enterStateData;
 
-	std::vector<UnitAIStateMachineData> aiThinkData;
+
+	std::vector<UnitAIEnterStateData> aiEnterStateData;
+	std::vector<UnitAIThinkData> aiThinkData;
 
 public:
 	UnitSystem();
