@@ -24,7 +24,7 @@ private:
 
 	void DrawMultiSelection(Rectangle dst, const std::vector<EntityId>& selection, EntityManager& em);
 	void DrawUnitDetail(Rectangle space, const UnitComponent& unit);
-	void DrawUnitInfo(Rectangle space, const UnitComponent& unit, const UnitHealthComponent& health);
+	void DrawUnitInfo(Rectangle space, EntityId id, const UnitComponent& unit, const UnitHealthComponent& health);
 
-	void GetUnitWireframeColors(const UnitHealthComponent& health, Color outColors[4]);
+	void GetUnitWireframeColors(EntityId id, const UnitHealthComponent& health, Color outColors[4]);
 };

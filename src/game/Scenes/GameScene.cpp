@@ -19,7 +19,7 @@ GameScene::~GameScene() {}
 void GameScene::Start() {
 	Vector2Int16 size = { 64 * 32,64 * 32 };
 
-	auto& race = RaceDatabase::Protoss;
+	auto& race = RaceDatabase::Terran;
 	race.LoadResourses();
 
 	hud = new GameHUD(race, size);
@@ -58,7 +58,7 @@ void GameScene::Start() {
 	//UnitEntityUtil::NewUnit(UnitDatabase::MineralField1, 0,
 	//	Vector2Int16(128, 256));
 
-	for (int i = 0; i < 1; ++i) {
+	for (int i = 0; i < 5; ++i) {
 		UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 2,
 			Vector2Int16(600, 32 * i + 32));
 	}

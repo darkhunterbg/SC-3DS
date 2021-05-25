@@ -33,7 +33,7 @@ void UnitSelectionConsolePanel::Draw(const std::vector<EntityId>& selection, Ent
 	const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(entityId);
 	const UnitHealthComponent& health = em.UnitArchetype.HealthComponents.GetComponent(entityId);
 
-	DrawUnitInfo(leftSpace, unit, health);
+	DrawUnitInfo(leftSpace, entityId, unit, health);
 	DrawUnitDetail(rightSpace, unit);
 }
 
@@ -87,7 +87,7 @@ void UnitSelectionConsolePanel::DrawMultiSelection(Rectangle dst, const std::vec
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(entityId);
 
 		Color wfColor[4];
-		GetUnitWireframeColors(health, wfColor);
+		GetUnitWireframeColors(entityId, health, wfColor);
 
 		const auto& wfBase = unit.def->Graphics->Wireframe.GetGroupBase();
 
@@ -133,7 +133,7 @@ void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, const UnitCompon
 	pos.y += 14;
 }
 
-void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, const UnitComponent& unit, const UnitHealthComponent& health)
+void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, EntityId entityId, const UnitComponent& unit, const UnitHealthComponent& health)
 {
 	auto font = Game::SystemFont;
 
@@ -162,7 +162,7 @@ void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, const UnitComponen
 	// ================== Wireframe ========================
 
 	Color wfColor[4];
-	GetUnitWireframeColors(health, wfColor);
+	GetUnitWireframeColors(entityId, health, wfColor);
 
 	const auto& wfBase = unit.def->Graphics->Wireframe.GetBase();
 
@@ -183,7 +183,7 @@ void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, const UnitComponen
 	}
 }
 
-void UnitSelectionConsolePanel::GetUnitWireframeColors(const UnitHealthComponent& health, Color outColors[4])
+void UnitSelectionConsolePanel::GetUnitWireframeColors(EntityId id, const UnitHealthComponent& health, Color outColors[4])
 {
 	static Color wfStateColor[3] = { Colors::UIGreen, Colors::UIYellow, Colors::UIRed };
 	int wfPartsState[4] = { 0,0,0,0 };
@@ -192,12 +192,36 @@ void UnitSelectionConsolePanel::GetUnitWireframeColors(const UnitHealthComponent
 
 	int damageParts = 0;
 
+
 	for (int i = health.current; i < health.max; i += damgeBreakpoint) {
 		++damageParts;
 	}
 
+	std::srand(id);
+
 	for (int i = 0; i < damageParts; ++i) {
-		++wfPartsState[i % 4];
+
+		int p = std::rand() % 4;
+
+		bool found = false;
+
+		for (p; p < 4; ++p) {
+			if (wfPartsState[p] < 2) {
+				found = true;
+				++wfPartsState[p];
+				break;
+			}
+		}
+
+		if (!found) {
+			for (p = 0; p < 4; ++p) {
+				if (wfPartsState[p] < 2) {
+					found = true;
+					++wfPartsState[p];
+					break;
+				}
+			}
+		}
 	}
 
 	for (int i = 0; i < 4; ++i) {
