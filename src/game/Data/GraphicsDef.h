@@ -51,12 +51,18 @@ struct UnitGraphicsDef {
 
 	} DeathAfterEffect;
 
+	static constexpr const int PartsCount = 4;
+	static constexpr const int GroupOffset = PartsCount + 1;
+
 	struct {
 		const SpriteFrameAtlas* Atlas = nullptr;
-		int PartsCount = 4;
+	
 
 		inline const SpriteFrame& GetBase() const { return Atlas->GetFrame(0); }
 		inline const SpriteFrame& GetPart(int i) const { return Atlas->GetFrame(i + 1); }
+
+		inline const SpriteFrame& GetGroupBase() const { return Atlas->GetFrame(GroupOffset); }
+		inline const SpriteFrame& GetGroupPart(int i) const { return Atlas->GetFrame(GroupOffset + i + 1); }
 	} Wireframe;
 
 	std::function<void()> LoadResourcesAction;

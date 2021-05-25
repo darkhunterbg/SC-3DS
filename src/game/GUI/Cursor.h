@@ -24,5 +24,5 @@ public:
 	PlayerId Player = 1;
 
 	void Draw();
-	void Update(Camera& camera, EntityManager& entityManager, std::vector<EntityId>& outSelection);
+	bool Update(Camera& camera, EntityManager& entityManager, std::vector<EntityId>& outSelection);
 };

@@ -19,6 +19,8 @@ struct RaceDef {
 	std::string Name;
 	SpriteAtlasDef ConsoleSprite;
 
+	const SpriteFrameAtlas* CommandIconsAtlas;
+
 	Sprite SupplyIcon;
 	uint8_t SupplyIconId;
 
@@ -29,6 +31,8 @@ struct RaceDef {
 	AdvisorSounds AdvisorUpdateSounds;
 
 	std::vector<AudioStreamDef> GameMusic;
+
+	std::function<void()> CommandIconsLoad;
 
 	RaceDef() {  }
 	RaceDef(const RaceDef&) = delete;

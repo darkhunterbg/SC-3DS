@@ -9,16 +9,22 @@
 
 static char buffer[64];
 
-void UnitSelectionConsolePanel::Draw(Rectangle dst, const std::vector<EntityId>& selection, EntityManager& em)
+void UnitSelectionConsolePanel::Draw(const std::vector<EntityId>& selection, EntityManager& em)
 {
 	if (selection.size() == 0)
 		return;
 
-	Rectangle leftSpace = dst;
+	if (selection.size() > 1) {
+
+		DrawMultiSelection(PanelDst, selection, em);
+		return;
+	}
+
+	Rectangle leftSpace = PanelDst;
 	leftSpace.size.x = 64;
 
 
-	Rectangle rightSpace = dst;
+	Rectangle rightSpace = PanelDst;
 	rightSpace.position.x += leftSpace.size.x;
 	rightSpace.size.x -= leftSpace.size.x;
 
@@ -29,8 +35,78 @@ void UnitSelectionConsolePanel::Draw(Rectangle dst, const std::vector<EntityId>&
 
 	DrawUnitInfo(leftSpace, unit, health);
 	DrawUnitDetail(rightSpace, unit);
+}
 
+void UnitSelectionConsolePanel::UpdateSelection(std::vector<EntityId>& selection)
+{
+	if (selection.size() < 2)
+		return;
 
+	if (!Game::Pointer.IsReleased())
+		return;
+
+	int max = std::min((int)selection.size(), 12);
+
+	Vector2Int pos = PanelDst.position;
+	pos.x += 3;
+	pos.y += 6;
+
+	for (int i = 0; i < max; ++i) {
+		Vector2Int offset = Vector2Int(i / 2, i % 2) * 36;
+
+		Rectangle rect = { { pos + offset}, {36,36} };
+
+		if (rect.Contains(Game::Pointer.Position())) {
+			EntityId entityId = selection[i];
+			selection.clear();
+			selection.push_back(entityId);
+		}
+	}
+
+}
+
+void UnitSelectionConsolePanel::DrawMultiSelection(Rectangle dst, const std::vector<EntityId>& selection, EntityManager& em)
+{
+	const Sprite& f = Race->CommandIconsAtlas->GetFrame(14).sprite;
+
+	int max = std::min((int)selection.size(), 12);
+
+	Vector2Int pos = dst.position;
+	pos.x += 3;
+	pos.y += 6;
+
+	for (int i = 0; i < max; ++i) {
+
+		Vector2Int offset = Vector2Int(i / 2, i % 2) * 36;
+
+		Platform::Draw(f, { pos + offset, Vector2Int(f.rect.size) });
+
+		EntityId entityId = selection[i];
+
+		const UnitHealthComponent& health = em.UnitArchetype.HealthComponents.GetComponent(entityId);
+		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(entityId);
+
+		Color wfColor[4];
+		GetUnitWireframeColors(health, wfColor);
+
+		const auto& wfBase = unit.def->Graphics->Wireframe.GetGroupBase();
+
+		offset += {1, 1};
+
+		/*Rectangle wfDst = { pos + offset , {0,0} };
+		wfDst.position += Vector2Int(wfBase.offset);
+		wfDst.size = Vector2Int(wfBase.sprite.rect.size);
+		Platform::Draw(wfBase.sprite, wfDst);*/
+
+		for (int i = 0; i < 4; ++i) {
+			const auto& wfPart = unit.def->Graphics->Wireframe.GetGroupPart(i);
+
+			Rectangle wfDst = { pos + offset , {0,0} };
+			wfDst.position += Vector2Int(wfPart.offset);
+			wfDst.size = Vector2Int(wfPart.sprite.rect.size);
+			Platform::Draw(wfPart.sprite, wfDst, wfColor[i]);
+		}
+	}
 }
 
 void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, const UnitComponent& unit)
@@ -68,7 +144,7 @@ void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, const UnitComponen
 	stats.position.y += wireframe.size.y;
 	stats.size.y -= wireframe.size.y;
 
-	Vector2Int pos = stats.position + Vector2Int{ stats.size.x / 2, 0};
+	Vector2Int pos = stats.position + Vector2Int{ stats.size.x / 2, 0 };
 
 	Color hpColor = Colors::UIGreen;
 
@@ -85,10 +161,34 @@ void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, const UnitComponen
 
 	// ================== Wireframe ========================
 
+	Color wfColor[4];
+	GetUnitWireframeColors(health, wfColor);
+
+	const auto& wfBase = unit.def->Graphics->Wireframe.GetBase();
+
+	/*
+	Rectangle wfDst = wireframe;
+	wfDst.position += Vector2Int(wfBase.offset);
+	wfDst.size = Vector2Int(wfBase.sprite.rect.size);
+	Platform::Draw(wfBase.sprite, wfDst);
+	*/
+
+	for (int i = 0; i < 4; ++i) {
+		const auto& wfPart = unit.def->Graphics->Wireframe.GetPart(i);
+
+		Rectangle wfDst = wireframe;
+		wfDst.position += Vector2Int(wfPart.offset);
+		wfDst.size = Vector2Int(wfPart.sprite.rect.size);
+		Platform::Draw(wfPart.sprite, wfDst, wfColor[i]);
+	}
+}
+
+void UnitSelectionConsolePanel::GetUnitWireframeColors(const UnitHealthComponent& health, Color outColors[4])
+{
 	static Color wfStateColor[3] = { Colors::UIGreen, Colors::UIYellow, Colors::UIRed };
-	int wfPartsState[4] = { 0,0,0,0};
-	
-	int damgeBreakpoint = health.max / (4*2);
+	int wfPartsState[4] = { 0,0,0,0 };
+
+	int damgeBreakpoint = health.max / (4 * 2);
 
 	int damageParts = 0;
 
@@ -100,20 +200,7 @@ void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, const UnitComponen
 		++wfPartsState[i % 4];
 	}
 
-	const auto& wfBase = unit.def->Graphics->Wireframe.GetBase();
-
-	Rectangle wfDst = wireframe;
-	wfDst.position += Vector2Int(wfBase.offset);
-	wfDst.size = Vector2Int(wfBase.sprite.rect.size);
-	Platform::Draw(wfBase.sprite, wfDst);
-
 	for (int i = 0; i < 4; ++i) {
-		const auto& wfPart = unit.def->Graphics->Wireframe.GetPart(i);
-
-		Rectangle wfDst = wireframe;
-		wfDst.position += Vector2Int(wfPart.offset);
-		wfDst.size = Vector2Int(wfPart.sprite.rect.size);
-		Color c = wfStateColor[wfPartsState[i]];
-		Platform::Draw(wfPart.sprite, wfDst, c);
+		outColors[i] = wfStateColor[wfPartsState[i]];
 	}
 }

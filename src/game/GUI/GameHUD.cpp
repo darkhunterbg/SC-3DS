@@ -13,10 +13,9 @@
 
 #include "../Profiler.h"
 
-
-
 //static Rectangle minimapDst = { {4,108},{128,128} };
 static Rectangle minimapDst = { {4,124},{113,113} };
+static Rectangle consolePanelDst= { {10,4},{220,84} };
 
 static constexpr const int MarkerTimer = 16;
 
@@ -31,6 +30,9 @@ GameHUD::GameHUD(const RaceDef& race, Vector2Int16 mapSize) : race(race) {
 	iconsAtlas = Game::AssetLoader.LoadAtlas("game_icons.t3x");
 	minimapUpscale = Vector2(mapSize) / Vector2(minimapDst.size);
 
+
+	consolePanel.Race = &race;
+	consolePanel.PanelDst = consolePanelDst;
 	//cmdIconsAtlas = Platform::LoadAtlas("cmdicons.t3x");
 }
 
@@ -117,7 +119,7 @@ void GameHUD::LowerScreenGUI(const Camera& camera, const std::vector<EntityId>& 
 
 	DrawMinimap(camera, em.GetMapSystem());
 
-	consolePanel.Draw({ {10,4},{220,84} }, selection, em);
+	consolePanel.Draw( selection, em);
 
 	DrawAbilities();
 }
@@ -129,6 +131,10 @@ void GameHUD::ApplyInput(Camera& camera) {
 			camera.Position = Vector2Int16(Vector2(pos) * minimapUpscale);
 		}
 	}
+}
+
+void GameHUD::UpdateSelection(std::vector<EntityId>& selection) {
+	consolePanel.UpdateSelection(selection);
 }
 
 void GameHUD::DrawUnitBars(const Camera& camera, const std::vector<EntityId>& selection, EntityManager& em) {

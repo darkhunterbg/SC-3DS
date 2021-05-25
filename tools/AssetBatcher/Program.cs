@@ -54,7 +54,13 @@ namespace AssetBatcher
 
 			T3SFoldersWithName("unit/thingy/o022", "unit/thingy/o022", "unit/thingy/od022");
 
-			T3SFolders("unit/wirefram/wirefram/000");
+			T3SFoldersWithName("unit/wirefram/wirefram/000", 
+				"unit/wirefram/wirefram/000",
+				"unit/wirefram/grpwire/000");
+
+			T3SFolders("unit/cmdbtns/tcmdbtns");
+			T3SFolders("unit/cmdbtns/pcmdbtns");
+			T3SFolders("unit/cmdbtns/zcmdbtns");
 
 			GeneraSourceCode();
 		}

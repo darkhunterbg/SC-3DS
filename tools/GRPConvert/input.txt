@@ -1,9 +1,11 @@
 ﻿#palette Terrain
 #tileset\*.grp
 
-wireframe unit\wirefram\wirefram.grp
+wireframe unit\wirefram\grpwire.grp
 
 done
+
+wireframe unit\wirefram\wirefram.grp
 
 palette Units
 unit\bullet\*.grp

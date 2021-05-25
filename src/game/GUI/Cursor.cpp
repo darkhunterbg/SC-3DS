@@ -40,10 +40,12 @@ void Cursor::Draw() {
 	Platform::Draw(frame.sprite, dst);
 }
 
-void Cursor::Update(Camera& camera, EntityManager& em, std::vector<EntityId>& outSelection) {
+bool Cursor::Update(Camera& camera, EntityManager& em, std::vector<EntityId>& selection) {
 
 	Vector2Int corner = { 0,0 };
 
+
+	bool selectionUpdate = false;
 	// TODO: State machine
 
 	if (!Game::Gamepad.IsButtonDown(GamepadButton::L))
@@ -101,8 +103,10 @@ void Cursor::Update(Camera& camera, EntityManager& em, std::vector<EntityId>& ou
 		}
 
 	if (Game::Gamepad.IsButtonReleased(GamepadButton::A)) {
+		selection.clear();
+		selectionUpdate = true;
 		if (!dragging && hover != Entity::None) {
-			outSelection.push_back(hover);
+			selection.push_back(hover);
 		}
 		else {
 			Vector2Int16 start = holdStart;
@@ -116,7 +120,7 @@ void Cursor::Update(Camera& camera, EntityManager& em, std::vector<EntityId>& ou
 			rect.position.x = std::min(start.x, end.x);
 			rect.position.y = std::min(start.y, end.y);
 
-			em.RectCast(rect, outSelection);
+			em.RectCast(rect, selection);
 			holdStart = { 0,0 };
 			regionRect = { {0,0},{0,0} };
 
@@ -162,4 +166,5 @@ void Cursor::Update(Camera& camera, EntityManager& em, std::vector<EntityId>& ou
 		clipCountdown = AnimFrameCount;
 	}
 
+	return  selectionUpdate;
 }

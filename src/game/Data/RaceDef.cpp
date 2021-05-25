@@ -7,6 +7,8 @@ void RaceDef::LoadResourses() {
 	AdvisorErrorSounds.LoadSoundClips();
 	AdvisorUpdateSounds.LoadSoundClips();
 
+	CommandIconsLoad();
+
 	const SpriteAtlas* icons = Game::AssetLoader.LoadAtlas("game_icons.t3x");
 	SupplyIcon = icons->GetSprite(SupplyIconId);
 

@@ -19,7 +19,7 @@ GameScene::~GameScene() {}
 void GameScene::Start() {
 	Vector2Int16 size = { 64 * 32,64 * 32 };
 
-	auto& race = RaceDatabase::Terran;
+	auto& race = RaceDatabase::Protoss;
 	race.LoadResourses();
 
 	hud = new GameHUD(race, size);
@@ -70,8 +70,8 @@ void GameScene::Start() {
 	//	Vector2Int16(48, 48));
 	EntityId e = 0;
 	int i = 0;
-	for (int y = 1; y > 0; --y) {
-		for (int x = 2; x > 0; --x) {
+	for (int y = 5; y > 0; --y) {
+		for (int x = 5; x > 0; --x) {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[0];
 			e = UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
@@ -131,7 +131,14 @@ void GameScene::Update() {
 
 	tmp.clear();
 
-	cursor->Update(camera, *entityManager, tmp);
+	tmp.insert(tmp.begin(), selection.begin(), selection.end());
+
+	bool selectionUpdate = cursor->Update(camera, *entityManager, tmp);
+	hud->UpdateSelection(tmp);
+
+	std::sort(tmp.begin(), tmp.end());
+	selection.clear();
+	selection.AddSortedEntities(tmp);
 
 	// TODO: Player input should be feed in the entity manager and on start of secondary update
 	//if (logical)
@@ -147,12 +154,8 @@ void GameScene::Update() {
 		}
 
 
-		if (tmp.size() > 0)
+		if (selectionUpdate && selection.size() > 0)
 		{
-			selection.clear();
-			std::sort(tmp.begin(), tmp.end());
-			selection.AddSortedEntities(tmp);
-
 			entityManager->GetSoundSystem().PlayUnitChatSelect(selection[0]);
 		}
 

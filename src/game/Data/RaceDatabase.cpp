@@ -1,4 +1,5 @@
 #include "RaceDatabase.h"
+#include "Generated.h"
 
 RaceDef RaceDatabase::Terran;
 RaceDef RaceDatabase::Zerg;
@@ -21,6 +22,7 @@ void RaceDatabase::Init()
 		d.GameMusic.push_back({ "music/terran1.wav" });
 		d.GameMusic.push_back({ "music/terran2.wav" });
 		d.GameMusic.push_back({ "music/terran3.wav" });
+		d.CommandIconsLoad = []() { Terran.CommandIconsAtlas = SpriteDatabase::Load_unit_cmdbtns_tcmdbtns(); };
 	}
 	// ============= Zerg =========================
 	{
@@ -37,6 +39,7 @@ void RaceDatabase::Init()
 		d.GameMusic.push_back({ "music/zerg1.wav" });
 		d.GameMusic.push_back({ "music/zerg2.wav" });
 		d.GameMusic.push_back({ "music/zerg3.wav" });
+		d.CommandIconsLoad = []() { Zerg.CommandIconsAtlas = SpriteDatabase::Load_unit_cmdbtns_zcmdbtns(); };
 	}
 	// ============= Protoss ======================
 	{
@@ -53,5 +56,6 @@ void RaceDatabase::Init()
 		d.GameMusic.push_back({ "music/protoss1.wav" });
 		d.GameMusic.push_back({ "music/protoss2.wav" });
 		d.GameMusic.push_back({ "music/protoss3.wav" });
+		d.CommandIconsLoad = []() { Protoss.CommandIconsAtlas = SpriteDatabase::Load_unit_cmdbtns_pcmdbtns(); };
 	}
 }

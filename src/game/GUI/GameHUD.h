@@ -23,6 +23,9 @@ class GameHUD {
 public:
 	GameHUD(const RaceDef& race, Vector2Int16 mapSize);
 
+
+	void UpdateSelection(std::vector<EntityId>& selection);
+
 	void ApplyInput(Camera& camera);
 	void UpperScreenGUI(const Camera& camera, const std::vector<EntityId>& selection, EntityManager& em);
 	void LowerScreenGUI(const Camera& camera, const std::vector<EntityId>& selection, EntityManager& em);
