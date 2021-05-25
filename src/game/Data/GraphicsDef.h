@@ -34,7 +34,7 @@ struct UnitGraphicsDef {
 	UnitAnimationClip MovementAnimations[32];
 	AnimationClip MovementGlowAnimations[32];
 	UnitAnimationClip AttackAnimations[32];
-	UnitAnimationClip IdleAnimations [32];
+	UnitAnimationClip IdleAnimations[32];
 	UnitAnimationClip DeathAnimation;
 
 	struct {
@@ -51,11 +51,19 @@ struct UnitGraphicsDef {
 
 	} DeathAfterEffect;
 
+	struct {
+		const SpriteFrameAtlas* Atlas = nullptr;
+		int PartsCount = 4;
+
+		inline const SpriteFrame& GetBase() const { return Atlas->GetFrame(0); }
+		inline const SpriteFrame& GetPart(int i) const { return Atlas->GetFrame(i + 1); }
+	} Wireframe;
+
 	std::function<void()> LoadResourcesAction;
 
 	inline bool HasMovementGlow() const { return MovementGlowAnimationDef.FrameCount > 0; }
 	inline bool HasDeathAfterEffect() const { return DeathAfterEffect.Def.FrameCount > 0; };
-	inline bool HasDeathAnimation() const {return DeathAnimationDef.FrameCount > 0; }
+	inline bool HasDeathAnimation() const { return DeathAnimationDef.FrameCount > 0; }
 
 	UnitGraphicsDef() {}
 	UnitGraphicsDef(const UnitGraphicsDef&) = delete;

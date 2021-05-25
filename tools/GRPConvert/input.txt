@@ -1,7 +1,9 @@
 ﻿#palette Terrain
 #tileset\*.grp
 
-clear
+wireframe unit\wirefram\wirefram.grp
+
+done
 
 palette Units
 unit\bullet\*.grp
@@ -29,3 +31,4 @@ palette Icons
 unit\cmdbtns\*.grp
 #game\icons.grp
 cursor\*.grp
+

@@ -13,6 +13,9 @@ namespace GRPConvert
 
 		static Palette shadowPalette;
 
+		static string dataDir = Path.GetFullPath("..\\..\\mpq\\");
+		static string dataOutDir = Path.GetFullPath("..\\..\\data_out\\");
+
 		static void Main(string[] args)
 		{
 			shadowPalette = new Palette(Color.Black) { Name = "Shadows" };
@@ -39,9 +42,6 @@ namespace GRPConvert
 
 			Palette pal = null;
 
-			string dataDir = Path.GetFullPath("..\\..\\mpq\\");
-			string dataOutDir = Path.GetFullPath("..\\..\\data_out\\");
-
 
 			foreach (var l in lines)
 			{
@@ -66,6 +66,12 @@ namespace GRPConvert
 				{
 					pal = palettes[l.Trim().Split(' ').Last()];
 					Console.WriteLine($"Using palette '{pal.Name}'");
+					continue;
+				}
+
+				if(l.StartsWith("wireframe "))
+				{
+					HandleWireframe(l.Split(" ").Last());
 					continue;
 				}
 
@@ -99,7 +105,6 @@ namespace GRPConvert
 
 					foreach (var fr in img.Frames)
 					{
-
 						string frName = i.ToString("D3") + ".png";
 						string s = Path.Combine(dst, frName);
 						++i;
@@ -117,7 +122,6 @@ namespace GRPConvert
 							string frName = "cm_" + i.ToString("D3") + ".png";
 							string s = Path.Combine(dst, frName);
 
-
 							fr.GenerateMapOfRemappedColors(p).Save(s, ImageFormat.Png);
 
 							info.Add($"{frName} {fr.XOffset} {fr.YOffset} {fr.Width} {fr.Height}");
@@ -130,6 +134,50 @@ namespace GRPConvert
 					Console.WriteLine(f);
 				}
 			}
+		}
+	
+		static void HandleWireframe(string f)
+		{
+			GRPImage img = new GRPImage(Path.Combine(dataDir, f));
+			
+
+			string dst = Path.Combine(dataOutDir, Path.GetDirectoryName(f), Path.GetFileNameWithoutExtension(f));
+			Directory.CreateDirectory(dst);
+
+			var p = palettes["Units"];
+
+			int i = 0;
+			foreach (var fr in img.Frames)
+			{
+				List<string> info = new List<string>();
+				info.Add($"{img.MaxWidth} {img.MaxHeight}");
+
+				string subDirName = i.ToString("D3");
+				string subDir = Path.Combine(dst, subDirName);
+
+				Directory.CreateDirectory(subDir);
+
+				int j = 0;
+				foreach(var wf in fr.GenerateWireframeImages(p))
+				{
+					string wfName = j.ToString() + ".png";
+
+					string outWf = Path.Combine(subDir, wfName);
+
+					wf.Save(outWf);
+
+					++j;
+
+					info.Add($"{wfName} {fr.XOffset} {fr.YOffset} {fr.Width} {fr.Height}");
+				}
+
+				++i;
+
+				File.WriteAllLines(Path.Combine(subDir, $"info.txt"), info);
+			}
+
+		
+			Console.WriteLine(f);
 		}
 	}
 }

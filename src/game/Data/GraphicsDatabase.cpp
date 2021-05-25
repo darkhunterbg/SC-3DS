@@ -73,6 +73,7 @@ static void MarineResources() {
 	d.MovementAnimationDef.GenerateAnimations(a, as, d.MovementAnimations);
 
 	d.Selection.Atlas = SpriteDatabase::Load_unit_thingy_o022();
+	d.Wireframe.Atlas = SpriteDatabase::Load_unit_wirefram_wirefram_000();
 
 	for (int i = 0; i < 2; ++i) {
 		d.AttackAnimationDef.GenerateAnimations(a, as, d.AttackAnimations);

@@ -42,6 +42,61 @@ namespace GRPConvert
 			return b;
 		}
 
+		public List<Bitmap> GenerateWireframeImages(Palette palette )
+		{
+			List<int> wireFrameColors = new List<int>();
+
+			for (int x = 0; x < Width; ++x)
+			{
+				for (int y = 0; y < Height; ++y)
+				{
+					int i = Pixels[x, y];
+					if (i == 0)
+						continue;
+
+					if(!wireFrameColors.Contains(i) && i > 200)
+						wireFrameColors.Add(i);
+				}
+			}
+
+			List<Bitmap> images = new List<Bitmap>();
+
+			Bitmap b = new Bitmap(Width, Height);
+			images.Add(b);
+			for (int x = 0; x < Width; ++x)
+			{
+				for (int y = 0; y < Height; ++y)
+				{
+					int i = Pixels[x, y];
+					if (i == 0 || wireFrameColors.Contains(i))
+						continue;
+
+					Color c = palette.Colors[i];
+					b.SetPixel(x, y, c);
+				}
+			}
+
+			foreach (int j in wireFrameColors)
+			{
+				b = new Bitmap(Width, Height);
+				images.Add(b);
+				for (int x = 0; x < Width; ++x)
+				{
+					for (int y = 0; y < Height; ++y)
+					{
+						int i = Pixels[x, y];
+
+						if (i != j)
+							continue;
+						b.SetPixel(x, y, Color.White);
+
+					}
+				}
+			}
+					return images;
+
+		}
+
 		public bool UsesRemappedColors(Palette palette)
 		{
 			for (int x = 0; x < Width; ++x)

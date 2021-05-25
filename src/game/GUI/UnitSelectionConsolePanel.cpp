@@ -82,4 +82,38 @@ void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, const UnitComponen
 	int len = stbsp_snprintf(buffer, sizeof(buffer), "%i/%i", health.current, health.max);
 	int offset = Platform::MeasureString(font, buffer, 0.35f).x;
 	Platform::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, hpColor, 0.35f);
+
+	// ================== Wireframe ========================
+
+	static Color wfStateColor[3] = { Colors::UIGreen, Colors::UIYellow, Colors::UIRed };
+	int wfPartsState[4] = { 0,0,0,0};
+	
+	int damgeBreakpoint = health.max / (4*2);
+
+	int damageParts = 0;
+
+	for (int i = health.current; i < health.max; i += damgeBreakpoint) {
+		++damageParts;
+	}
+
+	for (int i = 0; i < damageParts; ++i) {
+		++wfPartsState[i % 4];
+	}
+
+	const auto& wfBase = unit.def->Graphics->Wireframe.GetBase();
+
+	Rectangle wfDst = wireframe;
+	wfDst.position += Vector2Int(wfBase.offset);
+	wfDst.size = Vector2Int(wfBase.sprite.rect.size);
+	Platform::Draw(wfBase.sprite, wfDst);
+
+	for (int i = 0; i < 4; ++i) {
+		const auto& wfPart = unit.def->Graphics->Wireframe.GetPart(i);
+
+		Rectangle wfDst = wireframe;
+		wfDst.position += Vector2Int(wfPart.offset);
+		wfDst.size = Vector2Int(wfPart.sprite.rect.size);
+		Color c = wfStateColor[wfPartsState[i]];
+		Platform::Draw(wfPart.sprite, wfDst, c);
+	}
 }
