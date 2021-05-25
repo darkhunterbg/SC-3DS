@@ -200,6 +200,8 @@ struct UnitHealthComponent {
 		current -= std::min(value, current);
 	}
 
+	inline bool AtMax() const { return current == max; }
+
 	inline bool IsDead() const { return current == 0; }
 	inline void FromDef(const UnitDef& def) {
 		current = max = def.Health;

@@ -1,5 +1,5 @@
 #include "GameScene.h"
-//#include "../Platform.h"
+
 #include "../Game.h"
 #include "../GUI/GameHUD.h"
 #include "../GUI/Cursor.h"
@@ -10,7 +10,7 @@
 #include "../Data/RaceDatabase.h"
 #include "../Entity/EntityUtil.h"
 
-static std::vector<EntityId> selection;
+#include <algorithm>
 
 GameScene::GameScene() {}
 
@@ -58,10 +58,10 @@ void GameScene::Start() {
 	//UnitEntityUtil::NewUnit(UnitDatabase::MineralField1, 0,
 	//	Vector2Int16(128, 256));
 
-	for (int i = 0; i < 1; ++i) {
-		UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 2,
-			Vector2Int16(600, 32 * i + 32));
-	}
+	//for (int i = 0; i < 1; ++i) {
+	//	UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 2,
+	//		Vector2Int16(600, 32 * i + 32));
+	//}
 
 	//UnitEntityUtil::NewUnit(*UnitDatabase::Units[1], 2,
 	//	Vector2Int16(400, 300));
@@ -70,8 +70,8 @@ void GameScene::Start() {
 	//	Vector2Int16(48, 48));
 	EntityId e = 0;
 	int i = 0;
-	for (int y = 1; y > 0; --y) {
-		for (int x = 1; x > 0; --x) {
+	for (int y = 25; y > 0; --y) {
+		for (int x = 25; x > 0; --x) {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[0];
 			e = UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
@@ -87,7 +87,6 @@ void GameScene::Start() {
 		}
 	}
 
-	selection.push_back(e);
 
 	//entityManager->UnitArchetype.StateComponents.GetComponent(e) = UnitState::Attacking;
 
@@ -112,12 +111,24 @@ void GameScene::Update() {
 		entityManager->GetPlayerSystem().AddGas(1, 8);
 	}
 
-
 	hud->ApplyInput(camera);
 
 	static std::vector<EntityId> tmp;
 
 	tmp.clear();
+
+	for (EntityId id : selection) {
+		if (!entityManager->UnitArchetype.Archetype.HasEntity(id) ||
+			entityManager->UnitArchetype.HiddenArchetype.Archetype.HasEntity(id))
+
+			tmp.push_back(id);
+	}
+
+	if (tmp.size() > 0)
+		selection.RemoveSortedEntities(tmp);
+
+	tmp.clear();
+
 	cursor->Update(camera, *entityManager, tmp);
 
 	// TODO: Player input should be feed in the entity manager and on start of secondary update
@@ -137,7 +148,8 @@ void GameScene::Update() {
 		if (tmp.size() > 0)
 		{
 			selection.clear();
-			selection.insert(selection.begin(), tmp.begin(), tmp.end());
+			std::sort(tmp.begin(), tmp.end());
+			selection.AddSortedEntities(tmp);
 
 			entityManager->GetSoundSystem().PlayUnitChatSelect(selection[0]);
 		}
@@ -197,7 +209,7 @@ void GameScene::Update() {
 		}
 	}
 
-	entityManager->GetRenderSystem().SetSelection(selection, Colors::UIDarkGreen);
+	entityManager->GetRenderSystem().SetSelection(selection.GetEntities(), Colors::UIDarkGreen);
 
 	camera.Update();
 }
@@ -211,7 +223,7 @@ void GameScene::Draw() {
 
 	entityManager->Draw(camera);
 
-	hud->UpperScreenGUI(camera);
+	hud->UpperScreenGUI(camera, selection.GetEntities(), *entityManager);
 
 	cursor->Draw();
 

@@ -37,18 +37,6 @@ void Util::DrawTransparentRectangle(const Rectangle& rect, int thickness, Color 
 
 	dst.position += Vector2Int(rect.size.x - thickness, 0);
 	Platform::DrawRectangle(dst, color);
-
-	//dst = src + Vector2Int(0, rect.size.y - 1);
-	//Platform::DrawLine(src, dst, c);
-
-	//src = rect.position + Vector2Int(rect.size.x - 1, 0);
-	//dst = src + Vector2Int(0, rect.size.y - 1);
-	//Platform::DrawLine(src, dst, c);
-
-	//src = rect.position + Vector2Int(0, rect.size.y - 1);
-	//dst = src + Vector2Int(rect.size.x - 1, 0);
-
-	//Platform::DrawLine(src, dst, c);
 }
 
 

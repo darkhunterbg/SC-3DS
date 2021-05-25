@@ -113,6 +113,7 @@ private:
 	static bool RenderSort(const BatchDrawCommand& a, const BatchDrawCommand& b);
 
 	void CameraCull(const Rectangle16& rect, EntityManager& em);
+	void UnitSelectionCameraCull(const Rectangle16& rect, EntityManager& em);
 
 	void DrawEntities(const Camera& camera, const Rectangle16& camRect);
 	void DrawUnits(const Camera& camera, const Rectangle16& camRect);

@@ -51,6 +51,10 @@ void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
 
 	}
 
+	UnitSelectionCameraCull(camRect, em);
+}
+
+void RenderSystem::UnitSelectionCameraCull(const Rectangle16& camRect, EntityManager& em) {
 	unitSelectionData.clear();
 
 	for (EntityId id : selectedUnits) {
@@ -78,6 +82,7 @@ void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
 		}
 	}
 }
+
 
 void RenderSystem::DrawEntities(const Camera& camera, const Rectangle16& camRect) {
 

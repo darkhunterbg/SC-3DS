@@ -3,6 +3,8 @@
 #include "Scene.h"
 #include "../Camera.h"
 
+#include "../Entity//Entity.h"
+
 class GameHUD;
 class Cursor;
 class EntityManager;
@@ -22,4 +24,7 @@ private:
 	GameHUD* hud;
 	Cursor* cursor;
 	EntityManager* entityManager;
+
+	EntityCollection selection;
+
 };

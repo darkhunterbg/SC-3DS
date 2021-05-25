@@ -122,6 +122,8 @@ static void MarineData() {
 	d.DeathAfterEffect.Depth = -1;
 
 	d.Selection.VecticalOffset = 9;
+	d.Selection.BarSize = 6;
+	d.Selection.BarVerticalOffset = 20;
 
 	d.LoadResourcesAction = MarineResources;
 }
@@ -177,6 +179,8 @@ static void SCVData() {
 	d.DeathAnimationDef.FrameTime = 2;
 
 	d.Selection.VecticalOffset = 11;
+	d.Selection.BarSize = 6;
+
 
 	d.LoadResourcesAction = SCVResources;
 }

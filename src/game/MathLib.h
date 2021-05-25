@@ -88,7 +88,7 @@ struct Vector2T
 	//}
 
 	Vector2T Max(T mx, T my) const {
-		return Vector2T(std::min(x,mx), std::min(y,my)) ;
+		return Vector2T(std::min(x, mx), std::min(y, my));
 	}
 	Vector2T Min(T mx, T my) const {
 		return Vector2T(std::max(x, mx), std::max(y, my));
@@ -102,7 +102,7 @@ struct Vector2T
 	}
 
 	static T Dot(const Vector2T& a, const Vector2T& b) {
-		return a.x * a.y + b.x* b.y;
+		return a.x * a.y + b.x * b.y;
 	}
 
 	inline bool operator == (const Vector2T& b) const {
@@ -150,7 +150,7 @@ struct Vector2T
 
 
 	inline Vector2T operator << (int shift) const {
-		return Vector2T( x<< shift,  y << shift);
+		return Vector2T(x << shift, y << shift);
 	}
 	inline Vector2T operator >> (int shift) const {
 		return Vector2T(x >> shift, y >> shift);
@@ -320,12 +320,12 @@ struct Rectangle
 
 	inline Vector2Int GetCenter() const
 	{
-		return position + size / 2;
+		return position + size >> 1;
 	}
 	inline void SetCenter(Vector2Int center)
 	{
 		position = center;
-		position -= size / 2;
+		position -= size >> 1;
 	}
 	inline bool Intersects(const Rectangle& r) const
 	{
@@ -388,12 +388,12 @@ struct Rectangle16
 
 	inline Vector2Int16 GetCenter() const
 	{
-		return position + size / 2;
+		return position + size >> 1;
 	}
 	inline void SetCenter(Vector2Int16 center)
 	{
 		position = center;
-		position -= size / 2;
+		position -= size >> 1;
 	}
 	inline bool Intersects(const Rectangle16& r) const
 	{

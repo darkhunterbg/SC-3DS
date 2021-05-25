@@ -3,12 +3,14 @@
 #include "../Assets.h"
 #include "../Data/RaceDef.h"
 #include "../Color.h"
+#include "../Entity/Entity.h"
 
 #include <vector>
 
 class Camera;
 class MapSystem;
 class PlayerInfo;
+class EntityManager;
 
 struct GUIActionMarker {
 	Vector2Int16 pos;
@@ -21,7 +23,7 @@ public:
 	GameHUD(const RaceDef& race, Vector2Int16 mapSize);
 
 	void ApplyInput(Camera& camera);
-	void UpperScreenGUI(const Camera& camera);
+	void UpperScreenGUI(const Camera& camera, const std::vector<EntityId>& selection, EntityManager& em);
 	void LowerScreenGUI(const Camera& camera, MapSystem& mapSystem);
 	void UpdateInfo(const PlayerInfo& info);
 
@@ -55,7 +57,7 @@ private:
 	std::vector<GUIActionMarker> markers;
 
 	void DrawMarkers(const Camera& camera);
-
+	void DrawUnitBars(const Camera& camera, const std::vector<EntityId>& selection, EntityManager& em);
 	void DrawResource(Sprite icon, Vector2Int pos, Color color, const char* text, ...);
 	void DrawMinimap(const Camera& camera,  MapSystem& mapSystem);
 	void DrawAbilities();
