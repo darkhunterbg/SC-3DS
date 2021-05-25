@@ -50,6 +50,33 @@ void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
 		renderUnitData.ren.push_back(arch.RenderComponents[i]);
 
 	}
+
+	unitSelectionData.clear();
+
+	for (EntityId id : selectedUnits) {
+		if (em.UnitArchetype.RenderArchetype.Archetype.HasEntity(id)) {
+			auto& arch = em.UnitArchetype.RenderArchetype;
+
+			int i = Entity::ToIndex(id);
+
+			if (!em.FlagComponents[i].test(ComponentFlags::RenderEnabled))
+				continue;
+
+			const Rectangle16& bb = arch.BoundingBoxComponents[i];
+
+			if (!camRect.Intersects(bb))
+				continue;
+
+			const auto* def = em.UnitArchetype.UnitComponents.GetComponent(id).def;
+
+			unitSelectionData.graphics.push_back(def->Graphics->Selection.Atlas->GetFrame(0));
+			Vector2Int16 pos = em.PositionComponents.GetComponent(id);
+			pos -= Vector2Int16(def->Graphics->Selection.Atlas->FrameSize / 2);
+			unitSelectionData.position.push_back(pos);
+			unitSelectionData.order.push_back(arch.DestinationComponents.GetComponent(id).order);
+			unitSelectionData.verticalOffset.push_back(def->Graphics->Selection.VecticalOffset);
+		}
+	}
 }
 
 void RenderSystem::DrawEntities(const Camera& camera, const Rectangle16& camRect) {
@@ -61,17 +88,15 @@ void RenderSystem::DrawEntities(const Camera& camera, const Rectangle16& camRect
 	int entitiesCount = renderData.size();
 
 	for (int i = 0; i < entitiesCount; ++i) {
-		Vector2Int16  dst = renderData.pos[i];
+		Vector2Int16  dst = renderData.pos[i].dst;
 		const auto& r = renderData.ren[i];
 
 		dst -= camRect.position;
 		dst /= camera.Scale;
 
-		int order = r.depth * 10'000'000;
-		order += dst.y * 1000 + dst.x * 3;
 
 		BatchDrawCommand cmd;
-		cmd.order = order;
+		cmd.order = renderData.pos[i].order;
 		cmd.image = r.sprite;
 		cmd.position = dst;
 		cmd.scale = scale[r.hFlip];
@@ -101,12 +126,9 @@ void RenderSystem::DrawUnits(const Camera& camera, const Rectangle16& camRect) {
 		shadowDst -= camRect.position;
 		shadowDst /= camera.Scale;
 
-		int order = r.depth * 10'000'000;
-		order += dst.y * 1000 + dst.x * 3;
-
 
 		BatchDrawCommand cmd;
-		cmd.order = order;
+		cmd.order = rp.order;
 		cmd.image = r.shadowSprite;
 		cmd.position = shadowDst;
 		cmd.scale = scale[r.hFlip];
@@ -114,7 +136,7 @@ void RenderSystem::DrawUnits(const Camera& camera, const Rectangle16& camRect) {
 		if (cmd.image.textureId)
 			render.push_back(cmd);
 
-		cmd.order++;
+		cmd.order += 2;
 		cmd.image = r.sprite;
 		cmd.position = dst;
 		cmd.color = { Color32(Colors::Black),0 };
@@ -128,6 +150,33 @@ void RenderSystem::DrawUnits(const Camera& camera, const Rectangle16& camRect) {
 			render.push_back(cmd);
 	}
 }
+void RenderSystem::DrawSelection(const Camera& camera, const Rectangle16& camRect) {
+
+	int entitiesCount = unitSelectionData.size();
+
+	float camMul = 1.0f / camera.Scale;
+	BatchDrawCommand cmd;
+	cmd.scale = Vector2(camMul);
+	cmd.color = { selectionColor ,1 };
+
+	for (int i = 0; i < entitiesCount; ++i) {
+		auto& dst = unitSelectionData.position[i];
+		const auto& frame = unitSelectionData.graphics[i];
+		short offset = unitSelectionData.verticalOffset[i];
+
+		dst += frame.offset;
+		dst.y += offset;
+
+		dst -= camRect.position;
+		dst /= camera.Scale;
+
+		cmd.order = unitSelectionData.order[i] + 1;
+		cmd.image = frame.sprite.image;
+		cmd.position = dst;
+
+		render.push_back(cmd);
+	}
+}
 
 void RenderSystem::Draw(const Camera& camera, EntityManager& em) {
 	Rectangle16 camRect = camera.GetRectangle16();
@@ -138,6 +187,7 @@ void RenderSystem::Draw(const Camera& camera, EntityManager& em) {
 
 	DrawEntities(camera, camRect);
 	DrawUnits(camera, camRect);
+	DrawSelection(camera, camRect);
 
 	std::sort(render.begin(), render.end(), RenderSort);
 
@@ -194,7 +244,6 @@ void RenderSystem::DrawBoundingBoxes(const Camera& camera, EntityManager& em) {
 	}
 }
 
-
 bool RenderSystem::RenderSort(const BatchDrawCommand& a, const BatchDrawCommand& b) {
 	return a.order < b.order;
 }
@@ -205,8 +254,10 @@ void RenderSystem::UpdateRenderPositionsJob(int start, int end) {
 	RenderUpdatePosData& data = s->updatePosData;
 
 	for (int i = start; i < end; ++i) {
-		Vector2Int16& p = *data.outPos[i];
-		p = data.worldPos[i] + data.offset[i];
+		RenderDestinationComponent& p = *data.outDst[i];
+		p.dst = data.worldPos[i] + data.offset[i];
+		p.order = data.depth[i] * 10'000'000 + p.dst.y * 1000 + p.dst.x * 4;
+
 		data.outBB[i]->SetCenter(data.worldPos[i]);
 	}
 }
@@ -217,6 +268,8 @@ void RenderSystem::UpdateUnitRenderPositionsJob(int start, int end) {
 		RenderUnitDestinationComponent& p = *data.outPos[i];
 		p.dst = data.worldPos[i] + data.offset[i].offset;
 		p.shadowDst = data.worldPos[i] + data.offset[i].shadowOffset;
+		p.order = data.depth[i] * 10'000'000 + p.dst.y * 1000 + p.dst.x * 4;
+
 		data.outBB[i]->SetCenter(data.worldPos[i]);
 	}
 }
@@ -244,10 +297,11 @@ void RenderSystem::UpdatePositions(EntityManager& em, const EntityChangedData& c
 		if (flag.test(ComponentFlags::RenderChanged)) {
 
 			flag.clear(ComponentFlags::RenderChanged);
-			updatePosData.outPos.push_back(&arch.DestinationComponents[i]);
+			updatePosData.outDst.push_back(&arch.DestinationComponents[i]);
 			updatePosData.worldPos.push_back(em.PositionComponents[i]);
 			updatePosData.offset.push_back(arch.OffsetComponents[i]);
 			updatePosData.outBB.push_back(&arch.BoundingBoxComponents[i]);
+			updatePosData.depth.push_back(arch.RenderComponents[i].depth);
 		}
 	}
 
@@ -268,6 +322,7 @@ void RenderSystem::UpdatePositions(EntityManager& em, const EntityChangedData& c
 			unitUpdatePosData.worldPos.push_back(em.PositionComponents[i]);
 			unitUpdatePosData.offset.push_back(arch.OffsetComponents[i]);
 			unitUpdatePosData.outBB.push_back(&arch.BoundingBoxComponents[i]);
+			unitUpdatePosData.depth.push_back(arch.RenderComponents[i].depth);
 		}
 	}
 
@@ -275,5 +330,12 @@ void RenderSystem::UpdatePositions(EntityManager& em, const EntityChangedData& c
 
 	JobSystem::RunJob(updatePosData.size(), JobSystem::DefaultJobSize, UpdateRenderPositionsJob);
 	JobSystem::RunJob(unitUpdatePosData.size(), JobSystem::DefaultJobSize, UpdateUnitRenderPositionsJob);
+}
+
+void RenderSystem::SetSelection(const std::vector<EntityId>& selection, Color color)
+{
+	selectedUnits.clear();
+	selectedUnits.insert(selectedUnits.begin(), selection.begin(), selection.end());
+	selectionColor = Color32(color);
 }
 

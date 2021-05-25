@@ -101,7 +101,10 @@ namespace Colors {
 	constexpr Color Transparent = { 0,0,0,0 };
 
 	constexpr Color UIGreen = { 0x10fc18ff };
+	constexpr Color UIDarkGreen = { 0x249824ff };
 	constexpr Color UIRed = { 0xc81818ff };
+	constexpr Color UIDarkRed = { 0x840404ff };
+	constexpr Color UIDarkYellow = { 0xbcb834ff };
 	
 
 	constexpr Color SCRed = { 0xf40404ff };

@@ -48,7 +48,7 @@ void EntityUtil::CopyUnitRenderSettings(EntityId e) {
 
 	RenderComponent& render = em.RenderArchetype.RenderComponents.GetComponent(e);
 	Vector2Int16& offset = em.RenderArchetype.OffsetComponents.GetComponent(e);
-	Vector2Int16& dst = em.RenderArchetype.DestinationComponents.GetComponent(e);
+	auto& dst = em.RenderArchetype.DestinationComponents.GetComponent(e);
 	Rectangle16& bb = em.RenderArchetype.BoundingBoxComponents.GetComponent(e);
 
 	const RenderUnitComponent& Urender = em.UnitArchetype.RenderArchetype.RenderComponents.GetComponent(e);
@@ -61,7 +61,8 @@ void EntityUtil::CopyUnitRenderSettings(EntityId e) {
 	render.hFlip = Urender.hFlip;
 
 	offset = Uoffset.offset;
-	dst = Udst.dst;
+	dst.dst = Udst.dst;
+	dst.order = Udst.order;
 	bb = Ubb;
 }
 

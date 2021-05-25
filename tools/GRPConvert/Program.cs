@@ -17,6 +17,8 @@ namespace GRPConvert
 		{
 			shadowPalette = new Palette(Color.Black) { Name = "Shadows" };
 
+			palettes.Add("White", new Palette(Color.White) { Name = "White" });
+
 			foreach (var file in Directory.EnumerateFiles("..\\..\\palettes\\", "*.pal", SearchOption.AllDirectories))
 			{
 				palettes.Add(Path.GetFileNameWithoutExtension(file), new Palette(file));
@@ -31,6 +33,7 @@ namespace GRPConvert
 					palettes["Units"].Remap(i, remap);
 				}
 			}
+
 
 			string[] lines = File.ReadAllLines("input.txt");
 
@@ -113,7 +116,7 @@ namespace GRPConvert
 						{
 							string frName = "cm_" + i.ToString("D3") + ".png";
 							string s = Path.Combine(dst, frName);
-							
+
 
 							fr.GenerateMapOfRemappedColors(p).Save(s, ImageFormat.Png);
 

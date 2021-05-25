@@ -36,7 +36,6 @@ void GameHUD::DrawResource(Sprite icon, Vector2Int pos, Color color, const char*
 	Platform::DrawText(font, pos, textBuffer, color, 0.4f);
 }
 
-
 void GameHUD::UpdateInfo(const PlayerInfo& info) {
 	minerals.target = info.minerals;
 	gas.target = info.gas;

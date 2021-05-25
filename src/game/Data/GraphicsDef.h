@@ -38,6 +38,11 @@ struct UnitGraphicsDef {
 	UnitAnimationClip DeathAnimation;
 
 	struct {
+		const SpriteFrameAtlas* Atlas;
+		short VecticalOffset = 9;
+	} Selection;
+
+	struct {
 		AnimationDef Def;
 		AnimationClip Clip;
 		int Depth = 0;

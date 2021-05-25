@@ -14,6 +14,7 @@ SpriteFrameAtlas* SpriteDatabase::unit_neutral_min01;
 SpriteFrameAtlas* SpriteDatabase::unit_neutral_min01sha;
 SpriteFrameAtlas* SpriteDatabase::unit_bullet_tspark;
 SpriteFrameAtlas* SpriteDatabase::cursor;
+SpriteFrameAtlas* SpriteDatabase::unit_thingy_o022;
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_marine() {
 	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_terran_marine.t3x");
@@ -1256,6 +1257,17 @@ const SpriteFrameAtlas* SpriteDatabase::Load_cursor() {
 	a->SetOffset(77, Vector2Int(50,54));
 	a->SetOffset(78, Vector2Int(51,55));
 	a->SetOffset(79, Vector2Int(40,53));
+
+	return a;
+}
+
+const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_o022() {
+	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_thingy_o022.t3x");
+	auto* a = unit_thingy_o022 = new SpriteFrameAtlas(atlas);
+	a->FrameSize = Vector2Int(32, 32);
+
+	a->SetOffset(0, Vector2Int(6,10));
+	a->SetOffset(1, Vector2Int(6,11));
 
 	return a;
 }

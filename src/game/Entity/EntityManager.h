@@ -68,7 +68,7 @@ public:
 		EntityArchetype Archetype = EntityArchetype("Render");
 		ComponentCollection<RenderComponent> RenderComponents;
 		ComponentCollection<Vector2Int16> OffsetComponents;
-		ComponentCollection<Vector2Int16> DestinationComponents;
+		ComponentCollection<RenderDestinationComponent> DestinationComponents;
 		ComponentCollection<Rectangle16> BoundingBoxComponents;
 	} RenderArchetype;
 
@@ -204,6 +204,9 @@ public:
 	}
 	inline KinematicSystem& GetKinematicSystem() {
 		return kinematicSystem;
+	}
+	inline RenderSystem& GetRenderSystem() {
+		return renderSystem;
 	}
 	inline const Span<EntityId> GetEntities() const {
 		return entities.GetEntities();

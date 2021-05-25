@@ -149,7 +149,6 @@ void GameScene::Update() {
 			for (EntityId id : selection)
 			{
 				UnitEntityUtil::SetAIState(id, UnitAIState::GoToPosition, pos);
-
 				entityManager->GetSoundSystem().PlayUnitChatCommand(id);
 			}
 
@@ -173,14 +172,12 @@ void GameScene::Update() {
 						continue;
 
 					UnitEntityUtil::SetAIState(id, UnitAIState::AttackTarget, target);
-
 					entityManager->GetSoundSystem().PlayUnitChatCommand(id);
 				}
 			}
 			else {
 				for (EntityId id : selection) {
 					UnitEntityUtil::SetAIState(id, UnitAIState::GoToAttack, pos);
-
 					entityManager->GetSoundSystem().PlayUnitChatCommand(id);
 				}
 			}
@@ -195,21 +192,12 @@ void GameScene::Update() {
 			for (EntityId id : selection)
 			{
 				UnitEntityUtil::SetAIState(id, UnitAIState::Idle);
-
-				/*auto& def = entityManager->UnitArchetype.UnitComponents[id].def;
-
-				if (def->IsResourceContainer)
-					continue;
-				entityManager->UnitArchetype.StateComponents.GetComponent(id) =
-					UnitState::Death;
-				entityManager->FlagComponents.GetComponent(id)
-					.set(ComponentFlags::UnitStateChanged);*/
-
+				entityManager->GetSoundSystem().PlayUnitChatCommand(id);
 			}
-
-			//selection.clear();
 		}
 	}
+
+	entityManager->GetRenderSystem().SetSelection(selection, Colors::UIDarkGreen);
 
 	camera.Update();
 }

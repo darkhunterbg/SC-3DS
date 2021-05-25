@@ -117,7 +117,7 @@ struct RenderUnitComponent {
 	Image sprite;
 	Image shadowSprite;
 	Image colorSprite;
-	int depth = 0;
+	int8_t depth = 0;
 	bool hFlip = false;
 
 	inline void SetSpriteFrame(const UnitSpriteFrame& s) {
@@ -132,11 +132,18 @@ struct RenderUnitComponent {
 struct RenderUnitOffsetComponent {
 	Vector2Int16 offset;
 	Vector2Int16 shadowOffset;
+
+};
+
+struct RenderDestinationComponent {
+	Vector2Int16 dst;
+	int order = 0;
 };
 
 struct RenderUnitDestinationComponent {
 	Vector2Int16 dst;
 	Vector2Int16 shadowDst;
+	int order = 0;
 };
 
 struct NavigationComponent {

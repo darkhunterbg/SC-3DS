@@ -15,6 +15,10 @@ unit\zerg\*.grp
 palette Orange
 unit\thingy\*.grp
 
+palette White
+unit\thingy\o022.grp
+unit\thingy\od022.grp
+
 palette Orange
 unit\thingy\tscglow.grp
 unit\thingy\tbangs.grp

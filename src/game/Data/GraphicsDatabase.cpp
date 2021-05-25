@@ -72,6 +72,8 @@ static void MarineResources() {
 	d.DeathAnimationDef.GenerateAnimation(a, nullptr, d.DeathAnimation);
 	d.MovementAnimationDef.GenerateAnimations(a, as, d.MovementAnimations);
 
+	d.Selection.Atlas = SpriteDatabase::Load_unit_thingy_o022();
+
 	for (int i = 0; i < 2; ++i) {
 		d.AttackAnimationDef.GenerateAnimations(a, as, d.AttackAnimations);
 		d.AttackAnimationDef.FrameStart = 34;
@@ -119,6 +121,8 @@ static void MarineData() {
 	d.DeathAfterEffect.Def.FrameTime = 48;
 	d.DeathAfterEffect.Depth = -1;
 
+	d.Selection.VecticalOffset = 9;
+
 	d.LoadResourcesAction = MarineResources;
 }
 
@@ -136,6 +140,7 @@ static void SCVResources() {
 	d.MovementGlowAnimationDef.GenerateAnimations(a, d.MovementGlowAnimations);
 	d.IdleAnimationDef.GenerateAnimations(a,a, d.IdleAnimations);
 
+	d.Selection.Atlas = SpriteDatabase::Load_unit_thingy_o022();
 
 	d.AttackAnimationDef.GenerateAnimations(a, a, d.AttackAnimations);
 	d.AttackAnimationDef.FrameCount = 1;
@@ -170,6 +175,8 @@ static void SCVData() {
 	d.DeathAfterEffect.Def.FrameStart = 0;
 	d.DeathAfterEffect.Def.FrameCount = 9;
 	d.DeathAnimationDef.FrameTime = 2;
+
+	d.Selection.VecticalOffset = 11;
 
 	d.LoadResourcesAction = SCVResources;
 }

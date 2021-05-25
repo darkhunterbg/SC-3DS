@@ -193,7 +193,6 @@ static void  UnitAttackingEnterStateJob(int start, int end) {
 
 		EntityId e = scratch[i];
 
-
 		em.TimingArchetype.TimingComponents.GetComponent(e).NewTimer(unit.def->Weapon->TargetEffect[0].GetDuration());
 		em.TimingArchetype.ActionComponents.GetComponent(e).action = TimerExpiredAction::DeleteEntity;
 		em.FlagComponents.NewComponent(e).set(ComponentFlags::UpdateTimers);

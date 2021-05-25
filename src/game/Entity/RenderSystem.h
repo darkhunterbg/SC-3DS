@@ -16,7 +16,7 @@ struct EntityChangedData;
 class RenderSystem {
 
 	struct RenderData {
-		std::vector<Vector2Int16> pos;
+		std::vector<RenderDestinationComponent> pos;
 		std::vector<RenderComponent> ren;
 
 		inline void clear() {
@@ -41,22 +41,23 @@ class RenderSystem {
 		}
 	};
 
-
 	struct RenderUpdatePosData {
-		std::vector<Vector2Int16*> outPos;
+		std::vector<RenderDestinationComponent*> outDst;
 		std::vector<Rectangle16*> outBB;
 		std::vector<Vector2Int16> worldPos;
 		std::vector<Vector2Int16> offset;
+		std::vector< int8_t> depth;
 
 		inline void clear() {
 
-			outPos.clear();
+			outDst.clear();
 			worldPos.clear();
 			offset.clear();
 			outBB.clear();
+			depth.clear();
 		}
 		inline size_t size() {
-			return outPos.size();
+			return outDst.size();
 		}
 	};
 
@@ -65,25 +66,47 @@ class RenderSystem {
 		std::vector<Rectangle16*> outBB;
 		std::vector<Vector2Int16> worldPos;
 		std::vector<RenderUnitOffsetComponent> offset;
+		std::vector<int8_t> depth;
 
 		inline void clear() {
 			outPos.clear();
 			worldPos.clear();
 			offset.clear();
 			outBB.clear();
+			depth.capacity();
 		}
 		inline size_t size() {
 			return outPos.size();
 		}
 	};
 
+	struct RenderUnitSelectionData {
+		std::vector<SpriteFrame> graphics;
+		std::vector<Vector2Int16> position;
+		std::vector<int> order;
+		std::vector<short> verticalOffset;
+
+		inline void clear() {
+			graphics.clear();
+			position.clear();
+			order.clear();
+			verticalOffset.clear();
+		}
+		inline size_t size() {
+			return graphics.size();
+		}
+	};
+
 private:
 	std::vector<BatchDrawCommand> render;
+	std::vector<EntityId> selectedUnits;
+	Color32 selectionColor;
 
 	RenderData renderData;
 	RenderUnitData renderUnitData;
 	RenderUpdatePosData updatePosData;
 	RenderUnitUpdatePosData unitUpdatePosData;
+	RenderUnitSelectionData unitSelectionData;
 
 	static void UpdateUnitRenderPositionsJob(int start, int end);
 	static void UpdateRenderPositionsJob(int start, int end);
@@ -93,9 +116,12 @@ private:
 
 	void DrawEntities(const Camera& camera, const Rectangle16& camRect);
 	void DrawUnits(const Camera& camera, const Rectangle16& camRect);
+	void DrawSelection(const Camera& camera, const Rectangle16& camRect);
 public:
 	void Draw(const Camera& camera, EntityManager& em);
 	void DrawBoundingBoxes(const Camera& camera, EntityManager& em);
 	void UpdatePositions(EntityManager& em, const EntityChangedData& changed);
 
+
+	void SetSelection(const std::vector<EntityId>& selection, Color selectionColor);
 };

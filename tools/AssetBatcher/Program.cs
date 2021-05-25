@@ -21,9 +21,6 @@ namespace AssetBatcher
 
 		static void Main(string[] args)
 		{
-			string rootDir = Path.GetFullPath("../..");
-			string path = Path.Combine(rootDir, "data_out", "unit", "terran");
-			var dir = Path.Combine(rootDir, "gfx");
 
 			T3SFolders("unit/terran/marine", "unit/terran/tmadeath");
 			T3SFolders("unit/terran/tmashad");
@@ -48,7 +45,6 @@ namespace AssetBatcher
 
 			T3SFolders("unit/bullet/tspark");
 
-
 			List<string> cursor = new List<string>();
 			foreach (var d in Directory.GetDirectories("../../data_out/cursor"))
 			{
@@ -56,9 +52,9 @@ namespace AssetBatcher
 			}
 			T3SFoldersWithName("cursor", cursor.ToArray());
 
+			T3SFoldersWithName("unit/thingy/o022", "unit/thingy/o022", "unit/thingy/od022");
+
 			GeneraSourceCode();
-
-
 		}
 
 		static void GeneraSourceCode()
@@ -153,7 +149,8 @@ namespace AssetBatcher
 		static void T3SFoldersWithName(string name, params string[] folders)
 		{
 			if (string.IsNullOrEmpty(name))
-				name = folders[0].Replace('/', '_').Replace('\\', '_');
+				name = folders[0];
+			name = name.Replace('/', '_').Replace('\\', '_');
 
 			string root = Path.GetFullPath("../../data_out");
 
