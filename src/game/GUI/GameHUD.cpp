@@ -101,7 +101,8 @@ void GameHUD::UpperScreenGUI(const Camera& camera, const std::vector<EntityId>& 
 
 
 	Vector2Int pos = { 320 + 16 , 0 };
-	pos.x += 7.5 * std::strlen(textBuffer);
+
+	pos.x += Platform::MeasureString(font, textBuffer, 0.4f).x;
 	stbsp_snprintf(textBuffer, sizeof(textBuffer), "/%i", supply.max);
 	Platform::DrawText(font, pos + Vector2Int{ 1,1 }, textBuffer, Colors::Black, 0.4f);
 	Platform::DrawText(font, pos, textBuffer, Colors::UIGreen, 0.4f);
@@ -110,11 +111,13 @@ void GameHUD::UpperScreenGUI(const Camera& camera, const std::vector<EntityId>& 
 	Platform::Draw(sprite, { {0, 240 - sprite.rect.size.y,}, Vector2Int(sprite.rect.size) });
 }
 
-void GameHUD::LowerScreenGUI(const Camera& camera, MapSystem& mapSystem) {
+void GameHUD::LowerScreenGUI(const Camera& camera, const std::vector<EntityId>& selection, EntityManager& em) {
 
 	Platform::Draw(race.ConsoleSprite.GetSprite(0), { {0, 0,},{ 320, 240} });
 
-	DrawMinimap(camera, mapSystem);
+	DrawMinimap(camera, em.GetMapSystem());
+
+	consolePanel.Draw({ {10,4},{220,84} }, selection, em);
 
 	DrawAbilities();
 }

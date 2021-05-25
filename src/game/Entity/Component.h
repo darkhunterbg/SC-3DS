@@ -174,6 +174,7 @@ struct UnitAIStateDataComponent {
 struct UnitComponent {
 	const UnitDef* def;
 	EntityId movementGlowEntity = Entity::None;
+	uint16_t kills = 0;
 
 	inline bool HasMovementGlow() const { return movementGlowEntity != Entity::None; }
 };
@@ -196,8 +197,11 @@ struct UnitHealthComponent {
 	uint16_t current = 1;
 	uint16_t max = 1;
 
-	inline void Reduce(uint16_t value) {
-		current -= std::min(value, current);
+	inline bool Reduce(uint16_t value) {
+		uint16_t damage = std::min(value, current);
+		bool kill = damage == current;
+		current -= damage;
+		return damage && kill;
 	}
 
 	inline bool AtMax() const { return current == max; }

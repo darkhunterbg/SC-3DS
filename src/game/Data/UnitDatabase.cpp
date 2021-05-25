@@ -15,6 +15,7 @@ std::vector<UnitDef*> UnitDatabase::Units = {
 static void MarineData() {
 	UnitDef& u = UnitDatabase::Marine;
 	u.Name = "Terran Marine";
+	u.Title = "Private";
 	u.Health = 40;
 	u.MovementSpeed = 4;
 	u.RotationSpeed = 1;

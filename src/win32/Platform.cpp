@@ -114,6 +114,12 @@ Font Platform::LoadFont(const char* path) {
 
 	return { font };
 }
+Vector2Int Platform::MeasureString(Font font, const char* text, float scale) {
+	FC_Font* f = font.GetFontId<FC_Font>();
+	SDL_Rect rect =FC_GetBounds(f, 0, 0, FC_AlignEnum::FC_ALIGN_LEFT, FC_MakeScale(scale, scale), text);
+
+	return { rect.w, rect.h };
+}
 
 FILE* Platform::OpenAsset(const char* path) {
 	std::filesystem::path f = assetDir;

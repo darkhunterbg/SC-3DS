@@ -66,6 +66,21 @@ Font Platform::LoadFont(const char* path) {
 
 	return { font };
 }
+Vector2Int Platform::MeasureString(Font font, const char* text, float scale) {
+	C2D_Font f = (C2D_Font)font.fontId;
+	
+	C2D_TextBufClear(textBuffer);
+	C2D_Text t;
+	C2D_TextFontParse(&t, f, textBuffer, text);
+	C2D_TextOptimize(&t);
+
+	Vector2Int size;
+
+	size.x = (int)(t.width * scale);
+	size.y = (int)(t.lines * 30.0f * scale);
+
+	return size;
+}
 
 void Platform::ChangeBlendingMode(BlendMode mode) {
 
@@ -95,7 +110,6 @@ void Platform::ChangeBlendingMode(BlendMode mode) {
 		break;
 	}
 }
-
 
 // Render without blending
 
@@ -129,7 +143,6 @@ void Platform::DrawOnScreen(ScreenId screen) {
 void Platform::ClearBuffer(Color color) {
 	C2D_TargetClear(currentRT, Color32(color).value);
 }
-
 
 Sprite Platform::NewSprite(Image image, Rectangle16 src) {
 	C3D_Tex* tex = (C3D_Tex*)image.textureId;

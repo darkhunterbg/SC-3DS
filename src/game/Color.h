@@ -104,10 +104,11 @@ namespace Colors {
 	constexpr Color UIDarkGreen = { 0x249824ff };
 	constexpr Color UIRed = { 0xc81818ff };
 	constexpr Color UIDarkRed = { 0x840404ff };
-	constexpr Color UIYellow = { 0xfccc2cff };
+	constexpr Color UIYellow = { 0xdcdc3cff };
 	constexpr Color UIDarkYellow = { 0xbcb834ff };
 	constexpr Color UIGray = { 0xb0b0b0ff };
 	constexpr Color UIDarkGray = { 0x98948cff };
+	constexpr Color UILightGray = { 0xacacd9ff };
 
 	constexpr Color SCRed = { 0xf40404ff };
 	constexpr Color SCBlue = { 0x0c48ccff };

@@ -4,6 +4,7 @@
 #include "../Data/RaceDef.h"
 #include "../Color.h"
 #include "../Entity/Entity.h"
+#include "UnitSelectionConsolePanel.h"
 
 #include <vector>
 
@@ -24,13 +25,14 @@ public:
 
 	void ApplyInput(Camera& camera);
 	void UpperScreenGUI(const Camera& camera, const std::vector<EntityId>& selection, EntityManager& em);
-	void LowerScreenGUI(const Camera& camera, MapSystem& mapSystem);
+	void LowerScreenGUI(const Camera& camera, const std::vector<EntityId>& selection, EntityManager& em);
 	void UpdateInfo(const PlayerInfo& info);
 
 	void NewActionMarker(Vector2Int16 pos);
 
 private:
 	const RaceDef& race;
+	UnitSelectionConsolePanel consolePanel;
 
 	Font font;
 	const SpriteAtlas* iconsAtlas;

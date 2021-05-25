@@ -50,6 +50,7 @@ private:
 public:
 	static const SpriteAtlas* LoadAtlas(const char* path);
 	static Font LoadFont(const char* path);
+	static Vector2Int MeasureString(Font font, const char* text, float scale = 1);
 	static void DrawOnScreen(ScreenId screen);
 	static void DrawOnTexture(Texture texture);
 

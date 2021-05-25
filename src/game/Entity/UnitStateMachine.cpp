@@ -145,7 +145,7 @@ static void  UnitAttackingEnterStateJob(int start, int end) {
 		Vector2Int16 targetPos = em.PositionComponents.GetComponent(stateData.target.entityId);
 
 
-		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
+		 UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
 		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
 
 		uint8_t orientation = EntityUtil::GetOrientationToPosition(id, targetPos);
@@ -176,8 +176,13 @@ static void  UnitAttackingEnterStateJob(int start, int end) {
 
 		UnitWeaponComponent& weapon = em.UnitArchetype.WeaponComponents.GetComponent(id);
 		weapon.StartCooldown();
-		em.UnitArchetype.HealthComponents.GetComponent(stateData.target.entityId).Reduce(weapon.damage);
+		
+		bool kill = em.UnitArchetype.HealthComponents.GetComponent(stateData.target.entityId)
+			.Reduce(weapon.damage);
 
+		if (kill) {
+			++unit.kills;
+		}
 
 		TimingComponent& timer = em.TimingArchetype.TimingComponents.GetComponent(id);
 		TimingActionComponent& timerAction = em.TimingArchetype.ActionComponents.GetComponent(id);

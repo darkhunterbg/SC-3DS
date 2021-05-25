@@ -58,10 +58,10 @@ void GameScene::Start() {
 	//UnitEntityUtil::NewUnit(UnitDatabase::MineralField1, 0,
 	//	Vector2Int16(128, 256));
 
-	//for (int i = 0; i < 1; ++i) {
-	//	UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 2,
-	//		Vector2Int16(600, 32 * i + 32));
-	//}
+	for (int i = 0; i < 1; ++i) {
+		UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 2,
+			Vector2Int16(600, 32 * i + 32));
+	}
 
 	//UnitEntityUtil::NewUnit(*UnitDatabase::Units[1], 2,
 	//	Vector2Int16(400, 300));
@@ -70,8 +70,8 @@ void GameScene::Start() {
 	//	Vector2Int16(48, 48));
 	EntityId e = 0;
 	int i = 0;
-	for (int y = 25; y > 0; --y) {
-		for (int x = 25; x > 0; --x) {
+	for (int y = 1; y > 0; --y) {
+		for (int x = 2; x > 0; --x) {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[0];
 			e = UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
@@ -91,6 +91,8 @@ void GameScene::Start() {
 	//entityManager->UnitArchetype.StateComponents.GetComponent(e) = UnitState::Attacking;
 
 	entityManager->FullUpdate(camera);
+
+	selection.AddEntity(e);
 
 	//for (EntityId id : entityManager->UnitArchetype.Archetype.GetEntities()) {
 	//	UnitEntityUtil::AttackPosition(id, { 64,64 });
@@ -229,5 +231,5 @@ void GameScene::Draw() {
 
 	Platform::DrawOnScreen(ScreenId::Bottom);
 
-	hud->LowerScreenGUI(camera, entityManager->GetMapSystem());
+	hud->LowerScreenGUI(camera, selection.GetEntities(), *entityManager);
 }
