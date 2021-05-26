@@ -3,11 +3,12 @@
 #include "../Color.h"
 #include "../Game.h"
 
+#include "../Data/AbilityDatabase.h"
 #include "../Entity/EntityManager.h"
 
  UnitCommandsPanel::UnitCommandsPanel() {
 	 for (UnitCommand& cmd : unitCommands) {
-		 cmd.sprite = nullptr;
+		 cmd.ability = nullptr;
 		 cmd.enabled = false;
 		 cmd.active = false;
 		 cmd.pressed = false;
@@ -36,7 +37,7 @@ void UnitCommandsPanel::UpdateInput(GameHUDContext& context)
 			int y = i / 3;
 			const UnitCommand& cmd = unitCommands[i];
 
-			if (cmd.sprite == nullptr || !cmd.enabled)
+			if (cmd.ability == nullptr || !cmd.enabled)
 				continue;
 
 			Vector2Int offset = { x * 46, y * 40 };
@@ -74,7 +75,7 @@ void UnitCommandsPanel::DrawCommands(GameHUDContext& context) {
 
 			const UnitCommand& cmd = unitCommands[x + y * 3];
 
-			if (cmd.sprite == nullptr)
+			if (cmd.ability == nullptr)
 				continue;
 
 			Vector2Int offset = { x * 46, y * 40 };
@@ -87,8 +88,11 @@ void UnitCommandsPanel::DrawCommands(GameHUDContext& context) {
 			d.position += offset;
 			Platform::Draw(f, d);
 
-			d.size = Vector2Int(cmd.sprite->rect.size);
-			d.position += {3, 3};
+			const auto& commandIcon = cmd.ability->Sprite;
+
+			d.size = Vector2Int(commandIcon.sprite.rect.size);
+			d.position = dst.position + offset  +
+				(Vector2Int{ 36, 35 } - Vector2Int(commandIcon.offset + commandIcon.sprite.rect.size)) / 2;
 
 			
 			if (cmd.pressed) {
@@ -106,7 +110,7 @@ void UnitCommandsPanel::DrawCommands(GameHUDContext& context) {
 
 
 
-			Platform::Draw(*cmd.sprite, d, color);
+			Platform::Draw(commandIcon.sprite, d, color);
 		}
 	}
 }
@@ -114,13 +118,11 @@ void UnitCommandsPanel::DrawCommands(GameHUDContext& context) {
 void UnitCommandsPanel::UpdateCommands(GameHUDContext& context)
 {
 	for (UnitCommand& cmd : unitCommands) {
-		cmd.sprite = nullptr;
+		cmd.ability = nullptr;
 		cmd.enabled = false;
 		cmd.active = false;
 		cmd.pressed = false;
 	}
-
-	const auto atlas = Game::AssetLoader.LoadAtlas("unit_cmdbtns_cmdicons.t3x");
 
 	if (context.selectedEntities.size() > 0)
 	{
@@ -132,26 +134,26 @@ void UnitCommandsPanel::UpdateCommands(GameHUDContext& context)
 
 		UnitAIState state = em.UnitArchetype.AIStateComponents.GetComponent(entityId);
 
-		unitCommands[0].sprite = &atlas->GetSprite(228);
+		unitCommands[0].ability = &AbilityDatabase::Move;
 		unitCommands[0].enabled = true;
 		unitCommands[0].active = state == UnitAIState::GoToPosition || state == UnitAIState::GoToAttack;
 
-		unitCommands[1].sprite = &atlas->GetSprite(229);
+		unitCommands[1].ability = &AbilityDatabase::Stop;
 		unitCommands[1].enabled = true;
 		unitCommands[1].active = state == UnitAIState::Idle;
 
 		if (unit.def->Weapon) {
-			unitCommands[2].sprite = &atlas->GetSprite(230);
+			unitCommands[2].ability = &AbilityDatabase::Attack;
 			unitCommands[2].enabled = true;
 			unitCommands[2].active = state == UnitAIState::AttackTarget;
 		}
 
-		unitCommands[3].sprite = &atlas->GetSprite(254);
+		unitCommands[3].ability = &AbilityDatabase::Patrol;
 		unitCommands[3].enabled = true;
 
 		//236
 
-		unitCommands[4].sprite = &atlas->GetSprite(255);
+		unitCommands[4].ability = &AbilityDatabase::HoldPosition;
 		unitCommands[4].enabled = true;
 	}
 }

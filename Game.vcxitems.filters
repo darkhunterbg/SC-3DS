@@ -148,6 +148,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUDContext.h">
       <Filter>GUI</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\AbilityDef.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\AbilityDatabase.h">
+      <Filter>Data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -258,6 +264,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitCommandsPanel.cpp">
       <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\AbilityDatabase.cpp">
+      <Filter>Data</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

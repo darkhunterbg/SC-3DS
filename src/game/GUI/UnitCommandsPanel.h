@@ -9,11 +9,12 @@
 #include <array>
 
 class EntityManager;
+class AbilityDef;
 
 class UnitCommandsPanel {
 private:
 	struct UnitCommand {
-		const Sprite* sprite;
+		const AbilityDef* ability;
 		bool active;
 		bool enabled;
 		bool pressed;

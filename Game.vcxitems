@@ -19,6 +19,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Audio.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Camera.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Color.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\AbilityDatabase.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\AbilityDef.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\AnimationDef.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\Generated.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\GraphicsDatabase.h" />
@@ -74,6 +76,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Assets.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Audio.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Camera.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\AbilityDatabase.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\AnimationDef.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\Generated.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\GraphicsDef.cpp" />
