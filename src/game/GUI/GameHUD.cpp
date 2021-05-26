@@ -15,7 +15,7 @@
 
 //static Rectangle minimapDst = { {4,108},{128,128} };
 static Rectangle minimapDst = { {4,124},{113,113} };
-static Rectangle consolePanelDst= { {10,4},{220,84} };
+static Rectangle consolePanelDst= { {10,2},{220,84} };
 
 static constexpr const int MarkerTimer = 16;
 

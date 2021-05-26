@@ -3,6 +3,7 @@
 #include "../MathLib.h"
 #include "SoundDef.h"
 #include "AnimationDef.h"
+#include "../Assets.h"
 #include <string>
 #include <functional>
 
@@ -16,6 +17,9 @@ struct WeaponDef {
 	UnitSound Sound;
 	DirectionalAnimationDef TargetEffectDef;
 	AnimationClip TargetEffect[32];
+
+	Sprite Icon ;
+	int IconId = 0;
 
 	WeaponDef() {}
 	WeaponDef(const WeaponDef&) = delete;

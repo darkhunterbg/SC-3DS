@@ -12,6 +12,7 @@ namespace GRPConvert
 		static Dictionary<string, Palette> palettes = new Dictionary<string, Palette>();
 
 		static Palette shadowPalette;
+		static Palette cmdIconsPalette;
 
 		static string dataDir = Path.GetFullPath("..\\..\\mpq\\");
 		static string dataOutDir = Path.GetFullPath("..\\..\\data_out\\");
@@ -27,6 +28,9 @@ namespace GRPConvert
 				palettes.Add(Path.GetFileNameWithoutExtension(file), new Palette(file));
 			}
 
+			cmdIconsPalette = palettes["Icons"].Clone("CmdIcons");
+			palettes.Add(cmdIconsPalette.Name, cmdIconsPalette);
+
 			for (int i = 0; i < palettes["Units"].Colors.Count; ++i)
 			{
 				var c = palettes["Units"].Colors[i];
@@ -37,6 +41,17 @@ namespace GRPConvert
 				}
 			}
 
+			int[] t = { 
+				255, 222, 248, 236, 236,
+				187, 153, 146, 104, 76,
+				66, 35, 24, 10, 0 };
+
+			for(int i = 0; i < t.Length; ++i)
+			{
+				Color c = Color.FromArgb(255, t[i], t[i], t[i]);
+				cmdIconsPalette.Colors[i + 1] = c;
+
+			}
 
 			string[] lines = File.ReadAllLines("input.txt");
 
@@ -69,7 +84,7 @@ namespace GRPConvert
 					continue;
 				}
 
-				if(l.StartsWith("wireframe "))
+				if (l.StartsWith("wireframe "))
 				{
 					HandleWireframe(l.Split(" ").Last());
 					continue;
@@ -135,11 +150,11 @@ namespace GRPConvert
 				}
 			}
 		}
-	
+
 		static void HandleWireframe(string f)
 		{
 			GRPImage img = new GRPImage(Path.Combine(dataDir, f));
-			
+
 
 			string dst = Path.Combine(dataOutDir, Path.GetDirectoryName(f), Path.GetFileNameWithoutExtension(f));
 			Directory.CreateDirectory(dst);
@@ -158,7 +173,7 @@ namespace GRPConvert
 				Directory.CreateDirectory(subDir);
 
 				int j = 0;
-				foreach(var wf in fr.GenerateWireframeImages(p))
+				foreach (var wf in fr.GenerateWireframeImages(p))
 				{
 					string wfName = j.ToString() + ".png";
 
@@ -176,7 +191,7 @@ namespace GRPConvert
 				File.WriteAllLines(Path.Combine(subDir, $"info.txt"), info);
 			}
 
-		
+
 			Console.WriteLine(f);
 		}
 	}

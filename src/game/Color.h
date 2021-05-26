@@ -109,6 +109,8 @@ namespace Colors {
 	constexpr Color UIGray = { 0xb0b0b0ff };
 	constexpr Color UIDarkGray = { 0x98948cff };
 	constexpr Color UILightGray = { 0xacacd9ff };
+	constexpr Color IconYellow = { 0xfcfc38ff };
+	constexpr Color IconGray = { 0.6f,0.6f,0.6f,1 };
 
 	constexpr Color SCRed = { 0xf40404ff };
 	constexpr Color SCBlue = { 0x0c48ccff };

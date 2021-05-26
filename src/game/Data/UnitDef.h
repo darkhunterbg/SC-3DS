@@ -37,6 +37,9 @@ struct UnitDef {
 	const UnitGraphicsDef* Graphics = nullptr;
 	const WeaponDef* Weapon = nullptr;
 
+	Sprite ArmorIcon;
+	int ArmorIconId;
+
 	UnitDef() {  }
 	UnitDef(const UnitDef&) = delete;
 	UnitDef& operator=(const UnitDef&) = delete;

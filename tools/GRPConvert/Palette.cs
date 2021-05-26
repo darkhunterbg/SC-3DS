@@ -59,5 +59,11 @@ namespace GRPConvert
 				}
 			}
 		}
+
+		private Palette() { }
+		public Palette Clone(string name)
+		{
+			return new Palette() { Name = name, Colors = Colors.ToList() };
+		}
 	}
 }

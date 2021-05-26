@@ -29,6 +29,7 @@ public:
 	static SpriteFrameAtlas* unit_cmdbtns_tcmdbtns;
 	static SpriteFrameAtlas* unit_cmdbtns_pcmdbtns;
 	static SpriteFrameAtlas* unit_cmdbtns_zcmdbtns;
+	static SpriteFrameAtlas* unit_cmdbtns_cmdicons;
 
 	static const SpriteFrameAtlas* Load_unit_terran_marine();
 	static const SpriteFrameAtlas* Load_unit_terran_tmashad();
@@ -47,4 +48,5 @@ public:
 	static const SpriteFrameAtlas* Load_unit_cmdbtns_tcmdbtns();
 	static const SpriteFrameAtlas* Load_unit_cmdbtns_pcmdbtns();
 	static const SpriteFrameAtlas* Load_unit_cmdbtns_zcmdbtns();
+	static const SpriteFrameAtlas* Load_unit_cmdbtns_cmdicons();
 };

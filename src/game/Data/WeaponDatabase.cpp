@@ -18,10 +18,15 @@ static void GaussRifleData() {
 	d.TargetEffectDef.FrameStart = 0;
 	d.TargetEffectDef.FrameTime = 1;
 
+	d.IconId = 288;
+
 	d.LoadGraphicsAction = []() {
 		auto sa = SpriteDatabase::Load_unit_bullet_tspark();
 		WeaponDatabase::GaussRifle.TargetEffectDef.GenerateAnimations(sa,
 			WeaponDatabase::GaussRifle.TargetEffect);
+
+		WeaponDatabase::GaussRifle.Icon =
+			SpriteDatabase::Load_unit_cmdbtns_cmdicons()->GetFrame(WeaponDatabase::GaussRifle.IconId).sprite;
 	};
 }
 

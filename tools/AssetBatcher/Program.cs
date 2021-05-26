@@ -62,6 +62,8 @@ namespace AssetBatcher
 			T3SFolders("unit/cmdbtns/pcmdbtns");
 			T3SFolders("unit/cmdbtns/zcmdbtns");
 
+			T3SFolders("unit/cmdbtns/cmdicons");
+
 			GeneraSourceCode();
 		}
 

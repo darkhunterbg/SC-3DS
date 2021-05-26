@@ -1,9 +1,12 @@
 ﻿#palette Terrain
 #tileset\*.grp
 
-wireframe unit\wirefram\grpwire.grp
+palette CmdIcons
+unit\cmdbtns\cmdicons.grp
 
 done
+
+wireframe unit\wirefram\grpwire.grp
 
 wireframe unit\wirefram\wirefram.grp
 

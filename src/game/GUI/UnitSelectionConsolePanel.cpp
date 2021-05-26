@@ -9,6 +9,12 @@
 
 static char buffer[64];
 
+struct UnitItemInfo {
+
+	const Sprite* sprite;
+	uint8_t counter;
+};
+
 void UnitSelectionConsolePanel::Draw(const std::vector<EntityId>& selection, EntityManager& em)
 {
 	if (selection.size() == 0)
@@ -34,7 +40,7 @@ void UnitSelectionConsolePanel::Draw(const std::vector<EntityId>& selection, Ent
 	const UnitHealthComponent& health = em.UnitArchetype.HealthComponents.GetComponent(entityId);
 
 	DrawUnitInfo(leftSpace, entityId, unit, health);
-	DrawUnitDetail(rightSpace, unit);
+	DrawUnitDetail(rightSpace, entityId, unit, em);
 }
 
 void UnitSelectionConsolePanel::UpdateSelection(std::vector<EntityId>& selection)
@@ -109,7 +115,7 @@ void UnitSelectionConsolePanel::DrawMultiSelection(Rectangle dst, const std::vec
 	}
 }
 
-void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, const UnitComponent& unit)
+void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, const UnitComponent& unit, EntityManager& em)
 {
 	auto font = Game::SystemFont;
 
@@ -117,7 +123,7 @@ void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, const UnitCompon
 
 	int offset = Platform::MeasureString(font, unit.def->Name.data(), 0.4f).x;
 	Platform::DrawText(font, pos - Vector2Int(offset / 2, 0), unit.def->Name.data(), Colors::UILightGray, 0.4f);
-	pos.y += 18;
+	pos.y += 16;
 
 	if (unit.def->Title.length()) {
 		offset = Platform::MeasureString(font, unit.def->Title.data(), 0.4f).x;
@@ -130,7 +136,46 @@ void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, const UnitCompon
 
 	offset = 40;
 	Platform::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, Colors::UILightGray, 0.4f);
-	pos.y += 14;
+	pos.y += 18;
+
+	// ======================== Upgrades ==========================
+
+	pos.x = space.position.x;
+
+	const Sprite& f = Race->CommandIconsAtlas->GetFrame(12).sprite;
+
+
+	UnitItemInfo info[4];
+	int infoCount = 0;
+
+
+	info[infoCount].sprite = &unit.def->ArmorIcon;
+	info[infoCount].counter = 0;
+	++infoCount;
+
+	if (unit.def->Weapon) {
+		info[infoCount].sprite = &unit.def->Weapon->Icon;
+		info[infoCount].counter = 0;
+		++infoCount;
+	}
+
+	for (int i = 0; i < infoCount; ++i) {
+		Rectangle dst = { pos ,Vector2Int(f.rect.size) };
+	
+		Rectangle icoDst = dst;
+		icoDst.position += {2, 2};
+		icoDst.size -= {4, 4};
+
+		Platform::Draw(*info[i].sprite, icoDst, Colors::IconGray);
+		Platform::Draw(f, dst);
+
+		Vector2Int offset = { 24,23 };
+
+		stbsp_snprintf(buffer, sizeof(buffer), "%i", info[i].counter);
+		Platform::DrawText(font, pos + offset, buffer, Colors::UILightGray, 0.30f);
+
+		pos.x += 38;
+	}
 }
 
 void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, EntityId entityId, const UnitComponent& unit, const UnitHealthComponent& health)
@@ -156,8 +201,8 @@ void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, EntityId entityId,
 	}
 
 	int len = stbsp_snprintf(buffer, sizeof(buffer), "%i/%i", health.current, health.max);
-	int offset = Platform::MeasureString(font, buffer, 0.35f).x;
-	Platform::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, hpColor, 0.35f);
+	int offset = Platform::MeasureString(font, buffer, 0.3f).x;
+	Platform::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, hpColor, 0.3f);
 
 	// ================== Wireframe ========================
 

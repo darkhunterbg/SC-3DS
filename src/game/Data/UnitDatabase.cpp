@@ -2,6 +2,7 @@
 #include "Platform.h"
 #include "GraphicsDatabase.h"
 #include "WeaponDatabase.h"
+#include "Generated.h"
 
 UnitDef UnitDatabase::Marine;
 UnitDef UnitDatabase::SCV;
@@ -29,6 +30,8 @@ static void MarineData() {
 	u.Graphics = &GraphicsDatabase::Marine;
 
 	u.AudioPriority = 1;
+
+	u.ArmorIconId = 292;
 }
 static void SCVData() {
 	UnitDef& u = UnitDatabase::SCV;
@@ -84,13 +87,14 @@ void UnitDatabase::Init()
 
 void UnitDatabase::LoadUnitResources(UnitDef& def) {
 	def.Graphics->LoadResourcesAction();
+	def.ArmorIcon = SpriteDatabase::Load_unit_cmdbtns_cmdicons()
+		->GetFrame(def.ArmorIconId).sprite;
 	def.LoadAllSounds();
 }
 
 void UnitDatabase::LoadAllUnitResources()
 {
 	for (auto unit : Units) {
-
 		LoadUnitResources(*unit);
 	}
 }
