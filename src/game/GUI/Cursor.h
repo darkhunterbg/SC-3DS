@@ -6,7 +6,7 @@
 #include "../Entity/Common.h"
 
 class Camera;
-class EntityManager;
+class GameHUDContext;
 
 class Cursor {
 public:
@@ -24,5 +24,5 @@ public:
 	PlayerId Player = 1;
 
 	void Draw();
-	bool Update(Camera& camera, EntityManager& entityManager, std::vector<EntityId>& outSelection);
+	bool Update(Camera& camera, GameHUDContext& context);
 };

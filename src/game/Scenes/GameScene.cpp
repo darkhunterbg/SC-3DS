@@ -22,8 +22,6 @@ void GameScene::Start() {
 	auto& race = RaceDatabase::Terran;
 	race.LoadResourses();
 
-	hud = new GameHUD(race, size);
-
 
 	cursor = new Cursor();
 	cursor->Position = { 200,120 };
@@ -44,6 +42,8 @@ void GameScene::Start() {
 
 	entityManager->Init(size);
 
+	hud = new GameHUD(*entityManager, size);
+
 	Color color[] = { Colors::SCRed, Colors::SCBlue, Colors::SCLightGreen, Colors::SCPurle,
 	 Colors::SCOrange, Colors::SCGreen, Colors::SCBrown, Colors::SCLightYellow, Colors::SCWhite,
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
@@ -53,6 +53,8 @@ void GameScene::Start() {
 	for (int p = 0; p < totalPlayers; ++p) {
 		entityManager->GetPlayerSystem().AddPlayer(race, color[p]);
 	}
+
+	hud->SetPlayer(1, race);
 
 
 	//UnitEntityUtil::NewUnit(UnitDatabase::MineralField1, 0,
@@ -92,7 +94,7 @@ void GameScene::Start() {
 
 	entityManager->FullUpdate(camera);
 
-	selection.AddEntity(e);
+	hud->context.selectedEntities.AddEntity(e);
 
 	//for (EntityId id : entityManager->UnitArchetype.Archetype.GetEntities()) {
 	//	UnitEntityUtil::AttackPosition(id, { 64,64 });
@@ -119,7 +121,7 @@ void GameScene::Update() {
 
 	tmp.clear();
 
-	for (EntityId id : selection) {
+	for (EntityId id : hud->context.selectedEntities) {
 		if (!entityManager->UnitArchetype.Archetype.HasEntity(id) ||
 			entityManager->UnitArchetype.HiddenArchetype.Archetype.HasEntity(id))
 
@@ -127,18 +129,13 @@ void GameScene::Update() {
 	}
 
 	if (tmp.size() > 0)
-		selection.RemoveSortedEntities(tmp);
+		hud->context.selectedEntities.RemoveSortedEntities(tmp);
 
 	tmp.clear();
 
-	tmp.insert(tmp.begin(), selection.begin(), selection.end());
+	hud->UpdateSelection();
 
-	bool selectionUpdate = cursor->Update(camera, *entityManager, tmp);
-	hud->UpdateSelection(tmp);
-
-	std::sort(tmp.begin(), tmp.end());
-	selection.clear();
-	selection.AddSortedEntities(tmp);
+	bool selectionUpdate = cursor->Update(camera, hud->context);
 
 	// TODO: Player input should be feed in the entity manager and on start of secondary update
 	//if (logical)
@@ -154,22 +151,22 @@ void GameScene::Update() {
 		}
 
 
-		if (selectionUpdate && selection.size() > 0)
+		if (selectionUpdate && hud->context.selectedEntities.size() > 0)
 		{
-			entityManager->GetSoundSystem().PlayUnitChatSelect(selection[0]);
+			entityManager->GetSoundSystem().PlayUnitChatSelect(hud->context.selectedEntities[0]);
 		}
 
 		if (Game::Gamepad.IsButtonPressed(GamepadButton::X)) {
 
 			Vector2Int16 pos = camera.ScreenToWorld(cursor->Position);
 
-			for (EntityId id : selection)
+			for (EntityId id : hud->context.selectedEntities)
 			{
 				UnitEntityUtil::SetAIState(id, UnitAIState::GoToPosition, pos);
 				entityManager->GetSoundSystem().PlayUnitChatCommand(id);
 			}
 
-			if (selection.size()) {
+			if (hud->context.selectedEntities.size()) {
 				hud->NewActionMarker(pos);
 			}
 		}
@@ -183,7 +180,7 @@ void GameScene::Update() {
 
 			if (target != Entity::None)
 			{
-				for (EntityId id : selection) {
+				for (EntityId id : hud->context.selectedEntities) {
 
 					if (target == id)
 						continue;
@@ -193,7 +190,7 @@ void GameScene::Update() {
 				}
 			}
 			else {
-				for (EntityId id : selection) {
+				for (EntityId id : hud->context.selectedEntities) {
 					UnitEntityUtil::SetAIState(id, UnitAIState::GoToAttack, pos);
 					entityManager->GetSoundSystem().PlayUnitChatCommand(id);
 				}
@@ -206,7 +203,7 @@ void GameScene::Update() {
 		}
 		if (Game::Gamepad.IsButtonPressed(GamepadButton::Y)) {
 
-			for (EntityId id : selection)
+			for (EntityId id : hud->context.selectedEntities)
 			{
 				UnitEntityUtil::SetAIState(id, UnitAIState::Idle);
 				entityManager->GetSoundSystem().PlayUnitChatCommand(id);
@@ -214,7 +211,7 @@ void GameScene::Update() {
 		}
 	}
 
-	entityManager->GetRenderSystem().SetSelection(selection.GetEntities(), Colors::UIDarkGreen);
+	entityManager->GetRenderSystem().SetSelection(hud->context.selectedEntities.GetEntities(), Colors::UIDarkGreen);
 
 	camera.Update();
 }
@@ -222,17 +219,15 @@ void GameScene::Update() {
 void GameScene::Draw() {
 	const PlayerInfo& playerInfo = entityManager->GetPlayerSystem().GetPlayerInfo(1);
 
-	hud->UpdateInfo(playerInfo);
-
 	Platform::DrawOnScreen(ScreenId::Top);
 
 	entityManager->Draw(camera);
 
-	hud->UpperScreenGUI(camera, selection.GetEntities(), *entityManager);
+	hud->UpperScreenGUI(camera);
 
 	cursor->Draw();
 
 	Platform::DrawOnScreen(ScreenId::Bottom);
 
-	hud->LowerScreenGUI(camera, selection.GetEntities(), *entityManager);
+	hud->LowerScreenGUI(camera);
 }

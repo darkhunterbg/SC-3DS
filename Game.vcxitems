@@ -52,6 +52,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Game.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUD.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUDContext.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitCommandsPanel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitSelectionConsolePanel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Input.h" />

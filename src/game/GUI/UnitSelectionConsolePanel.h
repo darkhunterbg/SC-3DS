@@ -3,8 +3,8 @@
 #include "../Entity/Entity.h"
 
 #include "../MathLib.h"
-#include "../Data/RaceDef.h"
 #include "../Color.h"
+#include "GameHUDContext.h"
 
 #include <vector>
 
@@ -15,15 +15,14 @@ class UnitHealthComponent;
 class UnitSelectionConsolePanel {
 
 public:
-	void UpdateSelection( std::vector<EntityId>& selection);
+	void UpdateSelection(GameHUDContext& context);
 
-	void Draw(const std::vector<EntityId>& selection, EntityManager& em);
-	const RaceDef* Race = nullptr;
+	void Draw(GameHUDContext& context);
 	Rectangle PanelDst;
 private:
 
-	void DrawMultiSelection(Rectangle dst, const std::vector<EntityId>& selection, EntityManager& em);
-	void DrawUnitDetail(Rectangle space, EntityId id, const UnitComponent& unit, EntityManager& em);
+	void DrawMultiSelection(Rectangle dst, GameHUDContext& context);
+	void DrawUnitDetail(Rectangle space, EntityId id, const UnitComponent& unit, GameHUDContext& context);
 	void DrawUnitInfo(Rectangle space, EntityId id, const UnitComponent& unit, const UnitHealthComponent& health);
 
 	void GetUnitWireframeColors(EntityId id, const UnitHealthComponent& health, Color outColors[4]);

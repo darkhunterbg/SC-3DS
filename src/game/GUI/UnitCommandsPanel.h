@@ -1,11 +1,10 @@
 #pragma once
 
 #include "../Entity/Entity.h"
-
 #include "../MathLib.h"
-#include "../Data/RaceDef.h"
-
 #include "../Assets.h"
+
+#include "GameHUDContext.h"
 
 #include <array>
 
@@ -17,15 +16,15 @@ private:
 		const Sprite* sprite;
 		bool active;
 		bool enabled;
+		bool pressed;
 	};
 	
 	std::array<UnitCommand, 3 * 3> unitCommands;
 
-	void DrawCommands();
+	void DrawCommands(GameHUDContext& context);
 
 public:
-	const RaceDef* Race = nullptr;
 	Rectangle PanelDst;
 
-	void Draw(const std::vector<EntityId>& selection, EntityManager& em);
+	void Draw(GameHUDContext& context);
 };

@@ -15,7 +15,7 @@
 
 //static Rectangle minimapDst = { {4,108},{128,128} };
 static Rectangle minimapDst = { {4,124},{113,113} };
-static Rectangle consolePanelDst= { {10,2},{220,84} };
+static Rectangle consolePanelDst = { {10,2},{220,84} };
 static Rectangle commandsPanelDst = { {184,117}, {128,115} };
 
 static constexpr const int MarkerTimer = 16;
@@ -25,19 +25,24 @@ static std::array<Color, 3> YellowHPBarColorPalette = { 0xfccc2cff, 0xdc9434ff, 
 static std::array<Color, 3> RedHPBarColorPalette = { 0xa80808ff, 0xa80808ff, 0x840404ff };
 static std::array<Color, 3> GreenHPBarColorPalette = { 0x249824ff, 0x249824ff, 0x249824ff };
 
-GameHUD::GameHUD(const RaceDef& race, Vector2Int16 mapSize) : race(race) {
+GameHUD::GameHUD(EntityManager& em, Vector2Int16 mapSize) {
 
 	font = Game::SystemFont;
 	iconsAtlas = Game::AssetLoader.LoadAtlas("game_icons.t3x");
 	minimapUpscale = Vector2(mapSize) / Vector2(minimapDst.size);
 
+	context.em = &em;
 
-	consolePanel.Race = &race;
 	consolePanel.PanelDst = consolePanelDst;
 
-	commandsPanel.Race = &race;
 	commandsPanel.PanelDst = commandsPanelDst;
 	//cmdIconsAtlas = Platform::LoadAtlas("cmdicons.t3x");
+}
+
+
+void GameHUD::SetPlayer(PlayerId player, const RaceDef& race) {
+	context.race = &race;
+	context.player = player;
 }
 
 void GameHUD::DrawResource(Sprite icon, Vector2Int pos, Color color, const char* fmt, ...) {
@@ -52,7 +57,9 @@ void GameHUD::DrawResource(Sprite icon, Vector2Int pos, Color color, const char*
 	Platform::DrawText(font, pos, textBuffer, color, 0.4f);
 }
 
-void GameHUD::UpdateInfo(const PlayerInfo& info) {
+void GameHUD::UpdateInfo() {
+	const PlayerInfo& info = context.GetEntityManager().GetPlayerSystem().GetPlayerInfo(context.player);
+
 	minerals.target = info.minerals;
 	gas.target = info.gas;
 	supply.current = info.GetCurrentSupply();
@@ -86,10 +93,12 @@ void GameHUD::UpdateResourceDiff(GameHUD::Resource& r) {
 	r.shown += mod;
 }
 
-void GameHUD::UpperScreenGUI(const Camera& camera, const std::vector<EntityId>& selection, EntityManager& em) {
+void GameHUD::UpperScreenGUI(const Camera& camera) {
+
+	UpdateInfo();
 
 	DrawMarkers(camera);
-	DrawUnitBars(camera, selection, em);
+	DrawUnitBars(camera, context.selectedEntities.GetEntities(), context.GetEntityManager());
 
 	UpdateResourceDiff(minerals);
 	UpdateResourceDiff(gas);
@@ -99,11 +108,11 @@ void GameHUD::UpperScreenGUI(const Camera& camera, const std::vector<EntityId>& 
 	// Minerals
 	DrawResource(iconsAtlas->GetSprite(0), { 160, 2 }, color, "%i", minerals.shown);
 	// Gas
-	DrawResource(race.GasIcon, { 240, 2 }, color, "%i", gas.shown);
+	DrawResource(context.race->GasIcon, { 240, 2 }, color, "%i", gas.shown);
 	// Supply
 	if (supply.current > supply.max)
 		color = Colors::UIRed;
-	DrawResource(race.SupplyIcon, { 320,2 }, color, "%i", supply.current);
+	DrawResource(context.race->SupplyIcon, { 320,2 }, color, "%i", supply.current);
 
 
 	Vector2Int pos = { 320 + 16 , 0 };
@@ -113,19 +122,19 @@ void GameHUD::UpperScreenGUI(const Camera& camera, const std::vector<EntityId>& 
 	Platform::DrawText(font, pos + Vector2Int{ 1,1 }, textBuffer, Colors::Black, 0.4f);
 	Platform::DrawText(font, pos, textBuffer, Colors::UIGreen, 0.4f);
 
-	const auto& sprite = race.ConsoleSprite.GetSprite(1);
+	const auto& sprite = context.race->ConsoleSprite.GetSprite(1);
 	Platform::Draw(sprite, { {0, 240 - sprite.rect.size.y,}, Vector2Int(sprite.rect.size) });
 }
 
-void GameHUD::LowerScreenGUI(const Camera& camera, const std::vector<EntityId>& selection, EntityManager& em) {
+void GameHUD::LowerScreenGUI(const Camera& camera) {
 
-	Platform::Draw(race.ConsoleSprite.GetSprite(0), { {0, 0,},{ 320, 240} });
+	Platform::Draw(context.race->ConsoleSprite.GetSprite(0), { {0, 0,},{ 320, 240} });
 
-	DrawMinimap(camera, em.GetMapSystem());
+	DrawMinimap(camera);
 
-	consolePanel.Draw( selection, em);
+	consolePanel.Draw(context);
 
-	commandsPanel.Draw(selection, em);
+	commandsPanel.Draw(context);
 
 }
 
@@ -138,8 +147,8 @@ void GameHUD::ApplyInput(Camera& camera) {
 	}
 }
 
-void GameHUD::UpdateSelection(std::vector<EntityId>& selection) {
-	consolePanel.UpdateSelection(selection);
+void GameHUD::UpdateSelection() {
+	consolePanel.UpdateSelection(context);
 }
 
 void GameHUD::DrawUnitBars(const Camera& camera, const std::vector<EntityId>& selection, EntityManager& em) {
@@ -203,7 +212,7 @@ void GameHUD::DrawUnitBars(const Camera& camera, const std::vector<EntityId>& se
 		Util::DrawTransparentRectangle(rect, 1, Colors::Black);
 
 		Rectangle start = { Vector2Int(dst) + Vector2Int(3,1), Vector2Int(1,3) };
-	
+
 		for (int i = 1; i < barSize; ++i) {
 			Platform::DrawRectangle(start, Color32(Colors::Black));
 			start.position.x += 3;
@@ -259,9 +268,9 @@ void GameHUD::DrawMarkers(const Camera& camera) {
 	}
 }
 
-void GameHUD::DrawMinimap(const Camera& camera, MapSystem& mapSystem) {
+void GameHUD::DrawMinimap(const Camera& camera) {
 
-	mapSystem.DrawMinimap(minimapDst);
+	context.GetEntityManager().GetMapSystem().DrawMinimap(minimapDst);
 
 	Rectangle camRect = camera.GetRectangle();
 	Vector2 min = Vector2(camRect.GetMin());

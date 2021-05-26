@@ -6,6 +6,8 @@
 #include "../Util.h"
 #include "../Entity/EntityUtil.h"
 #include "../Data/GraphicsDatabase.h"
+#include "GameHUDContext.h"
+#include <algorithm>
 
 static constexpr const float Speed = 10;
 static constexpr const int AnimFrameCount = 6;
@@ -40,10 +42,11 @@ void Cursor::Draw() {
 	Platform::Draw(frame.sprite, dst);
 }
 
-bool Cursor::Update(Camera& camera, EntityManager& em, std::vector<EntityId>& selection) {
+bool Cursor::Update(Camera& camera, GameHUDContext& context) {
 
 	Vector2Int corner = { 0,0 };
 
+	EntityManager& em = context.GetEntityManager();
 
 	bool selectionUpdate = false;
 	// TODO: State machine
@@ -103,10 +106,10 @@ bool Cursor::Update(Camera& camera, EntityManager& em, std::vector<EntityId>& se
 		}
 
 	if (Game::Gamepad.IsButtonReleased(GamepadButton::A)) {
-		selection.clear();
+		context.selectedEntities.clear();
 		selectionUpdate = true;
 		if (!dragging && hover != Entity::None) {
-			selection.push_back(hover);
+			context.selectedEntities.AddEntity(hover);
 		}
 		else {
 			Vector2Int16 start = holdStart;
@@ -120,7 +123,14 @@ bool Cursor::Update(Camera& camera, EntityManager& em, std::vector<EntityId>& se
 			rect.position.x = std::min(start.x, end.x);
 			rect.position.y = std::min(start.y, end.y);
 
+			static std::vector<EntityId> selection;
+			selection.clear();
+
 			em.RectCast(rect, selection);
+			std::sort(selection.begin(), selection.end());
+
+			context.selectedEntities.AddSortedEntities(selection);
+
 			holdStart = { 0,0 };
 			regionRect = { {0,0},{0,0} };
 

@@ -15,14 +15,14 @@ struct UnitItemInfo {
 	uint8_t counter;
 };
 
-void UnitSelectionConsolePanel::Draw(const std::vector<EntityId>& selection, EntityManager& em)
+void UnitSelectionConsolePanel::Draw(GameHUDContext& context)
 {
-	if (selection.size() == 0)
+	if (context.selectedEntities.size() == 0)
 		return;
 
-	if (selection.size() > 1) {
+	if (context.selectedEntities.size() > 1) {
 
-		DrawMultiSelection(PanelDst, selection, em);
+		DrawMultiSelection(PanelDst, context);
 		return;
 	}
 
@@ -34,24 +34,26 @@ void UnitSelectionConsolePanel::Draw(const std::vector<EntityId>& selection, Ent
 	rightSpace.position.x += leftSpace.size.x;
 	rightSpace.size.x -= leftSpace.size.x;
 
-	EntityId entityId = selection.front();
+	EntityId entityId = context.selectedEntities[0];
+
+	auto& em = context.GetEntityManager();
 
 	const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(entityId);
 	const UnitHealthComponent& health = em.UnitArchetype.HealthComponents.GetComponent(entityId);
 
 	DrawUnitInfo(leftSpace, entityId, unit, health);
-	DrawUnitDetail(rightSpace, entityId, unit, em);
+	DrawUnitDetail(rightSpace, entityId, unit, context);
 }
 
-void UnitSelectionConsolePanel::UpdateSelection(std::vector<EntityId>& selection)
+void UnitSelectionConsolePanel::UpdateSelection(GameHUDContext& context)
 {
-	if (selection.size() < 2)
+	if (context.selectedEntities.size() < 2)
 		return;
 
 	if (!Game::Pointer.IsReleased())
 		return;
 
-	int max = std::min((int)selection.size(), 12);
+	int max = std::min((int)context.selectedEntities.size(), 12);
 
 	Vector2Int pos = PanelDst.position;
 	pos.x += 3;
@@ -63,23 +65,25 @@ void UnitSelectionConsolePanel::UpdateSelection(std::vector<EntityId>& selection
 		Rectangle rect = { { pos + offset}, {36,36} };
 
 		if (rect.Contains(Game::Pointer.Position())) {
-			EntityId entityId = selection[i];
-			selection.clear();
-			selection.push_back(entityId);
+			EntityId entityId = context.selectedEntities[i];
+			context.selectedEntities.clear();
+			context.selectedEntities.AddEntity(entityId);
 		}
 	}
 
 }
 
-void UnitSelectionConsolePanel::DrawMultiSelection(Rectangle dst, const std::vector<EntityId>& selection, EntityManager& em)
+void UnitSelectionConsolePanel::DrawMultiSelection(Rectangle dst, GameHUDContext& context)
 {
-	const Sprite& f = Race->CommandIconsAtlas->GetFrame(14).sprite;
+	const Sprite& f = context.GetCommandIconsAtlas().GetFrame(14).sprite;
 
-	int max = std::min((int)selection.size(), 12);
+	int max = std::min((int)context.selectedEntities.size(), 12);
 
 	Vector2Int pos = dst.position;
 	pos.x += 3;
 	pos.y += 6;
+
+	auto& em = context.GetEntityManager();
 
 	for (int i = 0; i < max; ++i) {
 
@@ -87,7 +91,7 @@ void UnitSelectionConsolePanel::DrawMultiSelection(Rectangle dst, const std::vec
 
 		Platform::Draw(f, { pos + offset, Vector2Int(f.rect.size) });
 
-		EntityId entityId = selection[i];
+		EntityId entityId = context.selectedEntities[i];
 
 		const UnitHealthComponent& health = em.UnitArchetype.HealthComponents.GetComponent(entityId);
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(entityId);
@@ -115,7 +119,7 @@ void UnitSelectionConsolePanel::DrawMultiSelection(Rectangle dst, const std::vec
 	}
 }
 
-void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, const UnitComponent& unit, EntityManager& em)
+void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, const UnitComponent& unit, GameHUDContext& context)
 {
 	auto font = Game::SystemFont;
 
@@ -142,7 +146,7 @@ void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, con
 
 	pos.x = space.position.x;
 
-	const Sprite& f = Race->CommandIconsAtlas->GetFrame(12).sprite;
+	const Sprite& f = context.GetCommandIconsAtlas().GetFrame(12).sprite;
 
 
 	UnitItemInfo info[4];

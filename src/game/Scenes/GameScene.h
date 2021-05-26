@@ -24,7 +24,4 @@ private:
 	GameHUD* hud;
 	Cursor* cursor;
 	EntityManager* entityManager;
-
-	EntityCollection selection;
-
 };

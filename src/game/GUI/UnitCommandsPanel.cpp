@@ -5,19 +5,22 @@
 
 #include "../Entity/EntityManager.h"
 
-void UnitCommandsPanel::Draw(const std::vector<EntityId>& selection, EntityManager& em)
+void UnitCommandsPanel::Draw(GameHUDContext& context)
 {
 	for (UnitCommand& cmd : unitCommands) {
 		cmd.sprite = nullptr;
 		cmd.enabled = false;
 		cmd.active = false;
+		cmd.pressed = false;
 	}
 
 	const auto atlas = Game::AssetLoader.LoadAtlas("unit_cmdbtns_cmdicons.t3x");
 
-	if (selection.size() > 0)
+	if (context.selectedEntities.size() > 0)
 	{
-		EntityId entityId = selection[0];
+		EntityId entityId = context.selectedEntities[0];
+
+		EntityManager& em = context.GetEntityManager();
 
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(entityId);
 
@@ -40,19 +43,21 @@ void UnitCommandsPanel::Draw(const std::vector<EntityId>& selection, EntityManag
 		unitCommands[3].sprite = &atlas->GetSprite(254);
 		unitCommands[3].enabled = true;
 
+		//236
+
 		unitCommands[4].sprite = &atlas->GetSprite(255);
 		unitCommands[4].enabled = true;
 	}
 
-	DrawCommands();
+	DrawCommands(context);
 }
 
 
-void UnitCommandsPanel::DrawCommands() {
+void UnitCommandsPanel::DrawCommands(GameHUDContext& context) {
 
 	Rectangle dst = PanelDst;
 
-	const Sprite& f = Race->CommandIconsAtlas->GetFrame(0).sprite;
+	const Sprite& f = context.GetCommandIconsAtlas().GetFrame(0).sprite;
 
 	dst.size = Vector2Int(f.rect.size);
 
@@ -65,6 +70,10 @@ void UnitCommandsPanel::DrawCommands() {
 				continue;
 
 			Vector2Int offset = { x * 45, y * 40 };
+			
+			if (cmd.pressed)
+				offset += {2, 2};
+
 			Rectangle d = dst;
 			d.position += offset;
 

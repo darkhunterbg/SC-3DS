@@ -6,12 +6,11 @@
 #include "../Entity/Entity.h"
 #include "UnitSelectionConsolePanel.h"
 #include "UnitCommandsPanel.h"
+#include "GameHUDContext.h"
 
 #include <vector>
 
 class Camera;
-class MapSystem;
-class PlayerInfo;
 class EntityManager;
 
 struct GUIActionMarker {
@@ -22,26 +21,26 @@ struct GUIActionMarker {
 
 class GameHUD {
 public:
-	GameHUD(const RaceDef& race, Vector2Int16 mapSize);
+	GameHUD(EntityManager& em, Vector2Int16 mapSize);
 
-
-	void UpdateSelection(std::vector<EntityId>& selection);
+	void UpdateSelection();
 
 	void ApplyInput(Camera& camera);
-	void UpperScreenGUI(const Camera& camera, const std::vector<EntityId>& selection, EntityManager& em);
-	void LowerScreenGUI(const Camera& camera, const std::vector<EntityId>& selection, EntityManager& em);
-	void UpdateInfo(const PlayerInfo& info);
+	void UpperScreenGUI(const Camera& camera);
+	void LowerScreenGUI(const Camera& camera);
+	
 
 	void NewActionMarker(Vector2Int16 pos);
 
+	GameHUDContext context;
+
+	void SetPlayer(PlayerId player,const RaceDef& race);
 private:
-	const RaceDef& race;
 	UnitSelectionConsolePanel consolePanel;
 	UnitCommandsPanel commandsPanel;
 
 	Font font;
 	const SpriteAtlas* iconsAtlas;
-	const SpriteAtlas* cmdIconsAtlas;
 
 	Vector2 minimapUpscale;
 
@@ -63,10 +62,14 @@ private:
 
 	std::vector<GUIActionMarker> markers;
 
+
+
 	void DrawMarkers(const Camera& camera);
 	void DrawUnitBars(const Camera& camera, const std::vector<EntityId>& selection, EntityManager& em);
 	void DrawResource(Sprite icon, Vector2Int pos, Color color, const char* text, ...);
-	void DrawMinimap(const Camera& camera,  MapSystem& mapSystem);
+	void DrawMinimap(const Camera& camera);
+
+	void UpdateInfo();
 
 	static void UpdateResourceDiff(Resource& r);
 };
