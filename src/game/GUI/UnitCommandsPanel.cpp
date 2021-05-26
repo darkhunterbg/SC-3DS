@@ -10,10 +10,6 @@
 
 #include "../Entity/EntityUtil.h"
 
-UnitCommandsPanel::UnitCommandsPanel() {
-
-}
-
 void UnitCommandsPanel::Draw(GameViewContext& context)
 {
 	DrawCommands(context);
@@ -23,6 +19,11 @@ void UnitCommandsPanel::UpdateInput(GameViewContext& context)
 {
 	UpdateCommands(context);
 
+	if (context.IsTargetSelectionMode &&
+		Game::Gamepad.IsButtonReleased(GamepadButton::B)) {
+
+		OnCommandPressed(context, unitCommands[8]);
+	}
 
 	Rectangle dst = PanelDst;
 
@@ -140,6 +141,7 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 
 	if (context.IsTargetSelectionMode) {
 		unitCommands[8].enabled = true;
+		unitCommands[8].pressed = unitCommands[8].active = Game::Gamepad.IsButtonDown(GamepadButton::B) ;
 		unitCommands[8].commandIcon = &SpriteDatabase::Load_unit_cmdbtns_cmdicons()->GetFrame(236);
 		return;
 	}
@@ -181,6 +183,8 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 }
 
 void UnitCommandsPanel::OnCommandPressed(GameViewContext& context, const UnitCommand& cmd) {
+
+	context.GetEntityManager().GetSoundSystem().PlayUISound(Game::ButtonAudio);
 
 	if (cmd.ability != nullptr) {
 

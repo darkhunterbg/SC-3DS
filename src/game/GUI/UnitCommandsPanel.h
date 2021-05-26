@@ -41,7 +41,6 @@ private:
 public:
 	Rectangle PanelDst;
 
-	UnitCommandsPanel();
 
 	void Draw(GameViewContext& context);
 	void UpdateInput(GameViewContext& context);

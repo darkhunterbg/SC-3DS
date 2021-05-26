@@ -13,13 +13,20 @@
 
 SoundSystem::SoundSystem()
 {
-	for (const auto& channel : Game::Audio.GetAudioChannes()) {
+	auto& channels = Game::Audio.GetAudioChannes();
+
+	const auto worldChannels = Span<AudioChannelState>(channels.Data(), channels.Size() - 2);
+
+	for (const auto& channel : worldChannels) {
 		if (channel.mono) {
 			EntityAudioChannel eac;
 			eac.channel = &channel;
-			audioChannels.push_back(eac);
+			worldAudioChannels.push_back(eac);
 		}
 	}
+
+	chatAudioChannel.channel = &channels[channels.Size() - 2];
+	uiAudioChannel.channel = &channels[channels.Size() - 1];
 
 	seed = Platform::ElaspedTime();
 }
@@ -88,7 +95,7 @@ void SoundSystem::CollectAudioFromSources(const Camera& camera, EntityManager& e
 
 	std::sort(entityAudioPriority.begin(), entityAudioPriority.end(), EntityAudioSort);
 
-	int max = std::min(entityUniqueAudio.size(), audioChannels.size() - 1);
+	int max = std::min(entityUniqueAudio.size(), worldAudioChannels.size() );
 
 	for (int i = 0; i < max; ++i) {
 		int index = entityAudioPriority[i].clipIndex;
@@ -105,10 +112,10 @@ void SoundSystem::UpdateEntityAudio(const Camera& camera, EntityManager& em)
 {
 	CollectAudioFromSources(camera, em);
 
-	int max = std::min(playWorldAudio.size(), audioChannels.size() - 1);
+	int max = std::min(playWorldAudio.size(), worldAudioChannels.size());
 
-	for (int j = 0; j < audioChannels.size() - 1; ++j) {
-		audioChannels[j].queued = false;
+	for (int j = 0; j < worldAudioChannels.size(); ++j) {
+		worldAudioChannels[j].queued = false;
 	}
 
 	for (int i = 0; i < max; ++i) {
@@ -117,8 +124,8 @@ void SoundSystem::UpdateEntityAudio(const Camera& camera, EntityManager& em)
 
 		bool channelFound = false;
 
-		for (int j = 0; j < audioChannels.size() - 1; ++j) {
-			auto& channel = audioChannels[j];
+		for (int j = 0; j < worldAudioChannels.size(); ++j) {
+			auto& channel = worldAudioChannels[j];
 			if (channel.queued)
 				continue;
 
@@ -139,8 +146,8 @@ void SoundSystem::UpdateEntityAudio(const Camera& camera, EntityManager& em)
 			uint16_t prio = playWorldAudio[i].priority;
 			int channelId = -1;
 
-			for (int j = 0; j < audioChannels.size() - 1; ++j) {
-				auto& channel = audioChannels[j];
+			for (int j = 0; j < worldAudioChannels.size() - 1; ++j) {
+				auto& channel = worldAudioChannels[j];
 				if (channel.queued)
 					continue;
 
@@ -153,7 +160,7 @@ void SoundSystem::UpdateEntityAudio(const Camera& camera, EntityManager& em)
 
 			if (channelId != -1) {
 				channelFound = true;
-				auto& channel = audioChannels[channelId];
+				auto& channel = worldAudioChannels[channelId];
 
 				Game::Audio.SetChannelVolume(channel.channel->ChannelId, playWorldAudio[i].volume);
 				Game::Audio.PlayClip(clip, channel.channel->ChannelId);
@@ -174,6 +181,11 @@ void SoundSystem::PlayUnitChat(EntityId id, UnitChatType type)
 	newChatRequest = { type, id };
 }
 
+void SoundSystem::PlayUISound(const AudioClip& clip)
+{
+	Game::Audio.PlayClip(clip, uiAudioChannel.channel->ChannelId);
+}
+
 
 void SoundSystem::UpdateChatRequest(EntityManager& em)
 {
@@ -188,7 +200,7 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 
 	newChatRequest = { UnitChatType::None, Entity::None, };
 
-	auto channel = audioChannels.back();
+	auto channel = chatAudioChannel;
 
 	if (newRequest) {
 		if (em.UnitArchetype.Archetype.HasEntity(currentChat.id)) {

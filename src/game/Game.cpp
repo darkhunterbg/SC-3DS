@@ -22,6 +22,7 @@ static std::string error;
 static double frameStartTime = 0;
 
 Font Game::SystemFont;
+AudioClip Game::ButtonAudio;
 Gamepad Game::Gamepad;
 Pointer Game::Pointer;
 AudioSystem Game::Audio;
@@ -55,6 +56,7 @@ void Game::Start() {
 
 	JobSystem::Init();
 	SystemFont = AssetLoader.LoadFont("font.bcfnt");
+	ButtonAudio = AssetLoader.LoadAudioClip("sound/misc/button.wav");
 	title = AssetLoader.LoadAtlas("glue_title.t3x");
 	startup = true;
 	frameStartTime = Platform::ElaspedTime();

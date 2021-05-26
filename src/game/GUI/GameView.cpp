@@ -69,12 +69,6 @@ void GameView::UpdateMarkers() {
 }
 
 void GameView::GamepadInput() {
-	if (Game::Gamepad.IsButtonReleased(GamepadButton::B)) {
-		if (context.IsTargetSelectionMode) {
-			context.CancelTargetSelection();
-		}
-	}
-
 	if (Game::Gamepad.IsButtonReleased(GamepadButton::A)) {
 
 		EntityId entity = cursor->GetEntityUnder();
@@ -95,19 +89,13 @@ void GameView::GamepadInput() {
 	}
 
 	if (Game::Gamepad.IsButtonReleased(GamepadButton::B)) {
-		if (context.IsTargetSelectionMode) {
-			context.CancelTargetSelection();
-		}
-		else {
+		if (!context.IsTargetSelectionMode) {
 			context.ActivateAbility(&AbilityDatabase::Stop);
 		}
 	}
 
 	if (Game::Gamepad.IsButtonReleased(GamepadButton::X)) {
-		if (context.IsTargetSelectionMode) {
-
-		}
-		else {
+		if (!context.IsTargetSelectionMode) {
 			context.ActivateAbility(&AbilityDatabase::Move, cursor->GetWorldPosition());
 		}
 	}

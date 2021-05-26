@@ -37,7 +37,9 @@ class SoundSystem {
 	};
 
 private:
-	std::vector<EntityAudioChannel> audioChannels;
+	std::vector<EntityAudioChannel> worldAudioChannels;
+	EntityAudioChannel chatAudioChannel;
+	EntityAudioChannel uiAudioChannel;
 
 	std::vector<AudioClip> entityUniqueAudio;
 	std::vector<EntityPriorityAudio> entityAudioPriority;
@@ -58,4 +60,6 @@ public:
 	void UpdateEntityAudio(const Camera& camera, EntityManager& em);
 	void UpdateChatRequest(EntityManager& em);
 	void PlayUnitChat(EntityId id, UnitChatType type);
+
+	void PlayUISound(const AudioClip& clip);
 };

@@ -6,6 +6,8 @@
 
 #include <algorithm>
 
+
+
 void GameViewContext::ActivateAbility(const AbilityDef* ability)
 {
 	if (selection.size() == 0)
@@ -25,9 +27,6 @@ void GameViewContext::ActivateAbility(const AbilityDef* ability)
 	for (EntityId id : selection) {
 		UnitEntityUtil::SetAIState(id, action);
 	}
-
-
-	PlayUnitSelectedAudio(UnitChatType::Command);
 }
 
 void GameViewContext::ActivateAbility(const AbilityDef* ability, EntityId target)
@@ -49,7 +48,6 @@ void GameViewContext::ActivateAbility(const AbilityDef* ability, EntityId target
 	for (EntityId id : selection) {
 		UnitEntityUtil::SetAIState(id, action, target);
 	}
-
 
 	PlayUnitSelectedAudio(UnitChatType::Command);
 	//NewActionMarker(position);

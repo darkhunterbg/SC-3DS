@@ -68,9 +68,12 @@ void UnitSelectionConsolePanel::UpdateSelection(GameViewContext& context)
 			EntityId entityId = context.selection[i];
 			context.selection.clear();
 			context.selection.AddEntity(entityId);
+
+			context.GetEntityManager().GetSoundSystem().PlayUISound(Game::ButtonAudio);
+
+			break;
 		}
 	}
-
 }
 
 void UnitSelectionConsolePanel::DrawMultiSelection(Rectangle dst, GameViewContext& context)
