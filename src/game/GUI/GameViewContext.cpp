@@ -139,9 +139,33 @@ void GameViewContext::SelectUnitsInRegion(const Rectangle16 region)
 
 	if (castResults.size() > 0)
 	{
-		std::sort(castResults.begin(), castResults.end());
-		selection.clear();
-		selection.AddSortedEntities(castResults);
+		bool allySelection = false;
+
+		for (EntityId id : castResults) {
+			if (UnitEntityUtil::IsAlly(player, id)) {
+				allySelection = true;
+				break;
+			}
+		}
+
+		static std::vector<EntityId> finalSelection;
+
+		if (allySelection) {
+			finalSelection.clear();
+			for (EntityId id : castResults) {
+				if (UnitEntityUtil::IsAlly(player, id)) {
+					finalSelection.push_back(id);
+				}
+			}
+
+			std::sort(finalSelection.begin(), finalSelection.end());
+			selection.clear();
+			selection.AddSortedEntities(finalSelection);
+		}
+		else {
+			selection.clear();
+			selection.AddEntity(castResults[0]);
+		}
 
 		if (HasSelectionControl())
 			PlayUnitSelectedAudio(UnitChatType::Select);
