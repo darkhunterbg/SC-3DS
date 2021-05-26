@@ -16,6 +16,7 @@
 //static Rectangle minimapDst = { {4,108},{128,128} };
 static Rectangle minimapDst = { {4,124},{113,113} };
 static Rectangle consolePanelDst= { {10,2},{220,84} };
+static Rectangle commandsPanelDst = { {184,117}, {128,115} };
 
 static constexpr const int MarkerTimer = 16;
 
@@ -33,6 +34,9 @@ GameHUD::GameHUD(const RaceDef& race, Vector2Int16 mapSize) : race(race) {
 
 	consolePanel.Race = &race;
 	consolePanel.PanelDst = consolePanelDst;
+
+	commandsPanel.Race = &race;
+	commandsPanel.PanelDst = commandsPanelDst;
 	//cmdIconsAtlas = Platform::LoadAtlas("cmdicons.t3x");
 }
 
@@ -121,7 +125,8 @@ void GameHUD::LowerScreenGUI(const Camera& camera, const std::vector<EntityId>& 
 
 	consolePanel.Draw( selection, em);
 
-	DrawAbilities();
+	commandsPanel.Draw(selection, em);
+
 }
 
 void GameHUD::ApplyInput(Camera& camera) {
@@ -270,14 +275,3 @@ void GameHUD::DrawMinimap(const Camera& camera, MapSystem& mapSystem) {
 
 	Util::DrawTransparentRectangle(rect, 1, Colors::White);
 }
-
-void GameHUD::DrawAbilities() {
-
-	//Platform::Draw(cmdIconsAtlas->GetSprite(228), { {188,120},{28,28} }, Colors::White);
-	//Platform::Draw(cmdIconsAtlas->GetSprite(229), { {235,120},{28,28} }, Colors::White);
-	//Platform::Draw(cmdIconsAtlas->GetSprite(230), { {280,120},{28,28} }, Colors::White);
-	//Platform::Draw(cmdIconsAtlas->GetSprite(254), { {188,160},{28,28} }, Colors::White);
-	//Platform::Draw(cmdIconsAtlas->GetSprite(255), { {235,160},{28,28} }, Colors::White);
-	//Platform::Draw(cmdIconsAtlas->GetSprite(237), { {188,200},{28,28} }, { 0.5f,0.5f,0.5f,0.5f });
-}
-

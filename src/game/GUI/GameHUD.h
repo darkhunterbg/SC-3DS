@@ -5,6 +5,7 @@
 #include "../Color.h"
 #include "../Entity/Entity.h"
 #include "UnitSelectionConsolePanel.h"
+#include "UnitCommandsPanel.h"
 
 #include <vector>
 
@@ -36,6 +37,7 @@ public:
 private:
 	const RaceDef& race;
 	UnitSelectionConsolePanel consolePanel;
+	UnitCommandsPanel commandsPanel;
 
 	Font font;
 	const SpriteAtlas* iconsAtlas;
@@ -65,7 +67,6 @@ private:
 	void DrawUnitBars(const Camera& camera, const std::vector<EntityId>& selection, EntityManager& em);
 	void DrawResource(Sprite icon, Vector2Int pos, Color color, const char* text, ...);
 	void DrawMinimap(const Camera& camera,  MapSystem& mapSystem);
-	void DrawAbilities();
 
 	static void UpdateResourceDiff(Resource& r);
 };

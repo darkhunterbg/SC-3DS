@@ -142,6 +142,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitSelectionConsolePanel.h">
       <Filter>GUI</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitCommandsPanel.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -248,6 +251,9 @@
       <Filter>Entity</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitSelectionConsolePanel.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitCommandsPanel.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
   </ItemGroup>
