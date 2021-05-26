@@ -2,7 +2,7 @@
 #include "Platform.h"
 
 static constexpr const int AudioChannelBufferSize = 4096 ;
-static constexpr const int MonoChannels = 5;
+static constexpr const int MonoChannels = 6;
 
 void AudioSystem::Init() {
 

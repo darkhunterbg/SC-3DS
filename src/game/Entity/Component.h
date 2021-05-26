@@ -168,6 +168,11 @@ struct UnitAIStateDataComponent {
 		EntityId entityId;
 		Vector2Int16 position;
 	} target = { 0 };
+
+	union {
+		EntityId entityId;
+		Vector2Int16 position;
+	} target2 = { 0 };
 };
 
 

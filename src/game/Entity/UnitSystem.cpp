@@ -30,13 +30,17 @@ void UnitSystem::UnitAIUpdate(EntityManager& em) {
 
 	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {
 
-		if (em.FlagComponents.GetComponent(id).test(ComponentFlags::UnitAIPaused))
+		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
+
+		if (flags.test(ComponentFlags::UnitAIPaused))
 			continue;
 
 		UnitAIState state = em.UnitArchetype.AIStateComponents.GetComponent(id);
 
-		if (em.FlagComponents.GetComponent(id).test(ComponentFlags::UnitAIStateChanged))
+		if (flags.test(ComponentFlags::UnitAIStateChanged)) {
 			aiEnterStateData[(int)state].entities.push_back(id);
+			flags.clear(ComponentFlags::UnitAIStateChanged);
+		}
 
 		const auto& stateData = em.UnitArchetype.AIStateDataComponents.GetComponent(id);
 		const auto& position = em.PositionComponents.GetComponent(id);

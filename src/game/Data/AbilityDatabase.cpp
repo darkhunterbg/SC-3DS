@@ -38,6 +38,10 @@ void AbilityDatabase::Init()
 	Attack.TargetingData.PositionSelectedAction = UnitAIState::GoToAttack;
 	Attack.TargetingData.EntitySelectedAction = UnitAIState::AttackTarget;
 
+	HoldPosition.TargetingData.SetAllStates(UnitAIState::HoldPosition);
+
+	Patrol.TargetingData.HasTargetSelection = true;
+	Patrol.TargetingData.SetAllStates(UnitAIState::Patrol);
 
 	const auto& sa = *SpriteDatabase::Load_unit_cmdbtns_cmdicons();
 

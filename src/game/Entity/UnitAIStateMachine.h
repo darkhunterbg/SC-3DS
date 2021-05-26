@@ -30,7 +30,7 @@ struct UnitAIThinkData {
 
 class IUnitAIState {
 public:
-	virtual void EnterState(UnitAIEnterStateData& data, EntityManager& em) = 0;
+	virtual void EnterState(UnitAIEnterStateData& data, EntityManager& em) {}
 	virtual void Think(UnitAIThinkData& data, EntityManager& em) = 0;
 };
 
@@ -54,20 +54,28 @@ public:
 
 class UnitAIAttackTargetState : public  IUnitAIState {
 public:
-	virtual void EnterState(UnitAIEnterStateData& data, EntityManager& em) override;
 	virtual void Think(UnitAIThinkData& data, EntityManager& em) override;
 };
 
 
 class UnitAIGoToState : public  IUnitAIState {
 public:
-	virtual void EnterState(UnitAIEnterStateData& data, EntityManager& em) override;
 	virtual void Think(UnitAIThinkData& data, EntityManager& em) override;
 };
 
 
 class UnitAIGoToAttackState : public  IUnitAIState {
 public:
+	virtual void Think(UnitAIThinkData& data, EntityManager& em) override;
+};
+
+
+class UnitAIHoldPositionState : public IUnitAIState {
+	virtual void EnterState(UnitAIEnterStateData& data, EntityManager& em) override;
+	virtual void Think(UnitAIThinkData& data, EntityManager& em) override;
+};
+
+class UnitAIPatrolState : public IUnitAIState {
 	virtual void EnterState(UnitAIEnterStateData& data, EntityManager& em) override;
 	virtual void Think(UnitAIThinkData& data, EntityManager& em) override;
 };
