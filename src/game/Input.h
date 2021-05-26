@@ -54,7 +54,7 @@ public:
 	void Update();
 	inline bool IsDown() const { return currentState.Touch; }
 	inline bool IsPressed() const { return !prevState.Touch && currentState.Touch; }
-	inline bool IsReleased() const { return prevState.Touch && currentState.Touch; }
+	inline bool IsReleased() const { return prevState.Touch && !currentState.Touch; }
 	inline Vector2Int Position() const { return currentState.Position; }
 	inline Vector2Int DeltaPosition() const { return currentState.Position - prevState.Position; }
 };

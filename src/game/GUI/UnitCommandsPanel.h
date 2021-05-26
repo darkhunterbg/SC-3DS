@@ -23,8 +23,14 @@ private:
 
 	void DrawCommands(GameHUDContext& context);
 
+	void UpdateCommands(GameHUDContext& context);
+
+	int pressedCommand = -1;
 public:
 	Rectangle PanelDst;
 
+	UnitCommandsPanel();
+
 	void Draw(GameHUDContext& context);
+	void UpdateInput(GameHUDContext& context);
 };

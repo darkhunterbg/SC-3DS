@@ -16,7 +16,7 @@
 //static Rectangle minimapDst = { {4,108},{128,128} };
 static Rectangle minimapDst = { {4,124},{113,113} };
 static Rectangle consolePanelDst = { {10,2},{220,84} };
-static Rectangle commandsPanelDst = { {184,117}, {128,115} };
+static Rectangle commandsPanelDst = { {186,118}, {128,115} };
 
 static constexpr const int MarkerTimer = 16;
 
@@ -149,6 +149,7 @@ void GameHUD::ApplyInput(Camera& camera) {
 
 void GameHUD::UpdateSelection() {
 	consolePanel.UpdateSelection(context);
+	commandsPanel.UpdateInput(context);
 }
 
 void GameHUD::DrawUnitBars(const Camera& camera, const std::vector<EntityId>& selection, EntityManager& em) {
