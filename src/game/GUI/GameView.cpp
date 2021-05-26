@@ -49,8 +49,9 @@ void GameView::Update(Camera& camera)
 	GamepadInput();
 
 	context.GetEntityManager().GetRenderSystem().SetSelection(
-		context.selection.GetEntities(), Colors::UIDarkGreen);
+		context.selection.GetEntities(), context.selectionColor);
 }
+
 void GameView::UpdateMarkers() {
 
 	for (int i = 0; i < context.markers.size(); ++i) {

@@ -38,6 +38,8 @@ public:
 	const AbilityDef* currentAbility = nullptr;
 	std::vector<GUIActionMarker> markers;
 
+	Color selectionColor;
+
 	void ActivateAbility(const AbilityDef* ability);
 	void ActivateAbility(const AbilityDef* ability, EntityId target);
 	void ActivateAbility(const AbilityDef* ,Vector2Int16 position);
@@ -69,6 +71,9 @@ public:
 
 	EntityId GetPriorityUnitSelected() const;
 
+
+	bool HasSelectionControl() const;
 private:
 	void PlayUnitSelectedAudio(UnitChatType type);
+	Color GetAlliedUnitColor(EntityId id);
 };

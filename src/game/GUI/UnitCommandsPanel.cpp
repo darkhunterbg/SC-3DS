@@ -138,6 +138,9 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 		cmd.pressed = false;
 	
 	}
+	
+	if (!context.HasSelectionControl())
+		return;
 
 	if (context.IsTargetSelectionMode) {
 		unitCommands[8].enabled = true;

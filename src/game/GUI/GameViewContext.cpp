@@ -6,8 +6,6 @@
 
 #include <algorithm>
 
-
-
 void GameViewContext::ActivateAbility(const AbilityDef* ability)
 {
 	if (selection.size() == 0)
@@ -145,7 +143,10 @@ void GameViewContext::SelectUnitsInRegion(const Rectangle16 region)
 		selection.clear();
 		selection.AddSortedEntities(castResults);
 
-		PlayUnitSelectedAudio(UnitChatType::Select);
+		if (HasSelectionControl())
+			PlayUnitSelectedAudio(UnitChatType::Select);
+
+		selectionColor = GetAlliedUnitColor(selection[0]);
 	}
 }
 
@@ -157,7 +158,10 @@ void GameViewContext::SelectUnitAtPosition(Vector2Int16 position)
 		selection.clear();
 		selection.AddEntity(id);
 
-		PlayUnitSelectedAudio(UnitChatType::Select);
+		if (HasSelectionControl())
+			PlayUnitSelectedAudio(UnitChatType::Select);
+
+		selectionColor = GetAlliedUnitColor(selection[0]);
 	}
 }
 
@@ -194,6 +198,14 @@ EntityId GameViewContext::GetPriorityUnitSelected() const
 	return Entity::None;
 }
 
+bool GameViewContext::HasSelectionControl() const
+{
+	if (!selection.size())
+		return false;
+
+	return UnitEntityUtil::IsAlly(player, selection[0]);
+}
+
 void GameViewContext::PlayUnitSelectedAudio(UnitChatType type)
 {
 	EntityId id = GetPriorityUnitSelected();
@@ -203,4 +215,14 @@ void GameViewContext::PlayUnitSelectedAudio(UnitChatType type)
 	}
 
 	GetEntityManager().GetSoundSystem().PlayUnitChat(id, type);
+}
+
+Color GameViewContext::GetAlliedUnitColor(EntityId id) {
+	if (UnitEntityUtil::IsAlly(player, id))
+		return Colors::UIDarkGreen;
+
+	if (UnitEntityUtil::IsEnemy(player, id))
+		return Colors::UIDarkRed;
+
+	return Colors::UIDarkYellow;
 }

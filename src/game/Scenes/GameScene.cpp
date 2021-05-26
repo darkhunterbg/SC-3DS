@@ -18,13 +18,11 @@ GameScene::~GameScene() {}
 void GameScene::Start() {
 	Vector2Int16 size = { 64 * 32,64 * 32 };
 
-
 	camera.Position = { 0,0 };
 	camera.Size = { 400,240 };
 	camera.Limits = { {0,0,}, size };
 
 	UnitDatabase::LoadAllUnitResources();
-
 
 	entityManager = new EntityManager();
 	//entityManager->DrawBoundingBoxes = true;
@@ -70,8 +68,8 @@ void GameScene::Start() {
 	//	Vector2Int16(48, 48));
 	EntityId e = 0;
 	int i = 0;
-	for (int y = 1; y > 0; --y) {
-		for (int x = 1; x > 0; --x) {
+	for (int y = 5; y > 0; --y) {
+		for (int x = 5; x > 0; --x) {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[0];
 			e = UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
