@@ -3,7 +3,7 @@
 #include <vector>
 #include "../Assets.h"
 #include "Entity.h"
-
+#include "Common.h"
 
 class EntityManager;
 class Camera;
@@ -11,12 +11,7 @@ struct AudioChannelState;
 
 
 class SoundSystem {
-	enum UnitChatType {
-		None = 0,
-		Select = 1,
-		Command = 2
-	};
-
+	
 	struct UnitChatRequest {
 		UnitChatType type;
 		EntityId id;
@@ -49,6 +44,8 @@ private:
 
 	std::vector<EntityAudio> playWorldAudio;
 
+	unsigned long seed = 0;
+
 	UnitChatRequest newChatRequest = { UnitChatType::None, Entity::None };
 	UnitChatRequest currentChat = { UnitChatType::None, Entity::None };
 
@@ -60,6 +57,5 @@ public:
 
 	void UpdateEntityAudio(const Camera& camera, EntityManager& em);
 	void UpdateChatRequest(EntityManager& em);
-	void PlayUnitChatSelect(EntityId id);
-	void PlayUnitChatCommand(EntityId id);
+	void PlayUnitChat(EntityId id, UnitChatType type);
 };

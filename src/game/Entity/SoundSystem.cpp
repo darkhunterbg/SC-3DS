@@ -4,7 +4,11 @@
 #include "EntityManager.h"
 #include "../Profiler.h"
 
+#include "../MathLib.h"
+#include "../Platform.h"
+
 #include <algorithm>
+
 
 
 SoundSystem::SoundSystem()
@@ -16,6 +20,8 @@ SoundSystem::SoundSystem()
 			audioChannels.push_back(eac);
 		}
 	}
+
+	seed = Platform::ElaspedTime();
 }
 
 bool SoundSystem::EntityAudioSort(const EntityPriorityAudio& a, EntityPriorityAudio& b) {
@@ -163,14 +169,9 @@ void SoundSystem::UpdateEntityAudio(const Camera& camera, EntityManager& em)
 }
 
 
-void SoundSystem::PlayUnitChatSelect(EntityId id)
+void SoundSystem::PlayUnitChat(EntityId id, UnitChatType type)
 {
-	newChatRequest = { UnitChatType::Select, id };
-}
-
-void SoundSystem::PlayUnitChatCommand(EntityId id)
-{
-	newChatRequest = { UnitChatType::Command, id };
+	newChatRequest = { type, id };
 }
 
 
@@ -193,6 +194,8 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 		if (em.UnitArchetype.Archetype.HasEntity(currentChat.id)) {
 			const UnitDef* def = em.UnitArchetype.UnitComponents.GetComponent(currentChat.id).def;
 			const UnitSound* sound = nullptr;
+
+			std::srand(seed);
 
 			if (currentChat.type == UnitChatType::Command) {
 				if (def->Sounds.Yes.TotalClips) {

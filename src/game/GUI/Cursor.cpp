@@ -6,7 +6,7 @@
 #include "../Util.h"
 #include "../Entity/EntityUtil.h"
 #include "../Data/GraphicsDatabase.h"
-#include "GameHUDContext.h"
+#include "GameViewContext.h"
 #include <algorithm>
 
 static constexpr const float Speed = 10;
@@ -43,11 +43,9 @@ void Cursor::Draw() {
 	Platform::Draw(frame.sprite, dst);
 }
 
-bool Cursor::Update(Camera& camera, GameHUDContext& context) {
+void Cursor::Update(Camera& camera, GameViewContext& context) {
 
 	corner = { 0,0 };
-
-	EntityManager& em = context.GetEntityManager();
 
 	// TODO: State machine
 
@@ -68,7 +66,7 @@ bool Cursor::Update(Camera& camera, GameHUDContext& context) {
 	}
 
 
-	holding = Game::Gamepad.IsButtonDown(GamepadButton::A);
+	holding = Game::Gamepad.IsButtonDown(GamepadButton::Y);
 
 	if (Position.y <= Limits.position.y) {
 		Position.y = Limits.position.y;
@@ -80,31 +78,23 @@ bool Cursor::Update(Camera& camera, GameHUDContext& context) {
 		corner.y = 1;
 	}
 
-	if (Game::Gamepad.IsButtonPressed(GamepadButton::A)) {
+	if (Game::Gamepad.IsButtonPressed(GamepadButton::Y)) {
 		holdStart = camera.ScreenToWorld(Position);
 	}
 
 	worldPos = camera.ScreenToWorld(Position);
-	hover = em.PointCast(worldPos);
+	hover = context.GetUnitAtPosition(worldPos);
 
-	if (hover != Entity::None &&
-		(!em.UnitArchetype.Archetype.HasEntity(hover) ||
-			em.UnitArchetype.HiddenArchetype.Archetype.HasEntity(hover))) {
-
-		hover = Entity::None;
-	}
 
 	dragging = (worldPos - holdStart).LengthSquared() != 0;
 
 	newClip = currentClip;
 
-	bool selectionChanged = false;
-
 	if (context.IsTargetSelectionMode) {
 		UpdateTargetSelectionState(camera, context);
 	}
 	else {
-		selectionChanged = UpdateDefaultState(camera, context);
+		UpdateDefaultState(camera, context);
 	}
 
 	if (corner.LengthSquared() != 0) {
@@ -119,16 +109,11 @@ bool Cursor::Update(Camera& camera, GameHUDContext& context) {
 		clipFrame = 0;
 		clipCountdown = AnimFrameCount;
 	}
-
-	return selectionChanged;
 }
 
-bool Cursor::UpdateDefaultState(Camera& camera, GameHUDContext& context)
+void Cursor::UpdateDefaultState(Camera& camera, GameViewContext& context)
 {
 	EntityManager& em = context.GetEntityManager();
-
-	bool selectionUpdate = false;
-
 
 	if (holding && dragging) {
 		Vector2Int16 start = camera.WorldToScreen(holdStart);
@@ -141,13 +126,10 @@ bool Cursor::UpdateDefaultState(Camera& camera, GameHUDContext& context)
 		regionRect.position.y = std::min(start.y, end.y);
 	}
 
-	if (Game::Gamepad.IsButtonReleased(GamepadButton::A)) {
-		context.selectedEntities.clear();
-		selectionUpdate = true;
-		if (!dragging && hover != Entity::None) {
-			context.selectedEntities.AddEntity(hover);
-		}
-		else {
+	if (Game::Gamepad.IsButtonReleased(GamepadButton::Y)) {
+	
+		if (dragging ) {
+		
 			Vector2Int16 start = holdStart;
 			Vector2Int16 end = worldPos;
 
@@ -159,20 +141,16 @@ bool Cursor::UpdateDefaultState(Camera& camera, GameHUDContext& context)
 			rect.position.x = std::min(start.x, end.x);
 			rect.position.y = std::min(start.y, end.y);
 
-			static std::vector<EntityId> selection;
-			selection.clear();
-
-			em.RectCast(rect, selection);
-			std::sort(selection.begin(), selection.end());
-
-			context.selectedEntities.AddSortedEntities(selection);
+			context.SelectUnitsInRegion(rect);
 
 			holdStart = { 0,0 };
 			regionRect = { {0,0},{0,0} };
 
 		}
+		else {
+			context.SelectUnitAtPosition(worldPos);
+		}
 	}
-
 
 	if (corner == Vector2Int{ 0,0 })
 	{
@@ -199,12 +177,9 @@ bool Cursor::UpdateDefaultState(Camera& camera, GameHUDContext& context)
 
 		}
 	}
-
-
-	return selectionUpdate;
 }
 
-void Cursor::UpdateTargetSelectionState(Camera& camera, GameHUDContext& context)
+void Cursor::UpdateTargetSelectionState(Camera& camera, GameViewContext& context)
 {
 	if (hover == Entity::None) {
 		newClip = &GraphicsDatabase::Cursor.targn;
@@ -220,18 +195,5 @@ void Cursor::UpdateTargetSelectionState(Camera& camera, GameHUDContext& context)
 			newClip = &GraphicsDatabase::Cursor.targy;
 		}
 
-	}
-
-	if (Game::Gamepad.IsButtonReleased(GamepadButton::A)) {
-		if (hover == Entity::None) {
-			context.ActivateCurrentAbility(worldPos);
-		}
-		else {
-			context.ActivateCurrentAbility(hover);
-		}
-	}
-
-	if (Game::Gamepad.IsButtonReleased(GamepadButton::B)) {
-		context.CancelTargetSelection();
 	}
 }

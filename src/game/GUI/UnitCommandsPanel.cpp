@@ -14,12 +14,12 @@ UnitCommandsPanel::UnitCommandsPanel() {
 
 }
 
-void UnitCommandsPanel::Draw(GameHUDContext& context)
+void UnitCommandsPanel::Draw(GameViewContext& context)
 {
 	DrawCommands(context);
 }
 
-void UnitCommandsPanel::UpdateInput(GameHUDContext& context)
+void UnitCommandsPanel::UpdateInput(GameViewContext& context)
 {
 	UpdateCommands(context);
 
@@ -74,7 +74,7 @@ void UnitCommandsPanel::UpdateInput(GameHUDContext& context)
 	}
 }
 
-void UnitCommandsPanel::DrawCommands(GameHUDContext& context) {
+void UnitCommandsPanel::DrawCommands(GameViewContext& context) {
 
 	Rectangle dst = PanelDst;
 
@@ -127,7 +127,7 @@ void UnitCommandsPanel::DrawCommands(GameHUDContext& context) {
 	}
 }
 
-void UnitCommandsPanel::UpdateCommands(GameHUDContext& context)
+void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 {
 	for (UnitCommand& cmd : unitCommands) {
 		cmd.ability = nullptr;
@@ -144,9 +144,9 @@ void UnitCommandsPanel::UpdateCommands(GameHUDContext& context)
 		return;
 	}
 	
-	if (context.selectedEntities.size() > 0)
+	if (context.selection.size() > 0)
 	{
-		EntityId entityId = context.selectedEntities[0];
+		EntityId entityId = context.selection[0];
 
 		EntityManager& em = context.GetEntityManager();
 
@@ -180,7 +180,7 @@ void UnitCommandsPanel::UpdateCommands(GameHUDContext& context)
 	}
 }
 
-void UnitCommandsPanel::OnCommandPressed(GameHUDContext& context, const UnitCommand& cmd) {
+void UnitCommandsPanel::OnCommandPressed(GameViewContext& context, const UnitCommand& cmd) {
 
 	if (cmd.ability != nullptr) {
 

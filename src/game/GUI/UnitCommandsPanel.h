@@ -4,7 +4,7 @@
 #include "../MathLib.h"
 #include "../Assets.h"
 
-#include "GameHUDContext.h"
+#include "GameViewContext.h"
 
 #include <array>
 
@@ -30,11 +30,11 @@ private:
 	
 	std::array<UnitCommand, 3 * 3> unitCommands;
 
-	void DrawCommands(GameHUDContext& context);
+	void DrawCommands(GameViewContext& context);
 
-	void UpdateCommands(GameHUDContext& context);
+	void UpdateCommands(GameViewContext& context);
 
-	void OnCommandPressed(GameHUDContext& context, const UnitCommand& cmd);
+	void OnCommandPressed(GameViewContext& context, const UnitCommand& cmd);
 
 	int pressedCommand = -1;
 	int hover = -1;
@@ -43,6 +43,6 @@ public:
 
 	UnitCommandsPanel();
 
-	void Draw(GameHUDContext& context);
-	void UpdateInput(GameHUDContext& context);
+	void Draw(GameViewContext& context);
+	void UpdateInput(GameViewContext& context);
 };

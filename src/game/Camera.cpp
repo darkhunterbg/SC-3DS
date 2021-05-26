@@ -3,7 +3,6 @@
 #include "Game.h"
 
 
-
 void Camera::Update() {
 
 	if (Game::Gamepad.IsButtonPressed(GamepadButton::R)) {

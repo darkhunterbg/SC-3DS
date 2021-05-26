@@ -6,7 +6,7 @@
 #include "../Entity/Common.h"
 
 class Camera;
-class GameHUDContext;
+class GameViewContext;
 
 class Cursor {
 public:
@@ -19,7 +19,6 @@ private:
 	int clipFrame = 0;
 	int clipCountdown = 0;
 
-
 	Vector2Int16 holdStart = { 0,0 };
 	Rectangle16 regionRect;
 	Vector2Int corner = { 0,0 };
@@ -28,10 +27,14 @@ private:
 	Vector2Int16 worldPos;
 	const AnimationClip* newClip;
 
-	bool UpdateDefaultState(Camera& camera, GameHUDContext& context);
-	void UpdateTargetSelectionState(Camera& camera, GameHUDContext& context);
+	void UpdateDefaultState(Camera& camera, GameViewContext& context);
+	void UpdateTargetSelectionState(Camera& camera, GameViewContext& context);
 public:
 	void Draw();
-	bool Update(Camera& camera, GameHUDContext& context);
+	void Update(Camera& camera, GameViewContext& context);
 
+	inline EntityId GetEntityUnder() const { return hover; }
+	inline Vector2Int16 GetWorldPosition() const {
+		return worldPos;
+	}
 };

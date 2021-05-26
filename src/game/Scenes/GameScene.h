@@ -3,10 +3,10 @@
 #include "Scene.h"
 #include "../Camera.h"
 
-#include "../Entity//Entity.h"
+#include "../Entity/Entity.h"
 
-class GameHUD;
 class Cursor;
+class GameView;
 class EntityManager;
 
 class GameScene : public Scene {
@@ -20,8 +20,7 @@ public:
 	virtual void Draw() override;
 
 private:
+	GameView* view;
 	Camera camera;
-	GameHUD* hud;
-	Cursor* cursor;
 	EntityManager* entityManager;
 };
