@@ -72,6 +72,7 @@ void UnitAIIdleState::EnterState(UnitAIEnterStateData& data, EntityManager& em)
 	for (EntityId id : data.entities) {
 		em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Idle;
 		em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
+
 	}
 }
 void UnitAIIdleState::Think(UnitAIThinkData& data, EntityManager& em)

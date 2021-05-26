@@ -48,7 +48,7 @@ void GameViewContext::ActivateAbility(const AbilityDef* ability, EntityId target
 	}
 
 	PlayUnitSelectedAudio(UnitChatType::Command);
-	//NewActionMarker(position);
+
 }
 
 void GameViewContext::ActivateAbility(const AbilityDef* ability, Vector2Int16 position)
@@ -70,9 +70,6 @@ void GameViewContext::ActivateAbility(const AbilityDef* ability, Vector2Int16 po
 	for (EntityId id : selection) {
 		UnitEntityUtil::SetAIState(id, action, position);
 	}
-
-	PlayUnitSelectedAudio(UnitChatType::Command);
-	NewActionMarker(position);
 }
 
 void GameViewContext::ActivateCurrentAbility()
@@ -118,6 +115,12 @@ void GameViewContext::NewActionMarker(Vector2Int16 pos)
 
 	markers.clear();
 	markers.push_back(marker);
+}
+
+void GameViewContext::NewUnitMarker(EntityId target)
+{
+	abilityTargetMarkerTimer = AbilityUnitTargetMarkerTimer;
+	abilityTarget = target;
 }
 
 void GameViewContext::SelectUnitsInRegion(const Rectangle16 region)
@@ -241,7 +244,7 @@ void GameViewContext::PlayUnitSelectedAudio(UnitChatType type)
 	GetEntityManager().GetSoundSystem().PlayUnitChat(id, type);
 }
 
-Color GameViewContext::GetAlliedUnitColor(EntityId id) {
+Color GameViewContext::GetAlliedUnitColor (EntityId id) const {
 	if (UnitEntityUtil::IsAlly(player, id))
 		return Colors::UIDarkGreen;
 

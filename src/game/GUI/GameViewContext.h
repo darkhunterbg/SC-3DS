@@ -26,6 +26,9 @@ enum class GameViewUnitFrienldyState {
 class GameViewContext {
 public:
 	static constexpr const int MarkerTimer = 16;
+	static constexpr const int AbilityUnitTargetMarkerTimer = 60;
+
+
 
 	EntityManager* em = nullptr;
 	const RaceDef* race = nullptr;
@@ -36,9 +39,16 @@ public:
 
 	bool IsTargetSelectionMode = false;
 	const AbilityDef* currentAbility = nullptr;
+	EntityId abilityTarget = Entity::None;
+	int abilityTargetMarkerTimer = 0;
 	std::vector<GUIActionMarker> markers;
 
 	Color selectionColor;
+
+	inline bool IsAbilityTargetMarkerVisible() const {
+		return abilityTargetMarkerTimer > 0 &&
+			(((AbilityUnitTargetMarkerTimer - abilityTargetMarkerTimer) / 20) % 2 == 0);
+	}
 
 	void ActivateAbility(const AbilityDef* ability);
 	void ActivateAbility(const AbilityDef* ability, EntityId target);
@@ -52,6 +62,7 @@ public:
 	void CancelTargetSelection();
 
 	void NewActionMarker(Vector2Int16 pos);
+	void NewUnitMarker(EntityId unit);
 
 	inline EntityManager& GetEntityManager() const {
 		return *em;
@@ -71,9 +82,10 @@ public:
 
 	EntityId GetPriorityUnitSelected() const;
 
-
 	bool HasSelectionControl() const;
-private:
+
+	Color GetAlliedUnitColor(EntityId id) const;
+
 	void PlayUnitSelectedAudio(UnitChatType type);
-	Color GetAlliedUnitColor(EntityId id);
+
 };

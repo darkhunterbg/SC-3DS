@@ -7,6 +7,22 @@
 
 #include <algorithm>
 
+
+static const Vector2 movementTable32[]{
+	{0,-1}, {0,-1},
+	{0.7,-0.7},{0.7,-0.7},{0.7,-0.7},{0.7,-0.7},
+	{1,0}, {1,0}, {1,0}, {1,0},
+	{0.7,0.7},{0.7,0.7},{0.7,0.7},{0.7,0.7},
+	{0,1},{0,1},{0,1},{0,1},
+	{-0.7,0.7},{-0.7,0.7},{-0.7,0.7},{-0.7,0.7},
+	{-1,0}, {-1,0}, {-1,0}, {-1,0},
+	{-0.7,-0.7},{-0.7,-0.7},{-0.7,-0.7},{-0.7,-0.7},
+	{0,-1},{0,-1}
+
+};
+
+
+
 static std::vector<EntityId> scratch;
 static UnitStateMachineChangeData* _d;
 static EntityManager* _e;
@@ -97,6 +113,9 @@ void UnitMovingState::EnterState(
 
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
 		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
+		auto& movement = em.MovementArchetype.MovementComponents.GetComponent(id);
+		const auto& orientation = em.OrientationComponents.GetComponent(id);
+		const auto& velocity = em.UnitArchetype.MovementComponents.GetComponent(id).movementSpeed;
 
 		em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
 			.GetComponent(id).clips = unit.def->Graphics->MovementAnimations;
@@ -111,6 +130,8 @@ void UnitMovingState::EnterState(
 			em.FlagComponents.GetComponent(glow).set(ComponentFlags::RenderEnabled);
 			em.FlagComponents.GetComponent(glow).set(ComponentFlags::OrientationChanged);
 		}
+
+		movement.velocity = Vector2Int8(movementTable32[orientation] * velocity);
 
 	}
 }
@@ -253,6 +274,13 @@ void UnitDeathState::EnterState(
 	for (EntityId id : data.entities) {
 
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
+
+		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
+
+		// Clear this in order to remove unit animation change on death 
+		// or just replace death animation with directional ones
+		flags.clear(ComponentFlags::OrientationChanged);
+		flags.clear(ComponentFlags::AnimationSetChanged);
 
 		if (unit.HasMovementGlow()) {
 			em.DeleteEntity(unit.movementGlowEntity);

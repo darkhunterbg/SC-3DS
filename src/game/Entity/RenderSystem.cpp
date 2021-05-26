@@ -57,32 +57,34 @@ void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
 void RenderSystem::UnitSelectionCameraCull(const Rectangle16& camRect, EntityManager& em) {
 	unitSelectionData.clear();
 
+	int j = -1;
 	for (EntityId id : selectedUnits) {
-		if (em.UnitArchetype.RenderArchetype.Archetype.HasEntity(id)) {
-			auto& arch = em.UnitArchetype.RenderArchetype;
+		++j;
 
-			int i = Entity::ToIndex(id);
+		auto& arch = em.UnitArchetype.RenderArchetype;
 
-			if (!em.FlagComponents[i].test(ComponentFlags::RenderEnabled))
-				continue;
+		int i = Entity::ToIndex(id);
 
-			const Rectangle16& bb = arch.BoundingBoxComponents[i];
+		if (!em.FlagComponents[i].test(ComponentFlags::RenderEnabled))
+			continue;
 
-			if (!camRect.Intersects(bb))
-				continue;
+		const Rectangle16& bb = arch.BoundingBoxComponents[i];
 
-			const auto* def = em.UnitArchetype.UnitComponents.GetComponent(id).def;
+		if (!camRect.Intersects(bb))
+			continue;
 
-			unitSelectionData.graphics.push_back(def->Graphics->Selection.Atlas->GetFrame(0));
-			Vector2Int16 pos = em.PositionComponents.GetComponent(id);
-			pos -= Vector2Int16(def->Graphics->Selection.Atlas->FrameSize / 2);
-			unitSelectionData.position.push_back(pos);
-			unitSelectionData.order.push_back(arch.DestinationComponents.GetComponent(id).order);
-			unitSelectionData.verticalOffset.push_back(def->Graphics->Selection.VecticalOffset);
-		}
+		const auto* def = em.UnitArchetype.UnitComponents.GetComponent(id).def;
+
+		unitSelectionData.graphics.push_back(def->Graphics->Selection.Atlas->GetFrame(0));
+		Vector2Int16 pos = em.PositionComponents.GetComponent(id);
+		pos -= Vector2Int16(def->Graphics->Selection.Atlas->FrameSize / 2);
+		unitSelectionData.position.push_back(pos);
+		unitSelectionData.order.push_back(arch.DestinationComponents.GetComponent(id).order);
+		unitSelectionData.verticalOffset.push_back(def->Graphics->Selection.VecticalOffset);
+		unitSelectionData.color.push_back(selectionColor[j]);
+
 	}
 }
-
 
 void RenderSystem::DrawEntities(const Camera& camera, const Rectangle16& camRect) {
 
@@ -162,18 +164,20 @@ void RenderSystem::DrawSelection(const Camera& camera, const Rectangle16& camRec
 	float camMul = 1.0f / camera.Scale;
 	BatchDrawCommand cmd;
 	cmd.scale = Vector2(camMul);
-	cmd.color = { selectionColor ,1 };
+
 
 	for (int i = 0; i < entitiesCount; ++i) {
 		auto& dst = unitSelectionData.position[i];
 		const auto& frame = unitSelectionData.graphics[i];
-		short offset = unitSelectionData.verticalOffset[i];
+		const short& offset = unitSelectionData.verticalOffset[i];
 
 		dst += frame.offset;
 		dst.y += offset;
 
 		dst -= camRect.position;
 		dst /= camera.Scale;
+
+		cmd.color = { unitSelectionData.color[i] ,1 };
 
 		cmd.order = unitSelectionData.order[i] + 1;
 		cmd.image = frame.sprite.image;
@@ -337,10 +341,22 @@ void RenderSystem::UpdatePositions(EntityManager& em, const EntityChangedData& c
 	JobSystem::RunJob(unitUpdatePosData.size(), JobSystem::DefaultJobSize, UpdateUnitRenderPositionsJob);
 }
 
-void RenderSystem::SetSelection(const std::vector<EntityId>& selection, Color color)
-{
+void RenderSystem::ClearSelection() {
 	selectedUnits.clear();
-	selectedUnits.insert(selectedUnits.begin(), selection.begin(), selection.end());
-	selectionColor = Color32(color);
+	selectionColor.clear();
+}
+
+void RenderSystem::AddSelection(const std::vector<EntityId>& selection, Color color)
+{
+	selectedUnits.insert(selectedUnits.end(), selection.begin(), selection.end());
+
+	for (int i = 0; i < selection.size(); ++i) {
+		selectionColor.push_back(Color32(color));
+	}
+}
+void RenderSystem::AddSelection(EntityId id, Color color)
+{
+	selectedUnits.push_back(id);
+	selectionColor.push_back(Color32(color));
 }
 

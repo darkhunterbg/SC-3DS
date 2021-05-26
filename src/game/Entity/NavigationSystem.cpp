@@ -10,18 +10,7 @@
 
 #include <algorithm>
 
-static const Vector2 movementTable32[]{
-	{0,-1}, {0,-1},
-	{0.7,-0.7},{0.7,-0.7},{0.7,-0.7},{0.7,-0.7},
-	{1,0}, {1,0}, {1,0}, {1,0},
-	{0.7,0.7},{0.7,0.7},{0.7,0.7},{0.7,0.7},
-	{0,1},{0,1},{0,1},{0,1},
-	{-0.7,0.7},{-0.7,0.7},{-0.7,0.7},{-0.7,0.7},
-	{-1,0}, {-1,0}, {-1,0}, {-1,0},
-	{-0.7,-0.7},{-0.7,-0.7},{-0.7,-0.7},{-0.7,-0.7},
-	{0,-1},{0,-1}
 
-};
 static const Vector2 movementTable8[]{
 		{0,-1}, {0.8,-0.8},{1,0}, {0.8,0.8},{0,1}, {-0.8,0.8}, {-1,0},{-0.8,-0.8}
 };
@@ -195,8 +184,6 @@ void NavigationSystem::ApplyUnitNavigationJob(int start, int end) {
 				em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Idle;
 			}
 			else {
-				movement.velocity = Vector2Int8(movementTable32[orientation] * velocity);
-
 				if (em.UnitArchetype.StateComponents.GetComponent(id) != UnitState::Movement)
 				{
 					flags.set(ComponentFlags::UnitStateChanged);

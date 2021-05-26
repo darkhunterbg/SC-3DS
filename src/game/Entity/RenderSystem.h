@@ -85,12 +85,14 @@ class RenderSystem {
 		std::vector<Vector2Int16> position;
 		std::vector<int> order;
 		std::vector<short> verticalOffset;
+		std::vector<Color32> color;
 
 		inline void clear() {
 			graphics.clear();
 			position.clear();
 			order.clear();
 			verticalOffset.clear();
+			color.clear();
 		}
 		inline size_t size() {
 			return graphics.size();
@@ -100,7 +102,7 @@ class RenderSystem {
 private:
 	std::vector<BatchDrawCommand> render;
 	std::vector<EntityId> selectedUnits;
-	Color32 selectionColor;
+	std::vector<Color32> selectionColor;
 
 	RenderData renderData;
 	RenderUnitData renderUnitData;
@@ -124,5 +126,7 @@ public:
 	void UpdatePositions(EntityManager& em, const EntityChangedData& changed);
 
 
-	void SetSelection(const std::vector<EntityId>& selection, Color selectionColor);
+	void ClearSelection();
+	void AddSelection(const std::vector<EntityId>& selection, Color selectionColor);
+	void AddSelection(EntityId id, Color selectionColor);
 };

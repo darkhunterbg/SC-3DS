@@ -48,8 +48,21 @@ void GameView::Update(Camera& camera)
 	UpdateMarkers();
 	GamepadInput();
 
-	context.GetEntityManager().GetRenderSystem().SetSelection(
-		context.selection.GetEntities(), context.selectionColor);
+
+	auto& renderSystem = context.GetEntityManager().GetRenderSystem();
+	renderSystem.ClearSelection();
+
+	if (context.abilityTargetMarkerTimer > 0) {
+		--context.abilityTargetMarkerTimer;
+
+		if (context.IsAbilityTargetMarkerVisible()) {
+			Color c = context.GetAlliedUnitColor(context.abilityTarget);
+			renderSystem.AddSelection(context.abilityTarget, c);
+		}
+	}
+
+	renderSystem.AddSelection(context.selection.GetEntities(), context.selectionColor);
+
 }
 
 void GameView::UpdateMarkers() {
@@ -70,23 +83,33 @@ void GameView::UpdateMarkers() {
 }
 
 void GameView::GamepadInput() {
+	if (context.selection.size() == 0)
+		return;
+
 	if (Game::Gamepad.IsButtonReleased(GamepadButton::A)) {
 
 		EntityId entity = cursor->GetEntityUnder();
 
+		// TODO: diffentiate enemy/ally
+		// TODO: goto unit position (follow state)
 		if (entity == Entity::None) {
 			if (context.IsTargetSelectionMode)
 				context.ActivateCurrentAbility(cursor->GetWorldPosition());
 			else
 				context.ActivateAbility(&AbilityDatabase::Attack, cursor->GetWorldPosition());
+
+			context.NewActionMarker(cursor->GetWorldPosition());
 		}
 		else {
 			if (context.IsTargetSelectionMode)
 				context.ActivateCurrentAbility(entity);
 			else
 				context.ActivateAbility(&AbilityDatabase::Attack, entity);
+
+			context.NewUnitMarker(entity);
 		}
 
+		context.PlayUnitSelectedAudio(UnitChatType::Command);
 	}
 
 	if (Game::Gamepad.IsButtonReleased(GamepadButton::B)) {
@@ -96,8 +119,22 @@ void GameView::GamepadInput() {
 	}
 
 	if (Game::Gamepad.IsButtonReleased(GamepadButton::X)) {
-		if (!context.IsTargetSelectionMode) {
-			context.ActivateAbility(&AbilityDatabase::Move, cursor->GetWorldPosition());
+		EntityId entity = cursor->GetEntityUnder();
+
+		if (entity == Entity::None) {
+			if (!context.IsTargetSelectionMode)
+			{
+				context.ActivateAbility(&AbilityDatabase::Move, cursor->GetWorldPosition());
+				context.NewActionMarker(cursor->GetWorldPosition());
+				context.PlayUnitSelectedAudio(UnitChatType::Command);
+			}
+		}
+		else {
+			if (!context.IsTargetSelectionMode) {
+				context.ActivateAbility(&AbilityDatabase::Move, cursor->GetWorldPosition());
+				context.NewUnitMarker(entity);
+				context.PlayUnitSelectedAudio(UnitChatType::Command);
+			}
 		}
 	}
 }
