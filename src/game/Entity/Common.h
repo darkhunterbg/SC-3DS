@@ -17,8 +17,9 @@ enum class UnitAIState :uint8_t {
 	AttackTarget = 1,
 	GoToPosition = 2,
 	GoToAttack = 3,
-};
 
+	Nothing = 0xFF,
+};
 
 enum class TimerExpiredAction : uint8_t {
 	None = 0,
@@ -27,6 +28,7 @@ enum class TimerExpiredAction : uint8_t {
 	DeleteEntity = 3,
 
 };
+
 
 
 

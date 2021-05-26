@@ -268,5 +268,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\AbilityDatabase.cpp">
       <Filter>Data</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUDContext.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

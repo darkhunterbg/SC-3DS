@@ -10,7 +10,7 @@ private:
 	~AbilityDatabase() = delete;
 
 public:
-	static AbilityDef Move, Stop, Attack, Patrol, HoldPosition;
+	static AbilityDef  Move, Stop, Attack, Patrol, HoldPosition;
 
 	static std::vector<AbilityDef*> Abilities;
 

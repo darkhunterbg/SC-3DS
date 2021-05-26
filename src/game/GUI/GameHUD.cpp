@@ -124,6 +124,15 @@ void GameHUD::UpperScreenGUI(const Camera& camera) {
 
 	const auto& sprite = context.race->ConsoleSprite.GetSprite(1);
 	Platform::Draw(sprite, { {0, 240 - sprite.rect.size.y,}, Vector2Int(sprite.rect.size) });
+
+	if (context.IsTargetSelectionMode) {
+		pos = { 0, 240 - sprite.rect.size.y, };
+		pos.y -= sprite.rect.size.y + 2;
+		pos.x += 160;
+		Platform::DrawText(font, pos + Vector2Int{1, 1}, "Select Target", Colors::Black, 0.4f);
+		Platform::DrawText(font, pos, "Select Target", Colors::UILightGray, 0.4f);
+	
+	}
 }
 
 void GameHUD::LowerScreenGUI(const Camera& camera) {
@@ -144,6 +153,10 @@ void GameHUD::ApplyInput(Camera& camera) {
 			Vector2Int pos = Game::Pointer.Position() - Vector2Int(minimapDst.position);
 			camera.Position = Vector2Int16(Vector2(pos) * minimapUpscale);
 		}
+	}
+
+	if (context.IsTargetSelectionMode) {
+
 	}
 }
 

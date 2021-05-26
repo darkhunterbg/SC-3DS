@@ -14,10 +14,18 @@ class AbilityDef;
 class UnitCommandsPanel {
 private:
 	struct UnitCommand {
-		const AbilityDef* ability;
-		bool active;
-		bool enabled;
-		bool pressed;
+		const AbilityDef* ability = nullptr;
+		const SpriteFrame* commandIcon = nullptr;
+		bool active = false;
+		bool enabled = false;
+		bool pressed = false;
+
+		bool IsVisible() const {
+			return ability || commandIcon;
+		};
+		bool IsUsable() const {
+			return IsVisible() && enabled;
+		}
 	};
 	
 	std::array<UnitCommand, 3 * 3> unitCommands;
@@ -26,7 +34,10 @@ private:
 
 	void UpdateCommands(GameHUDContext& context);
 
+	void OnCommandPressed(GameHUDContext& context, const UnitCommand& cmd);
+
 	int pressedCommand = -1;
+	int hover = -1;
 public:
 	Rectangle PanelDst;
 

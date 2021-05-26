@@ -62,8 +62,6 @@ private:
 
 	std::vector<GUIActionMarker> markers;
 
-
-
 	void DrawMarkers(const Camera& camera);
 	void DrawUnitBars(const Camera& camera, const std::vector<EntityId>& selection, EntityManager& em);
 	void DrawResource(Sprite icon, Vector2Int pos, Color color, const char* text, ...);

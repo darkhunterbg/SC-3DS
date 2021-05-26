@@ -3,7 +3,7 @@
 
 #if defined (_3DS)
 extern void FatalError(const char* error, ...);
-#define EXCEPTION(TEXT, ...)  FatalError(TEXT, ## __VA_ARGS__);
+#define EXCEPTION(TEXT, ...)  FatalError(TEXT, ## __VA_ARGS__); 
 
 #elif defined(_WIN32)
 #if defined(_DEBUG)

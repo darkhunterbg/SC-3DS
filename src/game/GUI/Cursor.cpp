@@ -18,6 +18,7 @@ Cursor::Cursor() {
 	currentClip = &GraphicsDatabase::Cursor.arrow;
 }
 
+
 void Cursor::Draw() {
 
 	clipCountdown--;
@@ -44,11 +45,10 @@ void Cursor::Draw() {
 
 bool Cursor::Update(Camera& camera, GameHUDContext& context) {
 
-	Vector2Int corner = { 0,0 };
+	corner = { 0,0 };
 
 	EntityManager& em = context.GetEntityManager();
 
-	bool selectionUpdate = false;
 	// TODO: State machine
 
 	if (!Game::Gamepad.IsButtonDown(GamepadButton::L))
@@ -68,7 +68,7 @@ bool Cursor::Update(Camera& camera, GameHUDContext& context) {
 	}
 
 
-	bool holding = Game::Gamepad.IsButtonDown(GamepadButton::A);
+	holding = Game::Gamepad.IsButtonDown(GamepadButton::A);
 
 	if (Position.y <= Limits.position.y) {
 		Position.y = Limits.position.y;
@@ -84,26 +84,62 @@ bool Cursor::Update(Camera& camera, GameHUDContext& context) {
 		holdStart = camera.ScreenToWorld(Position);
 	}
 
-	Vector2Int16 worldPos = camera.ScreenToWorld(Position);
-	EntityId hover = em.PointCast(worldPos);
+	worldPos = camera.ScreenToWorld(Position);
+	hover = em.PointCast(worldPos);
+
 	if (hover != Entity::None &&
 		(!em.UnitArchetype.Archetype.HasEntity(hover) ||
-		em.UnitArchetype.HiddenArchetype.Archetype.HasEntity(hover))) {
+			em.UnitArchetype.HiddenArchetype.Archetype.HasEntity(hover))) {
 
 		hover = Entity::None;
 	}
-	bool dragging = (worldPos - holdStart).LengthSquared() != 0;
 
-		if (holding && dragging) {
-			Vector2Int16 start = camera.WorldToScreen(holdStart);
-				Vector2Int16 end = camera.WorldToScreen(worldPos);
+	dragging = (worldPos - holdStart).LengthSquared() != 0;
 
-				regionRect.size = (end - start);
-				regionRect.size.x = std::abs(regionRect.size.x);
-			regionRect.size.y = std::abs(regionRect.size.y);
-			regionRect.position.x = std::min(start.x, end.x);
-			regionRect.position.y = std::min(start.y, end.y);
-		}
+	newClip = currentClip;
+
+	bool selectionChanged = false;
+
+	if (context.IsTargetSelectionMode) {
+		UpdateTargetSelectionState(camera, context);
+	}
+	else {
+		selectionChanged = UpdateDefaultState(camera, context);
+	}
+
+	if (corner.LengthSquared() != 0) {
+		int index = (corner.x + 1) + (corner.y + 1) * 3;
+		newClip = GraphicsDatabase::Cursor.scrollAnim[index];
+		Vector2 v = Vector2::Normalize(Vector2(corner));
+		camera.Position += Vector2Int16(v * camera.GetCameraSpeed());
+	}
+
+	if (newClip != currentClip) {
+		currentClip = newClip;
+		clipFrame = 0;
+		clipCountdown = AnimFrameCount;
+	}
+
+	return selectionChanged;
+}
+
+bool Cursor::UpdateDefaultState(Camera& camera, GameHUDContext& context)
+{
+	EntityManager& em = context.GetEntityManager();
+
+	bool selectionUpdate = false;
+
+
+	if (holding && dragging) {
+		Vector2Int16 start = camera.WorldToScreen(holdStart);
+		Vector2Int16 end = camera.WorldToScreen(worldPos);
+
+		regionRect.size = (end - start);
+		regionRect.size.x = std::abs(regionRect.size.x);
+		regionRect.size.y = std::abs(regionRect.size.y);
+		regionRect.position.x = std::min(start.x, end.x);
+		regionRect.position.y = std::min(start.y, end.y);
+	}
 
 	if (Game::Gamepad.IsButtonReleased(GamepadButton::A)) {
 		context.selectedEntities.clear();
@@ -137,25 +173,19 @@ bool Cursor::Update(Camera& camera, GameHUDContext& context) {
 		}
 	}
 
-	const auto* newClip = currentClip;
 
-	if (corner.LengthSquared() != 0) {
-		int index = (corner.x + 1) + (corner.y + 1) * 3;
-		newClip = GraphicsDatabase::Cursor.scrollAnim[index];
-		Vector2 v = Vector2::Normalize(Vector2(corner));
-		camera.Position += Vector2Int16(v * camera.GetCameraSpeed());
-	}
-	else {
+	if (corner == Vector2Int{ 0,0 })
+	{
 		if (!holding || !dragging)
 		{
 			if (hover == Entity::None) {
 				newClip = &GraphicsDatabase::Cursor.arrow;
 			}
 			else {
-				if (UnitEntityUtil::IsAlly(Player, hover)) {
+				if (UnitEntityUtil::IsAlly(context.player, hover)) {
 					newClip = &GraphicsDatabase::Cursor.magg;
 				}
-				else if (UnitEntityUtil::IsEnemy(Player, hover)) {
+				else if (UnitEntityUtil::IsEnemy(context.player, hover)) {
 					newClip = &GraphicsDatabase::Cursor.magr;
 				}
 				else {
@@ -170,11 +200,38 @@ bool Cursor::Update(Camera& camera, GameHUDContext& context) {
 		}
 	}
 
-	if (newClip != currentClip) {
-		currentClip = newClip;
-		clipFrame = 0;
-		clipCountdown = AnimFrameCount;
+
+	return selectionUpdate;
+}
+
+void Cursor::UpdateTargetSelectionState(Camera& camera, GameHUDContext& context)
+{
+	if (hover == Entity::None) {
+		newClip = &GraphicsDatabase::Cursor.targn;
+	}
+	else {
+		if (UnitEntityUtil::IsAlly(context.player, hover)) {
+			newClip = &GraphicsDatabase::Cursor.targg;
+		}
+		else if (UnitEntityUtil::IsEnemy(context.player, hover)) {
+			newClip = &GraphicsDatabase::Cursor.targr;
+		}
+		else {
+			newClip = &GraphicsDatabase::Cursor.targy;
+		}
+
 	}
 
-	return  selectionUpdate;
+	if (Game::Gamepad.IsButtonReleased(GamepadButton::A)) {
+		if (hover == Entity::None) {
+			context.ActivateCurrentAbility(worldPos);
+		}
+		else {
+			context.ActivateCurrentAbility(hover);
+		}
+	}
+
+	if (Game::Gamepad.IsButtonReleased(GamepadButton::B)) {
+		context.CancelTargetSelection();
+	}
 }

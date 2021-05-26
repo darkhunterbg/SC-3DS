@@ -11,7 +11,20 @@ struct AbilityDef {
 	std::string Name;
 	int IconId;
 
-	 SpriteFrame Sprite;
+	SpriteFrame Sprite;
+
+	struct {
+		bool HasTargetSelection = false;
+		UnitAIState EntitySelectedAction = UnitAIState::Nothing;
+		UnitAIState PositionSelectedAction = UnitAIState::Nothing;
+
+		inline void SetAllStates(UnitAIState s) {
+			EntitySelectedAction = PositionSelectedAction = s;
+		}
+		inline bool IsState(UnitAIState s) const {
+			return EntitySelectedAction == s || PositionSelectedAction == s;
+		}
+	} TargetingData;
 
 	AbilityDef() {}
 	AbilityDef(const AbilityDef&) = delete;
