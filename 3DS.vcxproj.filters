@@ -2,12 +2,56 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <None Include="Makefile" />
+    <None Include="src\3ds\citro2d\render2d.v.pica">
+      <Filter>citro2d</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\3ds\Main.cpp" />
     <ClCompile Include="src\3ds\Platform.cpp" />
+    <ClCompile Include="src\3ds\citro2d\c2d\spritesheet.c">
+      <Filter>citro2d\c2d</Filter>
+    </ClCompile>
+    <ClCompile Include="src\3ds\citro2d\c2d\text.c">
+      <Filter>citro2d\c2d</Filter>
+    </ClCompile>
+    <ClCompile Include="src\3ds\citro2d\c2d\font.c">
+      <Filter>citro2d\c2d</Filter>
+    </ClCompile>
+    <ClCompile Include="src\3ds\citro2d\c2d\base.c">
+      <Filter>citro2d\c2d</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\3ds\NDSAudioChannel.h" />
+    <ClInclude Include="src\3ds\citro2d\citro2d.h">
+      <Filter>citro2d</Filter>
+    </ClInclude>
+    <ClInclude Include="src\3ds\citro2d\c2d\text.h">
+      <Filter>citro2d\c2d</Filter>
+    </ClInclude>
+    <ClInclude Include="src\3ds\citro2d\c2d\base.h">
+      <Filter>citro2d\c2d</Filter>
+    </ClInclude>
+    <ClInclude Include="src\3ds\citro2d\c2d\font.h">
+      <Filter>citro2d\c2d</Filter>
+    </ClInclude>
+    <ClInclude Include="src\3ds\citro2d\c2d\sprite.h">
+      <Filter>citro2d\c2d</Filter>
+    </ClInclude>
+    <ClInclude Include="src\3ds\citro2d\c2d\spritesheet.h">
+      <Filter>citro2d\c2d</Filter>
+    </ClInclude>
+    <ClInclude Include="src\3ds\citro2d\c2d\internal.h">
+      <Filter>citro2d\c2d</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="citro2d">
+      <UniqueIdentifier>{67f80aba-5ec8-48bd-98c8-d262e3268bc7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="citro2d\c2d">
+      <UniqueIdentifier>{015ff797-a96b-415b-bb97-0d69c57b8d50}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

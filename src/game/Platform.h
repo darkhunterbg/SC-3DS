@@ -11,22 +11,13 @@ struct AudioChannelState;
 typedef int AudioChannelHandle;
 typedef void* Semaphore;
 
-struct DrawCommandColor {
-	Color32 color;
-	float blend;
-
-	inline void AlphaBlend(float alpha) {
-		color = Color32(0.0f, 0.0f, 0.0f, alpha);
-		blend = 0;
-	}
-};
 
 struct BatchDrawCommand {
 	int order;
 	Image image;
 	Vector2Int16 position;
 	Vector2 scale;
-	DrawCommandColor color;
+	Color32 color;
 };
 
 enum class ScreenId
@@ -60,8 +51,8 @@ public:
 	static Sprite NewSprite(Image image, Rectangle16 src);
 	static void BatchDraw(const Span< BatchDrawCommand> commands);
 	static void ClearBuffer(Color color);
-	static void Draw(const Sprite& sprite, Rectangle dst, Color additiveBlendColor = Colors::Black, bool hFlip = false , bool vFlip = false);
-	static void DrawText(const Font& font, Vector2Int position, const char* text, Color color, float scale = 1.0f);
+	static void Draw(const Sprite& sprite, Rectangle dst, Color additiveBlendColor = Colors::White, bool hFlip = false , bool vFlip = false);
+	static void DrawText(const Font& font, Vector2Int position, const char* text, Color color= Colors::White, float scale = 1.0f);
 	static void DrawLine(Vector2Int src, Vector2Int dst, Color color);
 	static void DrawRectangle(const Rectangle& rect, const Color32& color);
 	static Image NewTexture(Vector2Int size, bool pixelFiltering = false);

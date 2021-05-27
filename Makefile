@@ -37,6 +37,8 @@ TARGET		:=	SC
 BUILD		:=	build
 SOURCES		:=	src/3ds src/game src/game/Scenes src/game/Map src/game/GUI src/game/Loader src/game/Entity src/game/Data
 
+SOURCES		+= src/3ds/citro2d src/3ds/citro2d/c2d
+
 DATA		:=	data
 INCLUDES	:=	$(SOURCES)
 GRAPHICS	:=	gfx
@@ -69,7 +71,7 @@ CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++17 -Wno-unused-functio
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= -lcitro2d -lcitro3d -lctru -lm
+LIBS	:= -lcitro3d -lctru -lm
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

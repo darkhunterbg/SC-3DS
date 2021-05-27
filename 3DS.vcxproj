@@ -12,12 +12,24 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
+    <None Include="src\3ds\citro2d\render2d.v.pica" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\3ds\citro2d\c2d\base.c" />
+    <ClCompile Include="src\3ds\citro2d\c2d\font.c" />
+    <ClCompile Include="src\3ds\citro2d\c2d\spritesheet.c" />
+    <ClCompile Include="src\3ds\citro2d\c2d\text.c" />
     <ClCompile Include="src\3ds\Main.cpp" />
     <ClCompile Include="src\3ds\Platform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\3ds\citro2d\c2d\base.h" />
+    <ClInclude Include="src\3ds\citro2d\c2d\font.h" />
+    <ClInclude Include="src\3ds\citro2d\c2d\internal.h" />
+    <ClInclude Include="src\3ds\citro2d\c2d\sprite.h" />
+    <ClInclude Include="src\3ds\citro2d\c2d\spritesheet.h" />
+    <ClInclude Include="src\3ds\citro2d\c2d\text.h" />
+    <ClInclude Include="src\3ds\citro2d\citro2d.h" />
     <ClInclude Include="src\3ds\NDSAudioChannel.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

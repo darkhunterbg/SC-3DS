@@ -68,7 +68,7 @@ Font Platform::LoadFont(const char* path) {
 }
 Vector2Int Platform::MeasureString(Font font, const char* text, float scale) {
 	C2D_Font f = (C2D_Font)font.fontId;
-	
+
 	C2D_TextBufClear(textBuffer);
 	C2D_Text t;
 	C2D_TextFontParse(&t, f, textBuffer, text);
@@ -164,7 +164,7 @@ Sprite Platform::NewSprite(Image image, Rectangle16 src) {
 	return { src, {tex,s2} };
 }
 
-void Platform::BatchDraw(const Span< BatchDrawCommand> commands) {
+void Platform::BatchDraw(const Span<BatchDrawCommand> commands) {
 
 	static constexpr const int depthStep = 0.0001f;
 
@@ -172,10 +172,10 @@ void Platform::BatchDraw(const Span< BatchDrawCommand> commands) {
 		C2D_Image img = *(C2D_Image*)&cmd.image;
 
 		C2D_ImageTint tint;
-		tint.corners[0] = { cmd.color.color.value, cmd.color.blend };
-		tint.corners[1] = { cmd.color.color.value, cmd.color.blend };
-		tint.corners[2] = { cmd.color.color.value, cmd.color.blend };
-		tint.corners[3] = { cmd.color.color.value, cmd.color.blend };
+		tint.corners[0] = { cmd.color.value, 1};
+		tint.corners[1] = { cmd.color.value, 1 };
+		tint.corners[2] = { cmd.color.value, 1};
+		tint.corners[3] = { cmd.color.value,1};
 		C2D_DrawImageAt(img, cmd.position.x, cmd.position.y, 0, &tint, cmd.scale.x, cmd.scale.y);
 	}
 }
@@ -187,19 +187,19 @@ void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip
 		dst.size.x *= -1;
 	if (vFlip)
 		dst.size.y *= -1;
-	if (color != Colors::Black)
-	{
+	//if (color != Colors::Black)
+	//{
 		C2D_ImageTint tint;
 		u32 ucolor = C2D_Color32f(color.r, color.g, color.b, color.a);
-		tint.corners[0] = { ucolor , 0.5f };
-		tint.corners[1] = { ucolor , 0.5f };
-		tint.corners[2] = { ucolor , 0.5f };
-		tint.corners[3] = { ucolor , 0.5f };
+		tint.corners[0] = { ucolor , 1.0f };
+		tint.corners[1] = { ucolor , 1.0f };
+		tint.corners[2] = { ucolor , 1.0f };
+		tint.corners[3] = { ucolor , 1.0f };
 
 		C2D_DrawImageAt(img, dst.position.x, dst.position.y, 0, &tint, dst.size.x / (float)img.subtex->width, dst.size.y / (float)img.subtex->height);
-	}
-	else
-		C2D_DrawImageAt(img, dst.position.x, dst.position.y, 0, nullptr, dst.size.x / (float)img.subtex->width, dst.size.y / (float)img.subtex->height);
+	//}
+	//else
+	//	C2D_DrawImageAt(img, dst.position.x, dst.position.y, 0, nullptr, dst.size.x / (float)img.subtex->width, dst.size.y / (float)img.subtex->height);
 
 
 }

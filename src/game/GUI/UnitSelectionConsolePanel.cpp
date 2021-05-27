@@ -50,7 +50,7 @@ void UnitSelectionConsolePanel::UpdateSelection(GameViewContext& context)
 	if (context.selection.size() < 2)
 		return;
 
-	if (!Game::Pointer.IsReleased())
+	if (!Game::Pointer.IsPressed())
 		return;
 
 	int max = std::min((int)context.selection.size(), 12);

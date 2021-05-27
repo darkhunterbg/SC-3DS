@@ -224,20 +224,16 @@ void Platform::BatchDraw(const Span<BatchDrawCommand> commands) {
 			(int)(size.x * std::abs(cmd.scale.x)),
 			(int)(size.y * cmd.scale.y) };
 
-		Uint8 r = cmd.color.color.GetR();
-		Uint8 g = cmd.color.color.GetG();
-		Uint8 b = cmd.color.color.GetB();
-		Uint8 a = cmd.color.color.GetA();
+		Uint8 r = cmd.color.GetR();
+		Uint8 g = cmd.color.GetG();
+		Uint8 b = cmd.color.GetB();
+		Uint8 a = cmd.color.GetA();
 
 		SDL_SetTextureBlendMode(texture, blendMode);
 		SDL_SetTextureAlphaMod(texture, a);
-		if (r != 0 || g != 0 || b != 0 || a != 255) {
-			SDL_SetTextureColorMod(texture, r, g, b);
-		}
-		else {
-			SDL_SetTextureColorMod(texture, 255, 255, 255);
-		}
 
+		SDL_SetTextureColorMod(texture, r, g, b);
+		
 		SDL_RenderCopyEx(renderer, texture, nullptr, &dst, 0, nullptr, flags);
 	}
 }
@@ -266,13 +262,8 @@ void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip
 	SDL_SetTextureAlphaMod(cmd.texture, cmd.a);
 	SDL_SetTextureBlendMode(cmd.texture, blendMode);
 
-	if (cmd.r != 0 || cmd.g != 0 || cmd.b != 0 || cmd.a != 255) {
-		SDL_SetTextureColorMod(cmd.texture, cmd.r, cmd.g, cmd.b);
-	}
-	else {
-		SDL_SetTextureColorMod(cmd.texture, 255, 255, 255);
-	}
-
+	SDL_SetTextureColorMod(cmd.texture, cmd.r, cmd.g, cmd.b);
+	
 	SDL_RenderCopyEx(renderer, cmd.texture, &cmd.src, &cmd.dst, 0, nullptr, cmd.flip);
 
 	Uint32 f; int w; int h; int a;
