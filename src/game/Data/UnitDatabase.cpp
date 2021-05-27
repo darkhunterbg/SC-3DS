@@ -70,8 +70,8 @@ static void CommandCenterData() {
 	u.Sounds.What = { "sound/misc/button", 1 , true };
 	u.Graphics = &GraphicsDatabase::CommandCenter;
 
-	u.ArmorIconId = 292;
-	u.PortraitId = 2;
+	u.ArmorIconId = 329;
+	u.PortraitId = 3;
 }
 static void MineralField1Data() {
 	UnitDef& u = UnitDatabase::MineralField1;
@@ -87,7 +87,7 @@ static void MineralField1Data() {
 	u.Sounds.What = { "sound/misc/button", 1 , true };
 	u.Graphics = &GraphicsDatabase::Minerals1;
 
-	u.PortraitId = 3;
+	u.PortraitId = 2;
 }
 
 void UnitDatabase::Init()

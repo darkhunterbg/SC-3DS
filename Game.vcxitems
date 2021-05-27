@@ -35,6 +35,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Debug.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\Archetype.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\CommandProcessor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\Common.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\Component.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\Entity.h" />
@@ -89,6 +90,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\WeaponDatabase.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\Archetype.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\CommandProcessor.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\Entity.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\EntityManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\EntityTree.cpp" />

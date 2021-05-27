@@ -69,7 +69,7 @@ void GameScene::Start() {
 	EntityId e = 0;
 	int i = 0;
 	for (int y = 5; y > 0; --y) {
-		for (int x = 5; x > 0; --x) {
+		for (int x = 5 ; x > 0; --x) {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[0];
 			e = UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,

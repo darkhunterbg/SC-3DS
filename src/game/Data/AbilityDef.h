@@ -8,6 +8,8 @@
 
 struct AbilityDef {
 
+	int AbilityId = 0;
+
 	std::string Name;
 	int IconId;
 

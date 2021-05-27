@@ -59,7 +59,6 @@ void EntityManager::DeleteEntity(EntityId id) {
 
 }
 
-
 void EntityManager::DeleteEntitiesSorted(std::vector<EntityId>& e) {
 	int max = e.size();
 
@@ -167,7 +166,6 @@ void EntityManager::Update0(const Camera& camera) {
 	playerSystem.UpdateNextPlayerVision();
 
 	soundSystem.UpdateEntityAudio(camera, *this);
-
 }
 // Updates 24 per second (60 fps) 
 void EntityManager::Update1(const Camera& camera) {
@@ -189,6 +187,8 @@ void EntityManager::Update1(const Camera& camera) {
 }
 // Update 24 per second (60 fps) 
 void EntityManager::Update2(const Camera& camera) {
+	commandProcessor.ExecuteQueuedCommands(*this);
+
 	timingSystem.ApplyTimerActions(*this);
 
 	unitSystem.UpdateUnitStats(*this);
@@ -214,6 +214,10 @@ void EntityManager::Update2(const Camera& camera) {
 	kinematicSystem.ApplyCollidersChange(*this);
 
 	ApplyEntityChanges();
+
+	++logicalFrame;
+
+	commandProcessor.SetFrame(logicalFrame);
 }
 
 // Draws 12 per second (60 fps) 
@@ -225,21 +229,11 @@ void EntityManager::Draw1(const Camera& camera) {
 
 }
 // Draws 24 per second (60 fps) 
-void EntityManager::Draw2(const Camera& camera) {
-
-}
-
-static int updates[3] = { 0,0,0 };
-
-int last = -1;
+void EntityManager::Draw2(const Camera& camera) {}
 
 void EntityManager::FrameUpdate(const Camera& camera) {
 
 	ready = true;
-	//FullUpdate(camera);
-
-	if (updateId == last)
-		EXCEPTION("TRIED TO UPDATE TWICE");
 
 	switch (updateId)
 	{
@@ -247,31 +241,21 @@ void EntityManager::FrameUpdate(const Camera& camera) {
 		SectionProfiler p("Update0");
 
 		Update0(camera);
-
-		updates[0]++;
 		break;
 	}
 	case 1: {
 		SectionProfiler p("Update1");
 		Update1(camera);
-
-		updates[1]++;
 		break;
 	}
 	case 2: {
 		SectionProfiler p("Update2");
 		Update2(camera);
-
-
-		updates[2]++;
 		break;
 	}
 	default:
 		EXCEPTION("Invalid UpdateId %i", updateId);
 	}
-
-
-	last = updateId;
 
 	//Util::RealTimeStat("Entities", entities.size());
 }
@@ -283,6 +267,8 @@ void EntityManager::FullUpdate(const Camera& camera) {
 }
 
 void EntityManager::Draw(const Camera& camera) {
+
+	SectionProfiler p("Draw");
 
 	if (ready)
 	{

@@ -16,15 +16,7 @@ void GameViewContext::ActivateAbility(const AbilityDef* ability)
 		return;
 	}
 
-	auto action = ability->TargetingData.EntitySelectedAction;
-	if (action == UnitAIState::Nothing) {
-		EXCEPTION("Tried to active ability %s with Nothing action for entity!", ability->Name.data());
-		return;
-	}
-
-	for (EntityId id : selection) {
-		UnitEntityUtil::SetAIState(id, action);
-	}
+	em->GetCommandProcessor().UseAbility(player, selection.GetEntities(), *ability);
 }
 
 void GameViewContext::ActivateAbility(const AbilityDef* ability, EntityId target)
@@ -37,18 +29,8 @@ void GameViewContext::ActivateAbility(const AbilityDef* ability, EntityId target
 		return;
 	}
 
-	auto action = ability->TargetingData.EntitySelectedAction;
-	if (action == UnitAIState::Nothing) {
-		EXCEPTION("Tried to active ability %s with Nothing action for entity!", ability->Name.data());
-		return;
-	}
 
-	for (EntityId id : selection) {
-		UnitEntityUtil::SetAIState(id, action, target);
-	}
-
-	PlayUnitSelectedAudio(UnitChatType::Command);
-
+	em->GetCommandProcessor().UseAbility(player, selection.GetEntities(), *ability, target);
 }
 
 void GameViewContext::ActivateAbility(const AbilityDef* ability, Vector2Int16 position)
@@ -61,15 +43,7 @@ void GameViewContext::ActivateAbility(const AbilityDef* ability, Vector2Int16 po
 		return;
 	}
 
-	auto action = ability->TargetingData.PositionSelectedAction;
-	if (action == UnitAIState::Nothing) {
-		EXCEPTION("Tried to active ability %s with Nothing action for position!", ability->Name.data());
-		return;
-	}
-
-	for (EntityId id : selection) {
-		UnitEntityUtil::SetAIState(id, action, position);
-	}
+	em->GetCommandProcessor().UseAbility(player, selection.GetEntities(), *ability, position);
 }
 
 void GameViewContext::ActivateCurrentAbility()

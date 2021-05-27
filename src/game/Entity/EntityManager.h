@@ -16,6 +16,7 @@
 #include "MapSystem.h"
 #include "UnitSystem.h"
 #include "SoundSystem.h"
+#include "CommandProcessor.h"
 
 #include "../Data/UnitDef.h"
 #include "../Camera.h"
@@ -27,7 +28,6 @@ struct EntityChangedData {
 
 	size_t size() const { return entity.size(); }
 	void clear() { entity.clear(); position.clear(); oldPosition.clear(); }
-
 };
 
 class EntityManager {
@@ -43,6 +43,7 @@ private:
 	MapSystem mapSystem;
 	UnitSystem unitSystem;
 	SoundSystem soundSystem;
+	CommandProcessor commandProcessor;
 
 	bool ready = false;
 	bool doneUpdatingVision = false;
@@ -183,6 +184,7 @@ private:
 
 	unsigned long long frameCounter = 0;
 	int8_t updateId = 0;
+	uint32_t logicalFrame = 0;
 public:
 	bool DrawColliders = false;
 	bool DrawGrid = false;
@@ -207,6 +209,9 @@ public:
 	}
 	inline RenderSystem& GetRenderSystem() {
 		return renderSystem;
+	}
+	inline CommandProcessor& GetCommandProcessor() {
+		return commandProcessor;
 	}
 	inline const Span<EntityId> GetEntities() const {
 		return entities.GetEntities();

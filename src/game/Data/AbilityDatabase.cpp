@@ -15,6 +15,8 @@ std::vector<AbilityDef*> AbilityDatabase::Abilities = {
 	&AbilityDatabase::HoldPosition,
 };
 
+static int Id = 0;
+
 void AbilityDatabase::Init()
 {
 	Move.Name = "Move";
@@ -46,6 +48,8 @@ void AbilityDatabase::Init()
 
 	const auto& sa = *SpriteDatabase::Load_unit_cmdbtns_cmdicons();
 
-	for (auto& def : Abilities)
+	for (auto& def : Abilities) {
+		def->AbilityId = Id++;
 		def->Sprite = sa.GetFrame(def->IconId);
+	}
 }
