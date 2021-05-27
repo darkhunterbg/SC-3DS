@@ -103,15 +103,15 @@ void PlayerSystem::UpdatePlayerUnits(const EntityManager& em) {
 		PlayerId owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
 		const auto& data = em.UnitArchetype.DataComponents.GetComponent(id);
 
-		players[owner].currentSupplyDoubled += data.supplyUsage;
-		players[owner].maxSupplyDoubled += data.supplyProvides;
+		players[owner].usedSupplyDoubled += data.supplyUsage;
+		players[owner].providedSupplyDoubled += data.supplyProvides;
 	}
 	for (EntityId id : em.UnitArchetype.Archetype.RemovedEntities()) {
 		PlayerId owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
 		const auto& data = em.UnitArchetype.DataComponents.GetComponent(id);
 
-		players[owner].currentSupplyDoubled -= data.supplyUsage;
-		players[owner].maxSupplyDoubled -= data.supplyProvides;
+		players[owner].usedSupplyDoubled -= data.supplyUsage;
+		players[owner].providedSupplyDoubled -= data.supplyProvides;
 	}
 
 	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {

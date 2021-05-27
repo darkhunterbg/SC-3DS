@@ -29,7 +29,6 @@ void Init();
 void Uninit();
 void UpdateAudioChannel(NDSAudioChannel& channel);
 
-
 void FatalError(const char* error, ...) {
 	consoleInit(GFX_BOTTOM, nullptr);
 
@@ -112,7 +111,6 @@ int main()
 	return 0;
 }
 
-
 void Init() {
 
 	romfsInit();
@@ -143,7 +141,7 @@ void Init() {
 		assetDir = "StarCraft/romfs/";
 
 
-	userDir = assetDir + "User/";
+	userDir = assetDir.substr(0, assetDir.length() - 6) + "User/";
 	struct stat s = { 0 };
 
 	if (stat(userDir.data(), &s) != 0 || !S_ISDIR(s.st_mode)) {

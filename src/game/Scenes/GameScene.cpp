@@ -57,17 +57,19 @@ void GameScene::Start() {
 	//UnitEntityUtil::NewUnit(UnitDatabase::MineralField1, 0,
 	//	Vector2Int16(128, 256));
 
-	for (int i = 0; i < 5; ++i) {
-		UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 2,
-			Vector2Int16(600, 32 * i + 32));
-	}
+	//for (int i = 0; i < 5; ++i) {
+	//	UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 2,
+	//		Vector2Int16(600, 32 * i + 32));
+	//}
 
-	//UnitEntityUtil::NewUnit(*UnitDatabase::Units[1], 2,
-	//	Vector2Int16(400, 300));
+	EntityId e = UnitEntityUtil::NewUnit(UnitDatabase::CommandCenter, 1,
+		Vector2Int16(256, 256));
+
+	//entityManager->UnitArchetype.HealthComponents.GetComponent(e).current = 499;
 
 	//EntityId e = UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 0,
 	//	Vector2Int16(48, 48));
-	EntityId e = 0;
+	 e = 0;
 	int i = 0;
 	for (int y = 5; y > 0; --y) {
 		for (int x = 5; x > 0; --x) {

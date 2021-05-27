@@ -63,6 +63,7 @@ static void CommandCenterData() {
 	u.MovementSpeed = 0;
 	u.RotationSpeed = 0;
 	u.Vision = 10;
+	u.Armor = 1;
 	u.SetPovideSupply(10);
 	u.IsBuilding = true;
 
@@ -70,8 +71,8 @@ static void CommandCenterData() {
 	u.Sounds.What = { "sound/misc/button", 1 , true };
 	u.Graphics = &GraphicsDatabase::CommandCenter;
 
-	u.ArmorIconId = 329;
-	u.PortraitId = 3;
+
+	u.PortraitId = 2;
 }
 static void MineralField1Data() {
 	UnitDef& u = UnitDatabase::MineralField1;
@@ -87,7 +88,7 @@ static void MineralField1Data() {
 	u.Sounds.What = { "sound/misc/button", 1 , true };
 	u.Graphics = &GraphicsDatabase::Minerals1;
 
-	u.PortraitId = 2;
+	u.PortraitId = 3;
 }
 
 void UnitDatabase::Init()
@@ -100,9 +101,10 @@ void UnitDatabase::Init()
 
 void UnitDatabase::LoadUnitResources(UnitDef& def) {
 	def.Graphics->LoadResourcesAction();
-	def.ArmorIcon = SpriteDatabase::Load_unit_cmdbtns_cmdicons()
-		->GetFrame(def.ArmorIconId).sprite;
 
+	if (def.HasArmor())
+		def.ArmorIcon = SpriteDatabase::Load_unit_cmdbtns_cmdicons()
+		->GetFrame(def.ArmorIconId).sprite;
 
 
 	def.Portrait = Game::AssetLoader.LoadAtlas("portrait.t3x")->GetSprite(def.PortraitId);

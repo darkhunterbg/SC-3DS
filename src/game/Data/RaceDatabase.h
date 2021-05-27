@@ -11,4 +11,6 @@ public:
 	static RaceDef Terran, Zerg, Protoss;
 
 	static void Init();
+
+	static const RaceDef* GetRaceDef(RaceType type);
 };

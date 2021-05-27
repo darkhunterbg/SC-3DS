@@ -6,6 +6,7 @@ See SDL_FontCache.h for license info.
 */
 
 #include "SDL_FontCache.h"
+#include <SDL_render.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -913,6 +914,9 @@ static Uint8 FC_GrowGlyphCache(FC_Font* font)
     GPU_SetAnchor(new_level, 0.5f, 0.5f);  // Just in case the default is different
     #else
     SDL_Texture* new_level = SDL_CreateTexture(font->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, font->height * 12, font->height * 12);
+
+    SDL_SetTextureScaleMode(new_level, SDL_ScaleModeBest);
+
     #endif
     if(new_level == NULL || !FC_SetGlyphCacheLevel(font, font->glyph_cache_count, new_level))
     {
@@ -980,8 +984,10 @@ Uint8 FC_UploadGlyphCache(FC_Font* font, int cache_level, SDL_Surface* data_surf
         GPU_SetImageFilter(new_level, GPU_FILTER_NEAREST);
     #else
     SDL_Texture* new_level;
-    if(!fc_has_render_target_support)
+    if (!fc_has_render_target_support) {
         new_level = SDL_CreateTextureFromSurface(font->renderer, data_surface);
+        SDL_SetTextureScaleMode(new_level, SDL_ScaleModeBest);
+    }
     else
     {
         // Must upload with render target enabled so we can put more glyphs on later
@@ -1001,6 +1007,7 @@ Uint8 FC_UploadGlyphCache(FC_Font* font, int cache_level, SDL_Surface* data_surf
 
         new_level = SDL_CreateTexture(renderer, data_surface->format->format, SDL_TEXTUREACCESS_TARGET, data_surface->w, data_surface->h);
         SDL_SetTextureBlendMode(new_level, SDL_BLENDMODE_BLEND);
+        SDL_SetTextureScaleMode(new_level, SDL_ScaleModeBest);
 
         // Reset filter mode for the temp texture
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
@@ -1008,6 +1015,7 @@ Uint8 FC_UploadGlyphCache(FC_Font* font, int cache_level, SDL_Surface* data_surf
         {
             Uint8 r, g, b, a;
             SDL_Texture* temp = SDL_CreateTextureFromSurface(renderer, data_surface);
+            SDL_SetTextureScaleMode(temp, SDL_ScaleModeBest);
             SDL_Texture* prev_target = SDL_GetRenderTarget(renderer);
             SDL_Rect prev_clip, prev_viewport;
             int prev_logicalw, prev_logicalh;
@@ -1535,6 +1543,7 @@ Uint8 FC_AddGlyphToCache(FC_Font* font, SDL_Surface* glyph_surface)
         }
 
         img = SDL_CreateTextureFromSurface(renderer, glyph_surface);
+        SDL_SetTextureScaleMode(img, SDL_ScaleModeBest);
 
         destrect = font->last_glyph.rect;
         SDL_SetRenderTarget(renderer, dest);

@@ -159,22 +159,26 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 
 		UnitAIState state = em.UnitArchetype.AIStateComponents.GetComponent(entityId);
 
-		unitCommands[0].ability = &AbilityDatabase::Move;
-		unitCommands[0].enabled = true;
-
-		unitCommands[1].ability = &AbilityDatabase::Stop;
-		unitCommands[1].enabled = true;
-
 		if (unit.def->Weapon) {
 			unitCommands[2].ability = &AbilityDatabase::Attack;
 			unitCommands[2].enabled = true;
 		}
 
-		unitCommands[3].ability = &AbilityDatabase::Patrol;
-		unitCommands[3].enabled = true;
+		if (unit.def->MovementSpeed > 0)
+		{
+			unitCommands[0].ability = &AbilityDatabase::Move;
+			unitCommands[0].enabled = true;
 
-		unitCommands[4].ability = &AbilityDatabase::HoldPosition;
-		unitCommands[4].enabled = true;
+			unitCommands[1].ability = &AbilityDatabase::Stop;
+			unitCommands[1].enabled = true;
+
+
+			unitCommands[3].ability = &AbilityDatabase::Patrol;
+			unitCommands[3].enabled = true;
+
+			unitCommands[4].ability = &AbilityDatabase::HoldPosition;
+			unitCommands[4].enabled = true;
+		}
 
 		for (auto& cmd : unitCommands) {
 			if (!cmd.IsUsable())

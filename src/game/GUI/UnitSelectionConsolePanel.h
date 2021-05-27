@@ -22,7 +22,12 @@ public:
 private:
 
 	void DrawMultiSelection(Rectangle dst, GameViewContext& context);
+	
+	void DrawUnitName(Rectangle space, EntityId id, const UnitComponent& unit, GameViewContext& context);
+	void DrawSupplyInfo(Rectangle space, EntityId id, const UnitComponent& unit, GameViewContext& context);
+
 	void DrawUnitDetail(Rectangle space, EntityId id, const UnitComponent& unit, GameViewContext& context);
+
 	void DrawUnitInfo(Rectangle space, EntityId id, const UnitComponent& unit, const UnitHealthComponent& health);
 
 	void GetUnitWireframeColors(EntityId id, const UnitHealthComponent& health, Color outColors[4]);

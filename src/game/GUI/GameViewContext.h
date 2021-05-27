@@ -6,9 +6,11 @@
 #include "../Data/RaceDef.h"
 #include "../Entity/Component.h"
 #include "../Data/AbilityDef.h"
+#include "../Entity/Common.h"
 #include <vector>
 
 class EntityManager;
+struct PlayerInfo;
 
 struct GUIActionMarker {
 	Vector2Int16 pos;
@@ -27,7 +29,6 @@ class GameViewContext {
 public:
 	static constexpr const int MarkerTimer = 16;
 	static constexpr const int AbilityUnitTargetMarkerTimer = 60;
-
 
 
 	EntityManager* em = nullptr;
@@ -52,12 +53,12 @@ public:
 
 	void ActivateAbility(const AbilityDef* ability);
 	void ActivateAbility(const AbilityDef* ability, EntityId target);
-	void ActivateAbility(const AbilityDef* ,Vector2Int16 position);
+	void ActivateAbility(const AbilityDef*, Vector2Int16 position);
 
 	void ActivateCurrentAbility();
 	void ActivateCurrentAbility(EntityId target);
 	void ActivateCurrentAbility(Vector2Int16 position);
-	
+
 	void SelectAbilityTarget(const AbilityDef& def);
 	void CancelTargetSelection();
 
@@ -88,4 +89,7 @@ public:
 
 	void PlayUnitSelectedAudio(UnitChatType type);
 
+	const RaceDef& GetPlayerRaceDef() const;
+
+	const PlayerInfo& GetPlayerInfo() const;
 };

@@ -11,6 +11,7 @@ void RaceDatabase::Init()
 	{
 		RaceDef& d = Terran;
 		d.Name = "Terran";
+		d.SupplyNamePlural = "Supplies";
 		d.Type = RaceType::Terran;
 		d.ConsoleSprite.Path = "game_tconsole.t3x";
 		d.SupplyIconId = 5;
@@ -28,6 +29,7 @@ void RaceDatabase::Init()
 	{
 		RaceDef& d = Zerg;
 		d.Name = "Zerg";
+		d.SupplyNamePlural = "Controls";
 		d.Type = RaceType::Zerg;
 		d.ConsoleSprite.Path = "game_zconsole.t3x";
 		d.SupplyIconId = 4;
@@ -45,6 +47,7 @@ void RaceDatabase::Init()
 	{
 		RaceDef& d = Protoss;
 		d.Name = "Protoss";
+		d.SupplyNamePlural = "Psi";
 		d.Type = RaceType::Protoss;
 		d.ConsoleSprite.Path = "game_pconsole.t3x";
 		d.SupplyIconId = 6;
@@ -57,5 +60,20 @@ void RaceDatabase::Init()
 		d.GameMusic.push_back({ "music/protoss2.wav" });
 		d.GameMusic.push_back({ "music/protoss3.wav" });
 		d.CommandIconsLoad = []() { Protoss.CommandIconsAtlas = SpriteDatabase::Load_unit_cmdbtns_pcmdbtns(); };
+	}
+}
+
+const RaceDef* RaceDatabase::GetRaceDef(RaceType type)
+{
+	switch (type)
+	{
+	case RaceType::Terran: return &Terran;
+		break;
+	case RaceType::Zerg: return &Zerg;
+		break;
+	case RaceType::Protoss: return &Protoss;
+		break;
+	default:
+		return nullptr;
 	}
 }

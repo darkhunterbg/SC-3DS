@@ -47,8 +47,8 @@ void GameHUD::UpdateInfo(GameViewContext& context) {
 
 	minerals.target = info.minerals;
 	gas.target = info.gas;
-	supply.current = info.GetCurrentSupply();
-	supply.max = info.GetMaxSupply();
+	supply.current = info.GetUsedSupply();
+	supply.max = info.GetProvidedSupply();
 }
 
 static const  int GetResourceUpdate(int change) {

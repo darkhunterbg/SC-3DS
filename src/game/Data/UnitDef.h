@@ -18,7 +18,8 @@ struct UnitDef {
 	uint8_t Acceleration = 0;
 	uint8_t RotationSpeed = 1;
 	uint8_t Vision = 1;
-	
+	uint8_t Armor = 0;
+
 	bool IsBuilding = false;
 	bool IsResourceContainer = false;
 
@@ -34,24 +35,27 @@ struct UnitDef {
 		UnitSound Death;
 	} Sounds;
 
+	
 	const UnitGraphicsDef* Graphics = nullptr;
 	const WeaponDef* Weapon = nullptr;
 
 	Sprite ArmorIcon;
 	Sprite Portrait;
-	int ArmorIconId;
+	int ArmorIconId = -1;
 	int PortraitId;
+
 
 	UnitDef() {  }
 	UnitDef(const UnitDef&) = delete;
 	UnitDef& operator=(const UnitDef&) = delete;
 
 	inline void SetUseSupply(uint8_t amount, bool half = false) {
-		UseSupplyDoubled = (amount << 1)+ half;
+		UseSupplyDoubled = (amount << 1) + half;
 	}
 	inline void SetPovideSupply(uint8_t amount, bool half = false) {
 		ProvideSupplyDoubled = (amount << 1) + half;
 	}
+	inline bool HasArmor() const { return ArmorIconId != -1; }
 
 
 	inline void LoadAllSounds() {

@@ -1,13 +1,16 @@
 ﻿#palette Terrain
 #tileset\*.grp
 
+palette Icons
+unit\cmdbtns\*.grp
+#game\icons.grp
+cursor\*.grp
+
+
 palette CmdIcons
 unit\cmdbtns\cmdicons.grp
 
-done
-
 wireframe unit\wirefram\grpwire.grp
-
 wireframe unit\wirefram\wirefram.grp
 
 palette Units
@@ -26,14 +29,37 @@ palette White
 unit\thingy\o022.grp
 unit\thingy\od022.grp
 
+unit\thingy\o032.grp
+unit\thingy\od032.grp
+
+unit\thingy\o048.grp
+unit\thingy\od048.grp
+
+unit\thingy\o062.grp
+unit\thingy\od062.grp
+
+unit\thingy\o072.grp
+unit\thingy\od072.grp
+
+unit\thingy\o094.grp
+unit\thingy\od094.grp
+
+unit\thingy\o110.grp
+unit\thingy\od110.grp
+
+unit\thingy\o122.grp
+unit\thingy\od122.grp
+
+unit\thingy\o146.grp
+unit\thingy\od146.grp
+
+unit\thingy\o224.grp
+unit\thingy\od224.grp
+
 palette Orange
 unit\thingy\tscglow.grp
 unit\thingy\tbangs.grp
 unit\thingy\tbangx.grp
 unit\thingy\tbangl.grp
 
-palette Icons
-unit\cmdbtns\*.grp
-#game\icons.grp
-cursor\*.grp
 

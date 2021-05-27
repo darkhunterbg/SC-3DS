@@ -206,6 +206,9 @@ void GameView::DrawUnitBars(const Camera& camera) {
 		Vector2Int16 pos = em.PositionComponents.GetComponent(id);
 		pos.y += em.UnitArchetype.UnitComponents.GetComponent(id).def->Graphics->Selection.BarVerticalOffset;
 		int barSize = em.UnitArchetype.UnitComponents.GetComponent(id).def->Graphics->Selection.BarSize;
+
+		barSize /= camera.Scale;
+
 		int size = barSize * 3 - 1;
 
 		Rectangle16 bb = { {0,0}, Vector2Int16(size, 5) };
@@ -239,11 +242,11 @@ void GameView::DrawUnitBars(const Camera& camera) {
 			}
 
 
-			if (health.current * 100 < health.max * 33) {
+			if (health.current <= health.max / 3) {
 				palette = &RedHPBarColorPalette;
 			}
 
-			else if (health.current * 100 < health.max * 66) {
+			else if (health.current <= (health.max << 1) / 3) {
 				palette = &YellowHPBarColorPalette;
 			}
 		}

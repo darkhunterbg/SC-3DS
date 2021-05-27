@@ -179,6 +179,7 @@ struct UnitAIStateDataComponent {
 struct UnitComponent {
 	const UnitDef* def;
 	EntityId movementGlowEntity = Entity::None;
+	EntityId fires[3] = { Entity::None, Entity::None, Entity::None };
 	uint16_t kills = 0;
 
 	inline bool HasMovementGlow() const { return movementGlowEntity != Entity::None; }
@@ -189,20 +190,34 @@ struct UnitDataComponent {
 	uint8_t supplyProvides = 0;
 	uint8_t vision = 1;
 	bool isBuilding = false;
+	uint8_t internalTimer = 0;
+
+	inline void ResetFireTimer() {
+		internalTimer = 18;
+	}
 
 	inline void FromDef(const UnitDef& def) {
 		supplyUsage = def.UseSupplyDoubled;
 		supplyProvides = def.ProvideSupplyDoubled;
 		vision = def.Vision + 1;
 		isBuilding = def.IsBuilding;
+		ResetFireTimer();
 	}
 };
 
 struct UnitHealthComponent {
 	uint16_t current = 1;
 	uint16_t max = 1;
+	uint8_t armor = 0;
 
 	inline bool Reduce(uint16_t value) {
+		uint16_t dmg = std::max((int)value - (int)armor , 1);
+		uint16_t damage = std::min(dmg, current);
+		bool kill = damage == current;
+		current -= damage;
+		return damage && kill;
+	}
+	inline bool ReduceUnmitigated(uint16_t value) {
 		uint16_t damage = std::min(value, current);
 		bool kill = damage == current;
 		current -= damage;
@@ -214,6 +229,7 @@ struct UnitHealthComponent {
 	inline bool IsDead() const { return current == 0; }
 	inline void FromDef(const UnitDef& def) {
 		current = max = def.Health;
+		armor = def.Armor;
 	}
 };
 

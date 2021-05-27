@@ -5,6 +5,8 @@
 #include "../Game.h"
 #include "../Job.h"
 
+#include "../Data/GraphicsDatabase.h"
+
 // =============================== Unit System =================================
 
 UnitSystem::UnitSystem()
@@ -105,7 +107,7 @@ void UnitSystem::ApplyUnitState(EntityManager& em) {
 	for (int i = 0; i < UnitStateMachine::States.size(); ++i) {
 		auto& state = *UnitStateMachine::States[i];
 		auto& data = exitStateData[i];
-		if(data.size())
+		if (data.size())
 			state.ExitState(data, em);
 	}
 
@@ -120,6 +122,50 @@ void UnitSystem::ApplyUnitState(EntityManager& em) {
 void UnitSystem::UpdateUnitStats(EntityManager& em)
 {
 	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {
+
+		auto& healthComponent = em.UnitArchetype.HealthComponents.GetComponent(id);
+
+		auto& unitDataComponent = em.UnitArchetype.DataComponents.GetComponent(id);
+		auto& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
+		if (unitDataComponent.isBuilding) {
+
+			
+			// ========== DIRTY ====================
+
+			//if (healthComponent.current < (healthComponent.max << 4) / 5) {
+			//	if (unit.fires[0] == Entity::None) {
+			//		auto e2 = em.NewEntity();
+			//		em.OldPositionComponents.NewComponent(e2, em.PositionComponents.GetComponent(id));
+			//		em.FlagComponents.NewComponent(e2);
+			//		em.RenderArchetype.RenderComponents.GetComponent(e2).depth = 1;
+			//		em.RenderArchetype.Archetype.AddEntity(e2);
+			//		em.AnimationArchetype.Archetype.AddEntity(e2);
+
+			//		EntityUtil::PlayAnimation(e2, GraphicsDatabase::FireDamage.Left[0]);
+			//		EntityUtil::SetRenderFromAnimationClip(e2, GraphicsDatabase::FireDamage.Left[0],0);
+
+			//		em.ParentArchetype.Archetype.AddEntity(id);
+			//		em.ParentArchetype.ChildComponents.NewComponent(id).AddChild(e2);
+
+			//		em.UnitArchetype.UnitComponents.GetComponent(id).fires[0] = e2;
+
+			//	
+			//	}
+			//}
+
+			// =====================================
+
+			if (healthComponent.current < healthComponent.max / 3) {
+
+				if (unitDataComponent.internalTimer == 0)
+				{
+					healthComponent.ReduceUnmitigated(1);
+					unitDataComponent.ResetFireTimer();
+				}
+				--unitDataComponent.internalTimer;
+			}
+		}
+
 
 		if (em.UnitArchetype.HealthComponents.GetComponent(id).IsDead()) {
 			em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Death;

@@ -8,6 +8,7 @@
 #include "SoundDef.h"
 
 enum class RaceType :uint8_t {
+
 	Neutral = 0,
 	Terran = 1,
 	Zerg = 2,
@@ -23,6 +24,7 @@ struct RaceDef {
 
 	Sprite SupplyIcon;
 	uint8_t SupplyIconId;
+	std::string SupplyNamePlural;
 
 	Sprite GasIcon;
 	uint8_t GasIconId;

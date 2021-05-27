@@ -26,10 +26,15 @@ public:
 	static SpriteFrameAtlas* cursor;
 	static SpriteFrameAtlas* unit_thingy_o022;
 	static SpriteFrameAtlas* unit_wirefram_wirefram_000;
+	static SpriteFrameAtlas* unit_wirefram_wirefram_106;
+	static SpriteFrameAtlas* unit_thingy_o146;
 	static SpriteFrameAtlas* unit_cmdbtns_tcmdbtns;
 	static SpriteFrameAtlas* unit_cmdbtns_pcmdbtns;
 	static SpriteFrameAtlas* unit_cmdbtns_zcmdbtns;
 	static SpriteFrameAtlas* unit_cmdbtns_cmdicons;
+	static SpriteFrameAtlas* unit_thingy_ofirec;
+	static SpriteFrameAtlas* unit_thingy_ofirev;
+	static SpriteFrameAtlas* unit_thingy_ofiref;
 
 	static const SpriteFrameAtlas* Load_unit_terran_marine();
 	static const SpriteFrameAtlas* Load_unit_terran_tmashad();
@@ -45,8 +50,13 @@ public:
 	static const SpriteFrameAtlas* Load_cursor();
 	static const SpriteFrameAtlas* Load_unit_thingy_o022();
 	static const SpriteFrameAtlas* Load_unit_wirefram_wirefram_000();
+	static const SpriteFrameAtlas* Load_unit_wirefram_wirefram_106();
+	static const SpriteFrameAtlas* Load_unit_thingy_o146();
 	static const SpriteFrameAtlas* Load_unit_cmdbtns_tcmdbtns();
 	static const SpriteFrameAtlas* Load_unit_cmdbtns_pcmdbtns();
 	static const SpriteFrameAtlas* Load_unit_cmdbtns_zcmdbtns();
 	static const SpriteFrameAtlas* Load_unit_cmdbtns_cmdicons();
+	static const SpriteFrameAtlas* Load_unit_thingy_ofirec();
+	static const SpriteFrameAtlas* Load_unit_thingy_ofirev();
+	static const SpriteFrameAtlas* Load_unit_thingy_ofiref();
 };

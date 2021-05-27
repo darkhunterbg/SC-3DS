@@ -18,6 +18,11 @@ private:
 public:
 	static CursorGraphics Cursor;
 
+	static struct FireDamageStruct  {
+		AnimationDef LeftDef, MidDef, RightDef;
+		AnimationClip Left[2], Mid[2], Right[2];
+	}  FireDamage;
+
 	static UnitGraphicsDef Marine, SCV, CommandCenter, Minerals1;
 
 	static std::vector<UnitGraphicsDef*> Units;

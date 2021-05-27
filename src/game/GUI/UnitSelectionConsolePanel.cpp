@@ -42,7 +42,22 @@ void UnitSelectionConsolePanel::Draw(GameViewContext& context)
 	const UnitHealthComponent& health = em.UnitArchetype.HealthComponents.GetComponent(entityId);
 
 	DrawUnitInfo(leftSpace, entityId, unit, health);
-	DrawUnitDetail(rightSpace, entityId, unit, context);
+
+	Rectangle nameSpace = rightSpace;
+	nameSpace.size.y = 30;
+
+	DrawUnitName(nameSpace, entityId, unit, context);
+
+	Rectangle detailSpace = rightSpace;
+	detailSpace.position.y += nameSpace.size.y;
+	detailSpace.size.y -= nameSpace.size.y;
+
+	if (unit.def->ProvideSupplyDoubled) {
+		DrawSupplyInfo(detailSpace, entityId, unit, context);
+	}
+	else if (!unit.def->IsBuilding) {
+		DrawUnitDetail(detailSpace, entityId, unit, context);
+	}
 }
 
 void UnitSelectionConsolePanel::UpdateSelection(GameViewContext& context)
@@ -128,8 +143,7 @@ void UnitSelectionConsolePanel::DrawMultiSelection(Rectangle dst, GameViewContex
 	}
 }
 
-void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, const UnitComponent& unit, GameViewContext& context)
-{
+void UnitSelectionConsolePanel::DrawUnitName(Rectangle space, EntityId id, const UnitComponent& unit, GameViewContext& context) {
 	auto font = Game::SystemFont;
 
 	Vector2Int pos = space.position + Vector2Int(space.size.x / 2, 0);
@@ -142,12 +156,52 @@ void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, con
 		offset = Platform::MeasureString(font, unit.def->Title.data(), 0.4f).x;
 		Platform::DrawText(font, pos - Vector2Int(offset / 2, 0), unit.def->Title.data(), Colors::UILightGray, 0.4f);
 	}
+}
 
-	pos.y += 14;
+void UnitSelectionConsolePanel::DrawSupplyInfo(Rectangle space, EntityId id, const UnitComponent& unit, GameViewContext& context)
+{
+	auto font = Game::SystemFont;
+
+	Vector2Int pos = space.position + Vector2Int(space.size.x, 0);
+	pos.x -= 130;
+
+	// TODO: RIGHT ALIGH
+
+	const std::string& supplyName = context.GetPlayerRaceDef().SupplyNamePlural;
+
+	const PlayerInfo& info = context.GetPlayerInfo();
+
+	stbsp_snprintf(buffer, sizeof(buffer), "%s Used: %i", supplyName.data(), info.GetUsedSupply());
+	int offset = 12;
+	Platform::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray, 0.35f);
+	pos.y += 12;
+
+	stbsp_snprintf(buffer, sizeof(buffer), "%s Provided: %i", supplyName.data(), unit.def->ProvideSupplyDoubled >> 1);
+	offset = 0;
+	Platform::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray, 0.35f);
+	pos.y += 12;
+
+	stbsp_snprintf(buffer, sizeof(buffer), "Total %s : %i", supplyName.data(), info.GetProvidedSupply());
+	offset = 7;
+	Platform::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray, 0.35f);
+	pos.y += 12;
+
+	stbsp_snprintf(buffer, sizeof(buffer), "%s Max : %i", supplyName.data(), info.GetMaxSupply());
+	offset = 8;
+	Platform::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray, 0.35f);
+	pos.y += 12;
+}
+
+void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, const UnitComponent& unit, GameViewContext& context)
+{
+	auto font = Game::SystemFont;
+
+	Vector2Int pos = space.position + Vector2Int(space.size.x / 2, 0);
+
 
 	stbsp_snprintf(buffer, sizeof(buffer), "Kills: %i", unit.kills);
 
-	offset = 40;
+	int offset = 40;
 	Platform::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, Colors::UILightGray, 0.4f);
 	pos.y += 18;
 
@@ -162,9 +216,11 @@ void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, con
 	int infoCount = 0;
 
 
-	info[infoCount].sprite = &unit.def->ArmorIcon;
-	info[infoCount].counter = 0;
-	++infoCount;
+	if (unit.def->HasArmor()) {
+		info[infoCount].sprite = &unit.def->ArmorIcon;
+		info[infoCount].counter = 0;
+		++infoCount;
+	}
 
 	if (unit.def->Weapon) {
 		info[infoCount].sprite = &unit.def->Weapon->Icon;
@@ -174,7 +230,7 @@ void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, con
 
 	for (int i = 0; i < infoCount; ++i) {
 		Rectangle dst = { pos ,Vector2Int(f.rect.size) };
-	
+
 		Rectangle icoDst = dst;
 		icoDst.position += {2, 2};
 		icoDst.size -= {4, 4};
@@ -206,16 +262,22 @@ void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, EntityId entityId,
 
 	Color hpColor = Colors::UIGreen;
 
-	if (health.current * 100 < health.max * 33) {
+	if (health.current <= (health.max / 3)) {
 		hpColor = Colors::UIRed;
 	}
-	else if (health.current * 100 < health.max * 66) {
+	else if (health.current <= (health.max * 2) / 3) {
 		hpColor = Colors::UIYellow;
 	}
 
 	int len = stbsp_snprintf(buffer, sizeof(buffer), "%i/%i", health.current, health.max);
-	int offset = Platform::MeasureString(font, buffer, 0.3f).x;
-	Platform::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, hpColor, 0.3f);
+	int offset = Platform::MeasureString(font, buffer, 0.35f).x;
+	Platform::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, hpColor, 0.35f);
+
+	//pos.y += 10;
+
+	//len = stbsp_snprintf(buffer, sizeof(buffer), "%i/%i", 200, 250);
+	// offset = Platform::MeasureString(font, buffer, 0.35f).x;
+	//Platform::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, Colors::White, 0.35f);
 
 	// ================== Wireframe ========================
 

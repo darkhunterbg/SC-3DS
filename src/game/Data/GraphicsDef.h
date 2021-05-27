@@ -51,6 +51,9 @@ struct UnitGraphicsDef {
 
 	} DeathAfterEffect;
 
+
+	Vector2Int16 FireEffectPoints[3];
+
 	static constexpr const int PartsCount = 4;
 	static constexpr const int GroupOffset = PartsCount + 1;
 

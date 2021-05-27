@@ -211,7 +211,8 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 		.clips = def.Graphics->IdleAnimations;
 	em.UnitArchetype.AnimationArchetype.OrientationArchetype.Archetype.AddEntity(e);
 
-	em.UnitArchetype.WeaponComponents.NewComponent(e).FromDef(*def.Weapon);
+	if (def.Weapon)
+		em.UnitArchetype.WeaponComponents.NewComponent(e).FromDef(*def.Weapon);
 
 	if (def.MovementSpeed > 0) {
 		em.NavigationArchetype.NavigationComponents.NewComponent(e);
@@ -263,7 +264,7 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 		em.OldPositionComponents.NewComponent(e2, position);
 		//em.OrientationComponents.NewComponent(e2);
 		em.FlagComponents.NewComponent(e2);
-		em.RenderArchetype.RenderComponents.GetComponent(e2).depth = 1;
+		em.RenderArchetype.RenderComponents.GetComponent(e2).depth = 0;
 		em.RenderArchetype.Archetype.AddEntity(e2);
 		em.AnimationArchetype.Archetype.AddEntity(e2);
 		em.AnimationArchetype.OrientationArchetype.Archetype.AddEntity(e2);
@@ -329,6 +330,6 @@ bool UnitEntityUtil::IsEnemy(PlayerId player, EntityId id)
 {
 	EntityManager& em = GetManager();
 	auto owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
-	return owner !=0 && owner != player;
+	return owner != 0 && owner != player;
 }
 

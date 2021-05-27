@@ -6,6 +6,7 @@ UnitGraphicsDef GraphicsDatabase::SCV;
 UnitGraphicsDef GraphicsDatabase::CommandCenter;
 UnitGraphicsDef GraphicsDatabase::Minerals1;
 CursorGraphics GraphicsDatabase::Cursor;
+GraphicsDatabase::FireDamageStruct GraphicsDatabase::FireDamage;
 
 std::vector<UnitGraphicsDef*> GraphicsDatabase::Units =
 {
@@ -183,6 +184,7 @@ static void SCVData() {
 	d.Selection.BarSize = 6;
 
 
+
 	d.LoadResourcesAction = SCVResources;
 }
 
@@ -198,6 +200,9 @@ static void CommandCenterResources() {
 	d.RenderSize = Vector2Int16(a->FrameSize);
 	d.IdleAnimationDef.GenerateAnimations(a, as, d.IdleAnimations);
 	d.DeathAfterEffect.Def.GenerateAnimation(ad,  d.DeathAfterEffect.Clip);
+
+	d.Selection.Atlas = SpriteDatabase::Load_unit_thingy_o146();
+	d.Wireframe.Atlas = SpriteDatabase::Load_unit_wirefram_wirefram_106();
 }
 static void CommandCenterData() {
 	UnitGraphicsDef& d = GraphicsDatabase::CommandCenter;
@@ -215,6 +220,13 @@ static void CommandCenterData() {
 	d.DeathAfterEffect.Def.FrameTime = 2;
 
 	d.LoadResourcesAction = CommandCenterResources;
+
+
+	d.Selection.VecticalOffset = 6;
+	d.Selection.BarSize = 36;
+	d.Selection.BarVerticalOffset = 54;
+
+	d.FireEffectPoints[0] = { 10,60 };
 }
 
 // ============================ Mineral Fields ===============================
@@ -228,7 +240,6 @@ static void MineralsResources() {
 	d.RenderSize = Vector2Int16(as->FrameSize);
 	d.IdleAnimationDef.GenerateAnimations(a, as, d.IdleAnimations);
 }
-
 static void MineralsData() {
 	UnitGraphicsDef& d = GraphicsDatabase::Minerals1;
 	d.Collider.position = { -32,-16 };
@@ -253,6 +264,28 @@ void GraphicsDatabase::Init()
 	MineralsData();
 
 	Cursor.Load();
+
+	FireDamage.LeftDef.FrameCount = 12;
+	FireDamage.LeftDef.Looping = true;
+	FireDamage.LeftDef.GenerateAnimation(SpriteDatabase::Load_unit_thingy_ofirec(),FireDamage.Left[0]);
+
+	FireDamage.LeftDef.FrameStart = 12;
+	FireDamage.LeftDef.GenerateAnimation(SpriteDatabase::Load_unit_thingy_ofirec(), FireDamage.Left[1]);
+
+
+	FireDamage.MidDef.FrameCount = 12;
+	FireDamage.MidDef.Looping = true;
+	FireDamage.MidDef.GenerateAnimation(SpriteDatabase::Load_unit_thingy_ofirev(), FireDamage.Mid[0]);
+
+	FireDamage.MidDef.FrameStart = 12;
+	FireDamage.MidDef.GenerateAnimation(SpriteDatabase::Load_unit_thingy_ofirev(), FireDamage.Mid[1]);
+
+	FireDamage.RightDef.FrameCount = 12;
+	FireDamage.RightDef.Looping = true;
+	FireDamage.RightDef.GenerateAnimation(SpriteDatabase::Load_unit_thingy_ofiref(), FireDamage.Right[0]);
+
+	FireDamage.RightDef.FrameStart = 12;
+	FireDamage.RightDef.GenerateAnimation(SpriteDatabase::Load_unit_thingy_ofiref(), FireDamage.Right[1]);
 }
 
 void GraphicsDatabase::LoadAllGraphicsResources()

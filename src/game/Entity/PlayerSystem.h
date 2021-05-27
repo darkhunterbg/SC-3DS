@@ -99,20 +99,20 @@ struct PlayerInfo {
 
 	int16_t minerals = 0;
 	int16_t gas = 0;
-	int16_t currentSupplyDoubled = 0;
-	int16_t maxSupplyDoubled = 0;
+	int16_t usedSupplyDoubled = 0;
+	int16_t providedSupplyDoubled = 0;
 
 	RaceType race;
 
 	PlayerId id;
 
-	inline int GetCurrentSupply() const {
-		return currentSupplyDoubled >> 1;
+	inline int GetUsedSupply() const {
+		return usedSupplyDoubled >> 1;
 	}
-	inline int GetMaxSupply() const {
-		return maxSupplyDoubled >> 1;
+	inline int GetProvidedSupply() const {
+		return providedSupplyDoubled >> 1;
 	}
-
+	inline int GetMaxSupply() const { return 200; }
 
 	PlayerInfo(Color32 color, RaceType race, PlayerId id) :
 		color(color), race(race), id(id) {}

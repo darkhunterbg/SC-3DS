@@ -3,6 +3,7 @@
 #include "../Entity/EntityManager.h" 
 #include "../Entity/EntityUtil.h"
 #include "../Debug.h"
+#include "../Data/RaceDatabase.h"
 
 #include <algorithm>
 
@@ -116,21 +117,23 @@ void GameViewContext::SelectUnitsInRegion(const Rectangle16 region)
 
 	if (castResults.size() > 0)
 	{
-		bool allySelection = false;
+		bool multiSelection = false;
 
 		for (EntityId id : castResults) {
-			if (UnitEntityUtil::IsAlly(player, id)) {
-				allySelection = true;
+			if (UnitEntityUtil::IsAlly(player, id) && 
+				!em.UnitArchetype.DataComponents.GetComponent(id).isBuilding) {
+				multiSelection = true;
 				break;
 			}
 		}
 
 		static std::vector<EntityId> finalSelection;
 
-		if (allySelection) {
+		if (multiSelection) {
 			finalSelection.clear();
 			for (EntityId id : castResults) {
-				if (UnitEntityUtil::IsAlly(player, id)) {
+				if (UnitEntityUtil::IsAlly(player, id) && 
+					!em.UnitArchetype.DataComponents.GetComponent(id).isBuilding) {
 					finalSelection.push_back(id);
 				}
 			}
@@ -148,7 +151,10 @@ void GameViewContext::SelectUnitsInRegion(const Rectangle16 region)
 			PlayUnitSelectedAudio(UnitChatType::Select);
 
 		selectionColor = GetAlliedUnitColor(selection[0]);
+
+		CancelTargetSelection();
 	}
+
 }
 
 void GameViewContext::SelectUnitAtPosition(Vector2Int16 position)
@@ -163,6 +169,9 @@ void GameViewContext::SelectUnitAtPosition(Vector2Int16 position)
 			PlayUnitSelectedAudio(UnitChatType::Select);
 
 		selectionColor = GetAlliedUnitColor(selection[0]);
+
+
+		CancelTargetSelection();
 	}
 }
 
@@ -218,7 +227,19 @@ void GameViewContext::PlayUnitSelectedAudio(UnitChatType type)
 	GetEntityManager().GetSoundSystem().PlayUnitChat(id, type);
 }
 
-Color GameViewContext::GetAlliedUnitColor (EntityId id) const {
+const RaceDef& GameViewContext::GetPlayerRaceDef() const
+{
+	auto& info = GetPlayerInfo();
+
+	return *RaceDatabase::GetRaceDef(info.race);
+}
+
+const PlayerInfo& GameViewContext::GetPlayerInfo() const
+{
+	return GetEntityManager().GetPlayerSystem().GetPlayerInfo(player);
+}
+
+Color GameViewContext::GetAlliedUnitColor(EntityId id) const {
 	if (UnitEntityUtil::IsAlly(player, id))
 		return Colors::UIDarkGreen;
 
