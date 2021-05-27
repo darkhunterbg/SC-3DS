@@ -30,7 +30,6 @@ GameHUD::GameHUD(Vector2Int16 mapSize)
 	//cmdIconsAtlas = Platform::LoadAtlas("cmdicons.t3x");
 }
 
-
 void GameHUD::DrawResource(Sprite icon, Vector2Int pos, Color color, const char* fmt, ...) {
 	va_list args;
 	va_start(args, fmt);
@@ -51,7 +50,6 @@ void GameHUD::UpdateInfo(GameViewContext& context) {
 	supply.current = info.GetCurrentSupply();
 	supply.max = info.GetMaxSupply();
 }
-
 
 static const  int GetResourceUpdate(int change) {
 	return std::max(1, (int)std::ceil(std::sqrt(change)) / 2);
@@ -121,6 +119,7 @@ void GameHUD::LowerScreenGUI(const Camera& camera, GameViewContext& context) {
 
 	Platform::Draw(context.race->ConsoleSprite.GetSprite(0), { {0, 0,},{ 320, 240} });
 
+
 	DrawMinimap(camera, context);
 
 	consolePanel.Draw(context);
@@ -134,6 +133,14 @@ void GameHUD::Update(Camera& camera, GameViewContext& context) {
 		if (minimapDst.Contains(Game::Pointer.Position())) {
 			Vector2Int pos = Game::Pointer.Position() - Vector2Int(minimapDst.position);
 			camera.Position = Vector2Int16(Vector2(pos) * minimapUpscale);
+		}
+
+		if (portraitPanelDst.Contains(Game::Pointer.Position())) {
+			EntityId selected = context.GetPriorityUnitSelected();
+			if (selected != Entity::None) {
+				Vector2Int16 pos = context.GetEntityManager().PositionComponents.GetComponent(selected);
+				camera.Position = pos;
+			}
 		}
 	}
 

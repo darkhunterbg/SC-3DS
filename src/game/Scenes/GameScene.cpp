@@ -39,7 +39,7 @@ void GameScene::Start() {
 
 	int totalPlayers = 8;
 
-	auto& race = RaceDatabase::Protoss;
+	auto& race = RaceDatabase::Terran;
 	race.LoadResourses();
 
 
