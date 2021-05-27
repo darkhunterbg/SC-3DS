@@ -20,7 +20,7 @@ private:
 	void UpdateMarkers();
 	void DrawUnitBars(const Camera& camera);
 
-	void GamepadInput();
+	void ContextualGamepadInput();
 public:
 	GameView(EntityManager& em, Vector2Int16 mapSizePixels);
 

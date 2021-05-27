@@ -95,7 +95,7 @@ void SoundSystem::CollectAudioFromSources(const Camera& camera, EntityManager& e
 
 	std::sort(entityAudioPriority.begin(), entityAudioPriority.end(), EntityAudioSort);
 
-	int max = std::min(entityUniqueAudio.size(), worldAudioChannels.size() );
+	int max = std::min(entityUniqueAudio.size(), worldAudioChannels.size());
 
 	for (int i = 0; i < max; ++i) {
 		int index = entityAudioPriority[i].clipIndex;
@@ -194,6 +194,10 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 	if (newChatRequest.id != Entity::None &&
 		(currentChat.id != newChatRequest.id || currentChat.type != newChatRequest.type)) {
 
+		if (currentChat.id == newChatRequest.id)
+			sameUnitCounter++;
+		else
+			sameUnitCounter = 0;
 		currentChat = newChatRequest;
 		newRequest = true;
 	}
@@ -207,34 +211,50 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 			const UnitDef* def = em.UnitArchetype.UnitComponents.GetComponent(currentChat.id).def;
 			const UnitSound* sound = nullptr;
 
-			
+
 			if (currentChat.type == UnitChatType::Command) {
 				if (def->Sounds.Yes.TotalClips) {
 					sound = &def->Sounds.Yes;
-
+					sameUnitCounter = 0;
 				}
 			}
 			else {
-				if (def->Sounds.What.TotalClips) {
-					sound = &def->Sounds.What;
+				if (sameUnitCounter >= 5 &&
+					(sameUnitCounter - 5) < def->Sounds.Annoyed.TotalClips)
+				{
+					sound = &def->Sounds.Annoyed;
 				}
+				else {
+					if (def->Sounds.What.TotalClips) {
+						sound = &def->Sounds.What;
+					}
+				}
+				if (sameUnitCounter - 5 >= def->Sounds.Annoyed.TotalClips)
+					sameUnitCounter = 0;
 			}
 
 			if (sound) {
-				std::srand(seed);
+				int i = 0;
+				if (sameUnitCounter >= 5)
+					i = sameUnitCounter - 5;
+				else
+				{
+					std::srand(seed);
+					i = std::rand() % sound->TotalClips;
+					seed = std::rand();
+				}
 
-				int i = std::rand() % sound->TotalClips;
 				Game::Audio.PlayClip(sound->Clips[i], channel.channel->ChannelId);
-				seed = std::rand();
+
 			}
 		}
 
 	}
 
-	if (currentChat.id != Entity::None) {
+	if (currentChat.type != UnitChatType::None) {
 
 		if (channel.channel->IsDone()) {
-			currentChat = { UnitChatType::None, Entity::None };
+			currentChat = { UnitChatType::None, currentChat.id };
 		}
 		else {
 			if (!em.UnitArchetype.Archetype.HasEntity(currentChat.id)) {
@@ -244,8 +264,5 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 		}
 	}
 
-	if (currentChat.id != Entity::None && channel.channel->IsDone()) {
-
-	}
 }
 

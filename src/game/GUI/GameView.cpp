@@ -7,10 +7,10 @@
 
 #include "../Platform.h"
 #include "../Util.h"
+#include "../Entity/EntityUtil.h"
 #include "../Entity/EntityManager.h"
 
 #include "../Data/GraphicsDatabase.h"
-
 #include "../Data/AbilityDatabase.h"
 
 static std::array<Color, 3> GreyHPBarColorPalette = { 0xb0b0b0ff, 0x98948cff, 0x585858ff };
@@ -46,7 +46,7 @@ void GameView::Update(Camera& camera)
 	cursor->Update(camera, context);
 	hud->Update(camera, context);
 	UpdateMarkers();
-	GamepadInput();
+	ContextualGamepadInput();
 
 
 	auto& renderSystem = context.GetEntityManager().GetRenderSystem();
@@ -82,59 +82,67 @@ void GameView::UpdateMarkers() {
 	}
 }
 
-void GameView::GamepadInput() {
+void GameView::ContextualGamepadInput() {
 	if (context.selection.size() == 0)
 		return;
 
-	if (Game::Gamepad.IsButtonReleased(GamepadButton::A)) {
+	EntityId entity = cursor->GetEntityUnder();
+	Vector2Int16 position = cursor->GetWorldPosition();
+	bool commandTrigged = false;
+	bool commandHasTarget = false;
 
-		EntityId entity = cursor->GetEntityUnder();
-
-		// TODO: diffentiate enemy/ally
-		// TODO: goto unit position (follow state)
-		if (entity == Entity::None) {
-			if (context.IsTargetSelectionMode)
-				context.ActivateCurrentAbility(cursor->GetWorldPosition());
+	if (context.IsTargetSelectionMode) {
+		if (Game::Gamepad.IsButtonReleased(GamepadButton::A)) {
+			if (entity == Entity::None)
+				context.ActivateCurrentAbility(position);
 			else
-				context.ActivateAbility(&AbilityDatabase::Attack, cursor->GetWorldPosition());
-
-			context.NewActionMarker(cursor->GetWorldPosition());
-		}
-		else {
-			if (context.IsTargetSelectionMode)
 				context.ActivateCurrentAbility(entity);
-			else
-				context.ActivateAbility(&AbilityDatabase::Attack, entity);
 
-			context.NewUnitMarker(entity);
+			commandTrigged = true;
+			commandHasTarget = true;
+		}
+	}
+	else {
+
+		if (Game::Gamepad.IsButtonReleased(GamepadButton::A)) {
+			if (entity == Entity::None) {
+				context.ActivateAbility(&AbilityDatabase::Attack, position);
+			}
+			else {
+				if (UnitEntityUtil::IsEnemy(context.player, entity))
+					context.ActivateAbility(&AbilityDatabase::Attack, entity);
+				else
+					context.ActivateAbility(&AbilityDatabase::Move, entity);
+			}
+
+			commandTrigged = true;
+			commandHasTarget = true;
 		}
 
-		context.PlayUnitSelectedAudio(UnitChatType::Command);
-	}
-
-	if (Game::Gamepad.IsButtonReleased(GamepadButton::B)) {
-		if (!context.IsTargetSelectionMode) {
+		if (Game::Gamepad.IsButtonReleased(GamepadButton::B)) {
 			context.ActivateAbility(&AbilityDatabase::Stop);
+			commandTrigged = true;
+		}
+
+		if (Game::Gamepad.IsButtonReleased(GamepadButton::X)) {
+			if (entity == Entity::None)
+				context.ActivateAbility(&AbilityDatabase::Move, position);
+			else
+				context.ActivateAbility(&AbilityDatabase::Move, entity);
+
+			commandTrigged = true;
+			commandHasTarget = true;
 		}
 	}
 
-	if (Game::Gamepad.IsButtonReleased(GamepadButton::X)) {
-		EntityId entity = cursor->GetEntityUnder();
+	if (commandTrigged) {
+		context.PlayUnitSelectedAudio(UnitChatType::Command);
 
-		if (entity == Entity::None) {
-			if (!context.IsTargetSelectionMode)
-			{
-				context.ActivateAbility(&AbilityDatabase::Move, cursor->GetWorldPosition());
-				context.NewActionMarker(cursor->GetWorldPosition());
-				context.PlayUnitSelectedAudio(UnitChatType::Command);
-			}
-		}
-		else {
-			if (!context.IsTargetSelectionMode) {
-				context.ActivateAbility(&AbilityDatabase::Move, cursor->GetWorldPosition());
+		if (commandHasTarget) {
+			if (entity != Entity::None)
 				context.NewUnitMarker(entity);
-				context.PlayUnitSelectedAudio(UnitChatType::Command);
-			}
+			else
+				context.NewActionMarker(position);
 		}
 	}
 }

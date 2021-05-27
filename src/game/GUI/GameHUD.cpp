@@ -17,9 +17,10 @@
 static Rectangle minimapDst = { {4,124},{113,113} };
 static Rectangle consolePanelDst = { {10,2},{220,84} };
 static Rectangle commandsPanelDst = { {186,118}, {128,115} };
+static Rectangle portraitPanelDst = { {248, 20},{ 60, 56 } };
 
-GameHUD::GameHUD(Vector2Int16 mapSize) {
-
+GameHUD::GameHUD(Vector2Int16 mapSize)
+{
 	font = Game::SystemFont;
 	iconsAtlas = Game::AssetLoader.LoadAtlas("game_icons.t3x");
 	minimapUpscale = Vector2(mapSize) / Vector2(minimapDst.size);
@@ -109,6 +110,14 @@ void GameHUD::UpperScreenGUI(const Camera& camera, GameViewContext& context) {
 }
 
 void GameHUD::LowerScreenGUI(const Camera& camera, GameViewContext& context) {
+
+	Platform::ClearBuffer({ 0x080808ff });
+
+	EntityId selected = context.GetPriorityUnitSelected();
+	if (selected != Entity::None) {
+		auto& def = *context.GetEntityManager().UnitArchetype.UnitComponents.GetComponent(selected).def;
+		Platform::Draw(def.Portrait, portraitPanelDst);
+	}
 
 	Platform::Draw(context.race->ConsoleSprite.GetSprite(0), { {0, 0,},{ 320, 240} });
 

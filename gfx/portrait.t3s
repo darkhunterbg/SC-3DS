@@ -1,0 +1,5 @@
+--atlas -f auto-etc1 -z auto -q high
+portrait\0.png
+portrait\1.png
+portrait\2.png
+portrait\3.png

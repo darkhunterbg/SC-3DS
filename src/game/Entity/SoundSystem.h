@@ -47,6 +47,7 @@ private:
 	std::vector<EntityAudio> playWorldAudio;
 
 	unsigned long seed = 0;
+	int sameUnitCounter = 0;
 
 	UnitChatRequest newChatRequest = { UnitChatType::None, Entity::None };
 	UnitChatRequest currentChat = { UnitChatType::None, Entity::None };

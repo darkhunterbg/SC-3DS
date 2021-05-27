@@ -4,6 +4,8 @@
 #include "WeaponDatabase.h"
 #include "Generated.h"
 
+#include "../Game.h"
+
 UnitDef UnitDatabase::Marine;
 UnitDef UnitDatabase::SCV;
 UnitDef UnitDatabase::CommandCenter;
@@ -27,11 +29,13 @@ static void MarineData() {
 	u.Sounds.Death = { "sound/terran/marine/tmadth", 2 };
 	u.Sounds.What = { "sound/terran/marine/tmawht", 4 };
 	u.Sounds.Yes = { "sound/terran/marine/tmayes", 4 };
+	u.Sounds.Annoyed = { "sound/terran/marine/tmapss", 7 };
 	u.Graphics = &GraphicsDatabase::Marine;
 
 	u.AudioPriority = 1;
 
 	u.ArmorIconId = 292;
+	u.PortraitId = 0;
 }
 static void SCVData() {
 	UnitDef& u = UnitDatabase::SCV;
@@ -46,7 +50,11 @@ static void SCVData() {
 	u.Sounds.Death = { "sound/terran/scv/tscdth", 1 };
 	u.Sounds.What = { "sound/terran/scv/tscwht", 4 };
 	u.Sounds.Yes = { "sound/terran/scv/tscyes", 4 };
+	u.Sounds.Annoyed = { "sound/terran/scv/tscpss", 7 };
 	u.Graphics = &GraphicsDatabase::SCV;
+
+	u.ArmorIconId = 292;
+	u.PortraitId = 1;
 }
 static void CommandCenterData() {
 	UnitDef& u = UnitDatabase::CommandCenter;
@@ -61,6 +69,9 @@ static void CommandCenterData() {
 	u.Sounds.Death = { "sound/misc/explo4", 1 , true };
 	u.Sounds.What = { "sound/misc/button", 1 , true };
 	u.Graphics = &GraphicsDatabase::CommandCenter;
+
+	u.ArmorIconId = 292;
+	u.PortraitId = 2;
 }
 static void MineralField1Data() {
 	UnitDef& u = UnitDatabase::MineralField1;
@@ -75,6 +86,8 @@ static void MineralField1Data() {
 
 	u.Sounds.What = { "sound/misc/button", 1 , true };
 	u.Graphics = &GraphicsDatabase::Minerals1;
+
+	u.PortraitId = 3;
 }
 
 void UnitDatabase::Init()
@@ -89,6 +102,11 @@ void UnitDatabase::LoadUnitResources(UnitDef& def) {
 	def.Graphics->LoadResourcesAction();
 	def.ArmorIcon = SpriteDatabase::Load_unit_cmdbtns_cmdicons()
 		->GetFrame(def.ArmorIconId).sprite;
+
+
+
+	def.Portrait = Game::AssetLoader.LoadAtlas("portrait.t3x")->GetSprite(def.PortraitId);
+
 	def.LoadAllSounds();
 }
 

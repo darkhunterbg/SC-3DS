@@ -16,7 +16,7 @@ static EntityId DetectNearbyEnemy(EntityId id, Vector2Int16 pos, PlayerId owner,
 
 	const auto& weapon = em.UnitArchetype.WeaponComponents.GetComponent(id);
 
-	short range = (int)(weapon.maxRange) << 5;
+	short range = (int)(weapon.maxRange + 1) << 5;
 	Circle16 accquisitonRage = { pos , range };
 
 	em.GetKinematicSystem().CircleCast(accquisitonRage, scratch);
@@ -242,7 +242,7 @@ void UnitAIFollowState::Think(UnitAIThinkData& data, EntityManager& em)
 		const auto& pos = data.position[i];
 		const auto& owner = data.owner[i];
 		const auto& stateData = data.stateData[i];
-		
+
 		EntityId enemy = DetectNearbyEnemy(id, pos, owner, em);
 
 		if (enemy != Entity::None) {
