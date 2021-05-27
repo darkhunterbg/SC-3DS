@@ -12,6 +12,7 @@ SDL_Renderer* renderer;
 SDL_Texture* screens[2];
 SDL_Window* window;
 std::filesystem::path assetDir;
+std::filesystem::path userDir;
 uint64_t mainTimer;
 Rectangle touchScreenLocation;
 bool mute = false;
@@ -55,7 +56,12 @@ int main(int argc, char** argv) {
 	screens[0] = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 400, 240);
 	screens[1] = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 320, 240);
 
-	assetDir = std::filesystem::current_path();
+	assetDir = std::filesystem::current_path().parent_path();
+	userDir = std::filesystem::current_path();
+	userDir = userDir.append("User");
+
+	if (!std::filesystem::exists(userDir))
+		std::filesystem::create_directories(userDir);
 
 	bool done = false;
 
@@ -162,6 +168,4 @@ void Draw() {
 		SDL_SetRenderTarget(renderer, screen);
 		SDL_RenderClear(renderer);
 	}
-
-
 }

@@ -10,7 +10,6 @@
 #include <algorithm>
 
 
-
 SoundSystem::SoundSystem()
 {
 	auto& channels = Game::Audio.GetAudioChannes();
@@ -175,7 +174,6 @@ void SoundSystem::UpdateEntityAudio(const Camera& camera, EntityManager& em)
 
 }
 
-
 void SoundSystem::PlayUnitChat(EntityId id, UnitChatType type)
 {
 	newChatRequest = { type, id };
@@ -185,7 +183,6 @@ void SoundSystem::PlayUISound(const AudioClip& clip)
 {
 	Game::Audio.PlayClip(clip, uiAudioChannel.channel->ChannelId);
 }
-
 
 void SoundSystem::UpdateChatRequest(EntityManager& em)
 {
@@ -266,3 +263,21 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 
 }
 
+void SoundSystem::ClearAudio(EntityManager& em)
+{
+	for (auto& channel : worldAudioChannels) {
+		Game::Audio.StopChannel(channel.channel->ChannelId);
+	}
+
+	Game::Audio.StopChannel(uiAudioChannel.channel->ChannelId);
+	Game::Audio.StopChannel(chatAudioChannel.channel->ChannelId);
+
+	for (EntityId id : em.SoundArchetype.Archetype.GetEntities()) {
+
+		auto& flags = em.FlagComponents.GetComponent(id);
+		if (!flags.test(ComponentFlags::SoundTrigger))
+			continue;
+
+		flags.clear(ComponentFlags::SoundTrigger);
+	}
+}

@@ -65,11 +65,17 @@ void UnitSelectionConsolePanel::UpdateSelection(GameViewContext& context)
 		Rectangle rect = { { pos + offset}, {36,36} };
 
 		if (rect.Contains(Game::Pointer.Position())) {
-			EntityId entityId = context.selection[i];
-			context.selection.clear();
-			context.selection.AddEntity(entityId);
 
-			context.GetEntityManager().GetSoundSystem().PlayUISound(Game::ButtonAudio);
+			if (context.IsTargetSelectionMode) {
+				context.ActivateCurrentAbility(context.selection[i]);
+			}
+			else {
+				EntityId entityId = context.selection[i];
+				context.selection.clear();
+				context.selection.AddEntity(entityId);
+
+				context.GetEntityManager().GetSoundSystem().PlayUISound(Game::ButtonAudio);
+			}
 
 			break;
 		}

@@ -20,6 +20,7 @@
 extern SDL_Renderer* renderer;
 extern SDL_Window* window;
 extern std::filesystem::path assetDir;
+extern std::filesystem::path userDir;
 extern SDL_Texture* screens[2];
 extern uint64_t mainTimer;
 extern Rectangle touchScreenLocation;
@@ -69,7 +70,7 @@ const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 
 	if (!file.is_open())
 	{
-		EXCEPTION("Open atlas %s failed!", path);
+		EXCEPTION("Open atlas %s failed!", p.generic_string().data());
 	}
 
 	SpriteAtlas* asset = new SpriteAtlas();
@@ -107,7 +108,7 @@ Font Platform::LoadFont(const char* path) {
 
 	if (lf == 0) {
 		const char* error = SDL_GetError();
-		EXCEPTION("Load font %s failed with %s!", path, error);
+		EXCEPTION("Load font %s failed with %s!", fullPath.generic_string().data(), error);
 		FC_ClearFont(font);
 		return  { 0 };
 	}
@@ -463,6 +464,10 @@ void Platform::ReleaseSemaphore(Semaphore s, int v) {
 		SDL_SemPost((SDL_sem*)s);
 }
 
+std::string Platform::GetUserDirectory() {
+
+	return userDir.u8string() + "/";
+}
 
 static 	void AudioCallback(void* userdata, Uint8* stream, int len) {
 	AudioChannelState* state = (AudioChannelState*)userdata;

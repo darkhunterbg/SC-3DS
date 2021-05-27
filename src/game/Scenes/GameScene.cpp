@@ -15,6 +15,7 @@ GameScene::GameScene() {}
 
 GameScene::~GameScene() {}
 
+
 void GameScene::Start() {
 	Vector2Int16 size = { 64 * 32,64 * 32 };
 
@@ -49,7 +50,7 @@ void GameScene::Start() {
 	for (int p = 0; p < totalPlayers; ++p) {
 		entityManager->GetPlayerSystem().AddPlayer(race, color[p]);
 	}
-	
+
 	view->SetPlayer(1, race);
 
 
@@ -69,7 +70,7 @@ void GameScene::Start() {
 	EntityId e = 0;
 	int i = 0;
 	for (int y = 5; y > 0; --y) {
-		for (int x = 5 ; x > 0; --x) {
+		for (int x = 5; x > 0; --x) {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[0];
 			e = UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
@@ -85,14 +86,11 @@ void GameScene::Start() {
 		}
 	}
 
+	entityManager->FullUpdate();
 
-	//entityManager->UnitArchetype.StateComponents.GetComponent(e) = UnitState::Attacking;
-
-	entityManager->FullUpdate(camera);
-
-	//for (EntityId id : entityManager->UnitArchetype.Archetype.GetEntities()) {
-	//	UnitEntityUtil::AttackPosition(id, { 64,64 });
-	//}
+	/*if (loadFromFile) {
+		entityManager->GetCommandProcessor().ReplayFromFile("record.cmd", *entityManager);
+	}*/
 }
 
 int t = 0;

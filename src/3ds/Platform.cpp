@@ -1,3 +1,4 @@
+#include "..\game\Platform.h"
 #include "Platform.h"
 
 #include <citro3d.h>
@@ -21,6 +22,7 @@ struct RenderTarget {
 
 extern C3D_RenderTarget* screens[2];
 extern std::string assetDir;
+extern std::string userDir;
 extern C2D_TextBuf textBuffer;
 extern u64 mainTimer;
 extern std::vector<NDSAudioChannel*> audioChannels;
@@ -397,4 +399,9 @@ void Platform::ReleaseSemaphore(Semaphore s, int v) {
 	Result r = svcReleaseSemaphore(&o, *(Handle*)s, v);
 	if (r)
 		EXCEPTION("svcReleaseSemaphore failed with %s", R_SUMMARY(r));
+}
+
+std::string Platform::GetUserDirectory()
+{
+	return  userDir;
 }

@@ -70,6 +70,9 @@ public:
 	static Semaphore CreateSemaphore();
 	static void WaitSemaphore(Semaphore);
 	static void ReleaseSemaphore(Semaphore, int);
+
+
+	static std::string GetUserDirectory();
 };
 
 

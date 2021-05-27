@@ -5,6 +5,14 @@
 
 #include "../Data/AbilityDatabase.h"
 
+#include "../Platform.h"
+
+#include <stdio.h>
+
+
+// TODO: command alloc with limits to hardware
+// static constexpr const unsigned MaxCommands = 30 * 1024; // Around 1MB 
+
 void CommandProcessor::GenerateCommands(PlayerCommand& cmd, const std::vector<EntityId>& group) {
 	for (int i = 0; i < group.size(); ++i) {
 		cmd.entities[cmd.entityCount++] = group[i];
@@ -58,12 +66,12 @@ void CommandProcessor::UseAbility(PlayerId player, const std::vector<EntityId>& 
 
 void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 {
+	int add = sizeof(PlayerCommand);
+
 	for (int i = lastExecuted; i < commands.size(); ++i) {
 		const PlayerCommand& cmd = commands[i];
 
 		const auto& ability = *AbilityDatabase::Abilities[cmd.abilityId];
-
-		
 
 		switch (cmd.targetType)
 		{
@@ -110,5 +118,86 @@ void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 
 	}
 
+	bool record = lastExecuted < commands.size();
+
 	lastExecuted = commands.size();
 }
+
+void CommandProcessor::RecordToFile(const char* filename)
+{
+	std::string path = Platform::GetUserDirectory() + filename;
+
+
+	FILE* f = fopen(path.data(), "w+b");
+
+	if (f == nullptr)
+		EXCEPTION("Failed to open file for write %s", path.data());
+
+	int size = commands.size();
+	if (fwrite(&size, sizeof(int), 1, f) != 1)
+		EXCEPTION("Failed to write to %s", path.data());
+
+	int total = fwrite(commands.data(), sizeof(PlayerCommand), commands.size(), f);
+	if (total != commands.size())
+		EXCEPTION("Failed to write to %s", path.data());
+
+	fclose(f);
+}
+
+void CommandProcessor::ReplayFromFile(const char* filename, EntityManager& em)
+{
+	std::string path = Platform::GetUserDirectory() + filename;
+
+	FILE* f = fopen(path.data(), "rb");
+
+	if (f == nullptr)
+		EXCEPTION("Failed to open file for read %s", path.data());
+
+	commands.clear();
+
+	int size = 0;
+
+	if (fread(&size, sizeof(int), 1, f) != 1)
+		EXCEPTION("Failed to read from %s", path.data());
+
+	PlayerCommand* buffer = new PlayerCommand[size];
+
+	int total = fread(buffer, sizeof(PlayerCommand), size, f);
+	if (total != size)
+		EXCEPTION("Failed to read from %s", path.data());
+
+
+	fclose(f);
+
+	frame = 0;
+	lastExecuted = 0;
+
+	if (size > 0)
+	{
+		uint32_t latest = buffer[size-1].frameId;
+
+		int counter = 0;
+
+		while (latest != frame)
+		{
+			while (buffer[counter].frameId != frame)
+			{
+				em.FullUpdate();
+			}
+
+			for (; counter < size; ++counter) {
+				if (buffer[counter].frameId == frame) {
+					commands.push_back(buffer[counter]);
+				}
+				else
+					break;
+			}
+		}
+
+	}
+
+	em.GetSoundSystem().ClearAudio(em);
+
+	delete[] buffer;
+}
+

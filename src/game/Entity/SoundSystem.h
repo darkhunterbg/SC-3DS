@@ -52,6 +52,7 @@ private:
 	UnitChatRequest newChatRequest = { UnitChatType::None, Entity::None };
 	UnitChatRequest currentChat = { UnitChatType::None, Entity::None };
 
+
 	void CollectAudioFromSources(const Camera& camera, EntityManager& em);
 
 	static bool EntityAudioSort(const EntityPriorityAudio& a, EntityPriorityAudio& b);
@@ -63,4 +64,6 @@ public:
 	void PlayUnitChat(EntityId id, UnitChatType type);
 
 	void PlayUISound(const AudioClip& clip);
+
+	void ClearAudio(EntityManager& em);
 };

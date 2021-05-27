@@ -39,6 +39,7 @@ private:
 	uint32_t frame;
 	uint32_t lastExecuted = 0;
 
+
 	void GenerateCommands(PlayerCommand& cmd, const std::vector<EntityId>& group);
 public:
 	CommandProcessor() {}
@@ -50,6 +51,9 @@ public:
 	void UseAbility(PlayerId player, const std::vector<EntityId>& group, const AbilityDef& ability, EntityId target);
 
 	void ExecuteQueuedCommands(EntityManager& em);
+
+	void RecordToFile(const char* filename);
+	void ReplayFromFile(const char* filename, EntityManager& em);
 
 	inline void SetFrame(uint32_t f){
 		frame = f;

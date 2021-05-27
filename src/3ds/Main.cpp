@@ -2,6 +2,8 @@
 #include <citro3d.h>
 #include <citro2d.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include <string>
 #include <iostream>
@@ -18,6 +20,7 @@ C3D_RenderTarget* top;
 C3D_RenderTarget* bottom;
 C3D_RenderTarget* screens[2];
 std::string assetDir;
+std::string userDir;
 C2D_TextBuf textBuffer;
 u64 mainTimer;
 std::vector<NDSAudioChannel*> audioChannels;
@@ -139,6 +142,13 @@ void Init() {
 	else
 		assetDir = "StarCraft/romfs/";
 
+
+	userDir = assetDir + "User/";
+	struct stat s = { 0 };
+
+	if (stat(userDir.data(), &s) != 0 || !S_ISDIR(s.st_mode)) {
+		mkdir(userDir.data(), 0444);
+	}
 
 	textBuffer = C2D_TextBufNew(4096);
 }

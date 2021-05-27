@@ -175,9 +175,9 @@ private:
 	void ApplyEntityChanges();
 	void UpdateChildren();
 
-	void Update0(const Camera& camera);
-	void Update1(const Camera& camera);
-	void Update2(const Camera& camera);
+	void Update0();
+	void Update1();
+	void Update2();
 	void Draw0(const Camera& camera);
 	void Draw1(const Camera& camera);
 	void Draw2(const Camera& camera);
@@ -185,10 +185,13 @@ private:
 	unsigned long long frameCounter = 0;
 	int8_t updateId = 0;
 	uint32_t logicalFrame = 0;
+
+	
 public:
 	bool DrawColliders = false;
 	bool DrawGrid = false;
 	bool DrawBoundingBoxes = false;
+	bool Muted = false;
 
 	EntityManager();
 	~EntityManager();
@@ -230,7 +233,7 @@ public:
 
 	void Draw(const Camera& camera);
 
-	void FullUpdate(const Camera& camera);
+	void FullUpdate();
 
 	inline bool CollidesWithAny(const Rectangle16& collider, EntityId skip) {
 

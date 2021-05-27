@@ -45,7 +45,7 @@ void PerformanceTestScene::Start() {
 	//	//entityManager.GoTo(i, { 1024,1024 });
 	//}
 
-	entityManager.FullUpdate(camera);
+	entityManager.FullUpdate();
 }
 static int t = 0;
 static int c = 0;
