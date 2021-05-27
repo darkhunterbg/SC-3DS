@@ -5,7 +5,7 @@
 
 std::vector<IUnitAIState*> UnitAIStateMachine::States = {
 	new UnitAIIdleState(), new UnitAIAttackTargetState(), new UnitAIGoToState(), new UnitAIGoToAttackState(),
-	new UnitAIHoldPositionState(), new UnitAIPatrolState(),
+	new UnitAIHoldPositionState(), new UnitAIPatrolState(), new UnitAIFollowState(),
 };
 
 static std::vector<EntityId> scratch;
@@ -14,9 +14,9 @@ static EntityId DetectNearbyEnemy(EntityId id, Vector2Int16 pos, PlayerId owner,
 
 	scratch.clear();
 
-	const auto& unitData = em.UnitArchetype.DataComponents.GetComponent(id);
+	const auto& weapon = em.UnitArchetype.WeaponComponents.GetComponent(id);
 
-	short range = (int)(unitData.visiion) << 5;
+	short range = (int)(weapon.maxRange) << 5;
 	Circle16 accquisitonRage = { pos , range };
 
 	em.GetKinematicSystem().CircleCast(accquisitonRage, scratch);
@@ -26,7 +26,6 @@ static EntityId DetectNearbyEnemy(EntityId id, Vector2Int16 pos, PlayerId owner,
 	if (scratch.size() > 0)
 	{
 		int nearest = 0xFFFFFFFF / 2;
-
 
 		for (EntityId e : scratch) {
 			if (e == id)
@@ -46,11 +45,11 @@ static EntityId DetectNearbyEnemy(EntityId id, Vector2Int16 pos, PlayerId owner,
 
 	return result;
 }
-static void MoveToPosition(EntityId id, Vector2Int16 pos, Vector2Int16 target, EntityManager& em) {
+static bool TryMoveToPosition(EntityId id, Vector2Int16 pos, Vector2Int16 target, EntityManager& em) {
 	Vector2Int16 distance = target - pos;
 
 	if (distance.LengthSquaredInt() < 10) {
-		UnitEntityUtil::SetAIState(id, UnitAIState::Idle);
+		return true;
 	}
 	/*else if (distance.LengthSquaredInt() < 128) {
 
@@ -64,8 +63,28 @@ static void MoveToPosition(EntityId id, Vector2Int16 pos, Vector2Int16 target, E
 		em.FlagComponents.GetComponent(id).set(ComponentFlags::NavigationWork);
 		em.NavigationArchetype.NavigationComponents.GetComponent(id).target = target;
 	}
-}
 
+	return false;
+}
+static bool TryAttackTarget(EntityId target, EntityId id, Vector2Int16 pos, EntityManager& em) {
+	const auto& weapon = em.UnitArchetype.WeaponComponents.GetComponent(id);
+
+	Vector2Int16 targetPos = em.PositionComponents.GetComponent(target);
+
+	Vector2Int16 distance = targetPos - pos;
+
+	int range = (int)(weapon.maxRange + 1) << 5;
+
+	if (distance.LengthSquaredInt() <= range * range) {
+
+		if (weapon.IsReady())
+			UnitEntityUtil::AttackTarget(id, target);
+
+		return true;
+	}
+
+	return false;
+}
 
 void UnitAIIdleState::EnterState(UnitAIEnterStateData& data, EntityManager& em)
 {
@@ -86,8 +105,8 @@ void UnitAIIdleState::Think(UnitAIThinkData& data, EntityManager& em)
 
 		EntityId enemy = DetectNearbyEnemy(id, pos, owner, em);
 		if (enemy != Entity::None) {
-			Vector2Int16 trg = em.PositionComponents.GetComponent(id);
-			UnitEntityUtil::SetAIState(id, UnitAIState::GoToAttack, trg);
+
+			UnitEntityUtil::SetAIState(id, UnitAIState::AttackTarget, enemy);
 		}
 	}
 }
@@ -109,18 +128,8 @@ void UnitAIAttackTargetState::Think(UnitAIThinkData& data, EntityManager& em)
 			continue;
 		}
 
-		Vector2Int16 targetPos = em.PositionComponents.GetComponent(target);
-
-		Vector2Int16 distance = targetPos - pos;
-
-		int range = (int)(weapon.maxRange + 1) << 5;
-
-		if (distance.LengthSquaredInt() <= range * range) {
-
-			if (weapon.IsReady())
-				UnitEntityUtil::AttackTarget(id, target);
-		}
-		else {
+		if (!TryAttackTarget(target, id, pos, em)) {
+			Vector2Int16 targetPos = em.PositionComponents.GetComponent(target);
 			UnitEntityUtil::GoTo(id, targetPos);
 		}
 	}
@@ -134,7 +143,9 @@ void UnitAIGoToState::Think(UnitAIThinkData& data, EntityManager& em)
 		const auto& stateData = data.stateData[i];
 		const auto& pos = data.position[i];
 
-		MoveToPosition(id, pos, stateData.target.position, em);
+		if (TryMoveToPosition(id, pos, stateData.target.position, em)) {
+			UnitEntityUtil::SetAIState(id, UnitAIState::Idle);
+		}
 	}
 }
 
@@ -149,11 +160,17 @@ void UnitAIGoToAttackState::Think(UnitAIThinkData& data, EntityManager& em)
 		EntityId target = DetectNearbyEnemy(id, pos, data.owner[i], em);
 
 		if (target != Entity::None) {
-			UnitEntityUtil::SetAIState(id, UnitAIState::AttackTarget, target);
-			continue;
+			if (!TryAttackTarget(target, id, pos, em)) {
+				Vector2Int16 targetPos = em.PositionComponents.GetComponent(target);
+				TryMoveToPosition(id, pos, targetPos, em);
+			}
 		}
-
-		MoveToPosition(id, pos, stateData.target.position, em);
+		else
+		{
+			if (TryMoveToPosition(id, pos, stateData.target.position, em)) {
+				UnitEntityUtil::SetAIState(id, UnitAIState::Idle);
+			}
+		}
 	}
 }
 
@@ -175,20 +192,7 @@ void UnitAIHoldPositionState::Think(UnitAIThinkData& data, EntityManager& em)
 
 		EntityId target = DetectNearbyEnemy(id, pos, owner, em);
 		if (target != Entity::None) {
-			
-			const auto& weapon = em.UnitArchetype.WeaponComponents.GetComponent(id);
-
-			Vector2Int16 targetPos = em.PositionComponents.GetComponent(target);
-
-			Vector2Int16 distance = targetPos - pos;
-
-			int range = (int)(weapon.maxRange + 1) << 5;
-
-			if (distance.LengthSquaredInt() <= range * range) {
-
-				if (weapon.IsReady())
-					UnitEntityUtil::AttackTarget(id, target);
-			}
+			TryAttackTarget(target, id, pos, em);
 		}
 	}
 }
@@ -212,36 +216,58 @@ void UnitAIPatrolState::Think(UnitAIThinkData& data, EntityManager& em)
 
 		if (target != Entity::None) {
 
-			const auto& weapon = em.UnitArchetype.WeaponComponents.GetComponent(id);
-
-			Vector2Int16 targetPos = em.PositionComponents.GetComponent(target);
-
-			Vector2Int16 distance = targetPos - pos;
-
-			int range = (int)(weapon.maxRange + 1) << 5;
-
-			if (distance.LengthSquaredInt() <= range * range) {
-
-				if (weapon.IsReady())
-					UnitEntityUtil::AttackTarget(id, target);
+			if (!TryAttackTarget(target, id, pos, em)) {
+				Vector2Int16 targetPos = em.PositionComponents.GetComponent(target);
+				TryMoveToPosition(id, pos, targetPos, em);
 			}
-			else {
-				em.FlagComponents.GetComponent(id).set(ComponentFlags::NavigationWork);
-				em.NavigationArchetype.NavigationComponents.GetComponent(id).target =
-					targetPos;
+		}
+		else {
+
+			if (TryMoveToPosition(id, pos, stateData.target.position, em)) {
+				Vector2Int16 tmp = stateData.target.position;
+				auto& st = em.UnitArchetype.AIStateDataComponents.GetComponent(id);
+				st.target.position = stateData.target2.position;
+				st.target2.position = tmp;
+			}
+		}
+	}
+}
+
+void UnitAIFollowState::Think(UnitAIThinkData& data, EntityManager& em)
+{
+	int start = 0, end = data.size();
+	for (int i = start; i < end; ++i) {
+
+		EntityId id = data.entities[i];
+		const auto& pos = data.position[i];
+		const auto& owner = data.owner[i];
+		const auto& stateData = data.stateData[i];
+		
+		EntityId enemy = DetectNearbyEnemy(id, pos, owner, em);
+
+		if (enemy != Entity::None) {
+			if (TryAttackTarget(enemy, id, pos, em))
+				continue;
+		}
+
+		if (!em.UnitArchetype.Archetype.HasEntity(stateData.target.entityId))
+		{
+			UnitEntityUtil::SetAIState(id, UnitAIState::Idle);
+			continue;
+		}
+
+		Vector2Int16 target = em.PositionComponents.GetComponent(stateData.target.entityId);
+		Vector2Int16 distance = target - pos;
+		if (distance.LengthSquaredInt() < 128 * 128)
+		{
+			auto& state = em.UnitArchetype.StateComponents.GetComponent(id);
+			if (state != UnitState::Idle) {
+				em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Idle;
+				em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
 			}
 			continue;
 		}
-		else {
-			Vector2Int16 distance = stateData.target.position - pos;
-			if (distance.LengthSquaredInt() < 10) {
-				UnitEntityUtil::SetAIState(id, UnitAIState::Patrol, stateData.target2.position);
-			}
-			else {
-				em.FlagComponents.GetComponent(id).set(ComponentFlags::NavigationWork);
-				em.NavigationArchetype.NavigationComponents.GetComponent(id).target =
-					stateData.target.position;
-			}
-		}
+
+		TryMoveToPosition(id, pos, target, em);
 	}
 }

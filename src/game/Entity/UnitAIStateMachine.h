@@ -79,3 +79,7 @@ class UnitAIPatrolState : public IUnitAIState {
 	virtual void EnterState(UnitAIEnterStateData& data, EntityManager& em) override;
 	virtual void Think(UnitAIThinkData& data, EntityManager& em) override;
 };
+
+class UnitAIFollowState : public IUnitAIState {
+	virtual void Think(UnitAIThinkData& data, EntityManager& em) override;
+};

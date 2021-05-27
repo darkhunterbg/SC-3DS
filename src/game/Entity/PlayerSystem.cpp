@@ -122,7 +122,7 @@ void PlayerSystem::UpdatePlayerUnits(const EntityManager& em) {
 		position.x = position.x >> (5);
 		position.y = position.y >> (5);
 
-		playerVision[owner]->ranges.push_back({ position, data.visiion });
+		playerVision[owner]->ranges.push_back({ position, data.vision });
 	}
 }
 

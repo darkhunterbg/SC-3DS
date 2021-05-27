@@ -28,7 +28,7 @@ SoundSystem::SoundSystem()
 	chatAudioChannel.channel = &channels[channels.Size() - 2];
 	uiAudioChannel.channel = &channels[channels.Size() - 1];
 
-	seed = Platform::ElaspedTime();
+	seed = std::rand();
 }
 
 bool SoundSystem::EntityAudioSort(const EntityPriorityAudio& a, EntityPriorityAudio& b) {
@@ -207,8 +207,7 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 			const UnitDef* def = em.UnitArchetype.UnitComponents.GetComponent(currentChat.id).def;
 			const UnitSound* sound = nullptr;
 
-			std::srand(seed);
-
+			
 			if (currentChat.type == UnitChatType::Command) {
 				if (def->Sounds.Yes.TotalClips) {
 					sound = &def->Sounds.Yes;
@@ -222,8 +221,11 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 			}
 
 			if (sound) {
+				std::srand(seed);
+
 				int i = std::rand() % sound->TotalClips;
 				Game::Audio.PlayClip(sound->Clips[i], channel.channel->ChannelId);
+				seed = std::rand();
 			}
 		}
 

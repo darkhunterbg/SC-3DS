@@ -30,7 +30,8 @@ void AbilityDatabase::Init()
 	HoldPosition.IconId = 255;
 
 	Move.TargetingData.HasTargetSelection = true;
-	Move.TargetingData.SetAllStates(UnitAIState::GoToPosition);
+	Move.TargetingData.PositionSelectedAction = UnitAIState::GoToPosition;
+	Move.TargetingData.EntitySelectedAction = UnitAIState::Follow;
 
 	Stop.TargetingData.SetAllStates(UnitAIState::Idle);
 

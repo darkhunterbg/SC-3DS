@@ -19,6 +19,7 @@ enum class UnitAIState :uint8_t {
 	GoToAttack = 3,
 	HoldPosition = 4,
 	Patrol = 5,
+	Follow = 6,
 
 	Nothing = 0xFF,
 };
