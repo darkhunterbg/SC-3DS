@@ -70,12 +70,18 @@ static bool TryAttackTarget(EntityId target, EntityId id, Vector2Int16 pos, Enti
 	const auto& weapon = em.UnitArchetype.WeaponComponents.GetComponent(id);
 
 	Vector2Int16 targetPos = em.PositionComponents.GetComponent(target);
+	Rectangle16 collider = em.CollisionArchetype.ColliderComponents.GetComponent(target).collider;
+	collider.position += targetPos;
 
-	Vector2Int16 distance = targetPos - pos;
 
-	int range = (int)(weapon.maxRange + 1) << 5;
+	Vector2Int16 distance = collider.Closest(pos);
+	distance -= pos;
 
-	if (distance.LengthSquaredInt() <= range * range) {
+
+	int range = ((int)(weapon.maxRange + 1) << 5);
+
+
+	if (distance.LengthSquaredInt() < range * range) {
 
 		if (weapon.IsReady())
 			UnitEntityUtil::AttackTarget(id, target);
@@ -122,7 +128,7 @@ void UnitAIAttackTargetState::Think(UnitAIThinkData& data, EntityManager& em)
 
 		EntityId target = stateData.target.entityId;
 
-		
+
 
 		if (target == id || !em.UnitArchetype.Archetype.HasEntity(target))
 		{

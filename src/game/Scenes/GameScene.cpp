@@ -57,10 +57,10 @@ void GameScene::Start() {
 	//UnitEntityUtil::NewUnit(UnitDatabase::MineralField1, 0,
 	//	Vector2Int16(128, 256));
 
-	//for (int i = 0; i < 5; ++i) {
-	//	UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 2,
-	//		Vector2Int16(600, 32 * i + 32));
-	//}
+	for (int i = 0; i < 1; ++i) {
+		UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 2,
+			Vector2Int16(600, 32 * i + 32));
+	}
 
 	EntityId e = UnitEntityUtil::NewUnit(UnitDatabase::CommandCenter, 1,
 		Vector2Int16(256, 128));
@@ -69,19 +69,14 @@ void GameScene::Start() {
 
 	//EntityId e = UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 0,
 	//	Vector2Int16(48, 48));
-	 e = 0;
+
 	int i = 0;
 	for (int y = 1; y > 0; --y) {
 		for (int x = 1; x > 0; --x) {
 			Color c = color[(i) % 12];
-			auto& def = *UnitDatabase::Units[1];
-			e = UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
+			auto& def = *UnitDatabase::Units[0];
+			 UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
 				Vector2Int16(Vector2Int{ x * 32 + 48,y * 32 + 48 }));
-
-			//entityManager->UnitArchetype.OrientationComponents.GetComponent(e) = 12;
-			//EntityUtil::PlayAnimation(e, def.Graphics->IdleAnimations[0]);
-			//EntityUtil::StartTimer(e, 3, TimerExpiredAction::UnitToggleIdleAnimation, true);
-			//entityManager->GoTo(e, { 1024,1024 });
 
 			i += 1;
 
@@ -104,7 +99,7 @@ void GameScene::Update() {
 	t++;
 
 	if (t % 60 == 0) {
-		entityManager->GetPlayerSystem().AddMinerals(1, 800);
+		entityManager->GetPlayerSystem().AddMinerals(1, 8);
 		entityManager->GetPlayerSystem().AddGas(1, 8);
 	}
 

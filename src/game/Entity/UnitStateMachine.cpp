@@ -165,9 +165,12 @@ static void  UnitAttackingEnterStateJob(int start, int end) {
 		EntityId id = data.entities[i];
 		const auto& stateData = em.UnitArchetype.StateDataComponents.GetComponent(id);
 		Vector2Int16 targetPos = em.PositionComponents.GetComponent(stateData.target.entityId);
+		Rectangle16 targetCollider = em.CollisionArchetype.ColliderComponents.GetComponent(stateData.target.entityId).collider;
+
+		targetCollider.position += targetPos;
 
 
-		 UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
+		UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
 		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
 
 		uint8_t orientation = EntityUtil::GetOrientationToPosition(id, targetPos);
@@ -218,6 +221,11 @@ static void  UnitAttackingEnterStateJob(int start, int end) {
 	
 		// Particle Effect
 
+		targetCollider.Shrink(unit.def->Weapon->TargetEffect[0].GetFrameSize()>> 1);
+
+		Vector2Int16 spawnAt = targetCollider.Closest(em.PositionComponents.GetComponent(id));
+
+
 		EntityId e = scratch[i];
 
 		em.TimingArchetype.TimingComponents.GetComponent(e).NewTimer(unit.def->Weapon->TargetEffect[0].GetDuration());
@@ -225,7 +233,7 @@ static void  UnitAttackingEnterStateJob(int start, int end) {
 		em.FlagComponents.NewComponent(e).set(ComponentFlags::UpdateTimers);
 		em.FlagComponents.GetComponent(e).set(ComponentFlags::PositionChanged);
 		em.RenderArchetype.RenderComponents.GetComponent(e).depth = 1;
-		em.PositionComponents.NewComponent(e, targetPos);
+		em.PositionComponents.NewComponent(e, spawnAt);
 
 		EntityUtil::PlayAnimation(e, unit.def->Weapon->TargetEffect[0]);
 		EntityUtil::SetRenderFromAnimationClip(e, unit.def->Weapon->TargetEffect[0], 0);

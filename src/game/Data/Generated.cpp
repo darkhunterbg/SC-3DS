@@ -13,6 +13,7 @@ SpriteFrameAtlas* SpriteDatabase::unit_thingy_tbangx;
 SpriteFrameAtlas* SpriteDatabase::unit_neutral_min01;
 SpriteFrameAtlas* SpriteDatabase::unit_neutral_min01sha;
 SpriteFrameAtlas* SpriteDatabase::unit_bullet_tspark;
+SpriteFrameAtlas* SpriteDatabase::unit_bullet_scvspark;
 SpriteFrameAtlas* SpriteDatabase::cursor;
 SpriteFrameAtlas* SpriteDatabase::unit_thingy_o022;
 SpriteFrameAtlas* SpriteDatabase::unit_wirefram_wirefram_000;
@@ -1179,6 +1180,25 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_bullet_tspark() {
 	a->SetOffset(132, Vector2Int(10,6));
 	a->SetOffset(133, Vector2Int(10,6));
 	a->SetOffset(134, Vector2Int(10,6));
+
+	return a;
+}
+
+const SpriteFrameAtlas* SpriteDatabase::Load_unit_bullet_scvspark() {
+	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_bullet_scvspark.t3x");
+	auto* a = unit_bullet_scvspark = new SpriteFrameAtlas(atlas);
+	a->FrameSize = Vector2Int(48, 48);
+
+	a->SetOffset(0, Vector2Int(4,25));
+	a->SetOffset(1, Vector2Int(3,18));
+	a->SetOffset(2, Vector2Int(12,16));
+	a->SetOffset(3, Vector2Int(14,18));
+	a->SetOffset(4, Vector2Int(13,18));
+	a->SetOffset(5, Vector2Int(12,13));
+	a->SetOffset(6, Vector2Int(11,10));
+	a->SetOffset(7, Vector2Int(9,11));
+	a->SetOffset(8, Vector2Int(7,12));
+	a->SetOffset(9, Vector2Int(5,19));
 
 	return a;
 }

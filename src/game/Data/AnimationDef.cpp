@@ -16,9 +16,10 @@ void DirectionalAnimationDef::GenerateAnimations(const SpriteFrameAtlas* a, Anim
 	int animOffset = 0;
 
 	int offset = 16 / Directions;
-	int frameSkip = Directions + 1;
-
 	int max = Directions != 1 ? Directions : 0;
+	int frameSkip = Directions != 1 ? Directions + 1 : 1;
+
+
 
 	for (int d = 0; d <= max; ++d) {
 		for (int i = d * offset; i < (d + 1) * offset; ++i) {

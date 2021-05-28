@@ -23,6 +23,7 @@ public:
 	static SpriteFrameAtlas* unit_neutral_min01;
 	static SpriteFrameAtlas* unit_neutral_min01sha;
 	static SpriteFrameAtlas* unit_bullet_tspark;
+	static SpriteFrameAtlas* unit_bullet_scvspark;
 	static SpriteFrameAtlas* cursor;
 	static SpriteFrameAtlas* unit_thingy_o022;
 	static SpriteFrameAtlas* unit_wirefram_wirefram_000;
@@ -48,6 +49,7 @@ public:
 	static const SpriteFrameAtlas* Load_unit_neutral_min01();
 	static const SpriteFrameAtlas* Load_unit_neutral_min01sha();
 	static const SpriteFrameAtlas* Load_unit_bullet_tspark();
+	static const SpriteFrameAtlas* Load_unit_bullet_scvspark();
 	static const SpriteFrameAtlas* Load_cursor();
 	static const SpriteFrameAtlas* Load_unit_thingy_o022();
 	static const SpriteFrameAtlas* Load_unit_wirefram_wirefram_000();

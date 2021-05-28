@@ -36,15 +36,15 @@ static void FusionCutterData() {
 	d.Damage = 5;
 	d.Sound = { "sound/terran/scv/edrrep", 5 };
 
-	d.TargetEffectDef.FrameCount = 15;
-	d.TargetEffectDef.Directions = 8;
+	d.TargetEffectDef.FrameCount = 10;
+	d.TargetEffectDef.Directions = 1;
 	d.TargetEffectDef.FrameStart = 0;
 	d.TargetEffectDef.FrameTime = 1;
 
 	d.IconId = 329;
 
 	d.LoadGraphicsAction = []() {
-		auto sa = SpriteDatabase::Load_unit_bullet_tspark();
+		auto sa = SpriteDatabase::Load_unit_bullet_scvspark();
 		WeaponDatabase::FusionCutter.TargetEffectDef.GenerateAnimations(sa,
 			WeaponDatabase::FusionCutter.TargetEffect);	};
 }

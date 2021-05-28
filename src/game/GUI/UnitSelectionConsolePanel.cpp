@@ -1,5 +1,6 @@
 #include "UnitSelectionConsolePanel.h"
 #include "../Entity/EntityManager.h"
+#include "../Entity/EntityUtil.h"
 
 #include "../Platform.h"
 #include "../Game.h"
@@ -53,6 +54,7 @@ void UnitSelectionConsolePanel::Draw(GameViewContext& context)
 	detailSpace.size.y -= nameSpace.size.y;
 
 	const UnitDataComponent& data = em.UnitArchetype.DataComponents.GetComponent(entityId);
+
 
 	if (!data.IsQueueEmpty())
 	{
@@ -168,6 +170,9 @@ void UnitSelectionConsolePanel::DrawUnitName(Rectangle space, EntityId id, const
 
 void UnitSelectionConsolePanel::DrawSupplyInfo(Rectangle space, EntityId id, const UnitComponent& unit, GameViewContext& context)
 {
+	if (!UnitEntityUtil::IsAlly(context.player, id))
+		return;
+
 	auto font = Game::SystemFont;
 
 	Vector2Int pos = space.position;
@@ -202,6 +207,9 @@ void UnitSelectionConsolePanel::DrawSupplyInfo(Rectangle space, EntityId id, con
 
 void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId id, const UnitDataComponent& data, GameViewContext& context)
 {
+	if (!UnitEntityUtil::IsAlly(context.player, id))
+		return;
+
 	auto font = Game::SystemFont;
 
 	Vector2Int pos = space.position;

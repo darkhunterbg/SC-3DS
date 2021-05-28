@@ -263,7 +263,7 @@ void UnitSystem::UpdateBuilding(EntityManager& em)
 			}
 
 
-			bool completed = data.TickQueue(30);
+			bool completed = data.TickQueue(1);
 			if (completed) {
 				const UnitDef* def = data.Dequeue();
 

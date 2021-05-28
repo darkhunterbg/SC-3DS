@@ -120,7 +120,7 @@ void EntityUtil::SetMapObjectBoundingBoxFromRender(EntityId e)
 
 	Vector2Int16 size = renderBB.size;
 	mapBB.size = Vector2Int16(size >> 6) << 1;
-	mapBB.size = mapBB.size.Min(1, 1);
+	mapBB.size = mapBB.size.Floor(1, 1);
 	mapBB.position = (mapBB.size >> 1) * -1;
 }
 
@@ -226,7 +226,7 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 
 	Vector2Int16 size = def.Graphics->RenderSize;
 	mapBB.size = Vector2Int16(size >> 6) << 1;
-	mapBB.size = mapBB.size.Min(2, 2);
+	mapBB.size = mapBB.size.Floor(2, 2);
 	mapBB.position -= mapBB.size / 2;
 
 	if (playerId == 0 & def.IsResourceContainer) {

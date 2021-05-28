@@ -87,10 +87,10 @@ struct Vector2T
 	//	return *this;
 	//}
 
-	Vector2T Max(T mx, T my) const {
+	Vector2T Ceil(T mx, T my) const {
 		return Vector2T(std::min(x, mx), std::min(y, my));
 	}
-	Vector2T Min(T mx, T my) const {
+	Vector2T Floor(T mx, T my) const {
 		return Vector2T(std::max(x, mx), std::max(y, my));
 	}
 
@@ -420,12 +420,37 @@ struct Rectangle16
 	}
 
 	void Restrict(Vector2Int16 min, Vector2Int16 max) {
-		position = position.Min(min.x, min.y);
+		position = position.Floor(min.x, min.y);
 		Vector2Int16 end = position + size;
-		end = end.Max(max.x, max.y);
+		end = end.Ceil(max.x, max.y);
 		size = end - position;
 	}
+	
+	inline Vector2Int16 Closest(const Vector2Int16& pos) const {
+		Vector2Int16 r = pos;
+		if (pos.x < position.x) {
+			r.x = position.x;
+		}
+		else if (pos.x > position.x+ size.x) {
+			r.x = position.x + size.x;
+		}
+		
+		if (pos.y < position.y) {
+			r.y = position.y;
+		}
+		else if (pos.y > position.y + size.y) {
+			r.y = position.y + size.y;
+		}
 
+		return r;
+	}
+
+	inline void Shrink(const Vector2Int16& size) {
+		Vector2Int16 move = size << 1;
+		move = move.Ceil(this->size.x, this->size.y);
+		this->size -= move;
+		this->position += move >> 1;
+	}
 };
 
 

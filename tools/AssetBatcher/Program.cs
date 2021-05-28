@@ -44,6 +44,7 @@ namespace AssetBatcher
 
 
 			T3SFolders("unit/bullet/tspark");
+			T3SFolders("unit/bullet/scvspark");
 
 			List<string> cursor = new List<string>();
 			foreach (var d in Directory.GetDirectories("../../data_out/cursor"))

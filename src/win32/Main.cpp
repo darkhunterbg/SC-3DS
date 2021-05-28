@@ -1,5 +1,6 @@
 #include <SDL.h>
 #include <filesystem>
+#include <thread>
 
 #include "Color.h"
 #include "lodepng.h"
@@ -80,6 +81,8 @@ int main(int argc, char** argv) {
 
 	while (!done) {
 
+
+
 		Game::FrameStart();
 
 		SDL_Event event;
@@ -96,6 +99,7 @@ int main(int argc, char** argv) {
 
 		if (done)
 			break;
+
 
 
 		done = !Game::Update();
@@ -117,6 +121,12 @@ int main(int argc, char** argv) {
 
 
 		SDL_RenderPresent(renderer);
+
+		auto flags = SDL_GetWindowFlags(window);
+		if ((flags & SDL_WindowFlags::SDL_WINDOW_MINIMIZED))
+		{
+			SDL_Delay(16);
+		}
 	}
 
 	Game::End();
