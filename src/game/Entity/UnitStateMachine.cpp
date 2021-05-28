@@ -318,20 +318,10 @@ void UnitDeathState::ExitState(
 void UnitProducingState::EnterState(UnitStateMachineChangeData& data, EntityManager& em)
 {
 	for (EntityId id : data.entities) {
-
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
-
-		//em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
-		//	.GetComponent(id).clips = unit.def->Graphics->IdleAnimations;
-
-		//FlagsComponent& flags = em.FlagComponents.GetComponent(id);
-
-		//flags.set(ComponentFlags::AnimationEnabled);
-		//flags.set(ComponentFlags::AnimationSetChanged);
 
 		if (unit.HasMovementGlow()) {
 			EntityId glow = unit.movementGlowEntity;
-
 			em.FlagComponents.GetComponent(glow).set(ComponentFlags::AnimationEnabled);
 			em.FlagComponents.GetComponent(glow).set(ComponentFlags::RenderEnabled);
 		}
@@ -341,8 +331,8 @@ void UnitProducingState::EnterState(UnitStateMachineChangeData& data, EntityMana
 void UnitProducingState::ExitState(UnitStateMachineChangeData& data, EntityManager& em)
 {
 	for (EntityId id : data.entities) {
-		//FlagsComponent& flags = em.FlagComponents.GetComponent(id);
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
+
 		if (unit.HasMovementGlow()) {
 			EntityId glow = unit.movementGlowEntity;
 			em.FlagComponents.GetComponent(glow).clear(ComponentFlags::AnimationEnabled);

@@ -107,11 +107,11 @@ void NavigationSystem::UpdateNavigation(EntityManager& em)
 
 				auto& nav = em.NavigationArchetype.NavigationComponents[i];
 
-				if (nav.targetHeading == 255 ||
-					em.OrientationComponents[i] ==
-					nav.targetHeading) {
+				//if (nav.targetHeading == 255 ||
+				//	em.OrientationComponents[i] ==
+				//	nav.targetHeading) {
 
-
+				{
 					navigationData.velocity.push_back(em.UnitArchetype.MovementComponents[i].movementSpeed);
 					navigationData.position.push_back(em.PositionComponents[i]);
 					navigationData.collider.push_back(em.CollisionArchetype.ColliderComponents[i].collider);

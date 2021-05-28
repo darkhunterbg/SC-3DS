@@ -263,7 +263,7 @@ void UnitSystem::UpdateBuilding(EntityManager& em)
 			}
 
 
-			bool completed = data.TickQueue(1);
+			bool completed = data.TickQueue(30);
 			if (completed) {
 				const UnitDef* def = data.Dequeue();
 
@@ -284,8 +284,6 @@ void UnitSystem::UpdateBuilding(EntityManager& em)
 
 				iterate.position = iterate.position - bound / 2;
 				iterate.size = iterate.size + bound;
-				//iterate.position
-				//iterate.size += bound;
 
 				testPositions.clear();
 
