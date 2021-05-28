@@ -192,8 +192,52 @@ struct UnitDataComponent {
 	bool isBuilding = false;
 	uint8_t internalTimer = 0;
 
+	std::array<const UnitDef*, 5> productionQueue;
+	uint8_t queueSize = 0;
+	uint16_t queueTimer = 0;
+	Vector2Int16 spawnOffset;
+
 	inline void ResetFireTimer() {
 		internalTimer = 18;
+	}
+	inline bool EnqueueProduce(const UnitDef& def) {
+		if (IsQueueFull()) {
+			return false;
+		}
+
+		productionQueue[queueSize] = &def;
+
+		++queueSize;
+		if (queueTimer == 0)
+			queueTimer = def.BuildTime;
+
+		return true;
+	}
+
+	inline bool IsQueueEmpty() const {
+		return queueSize == 0;
+	}
+	inline bool IsQueueFull() const {
+		return queueSize == productionQueue.size();
+	}
+	inline bool TickQueue(int counter = 1) {
+		queueTimer = std::max(0, (int)queueTimer - counter);
+		return queueTimer == 0;
+	}
+
+	inline const UnitDef* Dequeue() {
+		const UnitDef* result = productionQueue[0];
+		for (int i = 1; i < queueSize; ++i) {
+			productionQueue[i - 1] = productionQueue[i];
+		}
+
+		--queueSize;
+
+		if (queueSize) {
+			queueTimer = productionQueue[0]->BuildTime;
+		}
+		return result;
+	
 	}
 
 	inline void FromDef(const UnitDef& def) {
@@ -201,8 +245,12 @@ struct UnitDataComponent {
 		supplyProvides = def.ProvideSupplyDoubled;
 		vision = def.Vision + 1;
 		isBuilding = def.IsBuilding;
+		spawnOffset = def.SpawnOffset;
+		queueSize = 0;
+		queueTimer = 0;
 		ResetFireTimer();
 	}
+
 };
 
 struct UnitHealthComponent {
@@ -211,7 +259,7 @@ struct UnitHealthComponent {
 	uint8_t armor = 0;
 
 	inline bool Reduce(uint16_t value) {
-		uint16_t dmg = std::max((int)value - (int)armor , 1);
+		uint16_t dmg = std::max((int)value - (int)armor, 1);
 		uint16_t damage = std::min(dmg, current);
 		bool kill = damage == current;
 		current -= damage;

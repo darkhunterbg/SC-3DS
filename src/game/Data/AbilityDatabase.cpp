@@ -5,7 +5,8 @@ AbilityDef AbilityDatabase::Move,
 AbilityDatabase::Stop,
 AbilityDatabase::Attack,
 AbilityDatabase::Patrol,
-AbilityDatabase::HoldPosition;
+AbilityDatabase::HoldPosition,
+AbilityDatabase::BuildUnit;
 
 std::vector<AbilityDef*> AbilityDatabase::Abilities = {
 	&AbilityDatabase::Move,
@@ -13,6 +14,7 @@ std::vector<AbilityDef*> AbilityDatabase::Abilities = {
 	&AbilityDatabase::Attack,
 	&AbilityDatabase::Patrol,
 	&AbilityDatabase::HoldPosition,
+	&AbilityDatabase::BuildUnit,
 };
 
 static int Id = 0;
@@ -24,6 +26,7 @@ void AbilityDatabase::Init()
 	Attack.Name = "Attack";
 	Patrol.Name = "Patrol";
 	HoldPosition.Name = "HoldPosition";
+	BuildUnit.Name = "Build";
 
 	Move.IconId = 228;
 	Stop.IconId = 229;

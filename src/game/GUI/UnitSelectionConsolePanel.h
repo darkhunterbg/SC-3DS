@@ -10,6 +10,7 @@
 
 class EntityManager;
 class UnitComponent;
+class UnitDataComponent;
 class UnitHealthComponent;
 
 class UnitSelectionConsolePanel {
@@ -25,7 +26,7 @@ private:
 	
 	void DrawUnitName(Rectangle space, EntityId id, const UnitComponent& unit, GameViewContext& context);
 	void DrawSupplyInfo(Rectangle space, EntityId id, const UnitComponent& unit, GameViewContext& context);
-
+	void DrawProductionDetails(Rectangle space, EntityId id, const UnitDataComponent& data, GameViewContext& context);
 	void DrawUnitDetail(Rectangle space, EntityId id, const UnitComponent& unit, GameViewContext& context);
 
 	void DrawUnitInfo(Rectangle space, EntityId id, const UnitComponent& unit, const UnitHealthComponent& health);

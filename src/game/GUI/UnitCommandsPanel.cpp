@@ -60,13 +60,13 @@ void UnitCommandsPanel::UpdateInput(GameViewContext& context)
 		}
 	}
 
-	
+
 	if (pressedCommand != -1) {
 		unitCommands[pressedCommand].pressed = true;
 		unitCommands[pressedCommand].active = true;
 	}
 
-	if (pressedCommand != -1 && Game::Pointer.IsReleased() ) {
+	if (pressedCommand != -1 && Game::Pointer.IsReleased()) {
 		if (pressedCommand == hover) {
 			OnCommandPressed(context, unitCommands[pressedCommand]);
 		}
@@ -100,7 +100,7 @@ void UnitCommandsPanel::DrawCommands(GameViewContext& context) {
 			d.position += offset;
 			Platform::Draw(f, d);
 
-			const SpriteFrame& commandIcon = cmd.commandIcon !=nullptr ?
+			const SpriteFrame& commandIcon = cmd.commandIcon != nullptr ?
 				*cmd.commandIcon : cmd.ability->Sprite;
 
 			d.size = Vector2Int(commandIcon.sprite.rect.size);
@@ -136,19 +136,19 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 		cmd.enabled = false;
 		cmd.active = false;
 		cmd.pressed = false;
-	
+
 	}
-	
+
 	if (!context.HasSelectionControl())
 		return;
 
 	if (context.IsTargetSelectionMode) {
 		unitCommands[8].enabled = true;
-		unitCommands[8].pressed = unitCommands[8].active = Game::Gamepad.IsButtonDown(GamepadButton::B) ;
+		unitCommands[8].pressed = unitCommands[8].active = Game::Gamepad.IsButtonDown(GamepadButton::B);
 		unitCommands[8].commandIcon = &SpriteDatabase::Load_unit_cmdbtns_cmdicons()->GetFrame(236);
 		return;
 	}
-	
+
 	if (context.selection.size() > 0)
 	{
 		EntityId entityId = context.selection[0];
@@ -180,6 +180,16 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 			unitCommands[4].enabled = true;
 		}
 
+		if (unit.def->ProductionUnit != nullptr) {
+			if (!em.UnitArchetype.DataComponents.GetComponent(entityId).IsQueueFull())
+			{
+				unitCommands[0].ability = &AbilityDatabase::BuildUnit;
+				unitCommands[0].enabled = true;
+				unitCommands[0].abilityProduce = unit.def->ProductionUnit;
+				unitCommands[0].commandIcon = &unit.def->ProductionUnit->Icon;
+			}
+		}
+
 		for (auto& cmd : unitCommands) {
 			if (!cmd.IsUsable())
 				continue;
@@ -194,6 +204,11 @@ void UnitCommandsPanel::OnCommandPressed(GameViewContext& context, const UnitCom
 	context.GetEntityManager().GetSoundSystem().PlayUISound(Game::ButtonAudio);
 
 	if (cmd.ability != nullptr) {
+
+		if (cmd.abilityProduce != nullptr) {
+			context.currentAbility = cmd.ability;
+			context.ActivateCurrentAbility(*cmd.abilityProduce);
+		}
 
 		if (cmd.ability->TargetingData.EntitySelectedAction == UnitAIState::Nothing)
 			return;

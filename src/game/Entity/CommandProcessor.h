@@ -15,6 +15,7 @@ enum class PlayerCommandTargetType : uint8_t  {
 	None,
 	Entity,
 	Position,
+	UnitType,
 };
 
 struct PlayerCommand {
@@ -24,6 +25,7 @@ struct PlayerCommand {
 	{
 		EntityId entity;
 		Vector2Int16 position;
+		uint16_t itemId;
 	} target = { 0 };
 
 	uint32_t frameId;
@@ -49,6 +51,7 @@ public:
 	void UseAbility(PlayerId player, const std::vector<EntityId>& group, const AbilityDef& ability);
 	void UseAbility(PlayerId player,  const std::vector<EntityId>& group, const AbilityDef& ability, Vector2Int16 target);
 	void UseAbility(PlayerId player, const std::vector<EntityId>& group, const AbilityDef& ability, EntityId target);
+	void UseAbility(PlayerId player, const std::vector<EntityId>& group, const AbilityDef& ability, const UnitDef& target);
 
 	void ExecuteQueuedCommands(EntityManager& em);
 

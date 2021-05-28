@@ -16,6 +16,8 @@ private:
 	struct UnitCommand {
 		const AbilityDef* ability = nullptr;
 		const SpriteFrame* commandIcon = nullptr;
+		const UnitDef* abilityProduce = nullptr;
+
 		bool active = false;
 		bool enabled = false;
 		bool pressed = false;

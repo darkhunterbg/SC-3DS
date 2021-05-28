@@ -63,6 +63,11 @@ namespace AssetBatcher
 				"unit/wirefram/wirefram/106",
 				"unit/wirefram/grpwire/106");
 
+
+			T3SFoldersWithName("unit/wirefram/wirefram/007",
+				"unit/wirefram/wirefram/007",
+				"unit/wirefram/grpwire/007");
+
 			T3SFoldersWithName("unit/thingy/o146", "unit/thingy/o146", "unit/thingy/od146");
 
 			T3SFolders("unit/cmdbtns/tcmdbtns");

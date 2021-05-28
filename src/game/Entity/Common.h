@@ -35,7 +35,8 @@ enum class TimerExpiredAction : uint8_t {
 enum UnitChatType {
 	None = 0,
 	Select = 1,
-	Command = 2
+	Command = 2,
+	Ready = 3,
 };
 
 

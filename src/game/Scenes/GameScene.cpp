@@ -71,10 +71,10 @@ void GameScene::Start() {
 	//	Vector2Int16(48, 48));
 	 e = 0;
 	int i = 0;
-	for (int y = 5; y > 0; --y) {
-		for (int x = 5; x > 0; --x) {
+	for (int y = 1; y > 0; --y) {
+		for (int x = 1; x > 0; --x) {
 			Color c = color[(i) % 12];
-			auto& def = *UnitDatabase::Units[0];
+			auto& def = *UnitDatabase::Units[1];
 			e = UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
 				Vector2Int16(Vector2Int{ x * 32 + 48,y * 32 + 48 }));
 

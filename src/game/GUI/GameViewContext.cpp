@@ -47,6 +47,19 @@ void GameViewContext::ActivateAbility(const AbilityDef* ability, Vector2Int16 po
 	em->GetCommandProcessor().UseAbility(player, selection.GetEntities(), *ability, position);
 }
 
+void GameViewContext::ActivateAbility(const AbilityDef* ability, const UnitDef& produce)
+{
+	if (selection.size() == 0)
+		return;
+
+	if (ability == nullptr) {
+		EXCEPTION("Tried to active null AbilityDef!");
+		return;
+	}
+
+	em->GetCommandProcessor().UseAbility(player, selection.GetEntities(), *ability, produce);
+}
+
 void GameViewContext::ActivateCurrentAbility()
 {
 	ActivateAbility(currentAbility);
@@ -61,6 +74,12 @@ void GameViewContext::ActivateCurrentAbility(EntityId target)
 void GameViewContext::ActivateCurrentAbility(Vector2Int16 position)
 {
 	ActivateAbility(currentAbility, position);
+	CancelTargetSelection();
+}
+
+void GameViewContext::ActivateCurrentAbility(const UnitDef& produce)
+{
+	ActivateAbility(currentAbility, produce);
 	CancelTargetSelection();
 }
 
@@ -120,7 +139,7 @@ void GameViewContext::SelectUnitsInRegion(const Rectangle16 region)
 		bool multiSelection = false;
 
 		for (EntityId id : castResults) {
-			if (UnitEntityUtil::IsAlly(player, id) && 
+			if (UnitEntityUtil::IsAlly(player, id) &&
 				!em.UnitArchetype.DataComponents.GetComponent(id).isBuilding) {
 				multiSelection = true;
 				break;
@@ -132,7 +151,7 @@ void GameViewContext::SelectUnitsInRegion(const Rectangle16 region)
 		if (multiSelection) {
 			finalSelection.clear();
 			for (EntityId id : castResults) {
-				if (UnitEntityUtil::IsAlly(player, id) && 
+				if (UnitEntityUtil::IsAlly(player, id) &&
 					!em.UnitArchetype.DataComponents.GetComponent(id).isBuilding) {
 					finalSelection.push_back(id);
 				}

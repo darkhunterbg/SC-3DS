@@ -1,0 +1,11 @@
+--atlas -f auto-etc1 -z auto -q high
+..\data_out\unit\wirefram\wirefram\007\0.png
+..\data_out\unit\wirefram\wirefram\007\1.png
+..\data_out\unit\wirefram\wirefram\007\2.png
+..\data_out\unit\wirefram\wirefram\007\3.png
+..\data_out\unit\wirefram\wirefram\007\4.png
+..\data_out\unit\wirefram\grpwire\007\0.png
+..\data_out\unit\wirefram\grpwire\007\1.png
+..\data_out\unit\wirefram\grpwire\007\2.png
+..\data_out\unit\wirefram\grpwire\007\3.png
+..\data_out\unit\wirefram\grpwire\007\4.png

@@ -17,6 +17,7 @@ SpriteFrameAtlas* SpriteDatabase::cursor;
 SpriteFrameAtlas* SpriteDatabase::unit_thingy_o022;
 SpriteFrameAtlas* SpriteDatabase::unit_wirefram_wirefram_000;
 SpriteFrameAtlas* SpriteDatabase::unit_wirefram_wirefram_106;
+SpriteFrameAtlas* SpriteDatabase::unit_wirefram_wirefram_007;
 SpriteFrameAtlas* SpriteDatabase::unit_thingy_o146;
 SpriteFrameAtlas* SpriteDatabase::unit_cmdbtns_tcmdbtns;
 SpriteFrameAtlas* SpriteDatabase::unit_cmdbtns_pcmdbtns;
@@ -1316,6 +1317,25 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_wirefram_wirefram_106() {
 	a->SetOffset(7, Vector2Int(0,2));
 	a->SetOffset(8, Vector2Int(0,2));
 	a->SetOffset(9, Vector2Int(0,2));
+
+	return a;
+}
+
+const SpriteFrameAtlas* SpriteDatabase::Load_unit_wirefram_wirefram_007() {
+	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_wirefram_wirefram_007.t3x");
+	auto* a = unit_wirefram_wirefram_007 = new SpriteFrameAtlas(atlas);
+	a->FrameSize = Vector2Int(64, 64);
+
+	a->SetOffset(0, Vector2Int(5,0));
+	a->SetOffset(1, Vector2Int(5,0));
+	a->SetOffset(2, Vector2Int(5,0));
+	a->SetOffset(3, Vector2Int(5,0));
+	a->SetOffset(4, Vector2Int(5,0));
+	a->SetOffset(5, Vector2Int(3,0));
+	a->SetOffset(6, Vector2Int(3,0));
+	a->SetOffset(7, Vector2Int(3,0));
+	a->SetOffset(8, Vector2Int(3,0));
+	a->SetOffset(9, Vector2Int(3,0));
 
 	return a;
 }

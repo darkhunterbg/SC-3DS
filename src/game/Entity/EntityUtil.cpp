@@ -248,8 +248,13 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 
 	em.UnitArchetype.StateComponents.NewComponent(e);
 
-	em.UnitArchetype.AIStateComponents.NewComponent(e, UnitAIState::Idle);
-	em.UnitArchetype.AIStateDataComponents.NewComponent(e);
+	if (def.IsBuilding) {
+		em.FlagComponents.GetComponent(e).set(ComponentFlags::UnitAIPaused);
+	}
+	else {
+		em.UnitArchetype.AIStateComponents.NewComponent(e, UnitAIState::Idle);
+		em.UnitArchetype.AIStateDataComponents.NewComponent(e);
+	}
 
 	em.SoundArchetype.Archetype.AddEntity(e);
 

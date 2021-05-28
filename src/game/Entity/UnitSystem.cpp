@@ -174,3 +174,41 @@ void UnitSystem::UpdateUnitStats(EntityManager& em)
 	}
 
 }
+
+struct Spawn {
+	const UnitDef* def;
+	Vector2Int16 pos;
+	PlayerId owner;
+	uint8_t orientation;
+};
+
+static std::vector<Spawn> spawn;
+
+void UnitSystem::UpdateBuilding(EntityManager& em)
+{
+	spawn.clear();
+
+	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {
+
+		UnitDataComponent& data = em.UnitArchetype.DataComponents.GetComponent(id);
+
+		if (!data.IsQueueEmpty()) {
+			bool completed = data.TickQueue(0);
+			if (completed) {
+				const UnitDef* def =data.Dequeue();
+			
+				Vector2Int16 pos = em.PositionComponents.GetComponent(id) + data.spawnOffset;
+				PlayerId owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
+				uint8_t orientation = EntityUtil::GetOrientationToPosition(id, pos);
+				spawn.push_back({ def, pos, owner , orientation});
+			}
+		}
+
+	}
+
+	for (const Spawn& s : spawn) {
+		EntityId e = UnitEntityUtil::NewUnit(*s.def, s.owner, s.pos);
+		em.OrientationComponents.GetComponent(e) = s.orientation;
+		em.GetSoundSystem().PlayUnitChat(e, UnitChatType::Ready);
+	}
+}

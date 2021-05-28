@@ -52,11 +52,19 @@ void UnitSelectionConsolePanel::Draw(GameViewContext& context)
 	detailSpace.position.y += nameSpace.size.y;
 	detailSpace.size.y -= nameSpace.size.y;
 
-	if (unit.def->ProvideSupplyDoubled) {
-		DrawSupplyInfo(detailSpace, entityId, unit, context);
+	const UnitDataComponent& data = em.UnitArchetype.DataComponents.GetComponent(entityId);
+
+	if (!data.IsQueueEmpty())
+	{
+		DrawProductionDetails(detailSpace, entityId, data, context);
 	}
-	else if (!unit.def->IsBuilding) {
-		DrawUnitDetail(detailSpace, entityId, unit, context);
+	else {
+		if (unit.def->ProvideSupplyDoubled) {
+			DrawSupplyInfo(detailSpace, entityId, unit, context);
+		}
+		else if (!unit.def->IsBuilding) {
+			DrawUnitDetail(detailSpace, entityId, unit, context);
+		}
 	}
 }
 
@@ -162,8 +170,8 @@ void UnitSelectionConsolePanel::DrawSupplyInfo(Rectangle space, EntityId id, con
 {
 	auto font = Game::SystemFont;
 
-	Vector2Int pos = space.position + Vector2Int(space.size.x, 0);
-	pos.x -= 130;
+	Vector2Int pos = space.position;
+	pos.x += 30;
 
 	// TODO: RIGHT ALIGH
 
@@ -190,6 +198,89 @@ void UnitSelectionConsolePanel::DrawSupplyInfo(Rectangle space, EntityId id, con
 	offset = 8;
 	Platform::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray, 0.35f);
 	pos.y += 12;
+}
+
+void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId id, const UnitDataComponent& data, GameViewContext& context)
+{
+	auto font = Game::SystemFont;
+
+	Vector2Int pos = space.position;
+	pos.x += 8;
+	pos.y -= 16;
+
+	const Sprite& f = context.GetCommandIconsAtlas().GetFrame(2).sprite;
+	//const Sprite& f2 = context.GetCommandIconsAtlas().GetFrame(4).sprite;
+	//const Sprite& a = context.GetCommandIconsAtlas().GetFrame(11).sprite;
+
+	int total = data.queueSize;
+
+	Rectangle dst;
+	dst.position = pos;
+
+	for (int i = 0; i < data.productionQueue.size(); ++i) {
+
+		dst.size = Vector2Int(f.rect.size);
+		Platform::Draw(f, dst);
+
+		if (i < data.queueSize) {
+			const SpriteFrame& n = data.productionQueue[i]->Icon;
+			Rectangle nDst = dst;
+			nDst.size = Vector2Int(n.sprite.rect.size);
+			nDst.position += Vector2Int(n.offset) + Vector2Int{ 2,2 };
+
+			Platform::Draw(n.sprite, nDst, Colors::IconYellow);
+
+			stbsp_snprintf(buffer, sizeof(buffer), "%i", i + 1);
+
+			Color c = i == 0 ? Colors::UILightGray : Colors::IconYellow;
+
+			Platform::DrawText(font, nDst.position + Vector2Int{ 25,19 }, buffer, c, 0.35f);
+		}
+		else {
+			const Sprite& n = context.GetCommandIconsAtlas().GetFrame(6 + i).sprite;
+
+			Rectangle nDst = dst;
+
+			nDst.size = Vector2Int(n.rect.size);
+			nDst.position += (dst.size - nDst.size) / 2;
+
+			Platform::Draw(n, nDst);
+		}
+
+		if (i == 0 || i == data.productionQueue.size() - 1)
+			dst.position += Vector2Int{ 0, dst.size.y };
+		else
+			dst.position += Vector2Int{ dst.size.x,0 };
+
+	}
+
+
+	const Sprite& pb = Game::AssetLoader.LoadAtlas("game_gui.t3x")->GetSprite(0);
+	Platform::DrawText(font, pos + Vector2Int{ 68, 4 }, "Building", Colors::UILightGray, 0.4f);
+
+	dst.position = pos + Vector2Int{ 38,24 };
+	dst.size = Vector2Int(pb.rect.size);
+	Platform::Draw(pb, dst);
+
+	dst.position += {3, 3};
+	dst.size = { 2,3 };
+
+	int progress = data.productionQueue[0]->BuildTime - data.queueTimer;
+	progress = (progress * 100) / data.productionQueue[0]->BuildTime;
+
+	if (progress == 0)
+		return;
+
+	for (int i = 0; i <= progress ; i += 3) {
+
+		Platform::DrawRectangle(dst, Color32(Colors::UIDarkGreen));
+		dst.position.x += 3;
+	}
+
+	if (progress % 3 > 1) {
+		dst.size.x = progress % 3 - 1;
+		Platform::DrawRectangle(dst, Color32(Colors::UIDarkGreen));
+	}
 }
 
 void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, const UnitComponent& unit, GameViewContext& context)

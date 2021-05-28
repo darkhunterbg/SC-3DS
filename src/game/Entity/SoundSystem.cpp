@@ -209,13 +209,24 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 			const UnitSound* sound = nullptr;
 
 
-			if (currentChat.type == UnitChatType::Command) {
+			switch (currentChat.type)
+			{
+			case UnitChatType::Command: {
 				if (def->Sounds.Yes.TotalClips) {
 					sound = &def->Sounds.Yes;
 					sameUnitCounter = 0;
 				}
+				break;
 			}
-			else {
+			case UnitChatType::Ready: {
+				if (def->Sounds.Ready.TotalClips) {
+					sound = &def->Sounds.Ready;
+					sameUnitCounter = 0;
+				}
+				break;
+			}
+			case UnitChatType::Select: {
+
 				if (sameUnitCounter >= 5 &&
 					(sameUnitCounter - 5) < def->Sounds.Annoyed.TotalClips)
 				{
@@ -228,8 +239,14 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 				}
 				if (sameUnitCounter - 5 >= def->Sounds.Annoyed.TotalClips)
 					sameUnitCounter = 0;
+
+				break;
+			}
+			default:
+				break;
 			}
 
+		
 			if (sound) {
 				int i = 0;
 				if (sameUnitCounter >= 5)

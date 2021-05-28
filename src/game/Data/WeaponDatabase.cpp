@@ -25,8 +25,6 @@ static void GaussRifleData() {
 		WeaponDatabase::GaussRifle.TargetEffectDef.GenerateAnimations(sa,
 			WeaponDatabase::GaussRifle.TargetEffect);
 
-		WeaponDatabase::GaussRifle.Icon =
-			SpriteDatabase::Load_unit_cmdbtns_cmdicons()->GetFrame(WeaponDatabase::GaussRifle.IconId).sprite;
 	};
 }
 
@@ -36,28 +34,32 @@ static void FusionCutterData() {
 	d.Cooldown = 15;
 	d.MaxRange = 0;
 	d.Damage = 5;
-	d.Sound = { "sound/terran/scv/edrrep", 5  };
+	d.Sound = { "sound/terran/scv/edrrep", 5 };
 
 	d.TargetEffectDef.FrameCount = 15;
 	d.TargetEffectDef.Directions = 8;
 	d.TargetEffectDef.FrameStart = 0;
 	d.TargetEffectDef.FrameTime = 1;
 
+	d.IconId = 329;
+
 	d.LoadGraphicsAction = []() {
 		auto sa = SpriteDatabase::Load_unit_bullet_tspark();
 		WeaponDatabase::FusionCutter.TargetEffectDef.GenerateAnimations(sa,
-			WeaponDatabase::FusionCutter.TargetEffect);
-	};
+			WeaponDatabase::FusionCutter.TargetEffect);	};
 }
 
 void WeaponDatabase::Init()
 {
 	GaussRifleData();
 	FusionCutterData();
+	auto s = SpriteDatabase::Load_unit_cmdbtns_cmdicons();
 
 	for (auto d : Weapons) {
 		d->LoadSound();
 		d->LoadGraphicsAction();
+
+		d->Icon = s->GetFrame(d->IconId).sprite;
 	}
 
 }

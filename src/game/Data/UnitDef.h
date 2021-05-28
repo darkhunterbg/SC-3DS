@@ -11,6 +11,7 @@
 #include "WeaponDef.h"
 
 struct UnitDef {
+	uint16_t Id = 0;
 	std::string Name;
 	std::string Title;
 	unsigned Health = 100;
@@ -19,6 +20,7 @@ struct UnitDef {
 	uint8_t RotationSpeed = 1;
 	uint8_t Vision = 1;
 	uint8_t Armor = 0;
+	uint16_t BuildTime = 0;
 
 	bool IsBuilding = false;
 	bool IsResourceContainer = false;
@@ -41,9 +43,15 @@ struct UnitDef {
 
 	Sprite ArmorIcon;
 	Sprite Portrait;
+	SpriteFrame Icon;
 	int ArmorIconId = -1;
 	int PortraitId;
+	int IconId;
 
+
+	Vector2Int16 SpawnOffset;
+
+	const UnitDef* ProductionUnit = nullptr;
 
 	UnitDef() {  }
 	UnitDef(const UnitDef&) = delete;

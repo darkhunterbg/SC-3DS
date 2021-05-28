@@ -24,4 +24,6 @@ public:
 	void UpdateUnitCooldowns(EntityManager& em);
 	void ApplyUnitState(EntityManager& em);
 	void UpdateUnitStats(EntityManager& em);
+
+	void UpdateBuilding(EntityManager& em);
 };

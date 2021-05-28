@@ -188,6 +188,8 @@ void EntityManager::Update1() {
 }
 // Update 24 per second (60 fps) 
 void EntityManager::Update2() {
+	unitSystem.UpdateBuilding(*this);
+
 	commandProcessor.ExecuteQueuedCommands(*this);
 
 	timingSystem.ApplyTimerActions(*this);

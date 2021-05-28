@@ -4,6 +4,7 @@
 #include "EntityManager.h"
 
 #include "../Data/AbilityDatabase.h"
+#include "../Data/UnitDatabase.h"
 
 #include "../Platform.h"
 
@@ -64,6 +65,19 @@ void CommandProcessor::UseAbility(PlayerId player, const std::vector<EntityId>& 
 	GenerateCommands(cmd, group);
 }
 
+void CommandProcessor::UseAbility(PlayerId player, const std::vector<EntityId>& group, const AbilityDef& ability, const UnitDef& target)
+{
+	PlayerCommand cmd;
+
+	cmd.frameId = frame;
+	cmd.playerId = player;
+	cmd.abilityId = ability.AbilityId;
+	cmd.target.itemId = target.Id;
+	cmd.targetType = PlayerCommandTargetType::UnitType;
+
+	GenerateCommands(cmd, group);
+}
+
 void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 {
 	int add = sizeof(PlayerCommand);
@@ -78,7 +92,7 @@ void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 		case  PlayerCommandTargetType::None: {
 			UnitAIState action = ability.TargetingData.EntitySelectedAction;
 			if (action == UnitAIState::Nothing) {
-				EXCEPTION("Tried to active ability %s with Nothing action for entity!", ability.Name.data());
+				EXCEPTION("Tried to active ability %s with Nothing action no target!", ability.Name.data());
 				return;
 			}
 
@@ -104,7 +118,7 @@ void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 		case  PlayerCommandTargetType::Position: {
 			UnitAIState action = ability.TargetingData.PositionSelectedAction;
 			if (action == UnitAIState::Nothing) {
-				EXCEPTION("Tried to active ability %s with Nothing action for entity!", ability.Name.data());
+				EXCEPTION("Tried to active ability %s with Nothing action for position!", ability.Name.data());
 				return;
 			}
 
@@ -114,6 +128,19 @@ void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 			}
 			break;
 		}
+		case  PlayerCommandTargetType::UnitType: {
+
+
+			const UnitDef& unit = *UnitDatabase::Units[cmd.target.itemId];
+
+			for (int j = 0; j < cmd.entityCount; ++j) {
+				EntityId id = cmd.entities[j];
+
+				em.UnitArchetype.DataComponents.GetComponent(id).EnqueueProduce(unit);
+			}
+			break;
+		}
+
 		}
 
 	}

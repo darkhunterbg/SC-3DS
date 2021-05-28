@@ -21,16 +21,6 @@ void TimingSystem::UpdateTimers(EntityManager& em)
 			auto& a = em.TimingArchetype.ActionComponents[i];
 			GetActionEntityTable(a.action).push_back(id);
 
-
-		/*	auto& table = GetActionEntityTable(a.action);
-				for (int i = 0; i < table.size(); ++i) {
-					for (int j = i + 1; j < table.size(); ++j) {
-						if (table[i] >= table[j])
-							EXCEPTION("UNSORTED ACTION TABLE!");
-					}
-				}*/
-			
-
 			if (t.nextTimer > 0) {
 				t.timer = t.nextTimer;
 			}

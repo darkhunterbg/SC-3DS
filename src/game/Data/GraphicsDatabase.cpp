@@ -149,6 +149,9 @@ static void SCVResources() {
 	d.AttackAnimationDef.GenerateAnimations(a, a, d.AttackAnimations);
 	d.AttackAnimationDef.FrameCount = 1;
 	d.AttackAnimationDef.GenerateAnimations(a, a, d.AttackAnimations);
+
+	d.Selection.Atlas = SpriteDatabase::Load_unit_thingy_o022();
+	d.Wireframe.Atlas = SpriteDatabase::Load_unit_wirefram_wirefram_007();
 }
 static void SCVData() {
 	UnitGraphicsDef& d = GraphicsDatabase::SCV;
@@ -181,8 +184,8 @@ static void SCVData() {
 	d.DeathAnimationDef.FrameTime = 2;
 
 	d.Selection.VecticalOffset = 11;
-	d.Selection.BarSize = 6;
-
+	d.Selection.BarSize = 7;
+	d.Selection.BarVerticalOffset = 24;
 
 
 	d.LoadResourcesAction = SCVResources;

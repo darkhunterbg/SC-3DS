@@ -53,11 +53,13 @@ public:
 
 	void ActivateAbility(const AbilityDef* ability);
 	void ActivateAbility(const AbilityDef* ability, EntityId target);
-	void ActivateAbility(const AbilityDef*, Vector2Int16 position);
+	void ActivateAbility(const AbilityDef* ability, Vector2Int16 position);
+	void ActivateAbility(const AbilityDef* ability, const UnitDef& produce);
 
 	void ActivateCurrentAbility();
 	void ActivateCurrentAbility(EntityId target);
 	void ActivateCurrentAbility(Vector2Int16 position);
+	void ActivateCurrentAbility(const UnitDef& produce);
 
 	void SelectAbilityTarget(const AbilityDef& def);
 	void CancelTargetSelection();
