@@ -133,9 +133,11 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 	for (UnitCommand& cmd : unitCommands) {
 		cmd.ability = nullptr;
 		cmd.commandIcon = nullptr;
+		cmd.abilityProduce = nullptr;
 		cmd.enabled = false;
 		cmd.active = false;
 		cmd.pressed = false;
+
 
 	}
 

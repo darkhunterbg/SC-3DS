@@ -4,6 +4,7 @@
 #include "EntityManager.h"
 #include "../Profiler.h"
 
+#include "../Data/RaceDef.h"
 #include "../MathLib.h"
 #include "../Platform.h"
 
@@ -179,6 +180,26 @@ void SoundSystem::PlayUnitChat(EntityId id, UnitChatType type)
 	newChatRequest = { type, id };
 }
 
+void SoundSystem::PlayAdviserErrorMessage(const RaceDef& race, AdvisorErrorMessageType message)
+{
+	auto& clip = race.AdvisorErrorSounds.Clips[(int)message];
+
+	if (clip.data == nullptr)
+		return;
+
+
+	auto& channel = chatAudioChannel;
+
+	if (clip.id == channel.clipId)
+		return;
+
+
+	currentChat.type = UnitChatType::Advisor;
+	channel.clipId = clip.id;
+
+	Game::Audio.PlayClip(clip, channel.channel->ChannelId);
+}
+
 void SoundSystem::PlayUISound(const AudioClip& clip)
 {
 	Game::Audio.PlayClip(clip, uiAudioChannel.channel->ChannelId);
@@ -201,7 +222,7 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 
 	newChatRequest = { UnitChatType::None, Entity::None, };
 
-	auto channel = chatAudioChannel;
+	auto& channel = chatAudioChannel;
 
 	if (newRequest) {
 		if (em.UnitArchetype.Archetype.HasEntity(currentChat.id)) {
@@ -246,7 +267,7 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 				break;
 			}
 
-		
+
 			if (sound) {
 				int i = 0;
 				if (sameUnitCounter >= 5)
@@ -259,6 +280,7 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 				}
 
 				Game::Audio.PlayClip(sound->Clips[i], channel.channel->ChannelId);
+				channel.clipId = sound->Clips[i].id;
 
 			}
 		}
@@ -269,11 +291,13 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 
 		if (channel.channel->IsDone()) {
 			currentChat = { UnitChatType::None, currentChat.id };
+			channel.clipId = 0xFFFF;
 		}
 		else {
 			if (!em.UnitArchetype.Archetype.HasEntity(currentChat.id)) {
 				currentChat = { UnitChatType::None, Entity::None };
 				Game::Audio.StopChannel(channel.channel->ChannelId);
+				channel.clipId = 0xFFFF;
 			}
 		}
 	}

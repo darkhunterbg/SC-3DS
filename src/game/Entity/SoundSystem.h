@@ -8,7 +8,7 @@
 class EntityManager;
 class Camera;
 struct AudioChannelState;
-
+class RaceDef;
 
 class SoundSystem {
 	
@@ -62,7 +62,7 @@ public:
 	void UpdateEntityAudio(const Camera& camera, EntityManager& em);
 	void UpdateChatRequest(EntityManager& em);
 	void PlayUnitChat(EntityId id, UnitChatType type);
-
+	void PlayAdviserErrorMessage(const RaceDef& race, AdvisorErrorMessageType message);
 	void PlayUISound(const AudioClip& clip);
 
 	void ClearAudio(EntityManager& em);

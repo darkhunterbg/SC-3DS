@@ -101,11 +101,8 @@ void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 		if (cmd.targetType == PlayerCommandTargetType::CancelBuildQueue) {
 			for (int j = 0; j < cmd.entityCount; ++j) {
 				EntityId id = cmd.entities[j];
-				const auto& unit = *em.UnitArchetype.DataComponents.GetComponent(id).RemoveFromQueue(cmd.target.itemId);
-
-				if (cmd.target.itemId == 0) {
-					em.GetPlayerSystem().AddMinerals(cmd.playerId, unit.MineralCost);
-				}
+			
+				em.GetUnitSystem().DequeueItem(id, cmd.target.itemId, em);
 			}
 			continue;
 		}
@@ -158,10 +155,9 @@ void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 
 			for (int j = 0; j < cmd.entityCount; ++j) {
 				EntityId id = cmd.entities[j];
-				em.UnitArchetype.DataComponents.GetComponent(id).EnqueueProduce(unit);
-				if (em.UnitArchetype.DataComponents.GetComponent(id).queueSize == 1) {
-					em.GetPlayerSystem().AddMinerals(cmd.playerId, -unit.MineralCost);
-				}
+
+				em.GetUnitSystem().EnqueueBuildUpdateCheck(id,unit);
+
 			}
 			break;
 		}
@@ -225,7 +221,7 @@ void CommandProcessor::ReplayFromFile(const char* filename, EntityManager& em)
 
 	if (size > 0)
 	{
-		uint32_t latest = buffer[size-1].frameId;
+		uint32_t latest = buffer[size - 1].frameId;
 
 		int counter = 0;
 

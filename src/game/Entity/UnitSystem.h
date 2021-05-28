@@ -9,6 +9,12 @@
 class EntityManager;
 
 class UnitSystem {
+	struct BuildUpdateData {
+		const UnitDef* def = nullptr;
+		EntityId id;
+		bool paid;
+	};
+
 private:
 	std::vector<UnitStateMachineChangeData> exitStateData;
 	std::vector<UnitStateMachineChangeData> enterStateData;
@@ -16,6 +22,9 @@ private:
 
 	std::vector<UnitAIEnterStateData> aiEnterStateData;
 	std::vector<UnitAIThinkData> aiThinkData;
+
+
+	std::vector<BuildUpdateData> unitBuildUpdate;
 
 public:
 	UnitSystem();
@@ -26,4 +35,11 @@ public:
 	void UpdateUnitStats(EntityManager& em);
 
 	void UpdateBuilding(EntityManager& em);
+
+	void DequeueItem(EntityId id, int itemId, EntityManager& em);
+
+	inline void EnqueueBuildUpdateCheck(EntityId id, const UnitDef& def, bool paid = false)
+	{
+		unitBuildUpdate.push_back({ &def, id, paid });
+	}
 };

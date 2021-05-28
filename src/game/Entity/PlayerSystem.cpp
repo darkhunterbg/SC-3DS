@@ -11,7 +11,16 @@ static constexpr const uint8_t TileVisibilityTimer = 40;
 bool PlayerInfo::HasEnoughSupply(const UnitDef& unit) const
 {
 	int available = std::min(GetMaxSupply(), (int)providedSupplyDoubled);
-	return available - (usedSupplyDoubled) >= unit.UseSupplyDoubled;
+	available -= usedSupplyDoubled + reserverdSupplyDoubled;
+	return available  >= unit.UseSupplyDoubled;
+}
+
+
+bool PlayerInfo::HasEnoughSupply(int supplyDoubled) const
+{
+	int available = std::min(GetMaxSupply(), (int)providedSupplyDoubled);
+	available -= usedSupplyDoubled + reserverdSupplyDoubled;
+	return available  >= supplyDoubled;
 }
 
 // ================== Player Vision ==================
@@ -100,6 +109,25 @@ void PlayerSystem::AddGas(PlayerId i, int gas)
 	player.gas += gas;
 	if (player.gas < 0)
 		player.gas = 0;
+}
+
+void PlayerSystem::ReserveSupply(PlayerId player, int supplyDoubled)
+{
+	players[player].reserverdSupplyDoubled += supplyDoubled;
+}
+
+bool PlayerSystem::HasEnoughFreeSupply(PlayerId player, int supplyDoubled) const
+{
+	return players[player].HasEnoughSupply(supplyDoubled);
+}
+bool PlayerSystem::HasEnoughMinerals(PlayerId player, int minerals) const
+{
+	return players[player].minerals >= minerals;
+}
+
+bool PlayerSystem::HasEnoughGas(PlayerId player, int gas) const
+{
+	return players[player].gas >= gas;
 }
 
 

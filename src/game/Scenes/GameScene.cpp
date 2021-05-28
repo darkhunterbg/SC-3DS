@@ -63,7 +63,7 @@ void GameScene::Start() {
 	//}
 
 	EntityId e = UnitEntityUtil::NewUnit(UnitDatabase::CommandCenter, 1,
-		Vector2Int16(256, 256));
+		Vector2Int16(256, 128));
 
 	//entityManager->UnitArchetype.HealthComponents.GetComponent(e).current = 499;
 
@@ -104,7 +104,7 @@ void GameScene::Update() {
 	t++;
 
 	if (t % 60 == 0) {
-		entityManager->GetPlayerSystem().AddMinerals(1, 8);
+		entityManager->GetPlayerSystem().AddMinerals(1, 800);
 		entityManager->GetPlayerSystem().AddGas(1, 8);
 	}
 

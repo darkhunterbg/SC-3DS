@@ -196,6 +196,7 @@ struct UnitDataComponent {
 	uint8_t queueSize = 0;
 	uint16_t queueTimer = 0;
 	Vector2Int16 spawnOffset;
+	bool build = false;
 
 	inline void ResetFireTimer() {
 		internalTimer = 18;
@@ -208,8 +209,10 @@ struct UnitDataComponent {
 		productionQueue[queueSize] = &def;
 
 		++queueSize;
-		if (queueTimer == 0)
+		if (queueTimer == 0) {
 			queueTimer = def.BuildTime;
+			build = false;
+		}
 
 		return true;
 	}
@@ -236,6 +239,9 @@ struct UnitDataComponent {
 		if (queueSize) {
 			queueTimer = productionQueue[0]->BuildTime;
 		}
+		
+		build = false;
+
 		return result;
 	}
 	inline const UnitDef* RemoveFromQueue(int queuePos) {
@@ -253,6 +259,7 @@ struct UnitDataComponent {
 		if (queueSize) {
 			if (queuePos == 0) {
 				queueTimer = productionQueue[0]->BuildTime;
+				build = false;
 			}
 		}
 		else {

@@ -7,6 +7,7 @@
 
 #include "../Platform.h"
 #include "../Util.h"
+#include "../StringLib.h"
 #include "../Entity/EntityUtil.h"
 #include "../Entity/EntityManager.h"
 
@@ -19,6 +20,8 @@ static std::array<Color, 3> RedHPBarColorPalette = { 0xa80808ff, 0xa80808ff, 0x8
 static std::array<Color, 3> GreenHPBarColorPalette = { 0x249824ff, 0x249824ff, 0x249824ff };
 
 static std::vector<PlayerEvent> newEvents;
+
+static constexpr const int MessageTimer = 60 * 3;
 
 GameView::GameView(EntityManager& em, Vector2Int16 mapSizePixels)
 {
@@ -75,11 +78,33 @@ void GameView::ProcessEvents()
 
 	context.GetEntityManager().GetPlayerSystem().GetPlayerEvents(context.player, PlayerEventType::All, newEvents);
 
+	auto& raceDef = *context.race;
+
 	for (const auto& ev : newEvents) {
 		switch (ev.type)
 		{
 		case PlayerEventType::NewUnit: {
 			context.GetEntityManager().GetSoundSystem().PlayUnitChat(ev.source, UnitChatType::Ready);
+			break;
+		}
+		case PlayerEventType::NotEnoughSupply: {
+
+			messageTimer = MessageTimer;
+			stbsp_snprintf(message, sizeof(message), "Not enough %s...build more %s.", raceDef.SupplyNamePlural.data(), raceDef.SupplyBuildingNamePlural.data());
+
+			context.GetEntityManager().GetSoundSystem().PlayAdviserErrorMessage(raceDef,
+				AdvisorErrorMessageType::NotEnoughSupply);
+			break;
+		}
+		case PlayerEventType::NotEnoughMinerals: {
+
+			messageTimer = MessageTimer;
+			stbsp_snprintf(message, sizeof(message), "Not enough minerals...mine more minerals.", raceDef.SupplyNamePlural.data(), raceDef.SupplyBuildingNamePlural.data());
+
+			context.GetEntityManager().GetSoundSystem().PlayAdviserErrorMessage(raceDef,
+				AdvisorErrorMessageType::NotEnoughMinerals);
+			break;
+
 			break;
 		}
 		default:
@@ -202,6 +227,18 @@ void GameView::DrawUpperScreen(const Camera& camera)
 	DrawMarkers(camera);
 	hud->UpperScreenGUI(camera, context);
 	cursor->Draw();
+
+	if (messageTimer > 0) {
+		--messageTimer;
+
+		Vector2Int size = Platform::MeasureString(Game::SystemFont, message, 0.4f);
+
+		Vector2Int pos = { 0,190 };
+		pos.x = (400 - size.x) / 2;
+
+		Platform::DrawText(Game::SystemFont, pos + Vector2Int(1,1), message, Colors::Black, 0.4f);
+		Platform::DrawText(Game::SystemFont, pos, message, Colors::White, 0.4f);
+	}
 }
 
 void GameView::DrawLowerScreen(const Camera& camera)

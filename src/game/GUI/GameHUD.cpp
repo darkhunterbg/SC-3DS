@@ -98,8 +98,8 @@ void GameHUD::UpperScreenGUI(const Camera& camera, GameViewContext& context) {
 	Platform::Draw(sprite, { {0, 240 - sprite.rect.size.y,}, Vector2Int(sprite.rect.size) });
 
 	if (context.IsTargetSelectionMode) {
-		pos = { 0, 240 - sprite.rect.size.y, };
-		pos.y -= sprite.rect.size.y + 2;
+		pos = { 0, 240 - sprite.rect.size.y };
+		pos.y -= 16;
 		pos.x += 160;
 		Platform::DrawText(font, pos + Vector2Int{ 1, 1 }, "Select Target", Colors::Black, 0.4f);
 		Platform::DrawText(font, pos, "Select Target", Colors::UILightGray, 0.4f);

@@ -122,7 +122,9 @@ void UnitAIAttackTargetState::Think(UnitAIThinkData& data, EntityManager& em)
 
 		EntityId target = stateData.target.entityId;
 
-		if (!em.UnitArchetype.Archetype.HasEntity(target))
+		
+
+		if (target == id || !em.UnitArchetype.Archetype.HasEntity(target))
 		{
 			UnitEntityUtil::SetAIState(id, UnitAIState::Idle);
 			continue;

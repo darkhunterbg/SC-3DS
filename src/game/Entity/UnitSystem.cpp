@@ -189,6 +189,53 @@ void UnitSystem::UpdateBuilding(EntityManager& em)
 {
 	spawn.clear();
 
+	for (const auto& cmd : unitBuildUpdate) {
+
+		EntityId id = cmd.id;
+		const UnitDef& unit = *cmd.def;
+
+		auto& data = em.UnitArchetype.DataComponents.GetComponent(id);
+
+		PlayerId playerId = em.UnitArchetype.OwnerComponents.GetComponent(id);
+
+		if (data.build) {
+			if (!data.IsQueueFull()) {
+
+				if (em.GetPlayerSystem().HasEnoughMinerals(playerId, unit.MineralCost)) {
+					data.EnqueueProduce(unit);
+					em.GetPlayerSystem().AddMinerals(playerId, -unit.MineralCost);
+				}
+				else {
+					em.GetPlayerSystem().NewEvent(playerId, PlayerEventType::NotEnoughMinerals, id);
+				}
+			}
+		}
+		else {
+			if ( em.GetPlayerSystem().HasEnoughFreeSupply(playerId, unit.UseSupplyDoubled)) {
+
+				if (cmd.paid || em.GetPlayerSystem().HasEnoughMinerals(playerId, unit.MineralCost)) {
+					if (data.IsQueueEmpty())
+						data.EnqueueProduce(unit);
+					data.build = true;
+
+					if (!cmd.paid)
+						em.GetPlayerSystem().AddMinerals(playerId, -unit.MineralCost);
+
+					em.GetPlayerSystem().ReserveSupply(playerId, unit.UseSupplyDoubled);
+				}
+				else {
+					em.GetPlayerSystem().NewEvent(playerId, PlayerEventType::NotEnoughMinerals, id);
+				}
+			}
+			else {
+				em.GetPlayerSystem().NewEvent(playerId, PlayerEventType::NotEnoughSupply, id);
+			}
+		}
+
+	}
+
+	unitBuildUpdate.clear();
+
 	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {
 
 		UnitDataComponent& data = em.UnitArchetype.DataComponents.GetComponent(id);
@@ -197,13 +244,23 @@ void UnitSystem::UpdateBuilding(EntityManager& em)
 		if (!data.IsQueueEmpty()) {
 			const UnitDef* def = data.productionQueue[0];
 
-			if (!em.GetPlayerSystem().GetPlayerInfo(owner).HasEnoughSupply(*def))
+			if (!data.build) {
+				if (!data.IsQueueEmpty()) {
+					const UnitDef* def = data.productionQueue[0];
+					if (em.GetPlayerSystem().HasEnoughFreeSupply(owner, def->UseSupplyDoubled))
+						EnqueueBuildUpdateCheck(id, *data.productionQueue[0], true);
+				}
 				continue;
+			}
 
 
-			bool completed = data.TickQueue(20);
+			bool completed = data.TickQueue(30);
 			if (completed) {
 				const UnitDef* def = data.Dequeue();
+
+				if (!data.IsQueueEmpty()) {
+					EnqueueBuildUpdateCheck(id, *data.productionQueue[0], true);
+				}
 
 				Rectangle16 iterate = em.CollisionArchetype.ColliderComponents.GetComponent(id)
 					.collider;
@@ -243,7 +300,7 @@ void UnitSystem::UpdateBuilding(EntityManager& em)
 
 					if (!em.GetKinematicSystem().CollidesWithAny(dstCollider, Entity::None))
 					{
-		
+
 						uint8_t orientation = EntityUtil::GetOrientationToPosition(id, pos);
 						spawn.push_back({ def, pos, owner , orientation });
 						break;
@@ -251,7 +308,6 @@ void UnitSystem::UpdateBuilding(EntityManager& em)
 				}
 			}
 		}
-
 	}
 
 	PlayerSystem& ps = em.GetPlayerSystem();
@@ -260,5 +316,38 @@ void UnitSystem::UpdateBuilding(EntityManager& em)
 		EntityId e = UnitEntityUtil::NewUnit(*s.def, s.owner, s.pos);
 		em.OrientationComponents.GetComponent(e) = s.orientation;
 		ps.NewEvent(s.owner, PlayerEventType::NewUnit, e);
+		ps.ReserveSupply(s.owner, -s.def->UseSupplyDoubled);
+	}
+}
+
+void UnitSystem::DequeueItem(EntityId id, int itemId, EntityManager& em)
+{
+	UnitDataComponent& data = em.UnitArchetype.DataComponents.GetComponent(id);
+	PlayerId owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
+
+
+	bool restoreSupply = data.build && itemId == 0;
+	const UnitDef* def = data.RemoveFromQueue(itemId);
+
+	if (def == nullptr)
+		return;
+
+	if (restoreSupply)
+		em.GetPlayerSystem().ReserveSupply(owner, -def->UseSupplyDoubled);
+	em.GetPlayerSystem().AddMinerals(owner, -def->MineralCost);
+
+	if (!data.IsQueueEmpty()) {
+		if (itemId == 0) {
+			def = data.productionQueue[0];
+
+			if (em.GetPlayerSystem().HasEnoughFreeSupply(owner, def->UseSupplyDoubled)) {
+				data.build = true;
+				em.GetPlayerSystem().ReserveSupply(owner, def->UseSupplyDoubled);
+			}
+			else {
+				data.build = false;
+				em.GetPlayerSystem().NewEvent(owner, PlayerEventType::NotEnoughSupply, id);
+			}
+		}
 	}
 }

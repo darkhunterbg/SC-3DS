@@ -37,6 +37,16 @@ enum UnitChatType {
 	Select = 1,
 	Command = 2,
 	Ready = 3,
+	Advisor = 4,
+};
+
+enum AdvisorErrorMessageType {
+	NotEnoughMinerals = 0,
+	NotEnoughGas = 1,
+	NotEnoughSupply = 2,
+	LandingInterrupted = 3,
+	InvalidLandingZone = 4,
+	NotEnoughEnergy = 6,
 };
 
 

@@ -16,6 +16,9 @@ private:
 	GameHUD* hud;
 	Cursor* cursor;
 
+	int messageTimer = 0;
+	char message[128];
+
 	void DrawMarkers(const Camera& camera);
 	void UpdateMarkers();
 	void DrawUnitBars(const Camera& camera);

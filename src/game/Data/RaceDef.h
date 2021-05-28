@@ -25,6 +25,7 @@ struct RaceDef {
 	Sprite SupplyIcon;
 	uint8_t SupplyIconId;
 	std::string SupplyNamePlural;
+	std::string SupplyBuildingNamePlural;
 
 	Sprite GasIcon;
 	uint8_t GasIconId;

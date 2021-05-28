@@ -15,6 +15,8 @@ class EntityManager;
 
 enum class PlayerEventType :uint8_t {
 	NewUnit = 1,
+	NotEnoughSupply = 2,
+	NotEnoughMinerals = 3,
 	All = 0xFF
 };
 
@@ -110,6 +112,7 @@ struct PlayerInfo {
 	int16_t gas = 0;
 	int16_t usedSupplyDoubled = 0;
 	int16_t providedSupplyDoubled = 0;
+	int16_t reserverdSupplyDoubled = 0;
 
 	RaceType race;
 	PlayerId id;
@@ -117,7 +120,7 @@ struct PlayerInfo {
 	bool newEvents = false;
 
 	inline int GetUsedSupply() const {
-		return (usedSupplyDoubled ) >> 1;
+		return (usedSupplyDoubled  + reserverdSupplyDoubled) >> 1;
 	}
 	inline int GetProvidedSupply() const {
 		return providedSupplyDoubled >> 1;
@@ -125,6 +128,7 @@ struct PlayerInfo {
 	inline int GetMaxSupply() const { return 200; }
 
 	bool HasEnoughSupply(const UnitDef& unit) const;
+	bool HasEnoughSupply(int supplyDoubled) const;
 	PlayerInfo(Color32 color, RaceType race, PlayerId id) :
 		color(color), race(race), id(id) {}
 };
@@ -163,6 +167,10 @@ public:
 
 	void AddMinerals(PlayerId player, int minerals);
 	void AddGas(PlayerId player, int gas);
+	void ReserveSupply(PlayerId player, int supplyDoubled);
+	bool HasEnoughFreeSupply(PlayerId player, int supplyDoubled) const;
+	bool HasEnoughMinerals(PlayerId player, int minerals) const;
+	bool HasEnoughGas(PlayerId player, int gas) const;
 
 	void UpdatePlayers(const EntityManager& em);
 	void ResetNewEvents();
