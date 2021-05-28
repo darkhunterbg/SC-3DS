@@ -26,6 +26,7 @@ static void MarineData() {
 	u.SetUseSupply(1);
 	u.Vision = 7;
 	u.Weapon = &WeaponDatabase::GaussRifle;
+	u.MineralCost = 50;
 
 	u.Sounds.Death = { "sound/terran/marine/tmadth", 2 };
 	u.Sounds.What = { "sound/terran/marine/tmawht", 4 };
@@ -52,6 +53,7 @@ static void SCVData() {
 	u.SetUseSupply(1);
 	u.Vision = 7;
 	u.Weapon = &WeaponDatabase::FusionCutter;
+	u.MineralCost = 50;
 
 	u.Sounds.Death = { "sound/terran/scv/tscdth", 1 };
 	u.Sounds.What = { "sound/terran/scv/tscwht", 4 };
@@ -76,6 +78,7 @@ static void CommandCenterData() {
 	u.Armor = 1;
 	u.SetPovideSupply(10);
 	u.IsBuilding = true;
+	u.MineralCost = 400;
 
 	u.Sounds.Death = { "sound/misc/explo4", 1 , true };
 	u.Sounds.What = { "sound/misc/button", 1 , true };
@@ -88,7 +91,7 @@ static void CommandCenterData() {
 	u.ProductionUnit = &UnitDatabase::SCV;
 	u.IconId = 106;
 
-	u.SpawnOffset = { -36,56 };
+	u.SpawnOffset = { 36,56 };
 }
 static void MineralField1Data() {
 	UnitDef& u = UnitDatabase::MineralField1;

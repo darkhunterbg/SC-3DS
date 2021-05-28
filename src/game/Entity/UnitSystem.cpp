@@ -129,7 +129,7 @@ void UnitSystem::UpdateUnitStats(EntityManager& em)
 		auto& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
 		if (unitDataComponent.isBuilding) {
 
-			
+
 			// ========== DIRTY ====================
 
 			//if (healthComponent.current < (healthComponent.max << 4) / 5) {
@@ -183,6 +183,7 @@ struct Spawn {
 };
 
 static std::vector<Spawn> spawn;
+static std::vector<Vector2Int16> testPositions;
 
 void UnitSystem::UpdateBuilding(EntityManager& em)
 {
@@ -191,16 +192,65 @@ void UnitSystem::UpdateBuilding(EntityManager& em)
 	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {
 
 		UnitDataComponent& data = em.UnitArchetype.DataComponents.GetComponent(id);
+		PlayerId owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
 
 		if (!data.IsQueueEmpty()) {
-			bool completed = data.TickQueue(0);
+			const UnitDef* def = data.productionQueue[0];
+
+			if (!em.GetPlayerSystem().GetPlayerInfo(owner).HasEnoughSupply(*def))
+				continue;
+
+
+			bool completed = data.TickQueue(20);
 			if (completed) {
-				const UnitDef* def =data.Dequeue();
-			
-				Vector2Int16 pos = em.PositionComponents.GetComponent(id) + data.spawnOffset;
-				PlayerId owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
-				uint8_t orientation = EntityUtil::GetOrientationToPosition(id, pos);
-				spawn.push_back({ def, pos, owner , orientation});
+				const UnitDef* def = data.Dequeue();
+				// TODO: part of player system: auto calculate
+				em.GetPlayerSystem().FreeReservedSupply(owner, *def);
+
+				Rectangle16 iterate = em.CollisionArchetype.ColliderComponents.GetComponent(id)
+					.collider;
+
+				iterate.position += em.PositionComponents.GetComponent(id);
+
+				Vector2Int16 bound = def->Graphics->Collider.size;
+
+				iterate.position = iterate.position - bound / 2;
+				iterate.size = iterate.size + bound;
+				//iterate.position
+				//iterate.size += bound;
+
+				testPositions.clear();
+
+				for (int x = bound.x; x < iterate.size.x; x += bound.x + 1) {
+					Vector2Int16 pos = Vector2Int16(x, iterate.size.y) + iterate.position;
+					testPositions.push_back(pos);
+				}
+				for (int y = iterate.size.y; y > bound.y; y -= bound.y + 3) {
+					Vector2Int16 pos = Vector2Int16(iterate.size.x, y) + iterate.position;
+					testPositions.push_back(pos);
+				}
+				for (int x = iterate.size.x; x > 0; x -= bound.x + 1) {
+					Vector2Int16 pos = Vector2Int16(x, -1) + iterate.position;
+					testPositions.push_back(pos);
+				}
+				for (int y = -1; y < iterate.size.y; y += bound.y + 3) {
+					Vector2Int16 pos = Vector2Int16(-1, y) + iterate.position;
+					testPositions.push_back(pos);
+				}
+
+				for (Vector2Int16 pos : testPositions)
+				{
+					Rectangle16 dstCollider = def->Graphics->Collider;
+					dstCollider.SetCenter(pos);
+
+					if (!em.GetKinematicSystem().CollidesWithAny(dstCollider, Entity::None))
+					{
+		
+						uint8_t orientation = EntityUtil::GetOrientationToPosition(id, pos);
+						spawn.push_back({ def, pos, owner , orientation });
+						break;
+					}
+				}
 			}
 		}
 

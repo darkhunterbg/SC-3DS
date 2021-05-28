@@ -78,12 +78,38 @@ void CommandProcessor::UseAbility(PlayerId player, const std::vector<EntityId>& 
 	GenerateCommands(cmd, group);
 }
 
+void CommandProcessor::CancelBuildQueue(PlayerId player, const std::vector<EntityId>& group, uint8_t queuePos)
+{
+	PlayerCommand cmd;
+
+	cmd.frameId = frame;
+	cmd.playerId = player;
+	cmd.abilityId = 0;
+	cmd.target.itemId = queuePos;
+	cmd.targetType = PlayerCommandTargetType::CancelBuildQueue;
+
+	GenerateCommands(cmd, group);
+}
+
 void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 {
 	int add = sizeof(PlayerCommand);
 
 	for (int i = lastExecuted; i < commands.size(); ++i) {
 		const PlayerCommand& cmd = commands[i];
+
+		if (cmd.targetType == PlayerCommandTargetType::CancelBuildQueue) {
+			for (int j = 0; j < cmd.entityCount; ++j) {
+				EntityId id = cmd.entities[j];
+				const auto& unit = *em.UnitArchetype.DataComponents.GetComponent(id).RemoveFromQueue(cmd.target.itemId);
+
+				if (cmd.target.itemId == 0) {
+					em.GetPlayerSystem().FreeReservedSupply(cmd.playerId,unit);
+					em.GetPlayerSystem().AddMinerals(cmd.playerId, unit.MineralCost);
+				}
+			}
+			continue;
+		}
 
 		const auto& ability = *AbilityDatabase::Abilities[cmd.abilityId];
 
@@ -129,18 +155,18 @@ void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 			break;
 		}
 		case  PlayerCommandTargetType::UnitType: {
-
-
 			const UnitDef& unit = *UnitDatabase::Units[cmd.target.itemId];
 
 			for (int j = 0; j < cmd.entityCount; ++j) {
 				EntityId id = cmd.entities[j];
-
 				em.UnitArchetype.DataComponents.GetComponent(id).EnqueueProduce(unit);
+				if (em.UnitArchetype.DataComponents.GetComponent(id).queueSize == 1) {
+					em.GetPlayerSystem().ReserveSupply(cmd.playerId, unit);
+					em.GetPlayerSystem().AddMinerals(cmd.playerId, -unit.MineralCost);
+				}
 			}
 			break;
 		}
-
 		}
 
 	}

@@ -237,7 +237,29 @@ struct UnitDataComponent {
 			queueTimer = productionQueue[0]->BuildTime;
 		}
 		return result;
-	
+	}
+	inline const UnitDef* RemoveFromQueue(int queuePos) {
+		if (queuePos >= queueSize)
+			return nullptr;
+
+		const UnitDef* result = productionQueue[queuePos];
+
+		for (int i = queuePos + 1; i < queueSize; ++i) {
+			productionQueue[i - 1] = productionQueue[i];
+		}
+
+		--queueSize;
+
+		if (queueSize) {
+			if (queuePos == 0) {
+				queueTimer = productionQueue[0]->BuildTime;
+			}
+		}
+		else {
+			queueTimer = 0;
+		}
+
+		return result;
 	}
 
 	inline void FromDef(const UnitDef& def) {

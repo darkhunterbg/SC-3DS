@@ -61,6 +61,8 @@ public:
 	void ActivateCurrentAbility(Vector2Int16 position);
 	void ActivateCurrentAbility(const UnitDef& produce);
 
+	void CancelBuildQueue(int queuePos);
+
 	void SelectAbilityTarget(const AbilityDef& def);
 	void CancelTargetSelection();
 

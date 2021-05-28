@@ -83,6 +83,11 @@ void GameViewContext::ActivateCurrentAbility(const UnitDef& produce)
 	CancelTargetSelection();
 }
 
+void GameViewContext::CancelBuildQueue(int queuePos)
+{
+	GetEntityManager().GetCommandProcessor().CancelBuildQueue(player, selection.GetEntities(), queuePos);
+}
+
 void GameViewContext::SelectAbilityTarget(const AbilityDef& def)
 {
 	currentAbility = &def;

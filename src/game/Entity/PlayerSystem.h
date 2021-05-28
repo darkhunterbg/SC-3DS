@@ -101,19 +101,21 @@ struct PlayerInfo {
 	int16_t gas = 0;
 	int16_t usedSupplyDoubled = 0;
 	int16_t providedSupplyDoubled = 0;
+	int16_t reservedDoubled = 0;
 
 	RaceType race;
 
 	PlayerId id;
 
 	inline int GetUsedSupply() const {
-		return usedSupplyDoubled >> 1;
+		return (usedSupplyDoubled + reservedDoubled) >> 1;
 	}
 	inline int GetProvidedSupply() const {
 		return providedSupplyDoubled >> 1;
 	}
 	inline int GetMaxSupply() const { return 200; }
 
+	bool HasEnoughSupply(const UnitDef& unit) const;
 	PlayerInfo(Color32 color, RaceType race, PlayerId id) :
 		color(color), race(race), id(id) {}
 };
@@ -148,6 +150,9 @@ public:
 	void AddMinerals(PlayerId player, int minerals);
 	void AddGas(PlayerId player, int gas);
 
+	void ReserveSupply(PlayerId player, const UnitDef& unit);
+	void FreeReservedSupply(PlayerId player, const UnitDef& unit);
+		
 	void UpdatePlayerUnits(const EntityManager& em);
 	bool UpdateNextPlayerVision(int players = 256);
 };

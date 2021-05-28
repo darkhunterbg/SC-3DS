@@ -217,6 +217,12 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 	Rectangle dst;
 	dst.position = pos;
 
+
+	Vector2Int pointerPos = { 0,0 };
+	if (Game::Pointer.IsPressed()) {
+		pointerPos = Game::Pointer.Position();
+	}
+
 	for (int i = 0; i < data.productionQueue.size(); ++i) {
 
 		dst.size = Vector2Int(f.rect.size);
@@ -245,6 +251,10 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 			nDst.position += (dst.size - nDst.size) / 2;
 
 			Platform::Draw(n, nDst);
+		}
+
+		if (dst.Contains(pointerPos)) {
+			context.CancelBuildQueue(i);
 		}
 
 		if (i == 0 || i == data.productionQueue.size() - 1)

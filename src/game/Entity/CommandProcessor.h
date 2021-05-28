@@ -16,6 +16,7 @@ enum class PlayerCommandTargetType : uint8_t  {
 	Entity,
 	Position,
 	UnitType,
+	CancelBuildQueue
 };
 
 struct PlayerCommand {
@@ -52,6 +53,8 @@ public:
 	void UseAbility(PlayerId player,  const std::vector<EntityId>& group, const AbilityDef& ability, Vector2Int16 target);
 	void UseAbility(PlayerId player, const std::vector<EntityId>& group, const AbilityDef& ability, EntityId target);
 	void UseAbility(PlayerId player, const std::vector<EntityId>& group, const AbilityDef& ability, const UnitDef& target);
+
+	void CancelBuildQueue(PlayerId player, const std::vector<EntityId>& group, uint8_t queuePos);
 
 	void ExecuteQueuedCommands(EntityManager& em);
 

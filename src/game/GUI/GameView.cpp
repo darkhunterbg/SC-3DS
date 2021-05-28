@@ -105,6 +105,7 @@ void GameView::ContextualGamepadInput() {
 	else {
 
 		if (Game::Gamepad.IsButtonReleased(GamepadButton::A)) {
+
 			if (entity == Entity::None) {
 				context.ActivateAbility(&AbilityDatabase::Attack, position);
 			}
@@ -120,18 +121,43 @@ void GameView::ContextualGamepadInput() {
 		}
 
 		if (Game::Gamepad.IsButtonReleased(GamepadButton::B)) {
-			context.ActivateAbility(&AbilityDatabase::Stop);
-			commandTrigged = true;
+
+			EntityId id = context.GetPriorityUnitSelected();
+
+			const auto& data = context.GetEntityManager().UnitArchetype.DataComponents.GetComponent(id);
+			if (data.isBuilding) {
+				if (!data.IsQueueEmpty()) {
+					context.CancelBuildQueue(data.queueSize - 1);
+				}
+			}
+			else {
+				context.ActivateAbility(&AbilityDatabase::Stop);
+				commandTrigged = true;
+			}
 		}
 
 		if (Game::Gamepad.IsButtonReleased(GamepadButton::X)) {
-			if (entity == Entity::None)
-				context.ActivateAbility(&AbilityDatabase::Move, position);
-			else
-				context.ActivateAbility(&AbilityDatabase::Move, entity);
 
-			commandTrigged = true;
-			commandHasTarget = true;
+			EntityId id = context.GetPriorityUnitSelected();
+
+			const auto& data = context.GetEntityManager().UnitArchetype.DataComponents.GetComponent(id);
+			if (data.isBuilding) {
+				const auto& def = *context.GetEntityManager().UnitArchetype.UnitComponents.GetComponent(id).def;
+				if (!data.IsQueueFull() && def.ProductionUnit != nullptr) {
+					context.ActivateAbility(&AbilityDatabase::BuildUnit,
+						*def.ProductionUnit);
+				}
+			}
+			else {
+
+				if (entity == Entity::None)
+					context.ActivateAbility(&AbilityDatabase::Move, position);
+				else
+					context.ActivateAbility(&AbilityDatabase::Move, entity);
+
+				commandTrigged = true;
+				commandHasTarget = true;
+			}
 		}
 	}
 

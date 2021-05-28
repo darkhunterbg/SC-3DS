@@ -388,7 +388,7 @@ struct Rectangle16
 
 	inline Vector2Int16 GetCenter() const
 	{
-		return position + size >> 1;
+		return position + (size >> 1);
 	}
 	inline void SetCenter(Vector2Int16 center)
 	{

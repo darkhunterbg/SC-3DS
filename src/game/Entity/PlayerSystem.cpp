@@ -7,6 +7,13 @@
 
 static constexpr const uint8_t TileVisibilityTimer = 40;
 
+
+bool PlayerInfo::HasEnoughSupply(const UnitDef& unit) const
+{
+	int available = std::min(400, (int)providedSupplyDoubled);
+	return available - (usedSupplyDoubled+ reservedDoubled) >= unit.UseSupplyDoubled;
+}
+
 // ================== Player Vision ==================
 
 void PlayerVision::SetGridSize(Vector2Int16 size) {
@@ -92,6 +99,18 @@ void PlayerSystem::AddGas(PlayerId i, int gas)
 	player.gas += gas;
 	if (player.gas < 0)
 		player.gas = 0;
+}
+
+void PlayerSystem::ReserveSupply(PlayerId i, const UnitDef& unit)
+{
+	auto& player = players[i];
+	player.reservedDoubled += unit.UseSupplyDoubled;
+}
+
+void PlayerSystem::FreeReservedSupply(PlayerId i, const UnitDef& unit)
+{
+	auto& player = players[i];
+	player.reservedDoubled -= unit.UseSupplyDoubled;
 }
 
 void PlayerSystem::UpdatePlayerUnits(const EntityManager& em) {
@@ -266,3 +285,4 @@ void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
 	}
 	//JobSystem::RunJob(vision.ranges.size(), vision.ranges.size(), UpdatePlayerVisionJob);
 }
+

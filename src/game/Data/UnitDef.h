@@ -22,6 +22,8 @@ struct UnitDef {
 	uint8_t Armor = 0;
 	uint16_t BuildTime = 0;
 
+	uint16_t MineralCost = 0;
+
 	bool IsBuilding = false;
 	bool IsResourceContainer = false;
 
