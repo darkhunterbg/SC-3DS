@@ -10,6 +10,7 @@ enum class UnitState : uint8_t {
 	Movement = 2,
 	Attacking = 3,
 	Death = 4,
+	Producing = 5,
 };
 
 enum class UnitAIState :uint8_t {

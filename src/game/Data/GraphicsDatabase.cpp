@@ -204,6 +204,12 @@ static void CommandCenterResources() {
 	d.IdleAnimationDef.GenerateAnimations(a, as, d.IdleAnimations);
 	d.DeathAfterEffect.Def.GenerateAnimation(ad,  d.DeathAfterEffect.Clip);
 
+	d.MovementGlowAnimationDef.GenerateAnimations(a, d.MovementGlowAnimations);
+	d.MovementGlowAnimationDef.GenerateAnimations(a, d.MovementGlowAnimations);
+	d.MovementGlowAnimationDef.GenerateAnimations(a, d.MovementGlowAnimations);
+	d.MovementGlowAnimationDef.FrameStart = 0;
+	d.MovementGlowAnimationDef.GenerateAnimations(a, d.MovementGlowAnimations);
+
 	d.Selection.Atlas = SpriteDatabase::Load_unit_thingy_o146();
 	d.Wireframe.Atlas = SpriteDatabase::Load_unit_wirefram_wirefram_106();
 }
@@ -221,6 +227,12 @@ static void CommandCenterData() {
 	d.DeathAfterEffect.Def.FrameStart = 0;
 	d.DeathAfterEffect.Def.FrameCount = 13;
 	d.DeathAfterEffect.Def.FrameTime = 2;
+
+	d.MovementGlowAnimationDef.FrameStart = 12;
+	d.MovementGlowAnimationDef.FrameCount = 1;
+	d.MovementGlowAnimationDef.Directions = 1;
+	d.MovementGlowAnimationDef.FrameTime = 1;
+	d.MovementGlowAnimationDef.Looping = true;
 
 	d.LoadResourcesAction = CommandCenterResources;
 

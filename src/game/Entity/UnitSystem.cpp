@@ -241,8 +241,17 @@ void UnitSystem::UpdateBuilding(EntityManager& em)
 		UnitDataComponent& data = em.UnitArchetype.DataComponents.GetComponent(id);
 		PlayerId owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
 
+	
+
 		if (!data.IsQueueEmpty()) {
 			const UnitDef* def = data.productionQueue[0];
+
+			auto& state = em.UnitArchetype.StateComponents.GetComponent(id);
+
+			if (state != UnitState::Producing) {
+				state = UnitState::Producing;
+				em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
+			}
 
 			if (!data.build) {
 				if (!data.IsQueueEmpty()) {
@@ -254,12 +263,16 @@ void UnitSystem::UpdateBuilding(EntityManager& em)
 			}
 
 
-			bool completed = data.TickQueue(30);
+			bool completed = data.TickQueue(1);
 			if (completed) {
 				const UnitDef* def = data.Dequeue();
 
 				if (!data.IsQueueEmpty()) {
 					EnqueueBuildUpdateCheck(id, *data.productionQueue[0], true);
+				}
+				else {
+					state = UnitState::Idle;
+					em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
 				}
 
 				Rectangle16 iterate = em.CollisionArchetype.ColliderComponents.GetComponent(id)
@@ -308,6 +321,7 @@ void UnitSystem::UpdateBuilding(EntityManager& em)
 				}
 			}
 		}
+
 	}
 
 	PlayerSystem& ps = em.GetPlayerSystem();
@@ -349,5 +363,10 @@ void UnitSystem::DequeueItem(EntityId id, int itemId, EntityManager& em)
 				em.GetPlayerSystem().NewEvent(owner, PlayerEventType::NotEnoughSupply, id);
 			}
 		}
+	}
+	else {
+		auto& state = em.UnitArchetype.StateComponents.GetComponent(id);
+		state = UnitState::Idle;
+		em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
 	}
 }
