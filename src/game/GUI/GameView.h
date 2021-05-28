@@ -28,6 +28,8 @@ public:
 
 	void Update(Camera& camera);
 
+	void ProcessEvents();
+
 	void DrawUpperScreen(const Camera& camera);
 	void DrawLowerScreen(const Camera& camera);
 

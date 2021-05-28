@@ -10,8 +10,8 @@ static constexpr const uint8_t TileVisibilityTimer = 40;
 
 bool PlayerInfo::HasEnoughSupply(const UnitDef& unit) const
 {
-	int available = std::min(400, (int)providedSupplyDoubled);
-	return available - (usedSupplyDoubled+ reservedDoubled) >= unit.UseSupplyDoubled;
+	int available = std::min(GetMaxSupply(), (int)providedSupplyDoubled);
+	return available - (usedSupplyDoubled) >= unit.UseSupplyDoubled;
 }
 
 // ================== Player Vision ==================
@@ -37,7 +37,7 @@ void PlayerVision::SetGridSize(Vector2Int16 size) {
 // ================== Player System ==================
 
 PlayerSystem::PlayerSystem() {
-	
+
 }
 
 void PlayerSystem::SetSize(Vector2Int16 size)
@@ -64,6 +64,7 @@ PlayerId PlayerSystem::AddPlayer(const RaceDef& race, Color color)
 	players.push_back(PlayerInfo(Color32(color), race.Type, id));
 	playerVision.push_back(new PlayerVision());
 	playerVision[id]->SetGridSize(gridSize);
+	playerEvents.push_back(PlayerEventCollection());
 
 	return id;
 }
@@ -101,19 +102,8 @@ void PlayerSystem::AddGas(PlayerId i, int gas)
 		player.gas = 0;
 }
 
-void PlayerSystem::ReserveSupply(PlayerId i, const UnitDef& unit)
-{
-	auto& player = players[i];
-	player.reservedDoubled += unit.UseSupplyDoubled;
-}
 
-void PlayerSystem::FreeReservedSupply(PlayerId i, const UnitDef& unit)
-{
-	auto& player = players[i];
-	player.reservedDoubled -= unit.UseSupplyDoubled;
-}
-
-void PlayerSystem::UpdatePlayerUnits(const EntityManager& em) {
+void PlayerSystem::UpdatePlayers(const EntityManager& em) {
 	for (PlayerVision* vision : playerVision) {
 		vision->ranges.clear();
 	}
@@ -143,6 +133,7 @@ void PlayerSystem::UpdatePlayerUnits(const EntityManager& em) {
 
 		playerVision[owner]->ranges.push_back({ position, data.vision });
 	}
+	
 }
 
 static PlayerSystem* s;
@@ -157,7 +148,7 @@ void PlayerSystem::UpdateNextPlayerVisionJob(int start, int end) {
 
 bool PlayerSystem::UpdateNextPlayerVision(int players) {
 	s = this;
-	
+
 	int max = std::min((int)playerVision.size(), playerUpdate + players);
 
 	JobSystem::RunJob(max - playerUpdate, 1, UpdateNextPlayerVisionJob);
@@ -286,3 +277,30 @@ void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
 	//JobSystem::RunJob(vision.ranges.size(), vision.ranges.size(), UpdatePlayerVisionJob);
 }
 
+void PlayerSystem::NewEvent(PlayerId player, PlayerEventType type, EntityId source)
+{
+	playerEvents[player].push_back({ source, player,type, });
+}
+
+void PlayerSystem::GetPlayerEvents(PlayerId player, PlayerEventType type, std::vector<PlayerEvent>& outEvents)
+{
+	for (const auto& ev : playerEvents[player]) {
+		if ((uint8_t)ev.type & (uint8_t)type) {
+			outEvents.push_back(ev);
+		}
+	}
+}
+
+void PlayerSystem::FinishCollectingEvents()
+{
+	newEventsReady = true;
+}
+
+void PlayerSystem::ResetNewEvents()
+{
+	newEventsReady = false;
+
+	for (PlayerEventCollection& collection : playerEvents) {
+		collection.clear();
+	}
+}

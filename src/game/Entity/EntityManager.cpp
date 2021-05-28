@@ -164,12 +164,16 @@ void EntityManager::UpdateChildren() {
 // Updates 12 per second (60 fps) 
 void EntityManager::Update0() {
 
+	playerSystem.ResetNewEvents();
+
 	playerSystem.UpdateNextPlayerVision();
 
 	//soundSystem.UpdateEntityAudio(camera, *this);
 }
 // Updates 24 per second (60 fps) 
 void EntityManager::Update1() {
+
+	playerSystem.ResetNewEvents();
 
 	playerSystem.UpdateNextPlayerVision();
 
@@ -198,6 +202,8 @@ void EntityManager::Update2() {
 
 	unitSystem.ApplyUnitState(*this);
 
+	playerSystem.FinishCollectingEvents();
+
 	kinematicSystem.MoveEntities(*this);
 
 	UpdateChildren();
@@ -210,13 +216,14 @@ void EntityManager::Update2() {
 
 	CollectEntityChanges();
 
-	playerSystem.UpdatePlayerUnits(*this);
+	playerSystem.UpdatePlayers(*this);
 	mapSystem.UpdateMap(*this, changedData);
 	renderSystem.UpdatePositions(*this, changedData);
 	kinematicSystem.UpdateCollidersPosition(*this, changedData);
 	kinematicSystem.ApplyCollidersChange(*this);
 
 	ApplyEntityChanges();
+
 
 	++logicalFrame;
 

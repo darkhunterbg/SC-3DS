@@ -245,4 +245,6 @@ public:
 	inline EntityId PointCast(Vector2Int16 point) {
 		return kinematicSystem.PointCast(point);
 	}
+
+
 };

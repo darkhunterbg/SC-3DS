@@ -104,7 +104,6 @@ void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 				const auto& unit = *em.UnitArchetype.DataComponents.GetComponent(id).RemoveFromQueue(cmd.target.itemId);
 
 				if (cmd.target.itemId == 0) {
-					em.GetPlayerSystem().FreeReservedSupply(cmd.playerId,unit);
 					em.GetPlayerSystem().AddMinerals(cmd.playerId, unit.MineralCost);
 				}
 			}
@@ -161,7 +160,6 @@ void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 				EntityId id = cmd.entities[j];
 				em.UnitArchetype.DataComponents.GetComponent(id).EnqueueProduce(unit);
 				if (em.UnitArchetype.DataComponents.GetComponent(id).queueSize == 1) {
-					em.GetPlayerSystem().ReserveSupply(cmd.playerId, unit);
 					em.GetPlayerSystem().AddMinerals(cmd.playerId, -unit.MineralCost);
 				}
 			}

@@ -204,8 +204,6 @@ void UnitSystem::UpdateBuilding(EntityManager& em)
 			bool completed = data.TickQueue(20);
 			if (completed) {
 				const UnitDef* def = data.Dequeue();
-				// TODO: part of player system: auto calculate
-				em.GetPlayerSystem().FreeReservedSupply(owner, *def);
 
 				Rectangle16 iterate = em.CollisionArchetype.ColliderComponents.GetComponent(id)
 					.collider;
@@ -256,9 +254,11 @@ void UnitSystem::UpdateBuilding(EntityManager& em)
 
 	}
 
+	PlayerSystem& ps = em.GetPlayerSystem();
+
 	for (const Spawn& s : spawn) {
 		EntityId e = UnitEntityUtil::NewUnit(*s.def, s.owner, s.pos);
 		em.OrientationComponents.GetComponent(e) = s.orientation;
-		em.GetSoundSystem().PlayUnitChat(e, UnitChatType::Ready);
+		ps.NewEvent(s.owner, PlayerEventType::NewUnit, e);
 	}
 }

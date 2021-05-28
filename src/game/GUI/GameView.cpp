@@ -18,6 +18,8 @@ static std::array<Color, 3> YellowHPBarColorPalette = { 0xfccc2cff, 0xdc9434ff, 
 static std::array<Color, 3> RedHPBarColorPalette = { 0xa80808ff, 0xa80808ff, 0x840404ff };
 static std::array<Color, 3> GreenHPBarColorPalette = { 0x249824ff, 0x249824ff, 0x249824ff };
 
+static std::vector<PlayerEvent> newEvents;
+
 GameView::GameView(EntityManager& em, Vector2Int16 mapSizePixels)
 {
 	cursor = new Cursor();
@@ -48,6 +50,8 @@ void GameView::Update(Camera& camera)
 	UpdateMarkers();
 	ContextualGamepadInput();
 
+	if (context.GetEntityManager().GetPlayerSystem().NewEventsReady())
+		ProcessEvents();
 
 	auto& renderSystem = context.GetEntityManager().GetRenderSystem();
 	renderSystem.ClearSelection();
@@ -63,6 +67,25 @@ void GameView::Update(Camera& camera)
 
 	renderSystem.AddSelection(context.selection.GetEntities(), context.selectionColor);
 
+}
+
+void GameView::ProcessEvents()
+{
+	newEvents.clear();
+
+	context.GetEntityManager().GetPlayerSystem().GetPlayerEvents(context.player, PlayerEventType::All, newEvents);
+
+	for (const auto& ev : newEvents) {
+		switch (ev.type)
+		{
+		case PlayerEventType::NewUnit: {
+			context.GetEntityManager().GetSoundSystem().PlayUnitChat(ev.source, UnitChatType::Ready);
+			break;
+		}
+		default:
+			break;
+		}
+	}
 }
 
 void GameView::UpdateMarkers() {

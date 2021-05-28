@@ -13,8 +13,17 @@
 
 class EntityManager;
 
+enum class PlayerEventType :uint8_t {
+	NewUnit = 1,
+	All = 0xFF
+};
 
-typedef std::vector<UnitDataComponent> PlayerUnits;
+struct PlayerEvent {
+	EntityId source;
+	PlayerId player;
+	PlayerEventType type;
+};
+
 
 class PlayerVision {
 public:
@@ -101,14 +110,14 @@ struct PlayerInfo {
 	int16_t gas = 0;
 	int16_t usedSupplyDoubled = 0;
 	int16_t providedSupplyDoubled = 0;
-	int16_t reservedDoubled = 0;
 
 	RaceType race;
-
 	PlayerId id;
 
+	bool newEvents = false;
+
 	inline int GetUsedSupply() const {
-		return (usedSupplyDoubled + reservedDoubled) >> 1;
+		return (usedSupplyDoubled ) >> 1;
 	}
 	inline int GetProvidedSupply() const {
 		return providedSupplyDoubled >> 1;
@@ -120,13 +129,18 @@ struct PlayerInfo {
 		color(color), race(race), id(id) {}
 };
 
+
 class PlayerSystem {
+	typedef std::vector<PlayerEvent> PlayerEventCollection;
+
 private:
 	Vector2Int16 gridSize;
 	int playerUpdate = 0;
+	bool newEventsReady = false;
 
 	std::vector<PlayerInfo> players;
 	std::vector<PlayerVision*> playerVision;
+	std::vector<PlayerEventCollection> playerEvents;
 
 	static void UpdatePlayerVisionTimers(PlayerVision& vision);
 	static void UpdatePlayerVision(PlayerVision& vision);
@@ -150,9 +164,13 @@ public:
 	void AddMinerals(PlayerId player, int minerals);
 	void AddGas(PlayerId player, int gas);
 
-	void ReserveSupply(PlayerId player, const UnitDef& unit);
-	void FreeReservedSupply(PlayerId player, const UnitDef& unit);
-		
-	void UpdatePlayerUnits(const EntityManager& em);
+	void UpdatePlayers(const EntityManager& em);
+	void ResetNewEvents();
 	bool UpdateNextPlayerVision(int players = 256);
+
+	void NewEvent(PlayerId player, PlayerEventType type, EntityId source);
+	void GetPlayerEvents(PlayerId player, PlayerEventType type, std::vector<PlayerEvent>& outEvents);
+	void FinishCollectingEvents();
+
+	inline bool NewEventsReady() const { return newEventsReady; }
 };
