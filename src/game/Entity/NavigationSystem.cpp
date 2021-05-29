@@ -32,10 +32,10 @@ static  int Evaluate(uint8_t d, uint8_t v, Vector2Int16 pos, const Rectangle16& 
 	{
 		int dist = ((nav.target - pos)).LengthSquaredInt();
 
-		if (dist > 64)
-			dist -= d << 2 == nav.targetHeading ? 64 : 0;
+		if (dist > 16 * 16)
+			dist -= d << 2 == nav.targetHeading ? 16 * 16 : 0;
 		else
-			dist -= d << 2 == nav.targetHeading ? v << 2 : 0;
+			dist -= d << 2 == nav.targetHeading ? v * v : 0;
 
 		return dist;
 	}

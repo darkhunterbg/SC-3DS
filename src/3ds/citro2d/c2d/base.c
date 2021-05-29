@@ -336,15 +336,15 @@ void C2Di_CalcQuad(C2Di_Quad* quad, const C2D_DrawParams* params)
 	quad->botRight[0] = -params->center.x + w;
 	quad->botRight[1] = -params->center.y + h;
 
-	if (params->angle != 0.0f)
-	{
-		float rsin = sinf(params->angle);
-		float rcos = cosf(params->angle);
-		C2Di_RotatePoint(quad->topLeft, rsin, rcos);
-		C2Di_RotatePoint(quad->topRight, rsin, rcos);
-		C2Di_RotatePoint(quad->botLeft, rsin, rcos);
-		C2Di_RotatePoint(quad->botRight, rsin, rcos);
-	}
+	//if (params->angle != 0.0f)
+	//{
+	//	float rsin = sinf(params->angle);
+	//	float rcos = cosf(params->angle);
+	//	C2Di_RotatePoint(quad->topLeft, rsin, rcos);
+	//	C2Di_RotatePoint(quad->topRight, rsin, rcos);
+	//	C2Di_RotatePoint(quad->botLeft, rsin, rcos);
+	//	C2Di_RotatePoint(quad->botRight, rsin, rcos);
+	//}
 
 	quad->topLeft[0] += params->pos.x;
 	quad->topLeft[1] += params->pos.y;
@@ -359,12 +359,12 @@ void C2Di_CalcQuad(C2Di_Quad* quad, const C2D_DrawParams* params)
 bool C2D_DrawImage(C2D_Image img, const C2D_DrawParams* params, const C2D_ImageTint* tint)
 {
 	C2Di_Context* ctx = C2Di_GetContext();
-	if (!(ctx->flags & C2DiF_Active))
-		return false;
-	if (6 > (ctx->vtxBufSize - ctx->vtxBufPos))
-		return false;
+	//if (!(ctx->flags & C2DiF_Active))
+	//	return false;
+	//if (6 > (ctx->vtxBufSize - ctx->vtxBufPos))
+	//	return false;
 
-	C2Di_SetCircle(false);
+	//C2Di_SetCircle(false);
 	C2Di_SetTex(img.tex);
 	C2Di_Update();
 
@@ -385,27 +385,29 @@ bool C2D_DrawImage(C2D_Image img, const C2D_DrawParams* params, const C2D_ImageT
 		C2Di_SwapUV(tcTopLeft, tcTopRight);
 		C2Di_SwapUV(tcBotLeft, tcBotRight);
 	}
-	if (params->pos.h < 0)
-	{
-		C2Di_SwapUV(tcTopLeft, tcBotLeft);
-		C2Di_SwapUV(tcTopRight, tcBotRight);
-	}
+	//if (params->pos.h < 0)
+	//{
+	//	C2Di_SwapUV(tcTopLeft, tcBotLeft);
+	//	C2Di_SwapUV(tcTopRight, tcBotRight);
+	//}
 
 	// Calculate colors
 	static const C2D_Tint s_defaultTint = { 0xFFFFFFFF, 0.0f };
-	const C2D_Tint* tintTopLeft = tint ? &tint->corners[C2D_TopLeft] : &s_defaultTint;
-	const C2D_Tint* tintTopRight = tint ? &tint->corners[C2D_TopRight] : &s_defaultTint;
-	const C2D_Tint* tintBotLeft = tint ? &tint->corners[C2D_BotLeft] : &s_defaultTint;
-	const C2D_Tint* tintBotRight = tint ? &tint->corners[C2D_BotRight] : &s_defaultTint;
+	const C2D_Tint* t = tint ? &tint->corners[C2D_TopLeft] : &s_defaultTint;
+
+	//const C2D_Tint* tintTopLeft = tint ? &tint->corners[C2D_TopLeft] : &s_defaultTint;
+	//const C2D_Tint* tintTopRight = tint ? &tint->corners[C2D_TopRight] : &s_defaultTint;
+	//const C2D_Tint* tintBotLeft = tint ? &tint->corners[C2D_BotLeft] : &s_defaultTint;
+	//const C2D_Tint* tintBotRight = tint ? &tint->corners[C2D_BotRight] : &s_defaultTint;
 
 	// Draw triangles
-	C2Di_AppendVtx(quad.topLeft[0], quad.topLeft[1], params->depth, tcTopLeft[0], tcTopLeft[1], 0, tintTopLeft->blend, tintTopLeft->color);
-	C2Di_AppendVtx(quad.botLeft[0], quad.botLeft[1], params->depth, tcBotLeft[0], tcBotLeft[1], 0, tintBotLeft->blend, tintBotLeft->color);
-	C2Di_AppendVtx(quad.botRight[0], quad.botRight[1], params->depth, tcBotRight[0], tcBotRight[1], 0, tintBotRight->blend, tintBotRight->color);
+	C2Di_AppendVtx(quad.topLeft[0], quad.topLeft[1], params->depth, tcTopLeft[0], tcTopLeft[1], 0, 0, t->color);
+	C2Di_AppendVtx(quad.botLeft[0], quad.botLeft[1], params->depth, tcBotLeft[0], tcBotLeft[1], 0, 0, t->color);
+	C2Di_AppendVtx(quad.botRight[0], quad.botRight[1], params->depth, tcBotRight[0], tcBotRight[1], 0, 0, t->color);
 
-	C2Di_AppendVtx(quad.topLeft[0], quad.topLeft[1], params->depth, tcTopLeft[0], tcTopLeft[1], 0, tintTopLeft->blend, tintTopLeft->color);
-	C2Di_AppendVtx(quad.botRight[0], quad.botRight[1], params->depth, tcBotRight[0], tcBotRight[1], 0, tintBotRight->blend, tintBotRight->color);
-	C2Di_AppendVtx(quad.topRight[0], quad.topRight[1], params->depth, tcTopRight[0], tcTopRight[1], 0, tintTopRight->blend, tintTopRight->color);
+	C2Di_AppendVtx(quad.topLeft[0], quad.topLeft[1], params->depth, tcTopLeft[0], tcTopLeft[1], 0, 0, t->color);
+	C2Di_AppendVtx(quad.botRight[0], quad.botRight[1], params->depth, tcBotRight[0], tcBotRight[1], 0, 0, t->color);
+	C2Di_AppendVtx(quad.topRight[0], quad.topRight[1], params->depth, tcTopRight[0], tcTopRight[1], 0, 0, t->color);
 
 	return true;
 }

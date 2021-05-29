@@ -300,7 +300,7 @@ void UnitAIGatherResoureState::Think(UnitAIThinkData& data, EntityManager& em)
 
 		Vector2Int16 target = collider.Closest(pos);
 
-		if ((target - pos).LengthSquaredInt() > 250) {
+		if ((target - pos).LengthSquaredInt() > 300) {
 			TryMoveToPosition(id, pos, target, em);
 		}
 		else {

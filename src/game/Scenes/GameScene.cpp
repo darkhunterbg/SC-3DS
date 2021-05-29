@@ -71,7 +71,7 @@ void GameScene::Start() {
 	//	Vector2Int16(48, 48));
 
 	int i = 0;
-	for (int y = 1; y > 0; --y) {
+	for (int y = 2; y > 0; --y) {
 		for (int x = 1; x > 0; --x) {
 			Color c = color[(i) % 12];
 			auto& def = *UnitDatabase::Units[1];
@@ -98,10 +98,10 @@ void GameScene::Update() {
 
 	t++;
 
-	if (t % 60 == 0) {
-		entityManager->GetPlayerSystem().AddMinerals(1, 8);
-		entityManager->GetPlayerSystem().AddGas(1, 8);
-	}
+	//if (t % 60 == 0) {
+	//	entityManager->GetPlayerSystem().AddMinerals(1, 8);
+	//	entityManager->GetPlayerSystem().AddGas(1, 8);
+	//}
 
 	view->Update(camera);
 

@@ -36,8 +36,8 @@ static void ShowTitleScreen() {
 	Platform::Draw(title->GetSprite(0), { {0,0},{400,240} });
 }
 static void InitialScene() {
-	Game::SetCurrentScene(new GameScene());
-	//Game::SetCurrentScene(new PerformanceTestScene());
+	//Game::SetCurrentScene(new GameScene());
+	Game::SetCurrentScene(new PerformanceTestScene());
 }
 
 void Game::FrameStart() {

@@ -10,6 +10,9 @@
 #include <cstring>
 
 void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
+
+	SectionProfiler p("CameraCull");
+
 	renderData.clear();
 
 	// TODO: second camera cull for more accurate sprite culling???
@@ -190,6 +193,8 @@ void RenderSystem::Draw(const Camera& camera, EntityManager& em) {
 	Rectangle16 camRect = camera.GetRectangle16();
 
 	CameraCull(camRect, em);
+
+	SectionProfiler p("EntityDraw");
 
 	render.clear();
 
