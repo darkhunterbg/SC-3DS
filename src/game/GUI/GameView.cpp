@@ -305,6 +305,9 @@ void GameView::DrawUnitBars(const Camera& camera) {
 
 		UnitHealthComponent health = em.UnitArchetype.HealthComponents.GetComponent(id);
 
+		if (health.IsInvulnerable())
+			continue;
+
 		auto* palette = &GreenHPBarColorPalette;
 
 		int hpBarsVisible = (int)std::ceil(((float)health.current * barSize) / (float)health.max);

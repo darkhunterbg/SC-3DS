@@ -59,17 +59,22 @@ namespace AssetBatcher
 				"unit/wirefram/wirefram/000",
 				"unit/wirefram/grpwire/000");
 
-
 			T3SFoldersWithName("unit/wirefram/wirefram/106",
 				"unit/wirefram/wirefram/106",
 				"unit/wirefram/grpwire/106");
-
 
 			T3SFoldersWithName("unit/wirefram/wirefram/007",
 				"unit/wirefram/wirefram/007",
 				"unit/wirefram/grpwire/007");
 
+			T3SFolders("unit/wirefram/wirefram");
+			T3SFolders("unit/wirefram/grpwire");
+			//"unit/wirefram/wirefram/176",
+			//"unit/wirefram/grpwire/176");
+
 			T3SFoldersWithName("unit/thingy/o146", "unit/thingy/o146", "unit/thingy/od146");
+
+			T3SFoldersWithName("unit/thingy/o072", "unit/thingy/o072", "unit/thingy/od072");
 
 			T3SFolders("unit/cmdbtns/tcmdbtns");
 			T3SFolders("unit/cmdbtns/pcmdbtns");
@@ -173,7 +178,7 @@ namespace AssetBatcher
 			T3SFoldersWithName(null, folders);
 		}
 
-		static void T3SFoldersWithName(string name, params string[] folders)
+		static void T3SFoldersWithName(string name,  params string[] folders)
 		{
 			if (string.IsNullOrEmpty(name))
 				name = folders[0];
@@ -197,7 +202,7 @@ namespace AssetBatcher
 
 					string path = Path.GetFullPath($"../../data_out/{src}");
 					paths.Add(path);
-					foreach (var f in Directory.GetFiles(path, "*.png", SearchOption.AllDirectories))
+					foreach (var f in Directory.GetFiles(path, "*.png", SearchOption.TopDirectoryOnly))
 					{
 						s.WriteLine("..\\data_out\\" + f.Substring(root.Length + 1));
 					}

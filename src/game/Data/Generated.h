@@ -29,7 +29,10 @@ public:
 	static SpriteFrameAtlas* unit_wirefram_wirefram_000;
 	static SpriteFrameAtlas* unit_wirefram_wirefram_106;
 	static SpriteFrameAtlas* unit_wirefram_wirefram_007;
+	static SpriteFrameAtlas* unit_wirefram_wirefram;
+	static SpriteFrameAtlas* unit_wirefram_grpwire;
 	static SpriteFrameAtlas* unit_thingy_o146;
+	static SpriteFrameAtlas* unit_thingy_o072;
 	static SpriteFrameAtlas* unit_cmdbtns_tcmdbtns;
 	static SpriteFrameAtlas* unit_cmdbtns_pcmdbtns;
 	static SpriteFrameAtlas* unit_cmdbtns_zcmdbtns;
@@ -55,7 +58,10 @@ public:
 	static const SpriteFrameAtlas* Load_unit_wirefram_wirefram_000();
 	static const SpriteFrameAtlas* Load_unit_wirefram_wirefram_106();
 	static const SpriteFrameAtlas* Load_unit_wirefram_wirefram_007();
+	static const SpriteFrameAtlas* Load_unit_wirefram_wirefram();
+	static const SpriteFrameAtlas* Load_unit_wirefram_grpwire();
 	static const SpriteFrameAtlas* Load_unit_thingy_o146();
+	static const SpriteFrameAtlas* Load_unit_thingy_o072();
 	static const SpriteFrameAtlas* Load_unit_cmdbtns_tcmdbtns();
 	static const SpriteFrameAtlas* Load_unit_cmdbtns_pcmdbtns();
 	static const SpriteFrameAtlas* Load_unit_cmdbtns_zcmdbtns();

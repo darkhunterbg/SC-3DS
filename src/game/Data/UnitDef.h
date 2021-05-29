@@ -14,7 +14,7 @@ struct UnitDef {
 	uint16_t Id = 0;
 	std::string Name;
 	std::string Title;
-	unsigned Health = 100;
+	uint16_t Health = 100;
 	uint8_t MovementSpeed = 1;
 	uint8_t Acceleration = 0;
 	uint8_t RotationSpeed = 1;

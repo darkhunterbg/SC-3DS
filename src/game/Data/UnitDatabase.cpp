@@ -96,7 +96,7 @@ static void CommandCenterData() {
 static void MineralField1Data() {
 	UnitDef& u = UnitDatabase::MineralField1;
 	u.Name = "Mineral Field";
-	u.Health = 100000;
+	u.Health = 0xFFFF;
 	u.MovementSpeed = 0;
 	u.RotationSpeed = 0;
 	u.Vision = 0;

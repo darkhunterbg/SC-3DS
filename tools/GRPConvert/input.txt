@@ -14,6 +14,10 @@ wireframe unit\wirefram\grpwire.grp
 wireframe unit\wirefram\wirefram.grp
 
 palette Units
+unit\wirefram\wirefram.grp
+unit\wirefram\grpwire.grp
+
+palette Units
 unit\bullet\*.grp
 
 palette Units

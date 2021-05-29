@@ -198,6 +198,8 @@ struct UnitDataComponent {
 	Vector2Int16 spawnOffset;
 	bool build = false;
 
+	uint16_t resources = 0;
+
 	inline void ResetFireTimer() {
 		internalTimer = 18;
 	}
@@ -274,6 +276,8 @@ struct UnitDataComponent {
 		supplyProvides = def.ProvideSupplyDoubled;
 		vision = def.Vision + 1;
 		isBuilding = def.IsBuilding;
+		if (def.IsResourceContainer)
+			resources = 1500;
 		spawnOffset = def.SpawnOffset;
 		queueSize = 0;
 		queueTimer = 0;
@@ -287,7 +291,12 @@ struct UnitHealthComponent {
 	uint16_t max = 1;
 	uint8_t armor = 0;
 
+	inline bool IsInvulnerable() const { return max == 0xFFFF; }
+
 	inline bool Reduce(uint16_t value) {
+		if (IsInvulnerable())
+			return 0;
+
 		uint16_t dmg = std::max((int)value - (int)armor, 1);
 		uint16_t damage = std::min(dmg, current);
 		bool kill = damage == current;
@@ -295,6 +304,9 @@ struct UnitHealthComponent {
 		return damage && kill;
 	}
 	inline bool ReduceUnmitigated(uint16_t value) {
+		if (IsInvulnerable())
+			return 0;
+
 		uint16_t damage = std::min(value, current);
 		bool kill = damage == current;
 		current -= damage;

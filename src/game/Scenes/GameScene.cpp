@@ -54,8 +54,8 @@ void GameScene::Start() {
 	view->SetPlayer(1, race);
 
 
-	//UnitEntityUtil::NewUnit(UnitDatabase::MineralField1, 0,
-	//	Vector2Int16(128, 256));
+	UnitEntityUtil::NewUnit(UnitDatabase::MineralField1, 0,
+		Vector2Int16(128, 256));
 
 	for (int i = 0; i < 1; ++i) {
 		UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 2,

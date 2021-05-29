@@ -31,7 +31,9 @@ static EntityId DetectNearbyEnemy(EntityId id, Vector2Int16 pos, PlayerId owner,
 			if (e == id)
 				continue;
 
-			if (em.UnitArchetype.OwnerComponents.GetComponent(e) != owner) {
+			PlayerId enemyOwner = em.UnitArchetype.OwnerComponents.GetComponent(e);
+
+			if (enemyOwner && enemyOwner != owner) {
 
 				int t = (em.PositionComponents.GetComponent(e) - pos).LengthSquaredInt();
 				if (t < nearest)

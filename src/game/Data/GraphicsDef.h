@@ -59,10 +59,12 @@ struct UnitGraphicsDef {
 
 	struct {
 		const SpriteFrameAtlas* Atlas = nullptr;
-	
 
-		inline const SpriteFrame& GetBase() const { return Atlas->GetFrame(0); }
-		inline const SpriteFrame& GetPart(int i) const { return Atlas->GetFrame(i + 1); }
+		int offset = 0;
+		int parts = 4;
+
+		inline const SpriteFrame& GetBase() const { return Atlas->GetFrame(offset); }
+		inline const SpriteFrame& GetPart(int i) const { return Atlas->GetFrame(i + offset + 1); }
 
 		inline const SpriteFrame& GetGroupBase() const { return Atlas->GetFrame(GroupOffset); }
 		inline const SpriteFrame& GetGroupPart(int i) const { return Atlas->GetFrame(GroupOffset + i + 1); }

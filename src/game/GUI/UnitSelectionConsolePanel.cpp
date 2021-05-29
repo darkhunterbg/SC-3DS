@@ -67,6 +67,19 @@ void UnitSelectionConsolePanel::Draw(GameViewContext& context)
 		else if (!unit.def->IsBuilding) {
 			DrawUnitDetail(detailSpace, entityId, unit, context);
 		}
+		else if (unit.def->IsResourceContainer) {
+
+
+			if (data.resources > 0) {
+				stbsp_snprintf(buffer, sizeof(buffer), "Minerals: %i", data.resources);
+
+				const UnitDataComponent& data = context.GetEntityManager().UnitArchetype.DataComponents.GetComponent(entityId);
+
+				Vector2Int off = detailSpace.position;
+				off += { 30,10};
+				Platform::DrawText(Game::SystemFont,  off, buffer, Colors::UILightGray, 0.4f);
+			}
+		}
 	}
 }
 
@@ -274,7 +287,7 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 
 
 	Platform::DrawText(font, pos + Vector2Int{ 68, 4 }, "Building", Colors::UILightGray, 0.4f);
-	
+
 
 	const Sprite& pb = Game::AssetLoader.LoadAtlas("game_gui.t3x")->GetSprite(0);
 
@@ -291,7 +304,7 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 	if (progress == 0)
 		return;
 
-	for (int i = 0; i <= progress ; i += 3) {
+	for (int i = 0; i <= progress; i += 3) {
 
 		Platform::DrawRectangle(dst, Color32(Colors::UIDarkGreen));
 		dst.position.x += 3;
@@ -315,6 +328,7 @@ void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, con
 	int offset = 40;
 	Platform::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, Colors::UILightGray, 0.4f);
 	pos.y += 18;
+
 
 	// ======================== Upgrades ==========================
 
@@ -365,52 +379,66 @@ void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, EntityId entityId,
 	Rectangle wireframe = space;
 	wireframe.size.y = 64;
 
-	Rectangle stats = space;
-	stats.position.y += wireframe.size.y;
-	stats.size.y -= wireframe.size.y;
 
-	Vector2Int pos = stats.position + Vector2Int{ stats.size.x / 2, 0 };
+	if (!health.IsInvulnerable())
+	{
+		Rectangle stats = space;
+		stats.position.y += wireframe.size.y;
+		stats.size.y -= wireframe.size.y;
 
-	Color hpColor = Colors::UIGreen;
+		Vector2Int pos = stats.position + Vector2Int{ stats.size.x / 2, 0 };
 
-	if (health.current <= (health.max / 3)) {
-		hpColor = Colors::UIRed;
+		Color hpColor = Colors::UIGreen;
+
+		if (health.current <= (health.max / 3)) {
+			hpColor = Colors::UIRed;
+		}
+		else if (health.current <= (health.max * 2) / 3) {
+			hpColor = Colors::UIYellow;
+		}
+
+		int len = stbsp_snprintf(buffer, sizeof(buffer), "%i/%i", health.current, health.max);
+		int offset = Platform::MeasureString(font, buffer, 0.35f).x;
+		Platform::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, hpColor, 0.35f);
+
+		//pos.y += 10;
+
+		//len = stbsp_snprintf(buffer, sizeof(buffer), "%i/%i", 200, 250);
+		// offset = Platform::MeasureString(font, buffer, 0.35f).x;
+		//Platform::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, Colors::White, 0.35f);
 	}
-	else if (health.current <= (health.max * 2) / 3) {
-		hpColor = Colors::UIYellow;
-	}
-
-	int len = stbsp_snprintf(buffer, sizeof(buffer), "%i/%i", health.current, health.max);
-	int offset = Platform::MeasureString(font, buffer, 0.35f).x;
-	Platform::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, hpColor, 0.35f);
-
-	//pos.y += 10;
-
-	//len = stbsp_snprintf(buffer, sizeof(buffer), "%i/%i", 200, 250);
-	// offset = Platform::MeasureString(font, buffer, 0.35f).x;
-	//Platform::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, Colors::White, 0.35f);
 
 	// ================== Wireframe ========================
 
-	Color wfColor[4];
-	GetUnitWireframeColors(entityId, health, wfColor);
-
-	const auto& wfBase = unit.def->Graphics->Wireframe.GetBase();
-
-	/*
-	Rectangle wfDst = wireframe;
-	wfDst.position += Vector2Int(wfBase.offset);
-	wfDst.size = Vector2Int(wfBase.sprite.rect.size);
-	Platform::Draw(wfBase.sprite, wfDst);
-	*/
-
-	for (int i = 0; i < 4; ++i) {
-		const auto& wfPart = unit.def->Graphics->Wireframe.GetPart(i);
-
+	if (unit.def->Graphics->Wireframe.parts == 1) {
+		const auto& wfPart = unit.def->Graphics->Wireframe.GetBase();
 		Rectangle wfDst = wireframe;
 		wfDst.position += Vector2Int(wfPart.offset);
 		wfDst.size = Vector2Int(wfPart.sprite.rect.size);
-		Platform::Draw(wfPart.sprite, wfDst, wfColor[i]);
+		Platform::Draw(wfPart.sprite, wfDst, Colors::White);
+	}
+	else {
+
+		Color wfColor[4];
+		GetUnitWireframeColors(entityId, health, wfColor);
+
+		const auto& wfBase = unit.def->Graphics->Wireframe.GetBase();
+
+		/*
+		Rectangle wfDst = wireframe;
+		wfDst.position += Vector2Int(wfBase.offset);
+		wfDst.size = Vector2Int(wfBase.sprite.rect.size);
+		Platform::Draw(wfBase.sprite, wfDst);
+		*/
+
+		for (int i = 0; i < 4; ++i) {
+			const auto& wfPart = unit.def->Graphics->Wireframe.GetPart(i);
+
+			Rectangle wfDst = wireframe;
+			wfDst.position += Vector2Int(wfPart.offset);
+			wfDst.size = Vector2Int(wfPart.sprite.rect.size);
+			Platform::Draw(wfPart.sprite, wfDst, wfColor[i]);
+		}
 	}
 }
 

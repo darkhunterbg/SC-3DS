@@ -254,6 +254,9 @@ static void MineralsResources() {
 
 	d.RenderSize = Vector2Int16(as->FrameSize);
 	d.IdleAnimationDef.GenerateAnimations(a, as, d.IdleAnimations);
+
+	d.Selection.Atlas = SpriteDatabase::Load_unit_thingy_o072();
+	d.Wireframe.Atlas = SpriteDatabase::Load_unit_wirefram_wirefram();
 }
 static void MineralsData() {
 	UnitGraphicsDef& d = GraphicsDatabase::Minerals1;
@@ -267,6 +270,13 @@ static void MineralsData() {
 	d.IdleAnimationDef.MultiDirectional = false;
 
 	d.LoadResourcesAction = MineralsResources;
+
+	d.Selection.VecticalOffset = 6;
+	d.Selection.BarSize = 18;
+
+	d.Wireframe.offset = 176;
+	d.Wireframe.parts = 1;
+	//d.Selection.BarVerticalOffset = 54;
 }
 
 // ==============================================================================
