@@ -23,6 +23,7 @@ enum class UnitAIState :uint8_t {
 	Patrol = 5,
 	Follow = 6,
 	GatherResource = 7,
+	ReturnCargo = 8,
 
 	Nothing = 0xFF,
 };

@@ -40,6 +40,7 @@ public:
 	static SpriteFrameAtlas* unit_thingy_ofirec;
 	static SpriteFrameAtlas* unit_thingy_ofirev;
 	static SpriteFrameAtlas* unit_thingy_ofiref;
+	static SpriteFrameAtlas* unit_neutral_orechunk;
 
 	static const SpriteFrameAtlas* Load_unit_terran_marine();
 	static const SpriteFrameAtlas* Load_unit_terran_tmashad();
@@ -69,4 +70,5 @@ public:
 	static const SpriteFrameAtlas* Load_unit_thingy_ofirec();
 	static const SpriteFrameAtlas* Load_unit_thingy_ofirev();
 	static const SpriteFrameAtlas* Load_unit_thingy_ofiref();
+	static const SpriteFrameAtlas* Load_unit_neutral_orechunk();
 };

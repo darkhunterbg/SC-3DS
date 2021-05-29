@@ -1,11 +1,13 @@
 #include "UnitAIStateMachine.h"
 #include "EntityUtil.h"
 #include "EntityManager.h"
+#include "../Data/GraphicsDatabase.h"
 
 
 std::vector<IUnitAIState*> UnitAIStateMachine::States = {
 	new UnitAIIdleState(), new UnitAIAttackTargetState(), new UnitAIGoToState(), new UnitAIGoToAttackState(),
-	new UnitAIHoldPositionState(), new UnitAIPatrolState(), new UnitAIFollowState(), new UnitAIGatherResoureState()
+	new UnitAIHoldPositionState(), new UnitAIPatrolState(), new UnitAIFollowState(), new UnitAIGatherResoureState(),
+	new UnitAIReturnCargoState()
 };
 
 static std::vector<EntityId> scratch;
@@ -312,8 +314,73 @@ void UnitAIGatherResoureState::Think(UnitAIThinkData& data, EntityManager& em)
 			}
 			else {
 				if (!em.FlagComponents.GetComponent(id).test(ComponentFlags::UpdateTimers)) {
-					UnitEntityUtil::SetAIState(id, UnitAIState::Idle);
+
+					auto e2 = em.NewEntity();
+					em.PositionComponents.NewComponent(e2, pos);
+					em.FlagComponents.NewComponent(e2);
+					em.RenderArchetype.RenderComponents.GetComponent(e2).depth = 0;
+					em.RenderArchetype.Archetype.AddEntity(e2);
+					em.AnimationArchetype.Archetype.AddEntity(e2);
+					em.AnimationArchetype.OrientationArchetype.Archetype.AddEntity(e2);
+					em.AnimationArchetype.OrientationArchetype.AnimOrientationComponents.GetComponent(e2)
+						.clips = GraphicsDatabase::MineralOre.Animations;
+
+					//em.ParentArchetype.Archetype.AddEntity(id);
+					em.ParentArchetype.ChildComponents.GetComponent(id).AddChild(e2);
+
+					em.UnitArchetype.UnitComponents.GetComponent(id).cargo = e2;
+				/*	em.FlagComponents.GetComponent(e2).set(ComponentFlags::RenderEnabled);
+					em.FlagComponents.GetComponent(e2).set(ComponentFlags::RenderChanged);*/
+
+					EntityUtil::SetRenderFromAnimationClip(e2, GraphicsDatabase::MineralOre.Animations[0], 0);
+					UnitEntityUtil::SetAIState(id, UnitAIState::ReturnCargo);
 				}
+			}
+		}
+	}
+}
+
+void UnitAIReturnCargoState::Think(UnitAIThinkData& data, EntityManager& em)
+{
+	int start = 0, end = data.size();
+
+	for (int i = start; i < end; ++i) {
+		EntityId id = data.entities[i];
+		const auto& pos = data.position[i];
+		const auto& owner = data.owner[i];
+		const auto& stateData = data.stateData[i];
+
+		scratch.clear();
+
+		em.GetKinematicSystem().CircleCast({ pos, { 10 << 5 } }, scratch);
+
+		for (EntityId t : scratch) {
+			if (em.UnitArchetype.OwnerComponents.GetComponent(t) != owner)
+				continue;
+
+			if (em.UnitArchetype.UnitComponents[t].def->IsResourceDepot) {
+
+				Rectangle16 collider = em.CollisionArchetype.ColliderComponents.GetComponent(t).collider;
+				collider.position += em.PositionComponents.GetComponent(t);
+
+				Vector2Int16 target = collider.Closest(pos);
+				Vector2Int16 len = target - pos;
+				if ((len).LengthSquaredInt() > 250) {
+					TryMoveToPosition(id, pos, target, em);
+				}
+				else {
+					em.GetPlayerSystem().AddMinerals(owner, 8);
+					EntityId c = em.UnitArchetype.UnitComponents.GetComponent(id).cargo;
+					em.DeleteEntity(c);
+					em.UnitArchetype.UnitComponents.GetComponent(id).cargo = Entity::None;
+					em.ParentArchetype.ChildComponents.GetComponent(id).RemoveChild(c);
+
+					em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Idle;
+					em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
+					UnitEntityUtil::SetAIState(id, UnitAIState::GatherResource, stateData.target.entityId);
+				}
+
+				continue;
 			}
 		}
 	}

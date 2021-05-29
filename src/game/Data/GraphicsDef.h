@@ -20,6 +20,11 @@ struct SpriteAtlasDef {
 	void Load();
 };
 
+struct GraphicsDef {
+	AnimationClip Animations[32];
+	DirectionalAnimationDef Def;
+};
+
 struct UnitGraphicsDef {
 	Vector2Int16 RenderSize;
 	Rectangle16 Collider;

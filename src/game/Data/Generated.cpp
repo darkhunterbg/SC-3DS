@@ -30,6 +30,7 @@ SpriteFrameAtlas* SpriteDatabase::unit_cmdbtns_cmdicons;
 SpriteFrameAtlas* SpriteDatabase::unit_thingy_ofirec;
 SpriteFrameAtlas* SpriteDatabase::unit_thingy_ofirev;
 SpriteFrameAtlas* SpriteDatabase::unit_thingy_ofiref;
+SpriteFrameAtlas* SpriteDatabase::unit_neutral_orechunk;
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_marine() {
 	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_terran_marine.t3x");
@@ -2390,6 +2391,32 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_ofiref() {
 	a->SetOffset(21, Vector2Int(8,13));
 	a->SetOffset(22, Vector2Int(9,18));
 	a->SetOffset(23, Vector2Int(9,13));
+
+	return a;
+}
+
+const SpriteFrameAtlas* SpriteDatabase::Load_unit_neutral_orechunk() {
+	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_neutral_orechunk.t3x");
+	auto* a = unit_neutral_orechunk = new SpriteFrameAtlas(atlas);
+	a->FrameSize = Vector2Int(32, 32);
+
+	a->SetOffset(0, Vector2Int(9,9));
+	a->SetOffset(1, Vector2Int(9,9));
+	a->SetOffset(2, Vector2Int(10,10));
+	a->SetOffset(3, Vector2Int(10,10));
+	a->SetOffset(4, Vector2Int(9,9));
+	a->SetOffset(5, Vector2Int(9,9));
+	a->SetOffset(6, Vector2Int(9,9));
+	a->SetOffset(7, Vector2Int(9,9));
+	a->SetOffset(8, Vector2Int(10,8));
+	a->SetOffset(9, Vector2Int(10,8));
+	a->SetOffset(10, Vector2Int(7,7));
+	a->SetOffset(11, Vector2Int(7,7));
+	a->SetOffset(12, Vector2Int(7,7));
+	a->SetOffset(13, Vector2Int(7,7));
+	a->SetOffset(14, Vector2Int(8,8));
+	a->SetOffset(15, Vector2Int(8,8));
+	a->SetOffset(16, Vector2Int(10,8));
 
 	return a;
 }

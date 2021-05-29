@@ -161,6 +161,7 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 
 		UnitAIState state = em.UnitArchetype.AIStateComponents.GetComponent(entityId);
 
+
 		if (unit.def->Weapon) {
 			unitCommands[2].ability = &AbilityDatabase::Attack;
 			unitCommands[2].enabled = true;
@@ -175,8 +176,17 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 			unitCommands[1].enabled = true;
 
 			if (unit.def->GathersResources) {
-				unitCommands[4].ability = &AbilityDatabase::Gather;
-				unitCommands[4].enabled = true;
+
+				if (unit.HasCargo())
+				{
+					unitCommands[4].ability = &AbilityDatabase::ReturnCargo;
+					unitCommands[4].enabled = true;
+
+				}
+				else {
+					unitCommands[4].ability = &AbilityDatabase::Gather;
+					unitCommands[4].enabled = true;
+				}
 			}
 			else {
 				unitCommands[3].ability = &AbilityDatabase::Patrol;

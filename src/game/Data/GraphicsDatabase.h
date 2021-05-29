@@ -11,6 +11,8 @@ struct CursorGraphics {
 	void Load();
 };
 
+
+
 class GraphicsDatabase {
 private:
 	GraphicsDatabase() = delete;
@@ -22,6 +24,8 @@ public:
 		AnimationDef LeftDef, MidDef, RightDef;
 		AnimationClip Left[2], Mid[2], Right[2];
 	}  FireDamage;
+
+	static GraphicsDef MineralOre;
 
 	static UnitGraphicsDef Marine, SCV, CommandCenter, Minerals1;
 

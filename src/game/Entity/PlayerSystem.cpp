@@ -324,6 +324,7 @@ void PlayerSystem::FinishCollectingEvents()
 	newEventsReady = true;
 }
 
+
 void PlayerSystem::ResetNewEvents()
 {
 	newEventsReady = false;

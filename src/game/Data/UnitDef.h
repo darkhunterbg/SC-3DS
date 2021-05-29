@@ -26,6 +26,7 @@ struct UnitDef {
 
 	bool IsBuilding = false;
 	bool IsResourceContainer = false;
+	bool IsResourceDepot = false;
 	bool GathersResources = false;
 
 	uint8_t UseSupplyDoubled = 0;

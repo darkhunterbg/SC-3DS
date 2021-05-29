@@ -7,6 +7,7 @@ UnitGraphicsDef GraphicsDatabase::CommandCenter;
 UnitGraphicsDef GraphicsDatabase::Minerals1;
 CursorGraphics GraphicsDatabase::Cursor;
 GraphicsDatabase::FireDamageStruct GraphicsDatabase::FireDamage;
+GraphicsDef GraphicsDatabase::MineralOre;
 
 std::vector<UnitGraphicsDef*> GraphicsDatabase::Units =
 {
@@ -311,6 +312,12 @@ void GraphicsDatabase::Init()
 
 	FireDamage.RightDef.FrameStart = 12;
 	FireDamage.RightDef.GenerateAnimation(SpriteDatabase::Load_unit_thingy_ofiref(), FireDamage.Right[1]);
+
+
+	MineralOre.Def.FrameCount = 1;
+	MineralOre.Def.FrameTime = 2;
+	MineralOre.Def.Looping = true;
+	MineralOre.Def.GenerateAnimations(SpriteDatabase::Load_unit_neutral_orechunk(), MineralOre.Animations);
 }
 
 void GraphicsDatabase::LoadAllGraphicsResources()

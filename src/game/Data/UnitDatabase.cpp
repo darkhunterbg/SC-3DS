@@ -79,6 +79,7 @@ static void CommandCenterData() {
 	u.Armor = 1;
 	u.SetPovideSupply(10);
 	u.IsBuilding = true;
+	u.IsResourceDepot = true;
 	u.MineralCost = 400;
 
 	u.Sounds.Death = { "sound/misc/explo4", 1 , true };

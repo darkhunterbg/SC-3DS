@@ -86,6 +86,8 @@ namespace AssetBatcher
 			T3SFolders("unit/thingy/ofirev");
 			T3SFolders("unit/thingy/ofiref");
 
+			T3SFolders("unit/neutral/orechunk");
+
 			GeneraSourceCode();
 		}
 

@@ -87,3 +87,7 @@ class UnitAIFollowState : public IUnitAIState {
 class UnitAIGatherResoureState : public IUnitAIState {
 	virtual void Think(UnitAIThinkData& data, EntityManager& em) override;
 };
+
+class UnitAIReturnCargoState : public IUnitAIState {
+	virtual void Think(UnitAIThinkData& data, EntityManager& em) override;
+};

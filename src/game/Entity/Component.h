@@ -99,6 +99,20 @@ struct ChildComponent {
 	inline void AddChild(EntityId child) {
 		children[childCount++] = child;
 	}
+	inline void RemoveChild(EntityId child) {
+		int index = 0xFF;
+		for (int i = 0; i < childCount; ++i) {
+			if (children[i] == child) {
+				index = i;
+				break;
+			}
+		}
+
+		for (int i =index; i < childCount - 1; ++i) {
+			children[i] = children[i + 1];
+		}
+		--childCount;
+	}
 };
 
 struct RenderComponent {
@@ -183,10 +197,12 @@ struct UnitAIStateDataComponent {
 struct UnitComponent {
 	const UnitDef* def;
 	EntityId movementGlowEntity = Entity::None;
+	EntityId cargo = Entity::None;;
 	EntityId fires[3] = { Entity::None, Entity::None, Entity::None };
 	uint16_t kills = 0;
 
 	inline bool HasMovementGlow() const { return movementGlowEntity != Entity::None; }
+	inline bool HasCargo() const { return cargo != Entity::None; }
 };
 
 struct UnitDataComponent {

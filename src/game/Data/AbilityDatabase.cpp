@@ -7,7 +7,8 @@ AbilityDatabase::Attack,
 AbilityDatabase::Patrol,
 AbilityDatabase::HoldPosition,
 AbilityDatabase::BuildUnit,
-AbilityDatabase::Gather;
+AbilityDatabase::Gather,
+AbilityDatabase::ReturnCargo;
 
 std::vector<AbilityDef*> AbilityDatabase::Abilities = {
 	&AbilityDatabase::Move,
@@ -16,7 +17,8 @@ std::vector<AbilityDef*> AbilityDatabase::Abilities = {
 	&AbilityDatabase::Patrol,
 	&AbilityDatabase::HoldPosition,
 	&AbilityDatabase::BuildUnit,
-	&AbilityDatabase::Gather
+	&AbilityDatabase::Gather,
+	&AbilityDatabase::ReturnCargo
 };
 
 static int Id = 0;
@@ -27,9 +29,10 @@ void AbilityDatabase::Init()
 	Stop.Name = "Stop";
 	Attack.Name = "Attack";
 	Patrol.Name = "Patrol";
-	HoldPosition.Name = "HoldPosition";
+	HoldPosition.Name = "Hold Position";
 	BuildUnit.Name = "Build";
 	Gather.Name = "Gather";
+	ReturnCargo.Name = "Return Cargo";
 
 	Move.IconId = 228;
 	Stop.IconId = 229;
@@ -37,6 +40,7 @@ void AbilityDatabase::Init()
 	Patrol.IconId = 254;
 	HoldPosition.IconId = 255;
 	Gather.IconId = 231;
+	ReturnCargo.IconId = 233;
 
 	Move.TargetingData.HasTargetSelection = true;
 	Move.TargetingData.PositionSelectedAction = UnitAIState::GoToPosition;
@@ -56,6 +60,8 @@ void AbilityDatabase::Init()
 	Gather.TargetingData.HasTargetSelection = true;
 	Gather.TargetingData.EntitySelectedAction = (UnitAIState::GatherResource);
 	Gather.TargetingData.PositionSelectedAction = (UnitAIState::GoToPosition);
+
+	ReturnCargo.TargetingData.EntitySelectedAction = (UnitAIState::ReturnCargo);
 
 	const auto& sa = *SpriteDatabase::Load_unit_cmdbtns_cmdicons();
 
