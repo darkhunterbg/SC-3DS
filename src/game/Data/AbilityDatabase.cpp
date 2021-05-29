@@ -6,7 +6,8 @@ AbilityDatabase::Stop,
 AbilityDatabase::Attack,
 AbilityDatabase::Patrol,
 AbilityDatabase::HoldPosition,
-AbilityDatabase::BuildUnit;
+AbilityDatabase::BuildUnit,
+AbilityDatabase::Gather;
 
 std::vector<AbilityDef*> AbilityDatabase::Abilities = {
 	&AbilityDatabase::Move,
@@ -15,6 +16,7 @@ std::vector<AbilityDef*> AbilityDatabase::Abilities = {
 	&AbilityDatabase::Patrol,
 	&AbilityDatabase::HoldPosition,
 	&AbilityDatabase::BuildUnit,
+	&AbilityDatabase::Gather
 };
 
 static int Id = 0;
@@ -27,12 +29,14 @@ void AbilityDatabase::Init()
 	Patrol.Name = "Patrol";
 	HoldPosition.Name = "HoldPosition";
 	BuildUnit.Name = "Build";
+	Gather.Name = "Gather";
 
 	Move.IconId = 228;
 	Stop.IconId = 229;
 	Attack.IconId = 230;
 	Patrol.IconId = 254;
 	HoldPosition.IconId = 255;
+	Gather.IconId = 231;
 
 	Move.TargetingData.HasTargetSelection = true;
 	Move.TargetingData.PositionSelectedAction = UnitAIState::GoToPosition;
@@ -48,6 +52,10 @@ void AbilityDatabase::Init()
 
 	Patrol.TargetingData.HasTargetSelection = true;
 	Patrol.TargetingData.SetAllStates(UnitAIState::Patrol);
+
+	Gather.TargetingData.HasTargetSelection = true;
+	Gather.TargetingData.EntitySelectedAction = (UnitAIState::GatherResource);
+	Gather.TargetingData.PositionSelectedAction = (UnitAIState::GoToPosition);
 
 	const auto& sa = *SpriteDatabase::Load_unit_cmdbtns_cmdicons();
 

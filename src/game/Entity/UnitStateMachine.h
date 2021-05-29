@@ -63,3 +63,10 @@ public:
 	virtual void EnterState(UnitStateMachineChangeData& data, EntityManager& em) override;
 	virtual void ExitState(UnitStateMachineChangeData& data, EntityManager& em) override;
 };
+
+
+class UnitMiningState : public IUnitState {
+public:
+	virtual void EnterState(UnitStateMachineChangeData& data, EntityManager& em) override;
+	virtual void ExitState(UnitStateMachineChangeData& data, EntityManager& em) override;
+};

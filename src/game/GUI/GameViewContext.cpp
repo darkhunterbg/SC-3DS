@@ -194,7 +194,6 @@ void GameViewContext::SelectUnitAtPosition(Vector2Int16 position)
 
 		selectionColor = GetAlliedUnitColor(selection[0]);
 
-
 		CancelTargetSelection();
 	}
 }

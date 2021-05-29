@@ -5,7 +5,7 @@
 
 std::vector<IUnitAIState*> UnitAIStateMachine::States = {
 	new UnitAIIdleState(), new UnitAIAttackTargetState(), new UnitAIGoToState(), new UnitAIGoToAttackState(),
-	new UnitAIHoldPositionState(), new UnitAIPatrolState(), new UnitAIFollowState(),
+	new UnitAIHoldPositionState(), new UnitAIPatrolState(), new UnitAIFollowState(), new UnitAIGatherResoureState()
 };
 
 static std::vector<EntityId> scratch;
@@ -279,5 +279,42 @@ void UnitAIFollowState::Think(UnitAIThinkData& data, EntityManager& em)
 		}
 
 		TryMoveToPosition(id, pos, target, em);
+	}
+}
+
+void UnitAIGatherResoureState::Think(UnitAIThinkData& data, EntityManager& em)
+{
+	int start = 0, end = data.size();
+	for (int i = start; i < end; ++i) {
+		EntityId id = data.entities[i];
+		const auto& pos = data.position[i];
+		const auto& owner = data.owner[i];
+		const auto& stateData = data.stateData[i];
+
+
+		Rectangle16 collider = em.CollisionArchetype.ColliderComponents.GetComponent(stateData.target.entityId).collider;
+
+		collider.position += em.PositionComponents.GetComponent(stateData.target.entityId);
+
+		Vector2Int16 target = collider.Closest(pos);
+
+		if ((target - pos).LengthSquaredInt() > 250) {
+			TryMoveToPosition(id, pos, target, em);
+		}
+		else {
+			auto& state = em.UnitArchetype.StateComponents.GetComponent(id);
+
+			if (state != UnitState::Mining)
+			{
+				em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Mining;
+				em.UnitArchetype.StateDataComponents.GetComponent(id).target.entityId = stateData.target.entityId;
+				em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
+			}
+			else {
+				if (!em.FlagComponents.GetComponent(id).test(ComponentFlags::UpdateTimers)) {
+					UnitEntityUtil::SetAIState(id, UnitAIState::Idle);
+				}
+			}
+		}
 	}
 }

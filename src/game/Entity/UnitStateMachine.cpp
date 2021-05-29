@@ -34,6 +34,7 @@ std::vector<IUnitState*> UnitStateMachine::States = {
 	new UnitAttackingState(),
 	new UnitDeathState(),
 	new UnitProducingState(),
+	new UnitMiningState(),
 };
 
 // ============================ Idle State ====================================
@@ -185,11 +186,11 @@ static void  UnitAttackingEnterStateJob(int start, int end) {
 		flags.set(ComponentFlags::OrientationChanged);
 
 
-		if (unit.HasMovementGlow()) {
-			EntityId glow = unit.movementGlowEntity;
-			em.FlagComponents.GetComponent(glow).clear(ComponentFlags::AnimationEnabled);
-			em.FlagComponents.GetComponent(glow).clear(ComponentFlags::RenderEnabled);
-		}
+		//if (unit.HasMovementGlow()) {
+		//	EntityId glow = unit.movementGlowEntity;
+		//	em.FlagComponents.GetComponent(glow).clear(ComponentFlags::AnimationEnabled);
+		//	em.FlagComponents.GetComponent(glow).clear(ComponentFlags::RenderEnabled);
+		//}
 
 		if (unit.def->Weapon->Sound.TotalClips > 0) {
 			int i = std::rand() % unit.def->Weapon->Sound.TotalClips;
@@ -224,7 +225,6 @@ static void  UnitAttackingEnterStateJob(int start, int end) {
 		targetCollider.Shrink(unit.def->Weapon->TargetEffect[0].GetFrameSize()>> 1);
 
 		Vector2Int16 spawnAt = targetCollider.Closest(em.PositionComponents.GetComponent(id));
-
 
 		EntityId e = scratch[i];
 
@@ -347,4 +347,103 @@ void UnitProducingState::ExitState(UnitStateMachineChangeData& data, EntityManag
 			em.FlagComponents.GetComponent(glow).clear(ComponentFlags::RenderEnabled);
 		}
 	}
+}
+
+
+// ============================  Mining State ====================================
+
+
+void UnitMiningState::EnterState(UnitStateMachineChangeData& data, EntityManager& em)
+{
+	scratch.clear();
+
+	em.NewEntities(data.entities.size(), scratch);
+	em.RenderArchetype.Archetype.AddSortedEntities(scratch);
+	em.AnimationArchetype.Archetype.AddSortedEntities(scratch);
+	em.MapObjectArchetype.Archetype.AddSortedEntities(scratch);
+	em.TimingArchetype.Archetype.AddSortedEntities(scratch);
+
+
+	int start = 0;
+	int end = data.size();
+	for (int i = start; i < end; ++i) {
+		EntityId id = data.entities[i];
+		auto& stateData = em.UnitArchetype.StateDataComponents.GetComponent(id);
+		Vector2Int16 targetPos = em.PositionComponents.GetComponent(stateData.target.entityId);
+		Rectangle16 targetCollider = em.CollisionArchetype.ColliderComponents.GetComponent(stateData.target.entityId).collider;
+
+		targetCollider.position += targetPos;
+
+
+		UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
+		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
+
+		uint8_t orientation = EntityUtil::GetOrientationToPosition(id, targetPos);
+		em.OrientationComponents.GetComponent(id) = orientation;
+
+
+		em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
+			.GetComponent(id).clips = unit.def->Graphics->AttackAnimations;
+
+		flags.set(ComponentFlags::AnimationSetChanged);
+		flags.set(ComponentFlags::AnimationEnabled);
+		flags.set(ComponentFlags::OrientationChanged);
+
+
+		if (unit.def->Weapon->Sound.TotalClips > 0) {
+			int i = std::rand() % unit.def->Weapon->Sound.TotalClips;
+
+			em.SoundArchetype.SourceComponents.GetComponent(id).clip = &unit.def->Weapon->Sound.Clips[i];
+			em.SoundArchetype.SourceComponents.GetComponent(id).priority = unit.def->AudioPriority;
+			flags.set(ComponentFlags::SoundTrigger);
+		}
+
+
+		TimingComponent& timer = em.TimingArchetype.TimingComponents.GetComponent(id);
+		TimingActionComponent& timerAction = em.TimingArchetype.ActionComponents.GetComponent(id);
+
+		timer.NewTimer(TimeUtil::SecondsTime(3));
+		timerAction.action = TimerExpiredAction::Mining;
+		flags.set(ComponentFlags::UpdateTimers);
+
+		// Particle Effect
+		targetCollider.Shrink({ 16,4 });
+		Vector2Int16 spawnAt = targetCollider.Closest(em.PositionComponents.GetComponent(id));
+	
+
+		EntityId e = scratch[i];
+
+		stateData.other.miningEffect = e;
+
+		em.FlagComponents.NewComponent(e).set(ComponentFlags::UpdateTimers);
+		em.FlagComponents.GetComponent(e).set(ComponentFlags::PositionChanged);
+		em.RenderArchetype.RenderComponents.GetComponent(e).depth = 1;
+		em.PositionComponents.NewComponent(e, spawnAt);
+
+		EntityUtil::PlayAnimation(e, unit.def->Weapon->TargetEffect[0]);
+		EntityUtil::SetRenderFromAnimationClip(e, unit.def->Weapon->TargetEffect[0], 0);
+		EntityUtil::SetMapObjectBoundingBoxFromRender(e);
+		em.AnimationArchetype.TrackerComponents.GetComponent(e).looping = true;
+	}
+}
+void UnitMiningState::ExitState(UnitStateMachineChangeData& data, EntityManager& em)
+{
+	int start = 0;
+	int end = data.size();
+
+	scratch.clear();
+
+	for (int i = start; i < end; ++i) {
+		EntityId id = data.entities[i];
+		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
+		flags.clear(ComponentFlags::UpdateTimers);
+
+		auto& stateData = em.UnitArchetype.StateDataComponents.GetComponent(id);
+		scratch.push_back(stateData.other.miningEffect);
+
+		flags.clear(ComponentFlags::SoundTrigger);
+	}
+
+	em.DeleteEntities(scratch, false);
+
 }

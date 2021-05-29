@@ -22,6 +22,7 @@ private:
 	void UnitDeathAfterEffect(std::vector<EntityId>& entities, EntityManager& em);
 	void DeleteEntities( std::vector<EntityId>& entities , EntityManager& em);
 	void WeaponAttack(std::vector<EntityId>& entities, EntityManager& em);
+	void Mining(std::vector<EntityId>& entities, EntityManager& em);
 public:
 	void UpdateTimers(EntityManager& em);
 	void ApplyTimerActions(EntityManager& em);

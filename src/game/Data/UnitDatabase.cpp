@@ -54,6 +54,7 @@ static void SCVData() {
 	u.Vision = 7;
 	u.Weapon = &WeaponDatabase::FusionCutter;
 	u.MineralCost = 50;
+	u.GathersResources = true;
 
 	u.Sounds.Death = { "sound/terran/scv/tscdth", 1 };
 	u.Sounds.What = { "sound/terran/scv/tscwht", 4 };

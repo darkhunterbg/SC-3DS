@@ -34,6 +34,7 @@ void TimingSystem::UpdateTimers(EntityManager& em)
 void TimingSystem::ApplyTimerActions(EntityManager& em) {
 
 	WeaponAttack(GetActionEntityTable(TimerExpiredAction::WeaponAttack), em);
+	Mining(GetActionEntityTable(TimerExpiredAction::Mining), em);
 	UnitDeathAfterEffect(GetActionEntityTable(TimerExpiredAction::UnitDeathAfterEffect), em);
 	DeleteEntities(GetActionEntityTable(TimerExpiredAction::DeleteEntity), em);
 
@@ -45,6 +46,16 @@ void TimingSystem::WeaponAttack(std::vector<EntityId>& entities, EntityManager& 
 	if (entities.size() > 0) {
 		for (EntityId id : entities) {
 			em.FlagComponents.GetComponent(id).clear(ComponentFlags::UnitAIPaused);
+		}
+	}
+}
+
+void TimingSystem::Mining(std::vector<EntityId>& entities, EntityManager& em)
+{
+	if (entities.size() > 0) {
+		for (EntityId id : entities) {
+			auto& flags = em.FlagComponents.GetComponent(id);
+			//flags.set(ComponentFlags::SoundTrigger);
 		}
 	}
 }

@@ -174,12 +174,17 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 			unitCommands[1].ability = &AbilityDatabase::Stop;
 			unitCommands[1].enabled = true;
 
+			if (unit.def->GathersResources) {
+				unitCommands[4].ability = &AbilityDatabase::Gather;
+				unitCommands[4].enabled = true;
+			}
+			else {
+				unitCommands[3].ability = &AbilityDatabase::Patrol;
+				unitCommands[3].enabled = true;
 
-			unitCommands[3].ability = &AbilityDatabase::Patrol;
-			unitCommands[3].enabled = true;
-
-			unitCommands[4].ability = &AbilityDatabase::HoldPosition;
-			unitCommands[4].enabled = true;
+				unitCommands[4].ability = &AbilityDatabase::HoldPosition;
+				unitCommands[4].enabled = true;
+			}
 		}
 
 		if (unit.def->ProductionUnit != nullptr) {
@@ -191,6 +196,7 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 				unitCommands[0].commandIcon = &unit.def->ProductionUnit->Icon;
 			}
 		}
+
 
 		for (auto& cmd : unitCommands) {
 			if (!cmd.IsUsable())

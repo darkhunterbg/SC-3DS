@@ -160,8 +160,14 @@ void GameView::ContextualGamepadInput() {
 			else {
 				if (UnitEntityUtil::IsEnemy(context.player, entity))
 					context.ActivateAbility(&AbilityDatabase::Attack, entity);
-				else
-					context.ActivateAbility(&AbilityDatabase::Move, entity);
+				else {
+					if (context.GetEntityManager().UnitArchetype.DataComponents.GetComponent(entity).resources > 0)
+					{
+						context.ActivateAbility(&AbilityDatabase::Gather, entity);
+					}
+					else
+						context.ActivateAbility(&AbilityDatabase::Move, entity);
+				}
 			}
 
 			commandTrigged = true;

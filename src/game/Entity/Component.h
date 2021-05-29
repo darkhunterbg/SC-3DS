@@ -160,6 +160,10 @@ struct UnitStateDataComponent {
 		EntityId entityId;
 		Vector2Int16 position;
 	} target = { 0 };
+
+	union {
+		EntityId miningEffect;
+	} other;
 };
 
 

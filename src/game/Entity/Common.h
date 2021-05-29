@@ -11,6 +11,7 @@ enum class UnitState : uint8_t {
 	Attacking = 3,
 	Death = 4,
 	Producing = 5,
+	Mining = 6,
 };
 
 enum class UnitAIState :uint8_t {
@@ -21,6 +22,7 @@ enum class UnitAIState :uint8_t {
 	HoldPosition = 4,
 	Patrol = 5,
 	Follow = 6,
+	GatherResource = 7,
 
 	Nothing = 0xFF,
 };
@@ -28,10 +30,13 @@ enum class UnitAIState :uint8_t {
 enum class TimerExpiredAction : uint8_t {
 	None = 0,
 	WeaponAttack = 1,
-	UnitDeathAfterEffect = 2,
-	DeleteEntity = 3,
+	Mining = 2,
+	UnitDeathAfterEffect = 3,
+	DeleteEntity = 4,
 
 };
+
+static constexpr const int TimerExpiredActionTypeCount = 5;
 
 enum UnitChatType {
 	None = 0,
@@ -51,4 +56,3 @@ enum AdvisorErrorMessageType {
 };
 
 
-static constexpr const int TimerExpiredActionTypeCount = 4;
