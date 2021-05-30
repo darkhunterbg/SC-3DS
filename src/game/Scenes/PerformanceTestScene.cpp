@@ -26,7 +26,8 @@ void PerformanceTestScene::Start() {
 		EntityId e = entityManager.NewEntity();
 		entityManager.UnitArchetype.RenderArchetype.Archetype.AddEntity(e);
 		EntityUtil::SetRenderFromAnimationClip(e, UnitDatabase::Marine.Graphics->IdleAnimations[0], 0);
-		EntityUtil::SetPosition(e, Vector2Int16((i % 100) * 32 + 16, i * 32 / 100 + 16));
+		Vector2Int16 pos = Vector2Int16((i % 100) * 32 + 16, (i  / 100)*32 + 16);
+		EntityUtil::SetPosition(e,pos);
 		entityManager.UnitArchetype.RenderArchetype.RenderComponents.GetComponent(e).unitColor =
 			Color32(Colors::White);
 	}

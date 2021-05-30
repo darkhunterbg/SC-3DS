@@ -57,8 +57,8 @@ public:
 	static void ClearBuffer(Color color);
 
 
-	static void SetBuffer(const Span< Vertex> buffer);
-	static void DrawBuffer(unsigned start, unsigned count, Texture texture);
+	static void SetDrawBuffers(const Span< Vertex> buffer);
+	static void ExecDrawCommands(const Span<DrawCommand> commands);
 
 	static void Draw(const Sprite& sprite, Rectangle dst, Color additiveBlendColor = Colors::White, bool hFlip = false , bool vFlip = false);
 	static void DrawText(const Font& font, Vector2Int position, const char* text, Color color= Colors::White, float scale = 1.0f);

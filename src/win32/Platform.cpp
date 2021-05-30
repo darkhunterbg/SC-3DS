@@ -35,6 +35,8 @@ extern int numberOfThreads;
 
 static ScreenId currentRT;
 static GPU_Target* target = nullptr;
+static Span<Vertex> vertexBufer;
+
 
 constexpr Uint8 SDL_FloatToUint8(float x) {
 	return (Uint8)(255.0f * ClampF(x, 0.0f, 1.0f) + 0.5f);
@@ -234,30 +236,30 @@ void Platform::BatchDraw(const Span<BatchDrawCommand> commands) {
 	}
 }
 
-static  Span<Vertex> b;
 
-void Platform::SetBuffer(const Span< Vertex> buffer) {
+void Platform::SetDrawBuffers(const Span<Vertex> buffer) {
 
-	b = buffer;
-	//GPU_FlushBlitBuffer();
-
-	//GLPlatform::PrepareDraw();
-	//GLPlatform::UpdateBuffer(buffer);
-
-	//if (target != nullptr) {
-	//	int h = GPU_GetTextureHandle(target->image);
-	//	//GPU_TARGET_DATA* data = (GPU_TARGET_DATA*)target->data;
-	//	glBindFramebuffer(GL_FRAMEBUFFER, h);
-	//}
+	vertexBufer = buffer;
 }
-void Platform::DrawBuffer(unsigned start, unsigned count, Texture texture) {
+void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
 
-	GPU_Image* img = (GPU_Image * )texture;
-
-	GPU_TriangleBatchX(img, target, count, b.Data(), 0, nullptr, GPU_BATCH_XY_ST_RGBA8);
-
-	//GLPlatform::DrawTriangles(start, count);
-	//GPU_ResetRendererState();
+	for (const DrawCommand& cmd : commands)
+	{
+		GPU_Image* img = (GPU_Image*)cmd.texture;
+		/*switch (cmd.type)
+		{
+		case DrawPrimitiveType::Triangle: {*/
+		GPU_PrimitiveBatchV(img, target, GPU_TRIANGLE_FAN,  cmd.count, vertexBufer.Data() + cmd.start, 0, nullptr, GPU_BATCH_XY_ST_RGBA8);
+			//break;
+	/*	}
+		case DrawPrimitiveType::Line: {
+			GPU_PrimitiveBatchV(img, target, GPU_LINES, cmd.count, vertexBufer.Data() + cmd.start, 0, nullptr, GPU_BATCH_XY_ST_RGBA8);
+			break;
+		}
+		default:
+			break;
+		}*/
+	}
 }
 
 void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip, bool vFlip) {

@@ -1,5 +1,4 @@
 #include "RenderSystem.h"
-#include "../Platform.h"
 #include "../Profiler.h"
 #include "../Job.h"
 #include "../Camera.h"
@@ -205,9 +204,7 @@ void RenderSystem::Draw(const Camera& camera, EntityManager& em) {
 
 	std::sort(render.begin(), render.end(), RenderSort);
 
-
 	Game::Renderer.BufferDraw(render);
-	//Platform::BatchDraw({ render.data(),render.size() });
 }
 void RenderSystem::DrawBoundingBoxes(const Camera& camera, EntityManager& em) {
 
