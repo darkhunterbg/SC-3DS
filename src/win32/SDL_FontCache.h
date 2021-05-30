@@ -33,6 +33,8 @@ THE SOFTWARE.
 #ifndef _SDL_FONTCACHE_H__
 #define _SDL_FONTCACHE_H__
 
+#define FC_USE_SDL_GPU
+
 #include "SDL.h"
 #include "SDL_ttf.h"
 

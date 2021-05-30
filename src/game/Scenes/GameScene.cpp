@@ -65,6 +65,8 @@ void GameScene::Start() {
 	EntityId e = UnitEntityUtil::NewUnit(UnitDatabase::CommandCenter, 1,
 		Vector2Int16(256, 128));
 
+
+
 	//entityManager->UnitArchetype.HealthComponents.GetComponent(e).current = 499;
 
 	//EntityId e = UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 0,

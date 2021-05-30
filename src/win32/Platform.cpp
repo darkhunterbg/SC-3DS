@@ -1,10 +1,12 @@
+
 #include "Platform.h"
 
 #include <SDL.h>
+#include <SDL_gpu.h>
 #include <fstream>
 #include <filesystem>
 
-#include "lodepng.h"
+
 #include "SDLDrawCommand.h"
 #include "Color.h"
 #include "StringLib.h"
@@ -17,11 +19,12 @@
 
 #include <SDL_ttf.h>
 
-extern SDL_Renderer* renderer;
-extern SDL_Window* window;
+
+
 extern std::filesystem::path assetDir;
 extern std::filesystem::path userDir;
-extern SDL_Texture* screens[2];
+extern GPU_Target* screen;
+extern GPU_Image* screens[2];
 extern uint64_t mainTimer;
 extern Rectangle touchScreenLocation;
 extern bool mute;
@@ -29,9 +32,7 @@ extern bool noThreading;
 extern int numberOfThreads;
 
 static ScreenId currentRT;
-static SDL_Texture* target = nullptr;
-
-static SDL_BlendMode blendMode = SDL_BlendMode::SDL_BLENDMODE_BLEND;
+static GPU_Target* target = nullptr;
 
 constexpr Uint8 SDL_FloatToUint8(float x) {
 	return (Uint8)(255.0f * ClampF(x, 0.0f, 1.0f) + 0.5f);
@@ -39,22 +40,15 @@ constexpr Uint8 SDL_FloatToUint8(float x) {
 
 static 	void AudioCallback(void* userdata, Uint8* stream, int len);
 
-SDL_Texture* LoadTexture(const std::string& path, Vector2Int& size) {
-	std::vector<unsigned char> buffer, image;
-	lodepng::load_file(buffer, path);
-	unsigned width = 0, height = 0;
-	unsigned error = lodepng::decode(image, width, height, buffer);
-	if (error) {
+GPU_Image* LoadTexture(const std::string& path, Vector2Int& size) {
+	GPU_Image* tex = GPU_LoadImage(path.data());
+
+	if (tex == nullptr) {
+		auto error = SDL_GetError();
 		EXCEPTION("Load texture %s failed with error %i.", path.data(), error);
 	}
 
-	SDL_Texture* tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC,
-		width, height);
-
-	SDL_UpdateTexture(tex, nullptr, image.data(), width * 4);
-	size = { (int)width,(int)height };
-
-	SDL_SetTextureScaleMode(tex, SDL_ScaleMode::SDL_ScaleModeBest);
+	size = { tex->w, tex->h };
 
 	return tex;
 }
@@ -84,7 +78,7 @@ const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 		f.append(str);
 
 		Vector2Int size;
-		SDL_Texture* tex = LoadTexture(f.generic_string(), size);
+		GPU_Image* tex = LoadTexture(f.generic_string(), size);
 		if (tex == nullptr)
 		{
 			delete asset;
@@ -103,23 +97,23 @@ Font Platform::LoadFont(const char* path) {
 	fullPath.append("gfx").append(path).replace_extension("ttf");
 
 	FC_Font* font = FC_CreateFont();
-	auto lf = FC_LoadFont(font, renderer, fullPath.generic_string().data(), 30, FC_MakeColor(255, 255, 255, 255), TTF_STYLE_NORMAL);
+	auto lf = FC_LoadFont(font, fullPath.generic_string().data(), 30, FC_MakeColor(255, 255, 255, 255), TTF_STYLE_NORMAL);
 
 
-	if (lf == 0) {
-		const char* error = SDL_GetError();
-		EXCEPTION("Load font %s failed with %s!", fullPath.generic_string().data(), error);
-		FC_ClearFont(font);
-		return  { 0 };
-	}
+	//if (lf == 0) {
+	//	const char* error = SDL_GetError();
+	//	EXCEPTION("Load font %s failed with %s!", fullPath.generic_string().data(), error);
+	//	FC_ClearFont(font);
+	//	return  { 0 };
+	//}
 
 	return { font };
 }
 Vector2Int Platform::MeasureString(Font font, const char* text, float scale) {
 	FC_Font* f = font.GetFontId<FC_Font>();
-	SDL_Rect rect =FC_GetBounds(f, 0, 0, FC_AlignEnum::FC_ALIGN_LEFT, FC_MakeScale(scale, scale), text);
+	GPU_Rect rect = FC_GetBounds(f, 0, 0, FC_AlignEnum::FC_ALIGN_LEFT, FC_MakeScale(scale, scale), text);
 
-	return { rect.w, rect.h };
+	return { (int)rect.w, (int)rect.h };
 }
 
 FILE* Platform::OpenAsset(const char* path) {
@@ -131,30 +125,33 @@ FILE* Platform::OpenAsset(const char* path) {
 
 void Platform::DrawOnScreen(ScreenId screen) {
 	currentRT = screen;
-	target = nullptr;
-	SDL_SetRenderTarget(renderer, screens[(int)currentRT]);
+	target = (screens[(int)currentRT])->target;
+
 }
 void Platform::DrawOnTexture(Texture texture) {
-	target = (SDL_Texture*)texture;
-	if (target == nullptr)
-		DrawOnScreen(currentRT);
+	auto t = (GPU_Image*)texture;
+
+	if (t == nullptr)
+		target = (screens[(int)currentRT])->target;
 	else
-		SDL_SetRenderTarget(renderer, target);
+		target = t->target;
 
 }
 Image Platform::NewTexture(Vector2Int size, bool pixelFiltering) {
-	SDL_Texture* tex = nullptr;
+	GPU_Image* tex = nullptr;
+
+	tex = GPU_CreateImage(size.x, size.y, GPU_FORMAT_RGBA);
 
 	if (pixelFiltering) {
-		std::string scale = SDL_GetHint(SDL_HINT_RENDER_SCALE_QUALITY);
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
-		tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, scale.data());
+		GPU_SetImageFilter(tex, GPU_FILTER_NEAREST);
 	}
 	else
 	{
-		tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
+		GPU_SetImageFilter(tex, GPU_FILTER_LINEAR);
 	}
+
+	GPU_LoadTarget(tex);
+	GPU_SetWrapMode(tex, GPU_WRAP_NONE, GPU_WRAP_NONE);
 	return { tex, 0 };
 }
 Sprite Platform::NewSprite(Image image, Rectangle16 src) {
@@ -163,83 +160,89 @@ Sprite Platform::NewSprite(Image image, Rectangle16 src) {
 
 
 void Platform::ChangeBlendingMode(BlendMode mode) {
+	GPU_BlendPresetEnum b = GPU_BLEND_NORMAL;
 
 	switch (mode)
 	{
 	case BlendMode::Alpha:
-		blendMode = SDL_BlendMode::SDL_BLENDMODE_BLEND;
+		b = GPU_BLEND_NORMAL;
 		break;
 	case BlendMode::AlphaOverride:
-		blendMode = SDL_ComposeCustomBlendMode(
-			SDL_BlendFactor::SDL_BLENDFACTOR_SRC_ALPHA, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
-			SDL_BlendOperation::SDL_BLENDOPERATION_ADD,
-			SDL_BlendFactor::SDL_BLENDFACTOR_SRC_ALPHA, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
-			SDL_BlendOperation::SDL_BLENDOPERATION_ADD);
+		b = GPU_BLEND_SET_ALPHA;
+		//blendMode = SDL_ComposeCustomBlendMode(
+		//	SDL_BlendFactor::SDL_BLENDFACTOR_SRC_ALPHA, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
+		//	SDL_BlendOperation::SDL_BLENDOPERATION_ADD,
+		//	SDL_BlendFactor::SDL_BLENDFACTOR_SRC_ALPHA, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
+		//	SDL_BlendOperation::SDL_BLENDOPERATION_ADD);
 		break;
 	case BlendMode::FullOverride:
-		blendMode = SDL_ComposeCustomBlendMode(
-			SDL_BlendFactor::SDL_BLENDFACTOR_ONE, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
-			SDL_BlendOperation::SDL_BLENDOPERATION_ADD,
-			SDL_BlendFactor::SDL_BLENDFACTOR_ONE, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
-			SDL_BlendOperation::SDL_BLENDOPERATION_ADD);
+		b = GPU_BLEND_SET;
+		//blendMode = SDL_ComposeCustomBlendMode(
+		//	SDL_BlendFactor::SDL_BLENDFACTOR_ONE, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
+		//	SDL_BlendOperation::SDL_BLENDOPERATION_ADD,
+		//	SDL_BlendFactor::SDL_BLENDFACTOR_ONE, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
+		//	SDL_BlendOperation::SDL_BLENDOPERATION_ADD);
 		break;
 	default:
 		break;
 	}
 
-	int error = SDL_SetRenderDrawBlendMode(renderer, blendMode);
-	if (error) {
-		const char* error = SDL_GetError();
-		EXCEPTION(error);
-	}
+	GPU_SetShapeBlendMode(b);
+	//if (error) {
+	//	const char* error = SDL_GetError();
+	//	EXCEPTION(error);
+	//}
 }
-//void Platform::ToggleTestBlend() {
-//	blendMode = SDL_ComposeCustomBlendMode(
-//		SDL_BlendFactor::SDL_BLENDFACTOR_SRC_ALPHA, SDL_BlendFactor::SDL_BLENDFACTOR_DST_ALPHA,
-//		SDL_BlendOperation::SDL_BLENDOPERATION_REV_SUBTRACT,
-//		SDL_BlendFactor::SDL_BLENDFACTOR_SRC_ALPHA, SDL_BlendFactor::SDL_BLENDFACTOR_DST_ALPHA,
-//		SDL_BlendOperation::SDL_BLENDOPERATION_REV_SUBTRACT);
-//	int e = SDL_SetRenderDrawBlendMode(renderer, blendMode);
-//	if (e) {
-//		const char* error = SDL_GetError();
-//		EXCEPTION(error);
-//	}
-//}
 
 void Platform::ClearBuffer(Color color) {
 	Color32 c(color);
-	SDL_SetRenderDrawColor(renderer, c.GetR(), c.GetG(), c.GetB(), c.GetA());
-	SDL_RenderClear(renderer);
+
+	GPU_ClearRGBA(target, c.GetR(), c.GetG(), c.GetB(), c.GetA());
+	//SDL_RenderClear(renderer);
 }
 void Platform::BatchDraw(const Span<BatchDrawCommand> commands) {
 	for (const auto& cmd : commands) {
-		auto texture = (SDL_Texture*)cmd.image.textureId;
-		SDL_RendererFlip flags = cmd.scale.x < 0 ? SDL_RendererFlip::SDL_FLIP_HORIZONTAL : SDL_RendererFlip::SDL_FLIP_NONE;
+		GPU_Image* img = (GPU_Image*)cmd.image.textureId;
+		GPU_FlipEnum flags = cmd.scale.x < 0 ? GPU_FLIP_HORIZONTAL : GPU_FLIP_NONE;
 		Vector2Int size;
-		Uint32 f;
-		int access;
-		SDL_QueryTexture(texture, &f, &access, &size.x, &size.y);
+	
+		size.x = img->w;
+		size.y = img->h;
+
 		SDL_Rect dst = {
 			(int)cmd.position.x,
 			(int)cmd.position.y,
 			(int)(size.x * std::abs(cmd.scale.x)),
 			(int)(size.y * cmd.scale.y) };
 
-		Uint8 r = cmd.color.GetR();
-		Uint8 g = cmd.color.GetG();
-		Uint8 b = cmd.color.GetB();
-		Uint8 a = cmd.color.GetA();
+		GPU_Rect src = { (float)0, (float)0, (float)size.x,(float)size.y };
+		GPU_Rect dstC = { (float)dst.x,(float)dst.y, (float)dst.w,(float)dst.h };
 
-		SDL_SetTextureBlendMode(texture, blendMode);
-		SDL_SetTextureAlphaMod(texture, a);
 
-		SDL_SetTextureColorMod(texture, r, g, b);
-		
-		SDL_RenderCopyEx(renderer, texture, nullptr, &dst, 0, nullptr, flags);
+		SDL_Color c;
+		c.r = cmd.color.GetR();
+		c.g = cmd.color.GetG();
+		c.b = cmd.color.GetB();
+		c.a = cmd.color.GetA();
+
+
+		GPU_SetColor(img, c);
+
+		GPU_BlitRectX(img, &src, target, &dstC,0,0,0, flags);
 	}
 }
+
+void Platform::SetBuffer(const Span< Vertex> buffer) {
+	//GLPlatform::UpdateBuffer(buffer);
+}
+void Platform::DrawBuffer(unsigned start, unsigned count, Texture texture) {
+	//GLPlatform::DrawTriangles(start, count);
+}
+
 void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip, bool vFlip) {
 	SDLDrawCommand cmd;
+
+	GPU_Image* img = (GPU_Image*)sprite.image.textureId;
 
 	cmd.texture = (SDL_Texture*)sprite.image.textureId;
 	cmd.src.x = sprite.rect.position.x;
@@ -248,10 +251,21 @@ void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip
 	cmd.src.h = sprite.rect.size.y;
 	cmd.dst = *(SDL_Rect*)&dst;
 
+	GPU_Rect src = { (float)cmd.src.x, (float)cmd.src.y, (float)cmd.src.w,(float)cmd.src.h };
+	GPU_Rect dstC = { (float)cmd.dst.x, (float)cmd.dst.y, (float)cmd.dst.w,(float)cmd.dst.h };
+
 	cmd.r = SDL_FloatToUint8(color.r);
 	cmd.g = SDL_FloatToUint8(color.g);
 	cmd.b = SDL_FloatToUint8(color.b);
 	cmd.a = SDL_FloatToUint8(color.a);
+
+
+	SDL_Color c;
+	c.r = cmd.r;
+	c.g = cmd.g;
+	c.b = cmd.b;
+	c.a = cmd.a;
+
 	cmd.type = SDLDrawCommandType::Sprite;
 
 	cmd.flip = hFlip ? SDL_RendererFlip::SDL_FLIP_HORIZONTAL : SDL_RendererFlip::SDL_FLIP_NONE;
@@ -259,16 +273,9 @@ void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip
 		cmd.flip = (SDL_RendererFlip)(cmd.flip | SDL_RendererFlip::SDL_FLIP_VERTICAL);
 	}
 
+	GPU_SetColor(img, c);
 
-	SDL_SetTextureAlphaMod(cmd.texture, cmd.a);
-	SDL_SetTextureBlendMode(cmd.texture, blendMode);
-
-	SDL_SetTextureColorMod(cmd.texture, cmd.r, cmd.g, cmd.b);
-	
-	SDL_RenderCopyEx(renderer, cmd.texture, &cmd.src, &cmd.dst, 0, nullptr, cmd.flip);
-
-	Uint32 f; int w; int h; int a;
-	SDL_QueryTexture(cmd.texture, &f, &a, &w, &h);
+	GPU_BlitRect(img, &src, target, &dstC);
 }
 void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color, float scale) {
 	SDLDrawCommand cmd;
@@ -284,7 +291,7 @@ void Platform::DrawText(const Font& font, Vector2Int position, const char* text,
 	cmd.b = SDL_FloatToUint8(color.b);
 	cmd.a = SDL_FloatToUint8(color.a);
 
-	FC_DrawScaleColor(cmd.font, renderer, cmd.dst.x, cmd.dst.y, FC_MakeScale(cmd.scale, cmd.scale), FC_MakeColor(cmd.r, cmd.g, cmd.b, cmd.a), cmd.text.data());
+	FC_DrawScaleColor(cmd.font, target, cmd.dst.x, cmd.dst.y, FC_MakeScale(cmd.scale, cmd.scale), FC_MakeColor(cmd.r, cmd.g, cmd.b, cmd.a), cmd.text.data());
 
 }
 void Platform::DrawLine(Vector2Int src, Vector2Int dst, Color color) {
@@ -301,11 +308,16 @@ void Platform::DrawLine(Vector2Int src, Vector2Int dst, Color color) {
 	cmd.dst.y = dst.y;
 
 
-	SDL_SetRenderDrawColor(renderer, cmd.r, cmd.g, cmd.b, cmd.a);
-	SDL_RenderDrawLine(renderer, cmd.src.x, cmd.src.y, cmd.dst.x, cmd.dst.y);
+	SDL_Color c;
+	c.r = cmd.r;
+	c.g = cmd.g;
+	c.b = cmd.b;
+	c.a = cmd.a;
+
+	GPU_Line(target, cmd.src.x, cmd.src.y, cmd.dst.x, cmd.dst.y, c);
 
 }
-void Platform::DrawRectangle(const Rectangle& rect, const Color32& color){
+void Platform::DrawRectangle(const Rectangle& rect, const Color32& color) {
 	SDLDrawCommand cmd;
 
 	cmd.type = SDLDrawCommandType::Rectangle;
@@ -315,9 +327,13 @@ void Platform::DrawRectangle(const Rectangle& rect, const Color32& color){
 	cmd.b = color.GetB();
 	cmd.a = color.GetA();
 
+	SDL_Color c;
+	c.r = cmd.r;
+	c.g = cmd.g;
+	c.b = cmd.b;
+	c.a = cmd.a;
 
-	SDL_SetRenderDrawColor(renderer, cmd.r, cmd.g, cmd.b, cmd.a);
-	SDL_RenderFillRect(renderer, &cmd.dst);
+	GPU_RectangleFilled(target, cmd.dst.x, cmd.dst.y, cmd.dst.x + cmd.dst.w, cmd.dst.y + cmd.dst.h, c);
 }
 
 double Platform::ElaspedTime() {
@@ -396,15 +412,15 @@ void Platform::UpdatePointerState(PointerState& state) {
 	Uint32  buttonState = SDL_GetMouseState(&pos.x, &pos.y);
 	state.Touch = buttonState & SDL_BUTTON(SDL_BUTTON_LEFT);
 
-	pos -= touchScreenLocation.position;
-	pos.x = std::min(std::max(pos.x, 0), touchScreenLocation.size.x);
-	pos.y = std::min(std::max(pos.y, 0), touchScreenLocation.size.x);
+
+	pos -= Vector2Int(touchScreenLocation.position);
+	pos.x = std::min(std::max(pos.x, 0), (int)touchScreenLocation.size.x);
+	pos.y = std::min(std::max(pos.y, 0), (int)touchScreenLocation.size.x);
 	pos.x = (pos.x * 320) / touchScreenLocation.size.x;
 	pos.y = (pos.y * 240) / touchScreenLocation.size.y;
 
 	state.Position = pos;
 }
-
 
 void Platform::CreateChannel(AudioChannelState& channel) {
 
@@ -469,7 +485,7 @@ std::string Platform::GetUserDirectory() {
 	return userDir.u8string() + "/";
 }
 
-static 	void AudioCallback(void* userdata, Uint8* stream, int len) {
+static void AudioCallback(void* userdata, Uint8* stream, int len) {
 	AudioChannelState* state = (AudioChannelState*)userdata;
 
 	SDL_memset(stream, 0, len);
@@ -486,7 +502,7 @@ static 	void AudioCallback(void* userdata, Uint8* stream, int len) {
 
 	int volume = (SDL_MIX_MAXVOLUME * state->volume) / 2;
 
-	
+
 	SDL_MixAudioFormat(stream, clip->PlayFrom(), AUDIO_S16LSB, len, volume);
 
 	clip->playPos += len;

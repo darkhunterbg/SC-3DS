@@ -4,12 +4,16 @@
 #include "MathLib.h"
 #include "Color.h"
 #include "Input.h"
+#include "Engine/GraphicsPrimitives.h"
+
+
 #include <functional>
 
 
 struct AudioChannelState;
 typedef int AudioChannelHandle;
 typedef void* Semaphore;
+
 
 
 struct BatchDrawCommand {
@@ -51,6 +55,11 @@ public:
 	static Sprite NewSprite(Image image, Rectangle16 src);
 	static void BatchDraw(const Span< BatchDrawCommand> commands);
 	static void ClearBuffer(Color color);
+
+
+	static void SetBuffer(const Span< Vertex> buffer);
+	static void DrawBuffer(unsigned start, unsigned count, Texture texture);
+
 	static void Draw(const Sprite& sprite, Rectangle dst, Color additiveBlendColor = Colors::White, bool hFlip = false , bool vFlip = false);
 	static void DrawText(const Font& font, Vector2Int position, const char* text, Color color= Colors::White, float scale = 1.0f);
 	static void DrawLine(Vector2Int src, Vector2Int dst, Color color);

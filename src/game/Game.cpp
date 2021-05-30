@@ -27,6 +27,7 @@ Gamepad Game::Gamepad;
 Pointer Game::Pointer;
 AudioSystem Game::Audio;
 AssetLoader Game::AssetLoader;
+GraphicsRenderer Game::Renderer;
 float Game::DeltaTime = 0;
 
 
@@ -36,8 +37,8 @@ static void ShowTitleScreen() {
 	Platform::Draw(title->GetSprite(0), { {0,0},{400,240} });
 }
 static void InitialScene() {
-	//Game::SetCurrentScene(new GameScene());
-	Game::SetCurrentScene(new PerformanceTestScene());
+	Game::SetCurrentScene(new GameScene());
+	//Game::SetCurrentScene(new PerformanceTestScene());
 }
 
 void Game::FrameStart() {
@@ -67,7 +68,6 @@ void Game::Start() {
 	WeaponDatabase::Init();
 	UnitDatabase::Init();
 	RaceDatabase::Init();
-	//frameLoad.push_back(0);
 }
 bool Game::Update() {
 

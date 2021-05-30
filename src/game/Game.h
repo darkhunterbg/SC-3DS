@@ -4,6 +4,7 @@
 #include "Audio.h"
 #include "AssetLoader.h"
 #include "Input.h"
+#include "Engine/GraphicsRenderer.h"
 
 class Scene;
 
@@ -21,6 +22,7 @@ public:
 	static Pointer Pointer;
 	static AudioSystem Audio;
 	static AssetLoader AssetLoader;
+	static GraphicsRenderer Renderer;
 
 	static float DeltaTime;
 

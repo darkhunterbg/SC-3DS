@@ -1,26 +1,26 @@
 #include <SDL.h>
+#include <SDL_gpu.h>
+
 #include <filesystem>
 #include <thread>
 
 #include "Color.h"
-#include "lodepng.h"
 #include "SDLDrawCommand.h"
 #include "SDL_FontCache.h"
 #include "Game.h"
 #include "MathLib.h"
 
-SDL_Renderer* renderer;
-SDL_Texture* screens[2];
+GPU_Image* screens[2];
+GPU_Target* screen;
 SDL_Window* window;
 std::filesystem::path assetDir;
 std::filesystem::path userDir;
 uint64_t mainTimer;
+
 Rectangle touchScreenLocation;
 bool mute = false;
 bool noThreading = true;
 
-void Init();
-void Uninit();
 void Draw();
 
 int static GetDriver() {
@@ -29,7 +29,7 @@ int static GetDriver() {
 	for (int i = 0; i < d; ++i) {
 		SDL_RendererInfo info;
 		SDL_GetRenderDriverInfo(i, &info);
-		if (info.name == std::string("direct3d11")) /*||
+		if (info.name == std::string("d3d")) /*||
 			info.name == std::string("opengl"))*/
 			return i;
 	}
@@ -39,23 +39,26 @@ int static GetDriver() {
 
 int main(int argc, char** argv) {
 
+	
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_AUDIO);
 
-	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "direct3d11");
+	screen = GPU_Init(400, 480, GPU_DEFAULT_INIT_FLAGS);
 
-	window = SDL_CreateWindow("StarCraft", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 400, 480,
-		SDL_WINDOW_RESIZABLE);
+	window = SDL_GetWindowFromID(screen->context->windowID);
+
+	SDL_SetWindowResizable(window, SDL_TRUE);
+	SDL_SetWindowTitle(window, "StarCraft");
 	SDL_MaximizeWindow(window);
 
 
-	renderer = SDL_CreateRenderer(window, GetDriver(), SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE);
+	screens[0] = GPU_CreateImage( 400, 240, GPU_FORMAT_RGBA);
+	screens[1] = GPU_CreateImage(320, 240, GPU_FORMAT_RGBA); 
+	GPU_LoadTarget(screens[0]);
+	GPU_LoadTarget(screens[1]);
+	GPU_SetImageFilter(screens[0], GPU_FILTER_LINEAR);
+	GPU_SetImageFilter(screens[1], GPU_FILTER_LINEAR);
+	GPU_SetShapeBlendMode(GPU_BLEND_NORMAL);
 
-	SDL_SetRenderDrawBlendMode(renderer, SDL_BlendMode::SDL_BLENDMODE_BLEND);
-
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
-
-	screens[0] = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 400, 240);
-	screens[1] = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 320, 240);
 
 	assetDir = std::filesystem::current_path().parent_path();
 	userDir = std::filesystem::current_path();
@@ -80,9 +83,6 @@ int main(int argc, char** argv) {
 	}
 
 	while (!done) {
-
-
-
 		Game::FrameStart();
 
 		SDL_Event event;
@@ -90,16 +90,18 @@ int main(int argc, char** argv) {
 			switch (event.type)
 			{
 			case SDL_QUIT: done = true; break;
+		
 			case SDL_WINDOWEVENT:
-				if (event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
+				if (event.window.event == SDL_WINDOWEVENT_CLOSE )
 					done = true;
+				if (event.window.event == SDL_WINDOWEVENT_RESIZED)
+					GPU_SetWindowResolution(event.window.data1, event.window.data2);
 				break;
 			}
 		}
 
 		if (done)
 			break;
-
 
 
 		done = !Game::Update();
@@ -109,43 +111,28 @@ int main(int argc, char** argv) {
 
 
 		Game::Draw();
-
+	
 		Draw();
 
 		Game::FrameEnd();
-
-		SDL_RenderSetViewport(renderer, nullptr);
-		SDL_Rect clip = { 0 };
-		SDL_GetWindowSize(window, &clip.w, &clip.h);
-		SDL_RenderSetClipRect(renderer, &clip);
-
-
-		SDL_RenderPresent(renderer);
-
-		auto flags = SDL_GetWindowFlags(window);
-		if ((flags & SDL_WindowFlags::SDL_WINDOW_MINIMIZED))
-		{
-			SDL_Delay(16);
-		}
+		GPU_Flip(screen);
+	
 	}
 
 	Game::End();
 
 
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
+	GPU_Quit();
 	SDL_Quit();
 
 	return 0;
 }
 
 void Draw() {
-	int w, h;
-	SDL_SetRenderTarget(renderer, nullptr);
-	SDL_GetRendererOutputSize(renderer, &w, &h);
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-	SDL_RenderClear(renderer);
+	int w = screen->base_w;
+	int h = screen->base_h;
 
+	GPU_Clear(screen);
 
 	const int n3dsUpW = 400;
 	const int n3dsUpH = 240;
@@ -159,7 +146,9 @@ void Draw() {
 	clip.h = h / 2;
 	clip.w = (clip.h * n3dsUpW) / n3dsUpH;
 	clip.x = (w - clip.w) / 2;
-	SDL_RenderCopy(renderer, screens[0], nullptr, &clip);
+
+	GPU_Rect r = { (float)clip.x, (float)clip.y, (float)clip.w, (float)clip.h };
+	GPU_BlitRect(screens[0], nullptr, screen, &r);
 
 	clip.y = clip.h;
 	clip.w = (clip.h * n3dsDnW) / n3dsDnH;
@@ -168,14 +157,14 @@ void Draw() {
 	touchScreenLocation.position = { clip.x, clip.y };
 	touchScreenLocation.size = { clip.w,clip.h };
 
-	SDL_RenderCopy(renderer, screens[1], nullptr, &clip);
-
+	 r = { (float)clip.x, (float)clip.y, (float)clip.w, (float)clip.h };
+	GPU_BlitRect(screens[1], nullptr, screen, &r );
 
 	const Color& c = Colors::CornflowerBlue;
 
-	SDL_SetRenderDrawColor(renderer, (Uint8)(c.r * 255), (Uint8)(c.g * 255), (Uint8)(c.b * 255), 255);
-	for (auto screen : screens) {
-		SDL_SetRenderTarget(renderer, screen);
-		SDL_RenderClear(renderer);
+	for (auto s : screens) {
+
+		GPU_ClearRGBA(s->target, (Uint8)(c.r * 255), (Uint8)(c.g * 255), (Uint8)(c.b * 255),255);
+	
 	}
 }

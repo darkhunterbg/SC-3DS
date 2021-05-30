@@ -2,12 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="src\win32\Main.cpp" />
-    <ClCompile Include="src\win32\lodepng.cpp" />
     <ClCompile Include="src\win32\Platform.cpp" />
     <ClCompile Include="src\win32\SDL_FontCache.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\win32\lodepng.h" />
     <ClInclude Include="src\win32\SDLDrawCommand.h" />
     <ClInclude Include="src\win32\SDL_FontCache.h" />
   </ItemGroup>

@@ -2,7 +2,7 @@
 
 #include <cmath>
 #include <cstdint>
-
+#include <algorithm>
 static const constexpr float PI = 3.14159265359f;
 
 /// <summary>
@@ -336,6 +336,8 @@ struct Rectangle
 		return v.x <= position.x + size.x && v.x >= position.x &&
 			v.y <= position.y + size.y && v.y >= position.y;
 	}
+
+
 };
 
 struct Circle16 {
@@ -457,4 +459,12 @@ struct Rectangle16
 
 inline Vector2Int Vector2Int_Ceil(const Vector2& v) {
 	return { (int)ceil(v.x), (int)ceilf(v.y) };
+}
+
+inline Rectangle16 Rectangle_ToRectangle16(const Rectangle& rect)  {
+	return { Vector2Int16(rect.position), Vector2Int16(rect.size) };
+}
+
+inline Rectangle Rectangle16_ToRectangle(const Rectangle16& rect) {
+	return { Vector2Int(rect.position), Vector2Int(rect.size) };
 }
