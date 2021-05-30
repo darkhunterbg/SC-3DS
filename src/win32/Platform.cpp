@@ -4,12 +4,12 @@
 
 #include <SDL.h>
 #include <SDL_gpu.h>
+
 #include <fstream>
 #include <filesystem>
 
 #include <GL/glew.h>
 
-#include "GLPlatform.h"
 #include "SDLDrawCommand.h"
 #include "Color.h"
 #include "StringLib.h"
@@ -204,7 +204,7 @@ void Platform::ClearBuffer(Color color) {
 }
 void Platform::BatchDraw(const Span<BatchDrawCommand> commands) {
 	for (const auto& cmd : commands) {
-		GPU_Image* img = (GPU_Image*)cmd.image.textureId;
+		GPU_Image* img = (GPU_Image*)cmd.sprite.image.textureId;
 		GPU_FlipEnum flags = cmd.scale.x < 0 ? GPU_FLIP_HORIZONTAL : GPU_FLIP_NONE;
 		Vector2Int size;
 	
@@ -234,15 +234,30 @@ void Platform::BatchDraw(const Span<BatchDrawCommand> commands) {
 	}
 }
 
+static  Span<Vertex> b;
+
 void Platform::SetBuffer(const Span< Vertex> buffer) {
 
-	GLPlatform::PrepareDraw();
-	GLPlatform::UpdateBuffer(buffer);
+	b = buffer;
+	//GPU_FlushBlitBuffer();
+
+	//GLPlatform::PrepareDraw();
+	//GLPlatform::UpdateBuffer(buffer);
+
+	//if (target != nullptr) {
+	//	int h = GPU_GetTextureHandle(target->image);
+	//	//GPU_TARGET_DATA* data = (GPU_TARGET_DATA*)target->data;
+	//	glBindFramebuffer(GL_FRAMEBUFFER, h);
+	//}
 }
 void Platform::DrawBuffer(unsigned start, unsigned count, Texture texture) {
 
-	GLPlatform::DrawTriangles(start, count);
-	GPU_ResetRendererState();
+	GPU_Image* img = (GPU_Image * )texture;
+
+	GPU_TriangleBatchX(img, target, count, b.Data(), 0, nullptr, GPU_BATCH_XY_ST_RGBA8);
+
+	//GLPlatform::DrawTriangles(start, count);
+	//GPU_ResetRendererState();
 }
 
 void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip, bool vFlip) {

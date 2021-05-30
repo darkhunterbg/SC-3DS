@@ -116,28 +116,28 @@ struct ChildComponent {
 };
 
 struct RenderComponent {
-	Image sprite;
+	Sprite sprite;
 	int8_t depth = 0;
 	bool hFlip = false;
 
 	inline void SetSpriteFrame(const SpriteFrame& s) {
-		sprite = s.sprite.image;
+		sprite = s.sprite;
 		hFlip = s.hFlip;
 	}
 };
 
 struct RenderUnitComponent {
 	Color32 unitColor;
-	Image sprite;
-	Image shadowSprite;
-	Image colorSprite;
+	Sprite sprite;
+	Sprite shadowSprite;
+	Sprite colorSprite;
 	int8_t depth = 0;
 	bool hFlip = false;
 
 	inline void SetSpriteFrame(const UnitSpriteFrame& s) {
-		sprite = s.sprite.image;
-		shadowSprite = s.shadowSprite.image;
-		colorSprite = s.colorSprite.image;
+		sprite = s.sprite;
+		shadowSprite = s.shadowSprite;
+		colorSprite = s.colorSprite;
 		hFlip = s.hFlip;
 	}
 };

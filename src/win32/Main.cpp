@@ -9,9 +9,6 @@
 #include "SDL_FontCache.h"
 #include "Game.h"
 #include "MathLib.h"
-#include "SpriteBatchShader.h"
-#include "GLPlatform.h"
-
 
 GPU_Image* screens[2];
 GPU_Target* screen;
@@ -60,8 +57,6 @@ int main(int argc, char** argv) {
 
 	mainTimer = SDL_GetPerformanceCounter();
 
-	GLPlatform::Init();
-
 	Game::Start();
 
 	if (argc > 1) {
@@ -99,26 +94,12 @@ int main(int argc, char** argv) {
 		if (done)
 			break;
 
-
-
-		//Game::Draw();
-
-		//GLPlatform::PrepareDraw();
-
-		Vertex v[3] = {
-			{{-1,-1},{0,0},0},
-			{{1,-1},{0,0},0},
-			{ {0,1},{0,0},0}
-		};
-
-		Platform::SetBuffer({ v,3 });
-		Platform::DrawBuffer(0, 1, 0);
+		Game::Draw();
 
 		Draw();
 
 		Game::FrameEnd();
 		GPU_Flip(screen);
-
 	}
 
 	Game::End();

@@ -188,12 +188,7 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 	em.TimingArchetype.Archetype.AddEntity(e);
 
 	em.UnitArchetype.RenderArchetype.RenderComponents.NewComponent(e, {
-		player.color,
-		def.Graphics->IdleAnimations[0].GetFrame(0).sprite.image,
-		def.Graphics->IdleAnimations[0].GetFrame(0).shadowSprite.image,
-		def.Graphics->IdleAnimations[0].GetFrame(0).colorSprite.image,
-		});
-
+		player.color }).SetSpriteFrame(def.Graphics->IdleAnimations[0].GetFrame(0));
 	//em.UnitArchetype.RenderArchetype.OffsetComponents.NewComponent(e, {
 	// Vector2Int16(def.Graphics->IdleAnimations[0].GetFrame(0).offset),
 	//	Vector2Int16(def.Graphics->IdleAnimations[0].GetFrame(0).shadowOffset)

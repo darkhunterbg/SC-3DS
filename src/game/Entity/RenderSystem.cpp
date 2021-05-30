@@ -108,7 +108,7 @@ void RenderSystem::DrawEntities(const Camera& camera, const Rectangle16& camRect
 
 		BatchDrawCommand cmd;
 		cmd.order = renderData.pos[i].order;
-		cmd.image = r.sprite;
+		cmd.sprite = r.sprite;
 		cmd.position = dst;
 		cmd.scale = scale[r.hFlip];
 		cmd.color = Color32(Colors::White);
@@ -140,24 +140,24 @@ void RenderSystem::DrawUnits(const Camera& camera, const Rectangle16& camRect) {
 
 		BatchDrawCommand cmd;
 		cmd.order = rp.order;
-		cmd.image = r.shadowSprite;
+		cmd.sprite = r.shadowSprite;
 		cmd.position = shadowDst;
 		cmd.scale = scale[r.hFlip];
 		cmd.color = shadowColor;
-		if (cmd.image.textureId)
+		if (cmd.sprite.image.textureId)
 			render.push_back(cmd);
 
 		cmd.order += 2;
-		cmd.image = r.sprite;
+		cmd.sprite = r.sprite;
 		cmd.position = dst;
 		cmd.color = Color32(Colors::White);
 
 		render.push_back(cmd);
 
 		cmd.order++;
-		cmd.image = r.colorSprite;
+		cmd.sprite = r.colorSprite;
 		cmd.color = Color32(r.unitColor);
-		if (cmd.image.textureId)
+		if (cmd.sprite.image.textureId)
 			render.push_back(cmd);
 	}
 }
@@ -182,7 +182,7 @@ void RenderSystem::DrawSelection(const Camera& camera, const Rectangle16& camRec
 		dst /= camera.Scale;
 
 		cmd.order = unitSelectionData.order[i] + 1;
-		cmd.image = frame.sprite.image;
+		cmd.sprite = frame.sprite;
 		cmd.position = dst;
 		cmd.color = unitSelectionData.color[i];
 

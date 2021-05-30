@@ -4,12 +4,9 @@
     <ClCompile Include="src\win32\Main.cpp" />
     <ClCompile Include="src\win32\Platform.cpp" />
     <ClCompile Include="src\win32\SDL_FontCache.c" />
-    <ClCompile Include="src\win32\GLPlatform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\win32\SDLDrawCommand.h" />
     <ClInclude Include="src\win32\SDL_FontCache.h" />
-    <ClInclude Include="src\win32\SpriteBatchShader.h" />
-    <ClInclude Include="src\win32\GLPlatform.h" />
   </ItemGroup>
 </Project>

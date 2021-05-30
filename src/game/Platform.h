@@ -18,7 +18,7 @@ typedef void* Semaphore;
 
 struct BatchDrawCommand {
 	int order;
-	Image image;
+	Sprite sprite;
 	Vector2Int16 position;
 	Vector2 scale;
 	Color32 color;

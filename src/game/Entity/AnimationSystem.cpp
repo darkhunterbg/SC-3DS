@@ -23,10 +23,7 @@ void AnimationSystem::UpdateUnitAnimationsJob(int start, int end) {
 
 		const UnitSpriteFrame& frame = anim.clip->GetFrame(tracker.clipFrame);
 
-		ren.hFlip = frame.hFlip;
-		ren.sprite = frame.sprite.image;
-		ren.shadowSprite = frame.shadowSprite.image;
-		ren.colorSprite = frame.colorSprite.image;
+		ren.SetSpriteFrame(frame);
 
 		offset.offset = frame.offset;
 		offset.shadowOffset = frame.shadowOffset;
@@ -46,8 +43,7 @@ void AnimationSystem::UpdateAnimationsJob(int start, int end) {
 		auto& flags = *data.flags[i];
 
 		const SpriteFrame& frame = anim.clip->GetFrame(tracker.clipFrame);
-		ren.hFlip = frame.hFlip;
-		ren.sprite = frame.sprite.image;
+		ren.SetSpriteFrame(frame);
 
 		offset = frame.offset;
 
