@@ -297,7 +297,7 @@ void EntityManager::Draw(const Camera& camera) {
 			EXCEPTION("Invalid UpdateId %i", updateId);
 		}
 
-		mapSystem.DrawMap(camera);
+		//mapSystem.DrawMap(camera);
 		renderSystem.Draw(camera, *this);
 
 		if (DrawBoundingBoxes)

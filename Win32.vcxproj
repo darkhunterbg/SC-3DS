@@ -62,21 +62,21 @@
     <LibraryPath>$(SolutionDIr)Libs\SDL\lib;$(SolutionDIr)Libs\SDL_ttf\lib;$(SolutionDIr)Libs\glew\lib;$(SolutionDIr)Libs\SDL_gpu\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)tmp\$(ProjectName)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDIr)Libs\SDL\include;$(SolutionDIr)Libs\SDL_ttf\include;$(SolutionDIr)Libs\SDL_gpu\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDIr)Libs\SDL\include;$(SolutionDIr)Libs\SDL_ttf\include;$(SolutionDIr)Libs\SDL_gpu\include;$(SolutionDIr)Libs\glew\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='OptDebug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>$(SolutionDIr)Libs\SDL\lib;$(SolutionDIr)Libs\SDL_ttf\lib;$(SolutionDIr)Libs\glew\lib;$(SolutionDIr)Libs\SDL_gpu\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)tmp\$(ProjectName)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDIr)Libs\SDL\include;$(SolutionDIr)Libs\SDL_ttf\include;$(SolutionDIr)Libs\SDL_gpu\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDIr)Libs\SDL\include;$(SolutionDIr)Libs\SDL_ttf\include;$(SolutionDIr)Libs\SDL_gpu\include;$(SolutionDIr)Libs\glew\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)tmp\$(ProjectName)\$(Configuration)\</IntDir>
     <LibraryPath>$(SolutionDIr)Libs\SDL\lib;$(SolutionDIr)Libs\SDL_ttf\lib;$(SolutionDIr)Libs\glew\lib;$(SolutionDIr)Libs\SDL_gpu\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(SolutionDIr)Libs\SDL\include;$(SolutionDIr)Libs\SDL_ttf\include;$(SolutionDIr)Libs\SDL_gpu\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDIr)Libs\SDL\include;$(SolutionDIr)Libs\SDL_ttf\include;$(SolutionDIr)Libs\SDL_gpu\include;$(SolutionDIr)Libs\glew\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -156,13 +156,16 @@ xcopy /y /d "$(SolutionDir)Libs\glew\lib\*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\win32\GLPlatform.cpp" />
     <ClCompile Include="src\win32\Main.cpp" />
     <ClCompile Include="src\win32\Platform.cpp" />
     <ClCompile Include="src\win32\SDL_FontCache.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\win32\GLPlatform.h" />
     <ClInclude Include="src\win32\SDLDrawCommand.h" />
     <ClInclude Include="src\win32\SDL_FontCache.h" />
+    <ClInclude Include="src\win32\SpriteBatchShader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

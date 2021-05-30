@@ -9,6 +9,9 @@
 #include "SDL_FontCache.h"
 #include "Game.h"
 #include "MathLib.h"
+#include "SpriteBatchShader.h"
+#include "GLPlatform.h"
+
 
 GPU_Image* screens[2];
 GPU_Target* screen;
@@ -23,25 +26,11 @@ bool noThreading = true;
 
 void Draw();
 
-int static GetDriver() {
-	int d = SDL_GetNumRenderDrivers();
-
-	for (int i = 0; i < d; ++i) {
-		SDL_RendererInfo info;
-		SDL_GetRenderDriverInfo(i, &info);
-		if (info.name == std::string("d3d")) /*||
-			info.name == std::string("opengl"))*/
-			return i;
-	}
-
-	return -1;
-}
-
 int main(int argc, char** argv) {
 
-	
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_AUDIO);
 
+	GPU_SetRequiredFeatures(GPU_FEATURE_BASIC_SHADERS);
 	screen = GPU_Init(400, 480, GPU_DEFAULT_INIT_FLAGS);
 
 	window = SDL_GetWindowFromID(screen->context->windowID);
@@ -51,8 +40,8 @@ int main(int argc, char** argv) {
 	SDL_MaximizeWindow(window);
 
 
-	screens[0] = GPU_CreateImage( 400, 240, GPU_FORMAT_RGBA);
-	screens[1] = GPU_CreateImage(320, 240, GPU_FORMAT_RGBA); 
+	screens[0] = GPU_CreateImage(400, 240, GPU_FORMAT_RGBA);
+	screens[1] = GPU_CreateImage(320, 240, GPU_FORMAT_RGBA);
 	GPU_LoadTarget(screens[0]);
 	GPU_LoadTarget(screens[1]);
 	GPU_SetImageFilter(screens[0], GPU_FILTER_LINEAR);
@@ -71,6 +60,7 @@ int main(int argc, char** argv) {
 
 	mainTimer = SDL_GetPerformanceCounter();
 
+	GLPlatform::Init();
 
 	Game::Start();
 
@@ -90,9 +80,9 @@ int main(int argc, char** argv) {
 			switch (event.type)
 			{
 			case SDL_QUIT: done = true; break;
-		
+
 			case SDL_WINDOWEVENT:
-				if (event.window.event == SDL_WINDOWEVENT_CLOSE )
+				if (event.window.event == SDL_WINDOWEVENT_CLOSE)
 					done = true;
 				if (event.window.event == SDL_WINDOWEVENT_RESIZED)
 					GPU_SetWindowResolution(event.window.data1, event.window.data2);
@@ -110,13 +100,25 @@ int main(int argc, char** argv) {
 			break;
 
 
-		Game::Draw();
-	
+
+		//Game::Draw();
+
+		//GLPlatform::PrepareDraw();
+
+		Vertex v[3] = {
+			{{-1,-1},{0,0},0},
+			{{1,-1},{0,0},0},
+			{ {0,1},{0,0},0}
+		};
+
+		Platform::SetBuffer({ v,3 });
+		Platform::DrawBuffer(0, 1, 0);
+
 		Draw();
 
 		Game::FrameEnd();
 		GPU_Flip(screen);
-	
+
 	}
 
 	Game::End();
@@ -129,6 +131,10 @@ int main(int argc, char** argv) {
 }
 
 void Draw() {
+
+	GPU_DeactivateShaderProgram();
+
+
 	int w = screen->base_w;
 	int h = screen->base_h;
 
@@ -157,14 +163,14 @@ void Draw() {
 	touchScreenLocation.position = { clip.x, clip.y };
 	touchScreenLocation.size = { clip.w,clip.h };
 
-	 r = { (float)clip.x, (float)clip.y, (float)clip.w, (float)clip.h };
-	GPU_BlitRect(screens[1], nullptr, screen, &r );
+	r = { (float)clip.x, (float)clip.y, (float)clip.w, (float)clip.h };
+	GPU_BlitRect(screens[1], nullptr, screen, &r);
 
 	const Color& c = Colors::CornflowerBlue;
 
 	for (auto s : screens) {
 
-		GPU_ClearRGBA(s->target, (Uint8)(c.r * 255), (Uint8)(c.g * 255), (Uint8)(c.b * 255),255);
-	
+		GPU_ClearRGBA(s->target, (Uint8)(c.r * 255), (Uint8)(c.g * 255), (Uint8)(c.b * 255), 255);
+
 	}
 }

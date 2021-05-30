@@ -1,12 +1,15 @@
 
 #include "Platform.h"
 
+
 #include <SDL.h>
 #include <SDL_gpu.h>
 #include <fstream>
 #include <filesystem>
 
+#include <GL/glew.h>
 
+#include "GLPlatform.h"
 #include "SDLDrawCommand.h"
 #include "Color.h"
 #include "StringLib.h"
@@ -18,7 +21,6 @@
 #include <stdio.h>
 
 #include <SDL_ttf.h>
-
 
 
 extern std::filesystem::path assetDir;
@@ -233,10 +235,14 @@ void Platform::BatchDraw(const Span<BatchDrawCommand> commands) {
 }
 
 void Platform::SetBuffer(const Span< Vertex> buffer) {
-	//GLPlatform::UpdateBuffer(buffer);
+
+	GLPlatform::PrepareDraw();
+	GLPlatform::UpdateBuffer(buffer);
 }
 void Platform::DrawBuffer(unsigned start, unsigned count, Texture texture) {
-	//GLPlatform::DrawTriangles(start, count);
+
+	GLPlatform::DrawTriangles(start, count);
+	GPU_ResetRendererState();
 }
 
 void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip, bool vFlip) {
