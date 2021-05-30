@@ -53,11 +53,10 @@ public:
 	//static void ToggleTestBlend();
 
 	static Sprite NewSprite(Image image, Rectangle16 src);
-	static void BatchDraw(const Span< BatchDrawCommand> commands);
 	static void ClearBuffer(Color color);
 
 
-	static void SetDrawBuffers(const Span< Vertex> buffer);
+	static Vertex* GetVertexBuffer();
 	static void ExecDrawCommands(const Span<DrawCommand> commands);
 
 	static void Draw(const Sprite& sprite, Rectangle dst, Color additiveBlendColor = Colors::White, bool hFlip = false , bool vFlip = false);

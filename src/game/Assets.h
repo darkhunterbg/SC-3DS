@@ -17,6 +17,7 @@ struct Image {
 struct Sprite {
 	Rectangle16 rect;
 	Image image;
+	Vector2 uv[2];
 };
 
 class SpriteAtlas {

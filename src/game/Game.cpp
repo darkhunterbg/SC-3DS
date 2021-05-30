@@ -62,6 +62,8 @@ void Game::Start() {
 	startup = true;
 	frameStartTime = Platform::ElaspedTime();
 	Audio.Init();
+	Renderer.Init();
+
 
 	GraphicsDatabase::Init();
 	AbilityDatabase::Init();

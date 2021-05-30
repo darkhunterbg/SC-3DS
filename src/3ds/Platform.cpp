@@ -30,6 +30,14 @@ static C3D_RenderTarget* currentRT = nullptr;
 static std::vector< RenderTarget> createdRenderTargets;
 static int currentScreen = 0;
 
+
+extern Vertex* vertexBuffer;
+extern C3D_BufInfo vbInfo;
+
+extern DVLB_s* spriteBatchBlob;
+extern shaderProgram_s spriteBatchProgram;
+extern C3D_AttrInfo spriteBatchAttributeInfo;
+
 const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 	std::string assetPath = assetDir + path;
 
@@ -46,7 +54,9 @@ const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 		C2D_Image img = C2D_SpriteSheetGetImage(sheet, i);
 		Sprite s;
 		s.image.textureId = img.tex;
-		s.image.textureId2 = (Texture)img.subtex;
+		s.uv[0] = { img.subtex->left, img.subtex->top };
+		s.uv[1] = { img.subtex->right, img.subtex->bottom };
+			// (Texture)img.subtex;
 		s.rect.position = { img.subtex->left * img.tex->width , img.subtex->top * img.tex->height };
 		s.rect.size = { img.subtex->width, img.subtex->height };
 
@@ -166,20 +176,73 @@ Sprite Platform::NewSprite(Image image, Rectangle16 src) {
 	return { src, {tex,s2} };
 }
 
-void Platform::BatchDraw(const Span<BatchDrawCommand> commands) {
+//void Platform::BatchDraw(const Span<BatchDrawCommand> commands) {
+//
+//	static constexpr const int depthStep = 0.0001f;
+//
+//	for (const auto& cmd : commands) {
+//		C2D_Image img = *(C2D_Image*)&cmd.image;
+//
+//		C2D_ImageTint tint;
+//		tint.corners[0] = { cmd.color.value, 1};
+//		tint.corners[1] = { cmd.color.value, 1 };
+//		tint.corners[2] = { cmd.color.value, 1};
+//		tint.corners[3] = { cmd.color.value,1};
+//		C2D_DrawImageAt(img, cmd.position.x, cmd.position.y, 0, &tint, cmd.scale.x, cmd.scale.y);
+//	}
+//}
 
-	static constexpr const int depthStep = 0.0001f;
 
-	for (const auto& cmd : commands) {
-		C2D_Image img = *(C2D_Image*)&cmd.image;
+Vertex* Platform::GetVertexBuffer() {
 
-		C2D_ImageTint tint;
-		tint.corners[0] = { cmd.color.value, 1};
-		tint.corners[1] = { cmd.color.value, 1 };
-		tint.corners[2] = { cmd.color.value, 1};
-		tint.corners[3] = { cmd.color.value,1};
-		C2D_DrawImageAt(img, cmd.position.x, cmd.position.y, 0, &tint, cmd.scale.x, cmd.scale.y);
+	return  vertexBuffer;
+}
+void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
+
+	auto uLoc_mdlvMtx = shaderInstanceGetUniformLocation(spriteBatchProgram.vertexShader, "mdlvMtx");
+	auto uLoc_projMtx = shaderInstanceGetUniformLocation(spriteBatchProgram.vertexShader, "projMtx");
+	C3D_Mtx projMtx, mdlvMtx;
+
+	Mtx_OrthoTilt(&projMtx, 0.0f, 400, 240, 0.0f, 1.0f, -1.0f, true);
+	Mtx_Identity(&mdlvMtx);
+
+
+	C3D_TexEnv* env = C3D_GetTexEnv(0);
+	C3D_TexEnvInit(env);
+	//C3D_TexEnvSrc set afterwards by C2Di_Update()
+	C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
+	C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_TEXTURE0, 0);
+
+	env = C3D_GetTexEnv(1);
+	C3D_TexEnvInit(env);
+
+	//C3D_TexEnvSrc(env, C3D_Both, GPU_PREVIOUS, GPU_PRIMARY_COLOR, 0);
+	//C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
+
+	C3D_BindProgram(&spriteBatchProgram);
+	C3D_SetAttrInfo(&spriteBatchAttributeInfo);
+	C3D_SetBufInfo(&vbInfo);
+
+	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, uLoc_projMtx, &projMtx);
+	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, uLoc_mdlvMtx, &mdlvMtx);
+
+	C3D_DepthTest(true, GPU_GEQUAL, GPU_WRITE_ALL);
+	C3D_CullFace(GPU_CULL_NONE);
+
+
+	for (const DrawCommand& cmd : commands)
+	{
+		C3D_Tex* img = (C3D_Tex*)cmd.texture;
+
+		C3D_TexBind(0, img);
+		/*switch (cmd.type)
+		{
+		case DrawPrimitiveType::Triangle: {*/
+		C3D_DrawArrays(GPU_TRIANGLES, cmd.start, cmd.count);
+	
 	}
+
+	C2D_Prepare();
 }
 
 void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip, bool vFlip) {
@@ -191,14 +254,14 @@ void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip
 		dst.size.y *= -1;
 	//if (color != Colors::Black)
 	//{
-		C2D_ImageTint tint;
-		u32 ucolor = C2D_Color32f(color.r, color.g, color.b, color.a);
-		tint.corners[0] = { ucolor , 1.0f };
-		tint.corners[1] = { ucolor , 1.0f };
-		tint.corners[2] = { ucolor , 1.0f };
-		tint.corners[3] = { ucolor , 1.0f };
+	C2D_ImageTint tint;
+	u32 ucolor = C2D_Color32f(color.r, color.g, color.b, color.a);
+	tint.corners[0] = { ucolor , 1.0f };
+	tint.corners[1] = { ucolor , 1.0f };
+	tint.corners[2] = { ucolor , 1.0f };
+	tint.corners[3] = { ucolor , 1.0f };
 
-		C2D_DrawImageAt(img, dst.position.x, dst.position.y, 0, &tint, dst.size.x / (float)img.subtex->width, dst.size.y / (float)img.subtex->height);
+	C2D_DrawImageAt(img, dst.position.x, dst.position.y, 0, &tint, dst.size.x / (float)img.subtex->width, dst.size.y / (float)img.subtex->height);
 	//}
 	//else
 	//	C2D_DrawImageAt(img, dst.position.x, dst.position.y, 0, nullptr, dst.size.x / (float)img.subtex->width, dst.size.y / (float)img.subtex->height);

@@ -16,6 +16,10 @@
 #include "Audio.h"
 #include "Profiler.h"
 
+#include "Engine/GraphicsPrimitives.h"
+
+#include <spritebatch_shbin.h>
+
 C3D_RenderTarget* top;
 C3D_RenderTarget* bottom;
 C3D_RenderTarget* screens[2];
@@ -24,6 +28,13 @@ std::string userDir;
 C2D_TextBuf textBuffer;
 u64 mainTimer;
 std::vector<NDSAudioChannel*> audioChannels;
+
+Vertex* vertexBuffer;
+C3D_BufInfo vbInfo;
+
+DVLB_s* spriteBatchBlob;
+shaderProgram_s spriteBatchProgram;
+C3D_AttrInfo spriteBatchAttributeInfo;
 
 void Init();
 void Uninit();
@@ -111,10 +122,30 @@ int main()
 	return 0;
 }
 
+void LoadShader() {
+	spriteBatchBlob = DVLB_ParseFile((u32*)spritebatch_shbin, spritebatch_shbin_size);
+	if (!spriteBatchBlob)
+		FatalError("Failed to compile spritebatch shader");
+
+	vertexBuffer = (Vertex*)linearAlloc(sizeof(Vertex) * 10 * 1024);
+
+	shaderProgramInit(&spriteBatchProgram);
+	shaderProgramSetVsh(&spriteBatchProgram, &spriteBatchBlob->DVLE[0]);
+
+	AttrInfo_Init(&spriteBatchAttributeInfo);
+	AttrInfo_AddLoader(&spriteBatchAttributeInfo, 0, GPU_FLOAT, 2); // v0=position
+	AttrInfo_AddLoader(&spriteBatchAttributeInfo, 1, GPU_FLOAT, 2); // v1=texcoord
+	AttrInfo_AddLoader(&spriteBatchAttributeInfo, 2, GPU_UNSIGNED_BYTE, 4); // v2=color
+
+	BufInfo_Init(&vbInfo);
+	BufInfo_Add(&vbInfo, vertexBuffer, sizeof(Vertex), 3, 0x210);
+}
+
 void Init() {
 
 	romfsInit();
 	gfxInitDefault();
+	
 
 	// Enable N3DS 804MHz operation, where available
 	//osSetSpeedupEnable(true);
@@ -124,10 +155,15 @@ void Init() {
 	//	FatalError("svcReleaseSemaphore failed with %s", R_SUMMARY(r));
 
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
-	C2D_Init(C2D_DEFAULT_MAX_OBJECTS * 8);
+
+	LoadShader();
+
+	C2D_Init(C2D_DEFAULT_MAX_OBJECTS );
 	C2D_Prepare();
 	screens[0] = top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
 	screens[1] = bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+
+	
 
 	ndspInit();
 	ndspSetOutputMode(NDSP_OUTPUT_STEREO);

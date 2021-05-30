@@ -35,7 +35,7 @@ extern int numberOfThreads;
 
 static ScreenId currentRT;
 static GPU_Target* target = nullptr;
-static Span<Vertex> vertexBufer;
+static Vertex* vertexBuffer = nullptr;
 
 
 constexpr Uint8 SDL_FloatToUint8(float x) {
@@ -89,7 +89,7 @@ const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 			return nullptr;
 		}
 		Rectangle16 rect = { {0,0},Vector2Int16(size) };
-		Sprite s = { rect ,{ tex ,nullptr} };
+		Sprite s = { rect ,{ tex ,nullptr}, {{0,0},{1,1} } };
 		asset->AddSprite(s);
 	}
 
@@ -204,42 +204,13 @@ void Platform::ClearBuffer(Color color) {
 	GPU_ClearRGBA(target, c.GetR(), c.GetG(), c.GetB(), c.GetA());
 	//SDL_RenderClear(renderer);
 }
-void Platform::BatchDraw(const Span<BatchDrawCommand> commands) {
-	for (const auto& cmd : commands) {
-		GPU_Image* img = (GPU_Image*)cmd.sprite.image.textureId;
-		GPU_FlipEnum flags = cmd.scale.x < 0 ? GPU_FLIP_HORIZONTAL : GPU_FLIP_NONE;
-		Vector2Int size;
-	
-		size.x = img->w;
-		size.y = img->h;
-
-		SDL_Rect dst = {
-			(int)cmd.position.x,
-			(int)cmd.position.y,
-			(int)(size.x * std::abs(cmd.scale.x)),
-			(int)(size.y * cmd.scale.y) };
-
-		GPU_Rect src = { (float)0, (float)0, (float)size.x,(float)size.y };
-		GPU_Rect dstC = { (float)dst.x,(float)dst.y, (float)dst.w,(float)dst.h };
 
 
-		SDL_Color c;
-		c.r = cmd.color.GetR();
-		c.g = cmd.color.GetG();
-		c.b = cmd.color.GetB();
-		c.a = cmd.color.GetA();
-
-
-		GPU_SetColor(img, c);
-
-		GPU_BlitRectX(img, &src, target, &dstC,0,0,0, flags);
+Span<Vertex> Platform::GetVertexBuffer() {
+	if (vertexBuffer== nullptr) {
+		vertexBuffer = new Vertex[10 * 1024];
 	}
-}
-
-
-void Platform::SetDrawBuffers(const Span<Vertex> buffer) {
-
-	vertexBufer = buffer;
+	return { vertexBuffer, 10 * 1024 };
 }
 void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
 
@@ -249,7 +220,7 @@ void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
 		/*switch (cmd.type)
 		{
 		case DrawPrimitiveType::Triangle: {*/
-		GPU_PrimitiveBatchV(img, target, GPU_TRIANGLE_FAN,  cmd.count, vertexBufer.Data() + cmd.start, 0, nullptr, GPU_BATCH_XY_ST_RGBA8);
+		GPU_PrimitiveBatchV(img, target, GPU_TRIANGLE_FAN,  cmd.count, vertexBuffer + cmd.start, 0, nullptr, GPU_BATCH_XY_ST_RGBA8);
 			//break;
 	/*	}
 		case DrawPrimitiveType::Line: {
@@ -257,7 +228,7 @@ void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
 			break;
 		}
 		default:
-			break;
+			break;t
 		}*/
 	}
 }
