@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Assets.h"
-#include "Input.h"
-
 
 class Scene;
 
@@ -15,9 +13,6 @@ private:
 public:
 	static Font SystemFont;
 	static AudioClip ButtonAudio;
-
-	static Gamepad Gamepad;
-	static Pointer Pointer;
 
 	static float DeltaTime;
 

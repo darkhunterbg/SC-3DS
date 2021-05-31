@@ -9,6 +9,7 @@
 #include "../Entity/EntityManager.h"
 #include "../Engine/GraphicsRenderer.h"
 #include "../Engine/AssetLoader.h"
+#include "../Engine/InputManager.h"
 
 #include "../Data/GraphicsDatabase.h"
 
@@ -132,13 +133,13 @@ void GameHUD::LowerScreenGUI(const Camera& camera, GameViewContext& context) {
 }
 
 void GameHUD::Update(Camera& camera, GameViewContext& context) {
-	if (Game::Pointer.IsDown()) {
-		if (minimapDst.Contains(Game::Pointer.Position())) {
-			Vector2Int pos = Game::Pointer.Position() - Vector2Int(minimapDst.position);
+	if (InputManager::Pointer.IsDown()) {
+		if (minimapDst.Contains(InputManager::Pointer.Position())) {
+			Vector2Int pos = InputManager::Pointer.Position() - Vector2Int(minimapDst.position);
 			camera.Position = Vector2Int16(Vector2(pos) * minimapUpscale);
 		}
 
-		if (portraitPanelDst.Contains(Game::Pointer.Position())) {
+		if (portraitPanelDst.Contains(InputManager::Pointer.Position())) {
 			EntityId selected = context.GetPriorityUnitSelected();
 			if (selected != Entity::None) {
 				Vector2Int16 pos = context.GetEntityManager().PositionComponents.GetComponent(selected);

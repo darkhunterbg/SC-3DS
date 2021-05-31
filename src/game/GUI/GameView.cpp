@@ -11,6 +11,7 @@
 #include "../Entity/EntityManager.h"
 
 #include "../Engine/GraphicsRenderer.h"
+#include "../Engine/InputManager.h"
 
 #include "../Data/GraphicsDatabase.h"
 #include "../Data/AbilityDatabase.h"
@@ -143,7 +144,7 @@ void GameView::ContextualGamepadInput() {
 	bool commandHasTarget = false;
 
 	if (context.IsTargetSelectionMode) {
-		if (Game::Gamepad.IsButtonReleased(GamepadButton::A)) {
+		if (InputManager::Gamepad.IsButtonReleased(GamepadButton::A)) {
 			if (entity == Entity::None)
 				context.ActivateCurrentAbility(position);
 			else
@@ -155,7 +156,7 @@ void GameView::ContextualGamepadInput() {
 	}
 	else {
 
-		if (Game::Gamepad.IsButtonReleased(GamepadButton::A)) {
+		if (InputManager::Gamepad.IsButtonReleased(GamepadButton::A)) {
 
 			if (entity == Entity::None) {
 				context.ActivateAbility(&AbilityDatabase::Attack, position);
@@ -177,7 +178,7 @@ void GameView::ContextualGamepadInput() {
 			commandHasTarget = true;
 		}
 
-		if (Game::Gamepad.IsButtonReleased(GamepadButton::B)) {
+		if (InputManager::Gamepad.IsButtonReleased(GamepadButton::B)) {
 
 			EntityId id = context.GetPriorityUnitSelected();
 
@@ -193,7 +194,7 @@ void GameView::ContextualGamepadInput() {
 			}
 		}
 
-		if (Game::Gamepad.IsButtonReleased(GamepadButton::X)) {
+		if (InputManager::Gamepad.IsButtonReleased(GamepadButton::X)) {
 
 			EntityId id = context.GetPriorityUnitSelected();
 

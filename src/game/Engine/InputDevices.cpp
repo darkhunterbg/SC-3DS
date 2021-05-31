@@ -1,4 +1,5 @@
-#include "Input.h"
+#include "InputDevices.h"
+
 #include "Platform.h"
 
 void Gamepad::Update()

@@ -10,6 +10,7 @@
 #include <algorithm>
 
 #include "Game.h"
+#include "Engine/InputManager.h"
 
 static constexpr const float Speed = 10;
 static constexpr const int AnimFrameCount = 6;
@@ -50,9 +51,9 @@ void Cursor::Update(Camera& camera, GameViewContext& context) {
 
 	// TODO: State machine
 
-	if (!Game::Gamepad.IsButtonDown(GamepadButton::L))
+	if (!InputManager::Gamepad.IsButtonDown(GamepadButton::L))
 	{
-		Vector2 move = Game::Gamepad.CPad();
+		Vector2 move = InputManager::Gamepad.CPad();
 		Position += Vector2Int16(move * Speed);
 	}
 
@@ -67,7 +68,7 @@ void Cursor::Update(Camera& camera, GameViewContext& context) {
 	}
 
 
-	holding = Game::Gamepad.IsButtonDown(GamepadButton::Y);
+	holding = InputManager::Gamepad.IsButtonDown(GamepadButton::Y);
 
 	if (Position.y <= Limits.position.y) {
 		Position.y = Limits.position.y;
@@ -79,7 +80,7 @@ void Cursor::Update(Camera& camera, GameViewContext& context) {
 		corner.y = 1;
 	}
 
-	if (Game::Gamepad.IsButtonPressed(GamepadButton::Y)) {
+	if (InputManager::Gamepad.IsButtonPressed(GamepadButton::Y)) {
 		holdStart = camera.ScreenToWorld(Position);
 	}
 
@@ -127,7 +128,7 @@ void Cursor::UpdateDefaultState(Camera& camera, GameViewContext& context)
 		regionRect.position.y = std::min(start.y, end.y);
 	}
 
-	if (Game::Gamepad.IsButtonReleased(GamepadButton::Y)) {
+	if (InputManager::Gamepad.IsButtonReleased(GamepadButton::Y)) {
 	
 		if (dragging ) {
 		

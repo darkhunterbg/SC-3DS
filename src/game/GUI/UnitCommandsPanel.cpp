@@ -9,6 +9,7 @@
 #include "../Entity/EntityUtil.h"
 
 #include "../Engine/GraphicsRenderer.h"
+#include "../Engine/InputManager.h"
 
 void UnitCommandsPanel::Draw(GameViewContext& context)
 {
@@ -20,7 +21,7 @@ void UnitCommandsPanel::UpdateInput(GameViewContext& context)
 	UpdateCommands(context);
 
 	if (context.IsTargetSelectionMode &&
-		Game::Gamepad.IsButtonReleased(GamepadButton::B)) {
+		InputManager::Gamepad.IsButtonReleased(GamepadButton::B)) {
 
 		OnCommandPressed(context, unitCommands[8]);
 	}
@@ -31,7 +32,7 @@ void UnitCommandsPanel::UpdateInput(GameViewContext& context)
 
 	dst.size = Vector2Int(f.rect.size);
 
-	if (Game::Pointer.IsDown()) {
+	if (InputManager::Pointer.IsDown()) {
 
 		hover = -1;
 
@@ -47,14 +48,14 @@ void UnitCommandsPanel::UpdateInput(GameViewContext& context)
 			Rectangle d = dst;
 			d.position += offset;
 
-			if (d.Contains(Game::Pointer.Position())) {
+			if (d.Contains(InputManager::Pointer.Position())) {
 				hover = i;
 				break;
 			}
 
 		}
 
-		if (Game::Pointer.IsPressed() && hover != -1)
+		if (InputManager::Pointer.IsPressed() && hover != -1)
 		{
 			pressedCommand = hover;
 		}
@@ -66,7 +67,7 @@ void UnitCommandsPanel::UpdateInput(GameViewContext& context)
 		unitCommands[pressedCommand].active = true;
 	}
 
-	if (pressedCommand != -1 && Game::Pointer.IsReleased()) {
+	if (pressedCommand != -1 && InputManager::Pointer.IsReleased()) {
 		if (pressedCommand == hover) {
 			OnCommandPressed(context, unitCommands[pressedCommand]);
 		}
@@ -146,7 +147,7 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 
 	if (context.IsTargetSelectionMode) {
 		unitCommands[8].enabled = true;
-		unitCommands[8].pressed = unitCommands[8].active = Game::Gamepad.IsButtonDown(GamepadButton::B);
+		unitCommands[8].pressed = unitCommands[8].active = InputManager::Gamepad.IsButtonDown(GamepadButton::B);
 		unitCommands[8].commandIcon = &SpriteDatabase::Load_unit_cmdbtns_cmdicons()->GetFrame(236);
 		return;
 	}

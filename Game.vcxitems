@@ -36,6 +36,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\AudioManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\GraphicsPrimitives.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\GraphicsRenderer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\InputDevices.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\InputManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\JobSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\Archetype.h" />
@@ -63,7 +65,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GameView.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitCommandsPanel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitSelectionConsolePanel.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Input.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\Wave.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\MathLib.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Platform.h" />
@@ -92,6 +93,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\AssetLoader.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\AudioManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\GraphicsRenderer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\InputDevices.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\InputManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\JobSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\Archetype.cpp" />
@@ -117,7 +120,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GameView.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitCommandsPanel.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitSelectionConsolePanel.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Input.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\Wave.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Profiler.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\GameScene.cpp" />

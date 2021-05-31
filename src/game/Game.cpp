@@ -15,6 +15,7 @@
 #include "Engine/JobSystem.h"
 #include "Engine/AudioManager.h"
 #include "Engine/AssetLoader.h"
+#include "Engine/InputManager.h"
 
 #include "Platform.h"
 
@@ -29,8 +30,7 @@ static double frameStartTime = 0;
 
 Font Game::SystemFont;
 AudioClip Game::ButtonAudio;
-Gamepad Game::Gamepad;
-Pointer Game::Pointer;
+
 
 float Game::DeltaTime = 0;
 
@@ -78,8 +78,9 @@ bool Game::Update() {
 
 	//SectionProfiler p("Update");
 
-	Gamepad.Update();
-	Pointer.Update();
+	
+	InputManager::Update();
+
 	AudioManager::UpdateAudio();
 
 	if (startup) {

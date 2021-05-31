@@ -30,7 +30,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\stb_sprintf.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\StringLib.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Camera.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Input.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Assets.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Color.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Game.h" />
@@ -178,6 +177,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\AssetLoader.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\InputManager.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\InputDevices.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -212,7 +217,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\KinematicSystem.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Input.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\NavigationSystem.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
@@ -308,6 +312,12 @@
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\AssetLoader.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\InputManager.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\InputDevices.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>

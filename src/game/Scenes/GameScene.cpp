@@ -10,6 +10,7 @@
 #include "../Entity/EntityUtil.h"
 
 #include "../Engine/GraphicsRenderer.h"
+#include "../Engine/InputManager.h"
 
 #include <algorithm>
 
@@ -112,7 +113,7 @@ void GameScene::Update() {
 	camera.Update();
 
 
-	if (Game::Gamepad.IsButtonReleased(GamepadButton::Select)) {
+	if (InputManager::Gamepad.IsButtonReleased(GamepadButton::Select)) {
 		entityManager->GetMapSystem().FogOfWarVisible = !entityManager->GetMapSystem().FogOfWarVisible;
 	}
 }

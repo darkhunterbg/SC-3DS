@@ -1,25 +1,25 @@
 #include "Camera.h"
 
-#include "Game.h"
+#include "Engine/InputManager.h"
 
 
 void Camera::Update() {
 
-	if (Game::Gamepad.IsButtonPressed(GamepadButton::R)) {
+	if (InputManager::Gamepad.IsButtonPressed(GamepadButton::R)) {
 		if (Scale == 1)
 			Scale = 2;
 		else
 			Scale = 1;
 	}
 
-	if (Game::Gamepad.IsButtonDown(GamepadButton::L))
+	if (InputManager::Gamepad.IsButtonDown(GamepadButton::L))
 	{
-		Vector2 move = Game::Gamepad.CPad();
+		Vector2 move = InputManager::Gamepad.CPad();
 		move *= (int)(GetCameraSpeed());
 		Position += Vector2Int16(move);
 	}
 
-	Vector2 move = Game::Gamepad.CStick()	;
+	Vector2 move = InputManager::Gamepad.CStick();
 	move *= (int)(GetCameraSpeed());
 	Position += Vector2Int16(move);
 

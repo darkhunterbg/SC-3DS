@@ -2,7 +2,6 @@
 #include "../Entity/EntityManager.h"
 #include "../Entity/EntityUtil.h"
 
-#include "../Engine/GraphicsRenderer.h"
 #include "../Game.h"
 
 #include "../Color.h"
@@ -11,6 +10,8 @@
 #include "../Platform.h"
 
 #include "../Engine/AssetLoader.h"
+#include "../Engine/InputManager.h"
+#include "../Engine/GraphicsRenderer.h"
 
 static char buffer[64];
 
@@ -92,7 +93,7 @@ void UnitSelectionConsolePanel::UpdateSelection(GameViewContext& context)
 	if (context.selection.size() < 2)
 		return;
 
-	if (!Game::Pointer.IsPressed())
+	if (!InputManager::Pointer.IsPressed())
 		return;
 
 	int max = std::min((int)context.selection.size(), 12);
@@ -106,7 +107,7 @@ void UnitSelectionConsolePanel::UpdateSelection(GameViewContext& context)
 
 		Rectangle rect = { { pos + offset}, {36,36} };
 
-		if (rect.Contains(Game::Pointer.Position())) {
+		if (rect.Contains(InputManager::Pointer.Position())) {
 
 			if (context.IsTargetSelectionMode) {
 				context.ActivateCurrentAbility(context.selection[i]);
@@ -244,8 +245,8 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 
 
 	Vector2Int pointerPos = { 0,0 };
-	if (Game::Pointer.IsPressed()) {
-		pointerPos = Game::Pointer.Position();
+	if (InputManager::Pointer.IsPressed()) {
+		pointerPos = InputManager::Pointer.Position();
 	}
 
 	for (int i = 0; i < data.productionQueue.size(); ++i) {
