@@ -3,8 +3,6 @@
 #include "../Entity/EntityUtil.h"
 
 #include "../Engine/GraphicsRenderer.h"
-
-#include "../Platform.h"
 #include "../Game.h"
 
 #include "../Color.h"

@@ -5,7 +5,6 @@
 #include "GraphicsPrimitives.h"
 
 #include <vector>
-
 #include <Span.h>
 
 class GraphicsRenderer {
@@ -33,7 +32,7 @@ private:
 public:
 	static void Init();
 	static void BufferDraw(std::vector<BatchDrawCommand>& cmd);
-	static void Draw(const Sprite& sprite, Vector2Int position, Color32 color= 0xFFFFFFFF);
+	static void Draw(const Sprite& sprite, Vector2Int position, Color32 color = 0xFFFFFFFF);
 	static void Draw(const Sprite& sprite, const Rectangle& dst, Color32 color = 0xFFFFFFFF);
 
 	inline static void Draw(const Sprite& sprite, Vector2Int position, Color color) {
@@ -45,10 +44,15 @@ public:
 
 	static void DrawText(const Font& font, Vector2Int position, const char* text, Color color = Colors::White, float scale = 1.0f);
 
-	static void DrawRectangle(const Rectangle& rect,  Color32 color);
+	static void DrawRectangle(const Rectangle& rect, Color32 color);
 
 	inline static void DrawRectangle(const Rectangle& rect, const Color& color) {
 		DrawRectangle(rect, Color32(color));
+	}
+	static void DrawLine(Vector2Int src, Vector2Int dst, Color32 color);
+
+	inline static void DrawLine(Vector2Int src, Vector2Int dst, Color color) {
+		DrawLine(src, dst ,Color32(color));
 	}
 
 	static void Submit();

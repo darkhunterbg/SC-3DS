@@ -7,7 +7,7 @@
 #include "../Assets.h"
 #include "../Span.h"
 #include "../Color.h"
-#include "../Platform.h"
+#include "../Engine/GraphicsPrimitives.h"
 
 class EntityManager;
 class Camera;

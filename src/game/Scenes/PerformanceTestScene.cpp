@@ -1,14 +1,14 @@
 #include "PerformanceTestScene.h"
 #include "../Data/UnitDatabase.h"
 #include "../Data/RaceDatabase.h"
-#include "../Platform.h"
 #include "../Profiler.h"
-#include <algorithm>
+
 #include "../Job.h"
 #include "../Entity/Component.h"
 #include "../Entity/EntityUtil.h"
 #include "../Engine/GraphicsRenderer.h"
 
+#include <algorithm>
 
 void PerformanceTestScene::Start() {
 

@@ -1,5 +1,4 @@
 #include "Profiler.h"
-#include "Platform.h"
 #include "StringLib.h"
 #include "Game.h"
 #include "StringLib.h"
@@ -81,14 +80,14 @@ void Profiler::ShowPerformance() {
 			c = Colors::Orange;
 		if (frameLoad[i] > 2)
 			c = Colors::Red;
-		Platform::DrawLine(offset, offset + Vector2Int(0, -y), c);
+		GraphicsRenderer::DrawLine(offset, offset + Vector2Int(0, -y), c);
 		offset.x--;
 	}
 	offset = { 1, y };
 
-	Platform::DrawLine(offset, offset + Vector2Int(60, 0), Colors::White);
+	GraphicsRenderer::DrawLine(offset, offset + Vector2Int(60, 0), Colors::White);
 	offset.y += 50;
-	Platform::DrawLine(offset, offset + Vector2Int(60, 0), Colors::White);
+	GraphicsRenderer::DrawLine(offset, offset + Vector2Int(60, 0), Colors::White);
 }
 
 void Profiler::FrameStart() {

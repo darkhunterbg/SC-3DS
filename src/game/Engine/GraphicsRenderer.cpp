@@ -63,9 +63,16 @@ void GraphicsRenderer::BufferDraw(std::vector<BatchDrawCommand>& cmd)
 		size.x *= c.scale.x;
 		size.y *= c.scale.y;
 
-
 		Vector2 start = c.sprite.uv[0];
 		Vector2 end = c.sprite.uv[1];
+
+		if (size.x < 0) {
+			size.x = -size.x;
+			float f = start.x;
+			start.x = end.x;
+			end.x = f;
+		}
+
 
 		if (dc->texture != c.sprite.image.textureId) {
 			dc = &instance.NewDrawCommand(c.sprite.image.textureId);
@@ -150,6 +157,14 @@ void GraphicsRenderer::DrawRectangle(const Rectangle& dst, Color32 color)
 	instance.AddVertex(Vector2(dst.position + dst.size), { 1,1 }, color);
 	instance.AddVertex(Vector2(dst.position + Vector2Int(0, dst.size.y)), { 0,1 }, color);
 	instance.AddVertex(Vector2(dst.position), { 0,0 }, color);
+}
+
+void GraphicsRenderer::DrawLine(Vector2Int src, Vector2Int dst, Color32 color)
+{
+	instance.GetDrawCommand(DrawCommandType::Line).count += 2;
+
+	instance.AddVertex(Vector2(src), { 0,0 }, color);
+	instance.AddVertex(Vector2(dst), { 1,1, }, color);
 }
 
 void GraphicsRenderer::Submit()

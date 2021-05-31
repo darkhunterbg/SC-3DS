@@ -5,7 +5,6 @@
 #include "../Game.h"
 #include "../Camera.h"
 
-#include "../Platform.h"
 #include "../Util.h"
 #include "../StringLib.h"
 #include "../Entity/EntityUtil.h"

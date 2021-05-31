@@ -251,8 +251,6 @@ void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
 				GPU_BlitRect(img,&src,target,&dst);
 			}*/
 
-			//GPU_Image* img = (GPU_Image*)cmd.texture;
-
 			GPU_PrimitiveBatchV(img, target, GPU_TRIANGLES, cmd.count, vertexBuffer + cmd.start, 0, nullptr, GPU_BATCH_XY_ST_RGBA8);
 
 			break;
@@ -269,7 +267,6 @@ void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
 				color.b = c.GetB();
 				color.a = c.GetA();
 		
-
 				Vector2 end = vertexBuffer[i + 2].position;
 			
 				GPU_RectangleFilled(target, start.x, start.y, end.x, end.y, color);
@@ -277,6 +274,26 @@ void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
 
 			/*	GPU_PrimitiveBatchV(white, target, GPU_TRIANGLES, cmd.count, vertexBuffer + cmd.start, 0, nullptr, GPU_BATCH_XY_ST_RGBA8);*/
 
+			break;
+		}
+		case DrawCommandType::Line: {
+
+			for (int i = cmd.start; i < cmd.start + cmd.count; i += 6) {
+
+				Vector2 start = vertexBuffer[i].position;
+				Color32 c = vertexBuffer[i].color.value;
+				SDL_Color color;
+
+				color.r = c.GetR();
+				color.g = c.GetG();
+				color.b = c.GetB();
+				color.a = c.GetA();
+
+				Vector2 end = vertexBuffer[i + 2].position;
+
+				GPU_Line(target, start.x, start.y, end.x, end.y, color);
+			}
+		
 			break;
 		}
 		default:
@@ -301,29 +318,6 @@ void Platform::DrawText(const Font& font, Vector2Int position, const char* text,
 	cmd.a = SDL_FloatToUint8(color.a);
 
 	FC_DrawScaleColor(cmd.font, target, cmd.dst.x, cmd.dst.y, FC_MakeScale(cmd.scale, cmd.scale), FC_MakeColor(cmd.r, cmd.g, cmd.b, cmd.a), cmd.text.data());
-
-}
-void Platform::DrawLine(Vector2Int src, Vector2Int dst, Color color) {
-	SDLDrawCommand cmd;
-
-	cmd.type = SDLDrawCommandType::Line;
-	cmd.r = SDL_FloatToUint8(color.r);
-	cmd.g = SDL_FloatToUint8(color.g);
-	cmd.b = SDL_FloatToUint8(color.b);
-	cmd.a = SDL_FloatToUint8(color.a);
-	cmd.src.x = src.x;
-	cmd.src.y = src.y;
-	cmd.dst.x = dst.x;
-	cmd.dst.y = dst.y;
-
-
-	SDL_Color c;
-	c.r = cmd.r;
-	c.g = cmd.g;
-	c.b = cmd.b;
-	c.a = cmd.a;
-
-	GPU_Line(target, cmd.src.x, cmd.src.y, cmd.dst.x, cmd.dst.y, c);
 
 }
 

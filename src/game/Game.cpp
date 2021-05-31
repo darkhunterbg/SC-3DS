@@ -1,6 +1,5 @@
 #include "Game.h"
 
-#include "Platform.h"
 #include "Scenes/Scene.h"
 #include "Scenes/GameScene.h"
 #include "Scenes/PerformanceTestScene.h"

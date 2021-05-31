@@ -1,5 +1,4 @@
 #include "UnitCommandsPanel.h"
-#include "../Platform.h"
 #include "../Color.h"
 #include "../Game.h"
 

@@ -1,7 +1,6 @@
 #include "MapSystem.h"
 #include "EntityManager.h"
 #include "../Game.h"
-#include "../Platform.h"
 #include "../Profiler.h"
 #include "../Engine/GraphicsRenderer.h"
 
@@ -289,27 +288,26 @@ void MapSystem::DrawFogOfWar(const Camera& camera) {
 
 	Rectangle16 camRect = camera.GetRectangle16();
 
+
 	GraphicsRenderer::DrawOnTexture(fowDownscaleSprite.image.textureId);
 	Platform::ClearBuffer(Colors::Transparent);
-
 	// downscale minimap fow
 	auto s = Platform::NewSprite(minimapFowTexture, { {0,0},Vector2Int16(minimapTextureSize) });
 	GraphicsRenderer::Draw(s,{ {0,0},{fowDownscaleSprite.rect.size.x,fowDownscaleSprite.rect.size.y} });
 
+
 	GraphicsRenderer::DrawOnTexture(fogOfWarTexture.textureId);
 	Platform::ClearBuffer(Colors::Transparent);
-
 	// upscale downscaled minimap fow
 	GraphicsRenderer::Draw(fowDownscaleSprite,
 		{ {0,0},{FogOfWarTextureSize.x,FogOfWarTextureSize.y} });
 
+
 	GraphicsRenderer::DrawOnTexture(nullptr);
 	GraphicsRenderer::ChangeBlendingMode(BlendMode::Alpha);
-
 	static constexpr const int CamDownscale = 32 / Upscale;
 	Rectangle16 src = { (camRect.position / CamDownscale), (camRect.size / CamDownscale) };
 	Sprite fowSprite = Platform::NewSprite(fogOfWarTexture, src);
-
 	GraphicsRenderer::Draw(fowSprite, { {0,0},{400,240} });
 
 	GraphicsRenderer::Submit();
@@ -350,7 +348,7 @@ void MapSystem::RenderMinimapFogOfWar(const PlayerVision& vision) {
 	Platform::ClearBuffer(Colors::Black);
 
 
-	Color colors[2] = { (Color(0,0,0,0.6)), Color(0,0,0,0.0f) };
+	Color colors[2] = { (Color(0,0,0,0.5)), Color(0,0,0,0.0f) };
 
 	GraphicsRenderer::ChangeBlendingMode(BlendMode::AllSet);
 
