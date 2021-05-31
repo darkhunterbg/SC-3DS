@@ -1,5 +1,6 @@
 #include "Cursor.h"
 #include "../Platform.h"
+#include "../Engine/GraphicsRenderer.h"
 #include "../Game.h"
 #include "../Camera.h"
 #include "../Entity/EntityManager.h"
@@ -40,7 +41,7 @@ void Cursor::Draw() {
 		Util::DrawTransparentRectangle(regionRect, 2, Colors::UIGreen);
 	}
 
-	Platform::Draw(frame.sprite, dst);
+	GraphicsRenderer::Draw(frame.sprite, dst);
 }
 
 void Cursor::Update(Camera& camera, GameViewContext& context) {

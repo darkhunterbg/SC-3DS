@@ -26,12 +26,13 @@ class MapSystem {
 	};
 private:
 
+	Sprite fowDownscaleSprite;
 	Vector2Int16 mapSize;
 	Vector2Int16 gridSize;
-	Image minimapTexture = { 0,0 };
-	Image minimapFowTexture = { 0,0 };
-	Image minimapTerrainTexture = { 0,0 };
-	Image fogOfWarTexture = { 0,0 };
+	Image minimapTexture = { 0 };
+	Image minimapFowTexture = { 0 };
+	Image minimapTerrainTexture = { 0};
+	Image fogOfWarTexture = { 0 };
 
 	short minimapTextureSize = 0;
 

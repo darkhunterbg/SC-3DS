@@ -4,6 +4,8 @@
 #include "Game.h"
 #include "StringLib.h"
 
+#include "Engine/GraphicsRenderer.h"
+
 #include <algorithm>
 #include <vector>
 #include <unordered_map>
@@ -37,7 +39,7 @@ static std::unordered_map<std::string, double> profileData;
 static float scale = 1.0f;
 
 void Profiler::ShowPerformance() {
-	Platform::DrawOnScreen(ScreenId::Top);
+	GraphicsRenderer::DrawOnScreen(ScreenId::Top);
 
 	char text[128];
 

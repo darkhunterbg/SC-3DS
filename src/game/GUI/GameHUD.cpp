@@ -8,6 +8,7 @@
 #include "../Entity/MapSystem.h"
 #include "../Util.h"
 #include "../Entity/EntityManager.h"
+#include "../Engine/GraphicsRenderer.h"
 
 #include "../Data/GraphicsDatabase.h"
 
@@ -36,10 +37,10 @@ void GameHUD::DrawResource(Sprite icon, Vector2Int pos, Color color, const char*
 	stbsp_vsnprintf(textBuffer, sizeof(textBuffer), fmt, args);
 	va_end(args);
 
-	Platform::Draw(icon, { pos,{ 14, 14} });
+	GraphicsRenderer::Draw(icon, { pos,{ 14, 14} });
 	pos += {16, -2};
-	Platform::DrawText(font, pos + Vector2Int{ 1,1 }, textBuffer, Colors::Black, 0.4f);
-	Platform::DrawText(font, pos, textBuffer, color, 0.4f);
+	GraphicsRenderer::DrawText(font, pos + Vector2Int{ 1,1 }, textBuffer, Colors::Black, 0.4f);
+	GraphicsRenderer::DrawText(font, pos, textBuffer, color, 0.4f);
 }
 
 void GameHUD::UpdateInfo(GameViewContext& context) {
@@ -91,18 +92,18 @@ void GameHUD::UpperScreenGUI(const Camera& camera, GameViewContext& context) {
 
 	pos.x += Platform::MeasureString(font, textBuffer, 0.4f).x;
 	stbsp_snprintf(textBuffer, sizeof(textBuffer), "/%i", supply.max);
-	Platform::DrawText(font, pos + Vector2Int{ 1,1 }, textBuffer, Colors::Black, 0.4f);
-	Platform::DrawText(font, pos, textBuffer, Colors::UIGreen, 0.4f);
+	GraphicsRenderer::DrawText(font, pos + Vector2Int{ 1,1 }, textBuffer, Colors::Black, 0.4f);
+	GraphicsRenderer::DrawText(font, pos, textBuffer, Colors::UIGreen, 0.4f);
 
 	const auto& sprite = context.race->ConsoleSprite.GetSprite(1);
-	Platform::Draw(sprite, { {0, 240 - sprite.rect.size.y,}, Vector2Int(sprite.rect.size) });
+	GraphicsRenderer::Draw(sprite, { {0, 240 - sprite.rect.size.y,}, Vector2Int(sprite.rect.size) });
 
 	if (context.IsTargetSelectionMode) {
 		pos = { 0, 240 - sprite.rect.size.y };
 		pos.y -= 16;
 		pos.x += 160;
-		Platform::DrawText(font, pos + Vector2Int{ 1, 1 }, "Select Target", Colors::Black, 0.4f);
-		Platform::DrawText(font, pos, "Select Target", Colors::UILightGray, 0.4f);
+		GraphicsRenderer::DrawText(font, pos + Vector2Int{ 1, 1 }, "Select Target", Colors::Black, 0.4f);
+		GraphicsRenderer::DrawText(font, pos, "Select Target", Colors::UILightGray, 0.4f);
 
 	}
 }
@@ -114,10 +115,10 @@ void GameHUD::LowerScreenGUI(const Camera& camera, GameViewContext& context) {
 	EntityId selected = context.GetPriorityUnitSelected();
 	if (selected != Entity::None) {
 		auto& def = *context.GetEntityManager().UnitArchetype.UnitComponents.GetComponent(selected).def;
-		Platform::Draw(def.Portrait, portraitPanelDst);
+		GraphicsRenderer::Draw(def.Portrait, portraitPanelDst);
 	}
 
-	Platform::Draw(context.race->ConsoleSprite.GetSprite(0), { {0, 0,},{ 320, 240} });
+	GraphicsRenderer::Draw(context.race->ConsoleSprite.GetSprite(0), { {0, 0,},{ 320, 240} });
 
 
 	DrawMinimap(camera, context);

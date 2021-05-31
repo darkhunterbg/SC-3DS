@@ -7,6 +7,7 @@
 #include "../Job.h"
 #include "../Entity/Component.h"
 #include "../Entity/EntityUtil.h"
+#include "../Engine/GraphicsRenderer.h"
 
 
 void PerformanceTestScene::Start() {
@@ -45,9 +46,7 @@ void PerformanceTestScene::Update() {
 	entityManager.FrameUpdate(camera);
 }
 
-
-
 void PerformanceTestScene::Draw() {
-	Platform::DrawOnScreen(ScreenId::Top);
+	GraphicsRenderer::DrawOnScreen(ScreenId::Top);
 	entityManager.Draw(camera);
 }

@@ -2,6 +2,7 @@
 #include "EntityManager.h"
 #include "Camera.h"
 #include "../Profiler.h"
+#include "../Engine/GraphicsRenderer.h"
 
 #include <vector>
 
@@ -106,7 +107,7 @@ void KinematicSystem::DrawColliders(const Camera& camera) {
 			dst.position /= camera.Scale;
 			dst.size /= camera.Scale;
 
-			Platform::DrawRectangle(dst, Color32(c));
+			GraphicsRenderer::DrawRectangle(dst, Color32(c));
 		}
 	}
 }

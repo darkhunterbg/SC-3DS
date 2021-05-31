@@ -16,26 +16,6 @@ typedef void* Semaphore;
 
 
 
-struct BatchDrawCommand {
-	int order;
-	Sprite sprite;
-	Vector2Int16 position;
-	Vector2 scale;
-	Color32 color;
-};
-
-enum class ScreenId
-{
-	Top = 0,
-	Bottom = 1,
-};
-
-enum class BlendMode {
-	Alpha = 0,
-	AlphaOverride = 1,
-	FullOverride = 2,
-};
-
 class Platform {
 
 private:
@@ -56,13 +36,11 @@ public:
 	static void ClearBuffer(Color color);
 
 
-	static Vertex* GetVertexBuffer();
+	static Span<Vertex> GetVertexBuffer();
 	static void ExecDrawCommands(const Span<DrawCommand> commands);
 
-	static void Draw(const Sprite& sprite, Rectangle dst, Color additiveBlendColor = Colors::White, bool hFlip = false , bool vFlip = false);
 	static void DrawText(const Font& font, Vector2Int position, const char* text, Color color= Colors::White, float scale = 1.0f);
 	static void DrawLine(Vector2Int src, Vector2Int dst, Color color);
-	static void DrawRectangle(const Rectangle& rect, const Color32& color);
 	static Image NewTexture(Vector2Int size, bool pixelFiltering = false);
 	static FILE* OpenAsset(const char* path);
 

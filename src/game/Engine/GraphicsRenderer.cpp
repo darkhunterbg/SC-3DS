@@ -3,10 +3,12 @@
 #include "../Platform.h"
 
 
+GraphicsRenderer GraphicsRenderer::instance;
 
 void GraphicsRenderer::Init()
 {
-	vertexBuffer = Platform::GetVertexBuffer();
+	instance.vertexBuffer = Platform::GetVertexBuffer();
+	Platform::ChangeBlendingMode(instance.blendMode);
 }
 
 void GraphicsRenderer::AddVertex(const Vector2& pos, const Vector2& uv, const Color32& c)
@@ -17,20 +19,43 @@ void GraphicsRenderer::AddVertex(const Vector2& pos, const Vector2& uv, const Co
 	v.color = c;
 }
 
+DrawCommand& GraphicsRenderer::GetDrawCommand(DrawCommandType type)
+{
+	if (instance.cmdType != type)
+	{
+		instance.drawCommands.push_back({ texture , (uint16_t)instance.vbPos,0 , type });
+		instance.texture = nullptr;
+		instance.cmdType = type;
+	}
+	return instance.drawCommands.back();
+}
+
+DrawCommand& GraphicsRenderer::NewDrawCommand(Texture texture)
+{
+	instance.drawCommands.push_back({ texture , (uint16_t)instance.vbPos,0 ,DrawCommandType::TexturedTriangle });
+	instance.texture = texture;
+	instance.cmdType = DrawCommandType::TexturedTriangle;
+
+	return instance.drawCommands.back();
+}
+
+DrawCommand& GraphicsRenderer::GetDrawCommand(Texture texture)
+{
+	if (instance.texture != texture)
+	{
+		instance.drawCommands.push_back({ texture , (uint16_t)instance.vbPos,0 ,DrawCommandType::TexturedTriangle });
+		instance.texture = texture;
+		instance.cmdType = DrawCommandType::TexturedTriangle;
+	}
+	return instance.drawCommands.back();
+}
+
 void GraphicsRenderer::BufferDraw(std::vector<BatchDrawCommand>& cmd)
 {
+	if (instance.drawCommands.size() == 0)
+		instance.drawCommands.push_back({ cmd.front().sprite.image.textureId , 0,0 , DrawCommandType::TexturedTriangle });
 
-	//Platform::BatchDraw({ cmd.data(),cmd.size() });
-	vbPos = 0;
-
-	if (drawCommands.size() == 0)
-		drawCommands.push_back({ cmd.front().sprite.image.textureId , 0,0 });
-
-
-	DrawCommand* dc = &drawCommands.front();
-
-	Vertex* vb = vertexBuffer;
-	//return;
+	DrawCommand* dc = &instance.drawCommands.front();
 
 	for (const auto& c : cmd) {
 
@@ -38,27 +63,22 @@ void GraphicsRenderer::BufferDraw(std::vector<BatchDrawCommand>& cmd)
 		size.x *= c.scale.x;
 		size.y *= c.scale.y;
 
-		//f += 2;
 
 		Vector2 start = c.sprite.uv[0];
 		Vector2 end = c.sprite.uv[1];
-		/*	Vector2 start = Vector2(c.sprite.rect.GetMin()) / Vector2(512.f, 512.f);
-			Vector2 end = Vector2(c.sprite.rect.GetMax()) / Vector2(512.f, 512.f);*/
 
 		if (dc->texture != c.sprite.image.textureId) {
-
-			drawCommands.push_back({ c.sprite.image.textureId, (uint16_t)vbPos,0 });
-			dc = &drawCommands.back();
+			dc = &instance.NewDrawCommand(c.sprite.image.textureId);
 		}
 
 
-		AddVertex(Vector2(c.position), start, c.color);
-		AddVertex(Vector2(c.position + Vector2Int16(size.x, 0)), { end.x,start.y }, c.color);
-		AddVertex(Vector2(c.position + size), end, c.color);
+		instance.AddVertex(Vector2(c.position), start, c.color);
+		instance.AddVertex(Vector2(c.position + Vector2Int16(size.x, 0)), { end.x,start.y }, c.color);
+		instance.AddVertex(Vector2(c.position + size), end, c.color);
 
-		AddVertex(Vector2(c.position + size), end, c.color);
-		AddVertex(Vector2(c.position + Vector2Int16(0, size.y)), { start.x,end.y }, c.color);
-		AddVertex(Vector2(c.position), start, c.color);
+		instance.AddVertex(Vector2(c.position + size), end, c.color);
+		instance.AddVertex(Vector2(c.position + Vector2Int16(0, size.y)), { start.x,end.y }, c.color);
+		instance.AddVertex(Vector2(c.position), start, c.color);
 
 		/*	vb[vbPos++] = { Vector2(c.position) ,start, c.color };
 			vb[vbPos++] = { Vector2(c.position + Vector2Int16(size.x,0)) , {end.x,start.y}, c.color };
@@ -72,19 +92,101 @@ void GraphicsRenderer::BufferDraw(std::vector<BatchDrawCommand>& cmd)
 		dc->count += 6;
 	}
 
-	texture = drawCommands.front().texture;
+	instance.texture = instance.drawCommands.front().texture;
 
+}
+
+void GraphicsRenderer::Draw(const Sprite& sprite, Vector2Int position, Color32 color)
+{
+	instance.GetDrawCommand(sprite.image.textureId).count += 6;
+
+	Vector2Int size = Vector2Int(sprite.rect.size);
+
+	Vector2 start = sprite.uv[0];
+	Vector2 end = sprite.uv[1];
+
+	instance.AddVertex(Vector2(position), start, color);
+	instance.AddVertex(Vector2(position + Vector2Int(size.x, 0)), { end.x,start.y }, color);
+	instance.AddVertex(Vector2(position + size), end, color);
+
+	instance.AddVertex(Vector2(position + size), end, color);
+	instance.AddVertex(Vector2(position + Vector2Int(0, size.y)), { start.x,end.y }, color);
+	instance.AddVertex(Vector2(position), start, color);
+}
+
+void GraphicsRenderer::Draw(const Sprite& sprite, const Rectangle& dst, Color32 color)
+{
+	instance.GetDrawCommand(sprite.image.textureId).count += 6;
+
+	Vector2Int size = dst.size;
+
+	Vector2 start = sprite.uv[0];
+	Vector2 end = sprite.uv[1];
+
+	instance.AddVertex(Vector2(dst.position), start, color);
+	instance.AddVertex(Vector2(dst.position + Vector2Int(size.x, 0)), { end.x,start.y }, color);
+	instance.AddVertex(Vector2(dst.position + size), end, color);
+
+	instance.AddVertex(Vector2(dst.position + size), end, color);
+	instance.AddVertex(Vector2(dst.position + Vector2Int(0, size.y)), { start.x,end.y }, color);
+	instance.AddVertex(Vector2(dst.position), start, color);
+}
+
+void GraphicsRenderer::DrawText(const Font& font, Vector2Int position, const char* text, Color color, float scale)
+{
 	Submit();
+
+	Platform::DrawText(font, position, text, color, scale);
+}
+
+void GraphicsRenderer::DrawRectangle(const Rectangle& dst, Color32 color)
+{
+	instance.GetDrawCommand(DrawCommandType::Triangle).count += 6;
+
+	instance.AddVertex(Vector2(dst.position), { 0,0 }, color);
+	instance.AddVertex(Vector2(dst.position + Vector2Int(dst.size.x, 0)), { 1,0, }, color);
+	instance.AddVertex(Vector2(dst.position + dst.size), { 1,1 }, color);
+
+	instance.AddVertex(Vector2(dst.position + dst.size), { 1,1 }, color);
+	instance.AddVertex(Vector2(dst.position + Vector2Int(0, dst.size.y)), { 0,1 }, color);
+	instance.AddVertex(Vector2(dst.position), { 0,0 }, color);
 }
 
 void GraphicsRenderer::Submit()
 {
-	if (!drawCommands.size())
+	if (!instance.drawCommands.size())
 		return;
 
-	Platform::ExecDrawCommands({ drawCommands.data(), drawCommands.size() });
+	Platform::ExecDrawCommands({ instance.drawCommands.data(), instance.drawCommands.size() });
 
-	texture = nullptr;
-	drawCommands.clear();
-	vbPos = 0;
+	instance.texture = nullptr;
+	instance.cmdType = DrawCommandType::None;
+	instance.drawCommands.clear();
+	instance.vbPos = 0;
+}
+
+void GraphicsRenderer::DrawOnScreen(ScreenId screen)
+{
+	Submit();
+
+	Platform::DrawOnScreen(screen);
+}
+
+void GraphicsRenderer::DrawOnTexture(Texture texture)
+{
+	Submit();
+
+	Platform::DrawOnTexture(texture);
+}
+
+void GraphicsRenderer::ChangeBlendingMode(BlendMode mode)
+{
+	if (mode == instance.blendMode)
+		return;
+
+	Submit();
+
+	instance.blendMode = mode;
+
+	Platform::ChangeBlendingMode(instance.blendMode);
 }

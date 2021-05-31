@@ -10,7 +10,6 @@
 typedef void* Texture;
 struct Image {
 	Texture textureId;
-	Texture textureId2;
 };
 
 

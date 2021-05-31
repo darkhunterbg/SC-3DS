@@ -16,7 +16,7 @@ public:
 
 	class Iterator {
 	public:
-		Iterator( Span<T>& span, unsigned pos) : _span(span), _pos(pos) {}
+		Iterator(Span<T>& span, unsigned pos) : _span(span), _pos(pos) {}
 		T& operator* () { return _span[_pos]; }
 		bool operator != (const Iterator& other) const { return _pos != other._pos; }
 		Iterator& operator++ () { ++_pos;	return *this; }
@@ -59,6 +59,9 @@ public:
 	}
 
 	inline const T& operator[](unsigned index)  const {
+		return At(index);
+	}
+	inline  T& operator[](unsigned index) {
 		return At(index);
 	}
 	ConstIterator begin() const {

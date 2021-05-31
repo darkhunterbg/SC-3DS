@@ -32,6 +32,7 @@ extern Rectangle touchScreenLocation;
 extern bool mute;
 extern bool noThreading;
 extern int numberOfThreads;
+extern GPU_Image* white;
 
 static ScreenId currentRT;
 static GPU_Target* target = nullptr;
@@ -89,7 +90,7 @@ const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 			return nullptr;
 		}
 		Rectangle16 rect = { {0,0},Vector2Int16(size) };
-		Sprite s = { rect ,{ tex ,nullptr}, {{0,0},{1,1} } };
+		Sprite s = { rect ,{ tex }, {{0,0},{1,1} } };
 		asset->AddSprite(s);
 	}
 
@@ -156,12 +157,14 @@ Image Platform::NewTexture(Vector2Int size, bool pixelFiltering) {
 
 	GPU_LoadTarget(tex);
 	GPU_SetWrapMode(tex, GPU_WRAP_NONE, GPU_WRAP_NONE);
-	return { tex, 0 };
+	return { tex };
 }
 Sprite Platform::NewSprite(Image image, Rectangle16 src) {
-	return { src, image };
+	GPU_Image* img = (GPU_Image*)image.textureId;
+	Vector2 start = Vector2(src.position) / Vector2(img->w, img->h);
+	Vector2 end = Vector2(src.GetMax()) / Vector2(img->w, img->h);
+	return { src, image , {start,end} };
 }
-
 
 void Platform::ChangeBlendingMode(BlendMode mode) {
 	GPU_BlendPresetEnum b = GPU_BLEND_NORMAL;
@@ -171,7 +174,7 @@ void Platform::ChangeBlendingMode(BlendMode mode) {
 	case BlendMode::Alpha:
 		b = GPU_BLEND_NORMAL;
 		break;
-	case BlendMode::AlphaOverride:
+	case BlendMode::AlphaSet:
 		b = GPU_BLEND_SET_ALPHA;
 		//blendMode = SDL_ComposeCustomBlendMode(
 		//	SDL_BlendFactor::SDL_BLENDFACTOR_SRC_ALPHA, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
@@ -179,7 +182,7 @@ void Platform::ChangeBlendingMode(BlendMode mode) {
 		//	SDL_BlendFactor::SDL_BLENDFACTOR_SRC_ALPHA, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
 		//	SDL_BlendOperation::SDL_BLENDOPERATION_ADD);
 		break;
-	case BlendMode::FullOverride:
+	case BlendMode::AllSet:
 		b = GPU_BLEND_SET;
 		//blendMode = SDL_ComposeCustomBlendMode(
 		//	SDL_BlendFactor::SDL_BLENDFACTOR_ONE, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
@@ -207,7 +210,7 @@ void Platform::ClearBuffer(Color color) {
 
 
 Span<Vertex> Platform::GetVertexBuffer() {
-	if (vertexBuffer== nullptr) {
+	if (vertexBuffer == nullptr) {
 		vertexBuffer = new Vertex[10 * 1024];
 	}
 	return { vertexBuffer, 10 * 1024 };
@@ -216,61 +219,73 @@ void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
 
 	for (const DrawCommand& cmd : commands)
 	{
-		GPU_Image* img = (GPU_Image*)cmd.texture;
-		/*switch (cmd.type)
+		switch (cmd.type)
 		{
-		case DrawPrimitiveType::Triangle: {*/
-		GPU_PrimitiveBatchV(img, target, GPU_TRIANGLE_FAN,  cmd.count, vertexBuffer + cmd.start, 0, nullptr, GPU_BATCH_XY_ST_RGBA8);
-			//break;
-	/*	}
-		case DrawPrimitiveType::Line: {
-			GPU_PrimitiveBatchV(img, target, GPU_LINES, cmd.count, vertexBufer.Data() + cmd.start, 0, nullptr, GPU_BATCH_XY_ST_RGBA8);
+		case DrawCommandType::TexturedTriangle: {
+
+			GPU_Image* img = (GPU_Image*)cmd.texture;
+			/*
+			for (int i = cmd.start; i < cmd.start + cmd.count; i += 6) {
+
+				Vertex start = vertexBuffer[i];
+				Color32 c = start.color.value;
+				SDL_Color color;
+
+				color.r = c.GetR();
+				color.g = c.GetG();
+				color.b = c.GetB();
+				color.a = c.GetA();
+
+
+				Vertex end = vertexBuffer[i + 2];
+
+				GPU_Rect src = { start.uv.x, start.uv.y, end.uv.x - start.uv.x, end.uv.y - start.uv.y };
+				src.x *= img->w;
+				src.y *= img->h;
+				src.w *= img->w;
+				src.h *= img->h;
+				GPU_Rect dst = { start.position.x, start.position.y, end.position.x - start.position.x, end.position.y - start.position.y };
+
+				GPU_SetColor(img, color);
+
+				GPU_BlitRect(img,&src,target,&dst);
+			}*/
+
+			//GPU_Image* img = (GPU_Image*)cmd.texture;
+
+			GPU_PrimitiveBatchV(img, target, GPU_TRIANGLES, cmd.count, vertexBuffer + cmd.start, 0, nullptr, GPU_BATCH_XY_ST_RGBA8);
+
+			break;
+		}
+		case DrawCommandType::Triangle: {
+			for (int i = cmd.start; i < cmd.start + cmd.count; i += 6) {
+
+				Vector2 start = vertexBuffer[i].position;
+				Color32 c = vertexBuffer[i].color.value;
+				SDL_Color color;
+			
+				color.r = c.GetR();
+				color.g = c.GetG();
+				color.b = c.GetB();
+				color.a = c.GetA();
+		
+
+				Vector2 end = vertexBuffer[i + 2].position;
+			
+				GPU_RectangleFilled(target, start.x, start.y, end.x, end.y, color);
+			}
+
+			/*	GPU_PrimitiveBatchV(white, target, GPU_TRIANGLES, cmd.count, vertexBuffer + cmd.start, 0, nullptr, GPU_BATCH_XY_ST_RGBA8);*/
+
 			break;
 		}
 		default:
-			break;t
-		}*/
+			break;
+		}
+
 	}
 }
 
-void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip, bool vFlip) {
-	SDLDrawCommand cmd;
-
-	GPU_Image* img = (GPU_Image*)sprite.image.textureId;
-
-	cmd.texture = (SDL_Texture*)sprite.image.textureId;
-	cmd.src.x = sprite.rect.position.x;
-	cmd.src.y = sprite.rect.position.y;
-	cmd.src.w = sprite.rect.size.x;
-	cmd.src.h = sprite.rect.size.y;
-	cmd.dst = *(SDL_Rect*)&dst;
-
-	GPU_Rect src = { (float)cmd.src.x, (float)cmd.src.y, (float)cmd.src.w,(float)cmd.src.h };
-	GPU_Rect dstC = { (float)cmd.dst.x, (float)cmd.dst.y, (float)cmd.dst.w,(float)cmd.dst.h };
-
-	cmd.r = SDL_FloatToUint8(color.r);
-	cmd.g = SDL_FloatToUint8(color.g);
-	cmd.b = SDL_FloatToUint8(color.b);
-	cmd.a = SDL_FloatToUint8(color.a);
-
-
-	SDL_Color c;
-	c.r = cmd.r;
-	c.g = cmd.g;
-	c.b = cmd.b;
-	c.a = cmd.a;
-
-	cmd.type = SDLDrawCommandType::Sprite;
-
-	cmd.flip = hFlip ? SDL_RendererFlip::SDL_FLIP_HORIZONTAL : SDL_RendererFlip::SDL_FLIP_NONE;
-	if (vFlip) {
-		cmd.flip = (SDL_RendererFlip)(cmd.flip | SDL_RendererFlip::SDL_FLIP_VERTICAL);
-	}
-
-	GPU_SetColor(img, c);
-
-	GPU_BlitRect(img, &src, target, &dstC);
-}
 void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color, float scale) {
 	SDLDrawCommand cmd;
 
@@ -310,24 +325,6 @@ void Platform::DrawLine(Vector2Int src, Vector2Int dst, Color color) {
 
 	GPU_Line(target, cmd.src.x, cmd.src.y, cmd.dst.x, cmd.dst.y, c);
 
-}
-void Platform::DrawRectangle(const Rectangle& rect, const Color32& color) {
-	SDLDrawCommand cmd;
-
-	cmd.type = SDLDrawCommandType::Rectangle;
-	cmd.dst = *(SDL_Rect*)&rect;
-	cmd.r = color.GetR();
-	cmd.g = color.GetG();
-	cmd.b = color.GetB();
-	cmd.a = color.GetA();
-
-	SDL_Color c;
-	c.r = cmd.r;
-	c.g = cmd.g;
-	c.b = cmd.b;
-	c.a = cmd.a;
-
-	GPU_RectangleFilled(target, cmd.dst.x, cmd.dst.y, cmd.dst.x + cmd.dst.w, cmd.dst.y + cmd.dst.h, c);
 }
 
 double Platform::ElaspedTime() {

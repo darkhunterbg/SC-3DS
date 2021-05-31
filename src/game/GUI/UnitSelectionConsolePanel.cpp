@@ -2,6 +2,8 @@
 #include "../Entity/EntityManager.h"
 #include "../Entity/EntityUtil.h"
 
+#include "../Engine/GraphicsRenderer.h"
+
 #include "../Platform.h"
 #include "../Game.h"
 
@@ -77,7 +79,7 @@ void UnitSelectionConsolePanel::Draw(GameViewContext& context)
 
 				Vector2Int off = detailSpace.position;
 				off += { 30,10};
-				Platform::DrawText(Game::SystemFont,  off, buffer, Colors::UILightGray, 0.4f);
+				GraphicsRenderer::DrawText(Game::SystemFont,  off, buffer, Colors::UILightGray, 0.4f);
 			}
 		}
 	}
@@ -136,7 +138,7 @@ void UnitSelectionConsolePanel::DrawMultiSelection(Rectangle dst, GameViewContex
 
 		Vector2Int offset = Vector2Int(i / 2, i % 2) * 36;
 
-		Platform::Draw(f, { pos + offset, Vector2Int(f.rect.size) });
+		GraphicsRenderer::Draw(f, { pos + offset, Vector2Int(f.rect.size) });
 
 		EntityId entityId = context.selection[i];
 
@@ -161,7 +163,7 @@ void UnitSelectionConsolePanel::DrawMultiSelection(Rectangle dst, GameViewContex
 			Rectangle wfDst = { pos + offset , {0,0} };
 			wfDst.position += Vector2Int(wfPart.offset);
 			wfDst.size = Vector2Int(wfPart.sprite.rect.size);
-			Platform::Draw(wfPart.sprite, wfDst, wfColor[i]);
+			GraphicsRenderer::Draw(wfPart.sprite, wfDst, wfColor[i]);
 		}
 	}
 }
@@ -172,12 +174,12 @@ void UnitSelectionConsolePanel::DrawUnitName(Rectangle space, EntityId id, const
 	Vector2Int pos = space.position + Vector2Int(space.size.x / 2, 0);
 
 	int offset = Platform::MeasureString(font, unit.def->Name.data(), 0.4f).x;
-	Platform::DrawText(font, pos - Vector2Int(offset / 2, 0), unit.def->Name.data(), Colors::UILightGray, 0.4f);
+	GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), unit.def->Name.data(), Colors::UILightGray, 0.4f);
 	pos.y += 16;
 
 	if (unit.def->Title.length()) {
 		offset = Platform::MeasureString(font, unit.def->Title.data(), 0.4f).x;
-		Platform::DrawText(font, pos - Vector2Int(offset / 2, 0), unit.def->Title.data(), Colors::UILightGray, 0.4f);
+		GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), unit.def->Title.data(), Colors::UILightGray, 0.4f);
 	}
 }
 
@@ -199,22 +201,22 @@ void UnitSelectionConsolePanel::DrawSupplyInfo(Rectangle space, EntityId id, con
 
 	stbsp_snprintf(buffer, sizeof(buffer), "%s Used: %i", supplyName.data(), info.GetUsedSupply());
 	int offset = 12;
-	Platform::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray, 0.35f);
+	GraphicsRenderer::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray, 0.35f);
 	pos.y += 12;
 
 	stbsp_snprintf(buffer, sizeof(buffer), "%s Provided: %i", supplyName.data(), unit.def->ProvideSupplyDoubled >> 1);
 	offset = 0;
-	Platform::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray, 0.35f);
+	GraphicsRenderer::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray, 0.35f);
 	pos.y += 12;
 
 	stbsp_snprintf(buffer, sizeof(buffer), "Total %s : %i", supplyName.data(), info.GetProvidedSupply());
 	offset = 7;
-	Platform::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray, 0.35f);
+	GraphicsRenderer::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray, 0.35f);
 	pos.y += 12;
 
 	stbsp_snprintf(buffer, sizeof(buffer), "%s Max : %i", supplyName.data(), info.GetMaxSupply());
 	offset = 8;
-	Platform::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray, 0.35f);
+	GraphicsRenderer::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray, 0.35f);
 	pos.y += 12;
 }
 
@@ -247,7 +249,7 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 	for (int i = 0; i < data.productionQueue.size(); ++i) {
 
 		dst.size = Vector2Int(f.rect.size);
-		Platform::Draw(f, dst);
+		GraphicsRenderer::Draw(f, dst);
 
 		if (i < data.queueSize) {
 			const SpriteFrame& n = data.productionQueue[i]->Icon;
@@ -255,7 +257,7 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 			nDst.size = Vector2Int(n.sprite.rect.size);
 			nDst.position += Vector2Int(n.offset) + Vector2Int{ 2,2 };
 
-			Platform::Draw(n.sprite, nDst, Colors::IconYellow);
+			GraphicsRenderer::Draw(n.sprite, nDst, Colors::IconYellow);
 
 			stbsp_snprintf(buffer, sizeof(buffer), "%i", i + 1);
 
@@ -271,7 +273,7 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 			nDst.size = Vector2Int(n.rect.size);
 			nDst.position += (dst.size - nDst.size) / 2;
 
-			Platform::Draw(n, nDst);
+			GraphicsRenderer::Draw(n, nDst);
 		}
 
 		if (dst.Contains(pointerPos)) {
@@ -286,14 +288,14 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 	}
 
 
-	Platform::DrawText(font, pos + Vector2Int{ 68, 4 }, "Building", Colors::UILightGray, 0.4f);
+	GraphicsRenderer::DrawText(font, pos + Vector2Int{ 68, 4 }, "Building", Colors::UILightGray, 0.4f);
 
 
 	const Sprite& pb = Game::AssetLoader.LoadAtlas("game_gui.t3x")->GetSprite(0);
 
 	dst.position = pos + Vector2Int{ 38,24 };
 	dst.size = Vector2Int(pb.rect.size);
-	Platform::Draw(pb, dst);
+	GraphicsRenderer::Draw(pb, dst);
 
 	dst.position += {3, 3};
 	dst.size = { 2,3 };
@@ -306,13 +308,13 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 
 	for (int i = 0; i <= progress; i += 3) {
 
-		Platform::DrawRectangle(dst, Color32(Colors::UIDarkGreen));
+		GraphicsRenderer::DrawRectangle(dst, Color32(Colors::UIDarkGreen));
 		dst.position.x += 3;
 	}
 
 	if (progress % 3 > 1) {
 		dst.size.x = progress % 3 - 1;
-		Platform::DrawRectangle(dst, Color32(Colors::UIDarkGreen));
+		GraphicsRenderer::DrawRectangle(dst, Color32(Colors::UIDarkGreen));
 	}
 }
 
@@ -326,7 +328,7 @@ void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, con
 	stbsp_snprintf(buffer, sizeof(buffer), "Kills: %i", unit.kills);
 
 	int offset = 40;
-	Platform::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, Colors::UILightGray, 0.4f);
+	GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, Colors::UILightGray, 0.4f);
 	pos.y += 18;
 
 
@@ -360,13 +362,13 @@ void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, con
 		icoDst.position += {2, 2};
 		icoDst.size -= {4, 4};
 
-		Platform::Draw(*info[i].sprite, icoDst, Colors::IconGray);
-		Platform::Draw(f, dst);
+		GraphicsRenderer::Draw(*info[i].sprite, icoDst, Colors::IconGray);
+		GraphicsRenderer::Draw(f, dst);
 
 		Vector2Int offset = { 24,23 };
 
 		stbsp_snprintf(buffer, sizeof(buffer), "%i", info[i].counter);
-		Platform::DrawText(font, pos + offset, buffer, Colors::UILightGray, 0.30f);
+		GraphicsRenderer::DrawText(font, pos + offset, buffer, Colors::UILightGray, 0.30f);
 
 		pos.x += 38;
 	}
@@ -399,7 +401,7 @@ void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, EntityId entityId,
 
 		int len = stbsp_snprintf(buffer, sizeof(buffer), "%i/%i", health.current, health.max);
 		int offset = Platform::MeasureString(font, buffer, 0.35f).x;
-		Platform::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, hpColor, 0.35f);
+		GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, hpColor, 0.35f);
 
 		//pos.y += 10;
 
@@ -415,7 +417,7 @@ void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, EntityId entityId,
 		Rectangle wfDst = wireframe;
 		wfDst.position += Vector2Int(wfPart.offset);
 		wfDst.size = Vector2Int(wfPart.sprite.rect.size);
-		Platform::Draw(wfPart.sprite, wfDst, Colors::White);
+		GraphicsRenderer::Draw(wfPart.sprite, wfDst, Colors::White);
 	}
 	else {
 
@@ -437,7 +439,7 @@ void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, EntityId entityId,
 			Rectangle wfDst = wireframe;
 			wfDst.position += Vector2Int(wfPart.offset);
 			wfDst.size = Vector2Int(wfPart.sprite.rect.size);
-			Platform::Draw(wfPart.sprite, wfDst, wfColor[i]);
+			GraphicsRenderer::Draw(wfPart.sprite, wfDst, wfColor[i]);
 		}
 	}
 }

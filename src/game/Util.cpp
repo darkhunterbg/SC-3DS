@@ -1,6 +1,7 @@
 #include "Util.h"
-#include "Platform.h"
+#include "Engine/GraphicsRenderer.h"
 #include "Profiler.h"
+
 
 void Util::DrawTransparentRectangle(const Rectangle& rect, Color c) {
 	Vector2Int src = rect.position;
@@ -26,17 +27,17 @@ void Util::DrawTransparentRectangle(const Rectangle& rect, int thickness, Color 
 
 	Rectangle dst = rect;
 	dst.size = Vector2Int(rect.size.x, thickness);
-	Platform::DrawRectangle(dst, color);
+	GraphicsRenderer::DrawRectangle(dst, color);
 
 	dst.position += Vector2Int(0, rect.size.y - thickness);
-	Platform::DrawRectangle(dst, color);
+	GraphicsRenderer::DrawRectangle(dst, color);
 
 	dst = rect;
 	dst.size = Vector2Int(thickness, rect.size.y);
-	Platform::DrawRectangle(dst, color);
+	GraphicsRenderer::DrawRectangle(dst, color);
 
 	dst.position += Vector2Int(rect.size.x - thickness, 0);
-	Platform::DrawRectangle(dst, color);
+	GraphicsRenderer::DrawRectangle(dst, color);
 }
 
 

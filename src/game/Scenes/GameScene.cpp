@@ -9,6 +9,8 @@
 #include "../Data/RaceDatabase.h"
 #include "../Entity/EntityUtil.h"
 
+#include "../Engine/GraphicsRenderer.h"
+
 #include <algorithm>
 
 GameScene::GameScene() {}
@@ -118,13 +120,13 @@ void GameScene::Update() {
 void GameScene::Draw() {
 	const PlayerInfo& playerInfo = entityManager->GetPlayerSystem().GetPlayerInfo(1);
 
-	Platform::DrawOnScreen(ScreenId::Top);
+	GraphicsRenderer::DrawOnScreen(ScreenId::Top);
 
 	entityManager->Draw(camera);
 
 	view->DrawUpperScreen(camera);
 
-	Platform::DrawOnScreen(ScreenId::Bottom);
+	GraphicsRenderer::DrawOnScreen(ScreenId::Bottom);
 
 	view->DrawLowerScreen(camera);
 }

@@ -3,6 +3,7 @@
 #include "../Game.h"
 #include "../Platform.h"
 #include "../Profiler.h"
+#include "../Engine/GraphicsRenderer.h"
 
 static Sprite tile;
 
@@ -83,11 +84,11 @@ void MapSystem::UpdateVisibleRenderEntities(EntityManager& em) {
 		bool visible = vision.IsVisible(dst);
 
 		if (!visible && FogOfWarVisible) {
-		/*	for (int i = 0; i < removedEntities.size(); ++i)
-			{
-				if (removedEntities[i] == id)
-					EXCEPTION("DUPLICATED ENTITIES!");
-			}*/
+			/*	for (int i = 0; i < removedEntities.size(); ++i)
+				{
+					if (removedEntities[i] == id)
+						EXCEPTION("DUPLICATED ENTITIES!");
+				}*/
 
 			removedEntities.push_back(id);
 		}
@@ -106,13 +107,13 @@ void MapSystem::UpdateVisibleRenderEntities(EntityManager& em) {
 		}
 	}
 
-	for (int i = 0; i < removedEntities.size() ; ++i)
-	{
-		for (int j = i + 1; j < removedEntities.size(); ++j) {
-			if (removedEntities[i] == removedEntities[j])
-				EXCEPTION("DUPLICATED ENTITIES!");
-		}
-	}
+	//for (int i = 0; i < removedEntities.size(); ++i)
+	//{
+	//	for (int j = i + 1; j < removedEntities.size(); ++j) {
+	//		if (removedEntities[i] == removedEntities[j])
+	//			EXCEPTION("DUPLICATED ENTITIES!");
+	//	}
+	//}
 
 
 	em.RenderArchetype.Archetype.RemoveSortedEntities(removedEntities);
@@ -263,7 +264,7 @@ void MapSystem::DrawMap(const Camera& camera)
 			dst.position /= camera.Scale;
 			dst.size /= camera.Scale;
 
-			Platform::Draw(tile, dst);
+			GraphicsRenderer::Draw(tile, dst);
 		}
 	}
 }
@@ -277,8 +278,8 @@ void MapSystem::DrawFogOfWar(const Camera& camera) {
 	Vector2Int16 FogOfWarTextureSize = Vector2Int16(minimapTextureSize, minimapTextureSize);
 	FogOfWarTextureSize *= Upscale;
 
-	static Sprite fowDownscaleSprite;
-	Platform::ChangeBlendingMode(BlendMode::FullOverride);
+
+	GraphicsRenderer::ChangeBlendingMode(BlendMode::AllSet);
 
 	if (fogOfWarTexture.textureId == nullptr) {
 		fogOfWarTexture = Platform::NewTexture(Vector2Int(FogOfWarTextureSize));
@@ -288,36 +289,37 @@ void MapSystem::DrawFogOfWar(const Camera& camera) {
 
 	Rectangle16 camRect = camera.GetRectangle16();
 
-	Platform::DrawOnTexture(fowDownscaleSprite.image.textureId);
+	GraphicsRenderer::DrawOnTexture(fowDownscaleSprite.image.textureId);
 	Platform::ClearBuffer(Colors::Transparent);
 
 	// downscale minimap fow
-	Platform::Draw({ { {0,0}, {minimapTextureSize, minimapTextureSize}}, minimapFowTexture },
-		{ {0,0},{fowDownscaleSprite.rect.size.x,fowDownscaleSprite.rect.size.y} });
+	auto s = Platform::NewSprite(minimapFowTexture, { {0,0},Vector2Int16(minimapTextureSize) });
+	GraphicsRenderer::Draw(s,{ {0,0},{fowDownscaleSprite.rect.size.x,fowDownscaleSprite.rect.size.y} });
 
-	Platform::DrawOnTexture(fogOfWarTexture.textureId);
+	GraphicsRenderer::DrawOnTexture(fogOfWarTexture.textureId);
 	Platform::ClearBuffer(Colors::Transparent);
 
 	// upscale downscaled minimap fow
-	Platform::Draw(fowDownscaleSprite,
+	GraphicsRenderer::Draw(fowDownscaleSprite,
 		{ {0,0},{FogOfWarTextureSize.x,FogOfWarTextureSize.y} });
 
-	Platform::DrawOnTexture(nullptr);
-	Platform::ChangeBlendingMode(BlendMode::Alpha);
+	GraphicsRenderer::DrawOnTexture(nullptr);
+	GraphicsRenderer::ChangeBlendingMode(BlendMode::Alpha);
 
 	static constexpr const int CamDownscale = 32 / Upscale;
 	Rectangle16 src = { (camRect.position / CamDownscale), (camRect.size / CamDownscale) };
 	Sprite fowSprite = Platform::NewSprite(fogOfWarTexture, src);
 
+	GraphicsRenderer::Draw(fowSprite, { {0,0},{400,240} });
 
-	Platform::Draw(fowSprite, { {0,0},{400,240} });
+	GraphicsRenderer::Submit();
 }
 
 void MapSystem::GenerateMinimapTerrainTexture() {
 	Rectangle mapBounds = { {0,0}, Vector2Int(mapSize) };
 
 	minimapTerrainTexture = Platform::NewTexture({ minimapTextureSize,minimapTextureSize });
-	Platform::DrawOnTexture(minimapTerrainTexture.textureId);
+	GraphicsRenderer::DrawOnTexture(minimapTerrainTexture.textureId);
 
 	Vector2 upscale = Vector2(mapBounds.size) / Vector2(minimapTextureSize, minimapTextureSize);
 
@@ -328,11 +330,11 @@ void MapSystem::GenerateMinimapTerrainTexture() {
 			Rectangle dst = { {x,y},{mapSize.x, mapSize.y} };
 			dst.position = Vector2Int(Vector2(x, y) / upscale);
 			dst.size = Vector2Int(Vector2(tileSize.x, tileSize.y) / upscale);
-			Platform::Draw(tile, dst);
+			GraphicsRenderer::Draw(tile, dst);
 		}
 	}
 
-	Platform::DrawOnTexture(nullptr);
+	GraphicsRenderer::DrawOnTexture(nullptr);
 }
 
 void MapSystem::RenderMinimapFogOfWar(const PlayerVision& vision) {
@@ -344,26 +346,26 @@ void MapSystem::RenderMinimapFogOfWar(const PlayerVision& vision) {
 	int mapSizeTiles = (int)mapSize.x / 32;
 	int multiplier = minimapTextureSize / mapSizeTiles;
 
-	Platform::DrawOnTexture(minimapFowTexture.textureId);
+	GraphicsRenderer::DrawOnTexture(minimapFowTexture.textureId);
 	Platform::ClearBuffer(Colors::Black);
 
 
-	Color32 colors[2] = { Color32(Color(0,0,0,0.6)), Color32(0) };
+	Color colors[2] = { (Color(0,0,0,0.6)), Color(0,0,0,0.0f) };
 
-	Platform::ChangeBlendingMode(BlendMode::FullOverride);
+	GraphicsRenderer::ChangeBlendingMode(BlendMode::AllSet);
 
 	for (short y = 0; y < mapSizeTiles; ++y) {
 		for (short x = 0; x < mapSizeTiles; ++x) {
 
 			uint8_t state = vision.GetState({ x,y });
 			if (state) {
-				const Color32& c = colors[state - 1];
-				Platform::DrawRectangle({ { x * multiplier, y * multiplier }, { multiplier, multiplier} }, c);
+				const Color& c = colors[state - 1];
+				GraphicsRenderer::DrawRectangle({ { x * multiplier, y * multiplier }, { multiplier, multiplier} }, c);
 			}
 		}
 	}
 
-	Platform::ChangeBlendingMode(BlendMode::Alpha);
+	GraphicsRenderer::ChangeBlendingMode(BlendMode::Alpha);
 }
 
 void MapSystem::RedrawMinimap(EntityManager& em) {
@@ -379,16 +381,14 @@ void MapSystem::RedrawMinimap(EntityManager& em) {
 
 	RenderMinimapFogOfWar(vision);
 
-	Platform::DrawOnTexture(minimapTexture.textureId);
+	GraphicsRenderer::DrawOnTexture(minimapTexture.textureId);
 
-	Sprite fullMapSprite;
-	fullMapSprite.rect = { {0,0}, Vector2Int16(minimapTextureSize) };
-	fullMapSprite.image = minimapTerrainTexture;
-	Platform::Draw(fullMapSprite, { {0,0}, Vector2Int(minimapTextureSize) });
+	Sprite fullMapSprite = Platform::NewSprite(minimapTerrainTexture, { {0,0}, Vector2Int16(minimapTextureSize) });
+	GraphicsRenderer::Draw(fullMapSprite, { {0,0}, Vector2Int(minimapTextureSize) });
 
 	if (FogOfWarVisible) {
 		fullMapSprite.image = minimapFowTexture;
-		Platform::Draw(fullMapSprite, { {0,0}, Vector2Int(minimapTextureSize) });
+		GraphicsRenderer::Draw(fullMapSprite, { {0,0}, Vector2Int(minimapTextureSize) });
 	}
 
 	int end = minimapData.size();
@@ -397,10 +397,10 @@ void MapSystem::RedrawMinimap(EntityManager& em) {
 		const Color32& color = minimapData.color[i];
 
 		Rectangle dst = { Vector2Int(collider.position), Vector2Int(collider.size) };
-		Platform::DrawRectangle(dst, color);
+		GraphicsRenderer::DrawRectangle(dst, color);
 	}
 
-	Platform::DrawOnTexture(nullptr);
+	GraphicsRenderer::DrawOnTexture(nullptr);
 }
 
 void MapSystem::DrawMinimap(Rectangle dst)
@@ -409,11 +409,9 @@ void MapSystem::DrawMinimap(Rectangle dst)
 		return;
 	}
 
-	Sprite minimapSprite;
-	minimapSprite.rect = { {0,0}, Vector2Int16(minimapTextureSize,minimapTextureSize) };
-	minimapSprite.image = minimapTexture;
+	Sprite minimapSprite = Platform::NewSprite(minimapTexture, { {0,0}, Vector2Int16(minimapTextureSize) });
 
-	Platform::Draw(minimapSprite, dst);
+	GraphicsRenderer::Draw(minimapSprite, dst);
 }
 
 void MapSystem::DrawGrid(const Camera& camera)
@@ -441,7 +439,7 @@ void MapSystem::DrawGrid(const Camera& camera)
 
 		Color32  c = (x % (32 * 32) == 0) ? bucketColor : cellColor;
 
-		Platform::DrawRectangle(dst, c);
+		GraphicsRenderer::DrawRectangle(dst, c);
 	}
 
 	dst.size = { camRect.size.x ,1 };
@@ -454,7 +452,7 @@ void MapSystem::DrawGrid(const Camera& camera)
 
 		Color32  c = (y % (32 * 32) == 0) ? bucketColor : cellColor;
 
-		Platform::DrawRectangle(dst, c);
+		GraphicsRenderer::DrawRectangle(dst, c);
 	}
 
 }

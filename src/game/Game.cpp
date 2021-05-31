@@ -14,6 +14,9 @@
 #include "Data/AbilityDatabase.h"
 #include "Job.h"
 
+
+#include "Engine/GraphicsRenderer.h"
+
 static Scene* currentScene;
 
 static const SpriteAtlas* title;
@@ -27,18 +30,18 @@ Gamepad Game::Gamepad;
 Pointer Game::Pointer;
 AudioSystem Game::Audio;
 AssetLoader Game::AssetLoader;
-GraphicsRenderer Game::Renderer;
+
 float Game::DeltaTime = 0;
 
 
 
 static void ShowTitleScreen() {
-	Platform::DrawOnScreen(ScreenId::Top);
-	Platform::Draw(title->GetSprite(0), { {0,0},{400,240} });
+	GraphicsRenderer::DrawOnScreen(ScreenId::Top);
+	GraphicsRenderer::Draw(title->GetSprite(0), { 0,0 });
 }
 static void InitialScene() {
-	//Game::SetCurrentScene(new GameScene());
-	Game::SetCurrentScene(new PerformanceTestScene());
+	Game::SetCurrentScene(new GameScene());
+	//Game::SetCurrentScene(new PerformanceTestScene());
 }
 
 void Game::FrameStart() {
@@ -62,7 +65,7 @@ void Game::Start() {
 	startup = true;
 	frameStartTime = Platform::ElaspedTime();
 	Audio.Init();
-	Renderer.Init();
+	GraphicsRenderer::Init();
 
 
 	GraphicsDatabase::Init();
@@ -106,6 +109,8 @@ void Game::Draw() {
 			currentScene->Draw();
 	}
 	//p.Submit();
+
+	GraphicsRenderer::Submit();
 
 	Profiler::ShowPerformance();
 }

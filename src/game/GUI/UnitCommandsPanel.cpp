@@ -7,8 +7,9 @@
 #include "../Entity/EntityManager.h"
 #include "../Data/Generated.h"
 #include "../Entity/Common.h"
-
 #include "../Entity/EntityUtil.h"
+
+#include "../Engine/GraphicsRenderer.h"
 
 void UnitCommandsPanel::Draw(GameViewContext& context)
 {
@@ -98,7 +99,7 @@ void UnitCommandsPanel::DrawCommands(GameViewContext& context) {
 
 			Rectangle d = dst;
 			d.position += offset;
-			Platform::Draw(f, d);
+			GraphicsRenderer::Draw(f, d);
 
 			const SpriteFrame& commandIcon = cmd.commandIcon != nullptr ?
 				*cmd.commandIcon : cmd.ability->Sprite;
@@ -123,7 +124,7 @@ void UnitCommandsPanel::DrawCommands(GameViewContext& context) {
 
 
 
-			Platform::Draw(commandIcon.sprite, d, color);
+			GraphicsRenderer::Draw(commandIcon.sprite, d, color);
 		}
 	}
 }

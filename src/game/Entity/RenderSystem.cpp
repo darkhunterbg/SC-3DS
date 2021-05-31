@@ -4,7 +4,7 @@
 #include "../Camera.h"
 #include "EntityManager.h"
 #include "../Util.h"
-#include "../Game.h"
+#include "../Engine/GraphicsRenderer.h"
 
 #include <algorithm>
 #include <cstring>
@@ -204,7 +204,7 @@ void RenderSystem::Draw(const Camera& camera, EntityManager& em) {
 
 	std::sort(render.begin(), render.end(), RenderSort);
 
-	Game::Renderer.BufferDraw(render);
+	GraphicsRenderer::BufferDraw(render);
 }
 void RenderSystem::DrawBoundingBoxes(const Camera& camera, EntityManager& em) {
 

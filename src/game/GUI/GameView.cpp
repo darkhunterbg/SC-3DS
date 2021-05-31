@@ -11,8 +11,11 @@
 #include "../Entity/EntityUtil.h"
 #include "../Entity/EntityManager.h"
 
+#include "../Engine/GraphicsRenderer.h"
+
 #include "../Data/GraphicsDatabase.h"
 #include "../Data/AbilityDatabase.h"
+
 
 static std::array<Color, 3> GreyHPBarColorPalette = { 0xb0b0b0ff, 0x98948cff, 0x585858ff };
 static std::array<Color, 3> YellowHPBarColorPalette = { 0xfccc2cff, 0xdc9434ff, 0xb09018ff };
@@ -242,8 +245,8 @@ void GameView::DrawUpperScreen(const Camera& camera)
 		Vector2Int pos = { 0,190 };
 		pos.x = (400 - size.x) / 2;
 
-		Platform::DrawText(Game::SystemFont, pos + Vector2Int(1,1), message, Colors::Black, 0.4f);
-		Platform::DrawText(Game::SystemFont, pos, message, Colors::White, 0.4f);
+		GraphicsRenderer::DrawText(Game::SystemFont, pos + Vector2Int(1,1), message, Colors::Black, 0.4f);
+		GraphicsRenderer::DrawText(Game::SystemFont, pos, message, Colors::White, 0.4f);
 	}
 }
 
@@ -284,7 +287,7 @@ void GameView::DrawMarkers(const Camera& camera) {
 		Vector2Int16 p = camera.WorldToScreen(marker.pos);
 		dst.SetCenter(Vector2Int(p));
 
-		Platform::Draw(frame.sprite, dst);
+		GraphicsRenderer::Draw(frame.sprite, dst);
 	}
 
 }
@@ -332,7 +335,7 @@ void GameView::DrawUnitBars(const Camera& camera) {
 			Rectangle greyDst = { {Vector2Int(dst) + Vector2Int(1,1) }, {size,1 } };
 
 			for (int i = 0; i < 3; ++i) {
-				Platform::DrawRectangle(greyDst, Color32(greyPalette->at(i)));
+				GraphicsRenderer::DrawRectangle(greyDst, Color32(greyPalette->at(i)));
 				++greyDst.position.y;
 			}
 
@@ -349,7 +352,7 @@ void GameView::DrawUnitBars(const Camera& camera) {
 		Rectangle barHp = { Vector2Int(dst) + Vector2Int(1,1), Vector2Int(hpBarsVisible * 3 - 1 ,1) };
 
 		for (int i = 0; i < 3; ++i) {
-			Platform::DrawRectangle(barHp, Color32(palette->at(i)));
+			GraphicsRenderer::DrawRectangle(barHp, Color32(palette->at(i)));
 			++barHp.position.y;
 		}
 
@@ -359,7 +362,7 @@ void GameView::DrawUnitBars(const Camera& camera) {
 		Rectangle start = { Vector2Int(dst) + Vector2Int(3,1), Vector2Int(1,3) };
 
 		for (int i = 1; i < barSize; ++i) {
-			Platform::DrawRectangle(start, Color32(Colors::Black));
+			GraphicsRenderer::DrawRectangle(start, Color32(Colors::Black));
 			start.position.x += 3;
 		}
 	}

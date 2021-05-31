@@ -11,6 +11,7 @@
 #include "MathLib.h"
 
 GPU_Image* screens[2];
+GPU_Image* white;
 GPU_Target* screen;
 SDL_Window* window;
 std::filesystem::path assetDir;
@@ -44,7 +45,10 @@ int main(int argc, char** argv) {
 	GPU_SetImageFilter(screens[0], GPU_FILTER_LINEAR);
 	GPU_SetImageFilter(screens[1], GPU_FILTER_LINEAR);
 	GPU_SetShapeBlendMode(GPU_BLEND_NORMAL);
-
+	white = GPU_CreateImage(1, 1, GPU_FORMAT_RGBA);
+	uint8_t data[4] = { 255,255,255,255 };
+	GPU_Rect rect = { 0,0,1,1 };
+	GPU_UpdateImageBytes(white, &rect, data, sizeof(data));
 
 	assetDir = std::filesystem::current_path().parent_path();
 	userDir = std::filesystem::current_path();

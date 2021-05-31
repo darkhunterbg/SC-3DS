@@ -57,7 +57,7 @@ const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 		s.uv[0] = { img.subtex->left, img.subtex->top };
 		s.uv[1] = { img.subtex->right, img.subtex->bottom };
 			// (Texture)img.subtex;
-		s.rect.position = { img.subtex->left * img.tex->width , img.subtex->top * img.tex->height };
+		//s.rect.position = { img.subtex->left * img.tex->width , img.subtex->top * img.tex->height };
 		s.rect.size = { img.subtex->width, img.subtex->height };
 
 		atlas->AddSprite(s);
@@ -159,21 +159,21 @@ void Platform::ClearBuffer(Color color) {
 Sprite Platform::NewSprite(Image image, Rectangle16 src) {
 	C3D_Tex* tex = (C3D_Tex*)image.textureId;
 
-	auto* s = (Tex3DS_SubTexture*)image.textureId2;
+	//auto* s = (Tex3DS_SubTexture*)image.textureId2;
 
 	auto* s2 = new Tex3DS_SubTexture();
 
 
-	s2->width = src.size.x;
-	s2->height = src.size.y;
-	s2->top = 1 - (float)src.position.y / (float)s->height;
-	s2->bottom = 1 - (float)(src.position.y + src.size.y) / (float)s->height;
-	s2->left = (float)src.position.x / (float)s->width;
-	s2->right = (float)(src.position.x + src.size.x) / (float)s->width;
+	//s2->width = src.size.x;
+	//s2->height = src.size.y;
+	//s2->top = 1 - (float)src.position.y / (float)s->height;
+	//s2->bottom = 1 - (float)(src.position.y + src.size.y) / (float)s->height;
+	//s2->left = (float)src.position.x / (float)s->width;
+	//s2->right = (float)(src.position.x + src.size.x) / (float)s->width;
 
 	//EXCEPTION("%.2f %.2f", s2->left, s2->right);
 
-	return { src, {tex,s2} };
+	return { src, {tex} };
 }
 
 //void Platform::BatchDraw(const Span<BatchDrawCommand> commands) {
@@ -314,7 +314,7 @@ Image Platform::NewTexture(Vector2Int size, bool pixelFiltering) {
 	st->top = 1;
 	st->bottom = 0;
 
-	return { tex, st };
+	return { tex };
 }
 
 double Platform::ElaspedTime() {
