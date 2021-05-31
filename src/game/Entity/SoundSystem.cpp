@@ -1,19 +1,21 @@
 #include "SoundSystem.h"
-#include "../Game.h"
+
 #include "../Camera.h"
 #include "EntityManager.h"
 #include "../Profiler.h"
 
 #include "../Data/RaceDef.h"
 #include "../MathLib.h"
-#include "../Platform.h"
+
+
+#include "../Engine/AudioManager.h"
 
 #include <algorithm>
 
 
 SoundSystem::SoundSystem()
 {
-	auto& channels = Game::Audio.GetAudioChannes();
+	auto& channels = AudioManager::GetAudioChannes();
 
 	const auto worldChannels = Span<AudioChannelState>(channels.Data(), channels.Size() - 2);
 
@@ -131,8 +133,8 @@ void SoundSystem::UpdateEntityAudio(const Camera& camera, EntityManager& em)
 
 			if (channel.channel->IsDone() || channel.clipId == clip.id)
 			{
-				Game::Audio.SetChannelVolume(channel.channel->ChannelId, playWorldAudio[i].volume);
-				Game::Audio.PlayClip(clip, channel.channel->ChannelId);
+				AudioManager::SetChannelVolume(channel.channel->ChannelId, playWorldAudio[i].volume);
+				AudioManager::PlayClip(clip, channel.channel->ChannelId);
 				channel.clipId = clip.id;
 				channel.queued = true;
 				channel.clipPriority = playWorldAudio[i].priority;
@@ -162,8 +164,8 @@ void SoundSystem::UpdateEntityAudio(const Camera& camera, EntityManager& em)
 				channelFound = true;
 				auto& channel = worldAudioChannels[channelId];
 
-				Game::Audio.SetChannelVolume(channel.channel->ChannelId, playWorldAudio[i].volume);
-				Game::Audio.PlayClip(clip, channel.channel->ChannelId);
+				AudioManager::SetChannelVolume(channel.channel->ChannelId, playWorldAudio[i].volume);
+				AudioManager::PlayClip(clip, channel.channel->ChannelId);
 				channel.clipId = clip.id;
 				channel.queued = true;
 				channel.clipPriority = playWorldAudio[i].priority;
@@ -197,12 +199,12 @@ void SoundSystem::PlayAdviserErrorMessage(const RaceDef& race, AdvisorErrorMessa
 	currentChat.type = UnitChatType::Advisor;
 	channel.clipId = clip.id;
 
-	Game::Audio.PlayClip(clip, channel.channel->ChannelId);
+	AudioManager::PlayClip(clip, channel.channel->ChannelId);
 }
 
 void SoundSystem::PlayUISound(const AudioClip& clip)
 {
-	Game::Audio.PlayClip(clip, uiAudioChannel.channel->ChannelId);
+	AudioManager::PlayClip(clip, uiAudioChannel.channel->ChannelId);
 }
 
 void SoundSystem::UpdateChatRequest(EntityManager& em)
@@ -279,7 +281,7 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 					seed = std::rand();
 				}
 
-				Game::Audio.PlayClip(sound->Clips[i], channel.channel->ChannelId);
+				AudioManager::PlayClip(sound->Clips[i], channel.channel->ChannelId);
 				channel.clipId = sound->Clips[i].id;
 
 			}
@@ -296,7 +298,7 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 		else {
 			if (!em.UnitArchetype.Archetype.HasEntity(currentChat.id)) {
 				currentChat = { UnitChatType::None, Entity::None };
-				Game::Audio.StopChannel(channel.channel->ChannelId);
+				AudioManager::StopChannel(channel.channel->ChannelId);
 				channel.clipId = 0xFFFF;
 			}
 		}
@@ -307,11 +309,11 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 void SoundSystem::ClearAudio(EntityManager& em)
 {
 	for (auto& channel : worldAudioChannels) {
-		Game::Audio.StopChannel(channel.channel->ChannelId);
+		AudioManager::StopChannel(channel.channel->ChannelId);
 	}
 
-	Game::Audio.StopChannel(uiAudioChannel.channel->ChannelId);
-	Game::Audio.StopChannel(chatAudioChannel.channel->ChannelId);
+	AudioManager::StopChannel(uiAudioChannel.channel->ChannelId);
+	AudioManager::StopChannel(chatAudioChannel.channel->ChannelId);
 
 	for (EntityId id : em.SoundArchetype.Archetype.GetEntities()) {
 

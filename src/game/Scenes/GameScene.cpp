@@ -2,7 +2,7 @@
 
 #include "../Game.h"
 #include "../GUI/GameView.h"
-#include "../Audio.h"
+#include "../Engine/AudioManager.h"
 #include "../Entity/EntityManager.h"
 #include "../Profiler.h"
 #include "../Data/UnitDatabase.h"
@@ -47,7 +47,7 @@ void GameScene::Start() {
 
 
 	AudioStream* stream = race.GameMusic[std::rand() % race.GameMusic.size()].Stream;
-	Game::Audio.PlayStream(stream, 0);
+	AudioManager::PlayStream(stream, 0);
 
 	for (int p = 0; p < totalPlayers; ++p) {
 		entityManager->GetPlayerSystem().AddPlayer(race, color[p]);

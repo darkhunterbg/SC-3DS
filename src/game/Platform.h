@@ -5,13 +5,11 @@
 #include "Color.h"
 #include "Input.h"
 #include "Engine/GraphicsPrimitives.h"
-
+#include "Engine/AudioChannel.h"
 
 #include <functional>
 
 
-struct AudioChannelState;
-typedef int AudioChannelHandle;
 typedef void* Semaphore;
 
 

@@ -4,18 +4,20 @@
 #include "Scenes/GameScene.h"
 #include "Scenes/PerformanceTestScene.h"
 #include "StringLib.h"
-#include "Audio.h"
 #include "Profiler.h"
 #include "Data/UnitDatabase.h"
 #include "Data/GraphicsDatabase.h"
 #include "Data/RaceDatabase.h"
 #include "Data/WeaponDatabase.h"
 #include "Data/AbilityDatabase.h"
+
+#include "Engine/GraphicsRenderer.h"
 #include "Engine/JobSystem.h"
+#include "Engine/AudioManager.h"
 
 #include "Platform.h"
 
-#include "Engine/GraphicsRenderer.h"
+
 
 static Scene* currentScene;
 
@@ -28,7 +30,6 @@ Font Game::SystemFont;
 AudioClip Game::ButtonAudio;
 Gamepad Game::Gamepad;
 Pointer Game::Pointer;
-AudioSystem Game::Audio;
 AssetLoader Game::AssetLoader;
 
 float Game::DeltaTime = 0;
@@ -64,7 +65,7 @@ void Game::Start() {
 	title = AssetLoader.LoadAtlas("glue_title.t3x");
 	startup = true;
 	frameStartTime = Platform::ElaspedTime();
-	Audio.Init();
+	AudioManager::Init();
 	GraphicsRenderer::Init();
 
 
@@ -80,7 +81,7 @@ bool Game::Update() {
 
 	Gamepad.Update();
 	Pointer.Update();
-	Audio.UpdateAudio();
+	AudioManager::UpdateAudio();
 
 	if (startup) {
 

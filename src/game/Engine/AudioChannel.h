@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Assets.h"
-
 #include <array>
-#include "Span.h"
+#include "../Span.h"
+
+#include "../Assets.h"
 
 typedef int AudioChannelHandle;
 
@@ -61,7 +61,7 @@ struct AudioChannelState {
 
 	bool IsDone() const { return queueSize == 0 && playbackCompleted; }
 
-	bool IsQueueFull() const  { return queueSize == QueueSize; }
+	bool IsQueueFull() const { return queueSize == QueueSize; }
 
 	bool QueueClip(AudioChannelClip clip) {
 		if (queueSize == QueueSize)
@@ -85,25 +85,4 @@ struct AudioChannelState {
 		playbackCompleted = false;
 	}
 	bool IsValid() const { return handle != -1; }
-};
-
-class AudioSystem {
-
-public:
-	AudioSystem(){}
-	AudioSystem(const AudioSystem&) = delete;
-	AudioSystem& operator=(const AudioSystem&) = delete;
-	void Init();
-	void PlayClip(const AudioClip&, int channel);
-	void PlayStream(AudioStream* stream, int channel);
-	void StopChannel(int channel);
-	void SetChannelVolume(int channel, float volume);
-
-	void UpdateAudio();
-
-	inline const Span<AudioChannelState> GetAudioChannes() const {
-		return { channels.data(), channels.size() };
-	}
-private:
-	std::vector<AudioChannelState> channels;
 };

@@ -46,7 +46,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\Wave.h">
       <Filter>Loader</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Audio.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\EntityManager.h">
       <Filter>Entity</Filter>
     </ClInclude>
@@ -171,6 +170,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\JobSystem.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\AudioManager.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\AudioChannel.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -192,7 +197,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\Wave.cpp">
       <Filter>Loader</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Audio.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\EntityManager.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
@@ -297,6 +301,9 @@
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\JobSystem.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\AudioManager.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>
