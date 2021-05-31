@@ -7,7 +7,7 @@
 #include <array>
 
 class AssetLoader {
-	typedef  std::size_t AssetId;
+	typedef std::size_t AssetId;
 
 	enum class AssetType : uint8_t {
 		Unknown = 0,
@@ -33,20 +33,24 @@ private:
 
 	AssetLoader(const AssetLoader&) = delete;
 	AssetLoader& operator=(const AssetLoader&) = delete;
+	AssetLoader() {}
 
 	std::unordered_map<AssetId, AssetEntry> loadedAssets;
 
-	inline constexpr const char* GetAssetTypeName(AssetType type) const {
-		if ((unsigned)type > AssetTypeName.size()) {
+	static AssetLoader instance;
+
+	static inline constexpr const char* GetAssetTypeName(AssetType type)  {
+		if ((unsigned)type > instance.AssetTypeName.size()) {
 			return "Invalid";
 		}
-		return AssetTypeName[(unsigned)type];
+		return instance.AssetTypeName[(unsigned)type];
 	}
-public:
-	AssetLoader() {}
 
-	const SpriteAtlas* LoadAtlas(const char* path);
-		Font LoadFont(const char* path);
-		AudioClip LoadAudioClip(const char* path);
-		AudioStream* LoadAudioStream(const char* path);
+public:
+	
+
+	static const SpriteAtlas* LoadAtlas(const char* path);
+	static Font LoadFont(const char* path);
+	static AudioClip LoadAudioClip(const char* path);
+	static AudioStream* LoadAudioStream(const char* path);
 };

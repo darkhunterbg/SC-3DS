@@ -1,8 +1,9 @@
 #include "MapSystem.h"
 #include "EntityManager.h"
-#include "../Game.h"
+
 #include "../Profiler.h"
 #include "../Engine/GraphicsRenderer.h"
+#include "../Engine/AssetLoader.h"
 
 static Sprite tile;
 
@@ -12,7 +13,7 @@ void MapSystem::SetSize(Vector2Int16 size)
 	gridSize = size / 32;
 	minimapTextureSize = size.x / 32;
 
-	tile = Game::AssetLoader.LoadAtlas("tileset_tile.t3x")->GetSprite(0);
+	tile = AssetLoader::LoadAtlas("tileset_tile.t3x")->GetSprite(0);
 }
 
 void MapSystem::UpdateMapObjectPositions(EntityManager& em, const EntityChangedData& changed) {

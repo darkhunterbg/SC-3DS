@@ -1,6 +1,6 @@
 #include "Cursor.h"
 #include "../Engine/GraphicsRenderer.h"
-#include "../Game.h"
+#include "../Engine/AssetLoader.h"
 #include "../Camera.h"
 #include "../Entity/EntityManager.h"
 #include "../Util.h"
@@ -9,12 +9,13 @@
 #include "GameViewContext.h"
 #include <algorithm>
 
+#include "Game.h"
+
 static constexpr const float Speed = 10;
 static constexpr const int AnimFrameCount = 6;
 
 Cursor::Cursor() {
-	;
-	atlas = Game::AssetLoader.LoadAtlas("cursor.t3x");
+	atlas = AssetLoader::LoadAtlas("cursor.t3x");
 	currentClip = &GraphicsDatabase::Cursor.arrow;
 }
 

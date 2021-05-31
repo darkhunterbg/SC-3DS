@@ -14,7 +14,6 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\AssetLoader.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Assets.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Camera.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Color.h" />
@@ -32,6 +31,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\WeaponDatabase.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\WeaponDef.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Debug.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\AssetLoader.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\AudioChannel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\AudioManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\GraphicsPrimitives.h" />
@@ -77,7 +77,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Util.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\AssetLoader.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Assets.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Camera.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\AbilityDatabase.cpp" />
@@ -90,6 +89,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\SoundDef.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\UnitDatabase.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\WeaponDatabase.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\AssetLoader.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\AudioManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\GraphicsRenderer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\JobSystem.cpp" />

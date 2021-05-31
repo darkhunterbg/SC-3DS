@@ -8,12 +8,14 @@
 #include "../Util.h"
 #include "../Entity/EntityManager.h"
 #include "../Engine/GraphicsRenderer.h"
+#include "../Engine/AssetLoader.h"
 
 #include "../Data/GraphicsDatabase.h"
 
 #include "../Profiler.h"
 
 #include "../Platform.h"
+
 
 //static Rectangle minimapDst = { {4,108},{128,128} };
 static Rectangle minimapDst = { {4,124},{113,113} };
@@ -24,7 +26,7 @@ static Rectangle portraitPanelDst = { {248, 20},{ 60, 56 } };
 GameHUD::GameHUD(Vector2Int16 mapSize)
 {
 	font = Game::SystemFont;
-	iconsAtlas = Game::AssetLoader.LoadAtlas("game_icons.t3x");
+	iconsAtlas = AssetLoader::LoadAtlas("game_icons.t3x");
 	minimapUpscale = Vector2(mapSize) / Vector2(minimapDst.size);
 
 	consolePanel.PanelDst = consolePanelDst;

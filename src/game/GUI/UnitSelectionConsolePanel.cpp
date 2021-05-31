@@ -10,6 +10,8 @@
 
 #include "../Platform.h"
 
+#include "../Engine/AssetLoader.h"
+
 static char buffer[64];
 
 struct UnitItemInfo {
@@ -291,7 +293,7 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 	GraphicsRenderer::DrawText(font, pos + Vector2Int{ 68, 4 }, "Building", Colors::UILightGray, 0.4f);
 
 
-	const Sprite& pb = Game::AssetLoader.LoadAtlas("game_gui.t3x")->GetSprite(0);
+	const Sprite& pb = AssetLoader::LoadAtlas("game_gui.t3x")->GetSprite(0);
 
 	dst.position = pos + Vector2Int{ 38,24 };
 	dst.size = Vector2Int(pb.rect.size);

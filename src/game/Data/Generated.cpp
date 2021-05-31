@@ -1,5 +1,5 @@
 #include "Generated.h"
-#include "../Game.h"
+#include "../Engine/AssetLoader.h"
 
 
 SpriteFrameAtlas* SpriteDatabase::unit_terran_marine;
@@ -33,7 +33,7 @@ SpriteFrameAtlas* SpriteDatabase::unit_thingy_ofiref;
 SpriteFrameAtlas* SpriteDatabase::unit_neutral_orechunk;
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_marine() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_terran_marine.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_terran_marine.t3x");
 	auto* a = unit_terran_marine = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(64, 64);
 
@@ -497,7 +497,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_marine() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_tmashad() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_terran_tmashad.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_terran_tmashad.t3x");
 	auto* a = unit_terran_tmashad = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(44, 44);
 
@@ -727,7 +727,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_tmashad() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_control() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_terran_control.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_terran_control.t3x");
 	auto* a = unit_terran_control = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(128, 160);
 
@@ -749,7 +749,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_control() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_tccshad() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_terran_tccshad.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_terran_tccshad.t3x");
 	auto* a = unit_terran_tccshad = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(128, 160);
 
@@ -764,7 +764,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_tccshad() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_scv() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_terran_scv.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_terran_scv.t3x");
 	auto* a = unit_terran_scv = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(72, 72);
 
@@ -943,7 +943,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_terran_scv() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_tbangs() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_thingy_tbangs.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_thingy_tbangs.t3x");
 	auto* a = unit_thingy_tbangs = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(128, 128);
 
@@ -961,7 +961,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_tbangs() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_tbangl() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_thingy_tbangl.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_thingy_tbangl.t3x");
 	auto* a = unit_thingy_tbangl = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(200, 200);
 
@@ -980,7 +980,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_tbangl() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_tbangx() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_thingy_tbangx.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_thingy_tbangx.t3x");
 	auto* a = unit_thingy_tbangx = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(252, 200);
 
@@ -1003,7 +1003,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_tbangx() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_neutral_min01() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_neutral_min01.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_neutral_min01.t3x");
 	auto* a = unit_neutral_min01 = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(64, 96);
 
@@ -1024,7 +1024,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_neutral_min01() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_neutral_min01sha() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_neutral_min01sha.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_neutral_min01sha.t3x");
 	auto* a = unit_neutral_min01sha = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(128, 96);
 
@@ -1045,7 +1045,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_neutral_min01sha() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_bullet_tspark() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_bullet_tspark.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_bullet_tspark.t3x");
 	auto* a = unit_bullet_tspark = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(40, 40);
 
@@ -1189,7 +1189,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_bullet_tspark() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_bullet_scvspark() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_bullet_scvspark.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_bullet_scvspark.t3x");
 	auto* a = unit_bullet_scvspark = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(48, 48);
 
@@ -1208,7 +1208,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_bullet_scvspark() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_cursor() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("cursor.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("cursor.t3x");
 	auto* a = cursor = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(128, 128);
 
@@ -1297,7 +1297,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_cursor() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_o022() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_thingy_o022.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_thingy_o022.t3x");
 	auto* a = unit_thingy_o022 = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(32, 32);
 
@@ -1308,7 +1308,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_o022() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_wirefram_wirefram_000() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_wirefram_wirefram_000.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_wirefram_wirefram_000.t3x");
 	auto* a = unit_wirefram_wirefram_000 = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(64, 64);
 
@@ -1327,7 +1327,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_wirefram_wirefram_000() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_wirefram_wirefram_106() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_wirefram_wirefram_106.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_wirefram_wirefram_106.t3x");
 	auto* a = unit_wirefram_wirefram_106 = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(64, 64);
 
@@ -1346,7 +1346,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_wirefram_wirefram_106() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_wirefram_wirefram_007() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_wirefram_wirefram_007.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_wirefram_wirefram_007.t3x");
 	auto* a = unit_wirefram_wirefram_007 = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(64, 64);
 
@@ -1365,7 +1365,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_wirefram_wirefram_007() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_wirefram_wirefram() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_wirefram_wirefram.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_wirefram_wirefram.t3x");
 	auto* a = unit_wirefram_wirefram = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(64, 64);
 
@@ -1602,7 +1602,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_wirefram_wirefram() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_wirefram_grpwire() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_wirefram_grpwire.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_wirefram_grpwire.t3x");
 	auto* a = unit_wirefram_grpwire = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(32, 32);
 
@@ -1742,7 +1742,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_wirefram_grpwire() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_o146() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_thingy_o146.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_thingy_o146.t3x");
 	auto* a = unit_thingy_o146 = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(148, 148);
 
@@ -1753,7 +1753,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_o146() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_o072() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_thingy_o072.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_thingy_o072.t3x");
 	auto* a = unit_thingy_o072 = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(80, 80);
 
@@ -1764,7 +1764,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_o072() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_cmdbtns_tcmdbtns() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_cmdbtns_tcmdbtns.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_cmdbtns_tcmdbtns.t3x");
 	auto* a = unit_cmdbtns_tcmdbtns = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(72, 72);
 
@@ -1810,7 +1810,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_cmdbtns_tcmdbtns() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_cmdbtns_pcmdbtns() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_cmdbtns_pcmdbtns.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_cmdbtns_pcmdbtns.t3x");
 	auto* a = unit_cmdbtns_pcmdbtns = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(72, 72);
 
@@ -1856,7 +1856,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_cmdbtns_pcmdbtns() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_cmdbtns_zcmdbtns() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_cmdbtns_zcmdbtns.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_cmdbtns_zcmdbtns.t3x");
 	auto* a = unit_cmdbtns_zcmdbtns = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(72, 72);
 
@@ -1902,7 +1902,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_cmdbtns_zcmdbtns() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_cmdbtns_cmdicons() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_cmdbtns_cmdicons.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_cmdbtns_cmdicons.t3x");
 	auto* a = unit_cmdbtns_cmdicons = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(36, 34);
 
@@ -2297,7 +2297,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_cmdbtns_cmdicons() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_ofirec() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_thingy_ofirec.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_thingy_ofirec.t3x");
 	auto* a = unit_thingy_ofirec = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(64, 96);
 
@@ -2330,7 +2330,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_ofirec() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_ofirev() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_thingy_ofirev.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_thingy_ofirev.t3x");
 	auto* a = unit_thingy_ofirev = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(64, 96);
 
@@ -2363,7 +2363,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_ofirev() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_ofiref() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_thingy_ofiref.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_thingy_ofiref.t3x");
 	auto* a = unit_thingy_ofiref = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(64, 96);
 
@@ -2396,7 +2396,7 @@ const SpriteFrameAtlas* SpriteDatabase::Load_unit_thingy_ofiref() {
 }
 
 const SpriteFrameAtlas* SpriteDatabase::Load_unit_neutral_orechunk() {
-	const SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas("unit_neutral_orechunk.t3x");
+	const SpriteAtlas* atlas = AssetLoader::LoadAtlas("unit_neutral_orechunk.t3x");
 	auto* a = unit_neutral_orechunk = new SpriteFrameAtlas(atlas);
 	a->FrameSize = Vector2Int(32, 32);
 

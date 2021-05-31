@@ -14,6 +14,7 @@
 #include "Engine/GraphicsRenderer.h"
 #include "Engine/JobSystem.h"
 #include "Engine/AudioManager.h"
+#include "Engine/AssetLoader.h"
 
 #include "Platform.h"
 
@@ -30,10 +31,8 @@ Font Game::SystemFont;
 AudioClip Game::ButtonAudio;
 Gamepad Game::Gamepad;
 Pointer Game::Pointer;
-AssetLoader Game::AssetLoader;
 
 float Game::DeltaTime = 0;
-
 
 
 static void ShowTitleScreen() {
@@ -60,9 +59,9 @@ void Game::FrameEnd() {
 void Game::Start() {
 
 	JobSystem::Init();
-	SystemFont = AssetLoader.LoadFont("font.bcfnt");
-	ButtonAudio = AssetLoader.LoadAudioClip("sound/misc/button.wav");
-	title = AssetLoader.LoadAtlas("glue_title.t3x");
+	SystemFont = AssetLoader::LoadFont("font.bcfnt");
+	ButtonAudio = AssetLoader::LoadAudioClip("sound/misc/button.wav");
+	title = AssetLoader::LoadAtlas("glue_title.t3x");
 	startup = true;
 	frameStartTime = Platform::ElaspedTime();
 	AudioManager::Init();

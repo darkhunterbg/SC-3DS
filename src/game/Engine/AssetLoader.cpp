@@ -1,17 +1,19 @@
 #include "AssetLoader.h"
 #include "Platform.h"
 #include "Debug.h"
-#include "Loader/Wave.h"
+#include "../Loader/Wave.h"
 
 static constexpr const int AudioStreamBufferSize = 4096;
 static AudioClip LoadAudioClipFromFile(const char* path);
 static AudioStream* LoadAudioStreamFromFile(const char* path);
 
+AssetLoader AssetLoader::instance;
+
 const SpriteAtlas* AssetLoader::LoadAtlas(const char* path)
 {
 	std::string p = path;
-	AssetId id = hasher(p);
-	AssetEntry& e = loadedAssets[id];
+	AssetId id = instance.hasher(p);
+	AssetEntry& e = instance.loadedAssets[id];
 
 	if (e.id == 0) {
 		e.data = Platform::LoadAtlas(p.data());
@@ -30,8 +32,8 @@ const SpriteAtlas* AssetLoader::LoadAtlas(const char* path)
 Font AssetLoader::LoadFont(const char* path)
 {
 	std::string p = path;
-	AssetId id = hasher(p);
-	AssetEntry& e = loadedAssets[id];
+	AssetId id = instance.hasher(p);
+	AssetEntry& e = instance.loadedAssets[id];
 
 	if (e.id == 0) {
 		e.data = new Font(Platform::LoadFont(p.data()));
@@ -51,8 +53,8 @@ Font AssetLoader::LoadFont(const char* path)
 AudioClip AssetLoader::LoadAudioClip(const char* path)
 {
 	std::string p = path;
-	AssetId id = hasher(p);
-	AssetEntry& e = loadedAssets[id];
+	AssetId id = instance.hasher(p);
+	AssetEntry& e = instance.loadedAssets[id];
 
 	if (e.id == 0) {
 		e.data = new AudioClip(LoadAudioClipFromFile(p.data()));
@@ -73,8 +75,8 @@ AudioStream* AssetLoader::LoadAudioStream(const char* path)
 {
 	std::string p = path;
 
-	AssetId id = hasher(p);
-	AssetEntry& e = loadedAssets[id];
+	AssetId id = instance.hasher(p);
+	AssetEntry& e = instance.loadedAssets[id];
 
 	if (e.id == 0) {
 		e.data = LoadAudioStreamFromFile(p.data());

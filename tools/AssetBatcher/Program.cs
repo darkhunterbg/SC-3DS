@@ -131,7 +131,7 @@ namespace AssetBatcher
 					int height = int.Parse(spl[1]);
 
 					s.WriteLine($"const SpriteFrameAtlas* SpriteDatabase::Load_{e.Name}() {{");
-					s.WriteLine($"\tconst SpriteAtlas* atlas = Game::AssetLoader.LoadAtlas(\"{e.Name}.t3x\");");
+					s.WriteLine($"\tconst SpriteAtlas* atlas = AssetLoader::LoadAtlas(\"{e.Name}.t3x\");");
 					s.WriteLine($"\tauto* a = {e.Name} = new SpriteFrameAtlas(atlas);");
 					s.WriteLine($"\ta->FrameSize = Vector2Int({width}, {height});");
 
@@ -240,7 +240,7 @@ public:
 
 		public static string SourceStart =
 @"#include ""Generated.h""
-#include ""../Game.h""
+#include ""../Engine/AssetLoader.h""
 
 ";
 

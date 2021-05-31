@@ -1,6 +1,6 @@
 #include "RaceDef.h"
 
-#include "../Game.h"
+#include "../Engine/AssetLoader.h"
 
 void RaceDef::LoadResourses() {
 	ConsoleSprite.Load();
@@ -9,7 +9,7 @@ void RaceDef::LoadResourses() {
 
 	CommandIconsLoad();
 
-	const SpriteAtlas* icons = Game::AssetLoader.LoadAtlas("game_icons.t3x");
+	const SpriteAtlas* icons = AssetLoader::LoadAtlas("game_icons.t3x");
 	SupplyIcon = icons->GetSprite(SupplyIconId);
 
 	GasIcon = icons->GetSprite(GasIconId);

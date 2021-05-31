@@ -5,7 +5,7 @@
 #include "Generated.h"
 #include "../Entity/EntityUtil.h"
 
-#include "../Game.h"
+#include "../Engine/AssetLoader.h"
 
 UnitDef UnitDatabase::Marine;
 UnitDef UnitDatabase::SCV;
@@ -135,7 +135,7 @@ void UnitDatabase::LoadUnitResources(UnitDef& def) {
 	def.Icon = SpriteDatabase::Load_unit_cmdbtns_cmdicons()
 		->GetFrame(def.IconId);
 
-	def.Portrait = Game::AssetLoader.LoadAtlas("portrait.t3x")->GetSprite(def.PortraitId);
+	def.Portrait = AssetLoader::LoadAtlas("portrait.t3x")->GetSprite(def.PortraitId);
 
 	def.LoadAllSounds();
 }

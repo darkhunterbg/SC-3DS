@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Assets.h"
-#include "AssetLoader.h"
 #include "Input.h"
 
 
@@ -19,7 +18,6 @@ public:
 
 	static Gamepad Gamepad;
 	static Pointer Pointer;
-	static AssetLoader AssetLoader;
 
 	static float DeltaTime;
 

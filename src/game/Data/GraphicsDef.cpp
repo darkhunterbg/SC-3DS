@@ -1,8 +1,8 @@
 #include "GraphicsDef.h"
 
-#include "../Game.h"
+#include "../Engine/AssetLoader.h"
 
 void SpriteAtlasDef::Load()
 {
-	Atlas = Game::AssetLoader.LoadAtlas(Path);
+	Atlas = AssetLoader::LoadAtlas(Path);
 }
