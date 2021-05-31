@@ -15,6 +15,7 @@
 #include "../Data/GraphicsDatabase.h"
 #include "../Data/AbilityDatabase.h"
 
+#include "../Platform.h"
 
 static std::array<Color, 3> GreyHPBarColorPalette = { 0xb0b0b0ff, 0x98948cff, 0x585858ff };
 static std::array<Color, 3> YellowHPBarColorPalette = { 0xfccc2cff, 0xdc9434ff, 0xb09018ff };

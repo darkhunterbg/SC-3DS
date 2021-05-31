@@ -269,7 +269,7 @@ void MapSystem::DrawMap(const Camera& camera)
 }
 
 void MapSystem::DrawFogOfWar(const Camera& camera) {
-	if (!FogOfWarVisible || minimapFowTexture.textureId == nullptr)
+	if (!FogOfWarVisible || minimapFowTexture.surfaceId == nullptr)
 		return;
 
 	static constexpr const int Upscale = 4;
@@ -280,35 +280,34 @@ void MapSystem::DrawFogOfWar(const Camera& camera) {
 
 	GraphicsRenderer::ChangeBlendingMode(BlendMode::AllSet);
 
-	if (fogOfWarTexture.textureId == nullptr) {
-		fogOfWarTexture = Platform::NewTexture(Vector2Int(FogOfWarTextureSize));
-		Image t = Platform::NewTexture(Vector2Int(minimapTextureSize / 2));
-		fowDownscaleSprite = Platform::NewSprite(t, { {0,0},Vector2Int16(minimapTextureSize / 2) });
+	if (fogOfWarTexture.surfaceId == nullptr) {
+		fogOfWarTexture = GraphicsRenderer::NewRenderSurface(Vector2Int(FogOfWarTextureSize));
+		fowDownscaleTexture = GraphicsRenderer::NewRenderSurface(Vector2Int(minimapTextureSize / 2));
 	}
 
 	Rectangle16 camRect = camera.GetRectangle16();
 
 
-	GraphicsRenderer::DrawOnTexture(fowDownscaleSprite.image.textureId);
-	Platform::ClearBuffer(Colors::Transparent);
+	GraphicsRenderer::DrawOnSurface(fowDownscaleTexture);
+	GraphicsRenderer::ClearCurrentSurface(Colors::Transparent);
 	// downscale minimap fow
-	auto s = Platform::NewSprite(minimapFowTexture, { {0,0},Vector2Int16(minimapTextureSize) });
-	GraphicsRenderer::Draw(s,{ {0,0},{fowDownscaleSprite.rect.size.x,fowDownscaleSprite.rect.size.y} });
+	GraphicsRenderer::Draw(minimapFowTexture, fowDownscaleTexture.GetRect());
 
 
-	GraphicsRenderer::DrawOnTexture(fogOfWarTexture.textureId);
-	Platform::ClearBuffer(Colors::Transparent);
+	GraphicsRenderer::DrawOnSurface(fogOfWarTexture);
+	GraphicsRenderer::ClearCurrentSurface(Colors::Transparent);
 	// upscale downscaled minimap fow
-	GraphicsRenderer::Draw(fowDownscaleSprite,
-		{ {0,0},{FogOfWarTextureSize.x,FogOfWarTextureSize.y} });
+	GraphicsRenderer::Draw(fowDownscaleTexture, fogOfWarTexture.GetRect());
 
 
-	GraphicsRenderer::DrawOnTexture(nullptr);
+	GraphicsRenderer::DrawOnCurrentScreen();
 	GraphicsRenderer::ChangeBlendingMode(BlendMode::Alpha);
 	static constexpr const int CamDownscale = 32 / Upscale;
 	Rectangle16 src = { (camRect.position / CamDownscale), (camRect.size / CamDownscale) };
-	Sprite fowSprite = Platform::NewSprite(fogOfWarTexture, src);
-	GraphicsRenderer::Draw(fowSprite, { {0,0},{400,240} });
+
+	Sprite sprite = GraphicsRenderer::NewSprite(fogOfWarTexture.sprite.textureId, src);
+
+	GraphicsRenderer::Draw(sprite, { {0,0},{400,240} });
 
 	GraphicsRenderer::Submit();
 }
@@ -316,8 +315,8 @@ void MapSystem::DrawFogOfWar(const Camera& camera) {
 void MapSystem::GenerateMinimapTerrainTexture() {
 	Rectangle mapBounds = { {0,0}, Vector2Int(mapSize) };
 
-	minimapTerrainTexture = Platform::NewTexture({ minimapTextureSize,minimapTextureSize });
-	GraphicsRenderer::DrawOnTexture(minimapTerrainTexture.textureId);
+	minimapTerrainTexture = GraphicsRenderer::NewRenderSurface({ minimapTextureSize,minimapTextureSize });
+	GraphicsRenderer::DrawOnSurface(minimapTerrainTexture);
 
 	Vector2 upscale = Vector2(mapBounds.size) / Vector2(minimapTextureSize, minimapTextureSize);
 
@@ -332,20 +331,19 @@ void MapSystem::GenerateMinimapTerrainTexture() {
 		}
 	}
 
-	GraphicsRenderer::DrawOnTexture(nullptr);
 }
 
-void MapSystem::RenderMinimapFogOfWar(const PlayerVision& vision) {
+void MapSystem::RedrawMinimapFogOfWar(const PlayerVision& vision) {
 
-	if (minimapFowTexture.textureId == nullptr) {
-		minimapFowTexture = Platform::NewTexture({ minimapTextureSize,minimapTextureSize });
+	if (minimapFowTexture.surfaceId == nullptr) {
+		minimapFowTexture = GraphicsRenderer::NewRenderSurface({ minimapTextureSize,minimapTextureSize });
 	}
 
 	int mapSizeTiles = (int)mapSize.x / 32;
 	int multiplier = minimapTextureSize / mapSizeTiles;
 
-	GraphicsRenderer::DrawOnTexture(minimapFowTexture.textureId);
-	Platform::ClearBuffer(Colors::Black);
+	GraphicsRenderer::DrawOnSurface(minimapFowTexture);
+	GraphicsRenderer::ClearCurrentSurface(Colors::Black);
 
 
 	Color colors[2] = { (Color(0,0,0,0.5)), Color(0,0,0,0.0f) };
@@ -369,24 +367,18 @@ void MapSystem::RenderMinimapFogOfWar(const PlayerVision& vision) {
 void MapSystem::RedrawMinimap(EntityManager& em) {
 	const PlayerVision& vision = em.GetPlayerSystem().GetPlayerVision(ActivePlayer);
 
-	if (minimapTerrainTexture.textureId == nullptr) {
+	if (minimapTerrainTexture.surfaceId == nullptr) {
 		GenerateMinimapTerrainTexture();
+		minimapTexture = GraphicsRenderer::NewRenderSurface({ minimapTextureSize,minimapTextureSize }, true);
 	}
 
-	if (minimapTexture.textureId == nullptr) {
-		minimapTexture = Platform::NewTexture({ minimapTextureSize,minimapTextureSize }, true);
-	}
+	RedrawMinimapFogOfWar(vision);
 
-	RenderMinimapFogOfWar(vision);
-
-	GraphicsRenderer::DrawOnTexture(minimapTexture.textureId);
-
-	Sprite fullMapSprite = Platform::NewSprite(minimapTerrainTexture, { {0,0}, Vector2Int16(minimapTextureSize) });
-	GraphicsRenderer::Draw(fullMapSprite, { {0,0}, Vector2Int(minimapTextureSize) });
+	GraphicsRenderer::DrawOnSurface(minimapTexture);
+	GraphicsRenderer::Draw(minimapTerrainTexture, { 0,0 });
 
 	if (FogOfWarVisible) {
-		fullMapSprite.image = minimapFowTexture;
-		GraphicsRenderer::Draw(fullMapSprite, { {0,0}, Vector2Int(minimapTextureSize) });
+		GraphicsRenderer::Draw(minimapFowTexture, { 0,0 });
 	}
 
 	int end = minimapData.size();
@@ -398,18 +390,16 @@ void MapSystem::RedrawMinimap(EntityManager& em) {
 		GraphicsRenderer::DrawRectangle(dst, color);
 	}
 
-	GraphicsRenderer::DrawOnTexture(nullptr);
+	GraphicsRenderer::DrawOnCurrentScreen();
 }
 
 void MapSystem::DrawMinimap(Rectangle dst)
 {
-	if (minimapTexture.textureId == nullptr) {
+	if (minimapTexture.surfaceId == nullptr) {
 		return;
 	}
 
-	Sprite minimapSprite = Platform::NewSprite(minimapTexture, { {0,0}, Vector2Int16(minimapTextureSize) });
-
-	GraphicsRenderer::Draw(minimapSprite, dst);
+	GraphicsRenderer::Draw(minimapTexture, dst);
 }
 
 void MapSystem::DrawGrid(const Camera& camera)

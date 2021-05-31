@@ -5,6 +5,8 @@
 #include "../Color.h"
 #include "Component.h"
 
+#include "../Engine/GraphicsPrimitives.h"
+
 #include <vector>
 
 class EntityManager;
@@ -26,13 +28,15 @@ class MapSystem {
 	};
 private:
 
-	Sprite fowDownscaleSprite;
 	Vector2Int16 mapSize;
 	Vector2Int16 gridSize;
-	Image minimapTexture = { 0 };
-	Image minimapFowTexture = { 0 };
-	Image minimapTerrainTexture = { 0};
-	Image fogOfWarTexture = { 0 };
+
+	RenderSurface minimapTexture = { 0 };
+	RenderSurface minimapFowTexture = { 0 };
+	RenderSurface minimapTerrainTexture = { 0};
+
+	RenderSurface fogOfWarTexture = { 0 };
+	RenderSurface fowDownscaleTexture = { 0 };
 
 	short minimapTextureSize = 0;
 
@@ -47,7 +51,7 @@ private:
 	static void InitFowVisibleEntitiesJob(int start, int end);
 
 	void GenerateMinimapTerrainTexture();
-	void RenderMinimapFogOfWar(const PlayerVision& vision);
+	void RedrawMinimapFogOfWar(const PlayerVision& vision);
 
 	void UpdateVisibleRenderEntities(EntityManager& em);
 	void UpdateVisibleRenderUnits(EntityManager& em);

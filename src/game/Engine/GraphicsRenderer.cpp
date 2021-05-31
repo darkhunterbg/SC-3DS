@@ -53,7 +53,7 @@ DrawCommand& GraphicsRenderer::GetDrawCommand(Texture texture)
 void GraphicsRenderer::BufferDraw(std::vector<BatchDrawCommand>& cmd)
 {
 	if (instance.drawCommands.size() == 0)
-		instance.drawCommands.push_back({ cmd.front().sprite.image.textureId , 0,0 , DrawCommandType::TexturedTriangle });
+		instance.drawCommands.push_back({ cmd.front().sprite.textureId , 0,0 , DrawCommandType::TexturedTriangle });
 
 	DrawCommand* dc = &instance.drawCommands.front();
 
@@ -74,8 +74,8 @@ void GraphicsRenderer::BufferDraw(std::vector<BatchDrawCommand>& cmd)
 		}
 
 
-		if (dc->texture != c.sprite.image.textureId) {
-			dc = &instance.NewDrawCommand(c.sprite.image.textureId);
+		if (dc->texture != c.sprite.textureId) {
+			dc = &instance.NewDrawCommand(c.sprite.textureId);
 		}
 
 
@@ -105,7 +105,7 @@ void GraphicsRenderer::BufferDraw(std::vector<BatchDrawCommand>& cmd)
 
 void GraphicsRenderer::Draw(const Sprite& sprite, Vector2Int position, Color32 color)
 {
-	instance.GetDrawCommand(sprite.image.textureId).count += 6;
+	instance.GetDrawCommand(sprite.textureId).count += 6;
 
 	Vector2Int size = Vector2Int(sprite.rect.size);
 
@@ -123,7 +123,7 @@ void GraphicsRenderer::Draw(const Sprite& sprite, Vector2Int position, Color32 c
 
 void GraphicsRenderer::Draw(const Sprite& sprite, const Rectangle& dst, Color32 color)
 {
-	instance.GetDrawCommand(sprite.image.textureId).count += 6;
+	instance.GetDrawCommand(sprite.textureId).count += 6;
 
 	Vector2Int size = dst.size;
 
@@ -187,11 +187,21 @@ void GraphicsRenderer::DrawOnScreen(ScreenId screen)
 	Platform::DrawOnScreen(screen);
 }
 
-void GraphicsRenderer::DrawOnTexture(Texture texture)
+void GraphicsRenderer::DrawOnSurface(RenderSurface surface)
 {
 	Submit();
+	Platform::DrawOnSurface(surface.surfaceId);
+}
 
-	Platform::DrawOnTexture(texture);
+void GraphicsRenderer::DrawOnCurrentScreen()
+{
+	Submit();
+	Platform::DrawOnSurface(nullptr);
+}
+
+RenderSurface GraphicsRenderer::NewRenderSurface(Vector2Int size, bool pixelFiltering)
+{
+	return Platform::NewRenderSurface(size, pixelFiltering);
 }
 
 void GraphicsRenderer::ChangeBlendingMode(BlendMode mode)
@@ -204,4 +214,14 @@ void GraphicsRenderer::ChangeBlendingMode(BlendMode mode)
 	instance.blendMode = mode;
 
 	Platform::ChangeBlendingMode(instance.blendMode);
+}
+
+void GraphicsRenderer::ClearCurrentSurface(Color color)
+{
+	Platform::ClearBuffer(color);
+}
+
+Sprite GraphicsRenderer::NewSprite(Texture texture, const Rectangle16& rect)
+{
+	return  Platform::NewSprite({ texture }, rect);
 }

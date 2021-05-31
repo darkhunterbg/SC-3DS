@@ -2,9 +2,19 @@
 
 #include "MathLib.h"
 #include "Color.h"
-#include "../Assets.h"
 
 typedef void* Texture;
+typedef void* Surface;
+
+struct Sprite {
+	Rectangle16 rect;
+	Vector2 uv[2];
+	Texture textureId;
+
+	inline Rectangle GetRect() const {
+		return { Vector2Int(rect.position), Vector2Int(rect.size) };
+	}
+};
 
 struct Vertex {
 	Vector2 position;
@@ -46,4 +56,18 @@ enum class BlendMode {
 	Alpha = 0,
 	AlphaSet = 1,
 	AllSet = 2,
+};
+
+
+struct RenderSurface {
+	Surface surfaceId = nullptr;
+	Sprite sprite;
+
+	inline Vector2Int GetSize() const {
+		return Vector2Int(sprite.rect.size);
+	}
+	inline Rectangle GetRect() const {
+		return sprite.GetRect();
+	}
+
 };

@@ -8,6 +8,8 @@
 #include "../Color.h"
 #include "../StringLib.h"
 
+#include "../Platform.h"
+
 static char buffer[64];
 
 struct UnitItemInfo {

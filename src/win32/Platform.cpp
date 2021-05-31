@@ -90,7 +90,7 @@ const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 			return nullptr;
 		}
 		Rectangle16 rect = { {0,0},Vector2Int16(size) };
-		Sprite s = { rect ,{ tex }, {{0,0},{1,1} } };
+		Sprite s = { rect ,  {{0,0},{1,1} }, tex };
 		asset->AddSprite(s);
 	}
 
@@ -133,16 +133,15 @@ void Platform::DrawOnScreen(ScreenId screen) {
 	target = (screens[(int)currentRT])->target;
 
 }
-void Platform::DrawOnTexture(Texture texture) {
-	auto t = (GPU_Image*)texture;
+void Platform::DrawOnSurface(Surface surface) {
+	auto t = (GPU_Target*)surface;
 
 	if (t == nullptr)
 		target = (screens[(int)currentRT])->target;
 	else
-		target = t->target;
-
+		target = t;
 }
-Image Platform::NewTexture(Vector2Int size, bool pixelFiltering) {
+RenderSurface Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering) {
 	GPU_Image* tex = nullptr;
 
 	tex = GPU_CreateImage(size.x, size.y, GPU_FORMAT_RGBA);
@@ -155,15 +154,19 @@ Image Platform::NewTexture(Vector2Int size, bool pixelFiltering) {
 		GPU_SetImageFilter(tex, GPU_FILTER_LINEAR);
 	}
 
-	GPU_LoadTarget(tex);
+	GPU_Target* surface = GPU_LoadTarget(tex);
 	GPU_SetWrapMode(tex, GPU_WRAP_NONE, GPU_WRAP_NONE);
-	return { tex };
+	Sprite s;
+	s.rect = { {0,0}, Vector2Int16(size) };
+	s.textureId = tex;
+	s.uv[1] = { 1,1 };
+	return {  surface , s };
 }
-Sprite Platform::NewSprite(Image image, Rectangle16 src) {
-	GPU_Image* img = (GPU_Image*)image.textureId;
+Sprite Platform::NewSprite(Texture texture, Rectangle16 src) {
+	GPU_Image* img = (GPU_Image*)texture;
 	Vector2 start = Vector2(src.position) / Vector2(img->w, img->h);
 	Vector2 end = Vector2(src.GetMax()) / Vector2(img->w, img->h);
-	return { src, image , {start,end} };
+	return { src,  {start,end} , texture};
 }
 
 void Platform::ChangeBlendingMode(BlendMode mode) {

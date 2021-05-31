@@ -90,9 +90,9 @@ void AnimationClip::AddFrameCentered(const SpriteFrame& frame, Vector2Int16 fram
 
 UnitAnimationClip::UnitAnimationClip() {
 	for (auto& sf : frames) {
-		sf.sprite.image = { nullptr };
-		sf.shadowSprite.image = { nullptr };
-		sf.colorSprite.image = { nullptr };
+		sf.sprite.textureId = nullptr ;
+		sf.shadowSprite.textureId =  nullptr ;
+		sf.colorSprite.textureId = nullptr ;
 	}
 }
 uint8_t UnitAnimationClip::AddFrameCentered(const SpriteFrame& frame, Vector2Int16 frameSize, bool hFlip)

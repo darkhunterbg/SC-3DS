@@ -7,17 +7,8 @@
 #include <string>
 #include <array>
 
-typedef void* Texture;
-struct Image {
-	Texture textureId;
-};
+#include "Engine/GraphicsPrimitives.h"
 
-
-struct Sprite {
-	Rectangle16 rect;
-	Image image;
-	Vector2 uv[2];
-};
 
 class SpriteAtlas {
 private:

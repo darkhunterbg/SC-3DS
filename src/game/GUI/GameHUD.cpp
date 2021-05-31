@@ -13,6 +13,8 @@
 
 #include "../Profiler.h"
 
+#include "../Platform.h"
+
 //static Rectangle minimapDst = { {4,108},{128,128} };
 static Rectangle minimapDst = { {4,124},{113,113} };
 static Rectangle consolePanelDst = { {10,2},{220,84} };
@@ -27,7 +29,6 @@ GameHUD::GameHUD(Vector2Int16 mapSize)
 
 	consolePanel.PanelDst = consolePanelDst;
 	commandsPanel.PanelDst = commandsPanelDst;
-	//cmdIconsAtlas = Platform::LoadAtlas("cmdicons.t3x");
 }
 
 void GameHUD::DrawResource(Sprite icon, Vector2Int pos, Color color, const char* fmt, ...) {
@@ -109,7 +110,7 @@ void GameHUD::UpperScreenGUI(const Camera& camera, GameViewContext& context) {
 
 void GameHUD::LowerScreenGUI(const Camera& camera, GameViewContext& context) {
 
-	Platform::ClearBuffer({ 0x080808ff });
+	GraphicsRenderer::ClearCurrentSurface({ 0x080808ff });
 
 	EntityId selected = context.GetPriorityUnitSelected();
 	if (selected != Entity::None) {

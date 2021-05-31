@@ -1,11 +1,11 @@
 #pragma once
 
-
-#include "../Platform.h"
 #include "GraphicsPrimitives.h"
 
 #include <vector>
 #include <Span.h>
+
+#include "../Assets.h"
 
 class GraphicsRenderer {
 
@@ -35,11 +35,25 @@ public:
 	static void Draw(const Sprite& sprite, Vector2Int position, Color32 color = 0xFFFFFFFF);
 	static void Draw(const Sprite& sprite, const Rectangle& dst, Color32 color = 0xFFFFFFFF);
 
-	inline static void Draw(const Sprite& sprite, Vector2Int position, Color color) {
+	inline static void Draw(const RenderSurface& surface, Vector2Int position, Color32 color = 0xFFFFFFFF) {
+		Draw(surface.sprite, position, color);
+	}
+
+	inline static void Draw(const RenderSurface& surface, const Rectangle& dst,  Color32 color = 0xFFFFFFFF) {
+		Draw(surface.sprite, dst, color);
+	}
+
+	inline static void Draw(const Sprite& sprite, Vector2Int position , Color color ) {
 		Draw(sprite, position, Color32(color));
 	}
-	inline static void Draw(const Sprite& sprite, const Rectangle& dst, Color color) {
+	inline static void Draw(const Sprite& sprite, const Rectangle& dst, Color color ) {
 		Draw(sprite, dst, Color32(color));
+	}
+	inline static void Draw(const RenderSurface& surface, Vector2Int position, Color color ) {
+		Draw(surface.sprite, position, Color32(color));
+	}
+	inline static void Draw(const RenderSurface& surface, const Rectangle& dst, Color color) {
+		Draw(surface.sprite, dst, Color32(color));
 	}
 
 	static void DrawText(const Font& font, Vector2Int position, const char* text, Color color = Colors::White, float scale = 1.0f);
@@ -59,7 +73,15 @@ public:
 
 	static void DrawOnScreen(ScreenId screen);
 
-	static void DrawOnTexture(Texture texture);
+	static void DrawOnSurface(RenderSurface surface);
+
+	static void DrawOnCurrentScreen();
+
+	static RenderSurface NewRenderSurface(Vector2Int size, bool pixelFiltering = false);
 
 	static void ChangeBlendingMode(BlendMode mode);
+
+	static void ClearCurrentSurface(Color color);
+
+	static Sprite NewSprite(Texture texture, const Rectangle16& rect);
 };

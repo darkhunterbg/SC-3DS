@@ -143,7 +143,7 @@ void RenderSystem::DrawUnits(const Camera& camera, const Rectangle16& camRect) {
 		cmd.position = shadowDst;
 		cmd.scale = scale[r.hFlip];
 		cmd.color = shadowColor;
-		if (cmd.sprite.image.textureId)
+		if (cmd.sprite.textureId)
 			render.push_back(cmd);
 
 		cmd.order += 2;
@@ -156,7 +156,7 @@ void RenderSystem::DrawUnits(const Camera& camera, const Rectangle16& camRect) {
 		cmd.order++;
 		cmd.sprite = r.colorSprite;
 		cmd.color = Color32(r.unitColor);
-		if (cmd.sprite.image.textureId)
+		if (cmd.sprite.textureId)
 			render.push_back(cmd);
 	}
 }

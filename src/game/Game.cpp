@@ -13,6 +13,7 @@
 #include "Data/AbilityDatabase.h"
 #include "Job.h"
 
+#include "Platform.h"
 
 #include "Engine/GraphicsRenderer.h"
 

@@ -38,14 +38,14 @@ public:
 	// =============== Graphics =========================
 
 	static void DrawOnScreen(ScreenId screen);
-	static void DrawOnTexture(Texture texture);
+	static void DrawOnSurface(Surface surface);
 	static void ChangeBlendingMode(BlendMode mode);
-	static Sprite NewSprite(Image image, Rectangle16 src);
+	static Sprite NewSprite(Texture texture, Rectangle16 src);
 	static void ClearBuffer(Color color);
 	static Span<Vertex> GetVertexBuffer();
 	static void ExecDrawCommands(const Span<DrawCommand> commands);
 	static void DrawText(const Font& font, Vector2Int position, const char* text, Color color= Colors::White, float scale = 1.0f);
-	static Image NewTexture(Vector2Int size, bool pixelFiltering = false);
+	static RenderSurface NewRenderSurface(Vector2Int size, bool pixelFiltering = false);
 
 	// ================ Input =======================
 
