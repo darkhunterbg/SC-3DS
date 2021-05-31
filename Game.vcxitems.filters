@@ -87,7 +87,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\Archetype.h">
       <Filter>Entity</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Job.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Debug.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\EntityTree.h">
       <Filter>Entity</Filter>
@@ -169,6 +168,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\GraphicsPrimitives.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\JobSystem.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -220,7 +222,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\PerformanceTestScene.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Job.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\Entity.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
@@ -293,6 +294,9 @@
       <Filter>Entity</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\GraphicsRenderer.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\JobSystem.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>

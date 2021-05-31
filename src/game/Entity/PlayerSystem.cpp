@@ -2,7 +2,7 @@
 #include "EntityManager.h"
 #include "../Profiler.h"
 #include "../MathLib.h"
-#include "../Job.h"
+#include "../Engine/JobSystem.h"
 #include <algorithm>
 
 static constexpr const uint8_t TileVisibilityTimer = 40;

@@ -8,7 +8,6 @@
 typedef void* Semaphore;
 
 
-
 struct Job {
 	int start;
 	int end;

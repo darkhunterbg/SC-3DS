@@ -160,13 +160,13 @@ RenderSurface Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering) {
 	s.rect = { {0,0}, Vector2Int16(size) };
 	s.textureId = tex;
 	s.uv[1] = { 1,1 };
-	return {  surface , s };
+	return { surface , s };
 }
 Sprite Platform::NewSprite(Texture texture, Rectangle16 src) {
 	GPU_Image* img = (GPU_Image*)texture;
 	Vector2 start = Vector2(src.position) / Vector2(img->w, img->h);
 	Vector2 end = Vector2(src.GetMax()) / Vector2(img->w, img->h);
-	return { src,  {start,end} , texture};
+	return { src,  {start,end} , texture };
 }
 
 void Platform::ChangeBlendingMode(BlendMode mode) {
@@ -264,14 +264,14 @@ void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
 				Vector2 start = vertexBuffer[i].position;
 				Color32 c = vertexBuffer[i].color.value;
 				SDL_Color color;
-			
+
 				color.r = c.GetR();
 				color.g = c.GetG();
 				color.b = c.GetB();
 				color.a = c.GetA();
-		
+
 				Vector2 end = vertexBuffer[i + 2].position;
-			
+
 				GPU_RectangleFilled(target, start.x, start.y, end.x, end.y, color);
 			}
 
@@ -296,7 +296,7 @@ void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
 
 				GPU_Line(target, start.x, start.y, end.x, end.y, color);
 			}
-		
+
 			break;
 		}
 		default:
