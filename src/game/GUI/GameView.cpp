@@ -16,8 +16,6 @@
 #include "../Data/GraphicsDatabase.h"
 #include "../Data/AbilityDatabase.h"
 
-#include "../Platform.h"
-
 static std::array<Color, 3> GreyHPBarColorPalette = { 0xb0b0b0ff, 0x98948cff, 0x585858ff };
 static std::array<Color, 3> YellowHPBarColorPalette = { 0xfccc2cff, 0xdc9434ff, 0xb09018ff };
 static std::array<Color, 3> RedHPBarColorPalette = { 0xa80808ff, 0xa80808ff, 0x840404ff };
@@ -241,13 +239,13 @@ void GameView::DrawUpperScreen(const Camera& camera)
 	if (messageTimer > 0) {
 		--messageTimer;
 
-		Vector2Int size = Platform::MeasureString(Game::SystemFont, message, 0.4f);
+		Vector2Int size = Game::SystemFont12->MeasureString( message);
 
 		Vector2Int pos = { 0,190 };
 		pos.x = (400 - size.x) / 2;
 
-		GraphicsRenderer::DrawText(Game::SystemFont, pos + Vector2Int(1,1), message, Colors::Black, 0.4f);
-		GraphicsRenderer::DrawText(Game::SystemFont, pos, message, Colors::White, 0.4f);
+		GraphicsRenderer::DrawText(*Game::SystemFont12, pos + Vector2Int(1,1), message, Colors::Black);
+		GraphicsRenderer::DrawText(*Game::SystemFont12, pos, message, Colors::White);
 	}
 }
 

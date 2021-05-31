@@ -22,13 +22,20 @@ public:
 	void AddSprite(const Sprite& sprite);
 };
 
-struct Font {
+class Font {
+private:
 	void* fontId;
+	float scale;
+public:
+	Font(void* fontId, float scale) : fontId(fontId), scale(scale) {}
+	Font(const Font&) = delete;
+	Font& operator=(const Font&) = delete;
+
+	Vector2Int MeasureString(const char* text) const;
 
 	template <class TFontType>
 	TFontType* GetFontId() const { return reinterpret_cast<TFontType*>(fontId); }
-
-	inline bool IsValid() { return fontId != nullptr; }
+	inline float GetScale() const { return scale; }
 };
 
 struct AudioInfo {
@@ -53,8 +60,6 @@ struct AudioInfo {
 		return GetTotalSize() / (float)GetBytesPerSec();
 	}
 };
-
-
 struct AudioClip {
 
 	AudioInfo info;
@@ -112,7 +117,6 @@ struct SpriteFrame {
 	Vector2Int16 offset;
 	bool hFlip = false;
 };
-
 class SpriteFrameAtlas {
 private:
 	const SpriteAtlas* atlas;

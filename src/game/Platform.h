@@ -24,13 +24,13 @@ public:
 
 	// ================ General Purpose =================
 
-	static Vector2Int MeasureString(Font font, const char* text, float scale = 1);
+	static Vector2Int MeasureString(const Font& font, const char* text);
 	static double ElaspedTime();
 
 	// ================ File System ======================
 	
 	static const SpriteAtlas* LoadAtlas(const char* path);
-	static Font LoadFont(const char* path);
+	static const Font* LoadFont(const char* path, int size);
 	static FILE* OpenAsset(const char* path);
 	static std::string GetUserDirectory();
 
@@ -43,7 +43,7 @@ public:
 	static void ClearBuffer(Color color);
 	static Span<Vertex> GetVertexBuffer();
 	static void ExecDrawCommands(const Span<DrawCommand> commands);
-	static void DrawText(const Font& font, Vector2Int position, const char* text, Color color= Colors::White, float scale = 1.0f);
+	static void DrawText(const Font& font, Vector2Int position, const char* text, Color color= Colors::White);
 	static RenderSurface NewRenderSurface(Vector2Int size, bool pixelFiltering = false);
 
 	// ================ Input =======================

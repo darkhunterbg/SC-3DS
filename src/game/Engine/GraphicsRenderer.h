@@ -56,7 +56,7 @@ public:
 		Draw(surface.sprite, dst, Color32(color));
 	}
 
-	static void DrawText(const Font& font, Vector2Int position, const char* text, Color color = Colors::White, float scale = 1.0f);
+	static void DrawText(const Font& font, Vector2Int position, const char* text, Color color = Colors::White);
 
 	static void DrawRectangle(const Rectangle& rect, Color32 color);
 

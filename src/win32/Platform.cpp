@@ -10,7 +10,6 @@
 
 #include <GL/glew.h>
 
-#include "SDLDrawCommand.h"
 #include "Color.h"
 #include "StringLib.h"
 #include "SDL_FontCache.h"
@@ -96,27 +95,27 @@ const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 
 	return asset;
 }
-Font Platform::LoadFont(const char* path) {
+const Font* Platform::LoadFont(const char* path, int size) {
 
 	std::filesystem::path fullPath = assetDir;
 	fullPath.append("gfx").append(path).replace_extension("ttf");
 
 	FC_Font* font = FC_CreateFont();
-	auto lf = FC_LoadFont(font, fullPath.generic_string().data(), 30, FC_MakeColor(255, 255, 255, 255), TTF_STYLE_NORMAL);
+	auto lf = FC_LoadFont(font, fullPath.generic_string().data(), size, FC_MakeColor(255, 255, 255, 255), TTF_STYLE_NORMAL);
 
 
-	//if (lf == 0) {
-	//	const char* error = SDL_GetError();
-	//	EXCEPTION("Load font %s failed with %s!", fullPath.generic_string().data(), error);
-	//	FC_ClearFont(font);
-	//	return  { 0 };
-	//}
+	if (lf == 0) {
+		const char* error = SDL_GetError();
+		EXCEPTION("Load font %s failed with %s!", fullPath.generic_string().data(), error);
+		FC_ClearFont(font);
+		return nullptr;
+	}
 
-	return { font };
+	return new Font(font, 1);
 }
-Vector2Int Platform::MeasureString(Font font, const char* text, float scale) {
+Vector2Int Platform::MeasureString(const Font& font, const char* text) {
 	FC_Font* f = font.GetFontId<FC_Font>();
-	GPU_Rect rect = FC_GetBounds(f, 0, 0, FC_AlignEnum::FC_ALIGN_LEFT, FC_MakeScale(scale, scale), text);
+	GPU_Rect rect = FC_GetBounds(f, 0, 0, FC_AlignEnum::FC_ALIGN_LEFT, FC_MakeScale(font.GetScale(), font.GetScale()), text);
 
 	return { (int)rect.w, (int)rect.h };
 }
@@ -306,21 +305,12 @@ void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
 	}
 }
 
-void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color, float scale) {
-	SDLDrawCommand cmd;
+void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color) {
 
-	cmd.type = SDLDrawCommandType::Text;
-	cmd.font = font.GetFontId<FC_Font>();
-	cmd.text = text;
-	cmd.dst.x = position.x;
-	cmd.dst.y = position.y;
-	cmd.scale = scale;
-	cmd.r = SDL_FloatToUint8(color.r);
-	cmd.g = SDL_FloatToUint8(color.g);
-	cmd.b = SDL_FloatToUint8(color.b);
-	cmd.a = SDL_FloatToUint8(color.a);
+	auto c = FC_MakeColor(SDL_FloatToUint8(color.r), SDL_FloatToUint8(color.g), SDL_FloatToUint8(color.b), SDL_FloatToUint8(color.a));
 
-	FC_DrawScaleColor(cmd.font, target, cmd.dst.x, cmd.dst.y, FC_MakeScale(cmd.scale, cmd.scale), FC_MakeColor(cmd.r, cmd.g, cmd.b, cmd.a), cmd.text.data());
+
+	FC_DrawScaleColor(font.GetFontId<FC_Font>(), target, position.x, position.y, FC_MakeScale(1, 1), c, text);
 
 }
 

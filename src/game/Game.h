@@ -11,7 +11,9 @@ private:
 	~Game() = delete;
 
 public:
-	static Font SystemFont;
+	static const Font* SystemFont12;
+	static const Font* SystemFont10;
+	static const Font* SystemFont8;
 	static AudioClip ButtonAudio;
 
 	static float DeltaTime;

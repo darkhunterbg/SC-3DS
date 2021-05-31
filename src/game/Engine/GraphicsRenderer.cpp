@@ -139,11 +139,11 @@ void GraphicsRenderer::Draw(const Sprite& sprite, const Rectangle& dst, Color32 
 	instance.AddVertex(Vector2(dst.position), start, color);
 }
 
-void GraphicsRenderer::DrawText(const Font& font, Vector2Int position, const char* text, Color color, float scale)
+void GraphicsRenderer::DrawText(const Font& font, Vector2Int position, const char* text, Color color)
 {
 	Submit();
 
-	Platform::DrawText(font, position, text, color, scale);
+	Platform::DrawText(font, position, text, color);
 }
 
 void GraphicsRenderer::DrawRectangle(const Rectangle& dst, Color32 color)

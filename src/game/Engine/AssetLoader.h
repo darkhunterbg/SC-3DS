@@ -50,7 +50,7 @@ public:
 	
 
 	static const SpriteAtlas* LoadAtlas(const char* path);
-	static Font LoadFont(const char* path);
+	static const Font* LoadFont(const char* path, int size);
 	static AudioClip LoadAudioClip(const char* path);
 	static AudioStream* LoadAudioStream(const char* path);
 };

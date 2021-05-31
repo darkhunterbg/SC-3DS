@@ -6,7 +6,6 @@
     <ClCompile Include="src\win32\SDL_FontCache.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\win32\SDLDrawCommand.h" />
     <ClInclude Include="src\win32\SDL_FontCache.h" />
   </ItemGroup>
 </Project>

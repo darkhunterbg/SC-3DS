@@ -7,8 +7,6 @@
 #include "../Color.h"
 #include "../StringLib.h"
 
-#include "../Platform.h"
-
 #include "../Engine/AssetLoader.h"
 #include "../Engine/InputManager.h"
 #include "../Engine/GraphicsRenderer.h"
@@ -81,8 +79,8 @@ void UnitSelectionConsolePanel::Draw(GameViewContext& context)
 				const UnitDataComponent& data = context.GetEntityManager().UnitArchetype.DataComponents.GetComponent(entityId);
 
 				Vector2Int off = detailSpace.position;
-				off += { 30,10};
-				GraphicsRenderer::DrawText(Game::SystemFont,  off, buffer, Colors::UILightGray, 0.4f);
+				off += { 30, 10};
+				GraphicsRenderer::DrawText(*Game::SystemFont12, off, buffer, Colors::UILightGray);
 			}
 		}
 	}
@@ -172,17 +170,17 @@ void UnitSelectionConsolePanel::DrawMultiSelection(Rectangle dst, GameViewContex
 }
 
 void UnitSelectionConsolePanel::DrawUnitName(Rectangle space, EntityId id, const UnitComponent& unit, GameViewContext& context) {
-	auto font = Game::SystemFont;
+	const auto& font = *Game::SystemFont12;
 
 	Vector2Int pos = space.position + Vector2Int(space.size.x / 2, 0);
 
-	int offset = Platform::MeasureString(font, unit.def->Name.data(), 0.4f).x;
-	GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), unit.def->Name.data(), Colors::UILightGray, 0.4f);
+	int offset = font.MeasureString(unit.def->Name.data()).x;
+	GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), unit.def->Name.data(), Colors::UILightGray);
 	pos.y += 16;
 
 	if (unit.def->Title.length()) {
-		offset = Platform::MeasureString(font, unit.def->Title.data(), 0.4f).x;
-		GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), unit.def->Title.data(), Colors::UILightGray, 0.4f);
+		offset = font.MeasureString(unit.def->Title.data()).x;
+		GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), unit.def->Title.data(), Colors::UILightGray);
 	}
 }
 
@@ -191,7 +189,7 @@ void UnitSelectionConsolePanel::DrawSupplyInfo(Rectangle space, EntityId id, con
 	if (!UnitEntityUtil::IsAlly(context.player, id))
 		return;
 
-	auto font = Game::SystemFont;
+	const auto& font = *Game::SystemFont10;
 
 	Vector2Int pos = space.position;
 	pos.x += 30;
@@ -204,22 +202,22 @@ void UnitSelectionConsolePanel::DrawSupplyInfo(Rectangle space, EntityId id, con
 
 	stbsp_snprintf(buffer, sizeof(buffer), "%s Used: %i", supplyName.data(), info.GetUsedSupply());
 	int offset = 12;
-	GraphicsRenderer::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray, 0.35f);
+	GraphicsRenderer::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray);
 	pos.y += 12;
 
 	stbsp_snprintf(buffer, sizeof(buffer), "%s Provided: %i", supplyName.data(), unit.def->ProvideSupplyDoubled >> 1);
 	offset = 0;
-	GraphicsRenderer::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray, 0.35f);
+	GraphicsRenderer::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray);
 	pos.y += 12;
 
 	stbsp_snprintf(buffer, sizeof(buffer), "Total %s : %i", supplyName.data(), info.GetProvidedSupply());
 	offset = 7;
-	GraphicsRenderer::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray, 0.35f);
+	GraphicsRenderer::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray);
 	pos.y += 12;
 
 	stbsp_snprintf(buffer, sizeof(buffer), "%s Max : %i", supplyName.data(), info.GetMaxSupply());
 	offset = 8;
-	GraphicsRenderer::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray, 0.35f);
+	GraphicsRenderer::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray);
 	pos.y += 12;
 }
 
@@ -228,7 +226,7 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 	if (!UnitEntityUtil::IsAlly(context.player, id))
 		return;
 
-	auto font = Game::SystemFont;
+	const auto& font = *Game::SystemFont10;
 
 	Vector2Int pos = space.position;
 	pos.x += 8;
@@ -266,7 +264,7 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 
 			Color c = i == 0 ? Colors::UILightGray : Colors::IconYellow;
 
-			Platform::DrawText(font, nDst.position + Vector2Int{ 25,19 }, buffer, c, 0.35f);
+			GraphicsRenderer::DrawText(font, nDst.position + Vector2Int{ 25,19 }, buffer, c);
 		}
 		else {
 			const Sprite& n = context.GetCommandIconsAtlas().GetFrame(6 + i).sprite;
@@ -291,7 +289,7 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 	}
 
 
-	GraphicsRenderer::DrawText(font, pos + Vector2Int{ 68, 4 }, "Building", Colors::UILightGray, 0.4f);
+	GraphicsRenderer::DrawText(*Game::SystemFont12, pos + Vector2Int{ 68, 4 }, "Building", Colors::UILightGray);
 
 
 	const Sprite& pb = AssetLoader::LoadAtlas("game_gui.t3x")->GetSprite(0);
@@ -323,7 +321,7 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 
 void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, const UnitComponent& unit, GameViewContext& context)
 {
-	auto font = Game::SystemFont;
+	const auto& font = *Game::SystemFont12;
 
 	Vector2Int pos = space.position + Vector2Int(space.size.x / 2, 0);
 
@@ -331,7 +329,7 @@ void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, con
 	stbsp_snprintf(buffer, sizeof(buffer), "Kills: %i", unit.kills);
 
 	int offset = 40;
-	GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, Colors::UILightGray, 0.4f);
+	GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, Colors::UILightGray);
 	pos.y += 18;
 
 
@@ -371,7 +369,7 @@ void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, con
 		Vector2Int offset = { 24,23 };
 
 		stbsp_snprintf(buffer, sizeof(buffer), "%i", info[i].counter);
-		GraphicsRenderer::DrawText(font, pos + offset, buffer, Colors::UILightGray, 0.30f);
+		GraphicsRenderer::DrawText(*Game::SystemFont8, pos + offset, buffer, Colors::UILightGray);
 
 		pos.x += 38;
 	}
@@ -379,7 +377,7 @@ void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, con
 
 void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, EntityId entityId, const UnitComponent& unit, const UnitHealthComponent& health)
 {
-	auto font = Game::SystemFont;
+	const auto& font = *Game::SystemFont10;
 
 	Rectangle wireframe = space;
 	wireframe.size.y = 64;
@@ -403,14 +401,14 @@ void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, EntityId entityId,
 		}
 
 		int len = stbsp_snprintf(buffer, sizeof(buffer), "%i/%i", health.current, health.max);
-		int offset = Platform::MeasureString(font, buffer, 0.35f).x;
-		GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, hpColor, 0.35f);
+		int offset = font.MeasureString(buffer).x;
+		GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, hpColor);
 
-		//pos.y += 10;
+		/*pos.y += 10;
 
-		//len = stbsp_snprintf(buffer, sizeof(buffer), "%i/%i", 200, 250);
-		// offset = Platform::MeasureString(font, buffer, 0.35f).x;
-		//Platform::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, Colors::White, 0.35f);
+		len = stbsp_snprintf(buffer, sizeof(buffer), "%i/%i", 200, 250);
+		offset = font.MeasureString(buffer).x;
+		GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), buffer, Colors::White);*/
 	}
 
 	// ================== Wireframe ========================
@@ -429,11 +427,11 @@ void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, EntityId entityId,
 
 		const auto& wfBase = unit.def->Graphics->Wireframe.GetBase();
 
-		/*
-		Rectangle wfDst = wireframe;
+		
+	/*	Rectangle wfDst = wireframe;
 		wfDst.position += Vector2Int(wfBase.offset);
 		wfDst.size = Vector2Int(wfBase.sprite.rect.size);
-		Platform::Draw(wfBase.sprite, wfDst);
+		GraphicsRenderer::Draw(wfBase.sprite, wfDst);
 		*/
 
 		for (int i = 0; i < 4; ++i) {

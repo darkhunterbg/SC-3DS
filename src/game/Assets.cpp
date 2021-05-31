@@ -1,5 +1,8 @@
 #include "Assets.h"
+
+#include "Platform.h"
 #include <stdio.h>
+
 
 SpriteAtlas::SpriteAtlas(int initialSize) {
 	sprites.reserve(initialSize);
@@ -119,4 +122,9 @@ void UnitAnimationClip::AddShadowFrameCentered(uint8_t index, const SpriteFrame&
 void UnitAnimationClip::AddColorFrame(uint8_t index, const SpriteFrame& frame)
 {
 	frames[index].colorSprite = frame.sprite;
+}
+
+Vector2Int Font::MeasureString(const char* text) const
+{
+	return Platform::MeasureString(*this, text);
 }

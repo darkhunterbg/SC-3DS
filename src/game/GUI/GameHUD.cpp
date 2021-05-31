@@ -15,8 +15,6 @@
 
 #include "../Profiler.h"
 
-#include "../Platform.h"
-
 
 //static Rectangle minimapDst = { {4,108},{128,128} };
 static Rectangle minimapDst = { {4,124},{113,113} };
@@ -26,7 +24,7 @@ static Rectangle portraitPanelDst = { {248, 20},{ 60, 56 } };
 
 GameHUD::GameHUD(Vector2Int16 mapSize)
 {
-	font = Game::SystemFont;
+	font = Game::SystemFont12;
 	iconsAtlas = AssetLoader::LoadAtlas("game_icons.t3x");
 	minimapUpscale = Vector2(mapSize) / Vector2(minimapDst.size);
 
@@ -42,8 +40,8 @@ void GameHUD::DrawResource(Sprite icon, Vector2Int pos, Color color, const char*
 
 	GraphicsRenderer::Draw(icon, { pos,{ 14, 14} });
 	pos += {16, -2};
-	GraphicsRenderer::DrawText(font, pos + Vector2Int{ 1,1 }, textBuffer, Colors::Black, 0.4f);
-	GraphicsRenderer::DrawText(font, pos, textBuffer, color, 0.4f);
+	GraphicsRenderer::DrawText(*font, pos + Vector2Int{ 1,1 }, textBuffer, Colors::Black);
+	GraphicsRenderer::DrawText(*font, pos, textBuffer, color);
 }
 
 void GameHUD::UpdateInfo(GameViewContext& context) {
@@ -93,10 +91,10 @@ void GameHUD::UpperScreenGUI(const Camera& camera, GameViewContext& context) {
 
 	Vector2Int pos = { 320 + 16 , 0 };
 
-	pos.x += Platform::MeasureString(font, textBuffer, 0.4f).x;
+	pos.x += font->MeasureString(textBuffer).x;
 	stbsp_snprintf(textBuffer, sizeof(textBuffer), "/%i", supply.max);
-	GraphicsRenderer::DrawText(font, pos + Vector2Int{ 1,1 }, textBuffer, Colors::Black, 0.4f);
-	GraphicsRenderer::DrawText(font, pos, textBuffer, Colors::UIGreen, 0.4f);
+	GraphicsRenderer::DrawText(*font, pos + Vector2Int{ 1,1 }, textBuffer, Colors::Black);
+	GraphicsRenderer::DrawText(*font, pos, textBuffer, Colors::UIGreen);
 
 	const auto& sprite = context.race->ConsoleSprite.GetSprite(1);
 	GraphicsRenderer::Draw(sprite, { {0, 240 - sprite.rect.size.y,}, Vector2Int(sprite.rect.size) });
@@ -105,8 +103,8 @@ void GameHUD::UpperScreenGUI(const Camera& camera, GameViewContext& context) {
 		pos = { 0, 240 - sprite.rect.size.y };
 		pos.y -= 16;
 		pos.x += 160;
-		GraphicsRenderer::DrawText(font, pos + Vector2Int{ 1, 1 }, "Select Target", Colors::Black, 0.4f);
-		GraphicsRenderer::DrawText(font, pos, "Select Target", Colors::UILightGray, 0.4f);
+		GraphicsRenderer::DrawText(*font, pos + Vector2Int{ 1, 1 }, "Select Target", Colors::Black);
+		GraphicsRenderer::DrawText(*font, pos, "Select Target", Colors::UILightGray);
 
 	}
 }

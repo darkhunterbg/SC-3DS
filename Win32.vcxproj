@@ -161,7 +161,6 @@ xcopy /y /d "$(SolutionDir)Libs\glew\lib\*.dll" "$(OutDir)"</Command>
     <ClCompile Include="src\win32\SDL_FontCache.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\win32\SDLDrawCommand.h" />
     <ClInclude Include="src\win32\SDL_FontCache.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

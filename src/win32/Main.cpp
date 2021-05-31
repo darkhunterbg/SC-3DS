@@ -5,7 +5,6 @@
 #include <thread>
 
 #include "Color.h"
-#include "SDLDrawCommand.h"
 #include "SDL_FontCache.h"
 #include "Game.h"
 #include "MathLib.h"

@@ -28,9 +28,12 @@ static bool startup;
 static std::string error;
 static double frameStartTime = 0;
 
-Font Game::SystemFont;
-AudioClip Game::ButtonAudio;
+const Font* Game::SystemFont12;
+const Font* Game::SystemFont10;
+const Font* Game::SystemFont8;
 
+
+AudioClip Game::ButtonAudio;
 
 float Game::DeltaTime = 0;
 
@@ -59,7 +62,9 @@ void Game::FrameEnd() {
 void Game::Start() {
 
 	JobSystem::Init();
-	SystemFont = AssetLoader::LoadFont("font.bcfnt");
+	SystemFont12 = AssetLoader::LoadFont("font.bcfnt",12);
+	SystemFont10 = AssetLoader::LoadFont("font.bcfnt", 10);
+	SystemFont8 = AssetLoader::LoadFont("font.bcfnt", 8);
 	ButtonAudio = AssetLoader::LoadAudioClip("sound/misc/button.wav");
 	title = AssetLoader::LoadAtlas("glue_title.t3x");
 	startup = true;

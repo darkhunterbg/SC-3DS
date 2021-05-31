@@ -7,6 +7,8 @@ static constexpr const int AudioStreamBufferSize = 4096;
 static AudioClip LoadAudioClipFromFile(const char* path);
 static AudioStream* LoadAudioStreamFromFile(const char* path);
 
+static std::hash<int> intHasher;
+
 AssetLoader AssetLoader::instance;
 
 const SpriteAtlas* AssetLoader::LoadAtlas(const char* path)
@@ -29,14 +31,15 @@ const SpriteAtlas* AssetLoader::LoadAtlas(const char* path)
 	return  (const SpriteAtlas*)e.data;
 }
 
-Font AssetLoader::LoadFont(const char* path)
+const Font* AssetLoader::LoadFont(const char* path, int size)
 {
 	std::string p = path;
 	AssetId id = instance.hasher(p);
+	id = (id * 513269) ^ intHasher(size);
 	AssetEntry& e = instance.loadedAssets[id];
 
 	if (e.id == 0) {
-		e.data = new Font(Platform::LoadFont(p.data()));
+		e.data = Platform::LoadFont(p.data(), size);
 		e.type = AssetType::Font;
 		e.id = id;
 	}
@@ -46,7 +49,7 @@ Font AssetLoader::LoadFont(const char* path)
 				p.data(), GetAssetTypeName(AssetType::Font), GetAssetTypeName(e.type));
 	}
 
-	return  *(const Font*)e.data;
+	return (const Font*)e.data;
 }
 
 
