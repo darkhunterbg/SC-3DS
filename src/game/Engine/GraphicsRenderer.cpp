@@ -1,6 +1,7 @@
 #include "GraphicsRenderer.h"
 
 #include "../Platform.h"
+#include "../Debug.h"
 
 
 GraphicsRenderer GraphicsRenderer::instance;
@@ -18,14 +19,17 @@ static inline void SwapUV(Vector2& a, Vector2& b)
 void GraphicsRenderer::Init()
 {
 	instance.vertexBuffer = Platform::GetVertexBuffer();
+	instance.vb = instance.vertexBuffer.Data();
 	Platform::ChangeBlendingMode(instance.blendMode);
 }
 
 
-
 void GraphicsRenderer::AddVertex(const Vector2& pos, const Vector2& uv, const Color32& c)
 {
-	auto& v = vertexBuffer[vbPos++];
+	if (vbPos == vertexBuffer.Size())
+		EXCEPTION("VertexBuffer overflow!");
+
+	auto& v = vb[vbPos++];
 	v.position = pos;
 	v.uv = uv;
 	v.color = c;
@@ -38,6 +42,7 @@ DrawCommand& GraphicsRenderer::GetDrawCommand(DrawCommandType type)
 		instance.drawCommands.push_back({ texture , (uint16_t)instance.vbPos,0 , type });
 		instance.texture = nullptr;
 		instance.cmdType = type;
+
 	}
 	return instance.drawCommands.back();
 }
@@ -64,8 +69,9 @@ DrawCommand& GraphicsRenderer::GetDrawCommand(Texture texture)
 
 void GraphicsRenderer::BufferDraw(std::vector<BatchDrawCommand>& cmd)
 {
+
 	if (instance.drawCommands.size() == 0)
-		instance.drawCommands.push_back({ cmd.front().sprite.textureId , 0,0 , DrawCommandType::TexturedTriangle });
+		instance.drawCommands.push_back({ cmd.front().sprite.textureId , (uint16_t)instance.vbPos,0 , DrawCommandType::TexturedTriangle });
 
 	DrawCommand* dc = &instance.drawCommands.front();
 
@@ -99,15 +105,6 @@ void GraphicsRenderer::BufferDraw(std::vector<BatchDrawCommand>& cmd)
 		instance.AddVertex(Vector2(c.position + size), bR, c.color);
 		instance.AddVertex(Vector2(c.position + Vector2Int16(0, size.y)), bL, c.color);
 		instance.AddVertex(Vector2(c.position), tL, c.color);
-
-		/*	vb[vbPos++] = { Vector2(c.position) ,start, c.color };
-			vb[vbPos++] = { Vector2(c.position + Vector2Int16(size.x,0)) , {end.x,start.y}, c.color };
-			vb[vbPos++] = { Vector2(c.position + size) , end, c.color };
-
-			vb[vbPos++] = { Vector2(c.position + size) , end, c.color };
-			vb[vbPos++] = { Vector2(c.position + Vector2Int16(0,size.y)) ,{start.x,end.y}, c.color };
-			vb[vbPos++] = { Vector2(c.position) ,start, c.color };*/
-
 
 		dc->count += 6;
 	}
@@ -165,6 +162,7 @@ void GraphicsRenderer::DrawText(const Font& font, Vector2Int position, const cha
 
 void GraphicsRenderer::DrawRectangle(const Rectangle& dst, Color32 color)
 {
+	//return;
 	instance.GetDrawCommand(DrawCommandType::Triangle).count += 6;
 
 	instance.AddVertex(Vector2(dst.position), { 0,0 }, color);
@@ -196,6 +194,17 @@ void GraphicsRenderer::DrawLine(Vector2Int src, Vector2Int dst, Color32 color)
 	instance.AddVertex(Vector2(src), { 0,0 }, color);
 }
 
+void GraphicsRenderer::NewFrame()
+{
+	instance.vbPos = 0;
+}
+
+void GraphicsRenderer::EndFrame()
+{
+	Submit();
+	instance.vbPos = 0;
+}
+
 void GraphicsRenderer::Submit()
 {
 	if (!instance.drawCommands.size())
@@ -206,7 +215,6 @@ void GraphicsRenderer::Submit()
 	instance.texture = nullptr;
 	instance.cmdType = DrawCommandType::None;
 	instance.drawCommands.clear();
-	instance.vbPos = 0;
 }
 
 void GraphicsRenderer::DrawOnScreen(ScreenId screen)
@@ -252,5 +260,5 @@ void GraphicsRenderer::ClearCurrentSurface(Color color)
 
 Sprite GraphicsRenderer::NewSprite(Texture texture, const Rectangle16& rect)
 {
-	return  Platform::NewSprite({ texture }, rect);
+	return  Platform::NewSprite(texture , rect);
 }

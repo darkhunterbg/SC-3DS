@@ -11,11 +11,12 @@ class GraphicsRenderer {
 
 private:
 
-	std::vector<DrawCommand> drawCommands;
-	Span<Vertex> vertexBuffer;
-	unsigned vbPos = 0;
 	Texture texture = nullptr;
 	DrawCommandType cmdType = DrawCommandType::None;
+	unsigned vbPos = 0;
+	Vertex* vb = nullptr;
+	std::vector<DrawCommand> drawCommands;
+	Span<Vertex> vertexBuffer;
 	BlendMode blendMode = BlendMode::Alpha;
 
 	void AddVertex(const Vector2& pos, const Vector2& uv, const Color32& c);
@@ -68,6 +69,10 @@ public:
 	inline static void DrawLine(Vector2Int src, Vector2Int dst, Color color) {
 		DrawLine(src, dst ,Color32(color));
 	}
+
+	static void NewFrame();
+
+	static void EndFrame();
 
 	static void Submit();
 

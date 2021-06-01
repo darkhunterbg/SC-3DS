@@ -43,8 +43,8 @@ static void ShowTitleScreen() {
 	GraphicsRenderer::Draw(title->GetSprite(0), { 0,0 });
 }
 static void InitialScene() {
-	// Game::SetCurrentScene(new GameScene());
-	Game::SetCurrentScene(new PerformanceTestScene());
+	Game::SetCurrentScene(new GameScene());
+	//Game::SetCurrentScene(new PerformanceTestScene());
 }
 
 void Game::FrameStart() {
@@ -105,6 +105,7 @@ bool Game::Update() {
 
 void Game::Draw() {
 	//SectionProfiler p("Draw");
+	GraphicsRenderer::NewFrame();
 
 	if (startup) {
 		ShowTitleScreen();
@@ -116,9 +117,9 @@ void Game::Draw() {
 	}
 	//p.Submit();
 
-	GraphicsRenderer::Submit();
+	Profiler::ShowPerformance();
 
-	//Profiler::ShowPerformance();
+	GraphicsRenderer::EndFrame();
 }
 
 void Game::End() {

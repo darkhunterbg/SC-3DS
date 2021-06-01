@@ -26,8 +26,9 @@ static RenderTarget currentRT;
 static std::vector<RenderTarget> createdRenderTargets;
 static int currentScreen = 0;
 static std::unordered_map<std::string, C2D_Font> loadedFonts;
+static bool c2d_Prepared = true;
 
-extern Vertex* vertexBuffer;
+extern Span<Vertex> vertexBuffer;
 extern C3D_BufInfo vbInfo;
 
 extern DVLB_s* spriteBatchBlob;
@@ -51,20 +52,11 @@ const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 		Sprite s;
 		s.textureId = img.tex;
 
-
-
-		/*if (Tex3DS_SubTextureRotated(img.subtex)) {
-			s.rect.size = { (short)img.subtex->height, (short)img.subtex->width };
-		}
-		else {
-			s.rect.size = { (short)img.subtex->width, (short)img.subtex->height };
-		}*/
 		Tex3DS_SubTextureTopLeft(img.subtex, &s.uv[0].x, &s.uv[0].y);
 		Tex3DS_SubTextureTopRight(img.subtex, &s.uv[1].x, &s.uv[1].y);
 		Tex3DS_SubTextureBottomLeft(img.subtex, &s.uv[2].x, &s.uv[2].y);
 		Tex3DS_SubTextureBottomRight(img.subtex, &s.uv[3].x, &s.uv[3].y);
 
-		// (Texture)img.subtex;
 		s.rect.size = { (short)img.subtex->width, (short)img.subtex->height };
 		s.rect.position = { img.subtex->left * img.tex->width , img.subtex->top * img.tex->height };
 
@@ -92,7 +84,7 @@ const Font* Platform::LoadFont(const char* path, int size) {
 	return new Font(loadedFonts[fontPath], scale);
 }
 Vector2Int Platform::MeasureString(const Font& font, const char* text) {
-	C2D_Font f = *font.GetFontId<C2D_Font>();
+	C2D_Font f = (C2D_Font)font.GetFontIdRaw();
 
 	C2D_TextBufClear(textBuffer);
 	C2D_Text t;
@@ -103,6 +95,8 @@ Vector2Int Platform::MeasureString(const Font& font, const char* text) {
 
 	size.x = (int)(t.width * font.GetScale());
 	size.y = (int)(t.lines * 30.0f * font.GetScale());
+
+	//EXCEPTION("%s : %i %i",text, size.x, size.y);
 
 	return size;
 }
@@ -170,90 +164,111 @@ Sprite Platform::NewSprite(Texture texture, Rectangle16 src) {
 
 	Vector2Int size = { tex->width, tex->height };
 
-	//auto* s = (Tex3DS_SubTexture*)image.textureId2;
+	Vector2 min = { 
+		(float)src.position.x / (float)size.x ,
+		1.0f - (float)src.position.y / (float)size.y };
+	Vector2 max = { 
+		(float)(src.position.x + src.size.x) / (float)size.x,
+		1 - (float)(src.position.y + src.size.y) / (float)size.y 
+	};
 
-	Vector2 uv[2];
-
-	uv[0].y = 1 - (float)src.position.y / (float)size.y;
-	uv[1].y = 1 - (float)(src.position.y + src.size.y) / (float)size.y;
-	uv[0].x = (float)src.position.x / (float)size.x;
-	uv[1].x = (float)(src.position.x + src.size.x) / (float)size.x;
-
-	//EXCEPTION("%.2f %.2f", s2->left, s2->right);
-
-	return { src,{ uv[0], uv[1]}, tex };
+	return Sprite{
+		src, 
+		{ min, {max.x, min.y}, {min.x, max.y}, max },
+		tex 
+	};
 }
 
 Span<Vertex> Platform::GetVertexBuffer() {
 
-	return  { vertexBuffer, 10 * 1024 };
+	return  vertexBuffer;
 }
-void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
-	//C2D_Prepare();
 
-	auto uLoc_mdlvMtx = shaderInstanceGetUniformLocation(spriteBatchProgram.vertexShader, "mdlvMtx");
-	auto uLoc_projMtx = shaderInstanceGetUniformLocation(spriteBatchProgram.vertexShader, "projMtx");
-	C3D_Mtx mdlvMtx, projMtx;
-
-
-	Mtx_OrthoTilt(&projMtx, 0.0f, 400, 240, 0.0f, 1.0f, -1.0f, true);
-
-	Mtx_Identity(&mdlvMtx);
-
-	C3D_TexEnv* env = C3D_GetTexEnv(1);
+static void SetEnv(DrawCommandType type) {
+	C3D_TexEnv* env = C3D_GetTexEnv(0);
 	C3D_TexEnvInit(env);
+	switch (type)
+	{
+	case DrawCommandType::TexturedTriangle:
+		C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
+		C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
 
-	//C3D_TexEnvSrc(env, C3D_Both, GPU_PREVIOUS, GPU_PRIMARY_COLOR, 0);
-	//C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
+		break;
+	case DrawCommandType::Triangle:
+		C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
+		C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
+		break;
+	default:
+		break;
+	}
+}
 
-	C3D_BindProgram(&spriteBatchProgram);
-	C3D_SetAttrInfo(&spriteBatchAttributeInfo);
-	C3D_SetBufInfo(&vbInfo);
+void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
+	
+	if (c2d_Prepared) {
+		C2D_Flush();
 
-	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, uLoc_projMtx, &projMtx);
-	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, uLoc_mdlvMtx, &mdlvMtx);
+		C3D_TexEnv* env = C3D_GetTexEnv(1);
+		C3D_TexEnvInit(env);
 
-	C3D_DepthTest(true, GPU_GEQUAL, GPU_WRITE_ALL);
-	C3D_CullFace(GPU_CULL_NONE);
+		C3D_BindProgram(&spriteBatchProgram);
+		C3D_SetAttrInfo(&spriteBatchAttributeInfo);
+		C3D_SetBufInfo(&vbInfo);
 
+		C3D_DepthTest(true, GPU_GEQUAL, GPU_WRITE_ALL);
+		C3D_CullFace(GPU_CULL_NONE);
+
+		c2d_Prepared = false;
+
+		C3D_Mtx mdlvMtx;
+		Mtx_Identity(&mdlvMtx);
+		auto uLoc_mdlvMtx = shaderInstanceGetUniformLocation(spriteBatchProgram.vertexShader, "mdlvMtx");
+		C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, uLoc_mdlvMtx, &mdlvMtx);
+	}
+
+
+	auto uLoc_projMtx = shaderInstanceGetUniformLocation(spriteBatchProgram.vertexShader, "projMtx");
+
+	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, uLoc_projMtx, &currentRT.projMtx);
+
+	SetEnv(commands[0].type);
+	DrawCommandType type = commands[0].type;
 
 	for (const DrawCommand& cmd : commands)
 	{
-		C3D_TexEnv* env = C3D_GetTexEnv(0);
-		C3D_TexEnvInit(env);
+		if (cmd.type != type) {
+			type = cmd.type;
+			SetEnv(cmd.type);
+		}
 
 		switch (cmd.type)
 		{
 		case DrawCommandType::TexturedTriangle: {
 			C3D_TexBind(0, (C3D_Tex*)cmd.texture);
-
-			C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
-			C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
-
 			C3D_DrawArrays(GPU_TRIANGLES, cmd.start, cmd.count);
 			break;
 		}
 		case DrawCommandType::Triangle: {
-			// C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
-			// C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
-
-			// C3D_DrawArrays(GPU_TRIANGLES, cmd.start, cmd.count);
-			// break;
+			C3D_DrawArrays(GPU_TRIANGLES, cmd.start, cmd.count);
+			break;
 		}
 		default:
 			break;
 		}
 	}
 
-	//C2D_Prepare();
+
 }
 
 void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color) {
 
-	return;
-	C2D_SceneBegin(currentRT.rt);
+	if (!c2d_Prepared) {
+		C2D_Prepare();
+		c2d_Prepared = true;
+	}
 
-	C2D_Font f = *(C2D_Font*)font.GetFontId<C2D_Font>();
+
+	C2D_Font f = (C2D_Font)font.GetFontIdRaw();
 
 	C2D_Text t;
 	C2D_TextBufClear(textBuffer);
@@ -263,8 +278,6 @@ void Platform::DrawText(const Font& font, Vector2Int position, const char* text,
 	u32 c = C2D_Color32f(color.r, color.g, color.b, color.a);
 
 	C2D_DrawText(&t, C2D_WithColor, position.x, position.y, 0, font.GetScale(), font.GetScale(), c);
-
-	C2D_Flush();
 }
 
 RenderSurface Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering) {
@@ -290,20 +303,13 @@ RenderSurface Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering) {
 	else
 		C3D_TexSetFilter(tex, GPU_TEXTURE_FILTER_PARAM::GPU_NEAREST, GPU_TEXTURE_FILTER_PARAM::GPU_NEAREST);
 
-	//Tex3DS_SubTexture* st = new Tex3DS_SubTexture();
-	//st->width = size.x;
-	//st->height = size.y;
-	//st->left = 0;
-	//st->right = 1;
-	//st->top = 1;
-	//st->bottom = 0;
-
 	Sprite s;
 	s.rect = { {0,0}, Vector2Int16(size) };
-	s.uv[0] = { 0,0 };
+	s.uv[0] = { 0,1 };
 	s.uv[1] = { 1,1 };
+	s.uv[2] = { 0,0 };
+	s.uv[3] = { 1,0 };
 	s.textureId = tex;
-
 
 
 	return { rt, s };

@@ -22,7 +22,7 @@ void PerformanceTestScene::Start() {
 	entityManager.GetPlayerSystem().AddPlayer(RaceDatabase::Terran, Colors::White);
 	entityManager.GetMapSystem().FogOfWarVisible = false;
 
-	for (int i = 0; i < 10000; ++i) {
+	for (int i = 0; i < 2000; ++i) {
 		EntityId e = entityManager.NewEntity();
 		entityManager.UnitArchetype.RenderArchetype.Archetype.AddEntity(e);
 		EntityUtil::SetRenderFromAnimationClip(e, UnitDatabase::Marine.Graphics->IdleAnimations[0], 0);

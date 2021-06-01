@@ -36,6 +36,7 @@ public:
 	template <class TFontType>
 	TFontType* GetFontId() const { return reinterpret_cast<TFontType*>(fontId); }
 	inline float GetScale() const { return scale; }
+	inline void* GetFontIdRaw() const { return fontId; }
 };
 
 struct AudioInfo {

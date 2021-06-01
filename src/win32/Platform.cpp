@@ -158,14 +158,17 @@ RenderSurface Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering) {
 	Sprite s;
 	s.rect = { {0,0}, Vector2Int16(size) };
 	s.textureId = tex;
-	s.uv[1] = { 1,1 };
+	s.uv[0] = { 0,0 };
+	s.uv[1] = { 1,0 };
+	s.uv[2] = { 0,1 };
+	s.uv[3] = { 1,1 };
 	return { surface , s };
 }
 Sprite Platform::NewSprite(Texture texture, Rectangle16 src) {
 	GPU_Image* img = (GPU_Image*)texture;
 	Vector2 start = Vector2(src.position) / Vector2(img->w, img->h);
 	Vector2 end = Vector2(src.GetMax()) / Vector2(img->w, img->h);
-	return { src,  {start,end} , texture };
+	return { src,  {start,{end.x, start.y}, {start.x, end.y }, end} , texture };
 }
 
 void Platform::ChangeBlendingMode(BlendMode mode) {

@@ -31,7 +31,7 @@ C2D_TextBuf textBuffer;
 u64 mainTimer;
 std::vector<NDSAudioChannel*> audioChannels;
 
-Vertex* vertexBuffer = nullptr;
+Span<Vertex> vertexBuffer ;
 C3D_BufInfo vbInfo;
 
 DVLB_s* spriteBatchBlob;
@@ -114,6 +114,7 @@ int main()
 		C2D_TargetClear(top, color);
 		C2D_TargetClear(bottom, color);
 		Game::Draw();
+
 		C3D_FrameEnd(0);
 	}
 
@@ -129,7 +130,9 @@ void LoadShader() {
 	if (!spriteBatchBlob)
 		FatalError("Failed to compile spritebatch shader");
 
-	vertexBuffer = (Vertex*)linearAlloc(sizeof(Vertex) * 10 * 1024);
+	static constexpr const int VBSize = 64 * 1024;
+
+	vertexBuffer = { (Vertex*)linearAlloc(sizeof(Vertex) * VBSize), VBSize };
 
 	shaderProgramInit(&spriteBatchProgram);
 	shaderProgramSetVsh(&spriteBatchProgram, &spriteBatchBlob->DVLE[0]);
@@ -140,7 +143,7 @@ void LoadShader() {
 	AttrInfo_AddLoader(&spriteBatchAttributeInfo, 2, GPU_UNSIGNED_BYTE, 4); // v2=color
 
 	BufInfo_Init(&vbInfo);
-	BufInfo_Add(&vbInfo, vertexBuffer, sizeof(Vertex), 3, 0x210);
+	BufInfo_Add(&vbInfo, vertexBuffer.Data(), sizeof(Vertex), 3, 0x210);
 }
 
 void Init() {

@@ -51,17 +51,17 @@ void Profiler::ShowPerformance() {
 		c = Colors::Red;
 
 	stbsp_snprintf(text, sizeof(text), "Frame %0.1f ms", frameTime);
-	Platform::DrawText(*Game::SystemFont12, { 1,0 }, text, c);
+	GraphicsRenderer::DrawText(*Game::SystemFont12, { 1,0 }, text, c);
 
 	int y = 15;
 	for (const auto& profile : profileData) {
 		stbsp_snprintf(text, sizeof(text), "%s %0.1f ms", profile.first.data(), profile.second);
-		Platform::DrawText(*Game::SystemFont12, { 1,y }, text, Colors::White);
+		GraphicsRenderer::DrawText(*Game::SystemFont12, { 1,y }, text, Colors::White);
 		y += 15;
 	}
 
 	stbsp_snprintf(text, sizeof(text), "Time %i s", (int)Platform::ElaspedTime());
-	Platform::DrawText(*Game::SystemFont12, { 1,y }, text, Colors::White);
+	GraphicsRenderer::DrawText(*Game::SystemFont12, { 1,y }, text, Colors::White);
 	y += 15;
 
 
@@ -90,8 +90,6 @@ void Profiler::ShowPerformance() {
 	GraphicsRenderer::DrawLine(offset, offset + Vector2Int(60, 0), Colors::White);
 	offset.y += 50;
 	GraphicsRenderer::DrawLine(offset, offset + Vector2Int(60, 0), Colors::White);
-
-	GraphicsRenderer::Submit();
 }
 
 void Profiler::FrameStart() {
