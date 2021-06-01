@@ -8,7 +8,7 @@ typedef void* Surface;
 
 struct Sprite {
 	Rectangle16 rect;
-	Vector2 uv[2];
+	Vector2 uv[4];
 	Texture textureId;
 
 	inline Rectangle GetRect() const {
@@ -26,7 +26,6 @@ enum class DrawCommandType : uint8_t {
 	None,
 	TexturedTriangle,
 	Triangle,
-	Line
 };
 
 struct DrawCommand {

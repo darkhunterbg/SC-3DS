@@ -5,11 +5,23 @@
 
 GraphicsRenderer GraphicsRenderer::instance;
 
+static inline void SwapUV(Vector2& a, Vector2& b)
+{
+	Vector2 temp = { a.x, a.y };
+	a.x = b.x;
+	a.y = b.y;
+	b.x = temp.x;
+	b.y = temp.y;
+}
+
+
 void GraphicsRenderer::Init()
 {
 	instance.vertexBuffer = Platform::GetVertexBuffer();
 	Platform::ChangeBlendingMode(instance.blendMode);
 }
+
+
 
 void GraphicsRenderer::AddVertex(const Vector2& pos, const Vector2& uv, const Color32& c)
 {
@@ -63,14 +75,15 @@ void GraphicsRenderer::BufferDraw(std::vector<BatchDrawCommand>& cmd)
 		size.x *= c.scale.x;
 		size.y *= c.scale.y;
 
-		Vector2 start = c.sprite.uv[0];
-		Vector2 end = c.sprite.uv[1];
+		Vector2 tL = c.sprite.uv[0];
+		Vector2 tR = c.sprite.uv[1];
+		Vector2 bL = c.sprite.uv[2];
+		Vector2 bR = c.sprite.uv[3];
 
 		if (size.x < 0) {
 			size.x = -size.x;
-			float f = start.x;
-			start.x = end.x;
-			end.x = f;
+			SwapUV(tL, tR);
+			SwapUV(bL, bR);
 		}
 
 
@@ -79,13 +92,13 @@ void GraphicsRenderer::BufferDraw(std::vector<BatchDrawCommand>& cmd)
 		}
 
 
-		instance.AddVertex(Vector2(c.position), start, c.color);
-		instance.AddVertex(Vector2(c.position + Vector2Int16(size.x, 0)), { end.x,start.y }, c.color);
-		instance.AddVertex(Vector2(c.position + size), end, c.color);
+		instance.AddVertex(Vector2(c.position), tL, c.color);
+		instance.AddVertex(Vector2(c.position + Vector2Int16(size.x, 0)), tR, c.color);
+		instance.AddVertex(Vector2(c.position + size), bR, c.color);
 
-		instance.AddVertex(Vector2(c.position + size), end, c.color);
-		instance.AddVertex(Vector2(c.position + Vector2Int16(0, size.y)), { start.x,end.y }, c.color);
-		instance.AddVertex(Vector2(c.position), start, c.color);
+		instance.AddVertex(Vector2(c.position + size), bR, c.color);
+		instance.AddVertex(Vector2(c.position + Vector2Int16(0, size.y)), bL, c.color);
+		instance.AddVertex(Vector2(c.position), tL, c.color);
 
 		/*	vb[vbPos++] = { Vector2(c.position) ,start, c.color };
 			vb[vbPos++] = { Vector2(c.position + Vector2Int16(size.x,0)) , {end.x,start.y}, c.color };
@@ -109,16 +122,18 @@ void GraphicsRenderer::Draw(const Sprite& sprite, Vector2Int position, Color32 c
 
 	Vector2Int size = Vector2Int(sprite.rect.size);
 
-	Vector2 start = sprite.uv[0];
-	Vector2 end = sprite.uv[1];
+	const Vector2& tL = sprite.uv[0];
+	const Vector2& tR = sprite.uv[1];
+	const Vector2& bL = sprite.uv[2];
+	const Vector2& bR = sprite.uv[3];
 
-	instance.AddVertex(Vector2(position), start, color);
-	instance.AddVertex(Vector2(position + Vector2Int(size.x, 0)), { end.x,start.y }, color);
-	instance.AddVertex(Vector2(position + size), end, color);
+	instance.AddVertex(Vector2(position), tL, color);
+	instance.AddVertex(Vector2(position + Vector2Int(size.x, 0)), tR, color);
+	instance.AddVertex(Vector2(position + size), bR, color);
 
-	instance.AddVertex(Vector2(position + size), end, color);
-	instance.AddVertex(Vector2(position + Vector2Int(0, size.y)), { start.x,end.y }, color);
-	instance.AddVertex(Vector2(position), start, color);
+	instance.AddVertex(Vector2(position + size), bR, color);
+	instance.AddVertex(Vector2(position + Vector2Int(0, size.y)), bL, color);
+	instance.AddVertex(Vector2(position), tL, color);
 }
 
 void GraphicsRenderer::Draw(const Sprite& sprite, const Rectangle& dst, Color32 color)
@@ -127,16 +142,18 @@ void GraphicsRenderer::Draw(const Sprite& sprite, const Rectangle& dst, Color32 
 
 	Vector2Int size = dst.size;
 
-	Vector2 start = sprite.uv[0];
-	Vector2 end = sprite.uv[1];
+	const Vector2& tL = sprite.uv[0];
+	const Vector2& tR = sprite.uv[1];
+	const Vector2& bL = sprite.uv[2];
+	const Vector2& bR = sprite.uv[3];
 
-	instance.AddVertex(Vector2(dst.position), start, color);
-	instance.AddVertex(Vector2(dst.position + Vector2Int(size.x, 0)), { end.x,start.y }, color);
-	instance.AddVertex(Vector2(dst.position + size), end, color);
+	instance.AddVertex(Vector2(dst.position), tL, color);
+	instance.AddVertex(Vector2(dst.position + Vector2Int(size.x, 0)), tR, color);
+	instance.AddVertex(Vector2(dst.position + size), bR, color);
 
-	instance.AddVertex(Vector2(dst.position + size), end, color);
-	instance.AddVertex(Vector2(dst.position + Vector2Int(0, size.y)), { start.x,end.y }, color);
-	instance.AddVertex(Vector2(dst.position), start, color);
+	instance.AddVertex(Vector2(dst.position + size), bR, color);
+	instance.AddVertex(Vector2(dst.position + Vector2Int(0, size.y)), bL, color);
+	instance.AddVertex(Vector2(dst.position), tL, color);
 }
 
 void GraphicsRenderer::DrawText(const Font& font, Vector2Int position, const char* text, Color color)
@@ -161,10 +178,22 @@ void GraphicsRenderer::DrawRectangle(const Rectangle& dst, Color32 color)
 
 void GraphicsRenderer::DrawLine(Vector2Int src, Vector2Int dst, Color32 color)
 {
-	instance.GetDrawCommand(DrawCommandType::Line).count += 2;
+	instance.GetDrawCommand(DrawCommandType::Triangle).count += 6;
+
+	Vector2 dir = Vector2(dst - src);
+	dir.Normalize();
+
+	float f = std::round(dir.x);
+	dir.x = std::round(dir.y);
+	dir.y = f;
 
 	instance.AddVertex(Vector2(src), { 0,0 }, color);
-	instance.AddVertex(Vector2(dst), { 1,1, }, color);
+	instance.AddVertex(Vector2(dst.x, src.y) + Vector2{ dir.x, 0 }, { 1,0, }, color);
+	instance.AddVertex(Vector2(dst) + dir, { 1, 1 }, color);
+
+	instance.AddVertex(Vector2(dst) + dir, { 1,1 }, color);
+	instance.AddVertex(Vector2(src.x, dst.y) + Vector2(0, dir.y), { 0,1 }, color);
+	instance.AddVertex(Vector2(src), { 0,0 }, color);
 }
 
 void GraphicsRenderer::Submit()

@@ -32,6 +32,7 @@
     <ClInclude Include="src\3ds\citro2d\c2d\text.h" />
     <ClInclude Include="src\3ds\citro2d\citro2d.h" />
     <ClInclude Include="src\3ds\NDSAudioChannel.h" />
+    <ClInclude Include="src\3ds\RenderTarget.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

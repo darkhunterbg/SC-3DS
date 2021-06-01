@@ -36,10 +36,10 @@ public:
 
 	// =============== Graphics =========================
 
+	static Sprite NewSprite(Texture texture, Rectangle16 src);
 	static void DrawOnScreen(ScreenId screen);
 	static void DrawOnSurface(Surface surface);
 	static void ChangeBlendingMode(BlendMode mode);
-	static Sprite NewSprite(Texture texture, Rectangle16 src);
 	static void ClearBuffer(Color color);
 	static Span<Vertex> GetVertexBuffer();
 	static void ExecDrawCommands(const Span<DrawCommand> commands);

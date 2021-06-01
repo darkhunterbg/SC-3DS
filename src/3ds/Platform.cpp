@@ -7,29 +7,25 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <unordered_map>
 
 #include "StringLib.h"
-#include "Audio.h"
 #include "NDSAudioChannel.h"
+#include "RenderTarget.h"
 
 #include "Debug.h"
 
-struct RenderTarget {
-	C3D_RenderTarget* rt;
-	C3D_Tex* tex;
-};
 
-
-extern C3D_RenderTarget* screens[2];
+extern RenderTarget screens[2];
 extern std::string assetDir;
 extern std::string userDir;
 extern C2D_TextBuf textBuffer;
 extern u64 mainTimer;
 extern std::vector<NDSAudioChannel*> audioChannels;
-static C3D_RenderTarget* currentRT = nullptr;
-static std::vector< RenderTarget> createdRenderTargets;
+static RenderTarget currentRT;
+static std::vector<RenderTarget> createdRenderTargets;
 static int currentScreen = 0;
-
+static std::unordered_map<std::string, C2D_Font> loadedFonts;
 
 extern Vertex* vertexBuffer;
 extern C3D_BufInfo vbInfo;
@@ -53,12 +49,24 @@ const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 	for (int i = 0; i < count; ++i) {
 		C2D_Image img = C2D_SpriteSheetGetImage(sheet, i);
 		Sprite s;
-		s.image.textureId = img.tex;
-		s.uv[0] = { img.subtex->left, img.subtex->top };
-		s.uv[1] = { img.subtex->right, img.subtex->bottom };
-			// (Texture)img.subtex;
-		//s.rect.position = { img.subtex->left * img.tex->width , img.subtex->top * img.tex->height };
-		s.rect.size = { img.subtex->width, img.subtex->height };
+		s.textureId = img.tex;
+
+
+
+		/*if (Tex3DS_SubTextureRotated(img.subtex)) {
+			s.rect.size = { (short)img.subtex->height, (short)img.subtex->width };
+		}
+		else {
+			s.rect.size = { (short)img.subtex->width, (short)img.subtex->height };
+		}*/
+		Tex3DS_SubTextureTopLeft(img.subtex, &s.uv[0].x, &s.uv[0].y);
+		Tex3DS_SubTextureTopRight(img.subtex, &s.uv[1].x, &s.uv[1].y);
+		Tex3DS_SubTextureBottomLeft(img.subtex, &s.uv[2].x, &s.uv[2].y);
+		Tex3DS_SubTextureBottomRight(img.subtex, &s.uv[3].x, &s.uv[3].y);
+
+		// (Texture)img.subtex;
+		s.rect.size = { (short)img.subtex->width, (short)img.subtex->height };
+		s.rect.position = { img.subtex->left * img.tex->width , img.subtex->top * img.tex->height };
 
 		atlas->AddSprite(s);
 	}
@@ -68,18 +76,23 @@ const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 
 	return atlas;
 }
-
-Font Platform::LoadFont(const char* path) {
+const Font* Platform::LoadFont(const char* path, int size) {
 
 	std::string fontPath = assetDir + path;
-	C2D_Font font = C2D_FontLoad(fontPath.data());
-	if (font == nullptr)
-		EXCEPTION("Load font %s failed!", path);
 
-	return { font };
+	if (loadedFonts.find(fontPath) == loadedFonts.end()) {
+
+		C2D_Font font = C2D_FontLoad(fontPath.data());
+		if (font == nullptr)
+			EXCEPTION("Load font %s failed!", path);
+
+		loadedFonts[fontPath] = font;
+	}
+	float scale = (float)size / 30.0f;
+	return new Font(loadedFonts[fontPath], scale);
 }
-Vector2Int Platform::MeasureString(Font font, const char* text, float scale) {
-	C2D_Font f = (C2D_Font)font.fontId;
+Vector2Int Platform::MeasureString(const Font& font, const char* text) {
+	C2D_Font f = *font.GetFontId<C2D_Font>();
 
 	C2D_TextBufClear(textBuffer);
 	C2D_Text t;
@@ -88,12 +101,11 @@ Vector2Int Platform::MeasureString(Font font, const char* text, float scale) {
 
 	Vector2Int size;
 
-	size.x = (int)(t.width * scale);
-	size.y = (int)(t.lines * 30.0f * scale);
+	size.x = (int)(t.width * font.GetScale());
+	size.y = (int)(t.lines * 30.0f * font.GetScale());
 
 	return size;
 }
-
 void Platform::ChangeBlendingMode(BlendMode mode) {
 
 	C2D_Flush();
@@ -106,13 +118,13 @@ void Platform::ChangeBlendingMode(BlendMode mode) {
 			GPU_BLENDFACTOR::GPU_SRC_ALPHA, GPU_BLENDFACTOR::GPU_ONE_MINUS_SRC_ALPHA,
 			GPU_BLENDFACTOR::GPU_SRC_ALPHA, GPU_BLENDFACTOR::GPU_ONE_MINUS_SRC_ALPHA);
 		break;
-	case BlendMode::AlphaOverride:
+	case BlendMode::AlphaSet:
 		C3D_AlphaBlend(
 			GPU_BLENDEQUATION::GPU_BLEND_ADD, GPU_BLENDEQUATION::GPU_BLEND_ADD,
 			GPU_BLENDFACTOR::GPU_SRC_ALPHA, GPU_BLENDFACTOR::GPU_ZERO,
 			GPU_BLENDFACTOR::GPU_SRC_ALPHA, GPU_BLENDFACTOR::GPU_ZERO);
 		break;
-	case BlendMode::FullOverride:
+	case BlendMode::AllSet:
 		C3D_AlphaBlend(
 			GPU_BLENDEQUATION::GPU_BLEND_ADD, GPU_BLENDEQUATION::GPU_BLEND_ADD,
 			GPU_BLENDFACTOR::GPU_ONE, GPU_BLENDFACTOR::GPU_ZERO,
@@ -123,97 +135,72 @@ void Platform::ChangeBlendingMode(BlendMode mode) {
 	}
 }
 
-// Render without blending
+void Platform::DrawOnSurface(Surface surface) {
 
-void Platform::DrawOnTexture(Texture texture) {
-
-	if (texture == nullptr) {
+	if (surface == nullptr) {
 		currentRT = screens[currentScreen];
-		C2D_SceneBegin(currentRT);
+		C2D_SceneBegin(currentRT.rt);
 		return;
 	}
-	const C3D_Tex* tex = (C3D_Tex*)texture;
+	C3D_RenderTarget* rt = (C3D_RenderTarget*)surface;
+	C2D_SceneBegin(rt);
 
-	for (const RenderTarget& rt : createdRenderTargets) {
-		if (rt.tex == tex) {
-			currentRT = rt.rt;
-
-			C2D_SceneBegin(rt.rt);
+	for (auto& crt : createdRenderTargets) {
+		if (crt.rt == rt) {
+			currentRT = crt;
 			return;
 		}
 	}
 
-	EXCEPTION("Render target for texture 0x%X not found", texture);
+	EXCEPTION("RenderTarget not found!");
 }
 void Platform::DrawOnScreen(ScreenId screen) {
 
 	currentScreen = (int)screen;
 	currentRT = screens[currentScreen];
-	C2D_SceneBegin(currentRT);
+	C2D_SceneBegin(currentRT.rt);
 }
 
 void Platform::ClearBuffer(Color color) {
-	C2D_TargetClear(currentRT, Color32(color).value);
+	C2D_TargetClear(currentRT.rt, Color32(color).value);
 }
 
-Sprite Platform::NewSprite(Image image, Rectangle16 src) {
-	C3D_Tex* tex = (C3D_Tex*)image.textureId;
+Sprite Platform::NewSprite(Texture texture, Rectangle16 src) {
+	C3D_Tex* tex = (C3D_Tex*)texture;
+
+	Vector2Int size = { tex->width, tex->height };
 
 	//auto* s = (Tex3DS_SubTexture*)image.textureId2;
 
-	auto* s2 = new Tex3DS_SubTexture();
+	Vector2 uv[2];
 
-
-	//s2->width = src.size.x;
-	//s2->height = src.size.y;
-	//s2->top = 1 - (float)src.position.y / (float)s->height;
-	//s2->bottom = 1 - (float)(src.position.y + src.size.y) / (float)s->height;
-	//s2->left = (float)src.position.x / (float)s->width;
-	//s2->right = (float)(src.position.x + src.size.x) / (float)s->width;
+	uv[0].y = 1 - (float)src.position.y / (float)size.y;
+	uv[1].y = 1 - (float)(src.position.y + src.size.y) / (float)size.y;
+	uv[0].x = (float)src.position.x / (float)size.x;
+	uv[1].x = (float)(src.position.x + src.size.x) / (float)size.x;
 
 	//EXCEPTION("%.2f %.2f", s2->left, s2->right);
 
-	return { src, {tex} };
+	return { src,{ uv[0], uv[1]}, tex };
 }
 
-//void Platform::BatchDraw(const Span<BatchDrawCommand> commands) {
-//
-//	static constexpr const int depthStep = 0.0001f;
-//
-//	for (const auto& cmd : commands) {
-//		C2D_Image img = *(C2D_Image*)&cmd.image;
-//
-//		C2D_ImageTint tint;
-//		tint.corners[0] = { cmd.color.value, 1};
-//		tint.corners[1] = { cmd.color.value, 1 };
-//		tint.corners[2] = { cmd.color.value, 1};
-//		tint.corners[3] = { cmd.color.value,1};
-//		C2D_DrawImageAt(img, cmd.position.x, cmd.position.y, 0, &tint, cmd.scale.x, cmd.scale.y);
-//	}
-//}
+Span<Vertex> Platform::GetVertexBuffer() {
 
-
-Vertex* Platform::GetVertexBuffer() {
-
-	return  vertexBuffer;
+	return  { vertexBuffer, 10 * 1024 };
 }
 void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
+	//C2D_Prepare();
 
 	auto uLoc_mdlvMtx = shaderInstanceGetUniformLocation(spriteBatchProgram.vertexShader, "mdlvMtx");
 	auto uLoc_projMtx = shaderInstanceGetUniformLocation(spriteBatchProgram.vertexShader, "projMtx");
-	C3D_Mtx projMtx, mdlvMtx;
+	C3D_Mtx mdlvMtx, projMtx;
+
 
 	Mtx_OrthoTilt(&projMtx, 0.0f, 400, 240, 0.0f, 1.0f, -1.0f, true);
+
 	Mtx_Identity(&mdlvMtx);
 
-
-	C3D_TexEnv* env = C3D_GetTexEnv(0);
-	C3D_TexEnvInit(env);
-	//C3D_TexEnvSrc set afterwards by C2Di_Update()
-	C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
-	C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_TEXTURE0, 0);
-
-	env = C3D_GetTexEnv(1);
+	C3D_TexEnv* env = C3D_GetTexEnv(1);
 	C3D_TexEnvInit(env);
 
 	//C3D_TexEnvSrc(env, C3D_Both, GPU_PREVIOUS, GPU_PRIMARY_COLOR, 0);
@@ -232,44 +219,41 @@ void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
 
 	for (const DrawCommand& cmd : commands)
 	{
-		C3D_Tex* img = (C3D_Tex*)cmd.texture;
+		C3D_TexEnv* env = C3D_GetTexEnv(0);
+		C3D_TexEnvInit(env);
 
-		C3D_TexBind(0, img);
-		/*switch (cmd.type)
+		switch (cmd.type)
 		{
-		case DrawPrimitiveType::Triangle: {*/
-		C3D_DrawArrays(GPU_TRIANGLES, cmd.start, cmd.count);
-	
+		case DrawCommandType::TexturedTriangle: {
+			C3D_TexBind(0, (C3D_Tex*)cmd.texture);
+
+			C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
+			C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
+
+			C3D_DrawArrays(GPU_TRIANGLES, cmd.start, cmd.count);
+			break;
+		}
+		case DrawCommandType::Triangle: {
+			// C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
+			// C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
+
+			// C3D_DrawArrays(GPU_TRIANGLES, cmd.start, cmd.count);
+			// break;
+		}
+		default:
+			break;
+		}
 	}
 
-	C2D_Prepare();
+	//C2D_Prepare();
 }
 
-void Platform::Draw(const Sprite& sprite, Rectangle dst, Color color, bool hFlip, bool vFlip) {
-	C2D_Image img = *(C2D_Image*)&sprite.image;
+void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color) {
 
-	if (hFlip)
-		dst.size.x *= -1;
-	if (vFlip)
-		dst.size.y *= -1;
-	//if (color != Colors::Black)
-	//{
-	C2D_ImageTint tint;
-	u32 ucolor = C2D_Color32f(color.r, color.g, color.b, color.a);
-	tint.corners[0] = { ucolor , 1.0f };
-	tint.corners[1] = { ucolor , 1.0f };
-	tint.corners[2] = { ucolor , 1.0f };
-	tint.corners[3] = { ucolor , 1.0f };
+	return;
+	C2D_SceneBegin(currentRT.rt);
 
-	C2D_DrawImageAt(img, dst.position.x, dst.position.y, 0, &tint, dst.size.x / (float)img.subtex->width, dst.size.y / (float)img.subtex->height);
-	//}
-	//else
-	//	C2D_DrawImageAt(img, dst.position.x, dst.position.y, 0, nullptr, dst.size.x / (float)img.subtex->width, dst.size.y / (float)img.subtex->height);
-
-
-}
-void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color, float scale) {
-	C2D_Font f = (C2D_Font)font.fontId;
+	C2D_Font f = *(C2D_Font*)font.GetFontId<C2D_Font>();
 
 	C2D_Text t;
 	C2D_TextBufClear(textBuffer);
@@ -278,16 +262,12 @@ void Platform::DrawText(const Font& font, Vector2Int position, const char* text,
 
 	u32 c = C2D_Color32f(color.r, color.g, color.b, color.a);
 
-	C2D_DrawText(&t, C2D_WithColor, position.x, position.y, 0, scale, scale, c);
+	C2D_DrawText(&t, C2D_WithColor, position.x, position.y, 0, font.GetScale(), font.GetScale(), c);
+
+	C2D_Flush();
 }
-void Platform::DrawLine(Vector2Int src, Vector2Int dst, Color color) {
-	u32 c = C2D_Color32f(color.r, color.g, color.b, color.a);
-	C2D_DrawLine(src.x, src.y, c, dst.x, dst.y, c, 1, 0);
-}
-void Platform::DrawRectangle(const Rectangle& rect, const Color32& color) {
-	C2D_DrawRectSolid(rect.position.x, rect.position.y, 0, rect.size.x, rect.size.y, color.value);
-}
-Image Platform::NewTexture(Vector2Int size, bool pixelFiltering) {
+
+RenderSurface Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering) {
 	C3D_Tex* tex = new C3D_Tex();
 	if (!C3D_TexInitVRAM(tex, size.x, size.y, GPU_TEXCOLOR::GPU_RGBA8))
 		EXCEPTION("Failed to create texture with size %ix%i!", size.x, size.y);
@@ -299,22 +279,34 @@ Image Platform::NewTexture(Vector2Int size, bool pixelFiltering) {
 	}
 
 	C3D_RenderTargetClear(rt, C3D_ClearBits::C3D_CLEAR_COLOR, C2D_Color32(0, 0, 0, 255), 0);
-	createdRenderTargets.push_back({ rt,tex });
+
+	RenderTarget renderTarget = { rt,tex, size };
+	renderTarget.Init();
+
+	createdRenderTargets.push_back(renderTarget);
 
 	if (!pixelFiltering)
 		C3D_TexSetFilter(tex, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR);
 	else
 		C3D_TexSetFilter(tex, GPU_TEXTURE_FILTER_PARAM::GPU_NEAREST, GPU_TEXTURE_FILTER_PARAM::GPU_NEAREST);
 
-	Tex3DS_SubTexture* st = new Tex3DS_SubTexture();
-	st->width = size.x;
-	st->height = size.y;
-	st->left = 0;
-	st->right = 1;
-	st->top = 1;
-	st->bottom = 0;
+	//Tex3DS_SubTexture* st = new Tex3DS_SubTexture();
+	//st->width = size.x;
+	//st->height = size.y;
+	//st->left = 0;
+	//st->right = 1;
+	//st->top = 1;
+	//st->bottom = 0;
 
-	return { tex };
+	Sprite s;
+	s.rect = { {0,0}, Vector2Int16(size) };
+	s.uv[0] = { 0,0 };
+	s.uv[1] = { 1,1 };
+	s.textureId = tex;
+
+
+
+	return { rt, s };
 }
 
 double Platform::ElaspedTime() {

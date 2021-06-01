@@ -90,6 +90,8 @@ void Profiler::ShowPerformance() {
 	GraphicsRenderer::DrawLine(offset, offset + Vector2Int(60, 0), Colors::White);
 	offset.y += 50;
 	GraphicsRenderer::DrawLine(offset, offset + Vector2Int(60, 0), Colors::White);
+
+	GraphicsRenderer::Submit();
 }
 
 void Profiler::FrameStart() {

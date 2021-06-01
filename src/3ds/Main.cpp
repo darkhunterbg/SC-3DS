@@ -13,23 +13,25 @@
 #include "StringLib.h"
 
 #include "NDSAudioChannel.h"
-#include "Audio.h"
+
 #include "Profiler.h"
 
 #include "Engine/GraphicsPrimitives.h"
+#include "Engine/AudioChannel.h"
+#include "RenderTarget.h"
 
 #include <spritebatch_shbin.h>
 
 C3D_RenderTarget* top;
 C3D_RenderTarget* bottom;
-C3D_RenderTarget* screens[2];
+RenderTarget screens[2];
 std::string assetDir;
 std::string userDir;
 C2D_TextBuf textBuffer;
 u64 mainTimer;
 std::vector<NDSAudioChannel*> audioChannels;
 
-Vertex* vertexBuffer;
+Vertex* vertexBuffer = nullptr;
 C3D_BufInfo vbInfo;
 
 DVLB_s* spriteBatchBlob;
@@ -159,10 +161,13 @@ void Init() {
 	LoadShader();
 
 	C2D_Init(C2D_DEFAULT_MAX_OBJECTS );
-	C2D_Prepare();
-	screens[0] = top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
-	screens[1] = bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
-
+	C2D_Prepare(); 
+	top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+	bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+	screens[0] = { top, nullptr, {400,240} };
+	screens[1] = { bottom, nullptr, {320,240} };
+	screens[0].Init();
+	screens[1].Init();
 	
 
 	ndspInit();

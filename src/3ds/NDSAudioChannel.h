@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Audio.h"
+#include "Engine/AudioChannel.h"
 
 
 struct NDSAudioChannel {

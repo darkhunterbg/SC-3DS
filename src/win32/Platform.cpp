@@ -89,7 +89,7 @@ const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 			return nullptr;
 		}
 		Rectangle16 rect = { {0,0},Vector2Int16(size) };
-		Sprite s = { rect ,  {{0,0},{1,1} }, tex };
+		Sprite s = { rect ,  {{0,0},{1,0}, {0,1},{1,1} }, tex };
 		asset->AddSprite(s);
 	}
 
@@ -275,26 +275,6 @@ void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
 			}
 
 			/*	GPU_PrimitiveBatchV(white, target, GPU_TRIANGLES, cmd.count, vertexBuffer + cmd.start, 0, nullptr, GPU_BATCH_XY_ST_RGBA8);*/
-
-			break;
-		}
-		case DrawCommandType::Line: {
-
-			for (int i = cmd.start; i < cmd.start + cmd.count; i += 6) {
-
-				Vector2 start = vertexBuffer[i].position;
-				Color32 c = vertexBuffer[i].color.value;
-				SDL_Color color;
-
-				color.r = c.GetR();
-				color.g = c.GetG();
-				color.b = c.GetB();
-				color.a = c.GetA();
-
-				Vector2 end = vertexBuffer[i + 2].position;
-
-				GPU_Line(target, start.x, start.y, end.x, end.y, color);
-			}
 
 			break;
 		}

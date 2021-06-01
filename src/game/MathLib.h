@@ -320,7 +320,7 @@ struct Rectangle
 
 	inline Vector2Int GetCenter() const
 	{
-		return position + size >> 1;
+		return position + (size >> 1);
 	}
 	inline void SetCenter(Vector2Int center)
 	{
