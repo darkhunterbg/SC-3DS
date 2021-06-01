@@ -1,0 +1,58 @@
+[
+  {
+    "Mode": 1,
+    "Path": "cursor/*"
+  },
+  {
+    "Mode": 1,
+    "Path": "unit/cmdbtns/*"
+  },
+  {
+    "Mode": 2,
+    "Path": "unit/cmdbtns/cmdicons.grp"
+  },
+  {
+    "Mode": 3,
+    "Path": "unit/wirefram/*"
+  },
+  {
+    "Mode": 0,
+    "Path": "unit/wirefram/*"
+  },
+  {
+    "Mode": 0,
+    "Path": "unit/bullet/*"
+  },
+  {
+    "Mode": 0,
+    "Path": "unit/terran/*"
+  },
+  {
+    "Mode": 0,
+    "Path": "unit/protoss/*"
+  },
+  {
+    "Mode": 0,
+    "Path": "unit/zerg/*"
+  },
+  {
+    "Mode": 0,
+    "Path": "unit/neutral/*"
+  },
+  {
+    "Mode": 4,
+    "Path": "unit/thingy/*"
+  },
+  {
+    "Mode": 5,
+    "Path": "unit/thingy/o[0123456789d]*"
+  },
+  {
+    "Mode": 4,
+    "Path": "unit/thingy/tbang*"
+  },
+  {
+    "Mode": 6,
+    "Path": "unit/**/*shad*"
+  }
+]
