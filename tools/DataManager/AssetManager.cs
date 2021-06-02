@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -41,13 +42,21 @@ namespace DataManager
 
 	public class ImageListAsset
 	{
+		public struct FrameData
+		{
+			public string fileName;
+			public Rectangle rect;
+		}
+
 		public string InfoFilePath { get; private set; }
 		public string RelativePath { get; private set; }
 		public string Name { get; private set; }
 		public string Dir { get; private set; }
 
 		public Vector2 FrameSize { get; private set; }
-		public List<Rectangle> Frames { get; private set; } = new List<Rectangle>();
+
+
+		public List<FrameData> Frames { get; private set; } = new List<FrameData>();
 
 		public ImageListAsset(string infoFile)
 		{
@@ -70,7 +79,13 @@ namespace DataManager
 				rect.Width = int.Parse(spl[3]);
 				rect.Height = int.Parse(spl[4]);
 
-				Frames.Add(rect);
+				string name = spl[0];
+
+				Frames.Add(new FrameData()
+				{
+					fileName = name,
+					rect = rect
+				});
 			}
 		}
 	}
@@ -96,6 +111,10 @@ namespace DataManager
 		public static readonly string PalettePath = "../../palettes/";
 		public static readonly string RawAssetDir = "../../mpq/";
 		public static readonly string ConvertedAssetDir = "../../data_out/";
+		public static readonly string ConvertedAssetDirRelative = "data_out/";
+		public static readonly string SpriteAtlasDir = "../../data/atlases/";
+		public static readonly string SpriteBuildDir = "../../gfxbuild/atlases/";
+		public static readonly string tex3dsPath = "C:\\devkitPro\\tools\\bin\\tex3ds.exe";
 
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();
 
@@ -105,6 +124,12 @@ namespace DataManager
 		{
 			if (!Directory.Exists(ConvertedAssetDir))
 				Directory.CreateDirectory(ConvertedAssetDir);
+
+			if (!Directory.Exists(SpriteAtlasDir))
+				Directory.CreateDirectory(SpriteAtlasDir);
+
+			if (!Directory.Exists(SpriteBuildDir))
+				Directory.CreateDirectory(SpriteBuildDir);
 
 			LoadPalettes();
 			ReloadImageListAssets();
@@ -265,6 +290,62 @@ namespace DataManager
 
 				File.WriteAllLines(Path.Combine(subDir, $"info.txt"), info);
 			}
+		}
+
+		public string ExportAtlas(IEnumerable<ImageListAsset> assets, string atlasName)
+		{
+			string file = Path.GetFullPath(Path.Combine(SpriteAtlasDir, atlasName) + ".t3s");
+
+			string outDir = $"../../{ConvertedAssetDirRelative}";
+
+			using (StreamWriter sw = new StreamWriter(file))
+			{
+				sw.WriteLine($"--atlas -f auto-etc1 -z auto -q high");
+				foreach (var asset in assets)
+				{
+					foreach (var frame in asset.Frames)
+					{
+						sw.WriteLine($"{outDir}{asset.RelativePath}/{frame.fileName}".Replace("\\", "/"));
+					}
+				}
+
+			}
+
+
+			return file;
+
+		}
+
+		public AsyncOperation BuildAtlas(string atlasName)
+		{
+			string infoFile = Path.GetFullPath(Path.Combine(SpriteAtlasDir, atlasName) + ".t3s");
+			string outAtlas = Path.GetFullPath(Path.Combine(SpriteBuildDir, atlasName)) + ".t3x";
+
+			string args = $"-i {infoFile} -o {outAtlas}";
+			var process = new ProcessStartInfo(tex3dsPath, args);
+			process.UseShellExecute = false;
+			process.CreateNoWindow = true;
+			process.RedirectStandardOutput = true;
+			process.RedirectStandardError = true;
+			var p = new Process()
+			{
+				StartInfo = process
+			};
+
+			return new AsyncOperation(() =>
+			{
+				p.Start();
+
+				p.WaitForExit();
+
+				string error = p.StandardError.ReadToEnd();
+				if (!string.IsNullOrEmpty(error))
+					throw new Exception($"Failed to build atlas: {error}");
+			}, () =>
+			{
+				p.Kill();
+			});
+
 		}
 	}
 }

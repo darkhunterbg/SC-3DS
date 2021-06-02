@@ -34,6 +34,15 @@ namespace DataManager
 		}
 	}
 
+	public static class IListExtensions
+	{
+		public static void AddNotContainet<T>(this IList<T> list, T item) where T: class
+		{
+			if (!list.Contains(item))
+				list.Add(item);
+		}
+	}
+
 	public static class IEnumerableExtensions
 	{
 		public static int IndexOf<T>(this IEnumerable<T> col, T element) where T : class

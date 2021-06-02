@@ -2,7 +2,9 @@
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -67,6 +69,13 @@ namespace DataManager.Panels
 			RecalculateUsed();
 		}
 
+		public void RemoveAsset(ImageListAsset asset)
+		{
+			Assets.Remove(asset);
+			imageList.Remove(asset.RelativePath);
+			RecalculateUsed();
+		}
+
 		public static float CalculateUsage(ImageListAsset asset)
 		{
 			int size = 1024 * 1024;
@@ -74,7 +83,7 @@ namespace DataManager.Panels
 
 			foreach (var frame in asset.Frames)
 			{
-				used += frame.Size.X * frame.Size.Y + 2;
+				used += frame.rect.Size.X * frame.rect.Size.Y + 2;
 			}
 
 
@@ -89,7 +98,7 @@ namespace DataManager.Panels
 			{
 				foreach (var frame in asset.Frames)
 				{
-					used += frame.Size.X * frame.Size.Y + 2;
+					used += frame.rect.Size.X * frame.rect.Size.Y + 2;
 				}
 			}
 
@@ -169,7 +178,25 @@ namespace DataManager.Panels
 
 		private void DrawEntries()
 		{
+
 			ImGui.BeginChild("##sag.entries");
+
+			if (ImGui.Button("Normalize##sag.entries.normalize"))
+			{
+				NormalizeEntries();
+			}
+			ImGui.SameLine();
+			if (ImGui.Button("Generate##sag.entries.generate"))
+			{
+				AppGame.RunCoroutine(GenerateCrt());
+			}
+			ImGui.SameLine();
+			if (ImGui.Button("Build##sag.entries.build"))
+			{
+				AppGame.RunCoroutine(BuildCrt());
+			}
+
+			ImGui.BeginChild("##sag.entries.items");
 
 			string text = string.Empty;
 
@@ -228,7 +255,7 @@ namespace DataManager.Panels
 
 				changed = true;
 			}
-
+			ImGui.EndChild();
 
 			ImGui.EndChild();
 		}
@@ -245,7 +272,7 @@ namespace DataManager.Panels
 		private void DrawImageAssetListItem(ImageListAsset file, bool enabled = true)
 		{
 			float usage = SpriteAtlasEntry.CalculateUsage(file) * 100;
-			
+
 			string text = $"[{file.Frames.Count}] [{file.FrameSize.X}x{file.FrameSize.Y}] {file.RelativePath} [{usage.ToString("F1")}%%]";
 
 			if (enabled)
@@ -291,6 +318,11 @@ namespace DataManager.Panels
 			ImGui.OpenPopup("sag.entries.add");
 
 			ImGui.BeginPopupModal("sag.entries.add", ref selectItemsModal, ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysAutoResize);
+
+			float total = modalSelectedAssets.Sum(s => SpriteAtlasEntry.CalculateUsage(s)) * 100;
+
+			ImGui.Text($"{total.ToString("F1")}%%");
+			ImGui.SameLine();
 
 			var query = DrawImageListAssetsFilter("sag.entries.add.filter");
 
@@ -353,6 +385,76 @@ namespace DataManager.Panels
 			ImGui.EndPopup();
 		}
 
+		private void NormalizeEntries()
+		{
+			List<ImageListAsset> assets = new List<ImageListAsset>();
+
+			foreach (var entry in entries)
+			{
+				foreach (var a in entry.Assets.ToArray())
+				{
+					if (assets.Contains(a))
+					{
+						entry.RemoveAsset(a);
+						changed = true;
+					}
+					else
+					{
+						assets.Add(a);
+					}
+				}
+			}
+
+
+		}
+
+		private IEnumerator GenerateCrt()
+		{
+			foreach (var file in Directory.GetFiles(AssetManager.SpriteAtlasDir))
+				File.Delete(file);
+
+			int i = 0;
+			foreach (var entry in entries)
+			{
+
+				if (!AppGui.ProgressDialog("Generating atlases", ++i, entries.Count, true))
+					yield break;
+
+				AppGame.AssetManager.ExportAtlas(entry.Assets, entry.OutputName);
+
+
+				yield return null;
+			}
+		}
+
+
+
+		private IEnumerator BuildCrt()
+		{
+			foreach(var file in Directory.GetFiles(AssetManager.SpriteBuildDir))
+				File.Delete(file);
+
+			int i = 0;
+
+			foreach (var entry in entries)
+			{
+				var op = AppGame.AssetManager.BuildAtlas(entry.OutputName);
+
+				while (!op.Completed)
+				{
+					if (!AppGui.ProgressDialog($"Building atlas: {entry.OutputName}", i, entries.Count, true))
+					{
+						op.Cancel();
+						yield break;
+
+					}
+
+					yield return null;
+				}
+
+				++i;
+			}
+		}
 	}
 
 }
