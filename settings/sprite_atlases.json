@@ -1,0 +1,30 @@
+[
+  {
+    "OutputName": "cursor",
+    "ImageList": [
+      "cursor\\arrow",
+      "cursor\\drag",
+      "cursor\\illegal",
+      "cursor\\magg",
+      "cursor\\magr",
+      "cursor\\magy",
+      "cursor\\scrolld",
+      "cursor\\scrolldl",
+      "cursor\\scrolldr",
+      "cursor\\scrolll",
+      "cursor\\scrollr",
+      "cursor\\scrollu",
+      "cursor\\scrollul",
+      "cursor\\scrollur",
+      "cursor\\targg",
+      "cursor\\targn",
+      "cursor\\targr",
+      "cursor\\targy",
+      "cursor\\time"
+    ]
+  },
+  {
+    "OutputName": "",
+    "ImageList": []
+  }
+]

@@ -351,12 +351,6 @@ namespace DataManager.Panels
 			ImGui.EndTooltip();
 		}
 
-		struct ConvertItem
-		{
-			GRPAsset asset;
-			GRPConvertMode mode;
-		}
-
 		private IEnumerator ConvertCrt(List<GRPConverEntry> entries)
 		{
 			HashSet<Tuple<GRPAsset,GRPConvertMode>> convert = new HashSet<Tuple<GRPAsset, GRPConvertMode>>();
@@ -373,9 +367,6 @@ namespace DataManager.Panels
 					{
 						convert.Add(item);
 					}
-		
-
-				
 				}
 			}
 
@@ -386,10 +377,12 @@ namespace DataManager.Panels
 				AppGame.AssetManager.ConvertGRP(item.Item1, item.Item2);
 
 				if (!AppGui.ProgressDialog($"Converting {i++}/{convert.Count}", i, convert.Count, true))
-					yield break;
+					break;
 
 				yield return null;
 			}
+
+			AppGame.AssetManager.ReloadImageListAssets();
 		}
 	}
 }

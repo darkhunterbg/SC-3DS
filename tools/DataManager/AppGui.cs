@@ -16,10 +16,9 @@ namespace DataManager
 		public AppGame Game { get; private set; }
 
 		public AssetConverter AssetConverter { get; private set; } = new AssetConverter();
+		public SpriteAtlasGenerator SpriteAtlasGenerator { get; private set; } = new SpriteAtlasGenerator();
 
 		private List<IEnumerator> coroutines = new List<IEnumerator>();
-
-		private Stopwatch watch = new Stopwatch();
 
 		public static void RunGuiCoroutine(IEnumerator crt)
 		{
@@ -46,13 +45,9 @@ namespace DataManager
 
 			ImGui.PopStyleVar(1);
 
-
-
-			watch.Restart();
-
 			AssetConverter.Update();
-
 			AssetConverter.Draw();
+			SpriteAtlasGenerator.Draw();
 
 			UpdateCoroutines();
 		}
