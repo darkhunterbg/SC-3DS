@@ -25,6 +25,8 @@ namespace DataManager.Assets
 
 		public List<FrameData> Frames { get; private set; } = new List<FrameData>();
 
+		public int TakenSpace => Frames.Sum(f => f.rect.Width * f.rect.Height + 2);
+
 		public ImageListAsset(string infoFile)
 		{
 			Dir = Path.GetDirectoryName(infoFile);

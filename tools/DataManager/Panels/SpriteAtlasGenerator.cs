@@ -80,13 +80,7 @@ namespace DataManager.Panels
 		public static float CalculateUsage(ImageListAsset asset)
 		{
 			int size = 1024 * 1024;
-			int used = 0;
-
-			foreach (var frame in asset.Frames)
-			{
-				used += frame.rect.Size.X * frame.rect.Size.Y + 2;
-			}
-
+			int used = asset.TakenSpace;
 
 			return (float)used / (float)size;
 		}
@@ -94,14 +88,7 @@ namespace DataManager.Panels
 		private void RecalculateUsed()
 		{
 			int size = 1024 * 1024;
-			int used = 0;
-			foreach (var asset in Assets)
-			{
-				foreach (var frame in asset.Frames)
-				{
-					used += frame.rect.Size.X * frame.rect.Size.Y + 2;
-				}
-			}
+			int used = Assets.Sum(a => a.TakenSpace);
 
 			Used = (float)used / (float)size;
 		}

@@ -28,6 +28,7 @@
     <TrimmerRootAssembly Include="Microsoft.Xna.Framework.Content.ContentTypeReader" Visible="false" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="27.1.0" />
     <PackageReference Include="Glob" Version="1.1.8" />
     <PackageReference Include="ImGui.NET" Version="1.78.0" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641" />

@@ -1,9 +1,12 @@
-﻿using DataManager.Assets;
+﻿using CsvHelper;
+using CsvHelper.Configuration;
+using DataManager.Assets;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -51,14 +54,22 @@ namespace DataManager
 		public static readonly string RawAssetDir = "../../mpq/";
 		public static readonly string ConvertedAssetDir = "../../data_out/";
 		public static readonly string ConvertedAssetDirRelative = "data_out/";
+		public static readonly string GameDataDir = "../../data/";
 		public static readonly string SpriteAtlasDir = "../../data/atlases/";
 		public static readonly string SpriteBuildDir = "../../gfxbuild/atlases/";
 		public static readonly string tex3dsPath = "C:\\devkitPro\\tools\\bin\\tex3ds.exe";
+
+		public static readonly string SpriteAtlasDataPath = $"{GameDataDir}atlases.csv";
 
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();
 
 		public List<ImageListAsset> ImageListAssets { get; private set; } = new List<ImageListAsset>();
 		public List<SpriteAtlasAsset> SpriteAtlasAssets { get; private set; } = new List<SpriteAtlasAsset>();
+
+		private CsvConfiguration csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+		{
+			Delimiter = ",",
+		};
 
 		public AssetManager()
 		{
@@ -89,10 +100,23 @@ namespace DataManager
 		public void ReloadSpriteAtlasAssets()
 		{
 			SpriteAtlasAssets.Clear();
-			foreach (var file in Directory.GetFiles(SpriteAtlasDir, "*.t3s", SearchOption.AllDirectories))
+
+			List<IGrouping<string, SpriteAtlasRecord>> atlasRecords = null;
+
+			using (var csv = new CsvReader(new StreamReader(SpriteAtlasDataPath), csvConfig))
 			{
-				SpriteAtlasAssets.Add(new SpriteAtlasAsset(file));
+				atlasRecords = csv.GetRecords<SpriteAtlasRecord>().GroupBy(g => g.AtlasName)
+					.ToList();
 			}
+
+			foreach(var group in atlasRecords)
+			{
+				var s = new SpriteAtlasAsset(group.Key);
+				SpriteAtlasAssets.Add(s);
+
+				s.SetRecords(group);
+			}
+
 		}
 
 		private void LoadPalettes()
@@ -242,55 +266,102 @@ namespace DataManager
 			}
 		}
 
-		public string ExportAtlas(IEnumerable<ImageListAsset> assets, string atlasName)
+		public void ExportAtlas(IEnumerable<ImageListAsset> assets, string atlasName)
 		{
-			string file = Path.GetFullPath(Path.Combine(SpriteAtlasDir, atlasName) + ".t3s");
+			List<ImageListAsset> group = new List<ImageListAsset>();
 
-			string outDir = $"../../{ConvertedAssetDirRelative}";
+			SpriteAtlasAsset spriteAtlas = new SpriteAtlasAsset(atlasName);
 
-			using (StreamWriter sw = new StreamWriter(file))
+			int freeSpace = 1024 * 1024;
+
+			var r = new SpriteAtlasRecord();
+
+			foreach(var asset in assets)
 			{
-				sw.WriteLine($"--atlas -f auto-etc1 -z auto -q high");
-				foreach (var asset in assets)
+				if(group.Sum(s=>s.TakenSpace) + asset.TakenSpace < freeSpace)
 				{
-					foreach (var frame in asset.Frames)
-					{
-						sw.WriteLine($"{outDir}{asset.RelativePath}/{frame.fileName}".Replace("\\", "/"));
-					}
+					group.Add(asset);
 				}
-
+				else
+				{
+					spriteAtlas.AddRecord(group);
+					group.Clear();
+				}
 			}
 
+			if(group.Count > 0)
+			{
+				spriteAtlas.AddRecord(group);
+			}
 
-			return file;
+			foreach(var atlas in spriteAtlas.Atlases)
+			{
 
+				string file = atlas.InfoFilePath;
+				string outDir = $"../../{ConvertedAssetDirRelative}";
+
+				using (StreamWriter sw = new StreamWriter(file))
+				{
+					sw.WriteLine($"--atlas -f auto-etc1 -z auto -q high");
+					foreach (var asset in assets)
+					{
+						foreach (var frame in asset.Frames)
+						{
+							sw.WriteLine($"{outDir}{asset.RelativePath}/{frame.fileName}".Replace("\\", "/"));
+						}
+					}
+
+				}
+			}
+
+		
+			SpriteAtlasAssets.RemoveAll(t => t.Name == atlasName);
+			SpriteAtlasAssets.Add(spriteAtlas);
+
+			var records = SpriteAtlasAssets.SelectMany(s => s.Atlases).OrderBy(t => t.AtlasName).ThenBy(t => t.AtlasIndex);
+
+
+			using (var csv = new CsvWriter(new StreamWriter(SpriteAtlasDataPath), csvConfig))
+			{
+				csv.WriteRecords(records);
+			}
 		}
 
 		public AsyncOperation BuildAtlas(SpriteAtlasAsset asset)
 		{
-			string infoFile = asset.InfoFile;
-			string outAtlas = Path.GetFullPath(Path.Combine(SpriteBuildDir, asset.Name)) + ".t3x";
-
-			string args = $"-i {infoFile} -o {outAtlas}";
-			var process = new ProcessStartInfo(tex3dsPath, args);
-			process.UseShellExecute = false;
-			process.CreateNoWindow = true;
-			process.RedirectStandardOutput = true;
-			process.RedirectStandardError = true;
-			var p = new Process()
-			{
-				StartInfo = process
-			};
+			Process p = null;
+			bool done = false;
 
 			return new AsyncOperation(() =>
 			{
-				p.Start();
+				foreach (var atlas in asset.Atlases)
+				{
+					if (done)
+						break;
 
-				p.WaitForExit();
+					string infoFile = atlas.InfoFilePath;
+					string outAtlas = Path.GetFullPath(Path.Combine(SpriteBuildDir, atlas.Name)) + ".t3x";
 
-				string error = p.StandardError.ReadToEnd();
-				if (!string.IsNullOrEmpty(error))
-					throw new Exception($"Failed to build atlas: {error}");
+					string args = $"-i {infoFile} -o {outAtlas}";
+					var process = new ProcessStartInfo(tex3dsPath, args);
+					process.UseShellExecute = false;
+					process.CreateNoWindow = true;
+					process.RedirectStandardOutput = true;
+					process.RedirectStandardError = true;
+					p = new Process()
+					{
+						StartInfo = process
+					};
+
+
+					p.Start();
+
+					p.WaitForExit();
+
+					string error = p.StandardError.ReadToEnd();
+					if (!string.IsNullOrEmpty(error))
+						throw new Exception($"Failed to build atlas: {error}");
+				}
 			}, () =>
 			{
 				p.Kill();
