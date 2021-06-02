@@ -1,4 +1,5 @@
-﻿using GlobExpressions;
+﻿using DataManager.Assets;
+using GlobExpressions;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
@@ -416,7 +417,6 @@ namespace DataManager.Panels
 			int i = 0;
 			foreach (var entry in entries)
 			{
-
 				if (!AppGui.ProgressDialog("Generating atlases", ++i, entries.Count, true))
 					yield break;
 
@@ -425,9 +425,9 @@ namespace DataManager.Panels
 
 				yield return null;
 			}
+
+			AppGame.AssetManager.ReloadSpriteAtlasAssets();
 		}
-
-
 
 		private IEnumerator BuildCrt()
 		{
@@ -436,13 +436,13 @@ namespace DataManager.Panels
 
 			int i = 0;
 
-			foreach (var entry in entries)
+			foreach (var atlas in AppGame.AssetManager.SpriteAtlasAssets)
 			{
-				var op = AppGame.AssetManager.BuildAtlas(entry.OutputName);
+				var op = AppGame.AssetManager.BuildAtlas(atlas);
 
 				while (!op.Completed)
 				{
-					if (!AppGui.ProgressDialog($"Building atlas: {entry.OutputName}", i, entries.Count, true))
+					if (!AppGui.ProgressDialog($"Building atlas: {atlas.Name}", i, entries.Count, true))
 					{
 						op.Cancel();
 						yield break;

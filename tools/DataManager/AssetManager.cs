@@ -28,67 +28,6 @@ namespace DataManager
 		}
 	}
 
-	public class GRPAsset
-	{
-		public string Path;
-		public string DisplayName;
-
-		public GRPAsset(string file)
-		{
-			Path = file;
-			DisplayName = file.Substring(AssetManager.RawAssetDir.Length);
-		}
-	}
-
-	public class ImageListAsset
-	{
-		public struct FrameData
-		{
-			public string fileName;
-			public Rectangle rect;
-		}
-
-		public string InfoFilePath { get; private set; }
-		public string RelativePath { get; private set; }
-		public string Name { get; private set; }
-		public string Dir { get; private set; }
-
-		public Vector2 FrameSize { get; private set; }
-
-
-		public List<FrameData> Frames { get; private set; } = new List<FrameData>();
-
-		public ImageListAsset(string infoFile)
-		{
-			Dir = Path.GetDirectoryName(infoFile);
-			RelativePath = Dir.Substring(AssetManager.ConvertedAssetDir.Length);
-			InfoFilePath = infoFile.Substring(AssetManager.ConvertedAssetDir.Length);
-			Name = Path.GetFileNameWithoutExtension(Dir);
-
-			string[] info = File.ReadAllLines(infoFile);
-			var spl = info[0].Split(' ');
-			FrameSize = new Vector2(int.Parse(spl[0]), int.Parse(spl[1]));
-
-			foreach (var e in info.Skip(1))
-			{
-				spl = e.Split(' ');
-
-				Rectangle rect = new Rectangle();
-				rect.X = int.Parse(spl[1]);
-				rect.Y = int.Parse(spl[2]);
-				rect.Width = int.Parse(spl[3]);
-				rect.Height = int.Parse(spl[4]);
-
-				string name = spl[0];
-
-				Frames.Add(new FrameData()
-				{
-					fileName = name,
-					rect = rect
-				});
-			}
-		}
-	}
 
 	public enum GRPConvertMode
 	{
@@ -119,6 +58,7 @@ namespace DataManager
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();
 
 		public List<ImageListAsset> ImageListAssets { get; private set; } = new List<ImageListAsset>();
+		public List<SpriteAtlasAsset> SpriteAtlasAssets { get; private set; } = new List<SpriteAtlasAsset>();
 
 		public AssetManager()
 		{
@@ -133,6 +73,7 @@ namespace DataManager
 
 			LoadPalettes();
 			ReloadImageListAssets();
+			ReloadSpriteAtlasAssets();
 		}
 
 		public void ReloadImageListAssets()
@@ -142,6 +83,15 @@ namespace DataManager
 			foreach (var file in Directory.GetFiles(ConvertedAssetDir, "info.txt", SearchOption.AllDirectories))
 			{
 				ImageListAssets.Add(new ImageListAsset(file));
+			}
+		}
+
+		public void ReloadSpriteAtlasAssets()
+		{
+			SpriteAtlasAssets.Clear();
+			foreach (var file in Directory.GetFiles(SpriteAtlasDir, "*.t3s", SearchOption.AllDirectories))
+			{
+				SpriteAtlasAssets.Add(new SpriteAtlasAsset(file));
 			}
 		}
 
@@ -316,10 +266,10 @@ namespace DataManager
 
 		}
 
-		public AsyncOperation BuildAtlas(string atlasName)
+		public AsyncOperation BuildAtlas(SpriteAtlasAsset asset)
 		{
-			string infoFile = Path.GetFullPath(Path.Combine(SpriteAtlasDir, atlasName) + ".t3s");
-			string outAtlas = Path.GetFullPath(Path.Combine(SpriteBuildDir, atlasName)) + ".t3x";
+			string infoFile = asset.InfoFile;
+			string outAtlas = Path.GetFullPath(Path.Combine(SpriteBuildDir, asset.Name)) + ".t3x";
 
 			string args = $"-i {infoFile} -o {outAtlas}";
 			var process = new ProcessStartInfo(tex3dsPath, args);
