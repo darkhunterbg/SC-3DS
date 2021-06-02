@@ -1,7 +1,9 @@
 ﻿using DataManager.Panels;
 using ImGuiNET;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -15,15 +17,20 @@ namespace DataManager
 
 		public AssetConverter AssetConverter { get; private set; } = new AssetConverter();
 
+		private List<IEnumerator> coroutines = new List<IEnumerator>();
+
+		private Stopwatch watch = new Stopwatch();
+
+		public static void RunGuiCoroutine(IEnumerator crt)
+		{
+			AppGame.Gui.coroutines.Add(crt);
+		}
+
 		public AppGui(AppGame game)
 		{
 			Game = game;
 		}
 
-		public void Update()
-		{
-			AssetConverter.Update();
-		}
 
 		public void Draw(Vector2 clientSize)
 		{
@@ -39,7 +46,53 @@ namespace DataManager
 
 			ImGui.PopStyleVar(1);
 
+
+
+			watch.Restart();
+
+			AssetConverter.Update();
+
 			AssetConverter.Draw();
+
+			UpdateCoroutines();
+		}
+
+		public bool UpdateCoroutines()
+		{
+			for (int i = 0; i < coroutines.Count; ++i)
+			{
+				var crt = coroutines[i];
+				if (!crt.MoveNext())
+				{
+					coroutines.RemoveAt(i--);
+				}
+			}
+
+			return coroutines.Count > 0;
+		}
+
+
+		public static bool ProgressDialog(string text, int count, int total, bool cancelable = false)
+		{
+			float progress = (float)count / (float)total;
+
+			return ProgressDialog(text, progress, cancelable);
+		}
+		public static bool ProgressDialog(string text, float progress, bool cancelable = false)
+		{
+			bool result = true;
+			ImGui.OpenPopup("Generic.ProgressBar");
+			bool open = true;
+			ImGui.BeginPopupModal("Generic.ProgressBar", ref open, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar);
+			ImGui.Text(text);
+			ImGui.ProgressBar(progress, new Vector2(400, 40));
+			if (cancelable)
+			{
+				result = !ImGui.Button("Cancel");
+			}
+			ImGui.EndPopup();
+
+			return result;
 		}
 	}
 }

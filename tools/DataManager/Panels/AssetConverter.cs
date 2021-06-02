@@ -4,6 +4,7 @@ using ImGuiNET;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,18 +15,6 @@ namespace DataManager.Panels
 {
 	public class AssetConverter
 	{
-		class GRPAsset
-		{
-			public string Path;
-			public string DisplayName;
-
-			public GRPAsset(string file)
-			{
-				Path = file;
-				DisplayName = file.Substring(AssetManager.RawAssetDir.Length);
-			}
-		}
-
 		class GRPConverEntry
 		{
 			[JsonProperty]
@@ -53,6 +42,11 @@ namespace DataManager.Panels
 
 				return assets.Where(a => glob.IsMatch(a.DisplayName));
 
+			}
+
+			public bool IsMatch(GRPAsset asset)
+			{
+				return glob.IsMatch(asset.DisplayName);
 			}
 
 			public void Init()
@@ -102,7 +96,7 @@ namespace DataManager.Panels
 				{
 					loaded.Dispose();
 					loaded = null;
-					
+
 				}
 
 				failed = false;
@@ -141,12 +135,12 @@ namespace DataManager.Panels
 			DrawConvertSettings();
 
 			ImGui.NextColumn();
-			DrawAssets();
+			DrawRawAssets();
 
 			ImGui.End();
 		}
 
-		private void DrawAssets()
+		private void DrawRawAssets()
 		{
 			ImGui.BeginChild("##AssetConverter.Assets");
 			ImGui.Text("Assets");
@@ -172,7 +166,7 @@ namespace DataManager.Panels
 				{
 					try
 					{
-						var g = new Glob(assetFilter);
+						var g = new Glob(assetFilter, GlobOptions.Compiled);
 						query = query.Where(a => g.IsMatch(a.DisplayName));
 					}
 					catch { }
@@ -182,13 +176,19 @@ namespace DataManager.Panels
 
 
 			ImGui.BeginChild("##AssetConverter.RawAssetsTable");
-			foreach (var file in query)
+			foreach (var asset in query)
 			{
-				ImGui.Text(file.DisplayName);
-				if (ImGui.IsItemHovered())
+				if (convertEntries.Any(t => t.IsMatch(asset)))
 				{
-					hovered = file;
+					ImGui.Text(asset.DisplayName);
 				}
+				else
+				{
+					ImGui.TextDisabled(asset.DisplayName);
+				}
+
+				if (ImGui.IsItemHovered())
+					hovered = asset;
 			}
 			ImGui.EndChild();
 
@@ -237,7 +237,12 @@ namespace DataManager.Panels
 
 			int total = convertEntries.SelectMany(entry => entry.GetMatches(rawAssets)).Distinct().Count();
 
-			ImGui.Button("Convert all##AssetConverter.ConvertSettings.ConvertAll");
+			if (ImGui.Button("Convert all##AssetConverter.ConvertSettings.ConvertAll"))
+			{
+				if (Directory.Exists(AssetManager.ConvertedAssetDir))
+					Directory.Delete(AssetManager.ConvertedAssetDir, true);
+				AppGui.RunGuiCoroutine(ConvertCrt(convertEntries));
+			}
 			ImGui.SameLine();
 			ImGui.Text($"{total}/{rawAssets.Count}");
 
@@ -277,7 +282,7 @@ namespace DataManager.Panels
 				ImGui.SameLine();
 				if (ImGui.Button($"Convert##AssetConverter.ConvertSettings.convert.{i}"))
 				{
-
+					AppGui.RunGuiCoroutine(ConvertCrt(new List<GRPConverEntry>() { entry }));
 				}
 
 				ImGui.SameLine();
@@ -344,6 +349,47 @@ namespace DataManager.Panels
 
 
 			ImGui.EndTooltip();
+		}
+
+		struct ConvertItem
+		{
+			GRPAsset asset;
+			GRPConvertMode mode;
+		}
+
+		private IEnumerator ConvertCrt(List<GRPConverEntry> entries)
+		{
+			HashSet<Tuple<GRPAsset,GRPConvertMode>> convert = new HashSet<Tuple<GRPAsset, GRPConvertMode>>();
+
+			foreach (var entry in entries)
+			{
+				var matches = entry.GetMatches(rawAssets);
+
+				foreach (var match in matches)
+				{
+					var item = new Tuple<GRPAsset, GRPConvertMode> (match, entry.Mode);
+
+					if (!convert.Contains(item))
+					{
+						convert.Add(item);
+					}
+		
+
+				
+				}
+			}
+
+			int i = 0;
+
+			foreach (var item in convert)
+			{
+				AppGame.AssetManager.ConvertGRP(item.Item1, item.Item2);
+
+				if (!AppGui.ProgressDialog($"Converting {i++}/{convert.Count}", i, convert.Count, true))
+					yield break;
+
+				yield return null;
+			}
 		}
 	}
 }

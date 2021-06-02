@@ -12,10 +12,6 @@
     "Path": "unit/cmdbtns/cmdicons.grp"
   },
   {
-    "Mode": 3,
-    "Path": "unit/wirefram/*"
-  },
-  {
     "Mode": 0,
     "Path": "unit/wirefram/*"
   },
@@ -54,5 +50,9 @@
   {
     "Mode": 6,
     "Path": "unit/**/*shad*"
+  },
+  {
+    "Mode": 3,
+    "Path": "unit/wirefram/*"
   }
 ]

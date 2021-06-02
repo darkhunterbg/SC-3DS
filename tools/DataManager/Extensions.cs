@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -17,7 +19,18 @@ namespace DataManager
 
 		public static Vector4 ToVec4(this System.Drawing.Color color)
 		{
-			return new Vector4(color.R/255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f);
+			return new Vector4(color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f);
+		}
+	}
+
+	public static class Texture2DExtensions
+	{
+		public static void SaveAsPng(this Texture2D texture, string fileName)
+		{
+			using (FileStream s = new FileStream(fileName, FileMode.OpenOrCreate))
+			{
+				texture.SaveAsPng(s, texture.Width, texture.Height);
+			}
 		}
 	}
 

@@ -27,17 +27,7 @@ namespace DataManager.Assets
 
 		static int MinTexSize = 128;
 
-		private Texture2D NewTexture()
-		{
-			int w = Width / MinTexSize;
-			if (Width % MinTexSize != 0)
-				w += 1;
-			int h = Height / MinTexSize;
-			if (Height % MinTexSize != 0)
-				h += 1;
-			return new Texture2D(AppGame.Device, w * MinTexSize, h * MinTexSize);
-		}
-
+	
 		public void DrawTo(Texture2D texture, Palette palette)
 		{
 			int w = Math.Min(Width, texture.Width);
@@ -61,7 +51,7 @@ namespace DataManager.Assets
 
 		public Texture2D ToTexture(Palette palette)
 		{
-			Texture2D b = NewTexture();
+			Texture2D b = new Texture2D(AppGame.Device, Width, Height);
 			Color[] data = new Color[Width * Height];
 			for (int x = 0; x < Width; ++x)
 			{
