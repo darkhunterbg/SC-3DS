@@ -9,8 +9,11 @@ namespace DataManager
 {
 	public class AsyncOperation
 	{
+
 		private Exception ex = null;
 		private volatile bool completed = false;
+
+		public float Progress { get; private set; }
 
 		public bool Completed
 		{
@@ -35,14 +38,17 @@ namespace DataManager
 				onCancelled();
 		}
 
-		public AsyncOperation(Action action, Action onCancelled = null)
+		public AsyncOperation(Action<Action<float>> action, Action onCancelled = null)
 		{
 			this.onCancelled = onCancelled;
 			Task.Run(() =>
 			{
 				try
 				{
-					action();
+					action((f)=>
+					{
+						Progress = f;
+					});
 				}
 				catch (Exception ex)
 				{

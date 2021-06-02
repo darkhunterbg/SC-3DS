@@ -109,7 +109,7 @@ namespace DataManager
 					.ToList();
 			}
 
-			foreach(var group in atlasRecords)
+			foreach (var group in atlasRecords)
 			{
 				var s = new SpriteAtlasAsset(group.Key);
 				SpriteAtlasAssets.Add(s);
@@ -272,13 +272,13 @@ namespace DataManager
 
 			SpriteAtlasAsset spriteAtlas = new SpriteAtlasAsset(atlasName);
 
-			int freeSpace = 1024 * 1024;
+			int freeSpace = (1024 * 1024 * 90) / 100;
 
 			var r = new SpriteAtlasRecord();
 
-			foreach(var asset in assets)
+			foreach (var asset in assets)
 			{
-				if(group.Sum(s=>s.TakenSpace) + asset.TakenSpace < freeSpace)
+				if (group.Sum(s => s.TakenSpace) + asset.TakenSpace < freeSpace)
 				{
 					group.Add(asset);
 				}
@@ -289,12 +289,12 @@ namespace DataManager
 				}
 			}
 
-			if(group.Count > 0)
+			if (group.Count > 0)
 			{
 				spriteAtlas.AddRecord(group);
 			}
 
-			foreach(var atlas in spriteAtlas.Atlases)
+			foreach (var atlas in spriteAtlas.Atlases)
 			{
 
 				string file = atlas.InfoFilePath;
@@ -303,7 +303,7 @@ namespace DataManager
 				using (StreamWriter sw = new StreamWriter(file))
 				{
 					sw.WriteLine($"--atlas -f auto-etc1 -z auto -q high");
-					foreach (var asset in assets)
+					foreach (var asset in atlas.ImageLists)
 					{
 						foreach (var frame in asset.Frames)
 						{
@@ -314,7 +314,7 @@ namespace DataManager
 				}
 			}
 
-		
+
 			SpriteAtlasAssets.RemoveAll(t => t.Name == atlasName);
 			SpriteAtlasAssets.Add(spriteAtlas);
 
@@ -332,15 +332,17 @@ namespace DataManager
 			Process p = null;
 			bool done = false;
 
-			return new AsyncOperation(() =>
+			return new AsyncOperation((Action<float> report) =>
 			{
-				foreach (var atlas in asset.Atlases)
+				int i = 0;
+				foreach (var subatlas in asset.Atlases)
 				{
+					++i;
 					if (done)
 						break;
 
-					string infoFile = atlas.InfoFilePath;
-					string outAtlas = Path.GetFullPath(Path.Combine(SpriteBuildDir, atlas.Name)) + ".t3x";
+					string infoFile = subatlas.InfoFilePath;
+					string outAtlas = Path.GetFullPath(Path.Combine(SpriteBuildDir, subatlas.FullName)) + ".t3x";
 
 					string args = $"-i {infoFile} -o {outAtlas}";
 					var process = new ProcessStartInfo(tex3dsPath, args);
@@ -360,7 +362,9 @@ namespace DataManager
 
 					string error = p.StandardError.ReadToEnd();
 					if (!string.IsNullOrEmpty(error))
-						throw new Exception($"Failed to build atlas: {error}");
+						throw new Exception($"Failed to build subatlas {subatlas.FullName}: {error}");
+
+					report((float)i / (float)asset.Atlases.Count());
 				}
 			}, () =>
 			{

@@ -48,10 +48,10 @@ namespace DataManager.Assets
 		public int AtlasIndex { get; set; }
 
 		[Ignore]
-		public string Name => $"{AtlasName}_{AtlasIndex}";
+		public string FullName => $"{AtlasName}_{AtlasIndex}";
 
 		[Ignore]
-		public string InfoFilePath => $"{ AssetManager.SpriteAtlasDir}{Name}.t3s";
+		public string InfoFilePath => $"{ AssetManager.SpriteAtlasDir}{FullName}.t3s";
 
 		[Ignore]
 		public List<ImageListAsset> ImageLists = new List<ImageListAsset>();
