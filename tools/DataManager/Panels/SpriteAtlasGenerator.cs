@@ -1,4 +1,5 @@
-﻿using ImGuiNET;
+﻿using GlobExpressions;
+using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -13,15 +14,15 @@ namespace DataManager.Panels
 	{
 		[JsonProperty]
 		public string OutputName = string.Empty;
-
-		[JsonProperty]
-		public List<string> ImageList = new List<string>();
+		[JsonProperty(PropertyName = "ImageList")]
+		private List<string> imageList = new List<string>();
 
 		[JsonIgnore]
 		public List<ImageListAsset> Assets = new List<ImageListAsset>();
-
 		[JsonIgnore]
 		public readonly int Id = -1;
+		[JsonIgnore]
+		public float Used { get; private set; }
 
 		static int id = 0;
 
@@ -32,10 +33,9 @@ namespace DataManager.Panels
 
 		public void Init()
 		{
-			
 			Assets.Clear();
 
-			foreach (var l in ImageList)
+			foreach (var l in imageList)
 			{
 
 				var item = AppGame.AssetManager.ImageListAssets.FirstOrDefault(a => a.RelativePath == l);
@@ -46,21 +46,54 @@ namespace DataManager.Panels
 			}
 
 			Assets = Assets.OrderBy(a => a.RelativePath).ToList();
-			ImageList.Sort();
+			imageList.Sort();
+
+			RecalculateUsed();
 		}
 
 		public void SetAssets(IEnumerable<ImageListAsset> assets)
 		{
-			ImageList.Clear();
+			imageList.Clear();
 			Assets.Clear();
 
 
 			Assets.AddRange(assets.Distinct());
 			Assets = Assets.OrderBy(a => a.RelativePath).ToList();
 
-			ImageList.AddRange(Assets.Select(s => s.RelativePath));
+			imageList.AddRange(Assets.Select(s => s.RelativePath));
 
-			ImageList.Sort();
+			imageList.Sort();
+
+			RecalculateUsed();
+		}
+
+		public static float CalculateUsage(ImageListAsset asset)
+		{
+			int size = 1024 * 1024;
+			int used = 0;
+
+			foreach (var frame in asset.Frames)
+			{
+				used += frame.Size.X * frame.Size.Y + 2;
+			}
+
+
+			return (float)used / (float)size;
+		}
+
+		private void RecalculateUsed()
+		{
+			int size = 1024 * 1024;
+			int used = 0;
+			foreach (var asset in Assets)
+			{
+				foreach (var frame in asset.Frames)
+				{
+					used += frame.Size.X * frame.Size.Y + 2;
+				}
+			}
+
+			Used = (float)used / (float)size;
 		}
 	}
 
@@ -74,6 +107,7 @@ namespace DataManager.Panels
 		bool selectItemsModal = false;
 		SpriteAtlasEntry selectItemsFor = null;
 		List<ImageListAsset> modalSelectedAssets = new List<ImageListAsset>();
+		string assetFilter = string.Empty;
 
 		public SpriteAtlasGenerator()
 		{
@@ -117,12 +151,18 @@ namespace DataManager.Panels
 		{
 			ImGui.BeginChild("##sag.assets");
 
-			foreach (var asset in AppGame.AssetManager.ImageListAssets)
+			var query = DrawImageListAssetsFilter("##sag.assets.search");
+
+			ImGui.BeginChild("##sag.assets.list");
+
+			foreach (var asset in query)
 			{
 				bool enabled = entries.Any(e => e.Assets.Contains(asset));
 				DrawImageAssetListItem(asset, enabled);
 
 			}
+
+			ImGui.EndChild();
 
 			ImGui.EndChild();
 		}
@@ -148,7 +188,10 @@ namespace DataManager.Panels
 					entry.OutputName = text;
 					changed = true;
 				}
-				
+
+				ImGui.SameLine();
+				ImGui.Text($"{(int)(entry.Used * 100)}%% used");
+
 				ImGui.SameLine();
 				if (ImGui.Button($"Edit List##sag.entries.edit.{entry.Id}"))
 				{
@@ -170,7 +213,7 @@ namespace DataManager.Panels
 
 				if (expand)
 				{
-					DrawEntryAssetList( entry);
+					DrawEntryAssetList(entry);
 
 					ImGui.TreePop();
 				}
@@ -190,7 +233,7 @@ namespace DataManager.Panels
 			ImGui.EndChild();
 		}
 
-		private void DrawEntryAssetList( SpriteAtlasEntry entry)
+		private void DrawEntryAssetList(SpriteAtlasEntry entry)
 		{
 			for (int j = 0; j < entry.Assets.Count; ++j)
 			{
@@ -201,30 +244,76 @@ namespace DataManager.Panels
 
 		private void DrawImageAssetListItem(ImageListAsset file, bool enabled = true)
 		{
+			float usage = SpriteAtlasEntry.CalculateUsage(file) * 100;
+			
+			string text = $"[{file.Frames.Count}] [{file.FrameSize.X}x{file.FrameSize.Y}] {file.RelativePath} [{usage.ToString("F1")}%%]";
+
 			if (enabled)
-				ImGui.Text($"[{file.Frames.Count}]");
+				ImGui.Text(text);
 			else
-				ImGui.TextDisabled($"[{file.Frames.Count}]");
-			ImGui.SameLine();
-			if (enabled)
-				ImGui.Text(file.RelativePath);
-			else
-				ImGui.TextDisabled(file.RelativePath);
+				ImGui.TextDisabled(text);
+
+		}
+
+		private IEnumerable<ImageListAsset> DrawImageListAssetsFilter(string id)
+		{
+			IEnumerable<ImageListAsset> query = AppGame.AssetManager.ImageListAssets;
+
+			ImGui.InputText($"##{id}", ref assetFilter, 256);
+
+			if (!string.IsNullOrEmpty(assetFilter))
+			{
+				if (!assetFilter.Contains('*') &&
+					!assetFilter.Contains('?') &&
+					!assetFilter.Contains('[') &&
+					!assetFilter.Contains('{'))
+
+					query = query.Where(a => a.RelativePath.Contains(assetFilter, StringComparison.InvariantCultureIgnoreCase));
+				else
+				{
+					try
+					{
+						var g = new Glob(assetFilter, GlobOptions.Compiled);
+						query = query.Where(a => g.IsMatch(a.RelativePath));
+					}
+					catch { }
+				}
+
+			}
+
+
+			return query;
+
 		}
 
 		private void DrawSelectItemsModal()
 		{
 			ImGui.OpenPopup("sag.entries.add");
 
-
 			ImGui.BeginPopupModal("sag.entries.add", ref selectItemsModal, ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysAutoResize);
 
+			var query = DrawImageListAssetsFilter("sag.entries.add.filter");
+
+			ImGui.SameLine();
+
+			if (ImGui.Button("Toggle Selection##sag.entries.add.toggle"))
+			{
+				foreach (var asset in query)
+				{
+					if (modalSelectedAssets.Contains(asset))
+						modalSelectedAssets.Remove(asset);
+					else
+						modalSelectedAssets.Add(asset);
+				}
+			}
+
+			query = query.OrderByDescending(asset => modalSelectedAssets.Contains(asset));
 
 			int i = 0;
 
 			ImGui.BeginChild("sag.entries.add.items", new Vector2(600, 600));
 
-			foreach (var asset in AppGame.AssetManager.ImageListAssets)
+			foreach (var asset in query)
 			{
 				bool selected = modalSelectedAssets.Contains(asset);
 
@@ -245,7 +334,7 @@ namespace DataManager.Panels
 
 			ImGui.EndChild();
 
-			if (ImGui.Button("Cancel"))
+			if (ImGui.Button("Cancel##sag.entries.add.cancel"))
 			{
 				selectItemsModal = false;
 				modalSelectedAssets.Clear();
@@ -253,7 +342,7 @@ namespace DataManager.Panels
 
 			ImGui.SameLine();
 
-			if (ImGui.Button("Ok"))
+			if (ImGui.Button("Ok##sag.entries.add.ok"))
 			{
 				selectItemsModal = false;
 				selectItemsFor.SetAssets(modalSelectedAssets);
