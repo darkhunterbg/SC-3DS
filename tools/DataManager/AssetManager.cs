@@ -70,6 +70,8 @@ namespace DataManager
 		public List<SpriteSheetAsset> SpriteSheets { get; private set; } = new List<SpriteSheetAsset>();
 		public List<GameImageAsset> Images { get; private set; } = new List<GameImageAsset>();
 
+		private Dictionary<string, List<GuiTexture>> loadedSheetImages = new Dictionary<string, List<GuiTexture>>();
+
 		private CsvConfiguration csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
 		{
 			Delimiter = ",",
@@ -89,7 +91,7 @@ namespace DataManager
 			LoadPalettes();
 			ReloadImageListAssets();
 			ReloadSpriteAtlasAssets();
-			ReloadGameImages();
+			ReloadImages();
 		}
 
 		public void ReloadImageListAssets()
@@ -100,6 +102,7 @@ namespace DataManager
 			{
 				ImageListAssets.Add(new ImageListAsset(file));
 			}
+
 		}
 
 		public void ReloadSpriteAtlasAssets()
@@ -154,20 +157,72 @@ namespace DataManager
 				SpriteSheets.AddRange(csv.GetRecords<SpriteSheetAsset>());
 			}
 
+
+			foreach (var sheet in SpriteSheets)
+			{
+				var atlas = SpriteAtlasAssets.FirstOrDefault(a => a.Name == sheet.Atlas);
+				if (atlas != null)
+				{
+					var subAtlas = atlas.SubAtlases.Skip(sheet.SubAtlasId).FirstOrDefault();
+					sheet.AfterDeserializationInit(subAtlas);
+				}
+			}
 		}
 
-		public void ReloadGameImages()
+		public void ReloadImages()
 		{
+			foreach (var tex in loadedSheetImages.SelectMany(s => s.Value))
+				tex.Dispose();
+
+			loadedSheetImages.Clear();
+
 			Images.Clear();
 
-			if (!File.Exists(GameImagesDataPath))
-				return;
-
-			using (var csv = new CsvReader(new StreamReader(GameImagesDataPath), csvConfig))
+			if (File.Exists(GameImagesDataPath))
 			{
-				Images.AddRange(csv.GetRecords<GameImageAsset>());
+				using (var csv = new CsvReader(new StreamReader(GameImagesDataPath), csvConfig))
+				{
+					Images.AddRange(csv.GetRecords<GameImageAsset>());
+				}
 			}
 
+			foreach (var sheet in SpriteSheets)
+			{
+				var item = Images.FirstOrDefault(i => i.SpriteSheetName == sheet.SheetName);
+				if (item != null)
+				{
+					item.SpriteSheet = sheet;
+				}
+				else
+				{
+					item = new GameImageAsset(sheet);
+					Images.Add(item);
+				}
+			}
+
+
+			Images = Images.OrderBy(i => i.SpriteSheetName).ToList();
+		}
+
+		public GuiTexture GetSheetImage(string sheetName, int frameIndex)
+		{
+			loadedSheetImages.TryGetValue(sheetName, out var images);
+
+			if (images == null)
+			{
+				var sheet = SpriteSheets.First(s => s.SheetName == sheetName);
+
+				images = new List<GuiTexture>();
+				loadedSheetImages[sheetName] = images;
+
+				for (int i = 0; i < sheet.Frames; ++i)
+				{
+					var tex = Texture2D.FromFile(AppGame.Device, sheet.Images.GetFrameFilePath(i));
+					images.Add(new GuiTexture(tex));
+				}
+				//var list = sheet.SubAtlas.ImageLists[sheet.]
+			}
+			return images[frameIndex];
 		}
 
 		private void LoadPalettes()
@@ -370,7 +425,7 @@ namespace DataManager
 			SpriteAtlasAssets.Add(spriteAtlas);
 
 			SpriteSheets.RemoveAll(t => t.Atlas == atlasName);
-			SpriteSheets.AddRange( spriteAtlas.SubAtlases.SelectMany(a => a.GenerateSpriteSheets()));
+			SpriteSheets.AddRange(spriteAtlas.SubAtlases.SelectMany(a => a.GenerateSpriteSheets()));
 
 			var records = SpriteAtlasAssets.SelectMany(s => s.SubAtlases).OrderBy(t => t.AtlasName).ThenBy(t => t.AtlasIndex);
 
@@ -430,6 +485,14 @@ namespace DataManager
 				p.Kill();
 			});
 
+		}
+
+		public void SaveImages()
+		{
+			using (var csv = new CsvWriter(new StreamWriter(GameImagesDataPath), csvConfig))
+			{
+				csv.WriteRecords(Images);
+			}
 		}
 	}
 }

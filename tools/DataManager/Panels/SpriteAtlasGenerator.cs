@@ -40,7 +40,6 @@ namespace DataManager.Panels
 
 			foreach (var l in imageList)
 			{
-
 				var item = AppGame.AssetManager.ImageListAssets.FirstOrDefault(a => a.RelativePath == l);
 				if (item == null || Assets.Contains(item))
 					continue;
@@ -433,6 +432,8 @@ namespace DataManager.Panels
 				yield return null;
 			}
 
+
+			AppGame.AssetManager.ReloadImages();
 
 		}
 

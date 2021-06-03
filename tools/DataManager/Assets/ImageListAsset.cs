@@ -14,6 +14,7 @@ namespace DataManager.Assets
 		{
 			public string fileName;
 			public Rectangle rect;
+
 		}
 
 		public string InfoFilePath { get; private set; }
@@ -56,6 +57,11 @@ namespace DataManager.Assets
 					rect = rect
 				});
 			}
+		}
+
+		public string GetFrameFilePath(int i)
+		{
+			return $"{AssetManager.ConvertedAssetDir}{RelativePath}\\{Frames[i].fileName}";
 		}
 	}
 }

@@ -124,13 +124,19 @@
   {
     "OutputName": "unit_wirefram_wirefram",
     "ImageList": [
-      "unit\\wirefram\\wirefram"
+      "unit\\wirefram\\wirefram",
+      "unit\\wirefram\\wirefram\\000",
+      "unit\\wirefram\\wirefram\\007",
+      "unit\\wirefram\\wirefram\\106"
     ]
   },
   {
     "OutputName": "unit_wirefram_grpwire",
     "ImageList": [
-      "unit\\wirefram\\grpwire"
+      "unit\\wirefram\\grpwire",
+      "unit\\wirefram\\grpwire\\000",
+      "unit\\wirefram\\grpwire\\007",
+      "unit\\wirefram\\grpwire\\106"
     ]
   },
   {

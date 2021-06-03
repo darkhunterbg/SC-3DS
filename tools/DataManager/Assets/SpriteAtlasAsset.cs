@@ -66,5 +66,17 @@ namespace DataManager.Assets
 			}
 			return result;
 		}
+
+		public ImageListAsset GetImageListAtOffset(int offset)
+		{
+			int i = 0;
+			while (offset > 0)
+			{
+				offset -= ImageLists[i].Frames.Count;
+				++i;
+			}
+
+			return ImageLists[i];
+		}
 	}
 }

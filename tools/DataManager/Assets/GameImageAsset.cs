@@ -18,7 +18,16 @@ namespace DataManager.Assets
 		[Index(1)]
 		public bool GraphicsTurns { get; set; }
 
+		[Index(2)]
+		public bool UnitColor { get; set; }
+
 		public GameImageAsset() { }
+
+		public GameImageAsset(SpriteSheetAsset asset)
+		{
+			SpriteSheet = asset;
+			SpriteSheetName = asset.SheetName;
+		}
 
 	}
 }

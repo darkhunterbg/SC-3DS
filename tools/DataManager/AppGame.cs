@@ -93,6 +93,8 @@ namespace DataManager
 
 			Gui.Draw(clientSize);
 
+			//ImGui.ShowDemoWindow();
+
 			ImGui.PopFont();
 
 			GuiRenderer.EndLayout();
