@@ -60,11 +60,13 @@ namespace DataManager
 		public static readonly string tex3dsPath = "C:\\devkitPro\\tools\\bin\\tex3ds.exe";
 
 		public static readonly string SpriteAtlasDataPath = $"{GameDataDir}atlases.csv";
+		public static readonly string SpriteSheetDataPath = $"{GameDataDir}spritesheets.csv";
 
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();
 
 		public List<ImageListAsset> ImageListAssets { get; private set; } = new List<ImageListAsset>();
 		public List<SpriteAtlasAsset> SpriteAtlasAssets { get; private set; } = new List<SpriteAtlasAsset>();
+		public List<SpriteSheetAsset> SpriteSheets { get; private set; } = new List<SpriteSheetAsset>();
 
 		private CsvConfiguration csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
 		{
@@ -100,7 +102,7 @@ namespace DataManager
 		public void ReloadSpriteAtlasAssets()
 		{
 			SpriteAtlasAssets.Clear();
-
+		
 			List<IGrouping<string, SpriteSubAtlas>> atlasRecords = null;
 
 			using (var csv = new CsvReader(new StreamReader(SpriteAtlasDataPath), csvConfig))
@@ -137,6 +139,13 @@ namespace DataManager
 				SpriteAtlasAssets.Add(s);
 
 				s.SetSubAtlases(group);
+			}
+
+			SpriteSheets.Clear();
+
+			using (var csv = new CsvReader(new StreamReader(SpriteSheetDataPath), csvConfig))
+			{
+				SpriteSheets.AddRange(csv.GetRecords<SpriteSheetAsset>());
 			}
 
 		}
@@ -340,12 +349,20 @@ namespace DataManager
 			SpriteAtlasAssets.RemoveAll(t => t.Name == atlasName);
 			SpriteAtlasAssets.Add(spriteAtlas);
 
+			SpriteSheets.RemoveAll(t => t.Atlas == atlasName);
+			SpriteSheets.AddRange( spriteAtlas.SubAtlases.SelectMany(a => a.GenerateSpriteSheets()));
+
 			var records = SpriteAtlasAssets.SelectMany(s => s.SubAtlases).OrderBy(t => t.AtlasName).ThenBy(t => t.AtlasIndex);
 
 
 			using (var csv = new CsvWriter(new StreamWriter(SpriteAtlasDataPath), csvConfig))
 			{
 				csv.WriteRecords(records);
+			}
+
+			using (var csv = new CsvWriter(new StreamWriter(SpriteSheetDataPath), csvConfig))
+			{
+				csv.WriteRecords(SpriteSheets);
 			}
 		}
 
