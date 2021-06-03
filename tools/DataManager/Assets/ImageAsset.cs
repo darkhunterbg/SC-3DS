@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
-	public class GameImageAsset
+	public class ImageAsset
 	{
 		[Ignore]
 		public SpriteSheetAsset SpriteSheet { get; set; }
@@ -21,9 +21,9 @@ namespace DataManager.Assets
 		[Index(2)]
 		public bool UnitColor { get; set; }
 
-		public GameImageAsset() { }
+		public ImageAsset() { }
 
-		public GameImageAsset(SpriteSheetAsset asset)
+		public ImageAsset(SpriteSheetAsset asset)
 		{
 			SpriteSheet = asset;
 			SpriteSheetName = asset.SheetName;

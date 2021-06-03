@@ -1,4 +1,5 @@
-﻿using DataManager.Panels;
+﻿using DataManager.Assets;
+using DataManager.Panels;
 using ImGuiNET;
 using System;
 using System.Collections;
@@ -18,6 +19,7 @@ namespace DataManager
 		public AssetConverter AssetConverter { get; private set; } = new AssetConverter();
 		public SpriteAtlasGenerator SpriteAtlasGenerator { get; private set; } = new SpriteAtlasGenerator();
 		public ImageEditor ImageEditor { get; private set; } = new ImageEditor();
+		public SpriteEditor SpriteEditor { get; private set; } = new SpriteEditor();
 
 		private List<IEnumerator> coroutines = new List<IEnumerator>();
 
@@ -50,6 +52,7 @@ namespace DataManager
 			AssetConverter.Draw();
 			SpriteAtlasGenerator.Draw();
 			ImageEditor.Draw();
+			SpriteEditor.Draw(clientSize);
 
 			UpdateCoroutines();
 		}
@@ -68,6 +71,35 @@ namespace DataManager
 			return coroutines.Count > 0;
 		}
 
+
+		public static void StrechNextItem()
+		{
+			ImGui.SetNextItemWidth(-float.Epsilon);
+		}
+
+		public static void DrawSpriteSheetInfo(SpriteSheetAsset ss)
+		{
+			ImGui.Text($"Dimensions: {ss.Width}x{ss.Height}");
+			ImGui.SameLine();
+
+
+			if (ss.SubAtlas != null)
+			{
+				ImGui.Text($"Frames: {ss.Frames}");
+
+				for (int i = 0; i < ss.Frames; ++i)
+				{
+					var tex = AppGame.AssetManager.GetSheetImage(ss.SheetName, i);
+
+					if (i % 16 > 0)
+						ImGui.SameLine();
+
+					ImGui.Image(tex.GuiImage, new Vector2(tex.Texture.Width, tex.Texture.Height));
+
+				}
+
+			}
+		}
 
 		public static bool ProgressDialog(string text, int count, int total, bool cancelable = false)
 		{

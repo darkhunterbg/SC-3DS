@@ -1,0 +1,4 @@
+Name,Image,BarSize,SelType,SelY
+Marine,unit\terran\marine,6,0,9
+MarineRemnants,unit\terran\tmadeath,6,0,11
+SCV,unit\terran\scv,7,0,11

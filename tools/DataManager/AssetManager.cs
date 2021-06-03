@@ -61,14 +61,16 @@ namespace DataManager
 
 		public static readonly string SpriteAtlasDataPath = $"{GameDataDir}atlases.csv";
 		public static readonly string SpriteSheetDataPath = $"{GameDataDir}spritesheets.csv";
-		public static readonly string GameImagesDataPath = $"{GameDataDir}images.csv";
+		public static readonly string ImagesDataPath = $"{GameDataDir}images.csv";
+		public static readonly string SpritesDataPath = $"{GameDataDir}sprites.csv";
 
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();
 
 		public List<ImageListAsset> ImageListAssets { get; private set; } = new List<ImageListAsset>();
 		public List<SpriteAtlasAsset> SpriteAtlasAssets { get; private set; } = new List<SpriteAtlasAsset>();
 		public List<SpriteSheetAsset> SpriteSheets { get; private set; } = new List<SpriteSheetAsset>();
-		public List<GameImageAsset> Images { get; private set; } = new List<GameImageAsset>();
+		public List<ImageAsset> Images { get; private set; } = new List<ImageAsset>();
+		public List<SpriteAsset> Sprites { get; private set; } = new List<SpriteAsset>();
 
 		private Dictionary<string, List<GuiTexture>> loadedSheetImages = new Dictionary<string, List<GuiTexture>>();
 
@@ -92,6 +94,7 @@ namespace DataManager
 			ReloadImageListAssets();
 			ReloadSpriteAtlasAssets();
 			ReloadImages();
+			ReloadSprites();
 		}
 
 		public void ReloadImageListAssets()
@@ -178,11 +181,11 @@ namespace DataManager
 
 			Images.Clear();
 
-			if (File.Exists(GameImagesDataPath))
+			if (File.Exists(ImagesDataPath))
 			{
-				using (var csv = new CsvReader(new StreamReader(GameImagesDataPath), csvConfig))
+				using (var csv = new CsvReader(new StreamReader(ImagesDataPath), csvConfig))
 				{
-					Images.AddRange(csv.GetRecords<GameImageAsset>());
+					Images.AddRange(csv.GetRecords<ImageAsset>());
 				}
 			}
 
@@ -195,13 +198,31 @@ namespace DataManager
 				}
 				else
 				{
-					item = new GameImageAsset(sheet);
+					item = new ImageAsset(sheet);
 					Images.Add(item);
 				}
 			}
 
 
 			Images = Images.OrderBy(i => i.SpriteSheetName).ToList();
+		}
+
+		public void ReloadSprites()
+		{
+			Sprites.Clear();
+
+			if (!File.Exists(SpritesDataPath))
+				return;
+			using (var csv = new CsvReader(new StreamReader(SpritesDataPath), csvConfig))
+			{
+				Sprites.AddRange(csv.GetRecords<SpriteAsset>());
+			}
+
+			foreach (var s in Sprites)
+			{
+				var img = Images.FirstOrDefault(ss => ss.SpriteSheetName == s.ImageName);
+				s.OnAfterDeserialize(img);
+			}
 		}
 
 		public GuiTexture GetSheetImage(string sheetName, int frameIndex)
@@ -489,9 +510,17 @@ namespace DataManager
 
 		public void SaveImages()
 		{
-			using (var csv = new CsvWriter(new StreamWriter(GameImagesDataPath), csvConfig))
+			using (var csv = new CsvWriter(new StreamWriter(ImagesDataPath), csvConfig))
 			{
 				csv.WriteRecords(Images);
+			}
+		}
+
+		public void SaveSprites()
+		{
+			using (var csv = new CsvWriter(new StreamWriter(SpritesDataPath), csvConfig))
+			{
+				csv.WriteRecords(Sprites);
 			}
 		}
 	}

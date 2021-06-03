@@ -15,7 +15,8 @@ namespace DataManager.Panels
 	{
 		private bool changed = false;
 		private string filter = string.Empty;
-		private GameImageAsset hoverItem = null;
+		private ImageAsset hoverItem = null;
+		private ImageAsset tableSelection = null;
 
 		public void Draw()
 		{
@@ -29,7 +30,8 @@ namespace DataManager.Panels
 			ImGui.InputText("##ie.filter", ref filter, 255);
 
 
-			if (!ImGui.BeginTable("##ie.items", 3, ImGuiTableFlags.Sortable | ImGuiTableFlags.BordersInnerH
+			if (!ImGui.BeginTable("##ie.items", 3, ImGuiTableFlags.Sortable | ImGuiTableFlags.PreciseWidths
+				| ImGuiTableFlags.SizingStretchProp
 					| ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable))
 				return;
 
@@ -39,7 +41,7 @@ namespace DataManager.Panels
 			ImGui.TableSetupColumn("Unit Color");
 			ImGui.TableHeadersRow();
 
-			IEnumerable<GameImageAsset> query = QueryData();
+			IEnumerable<ImageAsset> query = QueryData(filter);
 
 			int i = 0;
 
@@ -61,7 +63,7 @@ namespace DataManager.Panels
 			}
 		}
 
-		private void TableRow(int i, GameImageAsset item)
+		private void TableRow(int i, ImageAsset item)
 		{
 
 			ImGui.TableNextColumn();
@@ -87,32 +89,23 @@ namespace DataManager.Panels
 				item.UnitColor = value;
 				changed = true;
 			}
+
+			bool selected = tableSelection == item;
+
+			ImGui.SameLine();
+
+			if (ImGui.Selectable($"##ie.items.{i}.selected", ref selected, ImGuiSelectableFlags.SpanAllColumns))
+			{
+				if (selected)
+					tableSelection = item;
+				else
+					tableSelection = null;
+			}
 		}
 
-		private IEnumerable<GameImageAsset> QueryData()
+		private IEnumerable<ImageAsset> QueryData(string f)
 		{
-			IEnumerable<GameImageAsset> query = AppGame.AssetManager.Images;
-
-			if (!string.IsNullOrEmpty(filter))
-			{
-				if (!filter.Contains('*') &&
-					!filter.Contains('?') &&
-					!filter.Contains('[') &&
-					!filter.Contains('{'))
-
-					query = query.Where(a => a.SpriteSheetName.Contains(filter, StringComparison.InvariantCultureIgnoreCase));
-				else
-				{
-					try
-					{
-						var g = new Glob(filter, GlobOptions.Compiled);
-						query = query.Where(a => g.IsMatch(a.SpriteSheetName));
-					}
-					catch { }
-				}
-
-			}
-
+			IEnumerable<ImageAsset> query = GetImages(f);
 
 			var sort = ImGui.TableGetSortSpecs();
 
@@ -143,6 +136,33 @@ namespace DataManager.Panels
 			return query;
 		}
 
+		public static IEnumerable<ImageAsset> GetImages(string f)
+		{
+			IEnumerable<ImageAsset> query = AppGame.AssetManager.Images;
+
+			if (!string.IsNullOrEmpty(f))
+			{
+				if (!f.Contains('*') &&
+					!f.Contains('?') &&
+					!f.Contains('[') &&
+					!f.Contains('{'))
+
+					query = query.Where(a => a.SpriteSheetName.Contains(f, StringComparison.InvariantCultureIgnoreCase));
+				else
+				{
+					try
+					{
+						var g = new Glob(f, GlobOptions.Compiled);
+						query = query.Where(a => g.IsMatch(a.SpriteSheetName));
+					}
+					catch { }
+				}
+
+			}
+
+			return query;
+		}
+
 		private void DrawHoverItemTooltip()
 		{
 			if (hoverItem == null)
@@ -152,48 +172,7 @@ namespace DataManager.Panels
 
 			ImGui.BeginTooltip();
 
-			ImGui.Text($"Dimensions: {hoverItem.SpriteSheet.Width}x{hoverItem.SpriteSheet.Height}");
-			ImGui.SameLine();
-
-
-			if (hoverItem.SpriteSheet.SubAtlas != null)
-			{
-				ImGui.Text($"Frames: {hoverItem.SpriteSheet.Frames}");
-
-				for (int i = 0; i < hoverItem.SpriteSheet.Frames; ++i)
-				{
-					var tex = AppGame.AssetManager.GetSheetImage(hoverItem.SpriteSheetName, i);
-
-					if (i % 16 > 0)
-						ImGui.SameLine();
-
-					ImGui.Image(tex.GuiImage, new Vector2(tex.Texture.Width, tex.Texture.Height));
-					
-				}
-
-			}
-
-			//if (loaded != null)
-			//{
-			//	ImGui.Text($"Dimensions: {loaded.MaxWidth}x{loaded.MaxHeight}");
-			//	ImGui.Text($"Frames: {loaded.NumberOfFrames}");
-
-			//	Vector2 uv = new Vector2(loaded.Preview.Width, loaded.Preview.Height);
-			//	Vector2 size = new Vector2(loaded.MaxWidth, loaded.MaxHeight);
-			//	int multiplier = 1;
-			//	if (size.X <= 128 && size.Y <= 128)
-			//		multiplier = 2;
-			//	if (size.X <= 64 && size.Y <= 64)
-			//		multiplier = 4;
-			//	//if (size.X <= 32 && size.Y <= 32)
-			//	//	multiplier = 8;
-
-			//	ImGui.Image(previewTexture.GuiImage, uv * multiplier, Vector2.Zero, uv / previewTexture.Texture.Width);
-			//}
-			//else
-			//{
-			//	ImGui.TextColored(Microsoft.Xna.Framework.Color.Red.ToVec4(), "Failed to load image data.");
-			//}
+			AppGui.DrawSpriteSheetInfo(hoverItem.SpriteSheet);
 
 			ImGui.EndTooltip();
 		}
