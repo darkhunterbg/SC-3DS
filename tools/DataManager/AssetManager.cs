@@ -101,12 +101,34 @@ namespace DataManager
 		{
 			SpriteAtlasAssets.Clear();
 
-			List<IGrouping<string, SpriteAtlasRecord>> atlasRecords = null;
+			List<IGrouping<string, SpriteSubAtlas>> atlasRecords = null;
 
 			using (var csv = new CsvReader(new StreamReader(SpriteAtlasDataPath), csvConfig))
 			{
-				atlasRecords = csv.GetRecords<SpriteAtlasRecord>().GroupBy(g => g.AtlasName)
+				atlasRecords = csv.GetRecords<SpriteSubAtlas>().GroupBy(g => g.AtlasName)
 					.ToList();
+			}
+
+			var sheets = Directory.GetFileSystemEntries($"{SpriteAtlasDir}", "*.t3s");
+			Dictionary<string, List<string>> sheetsInfoFiles = new Dictionary<string, List<string>>();
+
+			foreach (var sheet in sheets)
+			{
+				var info = File.ReadAllLines(sheet).Skip(1).ToList();
+				string sheetName = Path.GetFileNameWithoutExtension(sheet);
+				sheetsInfoFiles[sheetName] = info
+					.Select(f => Path.GetDirectoryName(f))
+					.Distinct()
+					.Select(i => i.Substring(ConvertedAssetDir.Length) + "\\info.txt").ToList();
+
+			}
+
+
+			foreach (var r in atlasRecords.SelectMany(s => s))
+			{
+				var atlasInfoFiles = sheetsInfoFiles[r.FullName];
+				var images = ImageListAssets.Where(s => atlasInfoFiles.Contains(s.InfoFilePath)).ToList();
+				r.ImageLists = images;
 			}
 
 			foreach (var group in atlasRecords)
@@ -114,7 +136,7 @@ namespace DataManager
 				var s = new SpriteAtlasAsset(group.Key);
 				SpriteAtlasAssets.Add(s);
 
-				s.SetRecords(group);
+				s.SetSubAtlases(group);
 			}
 
 		}
@@ -274,7 +296,7 @@ namespace DataManager
 
 			int freeSpace = (1024 * 1024 * 90) / 100;
 
-			var r = new SpriteAtlasRecord();
+			var r = new SpriteSubAtlas();
 
 			foreach (var asset in assets)
 			{
@@ -284,17 +306,17 @@ namespace DataManager
 				}
 				else
 				{
-					spriteAtlas.AddRecord(group);
+					spriteAtlas.AddSubAtlas(group);
 					group.Clear();
 				}
 			}
 
 			if (group.Count > 0)
 			{
-				spriteAtlas.AddRecord(group);
+				spriteAtlas.AddSubAtlas(group);
 			}
 
-			foreach (var atlas in spriteAtlas.Atlases)
+			foreach (var atlas in spriteAtlas.SubAtlases)
 			{
 
 				string file = atlas.InfoFilePath;
@@ -318,7 +340,7 @@ namespace DataManager
 			SpriteAtlasAssets.RemoveAll(t => t.Name == atlasName);
 			SpriteAtlasAssets.Add(spriteAtlas);
 
-			var records = SpriteAtlasAssets.SelectMany(s => s.Atlases).OrderBy(t => t.AtlasName).ThenBy(t => t.AtlasIndex);
+			var records = SpriteAtlasAssets.SelectMany(s => s.SubAtlases).OrderBy(t => t.AtlasName).ThenBy(t => t.AtlasIndex);
 
 
 			using (var csv = new CsvWriter(new StreamWriter(SpriteAtlasDataPath), csvConfig))
@@ -335,7 +357,7 @@ namespace DataManager
 			return new AsyncOperation((Action<float> report) =>
 			{
 				int i = 0;
-				foreach (var subatlas in asset.Atlases)
+				foreach (var subatlas in asset.SubAtlases)
 				{
 					++i;
 					if (done)
@@ -364,7 +386,7 @@ namespace DataManager
 					if (!string.IsNullOrEmpty(error))
 						throw new Exception($"Failed to build subatlas {subatlas.FullName}: {error}");
 
-					report((float)i / (float)asset.Atlases.Count());
+					report((float)i / (float)asset.SubAtlases.Count());
 				}
 			}, () =>
 			{

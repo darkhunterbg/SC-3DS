@@ -10,26 +10,26 @@ namespace DataManager.Assets
 {
 	public class SpriteAtlasAsset
 	{
-		private List<SpriteAtlasRecord> records = new List<SpriteAtlasRecord>();
+		private List<SpriteSubAtlas> subAtlases = new List<SpriteSubAtlas>();
 
 		public string Name { get; private set; }
 
-		public IEnumerable<SpriteAtlasRecord> Atlases => records;
+		public IEnumerable<SpriteSubAtlas> SubAtlases => subAtlases;
 
-		public void AddRecord(IEnumerable<ImageListAsset> assets)
+		public void AddSubAtlas(IEnumerable<ImageListAsset> assets)
 		{
-			records.Add(new SpriteAtlasRecord()
+			subAtlases.Add(new SpriteSubAtlas()
 			{
 				AtlasName = Name,
-				AtlasIndex = records.Count,
+				AtlasIndex = subAtlases.Count,
 				ImageLists = assets.ToList(),
 			});
 		}
 
 
-		public void SetRecords(IEnumerable<SpriteAtlasRecord> assets)
+		public void SetSubAtlases(IEnumerable<SpriteSubAtlas> assets)
 		{
-			records.AddRange(assets);
+			subAtlases.AddRange(assets);
 		}
 
 
@@ -39,7 +39,7 @@ namespace DataManager.Assets
 		}
 	}
 
-	public class SpriteAtlasRecord
+	public class SpriteSubAtlas
 	{
 		[Index(0)]
 		public string AtlasName { get; set; }
@@ -54,7 +54,6 @@ namespace DataManager.Assets
 		public string InfoFilePath => $"{ AssetManager.SpriteAtlasDir}{FullName}.t3s";
 
 		[Ignore]
-		public List<ImageListAsset> ImageLists = new List<ImageListAsset>();
-
+		public List<ImageListAsset> ImageLists { get; set; } = new List<ImageListAsset>();
 	}
 }
