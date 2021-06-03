@@ -24,7 +24,8 @@ namespace DataManager.Panels
 			hoverItem = null;
 
 			ImGui.SetNextWindowSize(new Vector2(800, 600), ImGuiCond.FirstUseEver);
-			ImGui.Begin("Image Editor##ie");
+			if (!ImGui.Begin("Image Editor##ie"))
+				return;
 
 
 			ImGui.InputText("##ie.filter", ref filter, 255);

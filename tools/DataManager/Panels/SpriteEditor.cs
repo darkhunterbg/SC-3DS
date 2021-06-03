@@ -32,7 +32,8 @@ namespace DataManager.Panels
 			hoverItem = null;
 
 			ImGui.SetNextWindowSize(new Vector2(800, 600), ImGuiCond.FirstUseEver);
-			ImGui.Begin("Sprite Editor##se");
+			if (!ImGui.Begin("Sprite Editor##se"))
+				return;
 
 			ImGui.InputText("##se.filter", ref filter, 255);
 

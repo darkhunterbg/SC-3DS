@@ -129,7 +129,8 @@ namespace DataManager.Panels
 		{
 			ImGui.SetNextWindowSize(new Vector2(800, 600), ImGuiCond.FirstUseEver);
 
-			ImGui.Begin("Asset Converter##AssetConverter");
+			if (!ImGui.Begin("Asset Converter##AssetConverter"))
+				return;
 
 			ImGui.Columns(2);
 			DrawConvertSettings();
