@@ -17,6 +17,7 @@ namespace DataManager
 
 		public AssetConverter AssetConverter { get; private set; } = new AssetConverter();
 		public SpriteAtlasGenerator SpriteAtlasGenerator { get; private set; } = new SpriteAtlasGenerator();
+		public ImageEditor ImageEditor { get; private set; } = new ImageEditor();
 
 		private List<IEnumerator> coroutines = new List<IEnumerator>();
 
@@ -48,6 +49,7 @@ namespace DataManager
 			AssetConverter.Update();
 			AssetConverter.Draw();
 			SpriteAtlasGenerator.Draw();
+			ImageEditor.Draw();
 
 			UpdateCoroutines();
 		}

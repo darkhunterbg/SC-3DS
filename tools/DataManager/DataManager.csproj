@@ -30,7 +30,7 @@
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="27.1.0" />
     <PackageReference Include="Glob" Version="1.1.8" />
-    <PackageReference Include="ImGui.NET" Version="1.78.0" />
+    <PackageReference Include="ImGui.NET" Version="1.82.0" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

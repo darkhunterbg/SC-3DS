@@ -61,12 +61,14 @@ namespace DataManager
 
 		public static readonly string SpriteAtlasDataPath = $"{GameDataDir}atlases.csv";
 		public static readonly string SpriteSheetDataPath = $"{GameDataDir}spritesheets.csv";
+		public static readonly string GameImagesDataPath = $"{GameDataDir}images.csv";
 
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();
 
 		public List<ImageListAsset> ImageListAssets { get; private set; } = new List<ImageListAsset>();
 		public List<SpriteAtlasAsset> SpriteAtlasAssets { get; private set; } = new List<SpriteAtlasAsset>();
 		public List<SpriteSheetAsset> SpriteSheets { get; private set; } = new List<SpriteSheetAsset>();
+		public List<GameImageAsset> Images { get; private set; } = new List<GameImageAsset>();
 
 		private CsvConfiguration csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
 		{
@@ -87,6 +89,7 @@ namespace DataManager
 			LoadPalettes();
 			ReloadImageListAssets();
 			ReloadSpriteAtlasAssets();
+			ReloadGameImages();
 		}
 
 		public void ReloadImageListAssets()
@@ -102,7 +105,11 @@ namespace DataManager
 		public void ReloadSpriteAtlasAssets()
 		{
 			SpriteAtlasAssets.Clear();
-		
+			SpriteSheets.Clear();
+
+			if (!File.Exists(SpriteAtlasDataPath) || !File.Exists(SpriteSheetDataPath))
+				return;
+
 			List<IGrouping<string, SpriteSubAtlas>> atlasRecords = null;
 
 			using (var csv = new CsvReader(new StreamReader(SpriteAtlasDataPath), csvConfig))
@@ -141,11 +148,24 @@ namespace DataManager
 				s.SetSubAtlases(group);
 			}
 
-			SpriteSheets.Clear();
 
 			using (var csv = new CsvReader(new StreamReader(SpriteSheetDataPath), csvConfig))
 			{
 				SpriteSheets.AddRange(csv.GetRecords<SpriteSheetAsset>());
+			}
+
+		}
+
+		public void ReloadGameImages()
+		{
+			Images.Clear();
+
+			if (!File.Exists(GameImagesDataPath))
+				return;
+
+			using (var csv = new CsvReader(new StreamReader(GameImagesDataPath), csvConfig))
+			{
+				Images.AddRange(csv.GetRecords<GameImageAsset>());
 			}
 
 		}
