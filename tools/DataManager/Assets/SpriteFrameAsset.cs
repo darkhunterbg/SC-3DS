@@ -13,6 +13,7 @@ namespace DataManager.Assets
 		[Ignore]
 		public SpriteSheetAsset SpriteSheet { get; private set; }
 
+
 		[Index(0), Name("SpriteSheet")]
 		public string SpriteSheetName { get; set; }
 

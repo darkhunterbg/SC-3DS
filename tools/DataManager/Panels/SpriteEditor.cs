@@ -74,12 +74,7 @@ namespace DataManager.Panels
 
 			first = false;
 
-			ImGui.InputText("##se.filter", ref filter, 255);
-
-			if (ImGui.Button("New Sprite##se.new"))
-			{
-				CreateNewSprite();
-			}
+			DrawControlHeader();
 
 			DrawTable();
 
@@ -89,11 +84,11 @@ namespace DataManager.Panels
 
 			DrawSpritePreview((int)width);
 
-			ImGui.SetNextItemWidth(ImGui.GetColumnWidth()-200);
+			ImGui.SetNextItemWidth(ImGui.GetColumnWidth() - 200);
 			ImGui.ColorPicker4("Background Color##se.bgcolor", ref previewBgColor, ImGuiColorEditFlags.NoInputs | ImGuiColorEditFlags.NoAlpha);
 			ImGui.Checkbox("Selection Marker##se.selectionmarker", ref showSelectionMarker);
-			ImGui.Checkbox("Bars##se.bars", ref showBars); 
-			
+			ImGui.Checkbox("Bars##se.bars", ref showBars);
+
 
 			ImGui.End();
 
@@ -104,6 +99,46 @@ namespace DataManager.Panels
 			if (changed)
 			{
 				AppGame.AssetManager.SaveSprites();
+			}
+		}
+
+		private void DrawControlHeader()
+		{
+			ImGui.InputText("##se.filter", ref filter, 255);
+
+			if (ImGui.Button("New Sprite##se.new"))
+			{
+				CreateNewSprite();
+			}
+
+			ImGui.SameLine();
+
+			if (ImGui.Button("Duplicate Selected##se.copy"))
+			{
+				if (tableSelection != null)
+				{
+					int index = AppGame.AssetManager.Sprites.IndexOf(tableSelection);
+					var newS = new LogicalSpriteAsset(tableSelection)
+					{
+						Name = $"{tableSelection.Name} copy"
+					};
+					AppGame.AssetManager.Sprites.Insert(index + 1,newS);
+					tableSelection = newS;
+					changed = true;
+				}
+			}
+
+			ImGui.SameLine();
+
+			if (ImGui.Button("Delete Selected##se.del"))
+			{
+				if (tableSelection != null)
+				{
+					AppGame.AssetManager.Sprites.Remove(tableSelection);
+					changed = true;
+					tableSelection = null;
+				}
+				
 			}
 		}
 
@@ -129,7 +164,7 @@ namespace DataManager.Panels
 					{
 						var selection = selectionFrames[itemPreview.SelectionType];
 						pos = center + selection.GetOffset();
-						pos.Y += itemPreview.SelectionY;
+						pos.Y += itemPreview.SelectionOffset;
 						sb.Draw(selection.Image.Texture, pos.ToVector2(), Microsoft.Xna.Framework.Color.LightGreen);
 					}
 				}
@@ -152,9 +187,12 @@ namespace DataManager.Panels
 					int barWidth = itemPreview.BarSize * 3 + 1;
 
 					Vector2 size = new Vector2(barWidth, 5);
-					pos = center - size / 2;
-			
-					pos.Y += frame.Image.TextureSize.Y / 2 + itemPreview.SelectionY;
+					pos = center;
+					pos.X -= size.X / 2;
+
+					pos.Y += itemPreview.BarOffset;
+
+					pos.X = (int)pos.X;
 
 					sb.DrawRectangle(pos, size, Microsoft.Xna.Framework.Color.Black);
 
@@ -197,7 +235,7 @@ namespace DataManager.Panels
 		{
 			itemPreview = tableSelection;
 
-			if (!ImGui.BeginTable("##se.items", 6, ImGuiTableFlags.BordersInnerH
+			if (!ImGui.BeginTable("##se.items", 7, ImGuiTableFlags.BordersInnerH
 		| ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable
 	))
 				return;
@@ -206,6 +244,7 @@ namespace DataManager.Panels
 			ImGui.TableSetupColumn("Name");
 			ImGui.TableSetupColumn("Image");
 			ImGui.TableSetupColumn("Bar Size");
+			ImGui.TableSetupColumn("Bar Y");
 			ImGui.TableSetupColumn("Selection");
 			ImGui.TableSetupColumn("Selection Y");
 			ImGui.TableSetupColumn(string.Empty, ImGuiTableColumnFlags.WidthFixed, 100);
@@ -270,6 +309,16 @@ namespace DataManager.Panels
 			}
 
 			ImGui.TableNextColumn();
+			number = item.BarOffset;
+			AppGui.StrechNextItem();
+			if (ImGui.InputInt($"##se.items.{i}.bary", ref number))
+			{
+				item.BarOffset = number;
+				changed = true;
+			}
+
+			ImGui.TableNextColumn();
+
 			number = item.SelectionType;
 
 			AppGui.StrechNextItem();
@@ -281,25 +330,33 @@ namespace DataManager.Panels
 			}
 
 			ImGui.TableNextColumn();
-			number = item.SelectionY;
+			number = item.SelectionOffset;
 			AppGui.StrechNextItem();
 			if (ImGui.InputInt($"##se.items.{i}.sely", ref number))
 			{
-				item.SelectionY = number;
+				item.SelectionOffset = number;
 				changed = true;
 			}
 
 			ImGui.TableNextColumn();
+			if (ImGui.Button($"Duplicate##se.items.{i}.copy"))
+			{
+				int index = AppGame.AssetManager.Sprites.IndexOf(item);
+				AppGame.AssetManager.Sprites.Insert(index + 1, new LogicalSpriteAsset(item)
+				{
+					Name = $"{item.Name} copy"
+				});
+				changed = true;
+			}
+			ImGui.SameLine();
 			if (ImGui.Button($"Delete##se.items.{i}.del"))
 			{
 				AppGame.AssetManager.Sprites.Remove(item);
 				changed = true;
 			}
 
-			bool selected = tableSelection == item;
-
 			ImGui.SameLine();
-
+			bool selected = tableSelection == item;
 
 			if (ImGui.Selectable($"##se.items.{i}.selected", ref selected, ImGuiSelectableFlags.SpanAllColumns))
 			{
@@ -326,50 +383,6 @@ namespace DataManager.Panels
 		private IEnumerable<LogicalSpriteAsset> QueryData()
 		{
 			IEnumerable<LogicalSpriteAsset> query = Util.TextFilter(AppGame.AssetManager.Sprites, filter, a => a.Name);
-
-			var sort = ImGui.TableGetSortSpecs();
-
-			unsafe
-			{
-				if (sort.NativePtr == null)
-					return query;
-			}
-
-			switch (sort.Specs.ColumnIndex)
-			{
-				case 0:
-					{
-						query = sort.Specs.SortDirection == ImGuiSortDirection.Ascending ?
-							query.OrderBy(q => q.Name) : query.OrderByDescending(q => q.Name);
-						break;
-					}
-				case 1:
-					{
-						query = sort.Specs.SortDirection == ImGuiSortDirection.Ascending ?
-							query.OrderBy(q => q.ImageName) : query.OrderByDescending(q => q.ImageName);
-						break;
-					}
-
-				case 2:
-					{
-						query = sort.Specs.SortDirection == ImGuiSortDirection.Ascending ?
-							query.OrderBy(q => q.BarSize) : query.OrderByDescending(q => q.BarSize);
-						break;
-					}
-				case 3:
-					{
-						query = sort.Specs.SortDirection == ImGuiSortDirection.Ascending ?
-							query.OrderBy(q => q.SelectionType) : query.OrderByDescending(q => q.SelectionType);
-						break;
-					}
-				case 4:
-					{
-						query = sort.Specs.SortDirection == ImGuiSortDirection.Ascending ?
-							query.OrderBy(q => q.SelectionY) : query.OrderByDescending(q => q.SelectionY);
-						break;
-					}
-
-			}
 
 			return query;
 		}

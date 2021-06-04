@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,6 +36,9 @@ namespace DataManager.Assets
 
 		[Ignore]
 		public ImageListAsset ImageAsset { get; private set; }
+
+		[Ignore]
+		public Vector2 FrameSize => ImageAsset.FrameSize;
 
 		[Ignore]
 		public List<SpriteFrameAsset> Frames { get; private set; } = new List<SpriteFrameAsset>();

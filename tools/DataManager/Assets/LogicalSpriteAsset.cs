@@ -33,11 +33,18 @@ namespace DataManager.Assets
 		[Index(2)]
 		public int BarSize { get; set; }
 
-		[Index(3), Name("SelType")]
+		[Index(3)]
+		[Name("BarY")]
+		public int BarOffset { get; set; }
+
+		[Index(4)]
+		[Name("SelType")]
 		public int SelectionType { get; set; }
 
-		[Index(4), Name("SelY")]
-		public int SelectionY { get; set; }
+		[Index(5)]
+		[Name("SelY")]
+		public int SelectionOffset { get; set; }
+
 
 		static int id = 0;
 
@@ -47,6 +54,17 @@ namespace DataManager.Assets
 		public LogicalSpriteAsset()
 		{
 			Id = ++id;
+		}
+
+		public LogicalSpriteAsset(LogicalSpriteAsset copy)
+		{
+			Id = ++id;
+			Image = copy.Image;
+			Name = copy.Name;
+			BarSize = copy.BarSize;
+			BarOffset = copy.BarOffset;
+			SelectionType = copy.SelectionType;
+			SelectionOffset = copy.SelectionOffset;
 		}
 
 		public LogicalSpriteAsset(LogicalImageAsset asset)

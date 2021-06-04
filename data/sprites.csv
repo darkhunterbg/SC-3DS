@@ -1,6 +1,8 @@
-Name,Image,BarSize,SelType,SelY
-Marine,unit\terran\marine,6,0,9
-MarineRenmants,unit\terran\tmadeath,0,0,0
-SCV,unit\terran\scv,7,0,11
-CommandCenter,unit\terran\control,36,8,8
-MineralField1,unit\neutral\min01,18,4,5
+Name,Image,BarSize,BarY,SelType,SelY
+Marine,unit\terran\marine,6,20,0,9
+MarineRenmants,unit\terran\tmadeath,0,0,0,0
+SCV,unit\terran\scv,7,24,0,11
+CommandCenter,unit\terran\control,36,56,8,8
+MineralField1,unit\neutral\min01,18,31,4,5
+MineralField2,unit\neutral\min02,18,31,4,5
+MineralField3,unit\neutral\min03,18,31,4,5
