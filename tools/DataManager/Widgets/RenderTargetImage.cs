@@ -49,6 +49,14 @@ namespace DataManager.Widgets
 			return AppGame.Gui.SpriteBatch;
 		}
 
+		public SpriteBatch BeginDraw(Microsoft.Xna.Framework.Color clearColor)
+		{
+			AppGame.Device.SetRenderTarget(RenderTarget);
+			AppGame.Device.Clear(clearColor);
+
+			return AppGame.Gui.SpriteBatch;
+		}
+
 		public void EndDraw()
 		{
 			AppGame.Device.SetRenderTarget(AppGame.Gui.BackBuffer);

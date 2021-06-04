@@ -7,10 +7,14 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
-	public class ImageAsset
+	/// <summary>
+	/// Logical data about all sprite in a SpriteSheet(GRP) and how they should be displayed
+	/// </summary>
+	public class LogicalImageAsset
 	{
 		[Ignore]
-		public SpriteSheetAsset SpriteSheet { get; set; }
+		public SpriteSheetAsset SpriteSheet { get; private set; }
+
 
 		[Index(0),Name("SpriteSheet")]
 		public string SpriteSheetName { get; set; }
@@ -21,12 +25,17 @@ namespace DataManager.Assets
 		[Index(2)]
 		public bool UnitColor { get; set; }
 
-		public ImageAsset() { }
+		public LogicalImageAsset() { }
 
-		public ImageAsset(SpriteSheetAsset asset)
+		public LogicalImageAsset(SpriteSheetAsset asset)
 		{
 			SpriteSheet = asset;
 			SpriteSheetName = asset.SheetName;
+		}
+
+		public void OnAfterDeserialized(SpriteSheetAsset asset )
+		{
+			SpriteSheet = asset;
 		}
 
 	}

@@ -15,8 +15,8 @@ namespace DataManager.Panels
 	{
 		private bool changed = false;
 		private string filter = string.Empty;
-		private ImageAsset hoverItem = null;
-		private ImageAsset tableSelection = null;
+		private LogicalImageAsset hoverItem = null;
+		private LogicalImageAsset tableSelection = null;
 
 		public void Draw()
 		{
@@ -42,7 +42,7 @@ namespace DataManager.Panels
 			ImGui.TableSetupColumn("Unit Color");
 			ImGui.TableHeadersRow();
 
-			IEnumerable<ImageAsset> query = QueryData(filter);
+			IEnumerable<LogicalImageAsset> query = QueryData(filter);
 
 			int i = 0;
 
@@ -64,7 +64,7 @@ namespace DataManager.Panels
 			}
 		}
 
-		private void TableRow(int i, ImageAsset item)
+		private void TableRow(int i, LogicalImageAsset item)
 		{
 
 			ImGui.TableNextColumn();
@@ -104,9 +104,9 @@ namespace DataManager.Panels
 			}
 		}
 
-		private IEnumerable<ImageAsset> QueryData(string f)
+		private IEnumerable<LogicalImageAsset> QueryData(string f)
 		{
-			IEnumerable<ImageAsset> query = GetImages(f);
+			IEnumerable<LogicalImageAsset> query = GetImages(f);
 
 			var sort = ImGui.TableGetSortSpecs();
 
@@ -137,7 +137,7 @@ namespace DataManager.Panels
 			return query;
 		}
 
-		public static IEnumerable<ImageAsset> GetImages(string f)
+		public static IEnumerable<LogicalImageAsset> GetImages(string f)
 		{
 			return Util.TextFilter(AppGame.AssetManager.Images, f, a => a.SpriteSheetName);
 		}

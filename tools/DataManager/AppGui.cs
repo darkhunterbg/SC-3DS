@@ -166,9 +166,9 @@ namespace DataManager
 
 			if (ss.SubAtlas != null)
 			{
-				ImGui.Text($"Frames: {ss.Frames}");
+				ImGui.Text($"Frames: {ss.TotalFrames}");
 
-				for (int i = 0; i < ss.Frames; ++i)
+				for (int i = 0; i < ss.TotalFrames; ++i)
 				{
 					var tex = AppGame.AssetManager.GetSheetImage(ss.SheetName, i);
 

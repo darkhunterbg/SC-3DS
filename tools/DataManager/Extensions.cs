@@ -36,6 +36,15 @@ namespace DataManager
 		}
 	}
 
+	public static class Vector4Exptensions
+	{
+		public static Microsoft.Xna.Framework.Color ToColor(this Vector4 v)
+		{
+			return new Microsoft.Xna.Framework.Color(v.X, v.Y, v.Z, v.W);
+		}
+
+	}
+
 	public static class Texture2DExtensions
 	{
 		public static void SaveAsPng(this Texture2D texture, string fileName)

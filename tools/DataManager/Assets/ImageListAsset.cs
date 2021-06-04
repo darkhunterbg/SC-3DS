@@ -1,8 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,7 +14,7 @@ namespace DataManager.Assets
 		public class FrameData
 		{
 			public string fileName;
-			public Rectangle rect;
+			public Microsoft.Xna.Framework.Rectangle rect;
 
 		}
 
@@ -43,7 +44,7 @@ namespace DataManager.Assets
 			{
 				spl = e.Split(' ');
 
-				Rectangle rect = new Rectangle();
+				Microsoft.Xna.Framework.Rectangle rect = new Microsoft.Xna.Framework.Rectangle();
 				rect.X = int.Parse(spl[1]);
 				rect.Y = int.Parse(spl[2]);
 				rect.Width = int.Parse(spl[3]);

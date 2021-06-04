@@ -50,6 +50,7 @@ namespace DataManager
 	}
 
 
+
 	public class AssetManager
 	{
 		public static readonly string PalettePath = "../../palettes/";
@@ -65,14 +66,15 @@ namespace DataManager
 		public static readonly string SpriteSheetDataPath = $"{GameDataDir}spritesheets.csv";
 		public static readonly string ImagesDataPath = $"{GameDataDir}images.csv";
 		public static readonly string SpritesDataPath = $"{GameDataDir}sprites.csv";
+		public static readonly string FramesDataPath = $"{GameDataDir}frames.csv";
 
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();
 
 		public List<ImageListAsset> ImageListAssets { get; private set; } = new List<ImageListAsset>();
 		public List<SpriteAtlasAsset> SpriteAtlasAssets { get; private set; } = new List<SpriteAtlasAsset>();
 		public List<SpriteSheetAsset> SpriteSheets { get; private set; } = new List<SpriteSheetAsset>();
-		public List<ImageAsset> Images { get; private set; } = new List<ImageAsset>();
-		public List<SpriteAsset> Sprites { get; private set; } = new List<SpriteAsset>();
+		public List<LogicalImageAsset> Images { get; private set; } = new List<LogicalImageAsset>();
+		public List<LogicalSpriteAsset> Sprites { get; private set; } = new List<LogicalSpriteAsset>();
 
 		private Dictionary<string, List<GuiTexture>> loadedSheetImages = new Dictionary<string, List<GuiTexture>>();
 
@@ -187,7 +189,7 @@ namespace DataManager
 			{
 				using (var csv = new CsvReader(new StreamReader(ImagesDataPath), csvConfig))
 				{
-					Images.AddRange(csv.GetRecords<ImageAsset>());
+					Images.AddRange(csv.GetRecords<LogicalImageAsset>());
 				}
 			}
 
@@ -196,11 +198,11 @@ namespace DataManager
 				var item = Images.FirstOrDefault(i => i.SpriteSheetName == sheet.SheetName);
 				if (item != null)
 				{
-					item.SpriteSheet = sheet;
+					item.OnAfterDeserialized(sheet);
 				}
 				else
 				{
-					item = new ImageAsset(sheet);
+					item = new LogicalImageAsset(sheet);
 					Images.Add(item);
 				}
 			}
@@ -219,7 +221,7 @@ namespace DataManager
 				return;
 			using (var csv = new CsvReader(new StreamReader(SpritesDataPath), csvConfig))
 			{
-				Sprites.AddRange(csv.GetRecords<SpriteAsset>());
+				Sprites.AddRange(csv.GetRecords<LogicalSpriteAsset>());
 			}
 
 			foreach (var s in Sprites)
@@ -228,6 +230,7 @@ namespace DataManager
 				s.OnAfterDeserialize(img);
 			}
 		}
+
 
 		public GuiTexture GetSheetImage(string sheetName, int frameIndex)
 		{
@@ -243,9 +246,9 @@ namespace DataManager
 				images = new List<GuiTexture>();
 				loadedSheetImages[sheetName] = images;
 
-				for (int i = 0; i < sheet.Frames; ++i)
+				for (int i = 0; i < sheet.TotalFrames; ++i)
 				{
-					var tex = Texture2D.FromFile(AppGame.Device, sheet.Images.GetFrameFilePath(i));
+					var tex = Texture2D.FromFile(AppGame.Device, sheet.ImageAsset.GetFrameFilePath(i));
 					images.Add(new GuiTexture(tex));
 				}
 				//var list = sheet.SubAtlas.ImageLists[sheet.]
@@ -457,6 +460,7 @@ namespace DataManager
 
 			var records = SpriteAtlasAssets.SelectMany(s => s.SubAtlases).OrderBy(t => t.AtlasName).ThenBy(t => t.AtlasIndex);
 
+			var frames = SpriteSheets.SelectMany(s => s.Frames).OrderBy(f => f.SpriteSheetName);
 
 			using (var csv = new CsvWriter(new StreamWriter(SpriteAtlasDataPath), csvConfig))
 			{
@@ -466,6 +470,11 @@ namespace DataManager
 			using (var csv = new CsvWriter(new StreamWriter(SpriteSheetDataPath), csvConfig))
 			{
 				csv.WriteRecords(SpriteSheets);
+			}
+
+			using (var csv = new CsvWriter(new StreamWriter(FramesDataPath), csvConfig))
+			{
+				csv.WriteRecords(frames);
 			}
 		}
 

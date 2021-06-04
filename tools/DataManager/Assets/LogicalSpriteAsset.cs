@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
-	public class SpriteAsset
+	public class LogicalSpriteAsset
 	{
-		private ImageAsset _img;
+		private LogicalImageAsset _img;
 		[Ignore]
-		public ImageAsset Image
+		public LogicalImageAsset Image
 		{
 			get
 			{
@@ -44,17 +44,17 @@ namespace DataManager.Assets
 		[Ignore]
 		public readonly int Id;
 
-		public SpriteAsset()
+		public LogicalSpriteAsset()
 		{
 			Id = ++id;
 		}
 
-		public SpriteAsset(ImageAsset asset)
+		public LogicalSpriteAsset(LogicalImageAsset asset)
 		{
 			Id = ++id;
 			Image = asset;
 		}
-		public void OnAfterDeserialize(ImageAsset asset)
+		public void OnAfterDeserialize(LogicalImageAsset asset)
 		{
 			Image = asset;
 		}

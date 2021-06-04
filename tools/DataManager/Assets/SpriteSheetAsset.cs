@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
+
+	/// <summary>
+	/// Hold info about what frames are in single Sprite Sheet (.grp)
+	/// </summary>
 	public class SpriteSheetAsset
 	{
 		[Index(0)]
@@ -17,8 +21,8 @@ namespace DataManager.Assets
 		public int SubAtlasId { get; set; }
 		[Index(3)]
 		public int SubAtlasOffset { get; set; }
-		[Index(4)]
-		public int Frames { get; set; }
+		[Index(4), Name("Frames")]
+		public int TotalFrames { get; set; }
 		[Index(5)]
 		public int UnitColorOffset { get; set; }
 		[Index(6)]
@@ -30,7 +34,15 @@ namespace DataManager.Assets
 		public SpriteSubAtlas SubAtlas { get; private set; }
 
 		[Ignore]
-		public ImageListAsset Images { get; private set; }
+		public ImageListAsset ImageAsset { get; private set; }
+
+		[Ignore]
+		public List<SpriteFrameAsset> Frames { get; private set; } = new List<SpriteFrameAsset>();
+
+		public override string ToString()
+		{
+			return SheetName;
+		}
 
 		public SpriteSheetAsset() { }
 		public SpriteSheetAsset(SpriteSubAtlas subAtlas, int imageListIndex)
@@ -41,22 +53,31 @@ namespace DataManager.Assets
 			Atlas = subAtlas.AtlasName;
 			SubAtlasId = subAtlas.AtlasIndex;
 			SubAtlasOffset = subAtlas.ImageLists.Take(imageListIndex).Sum(s => s.Frames.Count);
-			Frames = subAtlas.ImageLists[imageListIndex].Frames.Count();
+			TotalFrames = subAtlas.ImageLists[imageListIndex].Frames.Count();
 			Width = (int)imageList.FrameSize.X;
 			Height = (int)imageList.FrameSize.Y;
 
-			Images = subAtlas.ImageLists[imageListIndex];
+			ImageAsset = subAtlas.ImageLists[imageListIndex];
 
-			UnitColorOffset = Images.Frames.IndexOf(f => f.fileName.StartsWith("cm_"));
+			UnitColorOffset = ImageAsset.Frames.IndexOf(f => f.fileName.StartsWith("cm_"));
 			if (UnitColorOffset < 0)
 				UnitColorOffset = 0;
 
 			SubAtlas = subAtlas;
+
+			for (int i = 0; i < TotalFrames; ++i)
+			{
+				Frames.Add(new SpriteFrameAsset(this, i));
+			}
 		}
 		public void AfterDeserializationInit(SpriteSubAtlas subAtlas)
 		{
 			SubAtlas = subAtlas;
-			Images = subAtlas.GetImageListAtOffset(SubAtlasOffset);
+			ImageAsset = subAtlas.GetImageListAtOffset(SubAtlasOffset);
+			for (int i = 0; i < TotalFrames; ++i)
+			{
+				Frames.Add(new SpriteFrameAsset(this, i));
+			}
 		}
 
 		public int GetUnitColorFrameIndex(int frame)
