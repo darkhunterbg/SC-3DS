@@ -49,13 +49,23 @@ namespace DataManager
 
 	public static class IListExtensions
 	{
-		public static void AddNotContainet<T>(this IList<T> list, T item) where T: class
+		public static void AddNotContainet<T>(this IList<T> list, T item) where T : class
 		{
 			if (!list.Contains(item))
 				list.Add(item);
 		}
 	}
+	public static class SpriteBatchExtensions
+	{
+		public static void DrawRectangle(this SpriteBatch sb, Vector2 start, Vector2 size, Microsoft.Xna.Framework.Color color)
+		{
+			var rect = new Microsoft.Xna.Framework.Rectangle((int)start.X, (int)start.Y,
+				(int)size.X, (int)size.Y);
+			sb.Draw(AppGame.White.Texture, rect, color);
+		}
 
+
+	}
 	public static class IEnumerableExtensions
 	{
 		public static int IndexOf<T>(this IEnumerable<T> e, Func<T,bool>  f) where T : class

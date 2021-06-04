@@ -290,30 +290,9 @@ namespace DataManager.Panels
 
 		private IEnumerable<ImageListAsset> DrawImageListAssetsFilter(string id)
 		{
-			IEnumerable<ImageListAsset> query = AppGame.AssetManager.ImageListAssets;
+			IEnumerable<ImageListAsset> query = Util.TextFilter(AppGame.AssetManager.ImageListAssets, assetFilter, a => a.RelativePath);
 
 			ImGui.InputText($"##{id}", ref assetFilter, 256);
-
-			if (!string.IsNullOrEmpty(assetFilter))
-			{
-				if (!assetFilter.Contains('*') &&
-					!assetFilter.Contains('?') &&
-					!assetFilter.Contains('[') &&
-					!assetFilter.Contains('{'))
-
-					query = query.Where(a => a.RelativePath.Contains(assetFilter, StringComparison.InvariantCultureIgnoreCase));
-				else
-				{
-					try
-					{
-						var g = new Glob(assetFilter, GlobOptions.Compiled);
-						query = query.Where(a => g.IsMatch(a.RelativePath));
-					}
-					catch { }
-				}
-
-			}
-
 
 			return query;
 

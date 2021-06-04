@@ -139,29 +139,7 @@ namespace DataManager.Panels
 
 		public static IEnumerable<ImageAsset> GetImages(string f)
 		{
-			IEnumerable<ImageAsset> query = AppGame.AssetManager.Images;
-
-			if (!string.IsNullOrEmpty(f))
-			{
-				if (!f.Contains('*') &&
-					!f.Contains('?') &&
-					!f.Contains('[') &&
-					!f.Contains('{'))
-
-					query = query.Where(a => a.SpriteSheetName.Contains(f, StringComparison.InvariantCultureIgnoreCase));
-				else
-				{
-					try
-					{
-						var g = new Glob(f, GlobOptions.Compiled);
-						query = query.Where(a => g.IsMatch(a.SpriteSheetName));
-					}
-					catch { }
-				}
-
-			}
-
-			return query;
+			return Util.TextFilter(AppGame.AssetManager.Images, f, a => a.SpriteSheetName);
 		}
 
 		private void DrawHoverItemTooltip()

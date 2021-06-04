@@ -153,28 +153,7 @@ namespace DataManager.Panels
 
 			hovered = null;
 
-			IEnumerable<GRPAsset> query = rawAssets;
-
-			if (!string.IsNullOrEmpty(assetFilter))
-			{
-				if (!assetFilter.Contains('*') &&
-					!assetFilter.Contains('?') &&
-					!assetFilter.Contains('[') &&
-					!assetFilter.Contains('{'))
-
-					query = query.Where(a => a.DisplayName.Contains(assetFilter, StringComparison.InvariantCultureIgnoreCase));
-				else
-				{
-					try
-					{
-						var g = new Glob(assetFilter, GlobOptions.Compiled);
-						query = query.Where(a => g.IsMatch(a.DisplayName));
-					}
-					catch { }
-				}
-
-			}
-
+			IEnumerable<GRPAsset> query = Util.TextFilter(rawAssets, assetFilter, a => a.DisplayName);
 
 			ImGui.BeginChild("##AssetConverter.RawAssetsTable");
 			foreach (var asset in query)

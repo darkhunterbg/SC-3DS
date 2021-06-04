@@ -22,8 +22,8 @@ namespace DataManager
 		public ImageEditor ImageEditor { get; private set; } = new ImageEditor();
 		public SpriteEditor SpriteEditor { get; private set; } = new SpriteEditor();
 
-		private SpriteBatch spriteBatch;
-		private RenderTarget2D renderTarget;
+		public SpriteBatch SpriteBatch { get; private set; }
+		public RenderTarget2D BackBuffer { get; private set; }
 		private IntPtr guiRenderTarget;
 
 
@@ -37,24 +37,24 @@ namespace DataManager
 		public AppGui(AppGame game)
 		{
 			Game = game;
-			spriteBatch = new SpriteBatch(game.GraphicsDevice);
-			renderTarget = new RenderTarget2D(game.GraphicsDevice, 1, 1);
-			guiRenderTarget = AppGame.GuiRenderer.BindTexture(renderTarget);
+			SpriteBatch = new SpriteBatch(game.GraphicsDevice);
+			BackBuffer = new RenderTarget2D(game.GraphicsDevice, 1, 1);
+			guiRenderTarget = AppGame.GuiRenderer.BindTexture(BackBuffer);
 		}
 
 
 		private void ResizeRenderTarget(Vector2 size)
 		{
-			if (renderTarget.Width != size.X || renderTarget.Height != size.Y)
+			if (BackBuffer.Width != size.X || BackBuffer.Height != size.Y)
 			{
 				if (size.X > 1 && size.Y > 1)
 				{
 
 					AppGame.GuiRenderer.UnbindTexture(guiRenderTarget);
-					renderTarget.Dispose();
+					BackBuffer.Dispose();
 
-					renderTarget = new RenderTarget2D(Game.GraphicsDevice, (int)size.X, (int)size.Y);
-					guiRenderTarget = AppGame.GuiRenderer.BindTexture(renderTarget);
+					BackBuffer = new RenderTarget2D(Game.GraphicsDevice, (int)size.X, (int)size.Y);
+					guiRenderTarget = AppGame.GuiRenderer.BindTexture(BackBuffer);
 				}
 			}
 		}
@@ -76,7 +76,7 @@ namespace DataManager
 
 			ResizeRenderTarget(clientSize);
 
-			AppGame.Device.SetRenderTarget(renderTarget);
+			AppGame.Device.SetRenderTarget(BackBuffer);
 			AppGame.Device.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
 
 			AssetConverter.Update();
@@ -113,6 +113,7 @@ namespace DataManager
 		private static Stack<Vector2> sbDrawSize = new Stack<Vector2>();
 		private static Stack<Viewport> viewport = new Stack<Viewport>();
 
+
 		public static SpriteBatch SpriteBatchBegin(Vector2 size, SamplerState? samplerState =
 			null, float aspectRatio = 0)
 		{
@@ -134,22 +135,22 @@ namespace DataManager
 
 			viewport.Push(new Viewport((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y));
 
-			AppGame.Gui.spriteBatch.Begin(SpriteSortMode.Deferred,null, samplerState);
+			AppGame.Gui.SpriteBatch.Begin(SpriteSortMode.Deferred,null, samplerState);
 
 			AppGame.Device.Viewport = viewport.Peek();
 
-			return AppGame.Gui.spriteBatch;
+			return AppGame.Gui.SpriteBatch;
 		}
 
 		public static void SpriteBatchEnd()
 		{
-			AppGame.Gui.spriteBatch.End();
+			AppGame.Gui.SpriteBatch.End();
 
 			var size = sbDrawSize.Pop();
 			var vp = viewport.Pop();
 
 
-			var rtSize = new Vector2(AppGame.Gui.renderTarget.Width, AppGame.Gui.renderTarget.Height);
+			var rtSize = new Vector2(AppGame.Gui.BackBuffer.Width, AppGame.Gui.BackBuffer.Height);
 
 			Vector2 uvStart = new Vector2(vp.X, vp.Y) / rtSize;
 			Vector2 uvEnd = (new Vector2(vp.X, vp.Y) + size) / rtSize;

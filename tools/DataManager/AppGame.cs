@@ -14,6 +14,7 @@ namespace DataManager
 		private GraphicsDeviceManager _graphics;
 
 		public static ImGUIRenderer GuiRenderer { get; private set; }
+		public static GuiTexture White { get; private set; }
 		private ImFontPtr font;
 
 		public static AppGui Gui { get; private set; }
@@ -58,6 +59,11 @@ namespace DataManager
 			ImGui.GetStyle().Alpha = 1.0f;
 			ImGui.GetIO().ConfigDockingAlwaysTabBar = true;
 			GuiRenderer.RebuildFontAtlas();
+
+			Texture2D white = new Texture2D(GraphicsDevice, 1, 1);
+			white.SetData<Color>(new Color[] { Color.White });
+			White = new GuiTexture(white);
+
 
 			sb = new SpriteBatch(GraphicsDevice);
 

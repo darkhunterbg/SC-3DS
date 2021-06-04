@@ -1,4 +1,6 @@
 Name,Image,BarSize,SelType,SelY
 Marine,unit\terran\marine,6,0,9
-MarineRemnants,unit\terran\tmadeath,6,0,11
+MarineRenmants,unit\terran\tmadeath,0,0,0
 SCV,unit\terran\scv,7,0,11
+CommandCenter,unit\terran\control,36,8,8
+MineralField1,unit\neutral\min01,18,4,5

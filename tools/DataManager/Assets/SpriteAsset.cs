@@ -38,11 +38,20 @@ namespace DataManager.Assets
 
 		[Index(4), Name("SelY")]
 		public int SelectionY { get; set; }
- 
-		public SpriteAsset() { }
+
+		static int id = 0;
+
+		[Ignore]
+		public readonly int Id;
+
+		public SpriteAsset()
+		{
+			Id = ++id;
+		}
 
 		public SpriteAsset(ImageAsset asset)
 		{
+			Id = ++id;
 			Image = asset;
 		}
 		public void OnAfterDeserialize(ImageAsset asset)

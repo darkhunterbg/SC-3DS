@@ -1,7 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
 using DataManager.Assets;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -9,6 +8,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 
 namespace DataManager
 {
@@ -16,6 +16,7 @@ namespace DataManager
 	{
 		public Texture2D Texture { get; private set; }
 		public IntPtr GuiImage { get; private set; }
+		public Vector2 TextureSize => new Vector2(Texture.Width, Texture.Height);
 
 
 		public GuiTexture(Texture2D texture)
@@ -26,7 +27,8 @@ namespace DataManager
 
 		public void Dispose()
 		{
-			Texture.Dispose();
+			if (Texture != null)
+				Texture.Dispose();
 			AppGame.GuiRenderer.UnbindTexture(GuiImage);
 		}
 	}
@@ -269,7 +271,7 @@ namespace DataManager
 
 			for (int i = 0; i < t.Length; ++i)
 			{
-				Color c = new Color(t[i], t[i], t[i], (byte)255);
+				Microsoft.Xna.Framework.Color c = new Microsoft.Xna.Framework.Color(t[i], t[i], t[i], (byte)255);
 				cmdIconsPalette.Colors[i + 1] = c;
 
 			}
@@ -279,13 +281,13 @@ namespace DataManager
 				var c = Palettes["Units"].Colors[i];
 				if (c.R == c.B && c.R > 10 && c.G == 0)
 				{
-					Color remap = new Color(c.R, c.R, c.R, c.A);
+					Microsoft.Xna.Framework.Color remap = new Microsoft.Xna.Framework.Color(c.R, c.R, c.R, c.A);
 					Palettes["Units"].Remap(i, remap);
 				}
 			}
 
-			Palettes.Add("Shadow", new Palette(Color.Black) { Name = "Shadow" });
-			Palettes.Add("White", new Palette(Color.White) { Name = "White" });
+			Palettes.Add("Shadow", new Palette(Microsoft.Xna.Framework.Color.Black) { Name = "Shadow" });
+			Palettes.Add("White", new Palette(Microsoft.Xna.Framework.Color.White) { Name = "White" });
 		}
 
 		public void ConvertGRP(GRPAsset asset, GRPConvertMode convertMode)

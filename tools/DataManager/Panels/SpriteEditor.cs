@@ -1,5 +1,5 @@
 ﻿using DataManager.Assets;
-using GlobExpressions;
+using DataManager.Widgets;
 using ImGuiNET;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -30,6 +30,8 @@ namespace DataManager.Panels
 			"22px","32px","46px", "62px","72px","94px","110px","122px","146px","224px",
 		};
 
+		private Microsoft.Xna.Framework.Color BarColor = new Microsoft.Xna.Framework.Color(0xff249824);
+		private RenderTargetImage spritePreview = new RenderTargetImage(new Vector2(256, 256));
 
 		public void Draw(Vector2 clientSize)
 		{
@@ -63,7 +65,7 @@ namespace DataManager.Panels
 
 			float width = ImGui.GetColumnWidth();
 
-			DrawSpritePreview(width);
+			DrawSpritePreview((int)width);
 
 			ImGui.End();
 
@@ -77,39 +79,20 @@ namespace DataManager.Panels
 			}
 		}
 
-		private void DrawSpritePreview(float width)
+		private void DrawSpritePreview(int width)
 		{
-			Vector2 pos = new Vector2(width, width);
-
-			var sb = AppGui.SpriteBatchBegin(pos, SamplerState.PointClamp);
-
+			var sb = spritePreview.BeginDraw();
+			sb.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp);
+			Vector2 center = spritePreview.Size / 2;
+			Vector2 pos = center;
 
 			if (itemPreview != null)
 			{
 				int frame = 0;
 				if (itemPreview.Image.GraphicsTurns)
-				{
 					frame += 12;
-				}
 
 				var sprite = AppGame.AssetManager.GetSheetImage(itemPreview.Image.SpriteSheetName, frame);
-
-				var size = new Vector2(sprite.Texture.Width, sprite.Texture.Height) * 4;
-
-				pos /= 2;
-				pos -= size / 2;
-
-				var dst = new Microsoft.Xna.Framework.Rectangle((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y);
-
-				sb.Draw(sprite.Texture, dst, Microsoft.Xna.Framework.Color.White);
-
-				if (itemPreview.Image.UnitColor)
-				{
-					frame = itemPreview.Image.SpriteSheet.GetUnitColorFrameIndex(frame);
-					sprite = AppGame.AssetManager.GetSheetImage(itemPreview.Image.SpriteSheetName, frame);
-					sb.Draw(sprite.Texture, dst, Microsoft.Xna.Framework.Color.White);
-
-				}
 
 				if (itemPreview.SelectionType >= 0)
 				{
@@ -119,10 +102,52 @@ namespace DataManager.Panels
 						sheet = $"0{sheet}";
 					sheet = $"unit\\thingy\\o{sheet}";
 					var selection = AppGame.AssetManager.GetSheetImage(sheet, 0);
-					sb.Draw(selection.Texture, dst, Microsoft.Xna.Framework.Color.LightGreen);
+
+					pos = center - selection.TextureSize / 2;
+					pos.Y += itemPreview.SelectionY;
+					sb.Draw(selection.Texture, pos.ToVector2(), Microsoft.Xna.Framework.Color.LightGreen);
 				}
 
+				pos = center - sprite.TextureSize / 2;
+
+				sb.Draw(sprite.Texture, pos.ToVector2(), Microsoft.Xna.Framework.Color.White);
+
+				if (itemPreview.Image.UnitColor)
+				{
+					frame = itemPreview.Image.SpriteSheet.GetUnitColorFrameIndex(frame);
+					sprite = AppGame.AssetManager.GetSheetImage(itemPreview.Image.SpriteSheetName, frame);
+					sb.Draw(sprite.Texture, pos.ToVector2(), Microsoft.Xna.Framework.Color.Magenta);
+				}
+
+
+				if (itemPreview.BarSize > 0)
+				{
+					int barWidth = itemPreview.BarSize * 3 + 1;
+
+					Vector2 size = new Vector2(barWidth, 5);
+					pos = center - size / 2;
+					pos.Y += sprite.TextureSize.Y / 2 + itemPreview.SelectionY;
+
+					sb.DrawRectangle(pos, size, Microsoft.Xna.Framework.Color.Black);
+
+					pos += new Vector2(1, 1);
+
+					for (int i = 0; i < itemPreview.BarSize; ++i)
+					{
+						sb.DrawRectangle(pos, new Vector2(2, 3), BarColor);
+						pos.X += 3;
+					}
+				}
 			}
+
+
+			sb.End();
+			spritePreview.EndDraw();
+
+			sb = AppGui.SpriteBatchBegin(new Vector2(width, width), SamplerState.PointClamp);
+
+			sb.Draw(spritePreview.RenderTarget, new Microsoft.Xna.Framework.Rectangle(0, 0, width, width),
+				 Microsoft.Xna.Framework.Color.White);
 
 			AppGui.SpriteBatchEnd();
 		}
@@ -144,7 +169,7 @@ namespace DataManager.Panels
 		{
 			itemPreview = tableSelection;
 
-			if (!ImGui.BeginTable("##se.items", 6, ImGuiTableFlags.Sortable | ImGuiTableFlags.BordersInnerH
+			if (!ImGui.BeginTable("##se.items", 6, ImGuiTableFlags.BordersInnerH
 		| ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable
 	))
 				return;
@@ -158,24 +183,23 @@ namespace DataManager.Panels
 			ImGui.TableSetupColumn(string.Empty, ImGuiTableColumnFlags.WidthFixed, 100);
 			ImGui.TableHeadersRow();
 
-			IEnumerable<SpriteAsset> query = QueryData();
-
-			int i = 0;
+			IEnumerable<SpriteAsset> query = QueryData(); ;
 
 			foreach (var item in query.ToList())
 			{
-				++i;
 				ImGui.TableNextRow();
 
-				TableRow(i, item);
+				TableRow(item);
 
 			}
 
 			ImGui.EndTable();
 		}
 
-		private void TableRow(int i, SpriteAsset item)
+		private void TableRow(SpriteAsset item)
 		{
+			int i = item.Id;
+
 			string text = string.Empty;
 			int number = 0;
 
@@ -184,7 +208,7 @@ namespace DataManager.Panels
 			ImGui.TableNextColumn();
 			text = item.Name;
 
-			AppGui.StrechNextItem();
+			//AppGui.StrechNextItem();
 			if (ImGui.InputText($"##se.items.{i}.name", ref text, 256))
 			{
 				item.Name = text;
@@ -260,37 +284,28 @@ namespace DataManager.Panels
 
 			if (ImGui.IsItemHovered())
 			{
-				itemPreview = item;
+				if (tableSelection != null)
+				{
+					if (selected)
+						itemPreview = tableSelection;
+				}
+				else
+					itemPreview = item;
 			}
 
 		}
 
 		private IEnumerable<SpriteAsset> QueryData()
 		{
-			IEnumerable<SpriteAsset> query = AppGame.AssetManager.Sprites;
-
-			if (!string.IsNullOrEmpty(filter))
-			{
-				if (!filter.Contains('*') &&
-					!filter.Contains('?') &&
-					!filter.Contains('[') &&
-					!filter.Contains('{'))
-
-					query = query.Where(a => a.Name.Contains(filter, StringComparison.InvariantCultureIgnoreCase));
-				else
-				{
-					try
-					{
-						var g = new Glob(filter, GlobOptions.Compiled);
-						query = query.Where(a => g.IsMatch(a.Name));
-					}
-					catch { }
-				}
-
-			}
-
+			IEnumerable<SpriteAsset> query = Util.TextFilter(AppGame.AssetManager.Sprites, filter, a => a.Name);
 
 			var sort = ImGui.TableGetSortSpecs();
+
+			unsafe
+			{
+				if (sort.NativePtr == null)
+					return query;
+			}
 
 			switch (sort.Specs.ColumnIndex)
 			{
