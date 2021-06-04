@@ -1,6 +1,7 @@
 ﻿using DataManager.Assets;
 using GlobExpressions;
 using ImGuiNET;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,11 +21,15 @@ namespace DataManager.Panels
 		private SpriteAsset changeItemImage = null;
 		private ImageAsset tmp = null;
 		private SpriteAsset tableSelection = null;
+		private SpriteAsset itemPreview = null;
+
+		private bool first = true;
 
 		private string[] SelectionTypes =
 		{
 			"22px","32px","46px", "62px","72px","94px","110px","122px","146px","224px",
 		};
+
 
 		public void Draw(Vector2 clientSize)
 		{
@@ -35,6 +40,14 @@ namespace DataManager.Panels
 			if (!ImGui.Begin("Sprite Editor##se"))
 				return;
 
+
+			ImGui.Columns(2, "se.columns");
+
+			if (first)
+				ImGui.SetColumnWidth(0, clientSize.X - 512);
+
+			first = false;
+
 			ImGui.InputText("##se.filter", ref filter, 255);
 
 			if (ImGui.Button("New Sprite##se.new"))
@@ -42,9 +55,98 @@ namespace DataManager.Panels
 				CreateNewSprite();
 			}
 
+			DrawTable();
+
+
+			ImGui.NextColumn();
+
+
+			float width = ImGui.GetColumnWidth();
+
+			DrawSpritePreview(width);
+
+			ImGui.End();
+
+			DrawHoverItemTooltip();
+			DrawChangeImageModal();
+
+
+			if (changed)
+			{
+				AppGame.AssetManager.SaveSprites();
+			}
+		}
+
+		private void DrawSpritePreview(float width)
+		{
+			Vector2 pos = new Vector2(width, width);
+
+			var sb = AppGui.SpriteBatchBegin(pos, SamplerState.PointClamp);
+
+
+			if (itemPreview != null)
+			{
+				int frame = 0;
+				if (itemPreview.Image.GraphicsTurns)
+				{
+					frame += 12;
+				}
+
+				var sprite = AppGame.AssetManager.GetSheetImage(itemPreview.Image.SpriteSheetName, frame);
+
+				var size = new Vector2(sprite.Texture.Width, sprite.Texture.Height) * 4;
+
+				pos /= 2;
+				pos -= size / 2;
+
+				var dst = new Microsoft.Xna.Framework.Rectangle((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y);
+
+				sb.Draw(sprite.Texture, dst, Microsoft.Xna.Framework.Color.White);
+
+				if (itemPreview.Image.UnitColor)
+				{
+					frame = itemPreview.Image.SpriteSheet.GetUnitColorFrameIndex(frame);
+					sprite = AppGame.AssetManager.GetSheetImage(itemPreview.Image.SpriteSheetName, frame);
+					sb.Draw(sprite.Texture, dst, Microsoft.Xna.Framework.Color.White);
+
+				}
+
+				if (itemPreview.SelectionType >= 0)
+				{
+					string sheet = SelectionTypes[itemPreview.SelectionType];
+					sheet = sheet.Substring(0, sheet.Length - 2);
+					if (sheet.Length < 3)
+						sheet = $"0{sheet}";
+					sheet = $"unit\\thingy\\o{sheet}";
+					var selection = AppGame.AssetManager.GetSheetImage(sheet, 0);
+					sb.Draw(selection.Texture, dst, Microsoft.Xna.Framework.Color.LightGreen);
+				}
+
+			}
+
+			AppGui.SpriteBatchEnd();
+		}
+
+		private void CreateNewSprite()
+		{
+			var sprite = new SpriteAsset()
+			{
+				Name = "New Sprite"
+
+			};
+			sprite.OnAfterDeserialize(AppGame.AssetManager.Images.FirstOrDefault());
+
+			AppGame.AssetManager.Sprites.Add(sprite);
+			changed = true;
+		}
+
+		private void DrawTable()
+		{
+			itemPreview = tableSelection;
+
 			if (!ImGui.BeginTable("##se.items", 6, ImGuiTableFlags.Sortable | ImGuiTableFlags.BordersInnerH
-					| ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable
-				))
+		| ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable
+	))
 				return;
 
 			ImGui.TableSetupScrollFreeze(0, 1);
@@ -53,6 +155,7 @@ namespace DataManager.Panels
 			ImGui.TableSetupColumn("Bar Size");
 			ImGui.TableSetupColumn("Selection");
 			ImGui.TableSetupColumn("Selection Y");
+			ImGui.TableSetupColumn(string.Empty, ImGuiTableColumnFlags.WidthFixed, 100);
 			ImGui.TableHeadersRow();
 
 			IEnumerable<SpriteAsset> query = QueryData();
@@ -69,32 +172,6 @@ namespace DataManager.Panels
 			}
 
 			ImGui.EndTable();
-
-			ImGui.SameLine();
-
-			ImGui.End();
-
-			DrawHoverItemTooltip();
-			DrawChangeImageModal();
-
-
-			if (changed)
-			{
-				AppGame.AssetManager.SaveSprites();
-			}
-		}
-
-		private void CreateNewSprite()
-		{
-			var sprite = new SpriteAsset()
-			{
-				Name = "New Sprite"
-
-			};
-			sprite.OnAfterDeserialize(AppGame.AssetManager.Images.FirstOrDefault());
-
-			AppGame.AssetManager.Sprites.Add(sprite);
-			changed = true;
 		}
 
 		private void TableRow(int i, SpriteAsset item)
@@ -171,6 +248,7 @@ namespace DataManager.Panels
 
 			ImGui.SameLine();
 
+
 			if (ImGui.Selectable($"##se.items.{i}.selected", ref selected, ImGuiSelectableFlags.SpanAllColumns))
 			{
 				if (selected)
@@ -178,6 +256,13 @@ namespace DataManager.Panels
 				else
 					tableSelection = null;
 			}
+
+
+			if (ImGui.IsItemHovered())
+			{
+				itemPreview = item;
+			}
+
 		}
 
 		private IEnumerable<SpriteAsset> QueryData()

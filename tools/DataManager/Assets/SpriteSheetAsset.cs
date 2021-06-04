@@ -20,8 +20,10 @@ namespace DataManager.Assets
 		[Index(4)]
 		public int Frames { get; set; }
 		[Index(5)]
-		public int Width { get; set; }
+		public int UnitColorOffset { get; set; }
 		[Index(6)]
+		public int Width { get; set; }
+		[Index(7)]
 		public int Height { get; set; }
 
 		[Ignore]
@@ -45,12 +47,21 @@ namespace DataManager.Assets
 
 			Images = subAtlas.ImageLists[imageListIndex];
 
+			UnitColorOffset = Images.Frames.IndexOf(f => f.fileName.StartsWith("cm_"));
+			if (UnitColorOffset < 0)
+				UnitColorOffset = 0;
+
 			SubAtlas = subAtlas;
 		}
 		public void AfterDeserializationInit(SpriteSubAtlas subAtlas)
 		{
 			SubAtlas = subAtlas;
 			Images = subAtlas.GetImageListAtOffset(SubAtlasOffset);
+		}
+
+		public int GetUnitColorFrameIndex(int frame)
+		{
+			return frame + UnitColorOffset;
 		}
 	}
 }

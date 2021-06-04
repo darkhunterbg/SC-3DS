@@ -23,6 +23,19 @@ namespace DataManager
 		}
 	}
 
+	public static class Vector2Exptensions
+	{
+		public static Vector2 ToVec4(this Microsoft.Xna.Framework.Vector2 v)
+		{
+			return new Vector2(v.X, v.Y);
+		}
+
+		public static Microsoft.Xna.Framework.Vector2 ToVector2(this Vector2 v)
+		{
+			return new Microsoft.Xna.Framework.Vector2(v.X, v.Y);
+		}
+	}
+
 	public static class Texture2DExtensions
 	{
 		public static void SaveAsPng(this Texture2D texture, string fileName)
@@ -45,6 +58,19 @@ namespace DataManager
 
 	public static class IEnumerableExtensions
 	{
+		public static int IndexOf<T>(this IEnumerable<T> e, Func<T,bool>  f) where T : class
+		{
+			int i = 0;
+			foreach(var item in e)
+			{
+				if (f(item))
+					return i;
+
+				++i;
+			}
+			return -1;
+		}
+
 		public static int IndexOf<T>(this IEnumerable<T> col, T element) where T : class
 		{
 			int i = 0;

@@ -1,6 +1,7 @@
 ﻿using DataManager.Assets;
 using DataManager.Panels;
 using ImGuiNET;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,6 +22,11 @@ namespace DataManager
 		public ImageEditor ImageEditor { get; private set; } = new ImageEditor();
 		public SpriteEditor SpriteEditor { get; private set; } = new SpriteEditor();
 
+		private SpriteBatch spriteBatch;
+		private RenderTarget2D renderTarget;
+		private IntPtr guiRenderTarget;
+
+
 		private List<IEnumerator> coroutines = new List<IEnumerator>();
 
 		public static void RunGuiCoroutine(IEnumerator crt)
@@ -31,8 +37,27 @@ namespace DataManager
 		public AppGui(AppGame game)
 		{
 			Game = game;
+			spriteBatch = new SpriteBatch(game.GraphicsDevice);
+			renderTarget = new RenderTarget2D(game.GraphicsDevice, 1, 1);
+			guiRenderTarget = AppGame.GuiRenderer.BindTexture(renderTarget);
 		}
 
+
+		private void ResizeRenderTarget(Vector2 size)
+		{
+			if (renderTarget.Width != size.X || renderTarget.Height != size.Y)
+			{
+				if (size.X > 1 && size.Y > 1)
+				{
+
+					AppGame.GuiRenderer.UnbindTexture(guiRenderTarget);
+					renderTarget.Dispose();
+
+					renderTarget = new RenderTarget2D(Game.GraphicsDevice, (int)size.X, (int)size.Y);
+					guiRenderTarget = AppGame.GuiRenderer.BindTexture(renderTarget);
+				}
+			}
+		}
 
 		public void Draw(Vector2 clientSize)
 		{
@@ -48,6 +73,12 @@ namespace DataManager
 
 			ImGui.PopStyleVar(1);
 
+
+			ResizeRenderTarget(clientSize);
+
+			AppGame.Device.SetRenderTarget(renderTarget);
+			AppGame.Device.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
+
 			AssetConverter.Update();
 			AssetConverter.Draw();
 			SpriteAtlasGenerator.Draw();
@@ -55,6 +86,8 @@ namespace DataManager
 			SpriteEditor.Draw(clientSize);
 
 			UpdateCoroutines();
+
+			AppGame.Device.SetRenderTarget(null);
 		}
 
 		public bool UpdateCoroutines()
@@ -75,6 +108,53 @@ namespace DataManager
 		public static void StrechNextItem()
 		{
 			ImGui.SetNextItemWidth(-float.Epsilon);
+		}
+
+		private static Stack<Vector2> sbDrawSize = new Stack<Vector2>();
+		private static Stack<Viewport> viewport = new Stack<Viewport>();
+
+		public static SpriteBatch SpriteBatchBegin(Vector2 size, SamplerState? samplerState =
+			null, float aspectRatio = 0)
+		{
+			if (aspectRatio != 0)
+			{
+				if (size.X > size.Y)
+				{
+					size.X = size.Y * aspectRatio;
+				}
+				else if (size.Y > size.X)
+				{
+					size.Y = size.X * aspectRatio;
+				}
+			}
+
+			sbDrawSize.Push(size);
+
+			Vector2 pos = ImGui.GetCursorPos();
+
+			viewport.Push(new Viewport((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y));
+
+			AppGame.Gui.spriteBatch.Begin(SpriteSortMode.Deferred,null, samplerState);
+
+			AppGame.Device.Viewport = viewport.Peek();
+
+			return AppGame.Gui.spriteBatch;
+		}
+
+		public static void SpriteBatchEnd()
+		{
+			AppGame.Gui.spriteBatch.End();
+
+			var size = sbDrawSize.Pop();
+			var vp = viewport.Pop();
+
+
+			var rtSize = new Vector2(AppGame.Gui.renderTarget.Width, AppGame.Gui.renderTarget.Height);
+
+			Vector2 uvStart = new Vector2(vp.X, vp.Y) / rtSize;
+			Vector2 uvEnd = (new Vector2(vp.X, vp.Y) + size) / rtSize;
+
+			ImGui.Image(AppGame.Gui.guiRenderTarget, size, uvStart, uvEnd);
 		}
 
 		public static void DrawSpriteSheetInfo(SpriteSheetAsset ss)

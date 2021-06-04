@@ -10,7 +10,7 @@ namespace DataManager.Assets
 {
 	public class ImageListAsset
 	{
-		public struct FrameData
+		public class FrameData
 		{
 			public string fileName;
 			public Rectangle rect;

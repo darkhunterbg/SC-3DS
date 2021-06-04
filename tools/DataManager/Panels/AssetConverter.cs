@@ -383,7 +383,7 @@ namespace DataManager.Panels
 				yield return null;
 			}
 
-			AppGame.AssetManager.ReloadImageListAssets();
+			AppGame.AssetManager.LoadImageListAssets();
 		}
 	}
 }

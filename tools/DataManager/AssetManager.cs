@@ -91,13 +91,13 @@ namespace DataManager
 				Directory.CreateDirectory(SpriteBuildDir);
 
 			LoadPalettes();
-			ReloadImageListAssets();
-			ReloadSpriteAtlasAssets();
+			LoadImageListAssets();
+			LoadSpriteAtlasAssets();
+
 			ReloadImages();
-			ReloadSprites();
 		}
 
-		public void ReloadImageListAssets()
+		public void LoadImageListAssets()
 		{
 			ImageListAssets.Clear();
 
@@ -108,7 +108,7 @@ namespace DataManager
 
 		}
 
-		public void ReloadSpriteAtlasAssets()
+		public void LoadSpriteAtlasAssets()
 		{
 			SpriteAtlasAssets.Clear();
 			SpriteSheets.Clear();
@@ -205,6 +205,8 @@ namespace DataManager
 
 
 			Images = Images.OrderBy(i => i.SpriteSheetName).ToList();
+
+			ReloadSprites();
 		}
 
 		public void ReloadSprites()
@@ -231,7 +233,10 @@ namespace DataManager
 
 			if (images == null)
 			{
-				var sheet = SpriteSheets.First(s => s.SheetName == sheetName);
+				var sheet = SpriteSheets.FirstOrDefault(s => s.SheetName == sheetName);
+
+				if (sheet == null)
+					return null;
 
 				images = new List<GuiTexture>();
 				loadedSheetImages[sheetName] = images;
