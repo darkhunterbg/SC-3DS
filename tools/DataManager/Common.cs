@@ -7,6 +7,29 @@ using System.Threading.Tasks;
 
 namespace DataManager
 {
+
+	public enum CustomEnumType
+	{
+		SelectionTypes
+	}
+
+	public static class CustomEnumValues
+	{
+		public static readonly List<string[]> CustomEnums = new List<string[]>();
+
+		static CustomEnumValues()
+		{
+			CustomEnums.Add(SelectionTypes);
+		}
+
+
+		public static string[] SelectionTypes =
+		{
+			"22px","32px","48px", "62px","72px","94px","110px","122px","146px","224px",
+		};
+
+
+	}
 	public class AsyncOperation
 	{
 
@@ -45,7 +68,7 @@ namespace DataManager
 			{
 				try
 				{
-					action((f)=>
+					action((f) =>
 					{
 						Progress = f;
 					});

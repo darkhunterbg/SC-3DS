@@ -9,8 +9,13 @@ namespace DataManager.Assets
 {
 	public class LogicalSpriteAsset
 	{
+		[Index(0)]
+		[DefaultEditor()]
+		public string Name { get; set; } = string.Empty;
+
 		private LogicalImageAsset _img;
 		[Ignore]
+		[ImageEditor]
 		public LogicalImageAsset Image
 		{
 			get
@@ -24,31 +29,33 @@ namespace DataManager.Assets
 			}
 		}
 
-		[Index(0)]
-		public string Name { get; set; } = string.Empty;
-
 		[Index(1), Name("Image")]
 		public string ImageName { get; set; } = string.Empty;
 
 		[Index(2)]
+		[DefaultEditor]
 		public int BarSize { get; set; }
 
 		[Index(3)]
 		[Name("BarY")]
+		[DefaultEditor]
 		public int BarOffset { get; set; }
 
 		[Index(4)]
 		[Name("SelType")]
+		[CustomEnumEditor(CustomEnumType.SelectionTypes)]
 		public int SelectionType { get; set; }
 
 		[Index(5)]
 		[Name("SelY")]
+		[DefaultEditor]
 		public int SelectionOffset { get; set; }
 
 
 		static int id = 0;
 
 		[Ignore]
+		[UniqueKey]
 		public readonly int Id;
 
 		public LogicalSpriteAsset()
