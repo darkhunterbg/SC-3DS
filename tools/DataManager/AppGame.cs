@@ -70,7 +70,7 @@ namespace DataManager
 			Device = _graphics.GraphicsDevice;
 
 			AssetManager = new AssetManager();
-
+			AssetManager.LoadEverything();
 			Gui = new AppGui(this);
 		}
 

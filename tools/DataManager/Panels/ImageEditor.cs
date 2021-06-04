@@ -11,14 +11,14 @@ using System.Threading.Tasks;
 
 namespace DataManager.Panels
 {
-	public class ImageEditor
+	public class ImageEditor : IGuiPanel
 	{
 		private bool changed = false;
 		private string filter = string.Empty;
 		private LogicalImageAsset hoverItem = null;
 		private LogicalImageAsset tableSelection = null;
 
-		public void Draw()
+		public void Draw(Vector2 clientSize)
 		{
 			changed = false;
 			hoverItem = null;

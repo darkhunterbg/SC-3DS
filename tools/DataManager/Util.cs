@@ -10,6 +10,20 @@ namespace DataManager
 {
 	public static class Util
 	{
+		public static TType ShallowCopyProperties<TType>(TType copy) where TType : class
+		{
+			var instance = Activator.CreateInstance<TType>();
+
+			var props = typeof(TType).GetProperties().Where(t => t.CanRead && t.CanWrite).ToList();
+
+			foreach(var p in props)
+			{
+				p.SetValue(instance, p.GetValue(copy));
+			}
+
+			return instance;
+		}
+
 		public static IEnumerable<T> TextFilter<T>(IEnumerable<T> query, string text, Func<T, string> filterBy)
 		{
 			if (!string.IsNullOrEmpty(text))

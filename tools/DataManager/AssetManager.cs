@@ -67,6 +67,7 @@ namespace DataManager
 		public static readonly string ImagesDataPath = $"{GameDataDir}images.csv";
 		public static readonly string SpritesDataPath = $"{GameDataDir}sprites.csv";
 		public static readonly string FramesDataPath = $"{GameDataDir}frames.csv";
+		public static readonly string UpgradesDataPath = $"{GameDataDir}upgrades.csv";
 
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();
 
@@ -75,6 +76,9 @@ namespace DataManager
 		public List<SpriteSheetAsset> SpriteSheets { get; private set; } = new List<SpriteSheetAsset>();
 		public List<LogicalImageAsset> Images { get; private set; } = new List<LogicalImageAsset>();
 		public List<LogicalSpriteAsset> Sprites { get; private set; } = new List<LogicalSpriteAsset>();
+		public List<UpgradeAsset> Upgrades { get; private set; } = new List<UpgradeAsset>();
+
+		public List<SpriteFrameAsset> Icons { get; private set; } = new List<SpriteFrameAsset>();
 
 		private Dictionary<string, List<GuiTexture>> loadedSheetImages = new Dictionary<string, List<GuiTexture>>();
 
@@ -94,13 +98,20 @@ namespace DataManager
 			if (!Directory.Exists(SpriteBuildDir))
 				Directory.CreateDirectory(SpriteBuildDir);
 
+		}
+
+
+		public void LoadEverything()
+		{
+
 			LoadPalettes();
 			LoadImageListAssets();
 			LoadSpriteAtlasAssets();
 
 			ReloadImages();
-		}
 
+			ReloadUpgrades();
+		}
 		public void LoadImageListAssets()
 		{
 			ImageListAssets.Clear();
@@ -116,6 +127,7 @@ namespace DataManager
 		{
 			SpriteAtlasAssets.Clear();
 			SpriteSheets.Clear();
+			Icons.Clear();
 
 			if (!File.Exists(SpriteAtlasDataPath) || !File.Exists(SpriteSheetDataPath))
 				return;
@@ -174,6 +186,12 @@ namespace DataManager
 					sheet.AfterDeserializationInit(subAtlas);
 				}
 			}
+
+			var iconsSheet = SpriteSheets.FirstOrDefault(s => s.SheetName == "unit\\cmdbtns\\cmdicons");
+			if (iconsSheet != null)
+			{
+				Icons.AddRange(iconsSheet.Frames);
+			}
 		}
 
 		public void ReloadImages()
@@ -231,6 +249,22 @@ namespace DataManager
 			}
 		}
 
+		public void ReloadUpgrades()
+		{
+			Upgrades.Clear();
+
+			if (!File.Exists(UpgradesDataPath))
+				return;
+			using (var csv = new CsvReader(new StreamReader(UpgradesDataPath), csvConfig))
+			{
+				Upgrades.AddRange(csv.GetRecords<UpgradeAsset>());
+			}
+
+			foreach (var s in Upgrades)
+			{
+				s.OnAfterDeserialize();
+			}
+		}
 
 		public GuiTexture GetSheetImage(string sheetName, int frameIndex)
 		{
@@ -537,6 +571,14 @@ namespace DataManager
 			using (var csv = new CsvWriter(new StreamWriter(SpritesDataPath), csvConfig))
 			{
 				csv.WriteRecords(Sprites);
+			}
+		}
+
+		public void SaveUpgrades()
+		{
+			using (var csv = new CsvWriter(new StreamWriter(UpgradesDataPath), csvConfig))
+			{
+				csv.WriteRecords(Upgrades);
 			}
 		}
 	}

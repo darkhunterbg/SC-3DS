@@ -7,12 +7,20 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DataManager.Widgets
 {
+
 	public class TableEditor<TItem> where TItem : class
 	{
+		enum ModalSelectionType
+		{
+			ImageList,
+			Icon
+		}
+
 		delegate void EditorDrawAction(PropertyInfo prop, EditorAttribute attr, TItem item, int itemId, int propId);
 
 		public delegate TItem NewItemAction(TItem copy);
@@ -27,6 +35,7 @@ namespace DataManager.Widgets
 		private List<PropertyInfo> editorProperties;
 		private List<EditorAttribute> editorAttributes;
 		private List<EditorDrawAction> editorDrawers;
+		private List<string> columns = new List<string>();
 
 		private FieldInfo uniqueKeyField;
 		private readonly string id;
@@ -39,10 +48,13 @@ namespace DataManager.Widgets
 		private object modalSelectedValue = null;
 		private int modalEditPropertyId = -1;
 		private string modalFilter = string.Empty;
+		private ModalSelectionType modalSelectionType;
 
 		private object tooltipHover = null;
 
 		public NewItemAction OnNewItem;
+
+		public bool DrawControlCell = true;
 
 		public TableEditor(string id)
 		{
@@ -57,31 +69,40 @@ namespace DataManager.Widgets
 				editorDrawers.Add(GetPropertyDrawer(editorProperties[i], editorAttributes[i]));
 			}
 
+			foreach (var p in editorProperties)
+			{
+				var editorAttr = p.GetCustomAttribute<EditorAttribute>();
+				string name = editorAttr.Name ?? p.Name;
+				name = Regex.Replace(name, "(\\B[A-Z])", " $1");
+				columns.Add(name);
+			}
+
 			uniqueKeyField = type.GetFields().FirstOrDefault(t => t.GetCustomAttribute<UniqueKeyAttribute>() != null);
 		}
 
 		public void Draw()
 		{
-			DrawControlHeader();
-
-			if (!ImGui.BeginTable(id, editorProperties.Count + 1, ImGuiTableFlags.BordersInnerH
-	| ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable))
-				return;
 			HoverItem = null;
 			changed = false;
 			tooltipHover = null;
+
+			DrawControlHeader();
+
+			if (!ImGui.BeginTable(id, editorProperties.Count + 1, ImGuiTableFlags.BordersInnerH
+	| ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable ))
+				return;
+
 			ImGui.TableSetupScrollFreeze(0, 1);
 
-			foreach (var p in editorProperties)
-			{
-				var editorAttr = p.GetCustomAttribute<EditorAttribute>();
 
-				ImGui.TableSetupColumn(editorAttr.Name ?? p.Name);
+			foreach (var c in columns)
+			{
+				ImGui.TableSetupColumn(c);
 			}
+
 			ImGui.TableSetupColumn(string.Empty, ImGuiTableColumnFlags.WidthFixed, 200);
 
 			ImGui.TableHeadersRow();
-
 
 			foreach (var item in DataSource.ToList())
 			{
@@ -113,8 +134,11 @@ namespace DataManager.Widgets
 
 			}
 
-			ImGui.TableNextColumn();
-			DrawControlCell(item, itemId);
+			if (DrawControlCell)
+			{
+				ImGui.TableNextColumn();
+				ControlCell(item, itemId);
+			}
 
 			ImGui.SameLine();
 			bool selected = SelectedItem == item;
@@ -134,11 +158,10 @@ namespace DataManager.Widgets
 			}
 		}
 
-		private void DrawControlCell(TItem item, int itemId)
+		private void ControlCell(TItem item, int itemId)
 		{
 			if (ImGui.Button($"Duplicate##{id}.items.{itemId}.control.copy"))
 			{
-
 				int index = DataSource.IndexOf(item);
 				var newItem = OnNewItem(item);
 				DataSource.Insert(index + 1, newItem);
@@ -213,6 +236,9 @@ namespace DataManager.Widgets
 
 				if (type == typeof(int))
 					return IntEditor;
+
+				if (type.IsEnum)
+					return EnumEditor;
 			}
 			else
 			{
@@ -221,6 +247,13 @@ namespace DataManager.Widgets
 
 				if (attr is ImageEditorAttribute)
 					return LogicalImageEditor;
+
+				if (attr is IconEditorAttribute)
+					return IconEditor;
+
+				if (attr is FrameTimeEditorAttribute)
+					return this.FrameTimeEditor;
+				
 			}
 
 
@@ -255,6 +288,20 @@ namespace DataManager.Widgets
 			}
 
 		}
+
+		private void EnumEditor(PropertyInfo prop, EditorAttribute attr, TItem item, int itemId, int propId)
+		{
+			number = (int)prop.GetValue(item);
+			AppGui.StrechNextItem();
+			var enumType = prop.PropertyType;
+			var enumValues = EnumCacheValues.GetValues(enumType);
+			if (ImGui.Combo($"##{id}.items.{itemId}.{propId}", ref number, enumValues, enumValues.Length))
+			{
+				prop.SetValue(item, number);
+				changed = true;
+			}
+		}
+
 		private void CustomEnumEditor(PropertyInfo prop, EditorAttribute attr, TItem item, int itemId, int propId)
 		{
 			var customAttr = attr as CustomEnumEditorAttribute;
@@ -286,7 +333,117 @@ namespace DataManager.Widgets
 			{
 				modalEditItem = item;
 				modalSelectedValue = prop.GetValue(modalEditItem);
+				modalSelectionType = ModalSelectionType.ImageList;
 				modalEditPropertyId = propId;
+			}
+		}
+
+		private void IconEditor(PropertyInfo prop, EditorAttribute attr, TItem item, int itemId, int propId)
+		{
+			var icon = prop.GetValue(item) as SpriteFrameAsset;
+
+			if (ImGui.ImageButton(icon.Image.GuiImage, icon.SpriteSheet.FrameSize, Vector2.Zero,
+				Vector2.One, 0,
+				Vector4.Zero,
+				Microsoft.Xna.Framework.Color.Yellow.ToVec4()))
+			{
+				modalEditItem = item;
+				modalSelectedValue = icon;
+				modalSelectionType = ModalSelectionType.Icon;
+				modalEditPropertyId = propId;
+			}
+
+		}
+
+		private void FrameTimeEditor(PropertyInfo prop, EditorAttribute attr, TItem item, int itemId, int propId)
+		{
+			number = (int)prop.GetValue(item);
+
+			ImGui.SetNextItemWidth(100);
+			if (ImGui.InputInt($"##{id}.items.{itemId}.{propId}", ref number,0))
+			{
+				prop.SetValue(item, number);
+				changed = true;
+			}
+			ImGui.SameLine();
+			ImGui.Text($"{(number / 15.0f).ToString("F1")} sec");
+
+		}
+
+		private string ChangeModalSelectedText()
+		{
+			if (modalSelectionType == ModalSelectionType.ImageList)
+				return (SelectedItem as LogicalImageAsset)?.SpriteSheet?.SheetName ?? string.Empty;
+
+			return null;
+		}
+		private bool ModalCanSearch()
+		{
+			return modalSelectionType == ModalSelectionType.ImageList;
+		}
+		private void ModalDrawSelection(object item, string filter)
+		{
+			int i = 0;
+			if (modalSelectionType == ModalSelectionType.ImageList)
+			{
+				var tmp = item as LogicalImageAsset;
+
+				var query = ImageEditor.GetImages(modalFilter);
+				query = query.OrderBy(asset => asset.SpriteSheetName);
+
+				foreach (var asset in query)
+				{
+					bool selected = tmp == asset;
+
+					if (ImGui.Selectable($"##table.modal.edit.select.{i++}", selected))
+					{
+						if (selected)
+							modalSelectedValue = null;
+						else
+							modalSelectedValue = asset;
+
+					}
+					ImGui.SameLine();
+					ImGui.Text(asset.SpriteSheetName);
+					if (ImGui.IsItemHovered())
+					{
+						ImGui.BeginTooltip();
+
+						AppGui.DrawSpriteSheetInfo(asset.SpriteSheet);
+
+						ImGui.EndTooltip();
+					}
+				}
+				return;
+			}
+			if (modalSelectionType == ModalSelectionType.Icon)
+			{
+				var image = item as SpriteFrameAsset;
+				var query = AppGame.AssetManager.Icons;
+
+				foreach (var asset in query)
+				{
+					i++;
+					bool selected = image == asset;
+
+					Vector4 color = selected ? Vector4.One : Vector4.Zero;
+
+					if (ImGui.ImageButton(asset.Image.GuiImage, new Vector2(64, 64), Vector2.Zero,
+				Vector2.One, 2,
+				color,
+				Microsoft.Xna.Framework.Color.Yellow.ToVec4()))
+					{
+						if (selected)
+							modalSelectedValue = null;
+						else
+							modalSelectedValue = asset;
+					}
+
+
+					if (i % 10 != 0)
+						ImGui.SameLine();
+				}
+				return;
 			}
 		}
 
@@ -296,53 +453,27 @@ namespace DataManager.Widgets
 
 			if (!opened)
 				return;
+			ImGui.OpenPopup("table.modal.edit");
 
-			var tmp = modalSelectedValue as LogicalImageAsset;
-
-			ImGui.OpenPopup("table.modal.edit.image");
-
-			if (!ImGui.BeginPopupModal("table.modal.edit.image", ref opened, ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysAutoResize))
+			if (!ImGui.BeginPopupModal("table.modal.edit", ref opened, ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysAutoResize))
 				return;
 
-			ImGui.Text(tmp?.SpriteSheetName ?? string.Empty);
+			string text = ChangeModalSelectedText();
+			if (text != null)
+				ImGui.Text(text);
 
-			ImGui.InputText("##table.modal.edit.image.filter", ref modalFilter, 255);
+			bool canSearch = ModalCanSearch();
+			if (canSearch)
+				ImGui.InputText("##table.modal.edit.filter", ref modalFilter, 255);
 
-			var query = ImageEditor.GetImages(modalFilter);
 
-			query = query.OrderBy(asset => asset.SpriteSheetName);
+			ImGui.BeginChild("table.modal.edit.items", new Vector2(800, 800));
 
-			int i = 0;
-
-			ImGui.BeginChild("table.modal.edit.image.items", new Vector2(600, 600));
-
-			foreach (var asset in query)
-			{
-				bool selected = tmp == asset;
-
-				if (ImGui.Selectable($"##table.modal.edit.image.select.{i++}", selected))
-				{
-					if (selected)
-						modalSelectedValue = null;
-					else
-						modalSelectedValue = asset;
-
-				}
-				ImGui.SameLine();
-				ImGui.Text(asset.SpriteSheetName);
-				if (ImGui.IsItemHovered())
-				{
-					ImGui.BeginTooltip();
-
-					AppGui.DrawSpriteSheetInfo(asset.SpriteSheet);
-
-					ImGui.EndTooltip();
-				}
-			}
+			ModalDrawSelection(modalSelectedValue, modalFilter);
 
 			ImGui.EndChild();
 
-			if (ImGui.Button("Cancel##table.modal.edit.image.cancel"))
+			if (ImGui.Button("Cancel##table.modal.cancel"))
 			{
 				modalEditItem = null;
 				modalSelectedValue = null;
@@ -353,13 +484,13 @@ namespace DataManager.Widgets
 
 			ImGui.SameLine();
 
-			if (tmp != null)
+			if (modalSelectedValue != null)
 			{
-				if (ImGui.Button("Ok##table.modal.edit.image.ok"))
+				if (ImGui.Button("Ok##table.modal.image.ok"))
 				{
 					var prop = editorProperties[modalEditPropertyId];
-					prop.SetValue(modalEditItem, tmp);
-					tmp = null;
+					prop.SetValue(modalEditItem, modalSelectedValue);
+
 					modalEditItem = null;
 					modalSelectedValue = null;
 					modalEditPropertyId = -1;

@@ -7,11 +7,43 @@ using System.Threading.Tasks;
 
 namespace DataManager
 {
+	public enum RaceEnum
+	{
+		Zerg,
+		Terran,
+		Protoss
+	}
 
 	public enum CustomEnumType
 	{
 		SelectionTypes
 	}
+
+	public static class EnumCacheValues
+	{
+		private static Dictionary<Type, string[]> cache = new Dictionary<Type, string[]>();
+		public static string[] GetValues(Type type)
+		{
+			if (!cache.TryGetValue(type, out var items))
+			{
+				items = Enum.GetNames(type);
+				cache[type] = items;
+			}
+
+			return items;
+		}
+		public static string[] GetValues<TEnum>() where TEnum : struct, Enum
+		{
+			if (!cache.TryGetValue(typeof(TEnum), out var items))
+			{
+				items = Enum.GetNames<TEnum>();
+				cache[typeof(TEnum)] = items;
+			}
+
+			return items;
+		}
+	}
+
 
 	public static class CustomEnumValues
 	{
@@ -22,12 +54,10 @@ namespace DataManager
 			CustomEnums.Add(SelectionTypes);
 		}
 
-
 		public static string[] SelectionTypes =
 		{
 			"22px","32px","48px", "62px","72px","94px","110px","122px","146px","224px",
 		};
-
 
 	}
 	public class AsyncOperation

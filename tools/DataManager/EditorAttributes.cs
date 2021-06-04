@@ -24,6 +24,15 @@ namespace DataManager
 
 	}
 
+	public class FrameTimeEditorAttribute : EditorAttribute
+	{
+
+	}
+
+	public class IconEditorAttribute : EditorAttribute
+	{
+
+	}
 
 	public class CustomEnumEditorAttribute : EditorAttribute
 	{
@@ -34,16 +43,6 @@ namespace DataManager
 			EnumType = enumType;
 		}
 	}
-
-	//public class EnumEditorAttribute : EditorAttribute
-	//{
-	//	public readonly Type EnumType;
-
-	//	public EnumEditorAttribute(Type type)
-	//	{
-	//		EnumType = type;
-	//	}
-	//}
 
 	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
 	public class UniqueKeyAttribute : Attribute

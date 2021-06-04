@@ -11,10 +11,8 @@ using System.Threading.Tasks;
 
 namespace DataManager.Panels
 {
-	public class SpriteEditor
+	public class SpriteEditor  :IGuiPanel
 	{
-		private string filter = string.Empty;
-
 		private bool first = true;
 		private bool showSelectionMarker = true;
 		private bool showBars = true;
@@ -54,11 +52,9 @@ namespace DataManager.Panels
 
 		public void Draw(Vector2 clientSize)
 		{
-
 			ImGui.SetNextWindowSize(new Vector2(800, 600), ImGuiCond.FirstUseEver);
 			if (!ImGui.Begin("Sprite Editor##se"))
 				return;
-
 
 			ImGui.Columns(2, "se.columns");
 
@@ -87,8 +83,6 @@ namespace DataManager.Panels
 				AppGame.AssetManager.SaveSprites();
 			}
 		}
-
-
 
 		private void DrawSpritePreview(int width)
 		{
@@ -172,13 +166,10 @@ namespace DataManager.Panels
 		{
 			LogicalSpriteAsset sprite = null;
 
-			if (copy!=null)
+			if (copy != null)
 			{
-				sprite = new LogicalSpriteAsset(copy)
-				{
-					Name = copy.Name + " Copy"
-
-				};
+				sprite = Util.ShallowCopyProperties(copy);
+				sprite.Name = copy.Name + " Copy";
 			}
 			else
 			{
@@ -189,6 +180,8 @@ namespace DataManager.Panels
 				};
 				sprite.OnAfterDeserialize(AppGame.AssetManager.Images.FirstOrDefault());
 			}
+
+
 
 			return sprite;
 		}

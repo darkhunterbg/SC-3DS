@@ -93,7 +93,7 @@ namespace DataManager.Panels
 		}
 	}
 
-	public class SpriteAtlasGenerator
+	public class SpriteAtlasGenerator : IGuiPanel
 	{
 		private List<SpriteAtlasEntry> entries = new List<SpriteAtlasEntry>();
 
@@ -114,7 +114,7 @@ namespace DataManager.Panels
 				e.Init();
 		}
 
-		public void Draw()
+		public void Draw(Vector2 clientSize)
 		{
 			changed = false;
 

@@ -17,15 +17,11 @@ namespace DataManager
 	{
 		public AppGame Game { get; private set; }
 
-		public AssetConverter AssetConverter { get; private set; } = new AssetConverter();
-		public SpriteAtlasGenerator SpriteAtlasGenerator { get; private set; } = new SpriteAtlasGenerator();
-		public ImageEditor ImageEditor { get; private set; } = new ImageEditor();
-		public SpriteEditor SpriteEditor { get; private set; } = new SpriteEditor();
-
 		public SpriteBatch SpriteBatch { get; private set; }
 		public RenderTarget2D BackBuffer { get; private set; }
 		private IntPtr guiRenderTarget;
 
+		private List<IGuiPanel> panels = new List<IGuiPanel>();
 
 		private List<IEnumerator> coroutines = new List<IEnumerator>();
 
@@ -40,6 +36,14 @@ namespace DataManager
 			SpriteBatch = new SpriteBatch(game.GraphicsDevice);
 			BackBuffer = new RenderTarget2D(game.GraphicsDevice, 1, 1);
 			guiRenderTarget = AppGame.GuiRenderer.BindTexture(BackBuffer);
+
+			var types = GetType().Assembly.GetTypes().Where(t => !t.IsAbstract && !t.IsInterface && t.IsAssignableTo(typeof(IGuiPanel)))
+				.ToList();
+
+			foreach (var t in types)
+			{
+				panels.Add(Activator.CreateInstance(t) as IGuiPanel);
+			}
 		}
 
 
@@ -79,11 +83,8 @@ namespace DataManager
 			AppGame.Device.SetRenderTarget(BackBuffer);
 			AppGame.Device.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
 
-			AssetConverter.Update();
-			AssetConverter.Draw();
-			SpriteAtlasGenerator.Draw();
-			ImageEditor.Draw();
-			SpriteEditor.Draw(clientSize);
+			foreach (var panel in panels)
+				panel.Draw(clientSize);
 
 			UpdateCoroutines();
 
@@ -135,7 +136,7 @@ namespace DataManager
 
 			viewport.Push(new Viewport((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y));
 
-			AppGame.Gui.SpriteBatch.Begin(SpriteSortMode.Deferred,null, samplerState);
+			AppGame.Gui.SpriteBatch.Begin(SpriteSortMode.Deferred, null, samplerState);
 
 			AppGame.Device.Viewport = viewport.Peek();
 

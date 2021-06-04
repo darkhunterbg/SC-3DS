@@ -51,7 +51,6 @@ namespace DataManager.Assets
 		[DefaultEditor]
 		public int SelectionOffset { get; set; }
 
-
 		static int id = 0;
 
 		[Ignore]

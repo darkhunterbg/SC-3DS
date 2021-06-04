@@ -13,7 +13,7 @@ using System.Numerics;
 
 namespace DataManager.Panels
 {
-	public class AssetConverter
+	public class AssetConverter : IGuiPanel
 	{
 		class GRPConverEntry
 		{
@@ -88,7 +88,7 @@ namespace DataManager.Panels
 				e.Init();
 		}
 
-		public void Update()
+		private void Update()
 		{
 			if (hovered == null)
 			{
@@ -125,12 +125,16 @@ namespace DataManager.Panels
 
 		}
 
-		public void Draw()
+		public void Draw(Vector2 clientSize)
 		{
+
 			ImGui.SetNextWindowSize(new Vector2(800, 600), ImGuiCond.FirstUseEver);
 
 			if (!ImGui.Begin("Asset Converter##AssetConverter"))
 				return;
+
+
+			Update();
 
 			ImGui.Columns(2);
 			DrawConvertSettings();
