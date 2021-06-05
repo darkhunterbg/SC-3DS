@@ -15,7 +15,7 @@ namespace DataManager.Panels
 	{
 		private bool changed = false;
 		private string filter = string.Empty;
-		private LogicalImageAsset tableSelection = null;
+		private ImageAsset tableSelection = null;
 
 		public void Draw(Vector2 clientSize)
 		{
@@ -39,7 +39,7 @@ namespace DataManager.Panels
 			ImGui.TableSetupColumn("Unit Color");
 			ImGui.TableHeadersRow();
 
-			IEnumerable<LogicalImageAsset> query = QueryData(filter);
+			IEnumerable<ImageAsset> query = QueryData(filter);
 
 			int i = 0;
 
@@ -56,11 +56,11 @@ namespace DataManager.Panels
 
 			if (changed)
 			{
-				AppGame.AssetManager.GetAssetDatabase<LogicalImageAsset>().Save();
+				AppGame.AssetManager.GetAssetDatabase<ImageAsset>().Save();
 			}
 		}
 
-		private void TableRow(int i, LogicalImageAsset item)
+		private void TableRow(int i, ImageAsset item)
 		{
 
 			ImGui.TableNextColumn();
@@ -100,10 +100,10 @@ namespace DataManager.Panels
 			}
 		}
 
-		private IEnumerable<LogicalImageAsset> QueryData(string f)
+		private IEnumerable<ImageAsset> QueryData(string f)
 		{
-			IEnumerable<LogicalImageAsset> query =
-					 Util.TextFilter(AppGame.AssetManager.GetAssets<LogicalImageAsset>(), f, a => a.SpriteSheetName);
+			IEnumerable<ImageAsset> query =
+					 Util.TextFilter(AppGame.AssetManager.GetAssets<ImageAsset>(), f, a => a.SpriteSheetName);
 
 			var sort = ImGui.TableGetSortSpecs();
 

@@ -175,14 +175,15 @@ namespace DataManager
 			if (obj == null)
 				return;
 
-			ImGui.BeginTooltip();
-
-			if (obj is LogicalImageAsset)
+			
+			if (obj is ImageAsset)
 			{
-				DrawSpriteSheetInfo(((LogicalImageAsset)obj).SpriteSheet);
-			}
+				ImGui.BeginTooltip();
 
-			ImGui.EndTooltip();
+				DrawSpriteSheetInfo(((ImageAsset)obj).SpriteSheet);
+
+				ImGui.EndTooltip();
+			}
 		}
 
 		public static void DrawSpriteSheetInfo(SpriteSheet ss)

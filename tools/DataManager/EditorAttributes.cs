@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataManager
 {
-	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
 	public abstract class EditorAttribute : Attribute
 	{
 		public string Name { get; set; }
@@ -39,7 +39,7 @@ namespace DataManager
 		}
 	}
 
-	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+	[AttributeUsage(AttributeTargets.Field , AllowMultiple = false, Inherited = true)]
 	public class UniqueKeyAttribute : Attribute
 	{
 		public string Name { get; set; }

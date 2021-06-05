@@ -111,8 +111,8 @@ namespace DataManager
 				Directory.CreateDirectory(SpriteBuildDir);
 
 
-			AddNewAssetDatabase<LogicalImageAsset>(ImagesDataPath);
-			AddNewAssetDatabase<LogicalSpriteAsset>(SpritesDataPath);
+			AddNewAssetDatabase<ImageAsset>(ImagesDataPath);
+			AddNewAssetDatabase<SpriteAsset>(SpritesDataPath);
 			AddNewAssetDatabase<UpgradeAsset>(UpgradesDataPath);
 			AddNewAssetDatabase<FlingyAsset>(FlingyDataPath);
 			AddNewAssetDatabase<WeaponAsset>(WeaponsDataPath);

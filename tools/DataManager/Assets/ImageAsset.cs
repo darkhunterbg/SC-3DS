@@ -10,7 +10,7 @@ namespace DataManager.Assets
 	/// <summary>
 	/// Logical data about all sprite in a SpriteSheet(GRP) and how they should be displayed
 	/// </summary>
-	public class LogicalImageAsset : Asset
+	public class ImageAsset : Asset
 	{
 		[Ignore]
 		public SpriteSheet SpriteSheet { get; private set; }
@@ -41,9 +41,9 @@ namespace DataManager.Assets
 			}
 		}
 
-		public LogicalImageAsset() : base() { }
+		public ImageAsset() : base() { }
 
-		public LogicalImageAsset(SpriteSheet asset)
+		public ImageAsset(SpriteSheet asset)
 		{
 			SpriteSheet = asset;
 			SpriteSheetName = asset.SheetName;

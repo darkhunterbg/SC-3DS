@@ -17,11 +17,11 @@ namespace DataManager.Panels
 		private bool showSelectionMarker = true;
 		private bool showBars = true;
 
-		private LogicalSpriteAsset itemPreview = null;
+		private SpriteAsset itemPreview = null;
 
 		private Vector4 previewBgColor = Microsoft.Xna.Framework.Color.CornflowerBlue.ToVec4();
 
-		private AssetTableEditor<LogicalSpriteAsset> table = new AssetTableEditor<LogicalSpriteAsset>("##se.table");
+		private AssetTableEditor<SpriteAsset> table = new AssetTableEditor<SpriteAsset>("##se.table");
 
 		private List<SpriteFrame> selectionFrames = new List<SpriteFrame>();
 
@@ -85,7 +85,7 @@ namespace DataManager.Panels
 			Vector2 center = spritePreview.Size / 2;
 			Vector2 pos = center;
 
-			if (itemPreview != null)
+			if (itemPreview?.Image != null)
 			{
 				int frameIndex = 0;
 				if (itemPreview.Image.GraphicsTurns)

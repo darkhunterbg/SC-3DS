@@ -10,7 +10,7 @@ namespace DataManager.Assets
 
 	public class FlingyAsset : Asset
 	{
-		private LogicalSpriteAsset _sprite;
+		private SpriteAsset _sprite;
 
 		[Index(0)]
 		[DefaultEditor]
@@ -21,7 +21,7 @@ namespace DataManager.Assets
 
 		[Ignore]
 		[DefaultEditor]
-		public LogicalSpriteAsset Sprite
+		public SpriteAsset Sprite
 		{
 			get { return _sprite; }
 			set { _sprite = value;
@@ -54,14 +54,14 @@ namespace DataManager.Assets
 		public override GuiTexture Preview => Sprite?.Preview;
 
 		public FlingyAsset() : base() { }
-		public FlingyAsset(LogicalSpriteAsset sprite) : base()
+		public FlingyAsset(SpriteAsset sprite) : base()
 		{
 			Sprite = sprite;
 		}
 
 		public override void OnAfterDeserialize()
 		{
-			_sprite = AppGame.AssetManager.GetAssets<LogicalSpriteAsset>().FirstOrDefault(s => s.Name == SpriteName);
+			_sprite = AppGame.AssetManager.GetAssets<SpriteAsset>().FirstOrDefault(s => s.Name == SpriteName);
 		}
 	}
 }

@@ -7,16 +7,17 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
-	public class LogicalSpriteAsset : Asset
+	public class SpriteAsset : Asset
 	{
 		[Index(0)]
 		[DefaultEditor()]
 		public string Name { get; set; } = string.Empty;
 
-		private LogicalImageAsset _img;
+		[AssetReference(nameof(ImageName))]
+		private ImageAsset _img;
 		[Ignore]
 		[DefaultEditor]
-		public LogicalImageAsset Image
+		public ImageAsset Image
 		{
 			get
 			{
@@ -54,16 +55,16 @@ namespace DataManager.Assets
 		public override string AssetName => Name;
 		public override GuiTexture Preview => Image?.Preview;
 
-		public LogicalSpriteAsset() : base() { }
+		public SpriteAsset() : base() { }
 
 
-		public LogicalSpriteAsset(LogicalImageAsset asset) : this()
+		public SpriteAsset(ImageAsset asset) : this()
 		{
 			Image = asset;
 		}
-		public override void  OnAfterDeserialize()
-		{
-			_img = AppGame.AssetManager.GetAssets<LogicalImageAsset>().FirstOrDefault(s => s.SpriteSheetName == ImageName);
-		}
+		//public override void  OnAfterDeserialize()
+		//{
+		//	_img = AppGame.AssetManager.GetAssets<LogicalImageAsset>().FirstOrDefault(s => s.SpriteSheetName == ImageName);
+		//}
 	}
 }

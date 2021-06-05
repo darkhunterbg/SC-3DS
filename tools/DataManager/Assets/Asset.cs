@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace DataManager.Assets
 {
@@ -25,8 +26,6 @@ namespace DataManager.Assets
 
 		public Asset() { id = ++id; }
 
-		public virtual void OnAfterDeserialize() { }
-
 		public override string ToString()
 		{
 			return AssetName;
@@ -37,7 +36,7 @@ namespace DataManager.Assets
 			return Util.ShallowCopyProperties(this);
 		}
 
-		public static TAsset New<TAsset>(TAsset copy) where TAsset: Asset
+		public static TAsset New<TAsset>(TAsset copy) where TAsset : Asset
 		{
 			if (copy == null)
 			{
@@ -47,9 +46,44 @@ namespace DataManager.Assets
 			}
 			return copy.Clone() as TAsset;
 		}
+
+
+		public virtual void OnAfterDeserialize()
+		{
+			var assetRefFields = GetType().GetFields(BindingFlags.Instance |
+				BindingFlags.SetField | BindingFlags.Public| BindingFlags.NonPublic)
+				.Where(p => p.GetCustomAttribute<AssetReferenceAttribute>() != null).ToList();
+
+			foreach (var r in assetRefFields)
+			{
+				var attr = r.GetCustomAttribute<AssetReferenceAttribute>();
+				var type = r.FieldType;
+				var key = GetType().GetProperty(attr.KeyPropertyName).GetValue(this) as string;
+
+				if (!string.IsNullOrEmpty(key))
+				{
+					var asset = AppGame.AssetManager.Assets[type]
+						.Assets.FirstOrDefault(a => a.AssetName == key);
+					if (asset != null)
+					{
+						r.SetValue(this, asset);
+					}
+				}
+			}
+
+		}
 	}
 
+	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
+	public class AssetReferenceAttribute : Attribute
+	{
+		public readonly string KeyPropertyName;
 
+		public AssetReferenceAttribute(string fieldName)
+		{
+			KeyPropertyName = fieldName;
+		}
+	}
 
 	public interface IAssetDatabase
 	{

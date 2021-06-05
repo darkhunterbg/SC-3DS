@@ -51,6 +51,7 @@ namespace DataManager
 	}
 
 
+
 	public static class CustomEnumValues
 	{
 		public static readonly List<string[]> CustomEnums = new List<string[]>();
