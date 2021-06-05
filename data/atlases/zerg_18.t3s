@@ -1,0 +1,11 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/zerg/lair/000.png
+../../data_out/unit/zerg/lair/001.png
+../../data_out/unit/zerg/lair/002.png
+../../data_out/unit/zerg/lair/003.png
+../../data_out/unit/zerg/lair/004.png
+../../data_out/unit/zerg/lair/cm_000.png
+../../data_out/unit/zerg/lair/cm_001.png
+../../data_out/unit/zerg/lair/cm_002.png
+../../data_out/unit/zerg/lair/cm_003.png
+../../data_out/unit/zerg/lair/cm_004.png

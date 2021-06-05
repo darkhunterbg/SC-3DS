@@ -1,0 +1,5 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/thingy/tileset/desert/SHDBBrke/000.png
+../../data_out/unit/thingy/tileset/desert/SHDBGas/000.png
+../../data_out/unit/thingy/tileset/desert/SHDBmed/000.png
+../../data_out/unit/thingy/tileset/desert/SHDBMoss/000.png

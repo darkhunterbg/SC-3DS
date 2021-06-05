@@ -27,9 +27,9 @@ namespace DataManager
 		[DllImport("SDL2.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern void SDL_MaximizeWindow(IntPtr window);
 
-		public static void RunCoroutine(IEnumerator crt)
+		public static GuiCoroutine RunCoroutine(IEnumerator crt)
 		{
-			AppGui.RunGuiCoroutine(crt);
+			return AppGui.RunGuiCoroutine(crt);
 		}
 
 		public AppGame()

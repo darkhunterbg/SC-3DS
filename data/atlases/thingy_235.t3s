@@ -1,0 +1,5 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/thingy/tileset/desert/LDBsuky/000.png
+../../data_out/unit/thingy/tileset/desert/LDBTent/000.png
+../../data_out/unit/thingy/tileset/desert/LDLbox01/000.png
+../../data_out/unit/thingy/tileset/desert/LDMachn1/000.png

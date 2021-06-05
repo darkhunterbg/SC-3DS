@@ -1,0 +1,3 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/thingy/tileset/platform/glob03/000.png
+../../data_out/unit/thingy/tileset/platform/glob1sha/000.png

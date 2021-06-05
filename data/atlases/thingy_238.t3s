@@ -1,0 +1,9 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/thingy/tileset/desert/Sarlacc/000.png
+../../data_out/unit/thingy/tileset/desert/Sarlacc/001.png
+../../data_out/unit/thingy/tileset/desert/Sarlacc/002.png
+../../data_out/unit/thingy/tileset/desert/Sarlacc/003.png
+../../data_out/unit/thingy/tileset/desert/Sarlacc/004.png
+../../data_out/unit/thingy/tileset/desert/Sarlacc/005.png
+../../data_out/unit/thingy/tileset/desert/Sarlacc/006.png
+../../data_out/unit/thingy/tileset/desert/Sarlacc/007.png

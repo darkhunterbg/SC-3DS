@@ -1,0 +1,4 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/thingy/tileset/ashworld/rorock02/000.png
+../../data_out/unit/thingy/tileset/ashworld/rorock03/000.png
+../../data_out/unit/thingy/tileset/badlands/hdrock01/000.png

@@ -167,6 +167,9 @@ namespace DataManager.Widgets
 		{
 			var icon = prop.GetValue(item) as SpriteFrame;
 
+			if (icon == null)
+				return false;
+
 			if (ImGui.ImageButton(icon.Image.GuiImage, icon.SpriteSheet.FrameSize, Vector2.Zero,
 				Vector2.One, 0,
 				Vector4.Zero,

@@ -14,6 +14,13 @@ using System.Threading.Tasks;
 
 namespace DataManager
 {
+	public class GuiCoroutine
+	{
+		public IEnumerator crt;
+		public volatile bool done = false;
+
+	}
+
 	public class AppGui
 	{
 		public AppGame Game { get; private set; }
@@ -24,13 +31,21 @@ namespace DataManager
 
 		private List<IGuiPanel> panels = new List<IGuiPanel>();
 
-		private List<IEnumerator> coroutines = new List<IEnumerator>();
+		private List<GuiCoroutine> coroutines = new List<GuiCoroutine>();
 
 		public object HoverObject;
 
-		public static void RunGuiCoroutine(IEnumerator crt)
+		public static GuiCoroutine RunGuiCoroutine(IEnumerator crt)
 		{
-			AppGame.Gui.coroutines.Add(crt);
+			lock (AppGame.Gui.coroutines)
+			{
+				GuiCoroutine c = new GuiCoroutine()
+				{
+					crt = crt
+				};
+				AppGame.Gui.coroutines.Add(c);
+				return c;
+			}
 		}
 
 		public AppGui(AppGame game)
@@ -109,8 +124,9 @@ namespace DataManager
 			for (int i = 0; i < coroutines.Count; ++i)
 			{
 				var crt = coroutines[i];
-				if (!crt.MoveNext())
+				if (!crt.crt.MoveNext())
 				{
+					crt.done = true;
 					coroutines.RemoveAt(i--);
 				}
 			}

@@ -1,0 +1,9 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/thingy/smoke/000.png
+../../data_out/unit/thingy/smoke/001.png
+../../data_out/unit/thingy/smoke/002.png
+../../data_out/unit/thingy/smoke/003.png
+../../data_out/unit/thingy/smoke/004.png
+../../data_out/unit/thingy/smoke/005.png
+../../data_out/unit/thingy/smoke/006.png
+../../data_out/unit/thingy/smoke/007.png

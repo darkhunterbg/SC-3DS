@@ -1,0 +1,3 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/thingy/tileset/badlands/lcshop08/000.png
+../../data_out/unit/thingy/tileset/badlands/lcshop09/000.png

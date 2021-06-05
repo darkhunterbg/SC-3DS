@@ -17,27 +17,27 @@
   },
   {
     "Mode": 0,
-    "Path": "unit/bullet/*"
+    "Path": "unit/bullet/**"
   },
   {
     "Mode": 0,
-    "Path": "unit/terran/*"
+    "Path": "unit/terran/**"
   },
   {
     "Mode": 0,
-    "Path": "unit/protoss/*"
+    "Path": "unit/protoss/**"
   },
   {
     "Mode": 0,
-    "Path": "unit/zerg/*"
+    "Path": "unit/zerg/**"
   },
   {
     "Mode": 0,
-    "Path": "unit/neutral/*"
+    "Path": "unit/neutral/**"
   },
   {
     "Mode": 4,
-    "Path": "unit/thingy/*"
+    "Path": "unit/thingy/**"
   },
   {
     "Mode": 5,
@@ -49,10 +49,18 @@
   },
   {
     "Mode": 6,
-    "Path": "unit/**/*shad*"
+    "Path": "unit/**/*sha*"
   },
   {
     "Mode": 3,
     "Path": "unit/wirefram/*"
+  },
+  {
+    "Mode": 0,
+    "Path": "unit/flingy/**"
+  },
+  {
+    "Mode": 5,
+    "Path": "game/blink*"
   }
 ]

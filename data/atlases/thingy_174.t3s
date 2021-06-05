@@ -1,0 +1,6 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/thingy/spotrail/000.png
+../../data_out/unit/thingy/spotrail/001.png
+../../data_out/unit/thingy/spotrail/002.png
+../../data_out/unit/thingy/spotrail/003.png
+../../data_out/unit/thingy/startloc/000.png

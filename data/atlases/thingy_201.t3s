@@ -1,0 +1,7 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/thingy/tileset/badlands/hdrock07/000.png
+../../data_out/unit/thingy/tileset/badlands/hdrock08/000.png
+../../data_out/unit/thingy/tileset/badlands/hdrock1s/000.png
+../../data_out/unit/thingy/tileset/badlands/hdrock2s/000.png
+../../data_out/unit/thingy/tileset/badlands/hdrock3s/000.png
+../../data_out/unit/thingy/tileset/badlands/hdrock4s/000.png

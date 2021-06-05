@@ -1,0 +1,5 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/terran/comsatc/000.png
+../../data_out/unit/terran/comsatc/001.png
+../../data_out/unit/terran/comsatc/002.png
+../../data_out/unit/terran/comsatc/003.png

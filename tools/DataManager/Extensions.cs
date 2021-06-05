@@ -25,7 +25,7 @@ namespace DataManager
 
 	public static class Vector2Exptensions
 	{
-		public static Vector2 ToVec4(this Microsoft.Xna.Framework.Vector2 v)
+		public static Vector2 ToVec2(this Microsoft.Xna.Framework.Vector2 v)
 		{
 			return new Vector2(v.X, v.Y);
 		}

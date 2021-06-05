@@ -1,0 +1,6 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/thingy/tileset/ashworld/hasroc01/000.png
+../../data_out/unit/thingy/tileset/ashworld/hasroc02/000.png
+../../data_out/unit/thingy/tileset/ashworld/hasroc03/000.png
+../../data_out/unit/thingy/tileset/ashworld/hasroc04/000.png
+../../data_out/unit/thingy/tileset/ashworld/hasroc05/000.png

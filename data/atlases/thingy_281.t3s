@@ -1,0 +1,4 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/thingy/tileset/install/dicran2/000.png
+../../data_out/unit/thingy/tileset/install/dicran3/000.png
+../../data_out/unit/thingy/tileset/install/dicran4/000.png

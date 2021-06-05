@@ -1,0 +1,3 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/thingy/tileset/jungle/tree03/000.png
+../../data_out/unit/thingy/tileset/jungle/tree04/000.png

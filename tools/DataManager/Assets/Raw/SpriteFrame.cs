@@ -50,6 +50,7 @@ namespace DataManager.Assets
 			return SpriteSheet.ImageAsset.Frames[FrameIndex];
 		}
 
+		[Ignore]
 		public GuiTexture Image => AppGame.AssetManager.GetSheetImage(SpriteSheet.SheetName, FrameIndex);
 	}
 }

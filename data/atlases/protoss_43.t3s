@@ -1,0 +1,9 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/protoss/photon/000.png
+../../data_out/unit/protoss/photon/001.png
+../../data_out/unit/protoss/photon/002.png
+../../data_out/unit/protoss/photon/003.png
+../../data_out/unit/protoss/photon/cm_000.png
+../../data_out/unit/protoss/photon/cm_001.png
+../../data_out/unit/protoss/photon/cm_002.png
+../../data_out/unit/protoss/photon/cm_003.png

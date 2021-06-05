@@ -1,0 +1,5 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/thingy/od022/000.png
+../../data_out/unit/thingy/od032/000.png
+../../data_out/unit/thingy/od048/000.png
+../../data_out/unit/thingy/od062/000.png

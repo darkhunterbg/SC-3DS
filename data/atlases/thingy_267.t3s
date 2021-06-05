@@ -1,0 +1,6 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/thingy/tileset/Ice/SLDComm/000.png
+../../data_out/unit/thingy/tileset/Ice/SLDDish/000.png
+../../data_out/unit/thingy/tileset/Ice/SLDDTre1/000.png
+../../data_out/unit/thingy/tileset/Ice/SLDDTre2/000.png
+../../data_out/unit/thingy/tileset/Ice/SLDRck01/000.png

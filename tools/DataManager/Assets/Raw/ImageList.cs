@@ -15,7 +15,7 @@ namespace DataManager.Assets
 		{
 			public string fileName;
 			public Microsoft.Xna.Framework.Rectangle rect;
-
+			public int index;
 		}
 
 		public string InfoFilePath { get; private set; }
@@ -55,7 +55,8 @@ namespace DataManager.Assets
 				Frames.Add(new FrameData()
 				{
 					fileName = name,
-					rect = rect
+					rect = rect,
+					index = Frames.Count
 				});
 			}
 		}

@@ -1,0 +1,4 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/thingy/tileset/twilight/LDxel02/000.png
+../../data_out/unit/thingy/tileset/twilight/LDxel02/001.png
+../../data_out/unit/thingy/tileset/twilight/LDxel02/002.png

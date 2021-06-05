@@ -11,6 +11,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace DataManager
 {
@@ -34,11 +35,6 @@ namespace DataManager
 			AppGame.GuiRenderer.UnbindTexture(GuiImage);
 		}
 	}
-
-
-
-
-
 
 	public enum GRPConvertMode
 	{
@@ -92,15 +88,15 @@ namespace DataManager
 		public static readonly CsvConfiguration CsvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
 		{
 			Delimiter = ",",
-			
-			
+
+
 		};
 
 		public Dictionary<Type, IAssetDatabase> Assets { get; private set; } = new Dictionary<Type, IAssetDatabase>();
 
 		public AssetManager()
 		{
-	
+
 			if (!Directory.Exists(ConvertedAssetDir))
 				Directory.CreateDirectory(ConvertedAssetDir);
 
@@ -231,7 +227,6 @@ namespace DataManager
 				Icons.AddRange(iconsSheet.Frames);
 			}
 		}
-
 
 		public GuiTexture GetSheetImage(string sheetName, int frameIndex)
 		{
@@ -406,11 +401,13 @@ namespace DataManager
 
 		public void ExportAtlas(IEnumerable<ImageList> assets, string atlasName)
 		{
+			Rectangle rect = new Rectangle(0, 0, 1024, 1024);
+
 			List<ImageList> group = new List<ImageList>();
 
 			SpriteAtlas spriteAtlas = new SpriteAtlas(atlasName);
 
-			int freeSpace = (1024 * 1024 * 90) / 100;
+			int freeSpace = (1024 * 1024) / 100;
 
 			var r = new SpriteSubAtlas();
 
@@ -424,6 +421,7 @@ namespace DataManager
 				{
 					spriteAtlas.AddSubAtlas(group);
 					group.Clear();
+					group.Add(asset);
 				}
 			}
 
@@ -461,7 +459,7 @@ namespace DataManager
 
 			var records = SpriteAtlases.SelectMany(s => s.SubAtlases).OrderBy(t => t.AtlasName).ThenBy(t => t.AtlasIndex);
 
-			var frames = SpriteSheets.SelectMany(s => s.Frames).OrderBy(f => f.SpriteSheetName);
+			var frames = SpriteSheets.SelectMany(s => s.Frames).OrderBy(f => f.SpriteSheetName).ToList();
 
 			using (var csv = new CsvWriter(new StreamWriter(SpriteAtlasDataPath), CsvConfig))
 			{
@@ -484,7 +482,7 @@ namespace DataManager
 			Process p = null;
 			bool done = false;
 
-			return new AsyncOperation((Action<float> report) =>
+			return new AsyncOperation((op) =>
 			{
 				int i = 0;
 				foreach (var subatlas in asset.SubAtlases)
@@ -516,7 +514,7 @@ namespace DataManager
 					if (!string.IsNullOrEmpty(error))
 						throw new Exception($"Failed to build subatlas {subatlas.FullName}: {error}");
 
-					report((float)i / (float)asset.SubAtlases.Count());
+					op.Progress = ((float)i / (float)asset.SubAtlases.Count());
 				}
 			}, () =>
 			{

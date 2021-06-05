@@ -1,0 +1,6 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/thingy/tileset/jungle/hdrock01/000.png
+../../data_out/unit/thingy/tileset/jungle/hdrock02/000.png
+../../data_out/unit/thingy/tileset/jungle/hdrock03/000.png
+../../data_out/unit/thingy/tileset/jungle/hdrock04/000.png
+../../data_out/unit/thingy/tileset/jungle/hdrock1s/000.png

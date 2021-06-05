@@ -1,10 +1,13 @@
 ﻿using DataManager.Assets;
+using DataManager.Assets.Raw;
+using DataManager.Build;
 using GlobExpressions;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -13,91 +16,12 @@ using System.Threading.Tasks;
 
 namespace DataManager.Panels
 {
-	public class SpriteAtlasEntry
-	{
-		[JsonProperty]
-		public string OutputName = string.Empty;
-		[JsonProperty(PropertyName = "ImageList")]
-		private List<string> imageList = new List<string>();
-
-		[JsonIgnore]
-		public List<ImageList> Assets = new List<ImageList>();
-		[JsonIgnore]
-		public readonly int Id = -1;
-		[JsonIgnore]
-		public float Used { get; private set; }
-
-		static int id = 0;
-
-		public SpriteAtlasEntry()
-		{
-			Id = ++id;
-		}
-
-		public void Init()
-		{
-			Assets.Clear();
-
-			foreach (var l in imageList)
-			{
-				var item = AppGame.AssetManager.ImageLists.FirstOrDefault(a => a.RelativePath == l);
-				if (item == null || Assets.Contains(item))
-					continue;
-
-				Assets.Add(item);
-			}
-
-			Assets = Assets.OrderBy(a => a.RelativePath).ToList();
-			imageList.Sort();
-
-			RecalculateUsed();
-		}
-
-		public void SetAssets(IEnumerable<ImageList> assets)
-		{
-			imageList.Clear();
-			Assets.Clear();
-
-
-			Assets.AddRange(assets.Distinct());
-			Assets = Assets.OrderBy(a => a.RelativePath).ToList();
-
-			imageList.AddRange(Assets.Select(s => s.RelativePath));
-
-			imageList.Sort();
-
-			RecalculateUsed();
-		}
-
-		public void RemoveAsset(ImageList asset)
-		{
-			Assets.Remove(asset);
-			imageList.Remove(asset.RelativePath);
-			RecalculateUsed();
-		}
-
-		public static float CalculateUsage(ImageList asset)
-		{
-			int size = 1024 * 1024;
-			int used = asset.TakenSpace;
-
-			return (float)used / (float)size;
-		}
-
-		private void RecalculateUsed()
-		{
-			int size = 1024 * 1024;
-			int used = Assets.Sum(a => a.TakenSpace);
-
-			Used = (float)used / (float)size;
-		}
-	}
 
 	public class SpriteAtlasGenerator : IGuiPanel
 	{
 		private List<SpriteAtlasEntry> entries = new List<SpriteAtlasEntry>();
 
-		static readonly string SettingsFileName = "sprite_atlases";
+		public static readonly string SettingsFileName = "sprite_atlases";
 
 		bool changed = false;
 		bool selectItemsModal = false;
@@ -203,7 +127,7 @@ namespace DataManager.Panels
 				}
 
 				ImGui.SameLine();
-				ImGui.Text($"{(int)(entry.Used * 100)}%% used");
+				ImGui.Text($"Atlas Size {(int)(entry.Used * 100)}%% ");
 
 				ImGui.SameLine();
 				if (ImGui.Button($"Edit List##sag.entries.edit.{entry.Id}"))
@@ -218,6 +142,12 @@ namespace DataManager.Panels
 				bool generated = AppGame.AssetManager.SpriteAtlases.Any(f => f.Name == entry.OutputName);
 
 
+				ImGui.SameLine();
+
+				if (ImGui.Button($"Generate##sag,entries.gen.{entry.Id}"))
+				{
+					GenerateSingle(entry);
+				}
 				ImGui.SameLine();
 
 				if (generated)
@@ -322,6 +252,13 @@ namespace DataManager.Panels
 				}
 			}
 
+			ImGui.SameLine();
+
+			if (ImGui.Button("Clear Selection##sag.entries.add.clear"))
+			{
+				modalSelectedAssets.Clear();
+			}
+
 			query = query.OrderByDescending(asset => modalSelectedAssets.Contains(asset));
 
 			int i = 0;
@@ -391,6 +328,12 @@ namespace DataManager.Panels
 
 		}
 
+		private void GenerateSingle(SpriteAtlasEntry entry)
+		{
+			AppGame.AssetManager.ExportAtlas(entry.Assets, entry.OutputName);
+			AppGame.AssetManager.ReloadAssets();
+		}
+
 		private IEnumerator GenerateCrt()
 		{
 			foreach (var file in Directory.GetFiles(AssetManager.SpriteAtlasDir))
@@ -405,7 +348,6 @@ namespace DataManager.Panels
 					yield break;
 
 				AppGame.AssetManager.ExportAtlas(entry.Assets, entry.OutputName);
-
 
 				yield return null;
 			}
@@ -428,7 +370,7 @@ namespace DataManager.Panels
 			while (!op.Completed)
 			{
 				float tmpProgress = op.Progress;
-	
+
 				if (!AppGui.ProgressDialog($"Building atlas: {atlas.Name}", tmpProgress, true))
 				{
 					op.Cancel();
@@ -443,35 +385,33 @@ namespace DataManager.Panels
 
 		private IEnumerator BuildAllCrt()
 		{
-			foreach(var file in Directory.GetFiles(AssetManager.SpriteBuildDir))
+			Stopwatch timer = new Stopwatch();
+			timer.Start();
+
+			BuildGenerator build = new BuildGenerator();
+
+			foreach (var file in Directory.GetFiles(AssetManager.SpriteBuildDir))
 				File.Delete(file);
 
-		
-			float progress = 0;
-			int count = AppGame.AssetManager.SpriteAtlases.Count;
 
-			foreach (var atlas in AppGame.AssetManager.SpriteAtlases)
+			var op = build.BuildAtlases(entries);
+
+
+			while (!op.Completed)
 			{
-				var op = AppGame.AssetManager.BuildAtlas(atlas);
+				var elapsed = TimeSpan.FromSeconds((int)timer.Elapsed.TotalSeconds);
 
-				while (!op.Completed)
+				if (!AppGui.ProgressDialog($"Building: {op.ItemName} ({elapsed.ToString("c")}) ", op.Progress, true))
 				{
-					float tmpProgress = op.Progress + progress;
-					tmpProgress /= (float)count;
+					op.Cancel();
+					break;
 
-					if (!AppGui.ProgressDialog($"Building atlas: {atlas.Name}", tmpProgress, true))
-					{
-						op.Cancel();
-						yield break;
-
-					}
-
-		
-					yield return null;
 				}
-
-				progress += 1;
+				yield return null;
 			}
+
+			build.Dispose();
+
 		}
 	}
 

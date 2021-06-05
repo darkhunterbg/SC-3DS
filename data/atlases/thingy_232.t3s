@@ -1,0 +1,7 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/thingy/tileset/desert/JGBroke/000.png
+../../data_out/unit/thingy/tileset/desert/JGBsgn/000.png
+../../data_out/unit/thingy/tileset/desert/JGBTent/000.png
+../../data_out/unit/thingy/tileset/desert/JGPlnt01/000.png
+../../data_out/unit/thingy/tileset/desert/JGPlnt02/000.png
+../../data_out/unit/thingy/tileset/desert/LDBaz/000.png

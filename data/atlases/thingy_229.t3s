@@ -1,0 +1,4 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/thingy/tileset/desert/HDBBroke/000.png
+../../data_out/unit/thingy/tileset/desert/HDBGas/000.png
+../../data_out/unit/thingy/tileset/desert/HDBmed/000.png

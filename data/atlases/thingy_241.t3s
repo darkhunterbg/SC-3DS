@@ -1,0 +1,4 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/thingy/tileset/desert/SJGBFact/000.png
+../../data_out/unit/thingy/tileset/desert/SJgbgas/000.png
+../../data_out/unit/thingy/tileset/desert/SJgbgen/000.png

@@ -69,11 +69,13 @@ namespace DataManager
 	}
 	public class AsyncOperation
 	{
-
 		private Exception ex = null;
 		private volatile bool completed = false;
 
-		public float Progress { get; private set; }
+		public volatile string ItemName = string.Empty;
+
+		public volatile float Progress = 0;
+
 
 		public bool Completed
 		{
@@ -98,17 +100,14 @@ namespace DataManager
 				onCancelled();
 		}
 
-		public AsyncOperation(Action<Action<float>> action, Action onCancelled = null)
+		public AsyncOperation(Action<AsyncOperation> action, Action onCancelled = null)
 		{
 			this.onCancelled = onCancelled;
 			Task.Run(() =>
 			{
 				try
 				{
-					action((f) =>
-					{
-						Progress = f;
-					});
+					action(this);
 				}
 				catch (Exception ex)
 				{
@@ -118,4 +117,7 @@ namespace DataManager
 			}).ConfigureAwait(false);
 		}
 	}
+
+
+
 }

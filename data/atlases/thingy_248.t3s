@@ -1,0 +1,5 @@
+--atlas -f auto-etc1 -z auto -q high
+../../data_out/unit/thingy/tileset/Ice/HDSTre04/000.png
+../../data_out/unit/thingy/tileset/Ice/HDTwr01/000.png
+../../data_out/unit/thingy/tileset/Ice/HDTwr02/000.png
+../../data_out/unit/thingy/tileset/Ice/JGAnt1/000.png

@@ -48,16 +48,14 @@ namespace DataManager.Assets
 		public SpriteSheet(SpriteSubAtlas subAtlas, int imageListIndex)
 		{
 			var imageList = subAtlas.ImageLists[imageListIndex];
-
+			ImageAsset = imageList;
 			SheetName = imageList.RelativePath;
 			Atlas = subAtlas.AtlasName;
 			SubAtlasId = subAtlas.AtlasIndex;
 			SubAtlasOffset = subAtlas.ImageLists.Take(imageListIndex).Sum(s => s.Frames.Count);
-			TotalFrames = subAtlas.ImageLists[imageListIndex].Frames.Count();
+			TotalFrames = imageList.Frames.Count();
 			Width = (int)imageList.FrameSize.X;
 			Height = (int)imageList.FrameSize.Y;
-
-			ImageAsset = subAtlas.ImageLists[imageListIndex];
 
 			UnitColorOffset = ImageAsset.Frames.IndexOf(f => f.fileName.StartsWith("cm_"));
 			if (UnitColorOffset < 0)
@@ -75,7 +73,9 @@ namespace DataManager.Assets
 		{
 			SubAtlas = AppGame.AssetManager.SpriteAtlases.FirstOrDefault(a => a.Name == Atlas)
 				.SubAtlases.FirstOrDefault(s => s.AtlasIndex == SubAtlasId);
-			ImageAsset = SubAtlas.GetImageListAtOffset(SubAtlasOffset);
+			
+			ImageAsset= SubAtlas.ImageLists.FirstOrDefault(s => s.RelativePath == SheetName); 
+			//ImageAsset = SubAtlas.GetImageListAtOffset(SubAtlasOffset);
 			for (int i = 0; i < TotalFrames; ++i)
 			{
 				Frames.Add(new SpriteFrame(this, i));

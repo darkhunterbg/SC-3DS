@@ -70,7 +70,7 @@ namespace DataManager.Assets
 		public ImageList GetImageListAtOffset(int offset)
 		{
 			int i = 0;
-			while (offset > 0)
+			while (offset >= ImageLists[i].Frames.Count)
 			{
 				offset -= ImageLists[i].Frames.Count;
 				++i;
