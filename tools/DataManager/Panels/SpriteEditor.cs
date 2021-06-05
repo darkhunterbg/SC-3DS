@@ -21,7 +21,7 @@ namespace DataManager.Panels
 
 		private Vector4 previewBgColor = Microsoft.Xna.Framework.Color.CornflowerBlue.ToVec4();
 
-		private TableEditor<LogicalSpriteAsset> table;
+		private AssetTableEditor<LogicalSpriteAsset> table = new AssetTableEditor<LogicalSpriteAsset>("##se.table");
 
 		private List<SpriteFrame> selectionFrames = new List<SpriteFrame>();
 
@@ -44,10 +44,6 @@ namespace DataManager.Panels
 				selectionFrames.Add(ss.Frames[0]);
 			}
 
-			table = new TableEditor<LogicalSpriteAsset>("##se.table");
-			table.OnNewItem = CreateNewSprite;
-
-			table.DataSource = AppGame.AssetManager.Sprites;
 		}
 
 		public void Draw(Vector2 clientSize)
@@ -77,10 +73,7 @@ namespace DataManager.Panels
 
 			ImGui.End();
 
-			if (table.HasChanges)
-			{
-				AppGame.AssetManager.SaveSprites();
-			}
+			table.SaveChanges();
 		}
 
 		private void DrawSpritePreview(int width)
@@ -159,27 +152,6 @@ namespace DataManager.Panels
 				 Microsoft.Xna.Framework.Color.White);
 
 			AppGui.SpriteBatchEnd();
-		}
-
-		private LogicalSpriteAsset CreateNewSprite(LogicalSpriteAsset copy)
-		{
-			LogicalSpriteAsset sprite = null;
-
-			if (copy != null)
-			{
-				sprite = Util.ShallowCopyProperties(copy);
-				sprite.Name = copy.Name + " Copy";
-			}
-			else
-			{
-				sprite = new LogicalSpriteAsset(AppGame.AssetManager.Images.FirstOrDefault())
-				{
-					Name = "New Sprite"
-
-				};
-			}
-
-			return sprite;
 		}
 	}
 }

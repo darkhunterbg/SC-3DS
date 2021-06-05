@@ -70,11 +70,15 @@ namespace DataManager.Widgets
 			HoverItem = null;
 			changed = false;
 
+			if (DataSource == null)
+				return;
+
 			DrawControlHeader();
 
 			if (!ImGui.BeginTable(id, editorProperties.Count + 1, ImGuiTableFlags.BordersInnerH
 	| ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable ))
 				return;
+
 
 			ImGui.TableSetupScrollFreeze(0, 1);
 

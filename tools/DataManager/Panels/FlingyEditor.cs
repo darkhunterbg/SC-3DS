@@ -12,23 +12,7 @@ namespace DataManager.Panels
 {
 	public class FlingyEditor : IGuiPanel
 	{
-		private TableEditor<FlingyAsset> table = new TableEditor<FlingyAsset>("##fe.table");
-
-		public FlingyEditor()
-		{
-			table.DataSource = AppGame.AssetManager.Flingy ;
-			table.OnNewItem = (c) =>
-			{
-				if (c != null)
-				{
-					return Util.ShallowCopyProperties(c);
-				}
-				else
-				{
-					return new FlingyAsset(AppGame.AssetManager.Sprites.FirstOrDefault());
-				}
-			};
-		}
+		private AssetTableEditor<FlingyAsset> table = new AssetTableEditor<FlingyAsset>("##fe.table");
 
 		public void Draw(Vector2 clientSize)
 		{
@@ -39,8 +23,7 @@ namespace DataManager.Panels
 
 			ImGui.End();
 
-			if (table.HasChanges)
-				AppGame.AssetManager.SaveFlingy();
+			table.SaveChanges();
 		}
 	}
 }

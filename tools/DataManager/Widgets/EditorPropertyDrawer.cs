@@ -139,11 +139,9 @@ namespace DataManager.Widgets
 		{
 			var asset = prop.GetValue(item) as Asset;
 
-			var icon = asset.Preview;
-
-			if (asset.Preview != null)
+			if (asset?.Preview != null)
 			{
-				ImGui.Image(icon.GuiImage, new Vector2(32, 32));
+				ImGui.Image(asset.Preview.GuiImage, new Vector2(32, 32));
 				ImGui.SameLine();
 			}
 

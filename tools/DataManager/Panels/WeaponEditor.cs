@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 
 namespace DataManager.Panels
 {
-	public class UpgradeEditor : IGuiPanel
+	public class WeaponEditor : IGuiPanel
 	{
-		private AssetTableEditor<UpgradeAsset> table = new AssetTableEditor<UpgradeAsset>("#ue.table");
+		private AssetTableEditor<WeaponAsset> table = new AssetTableEditor<WeaponAsset>("#we.table");
 
 		public void Draw(Vector2 clientSize)
 		{
-			if (!ImGui.Begin("Upgrade Editor##ue"))
+			if (!ImGui.Begin("Weapon Editor##we"))
 				return;
 
 			table.Draw();

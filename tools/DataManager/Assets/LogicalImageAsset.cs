@@ -13,7 +13,7 @@ namespace DataManager.Assets
 	public class LogicalImageAsset : Asset
 	{
 		[Ignore]
-		public SpriteSheetAsset SpriteSheet { get; private set; }
+		public SpriteSheet SpriteSheet { get; private set; }
 
 
 		[Index(0),Name("SpriteSheet")]
@@ -43,7 +43,7 @@ namespace DataManager.Assets
 
 		public LogicalImageAsset() : base() { }
 
-		public LogicalImageAsset(SpriteSheetAsset asset)
+		public LogicalImageAsset(SpriteSheet asset)
 		{
 			SpriteSheet = asset;
 			SpriteSheetName = asset.SheetName;

@@ -11,7 +11,7 @@ namespace DataManager.Assets
 	public class SpriteFrame 
 	{
 		[Ignore]
-		public SpriteSheetAsset SpriteSheet { get; private set; }
+		public SpriteSheet SpriteSheet { get; private set; }
 
 		[Index(0), Name("SpriteSheet")]
 		public string SpriteSheetName { get; set; }
@@ -33,7 +33,7 @@ namespace DataManager.Assets
 			return offset;
 		}
 
-		public SpriteFrame(SpriteSheetAsset asset, int frame)
+		public SpriteFrame(SpriteSheet asset, int frame)
 		{
 			SpriteSheet = asset;
 			SpriteSheetName = asset.SheetName;

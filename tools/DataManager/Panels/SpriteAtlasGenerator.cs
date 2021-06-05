@@ -215,7 +215,7 @@ namespace DataManager.Panels
 					modalSelectedAssets.AddRange(entry.Assets);
 				}
 
-				bool generated = AppGame.AssetManager.SpriteAtlasAssets.Any(f => f.Name == entry.OutputName);
+				bool generated = AppGame.AssetManager.SpriteAtlases.Any(f => f.Name == entry.OutputName);
 
 
 				ImGui.SameLine();
@@ -396,7 +396,7 @@ namespace DataManager.Panels
 			foreach (var file in Directory.GetFiles(AssetManager.SpriteAtlasDir))
 				File.Delete(file);
 
-			AppGame.AssetManager.SpriteAtlasAssets.Clear();
+			AppGame.AssetManager.SpriteAtlases.Clear();
 
 			int i = 0;
 			foreach (var entry in entries)
@@ -411,13 +411,13 @@ namespace DataManager.Panels
 			}
 
 
-			AppGame.AssetManager.ReloadImages();
+			AppGame.AssetManager.ReloadAssets();
 
 		}
 
 		private IEnumerator BuildAtlasCrt(SpriteAtlasEntry entry)
 		{
-			var atlas = AppGame.AssetManager.SpriteAtlasAssets.FirstOrDefault(f => f.Name == entry.OutputName);
+			var atlas = AppGame.AssetManager.SpriteAtlases.FirstOrDefault(f => f.Name == entry.OutputName);
 
 			if (atlas == null)
 				yield break;
@@ -448,9 +448,9 @@ namespace DataManager.Panels
 
 		
 			float progress = 0;
-			int count = AppGame.AssetManager.SpriteAtlasAssets.Count;
+			int count = AppGame.AssetManager.SpriteAtlases.Count;
 
-			foreach (var atlas in AppGame.AssetManager.SpriteAtlasAssets)
+			foreach (var atlas in AppGame.AssetManager.SpriteAtlases)
 			{
 				var op = AppGame.AssetManager.BuildAtlas(atlas);
 

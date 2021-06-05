@@ -120,7 +120,7 @@ namespace DataManager.Widgets
 		{
 			var tmp = selected as Asset;
 
-			var query = AppGame.AssetManager.Assets[objType];
+			var query = AppGame.AssetManager.Assets[objType].Assets;
 			query = Util.TextFilter(query, textFilter, t => t.AssetName);
 			query = query.OrderBy(asset => asset.AssetName);
 

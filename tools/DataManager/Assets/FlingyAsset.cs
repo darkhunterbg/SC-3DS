@@ -61,7 +61,7 @@ namespace DataManager.Assets
 
 		public override void OnAfterDeserialize()
 		{
-			_sprite = AppGame.AssetManager.Sprites.FirstOrDefault(s => s.Name == SpriteName);
+			_sprite = AppGame.AssetManager.GetAssets<LogicalSpriteAsset>().FirstOrDefault(s => s.Name == SpriteName);
 		}
 	}
 }

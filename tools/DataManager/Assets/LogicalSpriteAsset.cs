@@ -63,7 +63,7 @@ namespace DataManager.Assets
 		}
 		public override void  OnAfterDeserialize()
 		{
-			_img = AppGame.AssetManager.Images.FirstOrDefault(s => s.SpriteSheetName == ImageName);
+			_img = AppGame.AssetManager.GetAssets<LogicalImageAsset>().FirstOrDefault(s => s.SpriteSheetName == ImageName);
 		}
 	}
 }

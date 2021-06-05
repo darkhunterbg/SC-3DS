@@ -4,6 +4,7 @@ using CsvHelper.Configuration.Attributes;
 using DataManager.Assets;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -33,6 +34,8 @@ namespace DataManager
 			AppGame.GuiRenderer.UnbindTexture(GuiImage);
 		}
 	}
+
+
 
 
 
@@ -72,28 +75,29 @@ namespace DataManager
 		public static readonly string FramesDataPath = $"{GameDataDir}frames.csv";
 		public static readonly string UpgradesDataPath = $"{GameDataDir}upgrades.csv";
 		public static readonly string FlingyDataPath = $"{GameDataDir}flingy.csv";
+		public static readonly string WeaponsDataPath = $"{GameDataDir}weapons.csv";
 
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();
 
 		public List<ImageList> ImageLists { get; private set; } = new List<ImageList>();
-		public List<SpriteAtlas> SpriteAtlasAssets { get; private set; } = new List<SpriteAtlas>();
-		public List<SpriteSheetAsset> SpriteSheets { get; private set; } = new List<SpriteSheetAsset>();
-		public List<LogicalImageAsset> Images { get; private set; } = new List<LogicalImageAsset>();
-		public List<LogicalSpriteAsset> Sprites { get; private set; } = new List<LogicalSpriteAsset>();
-		public List<UpgradeAsset> Upgrades { get; private set; } = new List<UpgradeAsset>();
-		public List<FlingyAsset> Flingy { get; private set; } = new List<FlingyAsset>();
+		public List<SpriteAtlas> SpriteAtlases { get; private set; } = new List<SpriteAtlas>();
+		public List<SpriteSheet> SpriteSheets { get; private set; } = new List<SpriteSheet>();
+		//public List<LogicalImageAsset> Images { get; private set; } = new List<LogicalImageAsset>();
+		//public List<LogicalSpriteAsset> Sprites { get; private set; } = new List<LogicalSpriteAsset>();
+		//public List<UpgradeAsset> Upgrades { get; private set; } = new List<UpgradeAsset>();
+		//public List<FlingyAsset> Flingy { get; private set; } = new List<FlingyAsset>();
 
 		public List<SpriteFrame> Icons { get; private set; } = new List<SpriteFrame>();
 
 		private Dictionary<string, List<GuiTexture>> loadedSheetImages = new Dictionary<string, List<GuiTexture>>();
 
-		private CsvConfiguration csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+		public static readonly CsvConfiguration CsvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
 		{
 			Delimiter = ",",
 			
 		};
 
-		public Dictionary<Type, IEnumerable<Asset>> Assets { get; private set; } = new Dictionary<Type, IEnumerable<Asset>>();
+		public Dictionary<Type, IAssetDatabase> Assets { get; private set; } = new Dictionary<Type, IAssetDatabase>();
 
 		public AssetManager()
 		{
@@ -106,28 +110,46 @@ namespace DataManager
 			if (!Directory.Exists(SpriteBuildDir))
 				Directory.CreateDirectory(SpriteBuildDir);
 
+
+			AddNewAssetDatabase<LogicalImageAsset>(ImagesDataPath);
+			AddNewAssetDatabase<LogicalSpriteAsset>(SpritesDataPath);
+			AddNewAssetDatabase<UpgradeAsset>(UpgradesDataPath);
+			AddNewAssetDatabase<FlingyAsset>(FlingyDataPath);
+			AddNewAssetDatabase<WeaponAsset>(WeaponsDataPath);
+
+		}
+
+		private void AddNewAssetDatabase<TAsset>(string filePath) where TAsset : Asset
+		{
+			Assets[typeof(TAsset)] = new AssetDatabase<TAsset>(filePath);
+		}
+
+		public AssetDatabase<TAsset> GetAssetDatabase<TAsset>() where TAsset : Asset
+		{
+			return Assets[typeof(TAsset)] as AssetDatabase<TAsset>;
+		}
+
+		public List<TAsset> GetAssets<TAsset>() where TAsset : Asset
+		{
+			return (Assets[typeof(TAsset)] as AssetDatabase<TAsset>).Assets;
 		}
 
 
 		public void LoadEverything()
 		{
-			Assets[typeof(SpriteSheetAsset)] = SpriteSheets;
-			Assets[typeof(LogicalImageAsset)] = Images;
-			Assets[typeof(LogicalSpriteAsset)] = Sprites;
-			Assets[typeof(UpgradeAsset)] = Upgrades;
-			Assets[typeof(FlingyAsset)] = Flingy;
-
 			LoadPalettes();
-			LoadImageListAssets();
-			LoadSpriteAtlasAssets();
-
-			ReloadImages();
-
-			ReloadUpgrades();
-
-			ReloadFlingy();
+			LoadImageLists();
+			LoadSpriteAtlases();
+			ReloadAssets();
 		}
-		public void LoadImageListAssets()
+
+		public void ReloadAssets()
+		{
+			foreach (var db in Assets.Values)
+				db.Reload();
+		}
+
+		public void LoadImageLists()
 		{
 			ImageLists.Clear();
 
@@ -138,9 +160,14 @@ namespace DataManager
 
 		}
 
-		public void LoadSpriteAtlasAssets()
+		public void LoadSpriteAtlases()
 		{
-			SpriteAtlasAssets.Clear();
+			foreach (var tex in loadedSheetImages.SelectMany(s => s.Value))
+				tex.Dispose();
+
+			loadedSheetImages.Clear();
+
+			SpriteAtlases.Clear();
 			SpriteSheets.Clear();
 			Icons.Clear();
 
@@ -149,7 +176,7 @@ namespace DataManager
 
 			List<IGrouping<string, SpriteSubAtlas>> atlasRecords = null;
 
-			using (var csv = new CsvReader(new StreamReader(SpriteAtlasDataPath), csvConfig))
+			using (var csv = new CsvReader(new StreamReader(SpriteAtlasDataPath), CsvConfig))
 			{
 				atlasRecords = csv.GetRecords<SpriteSubAtlas>().GroupBy(g => g.AtlasName)
 					.ToList();
@@ -180,15 +207,15 @@ namespace DataManager
 			foreach (var group in atlasRecords)
 			{
 				var s = new SpriteAtlas(group.Key);
-				SpriteAtlasAssets.Add(s);
+				SpriteAtlases.Add(s);
 
 				s.SetSubAtlases(group);
 			}
 
 
-			using (var csv = new CsvReader(new StreamReader(SpriteSheetDataPath), csvConfig))
+			using (var csv = new CsvReader(new StreamReader(SpriteSheetDataPath), CsvConfig))
 			{
-				SpriteSheets.AddRange(csv.GetRecords<SpriteSheetAsset>());
+				SpriteSheets.AddRange(csv.GetRecords<SpriteSheet>());
 			}
 
 
@@ -204,93 +231,6 @@ namespace DataManager
 			}
 		}
 
-		public void ReloadImages()
-		{
-			foreach (var tex in loadedSheetImages.SelectMany(s => s.Value))
-				tex.Dispose();
-
-			loadedSheetImages.Clear();
-
-			Images.Clear();
-
-			if (File.Exists(ImagesDataPath))
-			{
-				using (var csv = new CsvReader(new StreamReader(ImagesDataPath), csvConfig))
-				{
-					Images.AddRange(csv.GetRecords<LogicalImageAsset>());
-				}
-			}
-
-			foreach (var sheet in SpriteSheets)
-			{
-				var item = Images.FirstOrDefault(i => i.SpriteSheetName == sheet.SheetName);
-				if (item != null)
-				{
-					item.OnAfterDeserialize();
-				}
-				else
-				{
-					item = new LogicalImageAsset(sheet);
-					Images.Add(item);
-				}
-			}
-
-
-			Images = Images.OrderBy(i => i.SpriteSheetName).ToList();
-
-			ReloadSprites();
-		}
-
-		public void ReloadSprites()
-		{
-			Sprites.Clear();
-
-			if (!File.Exists(SpritesDataPath))
-				return;
-			using (var csv = new CsvReader(new StreamReader(SpritesDataPath), csvConfig))
-			{
-				Sprites.AddRange(csv.GetRecords<LogicalSpriteAsset>());
-			}
-
-			foreach (var s in Sprites)
-			{
-				s.OnAfterDeserialize();
-			}
-		}
-
-		public void ReloadUpgrades()
-		{
-			Upgrades.Clear();
-
-			if (!File.Exists(UpgradesDataPath))
-				return;
-			using (var csv = new CsvReader(new StreamReader(UpgradesDataPath), csvConfig))
-			{
-				Upgrades.AddRange(csv.GetRecords<UpgradeAsset>());
-			}
-
-			foreach (var s in Upgrades)
-			{
-				s.OnAfterDeserialize();
-			}
-		}
-
-		public void ReloadFlingy()
-		{
-			Flingy.Clear();
-
-			if (!File.Exists(FlingyDataPath))
-				return;
-			using (var csv = new CsvReader(new StreamReader(FlingyDataPath), csvConfig))
-			{
-				Flingy.AddRange(csv.GetRecords<FlingyAsset>());
-			}
-
-			foreach (var s in Flingy)
-			{
-				s.OnAfterDeserialize();
-			}
-		}
 
 		public GuiTexture GetSheetImage(string sheetName, int frameIndex)
 		{
@@ -512,27 +452,27 @@ namespace DataManager
 			}
 
 
-			SpriteAtlasAssets.RemoveAll(t => t.Name == atlasName);
-			SpriteAtlasAssets.Add(spriteAtlas);
+			SpriteAtlases.RemoveAll(t => t.Name == atlasName);
+			SpriteAtlases.Add(spriteAtlas);
 
 			SpriteSheets.RemoveAll(t => t.Atlas == atlasName);
 			SpriteSheets.AddRange(spriteAtlas.SubAtlases.SelectMany(a => a.GenerateSpriteSheets()));
 
-			var records = SpriteAtlasAssets.SelectMany(s => s.SubAtlases).OrderBy(t => t.AtlasName).ThenBy(t => t.AtlasIndex);
+			var records = SpriteAtlases.SelectMany(s => s.SubAtlases).OrderBy(t => t.AtlasName).ThenBy(t => t.AtlasIndex);
 
 			var frames = SpriteSheets.SelectMany(s => s.Frames).OrderBy(f => f.SpriteSheetName);
 
-			using (var csv = new CsvWriter(new StreamWriter(SpriteAtlasDataPath), csvConfig))
+			using (var csv = new CsvWriter(new StreamWriter(SpriteAtlasDataPath), CsvConfig))
 			{
 				csv.WriteRecords(records);
 			}
 
-			using (var csv = new CsvWriter(new StreamWriter(SpriteSheetDataPath), csvConfig))
+			using (var csv = new CsvWriter(new StreamWriter(SpriteSheetDataPath), CsvConfig))
 			{
 				csv.WriteRecords(SpriteSheets);
 			}
 
-			using (var csv = new CsvWriter(new StreamWriter(FramesDataPath), csvConfig))
+			using (var csv = new CsvWriter(new StreamWriter(FramesDataPath), CsvConfig))
 			{
 				csv.WriteRecords(frames);
 			}
@@ -582,38 +522,6 @@ namespace DataManager
 				p.Kill();
 			});
 
-		}
-
-		public void SaveImages()
-		{
-			using (var csv = new CsvWriter(new StreamWriter(ImagesDataPath), csvConfig))
-			{
-				csv.WriteRecords(Images);
-			}
-		}
-
-		public void SaveSprites()
-		{
-			using (var csv = new CsvWriter(new StreamWriter(SpritesDataPath), csvConfig))
-			{
-				csv.WriteRecords(Sprites);
-			}
-		}
-
-		public void SaveUpgrades()
-		{
-			using (var csv = new CsvWriter(new StreamWriter(UpgradesDataPath), csvConfig))
-			{
-				csv.WriteRecords(Upgrades);
-			}
-		}
-
-		public void SaveFlingy()
-		{
-			using (var csv = new CsvWriter(new StreamWriter(FlingyDataPath), csvConfig))
-			{
-				csv.WriteRecords(Flingy);
-			}
 		}
 	}
 }

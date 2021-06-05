@@ -57,12 +57,12 @@ namespace DataManager.Assets
 		public List<ImageList> ImageLists { get; set; } = new List<ImageList>();
 
 
-		public List<SpriteSheetAsset> GenerateSpriteSheets()
+		public List<SpriteSheet> GenerateSpriteSheets()
 		{
-			List<SpriteSheetAsset> result = new List<SpriteSheetAsset>();
+			List<SpriteSheet> result = new List<SpriteSheet>();
 			for(int i = 0; i < ImageLists.Count; ++i)
 			{
-				result.Add(new SpriteSheetAsset(this, i));
+				result.Add(new SpriteSheet(this, i));
 			}
 			return result;
 		}

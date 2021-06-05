@@ -1,6 +1,8 @@
-﻿using CsvHelper.Configuration.Attributes;
+﻿using CsvHelper;
+using CsvHelper.Configuration.Attributes;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,6 +31,75 @@ namespace DataManager.Assets
 		{
 			return AssetName;
 		}
+
+		public virtual Asset Clone()
+		{
+			return Util.ShallowCopyProperties(this);
+		}
+
+		public static TAsset New<TAsset>(TAsset copy) where TAsset: Asset
+		{
+			if (copy == null)
+			{
+				var r = Activator.CreateInstance<TAsset>();
+				r.OnAfterDeserialize();
+				return r;
+			}
+			return copy.Clone() as TAsset;
+		}
 	}
 
+
+
+	public interface IAssetDatabase
+	{
+		Type Type { get; }
+
+		public IEnumerable<Asset> Assets { get; }
+
+		void Reload();
+		void Save();
+	}
+
+	public class AssetDatabase<TAsset> : IAssetDatabase where TAsset
+		: Asset
+	{
+		private readonly Type type = typeof(TAsset);
+		public string FilePath { get; private set; }
+
+		Type IAssetDatabase.Type => type;
+
+		IEnumerable<Asset> IAssetDatabase.Assets => Assets;
+
+		public List<TAsset> Assets { get; private set; } = new List<TAsset>();
+
+		public AssetDatabase(string file)
+		{
+			FilePath = file;
+		}
+
+		public void Reload()
+		{
+			Assets.Clear();
+			if (!File.Exists(FilePath))
+				return;
+			using (var csv = new CsvReader(new StreamReader(FilePath), AssetManager.CsvConfig))
+			{
+				Assets.AddRange(csv.GetRecords<TAsset>());
+			}
+
+			foreach (var s in Assets)
+			{
+				s.OnAfterDeserialize();
+			}
+		}
+
+		public void Save()
+		{
+			using (var csv = new CsvWriter(new StreamWriter(FilePath), AssetManager.CsvConfig))
+			{
+				csv.WriteRecords(Assets);
+			}
+		}
+	}
 }

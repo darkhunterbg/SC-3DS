@@ -185,7 +185,7 @@ namespace DataManager
 			ImGui.EndTooltip();
 		}
 
-		public static void DrawSpriteSheetInfo(SpriteSheetAsset ss)
+		public static void DrawSpriteSheetInfo(SpriteSheet ss)
 		{
 			ImGui.Text($"Dimensions: {ss.Width}x{ss.Height}");
 			ImGui.SameLine();

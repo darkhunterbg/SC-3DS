@@ -12,7 +12,7 @@ namespace DataManager.Assets
 	/// <summary>
 	/// Hold info about what frames are in single Sprite Sheet (.grp)
 	/// </summary>
-	public class SpriteSheetAsset : Asset
+	public class SpriteSheet 
 	{
 		[Index(0)]
 		public string SheetName { get; set; }
@@ -43,11 +43,9 @@ namespace DataManager.Assets
 		[Ignore]
 		public List<SpriteFrame> Frames { get; private set; } = new List<SpriteFrame>();
 
-		public override string AssetName => SheetName;
 
-
-		public SpriteSheetAsset() { }
-		public SpriteSheetAsset(SpriteSubAtlas subAtlas, int imageListIndex)
+		public SpriteSheet() { }
+		public SpriteSheet(SpriteSubAtlas subAtlas, int imageListIndex)
 		{
 			var imageList = subAtlas.ImageLists[imageListIndex];
 
@@ -73,9 +71,9 @@ namespace DataManager.Assets
 			}
 		}
 
-		public override void OnAfterDeserialize()
+		public void OnAfterDeserialize()
 		{
-			SubAtlas = AppGame.AssetManager.SpriteAtlasAssets.FirstOrDefault(a => a.Name == Atlas)
+			SubAtlas = AppGame.AssetManager.SpriteAtlases.FirstOrDefault(a => a.Name == Atlas)
 				.SubAtlases.FirstOrDefault(s => s.AtlasIndex == SubAtlasId);
 			ImageAsset = SubAtlas.GetImageListAtOffset(SubAtlasOffset);
 			for (int i = 0; i < TotalFrames; ++i)

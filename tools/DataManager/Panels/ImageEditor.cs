@@ -56,7 +56,7 @@ namespace DataManager.Panels
 
 			if (changed)
 			{
-				AppGame.AssetManager.SaveImages();
+				AppGame.AssetManager.GetAssetDatabase<LogicalImageAsset>().Save();
 			}
 		}
 
@@ -102,7 +102,8 @@ namespace DataManager.Panels
 
 		private IEnumerable<LogicalImageAsset> QueryData(string f)
 		{
-			IEnumerable<LogicalImageAsset> query = GetImages(f);
+			IEnumerable<LogicalImageAsset> query =
+					 Util.TextFilter(AppGame.AssetManager.GetAssets<LogicalImageAsset>(), f, a => a.SpriteSheetName);
 
 			var sort = ImGui.TableGetSortSpecs();
 
@@ -131,11 +132,6 @@ namespace DataManager.Panels
 			}
 
 			return query;
-		}
-
-		public static IEnumerable<LogicalImageAsset> GetImages(string f)
-		{
-			return Util.TextFilter(AppGame.AssetManager.Images, f, a => a.SpriteSheetName);
 		}
 
 	}
