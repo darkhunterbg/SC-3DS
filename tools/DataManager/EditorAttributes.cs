@@ -24,6 +24,11 @@ namespace DataManager
 
 	}
 
+	public class SupplyEditorAttribute : EditorAttribute
+	{
+
+	}
+
 	public class IconEditorAttribute : EditorAttribute
 	{
 

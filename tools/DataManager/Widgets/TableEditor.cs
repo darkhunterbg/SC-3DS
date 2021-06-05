@@ -15,7 +15,7 @@ namespace DataManager.Widgets
 
 	public class TableEditor<TItem> where TItem : class
 	{
-	
+
 		public delegate TItem NewItemAction(TItem copy);
 
 		public TItem SelectedItem { get; set; }
@@ -76,7 +76,7 @@ namespace DataManager.Widgets
 			DrawControlHeader();
 
 			if (!ImGui.BeginTable(id, editorProperties.Count + 1, ImGuiTableFlags.BordersInnerH
-	| ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable ))
+	| ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable))
 				return;
 
 

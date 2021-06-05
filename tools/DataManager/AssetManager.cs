@@ -76,16 +76,14 @@ namespace DataManager
 		public static readonly string UpgradesDataPath = $"{GameDataDir}upgrades.csv";
 		public static readonly string FlingyDataPath = $"{GameDataDir}flingy.csv";
 		public static readonly string WeaponsDataPath = $"{GameDataDir}weapons.csv";
+		public static readonly string UnitsDataPath = $"{GameDataDir}units.csv";
 
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();
 
 		public List<ImageList> ImageLists { get; private set; } = new List<ImageList>();
 		public List<SpriteAtlas> SpriteAtlases { get; private set; } = new List<SpriteAtlas>();
 		public List<SpriteSheet> SpriteSheets { get; private set; } = new List<SpriteSheet>();
-		//public List<LogicalImageAsset> Images { get; private set; } = new List<LogicalImageAsset>();
-		//public List<LogicalSpriteAsset> Sprites { get; private set; } = new List<LogicalSpriteAsset>();
-		//public List<UpgradeAsset> Upgrades { get; private set; } = new List<UpgradeAsset>();
-		//public List<FlingyAsset> Flingy { get; private set; } = new List<FlingyAsset>();
+
 
 		public List<SpriteFrame> Icons { get; private set; } = new List<SpriteFrame>();
 
@@ -95,12 +93,14 @@ namespace DataManager
 		{
 			Delimiter = ",",
 			
+			
 		};
 
 		public Dictionary<Type, IAssetDatabase> Assets { get; private set; } = new Dictionary<Type, IAssetDatabase>();
 
 		public AssetManager()
 		{
+	
 			if (!Directory.Exists(ConvertedAssetDir))
 				Directory.CreateDirectory(ConvertedAssetDir);
 
@@ -116,6 +116,7 @@ namespace DataManager
 			AddNewAssetDatabase<UpgradeAsset>(UpgradesDataPath);
 			AddNewAssetDatabase<FlingyAsset>(FlingyDataPath);
 			AddNewAssetDatabase<WeaponAsset>(WeaponsDataPath);
+			AddNewAssetDatabase<UnitAsset>(UnitsDataPath);
 
 		}
 

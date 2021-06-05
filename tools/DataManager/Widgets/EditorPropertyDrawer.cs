@@ -53,6 +53,8 @@ namespace DataManager.Widgets
 				if (attr is FrameTimeEditorAttribute)
 					return FrameTimeEditor;
 
+				if (attr is SupplyEditorAttribute)
+					return SupplyEditor;
 			}
 
 
@@ -117,7 +119,6 @@ namespace DataManager.Widgets
 
 			return false;
 		}
-
 
 		private static bool CustomEnumEditor(PropertyInfo prop, EditorAttribute attr, object item)
 		{
@@ -189,6 +190,23 @@ namespace DataManager.Widgets
 			}
 			ImGui.SameLine();
 			ImGui.Text($"{(number / 15.0f).ToString("F1")} sec");
+
+			return changed;
+		}
+		private static bool SupplyEditor(PropertyInfo prop, EditorAttribute attr, object item)
+		{
+			number = (int)prop.GetValue(item);
+
+			bool changed = false;
+
+			ImGui.SetNextItemWidth(100);
+			if (ImGui.InputInt(string.Empty, ref number, 0))
+			{
+				prop.SetValue(item, number);
+				changed = true;
+			}
+			ImGui.SameLine();
+			ImGui.Text($"{(number / 2.0f)}");
 
 			return changed;
 		}

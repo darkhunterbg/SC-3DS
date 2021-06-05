@@ -12,24 +12,9 @@ namespace DataManager.Assets
 		public override string AssetName => throw new NotImplementedException();
 		public override GuiTexture Preview => Icon?.Image;
 
-		private SpriteFrame _icon;
-		private UpgradeAsset _upgrade;
-
-		[Index(0)]
-		public int IconId { get; set; }
-
-		[Ignore]
+		[Index(0), TypeConverter(typeof(IconConverter)),Name("IconId")]
 		[IconEditor()]
-		public SpriteFrame Icon
-		{
-			get { return _icon; }
-			set
-			{
-				_icon = value;
-				IconId = _icon?.FrameIndex ?? 0;
-			}
-		}
-
+		public SpriteFrame Icon { get; set; }
 		[Index(1)]
 		[DefaultEditor]
 		public string Name { get; set; }
@@ -49,33 +34,17 @@ namespace DataManager.Assets
 		[FrameTimeEditor]
 		public int Cooldown { get; set; }
 
-		[Index(6) , Name("Upgrade")]
-		public string UpgradeName { get; set; }
+		
 
-
-		[Ignore]
+		[Index(6), TypeConverter(typeof(AssetConverter))]
 		[DefaultEditor()]
-		public UpgradeAsset Upgrade
-		{
-			get { return _upgrade; }
-			set
-			{
-				_upgrade = value;
-				UpgradeName = _upgrade?.Name ?? null;
-			}
-		}
+		public UpgradeAsset Upgrade { get; set; }
 
 		public WeaponAsset() : base() { }
 		public WeaponAsset(SpriteFrame asset, UpgradeAsset upgrade) : this()
 		{
 			Icon = asset;
 			Upgrade = upgrade;
-		}
-
-		public override void OnAfterDeserialize()
-		{
-			_icon = AppGame.AssetManager.Icons.Skip(IconId).FirstOrDefault();
-			_upgrade = AppGame.AssetManager.GetAssets<UpgradeAsset>().FirstOrDefault(a=>a.Name == UpgradeName);
 		}
 	}
 }

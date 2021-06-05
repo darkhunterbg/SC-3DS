@@ -13,25 +13,12 @@ namespace DataManager.Assets
 		[DefaultEditor()]
 		public string Name { get; set; } = string.Empty;
 
-		[AssetReference(nameof(ImageName))]
-		private ImageAsset _img;
-		[Ignore]
-		[DefaultEditor]
-		public ImageAsset Image
-		{
-			get
-			{
-				return _img;
-			}
-			set
-			{
-				_img = value;
-				ImageName = _img?.SpriteSheetName ?? string.Empty;
-			}
-		}
 
-		[Index(1), Name("Image")]
-		public string ImageName { get; set; } = string.Empty;
+		[Index(1)]
+		[DefaultEditor]
+		[TypeConverter(typeof(AssetConverter))]
+		public ImageAsset Image { get; set; }
+
 
 		[Index(2)]
 		[DefaultEditor]
@@ -57,14 +44,10 @@ namespace DataManager.Assets
 
 		public SpriteAsset() : base() { }
 
-
 		public SpriteAsset(ImageAsset asset) : this()
 		{
 			Image = asset;
 		}
-		//public override void  OnAfterDeserialize()
-		//{
-		//	_img = AppGame.AssetManager.GetAssets<LogicalImageAsset>().FirstOrDefault(s => s.SpriteSheetName == ImageName);
-		//}
+
 	}
 }

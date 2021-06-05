@@ -10,24 +10,14 @@ namespace DataManager.Assets
 
 	public class FlingyAsset : Asset
 	{
-		private SpriteAsset _sprite;
 
 		[Index(0)]
 		[DefaultEditor]
 		public string Name { get; set; }
 
-		[Index(1),Name("Sprite")]
-		public string SpriteName { get; set; }
-
-		[Ignore]
+		[Index(1), TypeConverter(typeof(AssetConverter))]
 		[DefaultEditor]
-		public SpriteAsset Sprite
-		{
-			get { return _sprite; }
-			set { _sprite = value;
-				SpriteName = _sprite?.Name ?? null;
-			}
-		}
+		public SpriteAsset Sprite { get; set; }
 
 		[Index(2)]
 		[DefaultEditor]
@@ -57,11 +47,6 @@ namespace DataManager.Assets
 		public FlingyAsset(SpriteAsset sprite) : base()
 		{
 			Sprite = sprite;
-		}
-
-		public override void OnAfterDeserialize()
-		{
-			_sprite = AppGame.AssetManager.GetAssets<SpriteAsset>().FirstOrDefault(s => s.Name == SpriteName);
 		}
 	}
 }

@@ -10,22 +10,9 @@ namespace DataManager.Assets
 	public class UpgradeAsset : Asset
 	{
 
-		private SpriteFrame _icon;
-
-		[Index(0)]
-		public int IconId { get; set; }
-
-		[Ignore]
-		[IconEditorAttribute()]
-		public SpriteFrame Icon
-		{
-			get { return _icon; }
-			set
-			{
-				_icon = value;
-				IconId = _icon?.FrameIndex ?? 0;
-			}
-		}
+		[Index(0), TypeConverter(typeof(IconConverter)), Name("IconId")]
+		[IconEditor()]
+		public SpriteFrame Icon { get; set; }
 
 		[DefaultEditor()]
 		[Index(1)]
@@ -70,11 +57,6 @@ namespace DataManager.Assets
 		public UpgradeAsset(SpriteFrame asset) : this()
 		{
 			Icon = asset;
-		}
-
-		public override void OnAfterDeserialize()
-		{
-			_icon = AppGame.AssetManager.Icons.Skip(IconId).FirstOrDefault();
 		}
 	}
 }

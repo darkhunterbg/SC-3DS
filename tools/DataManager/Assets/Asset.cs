@@ -7,9 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
+using CsvHelper.Configuration;
+using CsvHelper.TypeConversion;
 
 namespace DataManager.Assets
 {
+
 	public abstract class Asset
 	{
 		[Ignore]
@@ -24,7 +27,7 @@ namespace DataManager.Assets
 
 		static int id = 0;
 
-		public Asset() { id = ++id; }
+		public Asset() { Id = ++id; }
 
 		public override string ToString()
 		{
@@ -47,43 +50,44 @@ namespace DataManager.Assets
 			return copy.Clone() as TAsset;
 		}
 
+		public virtual void OnAfterDeserialize() { }
 
-		public virtual void OnAfterDeserialize()
+
+		public class AssetConverter : DefaultTypeConverter
 		{
-			var assetRefFields = GetType().GetFields(BindingFlags.Instance |
-				BindingFlags.SetField | BindingFlags.Public| BindingFlags.NonPublic)
-				.Where(p => p.GetCustomAttribute<AssetReferenceAttribute>() != null).ToList();
-
-			foreach (var r in assetRefFields)
+			public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
 			{
-				var attr = r.GetCustomAttribute<AssetReferenceAttribute>();
-				var type = r.FieldType;
-				var key = GetType().GetProperty(attr.KeyPropertyName).GetValue(this) as string;
+				var type = memberMapData.Type;
+				var asset = AppGame.AssetManager.Assets[type]
+						.Assets.FirstOrDefault(a => a.AssetName == text);
 
-				if (!string.IsNullOrEmpty(key))
-				{
-					var asset = AppGame.AssetManager.Assets[type]
-						.Assets.FirstOrDefault(a => a.AssetName == key);
-					if (asset != null)
-					{
-						r.SetValue(this, asset);
-					}
-				}
+				return asset;
 			}
-
+			public override string ConvertToString(object value, IWriterRow row, MemberMapData memberMapData)
+			{
+				if (value == null)
+					return string.Empty;
+				return ((Asset)value).AssetName;
+			}
 		}
-	}
 
-	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-	public class AssetReferenceAttribute : Attribute
-	{
-		public readonly string KeyPropertyName;
-
-		public AssetReferenceAttribute(string fieldName)
+		public class IconConverter : DefaultTypeConverter
 		{
-			KeyPropertyName = fieldName;
+			public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
+			{
+				int.TryParse(text, out int index);
+
+				var icon = AppGame.AssetManager.Icons.Skip(index).FirstOrDefault();
+
+				return icon;
+			}
+			public override string ConvertToString(object value, IWriterRow row, MemberMapData memberMapData)
+			{
+				return ((Asset)value).AssetName;
+			}
 		}
 	}
+
 
 	public interface IAssetDatabase
 	{
@@ -119,6 +123,12 @@ namespace DataManager.Assets
 				return;
 			using (var csv = new CsvReader(new StreamReader(FilePath), AssetManager.CsvConfig))
 			{
+				csv.Context.TypeConverterCache.AddConverter<Asset.AssetConverter>(
+				new Asset.AssetConverter());
+
+				csv.Context.TypeConverterCache.AddConverter<Asset.IconConverter>(
+			new Asset.IconConverter());
+
 				Assets.AddRange(csv.GetRecords<TAsset>());
 			}
 
@@ -132,6 +142,12 @@ namespace DataManager.Assets
 		{
 			using (var csv = new CsvWriter(new StreamWriter(FilePath), AssetManager.CsvConfig))
 			{
+				csv.Context.TypeConverterCache.AddConverter<Asset.AssetConverter>(
+				new Asset.AssetConverter());
+
+				csv.Context.TypeConverterCache.AddConverter<Asset.IconConverter>(
+		new Asset.IconConverter());
+
 				csv.WriteRecords(Assets);
 			}
 		}

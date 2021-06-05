@@ -19,40 +19,37 @@ namespace DataManager.Assets
 		public string Name { get; set; }
 
 		[Index(1)]
+		[DefaultEditor]
 		public int HitPoints { get; set; }
 
 		[Index(2)]
+		[DefaultEditor]
 		public int Armor { get; set; }
 
 		[Index(3)]
+		[DefaultEditor]
 		public int MineralCost { get; set; }
 
 		[Index(4)]
+		[DefaultEditor]
 		public int VespeneCost { get; set; }
 
 		[Index(5)]
+		[FrameTimeEditor]
 		public int TimeCost { get; set; }
 
 		[Index(6)]
+		[SupplyEditor]
 		public int SupplyTake { get; set; }
 
 		[Index(7)]
+		[SupplyEditor]
 		public int SupplyGive { get; set; }
 
-		[Index(8)]
-		public string GraphicsName { get; set; }
-
-		[Ignore]
+		[Index(8), TypeConverter(typeof(AssetConverter))]
 		[DefaultEditor]
-		public FlingyAsset Graphics
-		{
-			get { return _graphics; }
-			set
-			{
-				_graphics = value;
-				GraphicsName = _graphics?.AssetName;
-			}
-		}
+		public FlingyAsset Graphics { get; set; }
+
 
 		public UnitAsset() : base() { }
 
