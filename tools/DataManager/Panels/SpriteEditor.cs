@@ -52,7 +52,6 @@ namespace DataManager.Panels
 
 		public void Draw(Vector2 clientSize)
 		{
-			ImGui.SetNextWindowSize(new Vector2(800, 600), ImGuiCond.FirstUseEver);
 			if (!ImGui.Begin("Sprite Editor##se"))
 				return;
 

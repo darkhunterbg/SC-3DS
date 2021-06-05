@@ -118,8 +118,6 @@ namespace DataManager.Panels
 		{
 			changed = false;
 
-			ImGui.SetNextWindowSize(new Vector2(800, 600), ImGuiCond.FirstUseEver);
-
 			if (!ImGui.Begin("Sprite Atlas Generator##sag"))
 				return;
 

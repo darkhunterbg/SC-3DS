@@ -1,5 +1,6 @@
 ﻿using DataManager.Assets;
 using DataManager.Panels;
+using DataManager.Widgets;
 using ImGuiNET;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -24,6 +25,8 @@ namespace DataManager
 		private List<IGuiPanel> panels = new List<IGuiPanel>();
 
 		private List<IEnumerator> coroutines = new List<IEnumerator>();
+
+		public object HoverObject;
 
 		public static void RunGuiCoroutine(IEnumerator crt)
 		{
@@ -65,6 +68,8 @@ namespace DataManager
 
 		public void Draw(Vector2 clientSize)
 		{
+			HoverObject = null;
+
 			ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(0, 0));
 
 			ImGui.SetNextWindowSize(new Vector2(clientSize.X, clientSize.Y));
@@ -84,7 +89,15 @@ namespace DataManager
 			AppGame.Device.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
 
 			foreach (var panel in panels)
+			{
+				ImGui.SetNextWindowSize(new Vector2(800, 600), ImGuiCond.FirstUseEver);
 				panel.Draw(clientSize);
+			}
+
+			
+			TooltipForObject(HoverObject);
+
+			EditorModalSelect.DrawSelectItemModal();
 
 			UpdateCoroutines();
 
@@ -105,7 +118,6 @@ namespace DataManager
 			return coroutines.Count > 0;
 		}
 
-
 		public static void StrechNextItem()
 		{
 			ImGui.SetNextItemWidth(-float.Epsilon);
@@ -113,7 +125,6 @@ namespace DataManager
 
 		private static Stack<Vector2> sbDrawSize = new Stack<Vector2>();
 		private static Stack<Viewport> viewport = new Stack<Viewport>();
-
 
 		public static SpriteBatch SpriteBatchBegin(Vector2 size, SamplerState? samplerState =
 			null, float aspectRatio = 0)
@@ -157,6 +168,21 @@ namespace DataManager
 			Vector2 uvEnd = (new Vector2(vp.X, vp.Y) + size) / rtSize;
 
 			ImGui.Image(AppGame.Gui.guiRenderTarget, size, uvStart, uvEnd);
+		}
+
+		private void TooltipForObject(object obj)
+		{
+			if (obj == null)
+				return;
+
+			ImGui.BeginTooltip();
+
+			if (obj is LogicalImageAsset)
+			{
+				DrawSpriteSheetInfo(((LogicalImageAsset)obj).SpriteSheet);
+			}
+
+			ImGui.EndTooltip();
 		}
 
 		public static void DrawSpriteSheetInfo(SpriteSheetAsset ss)

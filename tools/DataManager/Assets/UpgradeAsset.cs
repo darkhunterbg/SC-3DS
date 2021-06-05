@@ -80,7 +80,7 @@ namespace DataManager.Assets
 
 		public void OnAfterDeserialize()
 		{
-			Icon = AppGame.AssetManager.Icons.Skip(IconId).FirstOrDefault();
+			_icon = AppGame.AssetManager.Icons.Skip(IconId).FirstOrDefault();
 		}
 	}
 }

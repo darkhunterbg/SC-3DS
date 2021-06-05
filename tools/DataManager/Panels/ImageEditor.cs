@@ -15,15 +15,12 @@ namespace DataManager.Panels
 	{
 		private bool changed = false;
 		private string filter = string.Empty;
-		private LogicalImageAsset hoverItem = null;
 		private LogicalImageAsset tableSelection = null;
 
 		public void Draw(Vector2 clientSize)
 		{
 			changed = false;
-			hoverItem = null;
-
-			ImGui.SetNextWindowSize(new Vector2(800, 600), ImGuiCond.FirstUseEver);
+	
 			if (!ImGui.Begin("Image Editor##ie"))
 				return;
 
@@ -57,7 +54,6 @@ namespace DataManager.Panels
 
 			ImGui.End();
 
-			DrawHoverItemTooltip();
 			if (changed)
 			{
 				AppGame.AssetManager.SaveImages();
@@ -71,7 +67,7 @@ namespace DataManager.Panels
 			ImGui.Text(item.SpriteSheetName);
 			if (ImGui.IsItemHovered())
 			{
-				hoverItem = item;
+				AppGame.Gui.HoverObject = item;
 			}
 
 			ImGui.TableNextColumn();
@@ -142,18 +138,5 @@ namespace DataManager.Panels
 			return Util.TextFilter(AppGame.AssetManager.Images, f, a => a.SpriteSheetName);
 		}
 
-		private void DrawHoverItemTooltip()
-		{
-			if (hoverItem == null)
-			{
-				return;
-			}
-
-			ImGui.BeginTooltip();
-
-			AppGui.DrawSpriteSheetInfo(hoverItem.SpriteSheet);
-
-			ImGui.EndTooltip();
-		}
 	}
 }

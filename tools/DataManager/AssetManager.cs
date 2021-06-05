@@ -68,6 +68,7 @@ namespace DataManager
 		public static readonly string SpritesDataPath = $"{GameDataDir}sprites.csv";
 		public static readonly string FramesDataPath = $"{GameDataDir}frames.csv";
 		public static readonly string UpgradesDataPath = $"{GameDataDir}upgrades.csv";
+		public static readonly string FlingyDataPath = $"{GameDataDir}fringly.csv";
 
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();
 
@@ -77,6 +78,7 @@ namespace DataManager
 		public List<LogicalImageAsset> Images { get; private set; } = new List<LogicalImageAsset>();
 		public List<LogicalSpriteAsset> Sprites { get; private set; } = new List<LogicalSpriteAsset>();
 		public List<UpgradeAsset> Upgrades { get; private set; } = new List<UpgradeAsset>();
+		public List<FlingyAsset> Flingy { get; private set; } = new List<FlingyAsset>();
 
 		public List<SpriteFrameAsset> Icons { get; private set; } = new List<SpriteFrameAsset>();
 
@@ -261,6 +263,23 @@ namespace DataManager
 			}
 
 			foreach (var s in Upgrades)
+			{
+				s.OnAfterDeserialize();
+			}
+		}
+
+		public void ReloadFlingy()
+		{
+			Flingy.Clear();
+
+			if (!File.Exists(FlingyDataPath))
+				return;
+			using (var csv = new CsvReader(new StreamReader(FlingyDataPath), csvConfig))
+			{
+				Flingy.AddRange(csv.GetRecords<FlingyAsset>());
+			}
+
+			foreach (var s in Flingy)
 			{
 				s.OnAfterDeserialize();
 			}
@@ -579,6 +598,14 @@ namespace DataManager
 			using (var csv = new CsvWriter(new StreamWriter(UpgradesDataPath), csvConfig))
 			{
 				csv.WriteRecords(Upgrades);
+			}
+		}
+
+		public void SaveFlingy()
+		{
+			using (var csv = new CsvWriter(new StreamWriter(FlingyDataPath), csvConfig))
+			{
+				csv.WriteRecords(Flingy);
 			}
 		}
 	}

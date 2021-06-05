@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 
 namespace DataManager.Panels
 {
-	public class UpgradeEditor : IGuiPanel
+	public class FlingyEditor : IGuiPanel
 	{
-		private TableEditor<UpgradeAsset> table = new TableEditor<UpgradeAsset>("#ue.table");
+		private TableEditor<FlingyAsset> table = new TableEditor<FlingyAsset>("#fe.table");
 
-		public UpgradeEditor()
+		public FlingyEditor()
 		{
-			table.DataSource = AppGame.AssetManager.Upgrades;
+			table.DataSource = AppGame.AssetManager.Flingy ;
 			table.OnNewItem = (c) =>
 			{
 				if (c != null)
@@ -25,14 +25,14 @@ namespace DataManager.Panels
 				}
 				else
 				{
-					return new UpgradeAsset(AppGame.AssetManager.Icons.FirstOrDefault());
+					return new FlingyAsset(AppGame.AssetManager.Sprites.FirstOrDefault());
 				}
 			};
 		}
 
 		public void Draw(Vector2 clientSize)
 		{
-			if (!ImGui.Begin("Upgrade Editor##ue"))
+			if (!ImGui.Begin("Flingy Editor##fe"))
 				return;
 
 			table.Draw();
@@ -40,7 +40,7 @@ namespace DataManager.Panels
 			ImGui.End();
 
 			if (table.HasChanges)
-				AppGame.AssetManager.SaveUpgrades();
+				AppGame.AssetManager.SaveFlingy();
 		}
 	}
 }

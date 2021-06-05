@@ -1,0 +1,2 @@
+Name,Sprite,TopSpeed,Acceleration,HalfDistance,TurnRadius,MoveControl
+Marine,Marine,1,1,1,40,Script
