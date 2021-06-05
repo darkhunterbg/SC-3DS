@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DataManager
@@ -12,6 +13,12 @@ namespace DataManager
 		Zerg,
 		Terran,
 		Protoss
+	}
+
+	public enum MoveControlType
+	{
+		FlingyData,
+		Script
 	}
 
 	public enum CustomEnumType
@@ -27,7 +34,7 @@ namespace DataManager
 			if (!cache.TryGetValue(type, out var items))
 			{
 				items = Enum.GetNames(type);
-				cache[type] = items;
+				cache[type] = items.Select(t => Regex.Replace(t, "(\\B[A-Z])", " $1")).ToArray(); 
 			}
 
 			return items;
@@ -37,9 +44,8 @@ namespace DataManager
 			if (!cache.TryGetValue(typeof(TEnum), out var items))
 			{
 				items = Enum.GetNames<TEnum>();
-				cache[typeof(TEnum)] = items;
+				cache[typeof(TEnum)] = items.Select(t => Regex.Replace(t, "(\\B[A-Z])", " $1")).ToArray();
 			}
-
 			return items;
 		}
 	}

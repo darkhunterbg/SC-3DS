@@ -101,7 +101,10 @@ namespace DataManager.Widgets
 
 		private void TableRow(TItem item)
 		{
+
 			int itemId = (int)uniqueKeyField.GetValue(item);
+
+			ImGui.PushID(itemId);
 
 			for (int i = 0; i < editorAttributes.Count; ++i)
 			{
@@ -110,7 +113,7 @@ namespace DataManager.Widgets
 				var attr = editorAttributes[i];
 				var prop = editorProperties[i];
 
-				ImGui.PushID(itemId);
+				ImGui.PushID(i);
 
 				if (editorDrawers[i](prop, attr, item))
 					changed = true;
@@ -128,7 +131,7 @@ namespace DataManager.Widgets
 			ImGui.SameLine();
 			bool selected = SelectedItem == item;
 
-			if (ImGui.Selectable($"##{id}.items.{itemId}.selected", ref selected, ImGuiSelectableFlags.SpanAllColumns))
+			if (ImGui.Selectable(string.Empty, ref selected, ImGuiSelectableFlags.SpanAllColumns))
 			{
 				if (selected)
 					SelectedItem = item;
@@ -136,16 +139,15 @@ namespace DataManager.Widgets
 					SelectedItem = null;
 			}
 
-
 			if (ImGui.IsItemHovered())
-			{
 				HoverItem = item;
-			}
+
+			ImGui.PopID();
 		}
 
 		private void ControlCell(TItem item, int itemId)
 		{
-			if (ImGui.Button($"Duplicate##{id}.items.{itemId}.control.copy"))
+			if (ImGui.Button($"Duplicate"))
 			{
 				int index = DataSource.IndexOf(item);
 				var newItem = OnNewItem(item);
@@ -153,7 +155,7 @@ namespace DataManager.Widgets
 				changed = true;
 			}
 			ImGui.SameLine();
-			if (ImGui.Button($"Delete##{id}.items.{itemId}.control.del"))
+			if (ImGui.Button($"Delete"))
 			{
 				DataSource.Remove(item);
 				changed = true;

@@ -7,11 +7,6 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
-	public enum MoveControlType
-	{
-		FlingyData,
-		Script,
-	}
 
 	public class FlingyAsset
 	{
@@ -25,7 +20,7 @@ namespace DataManager.Assets
 		public string SpriteName { get; set; }
 
 		[Ignore]
-		[DefaultEditor]
+		[SpriteEditor]
 		public LogicalSpriteAsset Sprite
 		{
 			get { return _sprite; }
@@ -47,11 +42,11 @@ namespace DataManager.Assets
 		[DefaultEditor]
 		public int HalfDistance { get; set; }
 
-		[Index(4)]
+		[Index(5)]
 		[DefaultEditor]
 		public int TurnRadius { get; set; }
 
-		[Index(5)]
+		[Index(6)]
 		[DefaultEditor]
 		public MoveControlType MoveControl { get; set; }
 

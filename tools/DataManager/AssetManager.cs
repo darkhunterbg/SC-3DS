@@ -68,7 +68,7 @@ namespace DataManager
 		public static readonly string SpritesDataPath = $"{GameDataDir}sprites.csv";
 		public static readonly string FramesDataPath = $"{GameDataDir}frames.csv";
 		public static readonly string UpgradesDataPath = $"{GameDataDir}upgrades.csv";
-		public static readonly string FlingyDataPath = $"{GameDataDir}fringly.csv";
+		public static readonly string FlingyDataPath = $"{GameDataDir}flingy.csv";
 
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();
 
@@ -87,6 +87,7 @@ namespace DataManager
 		private CsvConfiguration csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
 		{
 			Delimiter = ",",
+			
 		};
 
 		public AssetManager()
@@ -113,6 +114,8 @@ namespace DataManager
 			ReloadImages();
 
 			ReloadUpgrades();
+
+			ReloadFlingy();
 		}
 		public void LoadImageListAssets()
 		{

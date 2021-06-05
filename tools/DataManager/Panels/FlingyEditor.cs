@@ -12,7 +12,7 @@ namespace DataManager.Panels
 {
 	public class FlingyEditor : IGuiPanel
 	{
-		private TableEditor<FlingyAsset> table = new TableEditor<FlingyAsset>("#fe.table");
+		private TableEditor<FlingyAsset> table = new TableEditor<FlingyAsset>("##fe.table");
 
 		public FlingyEditor()
 		{

@@ -44,8 +44,9 @@ namespace DataManager.Widgets
 			if (!ImGui.BeginPopupModal("modal.select", ref opened, ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysAutoResize))
 				return;
 
-			Header();
 
+			ImGui.Text(Header());
+			ImGui.InputText("##modal.select.filter", ref textFilter, 255);
 
 			ImGui.BeginChild("modal.select.items", new Vector2(800, 800));
 
@@ -77,32 +78,35 @@ namespace DataManager.Widgets
 			ImGui.EndPopup();
 		}
 
-		private static void Header()
+		private static string Header()
 		{
 			if (objType == typeof(LogicalImageAsset))
 			{
-				string text = (selected as LogicalImageAsset)?.SpriteSheet?.SheetName ?? string.Empty;
-				ImGui.Text(text);
+				return (selected as LogicalImageAsset)?.SpriteSheet?.SheetName ?? string.Empty;
 
-				ImGui.InputText("##modal.select.filter", ref textFilter, 255);
-				return;
 			}
 			if (objType == typeof(SpriteFrameAsset))
 			{
 				int id = (selected as SpriteFrameAsset)?.FrameIndex ?? -1;
-				ImGui.Text(id != -1 ? id.ToString() : string.Empty);
-
-
-				ImGui.InputText("##modal.select.filter", ref textFilter, 255);
-				
-				return;
+				return id != -1 ? id.ToString() : string.Empty;
 			}
+			if (objType == typeof(LogicalSpriteAsset))
+			{
+				return (selected as LogicalSpriteAsset)?.Name ?? string.Empty;
+
+			}
+			return string.Empty;
 		}
 		private static void Content()
 		{
 			if (objType == typeof(LogicalImageAsset))
 			{
 				LogicalImageAssetContent();
+				return;
+			}
+			if (objType == typeof(LogicalSpriteAsset))
+			{
+				LogicalSpriteAssetContent();
 				return;
 			}
 			if (objType == typeof(SpriteFrameAsset))
@@ -138,6 +142,41 @@ namespace DataManager.Widgets
 				}
 				ImGui.SameLine();
 				ImGui.Text(asset.SpriteSheetName);
+				if (ImGui.IsItemHovered())
+				{
+					AppGame.Gui.HoverObject = asset;
+
+				}
+
+				ImGui.PopID();
+			}
+		}
+
+		private static void LogicalSpriteAssetContent()
+		{
+			var tmp = selected as LogicalSpriteAsset;
+
+			var query = Util.TextFilter(AppGame.AssetManager.Sprites, textFilter, a => a.Name);
+			query = query.OrderBy(asset => asset.Name);
+
+			int i = 0;
+
+			foreach (var asset in query)
+			{
+				ImGui.PushID(i++);
+
+				bool isSelectedItem = tmp == asset;
+
+				if (ImGui.Selectable(string.Empty, isSelectedItem))
+				{
+					if (isSelectedItem)
+						selected = null;
+					else
+						selected = asset;
+
+				}
+				ImGui.SameLine();
+				ImGui.Text(asset.Name);
 				if (ImGui.IsItemHovered())
 				{
 					AppGame.Gui.HoverObject = asset;

@@ -52,6 +52,9 @@ namespace DataManager.Widgets
 				if (attr is FrameTimeEditorAttribute)
 					return FrameTimeEditor;
 
+				if (attr is SpriteEditorAttribute)
+					return LogicalSpriteEditor;
+
 			}
 
 
@@ -152,6 +155,26 @@ namespace DataManager.Widgets
 
 			return DelayedChangedValue();
 		}
+		private static bool LogicalSpriteEditor(PropertyInfo prop, EditorAttribute attr, object item)
+		{
+			var image = prop.GetValue(item) as LogicalSpriteAsset;
+
+			ImGui.Text(image?.Name ?? string.Empty);
+
+			if (ImGui.IsItemHovered())
+			{
+				AppGame.Gui.HoverObject = image;
+			}
+
+			ImGui.SameLine();
+
+			if (ImGui.Button($"Change"))
+			{
+				ModalSelect(prop, item);
+			}
+
+			return DelayedChangedValue();
+		}
 		private static bool IconEditor(PropertyInfo prop, EditorAttribute attr, object item)
 		{
 			var icon = prop.GetValue(item) as SpriteFrameAsset;
@@ -182,5 +205,7 @@ namespace DataManager.Widgets
 
 			return changed;
 		}
+
+
 	}
 }

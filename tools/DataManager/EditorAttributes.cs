@@ -34,6 +34,12 @@ namespace DataManager
 
 	}
 
+
+	public class SpriteEditorAttribute : EditorAttribute
+	{
+
+	}
+
 	public class CustomEnumEditorAttribute : EditorAttribute
 	{
 		public CustomEnumType EnumType;
