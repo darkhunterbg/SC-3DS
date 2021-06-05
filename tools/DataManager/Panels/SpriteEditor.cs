@@ -23,7 +23,7 @@ namespace DataManager.Panels
 
 		private TableEditor<LogicalSpriteAsset> table;
 
-		private List<SpriteFrameAsset> selectionFrames = new List<SpriteFrameAsset>();
+		private List<SpriteFrame> selectionFrames = new List<SpriteFrame>();
 
 		private Microsoft.Xna.Framework.Color BarColor = new Microsoft.Xna.Framework.Color(0xff249824);
 		private RenderTargetImage spritePreview = new RenderTargetImage(new Vector2(256, 256));
@@ -172,15 +172,12 @@ namespace DataManager.Panels
 			}
 			else
 			{
-				sprite = new LogicalSpriteAsset()
+				sprite = new LogicalSpriteAsset(AppGame.AssetManager.Images.FirstOrDefault())
 				{
 					Name = "New Sprite"
 
 				};
-				sprite.OnAfterDeserialize(AppGame.AssetManager.Images.FirstOrDefault());
 			}
-
-
 
 			return sprite;
 		}

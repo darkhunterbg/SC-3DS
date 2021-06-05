@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
-	public class ImageListAsset
+	public class ImageList
 	{
 		public class FrameData
 		{
@@ -29,7 +29,7 @@ namespace DataManager.Assets
 
 		public int TakenSpace => Frames.Sum(f => f.rect.Width * f.rect.Height + 2);
 
-		public ImageListAsset(string infoFile)
+		public ImageList(string infoFile)
 		{
 			Dir = Path.GetDirectoryName(infoFile);
 			RelativePath = Dir.Substring(AssetManager.ConvertedAssetDir.Length);

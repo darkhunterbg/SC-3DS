@@ -37,23 +37,21 @@ namespace DataManager.Widgets
 
 				if (type.IsEnum)
 					return EnumEditor;
+
+				if (type.IsSubclassOf(typeof(Asset)))
+					return AssetEditor;
 			}
 			else
 			{
 				if (attr is CustomEnumEditorAttribute)
 					return CustomEnumEditor;
 
-				if (attr is ImageEditorAttribute)
-					return LogicalImageEditor;
-
+		
 				if (attr is IconEditorAttribute)
 					return IconEditor;
 
 				if (attr is FrameTimeEditorAttribute)
 					return FrameTimeEditor;
-
-				if (attr is SpriteEditorAttribute)
-					return LogicalSpriteEditor;
 
 			}
 
@@ -120,6 +118,7 @@ namespace DataManager.Widgets
 			return false;
 		}
 
+
 		private static bool CustomEnumEditor(PropertyInfo prop, EditorAttribute attr, object item)
 		{
 			var customAttr = attr as CustomEnumEditorAttribute;
@@ -135,15 +134,24 @@ namespace DataManager.Widgets
 			}
 			return false;
 		}
-		private static bool LogicalImageEditor(PropertyInfo prop, EditorAttribute attr, object item)
+		
+		private static bool AssetEditor(PropertyInfo prop, EditorAttribute attr, object item)
 		{
-			var image = prop.GetValue(item) as LogicalImageAsset;
+			var asset = prop.GetValue(item) as Asset;
 
-			ImGui.Text(image.SpriteSheetName ?? string.Empty);
+			var icon = asset.Preview;
+
+			if (asset.Preview != null)
+			{
+				ImGui.Image(icon.GuiImage, new Vector2(32, 32));
+				ImGui.SameLine();
+			}
+
+			ImGui.Text(asset?.AssetName ?? string.Empty);
 
 			if (ImGui.IsItemHovered())
 			{
-				AppGame.Gui.HoverObject = image;
+				AppGame.Gui.HoverObject = asset;
 			}
 
 			ImGui.SameLine();
@@ -155,29 +163,10 @@ namespace DataManager.Widgets
 
 			return DelayedChangedValue();
 		}
-		private static bool LogicalSpriteEditor(PropertyInfo prop, EditorAttribute attr, object item)
-		{
-			var image = prop.GetValue(item) as LogicalSpriteAsset;
 
-			ImGui.Text(image?.Name ?? string.Empty);
-
-			if (ImGui.IsItemHovered())
-			{
-				AppGame.Gui.HoverObject = image;
-			}
-
-			ImGui.SameLine();
-
-			if (ImGui.Button($"Change"))
-			{
-				ModalSelect(prop, item);
-			}
-
-			return DelayedChangedValue();
-		}
 		private static bool IconEditor(PropertyInfo prop, EditorAttribute attr, object item)
 		{
-			var icon = prop.GetValue(item) as SpriteFrameAsset;
+			var icon = prop.GetValue(item) as SpriteFrame;
 
 			if (ImGui.ImageButton(icon.Image.GuiImage, icon.SpriteSheet.FrameSize, Vector2.Zero,
 				Vector2.One, 0,

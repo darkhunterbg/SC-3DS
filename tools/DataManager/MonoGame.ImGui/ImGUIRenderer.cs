@@ -182,7 +182,7 @@ namespace MonoGame.ImGui
             var io = ImGuiNET.ImGui.GetIO();
             var display_size = io.DisplaySize;
 
-            const float offset = 0.5f;
+            const float offset = 0.0f;
             _effect.World = Matrix.Identity;
             _effect.View = Matrix.Identity;
             _effect.Projection = Matrix.CreateOrthographicOffCenter(offset, display_size.X + offset, display_size.Y + offset, offset, -1.0f, 1.0f);

@@ -21,7 +21,7 @@ namespace DataManager.Panels
 		private List<string> imageList = new List<string>();
 
 		[JsonIgnore]
-		public List<ImageListAsset> Assets = new List<ImageListAsset>();
+		public List<ImageList> Assets = new List<ImageList>();
 		[JsonIgnore]
 		public readonly int Id = -1;
 		[JsonIgnore]
@@ -40,7 +40,7 @@ namespace DataManager.Panels
 
 			foreach (var l in imageList)
 			{
-				var item = AppGame.AssetManager.ImageListAssets.FirstOrDefault(a => a.RelativePath == l);
+				var item = AppGame.AssetManager.ImageLists.FirstOrDefault(a => a.RelativePath == l);
 				if (item == null || Assets.Contains(item))
 					continue;
 
@@ -53,7 +53,7 @@ namespace DataManager.Panels
 			RecalculateUsed();
 		}
 
-		public void SetAssets(IEnumerable<ImageListAsset> assets)
+		public void SetAssets(IEnumerable<ImageList> assets)
 		{
 			imageList.Clear();
 			Assets.Clear();
@@ -69,14 +69,14 @@ namespace DataManager.Panels
 			RecalculateUsed();
 		}
 
-		public void RemoveAsset(ImageListAsset asset)
+		public void RemoveAsset(ImageList asset)
 		{
 			Assets.Remove(asset);
 			imageList.Remove(asset.RelativePath);
 			RecalculateUsed();
 		}
 
-		public static float CalculateUsage(ImageListAsset asset)
+		public static float CalculateUsage(ImageList asset)
 		{
 			int size = 1024 * 1024;
 			int used = asset.TakenSpace;
@@ -102,7 +102,7 @@ namespace DataManager.Panels
 		bool changed = false;
 		bool selectItemsModal = false;
 		SpriteAtlasEntry selectItemsFor = null;
-		List<ImageListAsset> modalSelectedAssets = new List<ImageListAsset>();
+		List<ImageList> modalSelectedAssets = new List<ImageList>();
 		string assetFilter = string.Empty;
 
 		public SpriteAtlasGenerator()
@@ -273,7 +273,7 @@ namespace DataManager.Panels
 			}
 		}
 
-		private void DrawImageAssetListItem(ImageListAsset file, bool enabled = true)
+		private void DrawImageAssetListItem(ImageList file, bool enabled = true)
 		{
 			float usage = SpriteAtlasEntry.CalculateUsage(file) * 100;
 
@@ -286,9 +286,9 @@ namespace DataManager.Panels
 
 		}
 
-		private IEnumerable<ImageListAsset> DrawImageListAssetsFilter(string id)
+		private IEnumerable<ImageList> DrawImageListAssetsFilter(string id)
 		{
-			IEnumerable<ImageListAsset> query = Util.TextFilter(AppGame.AssetManager.ImageListAssets, assetFilter, a => a.RelativePath);
+			IEnumerable<ImageList> query = Util.TextFilter(AppGame.AssetManager.ImageLists, assetFilter, a => a.RelativePath);
 
 			ImGui.InputText($"##{id}", ref assetFilter, 256);
 
@@ -370,7 +370,7 @@ namespace DataManager.Panels
 
 		private void NormalizeEntries()
 		{
-			List<ImageListAsset> assets = new List<ImageListAsset>();
+			List<ImageList> assets = new List<ImageList>();
 
 			foreach (var entry in entries)
 			{

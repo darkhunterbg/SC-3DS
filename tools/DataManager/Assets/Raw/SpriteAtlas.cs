@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
-	public class SpriteAtlasAsset
+	public class SpriteAtlas 
 	{
 		private List<SpriteSubAtlas> subAtlases = new List<SpriteSubAtlas>();
 
@@ -16,7 +16,7 @@ namespace DataManager.Assets
 
 		public IEnumerable<SpriteSubAtlas> SubAtlases => subAtlases;
 
-		public void AddSubAtlas(IEnumerable<ImageListAsset> assets)
+		public void AddSubAtlas(IEnumerable<ImageList> assets)
 		{
 			subAtlases.Add(new SpriteSubAtlas()
 			{
@@ -33,7 +33,7 @@ namespace DataManager.Assets
 		}
 
 
-		public SpriteAtlasAsset(string name)
+		public SpriteAtlas(string name)
 		{
 			Name = name;
 		}
@@ -54,7 +54,7 @@ namespace DataManager.Assets
 		public string InfoFilePath => $"{ AssetManager.SpriteAtlasDir}{FullName}.t3s";
 
 		[Ignore]
-		public List<ImageListAsset> ImageLists { get; set; } = new List<ImageListAsset>();
+		public List<ImageList> ImageLists { get; set; } = new List<ImageList>();
 
 
 		public List<SpriteSheetAsset> GenerateSpriteSheets()
@@ -67,7 +67,7 @@ namespace DataManager.Assets
 			return result;
 		}
 
-		public ImageListAsset GetImageListAtOffset(int offset)
+		public ImageList GetImageListAtOffset(int offset)
 		{
 			int i = 0;
 			while (offset > 0)

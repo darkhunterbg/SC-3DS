@@ -12,7 +12,7 @@ namespace DataManager.Assets
 	/// <summary>
 	/// Hold info about what frames are in single Sprite Sheet (.grp)
 	/// </summary>
-	public class SpriteSheetAsset
+	public class SpriteSheetAsset : Asset
 	{
 		[Index(0)]
 		public string SheetName { get; set; }
@@ -35,18 +35,16 @@ namespace DataManager.Assets
 		public SpriteSubAtlas SubAtlas { get; private set; }
 
 		[Ignore]
-		public ImageListAsset ImageAsset { get; private set; }
+		public ImageList ImageAsset { get; private set; }
 
 		[Ignore]
 		public Vector2 FrameSize => ImageAsset.FrameSize;
 
 		[Ignore]
-		public List<SpriteFrameAsset> Frames { get; private set; } = new List<SpriteFrameAsset>();
+		public List<SpriteFrame> Frames { get; private set; } = new List<SpriteFrame>();
 
-		public override string ToString()
-		{
-			return SheetName;
-		}
+		public override string AssetName => SheetName;
+
 
 		public SpriteSheetAsset() { }
 		public SpriteSheetAsset(SpriteSubAtlas subAtlas, int imageListIndex)
@@ -71,18 +69,22 @@ namespace DataManager.Assets
 
 			for (int i = 0; i < TotalFrames; ++i)
 			{
-				Frames.Add(new SpriteFrameAsset(this, i));
+				Frames.Add(new SpriteFrame(this, i));
 			}
 		}
-		public void AfterDeserializationInit(SpriteSubAtlas subAtlas)
+
+		public override void OnAfterDeserialize()
 		{
-			SubAtlas = subAtlas;
-			ImageAsset = subAtlas.GetImageListAtOffset(SubAtlasOffset);
+			SubAtlas = AppGame.AssetManager.SpriteAtlasAssets.FirstOrDefault(a => a.Name == Atlas)
+				.SubAtlases.FirstOrDefault(s => s.AtlasIndex == SubAtlasId);
+			ImageAsset = SubAtlas.GetImageListAtOffset(SubAtlasOffset);
 			for (int i = 0; i < TotalFrames; ++i)
 			{
-				Frames.Add(new SpriteFrameAsset(this, i));
+				Frames.Add(new SpriteFrame(this, i));
 			}
+
 		}
+
 
 		public int GetUnitColorFrameIndex(int frame)
 		{

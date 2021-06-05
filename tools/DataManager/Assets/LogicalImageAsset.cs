@@ -10,7 +10,7 @@ namespace DataManager.Assets
 	/// <summary>
 	/// Logical data about all sprite in a SpriteSheet(GRP) and how they should be displayed
 	/// </summary>
-	public class LogicalImageAsset
+	public class LogicalImageAsset : Asset
 	{
 		[Ignore]
 		public SpriteSheetAsset SpriteSheet { get; private set; }
@@ -25,7 +25,23 @@ namespace DataManager.Assets
 		[Index(2)]
 		public bool UnitColor { get; set; }
 
-		public LogicalImageAsset() { }
+		public override string AssetName => SpriteSheetName;
+		public override GuiTexture Preview
+		{
+			get
+			{
+				if (SpriteSheet == null)
+					return null;
+
+				int f = GraphicsTurns ? 12 : 0;
+				if (SpriteSheet.Frames.Count <= f)
+					return null;
+
+				return SpriteSheet.Frames[f].Image;
+			}
+		}
+
+		public LogicalImageAsset() : base() { }
 
 		public LogicalImageAsset(SpriteSheetAsset asset)
 		{
@@ -33,10 +49,9 @@ namespace DataManager.Assets
 			SpriteSheetName = asset.SheetName;
 		}
 
-		public void OnAfterDeserialized(SpriteSheetAsset asset )
+		public override void OnAfterDeserialize()
 		{
-			SpriteSheet = asset;
+			SpriteSheet = AppGame.AssetManager.SpriteSheets.FirstOrDefault(s => s.SheetName == SpriteSheetName);
 		}
-
 	}
 }

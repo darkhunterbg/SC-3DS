@@ -8,11 +8,10 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
-	public class SpriteFrameAsset
+	public class SpriteFrame 
 	{
 		[Ignore]
 		public SpriteSheetAsset SpriteSheet { get; private set; }
-
 
 		[Index(0), Name("SpriteSheet")]
 		public string SpriteSheetName { get; set; }
@@ -34,9 +33,7 @@ namespace DataManager.Assets
 			return offset;
 		}
 
-
-
-		public SpriteFrameAsset(SpriteSheetAsset asset, int frame)
+		public SpriteFrame(SpriteSheetAsset asset, int frame)
 		{
 			SpriteSheet = asset;
 			SpriteSheetName = asset.SheetName;
@@ -48,12 +45,11 @@ namespace DataManager.Assets
 			Y = (int)offset.Y;
 		}
 
-		public ImageListAsset.FrameData GetFrameData()
+		public ImageList.FrameData GetFrameData()
 		{
 			return SpriteSheet.ImageAsset.Frames[FrameIndex];
 		}
 
 		public GuiTexture Image => AppGame.AssetManager.GetSheetImage(SpriteSheet.SheetName, FrameIndex);
-
 	}
 }

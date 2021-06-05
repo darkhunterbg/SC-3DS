@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace DataManager.Assets
 {
 
-	public class FlingyAsset
+	public class FlingyAsset : Asset
 	{
 		private LogicalSpriteAsset _sprite;
 
@@ -20,7 +20,7 @@ namespace DataManager.Assets
 		public string SpriteName { get; set; }
 
 		[Ignore]
-		[SpriteEditor]
+		[DefaultEditor]
 		public LogicalSpriteAsset Sprite
 		{
 			get { return _sprite; }
@@ -50,21 +50,16 @@ namespace DataManager.Assets
 		[DefaultEditor]
 		public MoveControlType MoveControl { get; set; }
 
-		static int id = 0;
+		public override string AssetName => Name;
+		public override GuiTexture Preview => Sprite?.Preview;
 
-		[UniqueKey]
-		public readonly int Id = 0;
-
-		public FlingyAsset() {
-			Id = ++id;
-		}
-
+		public FlingyAsset() : base() { }
 		public FlingyAsset(LogicalSpriteAsset sprite) : base()
 		{
 			Sprite = sprite;
 		}
 
-		public void OnAfterDeserialize()
+		public override void OnAfterDeserialize()
 		{
 			_sprite = AppGame.AssetManager.Sprites.FirstOrDefault(s => s.Name == SpriteName);
 		}

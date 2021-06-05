@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
-	public class GRPAsset
+	public class GRPEntry
 	{
 		public string Path;
 		public string DisplayName;
 
-		public GRPAsset(string file)
+		public GRPEntry(string file)
 		{
 			Path = file;
 			DisplayName = file.Substring(AssetManager.RawAssetDir.Length);

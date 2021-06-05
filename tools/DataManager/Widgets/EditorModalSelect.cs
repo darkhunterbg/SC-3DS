@@ -45,9 +45,8 @@ namespace DataManager.Widgets
 				return;
 
 
-			ImGui.Text(Header());
+			Header();
 			ImGui.InputText("##modal.select.filter", ref textFilter, 255);
-
 			ImGui.BeginChild("modal.select.items", new Vector2(800, 800));
 
 			Content();
@@ -78,38 +77,38 @@ namespace DataManager.Widgets
 			ImGui.EndPopup();
 		}
 
-		private static string Header()
+		private static void Header()
 		{
-			if (objType == typeof(LogicalImageAsset))
+			if (objType.IsSubclassOf(typeof(Asset)))
 			{
-				return (selected as LogicalImageAsset)?.SpriteSheet?.SheetName ?? string.Empty;
+				var asset = selected as Asset;
+
+				if (asset?.Preview != null)
+				{
+				
+					ImGui.Image(asset.Preview.GuiImage, new Vector2(32, 32));
+
+				}
+				ImGui.SameLine();
+				ImGui.Text(asset?.AssetName ?? string.Empty);
 
 			}
-			if (objType == typeof(SpriteFrameAsset))
+			if (objType == typeof(SpriteFrame))
 			{
-				int id = (selected as SpriteFrameAsset)?.FrameIndex ?? -1;
-				return id != -1 ? id.ToString() : string.Empty;
+				int id = (selected as SpriteFrame)?.FrameIndex ?? -1;
+				string text = id != -1 ? id.ToString() : string.Empty;
+				ImGui.Text(text);
 			}
-			if (objType == typeof(LogicalSpriteAsset))
-			{
-				return (selected as LogicalSpriteAsset)?.Name ?? string.Empty;
-
-			}
-			return string.Empty;
 		}
 		private static void Content()
 		{
-			if (objType == typeof(LogicalImageAsset))
+			if (objType.IsSubclassOf(typeof(Asset)))
 			{
-				LogicalImageAssetContent();
+				AssetContent();
 				return;
 			}
-			if (objType == typeof(LogicalSpriteAsset))
-			{
-				LogicalSpriteAssetContent();
-				return;
-			}
-			if (objType == typeof(SpriteFrameAsset))
+			
+			if (objType == typeof(SpriteFrame))
 			{
 				IconContent();
 				return;
@@ -117,12 +116,13 @@ namespace DataManager.Widgets
 		}
 
 
-		private static void LogicalImageAssetContent()
+		private static void AssetContent()
 		{
-			var tmp = selected as LogicalImageAsset;
+			var tmp = selected as Asset;
 
-			var query = ImageEditor.GetImages(textFilter);
-			query = query.OrderBy(asset => asset.SpriteSheetName);
+			var query = AppGame.AssetManager.Assets[objType];
+			query = Util.TextFilter(query, textFilter, t => t.AssetName);
+			query = query.OrderBy(asset => asset.AssetName);
 
 			int i = 0;
 
@@ -140,8 +140,15 @@ namespace DataManager.Widgets
 						selected = asset;
 
 				}
+				if (asset.Preview != null)
+				{
+					ImGui.SameLine();
+					ImGui.Image(asset.Preview.GuiImage, new Vector2(32, 32));
+				
+				}
+
 				ImGui.SameLine();
-				ImGui.Text(asset.SpriteSheetName);
+				ImGui.Text(asset.AssetName);
 				if (ImGui.IsItemHovered())
 				{
 					AppGame.Gui.HoverObject = asset;
@@ -152,43 +159,9 @@ namespace DataManager.Widgets
 			}
 		}
 
-		private static void LogicalSpriteAssetContent()
-		{
-			var tmp = selected as LogicalSpriteAsset;
-
-			var query = Util.TextFilter(AppGame.AssetManager.Sprites, textFilter, a => a.Name);
-			query = query.OrderBy(asset => asset.Name);
-
-			int i = 0;
-
-			foreach (var asset in query)
-			{
-				ImGui.PushID(i++);
-
-				bool isSelectedItem = tmp == asset;
-
-				if (ImGui.Selectable(string.Empty, isSelectedItem))
-				{
-					if (isSelectedItem)
-						selected = null;
-					else
-						selected = asset;
-
-				}
-				ImGui.SameLine();
-				ImGui.Text(asset.Name);
-				if (ImGui.IsItemHovered())
-				{
-					AppGame.Gui.HoverObject = asset;
-
-				}
-
-				ImGui.PopID();
-			}
-		}
 		private static void IconContent()
 		{
-			var image = selected as SpriteFrameAsset;
+			var image = selected as SpriteFrame;
 			var query = AppGame.AssetManager.Icons;
 
 			int i = 0;

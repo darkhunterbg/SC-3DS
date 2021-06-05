@@ -7,17 +7,17 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
-	public class UpgradeAsset
+	public class UpgradeAsset : Asset
 	{
 
-		private SpriteFrameAsset _icon;
+		private SpriteFrame _icon;
 
 		[Index(0)]
 		public int IconId { get; set; }
 
 		[Ignore]
 		[IconEditorAttribute()]
-		public SpriteFrameAsset Icon
+		public SpriteFrame Icon
 		{
 			get { return _icon; }
 			set
@@ -63,22 +63,16 @@ namespace DataManager.Assets
 		[DefaultEditor()]
 		public RaceEnum Race { get; set; }
 
-		private static int id;
+		public override string AssetName => Name;
+		public override GuiTexture Preview => Icon?.Image;
 
-		[Ignore]
-		[UniqueKey]
-		public readonly int Id;
-
-		public UpgradeAsset()
-		{
-			Id = ++id;
-		}
-		public UpgradeAsset(SpriteFrameAsset asset) : this()
+		public UpgradeAsset() : base() { }
+		public UpgradeAsset(SpriteFrame asset) : this()
 		{
 			Icon = asset;
 		}
 
-		public void OnAfterDeserialize()
+		public override void OnAfterDeserialize()
 		{
 			_icon = AppGame.AssetManager.Icons.Skip(IconId).FirstOrDefault();
 		}

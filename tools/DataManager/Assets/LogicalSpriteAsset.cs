@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
-	public class LogicalSpriteAsset
+	public class LogicalSpriteAsset : Asset
 	{
 		[Index(0)]
 		[DefaultEditor()]
@@ -15,7 +15,7 @@ namespace DataManager.Assets
 
 		private LogicalImageAsset _img;
 		[Ignore]
-		[ImageEditor]
+		[DefaultEditor]
 		public LogicalImageAsset Image
 		{
 			get
@@ -51,36 +51,19 @@ namespace DataManager.Assets
 		[DefaultEditor]
 		public int SelectionOffset { get; set; }
 
-		static int id = 0;
+		public override string AssetName => Name;
+		public override GuiTexture Preview => Image?.Preview;
 
-		[Ignore]
-		[UniqueKey]
-		public readonly int Id;
+		public LogicalSpriteAsset() : base() { }
 
-		public LogicalSpriteAsset()
-		{
-			Id = ++id;
-		}
 
-		public LogicalSpriteAsset(LogicalSpriteAsset copy)
-		{
-			Id = ++id;
-			Image = copy.Image;
-			Name = copy.Name;
-			BarSize = copy.BarSize;
-			BarOffset = copy.BarOffset;
-			SelectionType = copy.SelectionType;
-			SelectionOffset = copy.SelectionOffset;
-		}
-
-		public LogicalSpriteAsset(LogicalImageAsset asset)
-		{
-			Id = ++id;
-			Image = asset;
-		}
-		public void OnAfterDeserialize(LogicalImageAsset asset)
+		public LogicalSpriteAsset(LogicalImageAsset asset) : this()
 		{
 			Image = asset;
+		}
+		public override void  OnAfterDeserialize()
+		{
+			_img = AppGame.AssetManager.Images.FirstOrDefault(s => s.SpriteSheetName == ImageName);
 		}
 	}
 }

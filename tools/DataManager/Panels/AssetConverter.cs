@@ -37,14 +37,14 @@ namespace DataManager.Panels
 				}
 			}
 
-			public IEnumerable<GRPAsset> GetMatches(IEnumerable<GRPAsset> assets)
+			public IEnumerable<GRPEntry> GetMatches(IEnumerable<GRPEntry> assets)
 			{
 
 				return assets.Where(a => glob.IsMatch(a.DisplayName));
 
 			}
 
-			public bool IsMatch(GRPAsset asset)
+			public bool IsMatch(GRPEntry asset)
 			{
 				return glob.IsMatch(asset.DisplayName);
 			}
@@ -55,10 +55,10 @@ namespace DataManager.Panels
 			}
 		}
 
-		private List<GRPAsset> rawAssets;
+		private List<GRPEntry> rawAssets;
 		private List<GRPConverEntry> convertEntries = new List<GRPConverEntry>();
 		private GRPImage loaded;
-		private GRPAsset hovered;
+		private GRPEntry hovered;
 		private GuiTexture previewTexture;
 		private string assetFilter = string.Empty;
 
@@ -71,7 +71,7 @@ namespace DataManager.Panels
 		public AssetConverter()
 		{
 			rawAssets = Directory.GetFiles(AssetManager.RawAssetDir, "*.grp", SearchOption.AllDirectories)
-				.Select(s => new GRPAsset(s)).ToList();
+				.Select(s => new GRPEntry(s)).ToList();
 
 			Texture2D tex = new Texture2D(AppGame.Device, 1024, 1024, false, SurfaceFormat.Color);
 
@@ -154,7 +154,7 @@ namespace DataManager.Panels
 
 			hovered = null;
 
-			IEnumerable<GRPAsset> query = Util.TextFilter(rawAssets, assetFilter, a => a.DisplayName);
+			IEnumerable<GRPEntry> query = Util.TextFilter(rawAssets, assetFilter, a => a.DisplayName);
 
 			ImGui.BeginChild("##AssetConverter.RawAssetsTable");
 			foreach (var asset in query)
@@ -334,7 +334,7 @@ namespace DataManager.Panels
 
 		private IEnumerator ConvertCrt(List<GRPConverEntry> entries)
 		{
-			HashSet<Tuple<GRPAsset,GRPConvertMode>> convert = new HashSet<Tuple<GRPAsset, GRPConvertMode>>();
+			HashSet<Tuple<GRPEntry,GRPConvertMode>> convert = new HashSet<Tuple<GRPEntry, GRPConvertMode>>();
 
 			foreach (var entry in entries)
 			{
@@ -342,7 +342,7 @@ namespace DataManager.Panels
 
 				foreach (var match in matches)
 				{
-					var item = new Tuple<GRPAsset, GRPConvertMode> (match, entry.Mode);
+					var item = new Tuple<GRPEntry, GRPConvertMode> (match, entry.Mode);
 
 					if (!convert.Contains(item))
 					{

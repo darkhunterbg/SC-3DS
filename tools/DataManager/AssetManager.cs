@@ -1,5 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using CsvHelper.Configuration.Attributes;
 using DataManager.Assets;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -32,6 +33,8 @@ namespace DataManager
 			AppGame.GuiRenderer.UnbindTexture(GuiImage);
 		}
 	}
+
+
 
 
 	public enum GRPConvertMode
@@ -72,15 +75,15 @@ namespace DataManager
 
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();
 
-		public List<ImageListAsset> ImageListAssets { get; private set; } = new List<ImageListAsset>();
-		public List<SpriteAtlasAsset> SpriteAtlasAssets { get; private set; } = new List<SpriteAtlasAsset>();
+		public List<ImageList> ImageLists { get; private set; } = new List<ImageList>();
+		public List<SpriteAtlas> SpriteAtlasAssets { get; private set; } = new List<SpriteAtlas>();
 		public List<SpriteSheetAsset> SpriteSheets { get; private set; } = new List<SpriteSheetAsset>();
 		public List<LogicalImageAsset> Images { get; private set; } = new List<LogicalImageAsset>();
 		public List<LogicalSpriteAsset> Sprites { get; private set; } = new List<LogicalSpriteAsset>();
 		public List<UpgradeAsset> Upgrades { get; private set; } = new List<UpgradeAsset>();
 		public List<FlingyAsset> Flingy { get; private set; } = new List<FlingyAsset>();
 
-		public List<SpriteFrameAsset> Icons { get; private set; } = new List<SpriteFrameAsset>();
+		public List<SpriteFrame> Icons { get; private set; } = new List<SpriteFrame>();
 
 		private Dictionary<string, List<GuiTexture>> loadedSheetImages = new Dictionary<string, List<GuiTexture>>();
 
@@ -89,6 +92,8 @@ namespace DataManager
 			Delimiter = ",",
 			
 		};
+
+		public Dictionary<Type, IEnumerable<Asset>> Assets { get; private set; } = new Dictionary<Type, IEnumerable<Asset>>();
 
 		public AssetManager()
 		{
@@ -106,6 +111,11 @@ namespace DataManager
 
 		public void LoadEverything()
 		{
+			Assets[typeof(SpriteSheetAsset)] = SpriteSheets;
+			Assets[typeof(LogicalImageAsset)] = Images;
+			Assets[typeof(LogicalSpriteAsset)] = Sprites;
+			Assets[typeof(UpgradeAsset)] = Upgrades;
+			Assets[typeof(FlingyAsset)] = Flingy;
 
 			LoadPalettes();
 			LoadImageListAssets();
@@ -119,11 +129,11 @@ namespace DataManager
 		}
 		public void LoadImageListAssets()
 		{
-			ImageListAssets.Clear();
+			ImageLists.Clear();
 
 			foreach (var file in Directory.GetFiles(ConvertedAssetDir, "info.txt", SearchOption.AllDirectories))
 			{
-				ImageListAssets.Add(new ImageListAsset(file));
+				ImageLists.Add(new ImageList(file));
 			}
 
 		}
@@ -163,13 +173,13 @@ namespace DataManager
 			foreach (var r in atlasRecords.SelectMany(s => s))
 			{
 				var atlasInfoFiles = sheetsInfoFiles[r.FullName];
-				var images = ImageListAssets.Where(s => atlasInfoFiles.Contains(s.InfoFilePath)).ToList();
+				var images = ImageLists.Where(s => atlasInfoFiles.Contains(s.InfoFilePath)).ToList();
 				r.ImageLists = images;
 			}
 
 			foreach (var group in atlasRecords)
 			{
-				var s = new SpriteAtlasAsset(group.Key);
+				var s = new SpriteAtlas(group.Key);
 				SpriteAtlasAssets.Add(s);
 
 				s.SetSubAtlases(group);
@@ -184,12 +194,7 @@ namespace DataManager
 
 			foreach (var sheet in SpriteSheets)
 			{
-				var atlas = SpriteAtlasAssets.FirstOrDefault(a => a.Name == sheet.Atlas);
-				if (atlas != null)
-				{
-					var subAtlas = atlas.SubAtlases.Skip(sheet.SubAtlasId).FirstOrDefault();
-					sheet.AfterDeserializationInit(subAtlas);
-				}
+				sheet.OnAfterDeserialize();
 			}
 
 			var iconsSheet = SpriteSheets.FirstOrDefault(s => s.SheetName == "unit\\cmdbtns\\cmdicons");
@@ -221,7 +226,7 @@ namespace DataManager
 				var item = Images.FirstOrDefault(i => i.SpriteSheetName == sheet.SheetName);
 				if (item != null)
 				{
-					item.OnAfterDeserialized(sheet);
+					item.OnAfterDeserialize();
 				}
 				else
 				{
@@ -249,8 +254,7 @@ namespace DataManager
 
 			foreach (var s in Sprites)
 			{
-				var img = Images.FirstOrDefault(ss => ss.SpriteSheetName == s.ImageName);
-				s.OnAfterDeserialize(img);
+				s.OnAfterDeserialize();
 			}
 		}
 
@@ -349,7 +353,7 @@ namespace DataManager
 			Palettes.Add("White", new Palette(Microsoft.Xna.Framework.Color.White) { Name = "White" });
 		}
 
-		public void ConvertGRP(GRPAsset asset, GRPConvertMode convertMode)
+		public void ConvertGRP(GRPEntry asset, GRPConvertMode convertMode)
 		{
 			switch (convertMode)
 			{
@@ -368,7 +372,7 @@ namespace DataManager
 			}
 		}
 
-		private void HandleGRPConvert(GRPAsset asset, Palette pal)
+		private void HandleGRPConvert(GRPEntry asset, Palette pal)
 		{
 			string f = asset.DisplayName;
 
@@ -417,7 +421,7 @@ namespace DataManager
 			File.WriteAllLines(Path.Combine(dst, $"info.txt"), info);
 		}
 
-		private void HandleWireframeGRPConvert(GRPAsset asset)
+		private void HandleWireframeGRPConvert(GRPEntry asset)
 		{
 			string f = asset.DisplayName;
 			GRPImage img = new GRPImage(asset.Path);
@@ -459,11 +463,11 @@ namespace DataManager
 			}
 		}
 
-		public void ExportAtlas(IEnumerable<ImageListAsset> assets, string atlasName)
+		public void ExportAtlas(IEnumerable<ImageList> assets, string atlasName)
 		{
-			List<ImageListAsset> group = new List<ImageListAsset>();
+			List<ImageList> group = new List<ImageList>();
 
-			SpriteAtlasAsset spriteAtlas = new SpriteAtlasAsset(atlasName);
+			SpriteAtlas spriteAtlas = new SpriteAtlas(atlasName);
 
 			int freeSpace = (1024 * 1024 * 90) / 100;
 
@@ -534,7 +538,7 @@ namespace DataManager
 			}
 		}
 
-		public AsyncOperation BuildAtlas(SpriteAtlasAsset asset)
+		public AsyncOperation BuildAtlas(SpriteAtlas asset)
 		{
 			Process p = null;
 			bool done = false;

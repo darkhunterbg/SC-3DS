@@ -19,23 +19,12 @@ namespace DataManager
 		
 	}
 
-	public class ImageEditorAttribute : EditorAttribute
-	{
-
-	}
-
 	public class FrameTimeEditorAttribute : EditorAttribute
 	{
 
 	}
 
 	public class IconEditorAttribute : EditorAttribute
-	{
-
-	}
-
-
-	public class SpriteEditorAttribute : EditorAttribute
 	{
 
 	}
