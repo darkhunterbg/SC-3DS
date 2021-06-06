@@ -9,43 +9,8 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
-
-	public class ImageFrame
-	{
-		public string fileName;
-		public Microsoft.Xna.Framework.Rectangle rect;
-		public readonly int FrameIndex;
-
-		public Vector2 Position => rect.Location.ToVector2().ToVec2();
-		public Vector2 Size => rect.Size.ToVector2().ToVec2();
-
-		public int TakenSpace => (rect.Width + 1) * (rect.Height + 1);
-
-		public ImageList ImageList { get; private set; }
-		public GuiTexture Image => AppGame.AssetManager.GetSheetImage(ImageList.Key, FrameIndex);
-
-		public Vector2 GetOffset(bool hFlip = false)
-		{
-			Vector2 offset = Position - ImageList.FrameSize / 2;
-			if (hFlip)
-				offset.X = ImageList.FrameSize.X / 2 - Position.X - (int)Size.X;
-
-			return offset;
-		}
-
-		public ImageFrame(ImageList list,int i)
-		{
-			ImageList = list;
-			FrameIndex = i;
-		}
-
-
-	}
-
 	public class ImageList
 	{
-		
-
 		public string InfoFilePath { get; private set; }
 		public string RelativePath { get; private set; }
 		public string Key => RelativePath;

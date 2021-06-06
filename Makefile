@@ -39,7 +39,7 @@ SOURCES		:=	src/3ds src/game src/game/Scenes src/game/Map src/game/GUI src/game/
 
 SOURCES		+= src/3ds/citro2d src/3ds/citro2d/c2d
 
-DATA		:=	data
+#DATA		:=	data
 INCLUDES	:=	$(SOURCES)
 GRAPHICS	:=	gfx
 GFXBUILD	:=	gfxbuild

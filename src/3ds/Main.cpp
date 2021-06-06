@@ -31,7 +31,7 @@ C2D_TextBuf textBuffer;
 u64 mainTimer;
 std::vector<NDSAudioChannel*> audioChannels;
 
-Span<Vertex> vertexBuffer ;
+Span<Vertex> vertexBuffer;
 C3D_BufInfo vbInfo;
 
 DVLB_s* spriteBatchBlob;
@@ -42,8 +42,11 @@ void Init();
 void Uninit();
 void UpdateAudioChannel(NDSAudioChannel& channel);
 
+PrintConsole* console = NULL;
+
 void FatalError(const char* error, ...) {
-	consoleInit(GFX_BOTTOM, nullptr);
+	if (console == nullptr)
+		console = consoleInit(GFX_BOTTOM, nullptr);
 
 	int i = 0;
 	for (auto channel : audioChannels) {
@@ -72,8 +75,92 @@ void FatalError(const char* error, ...) {
 	exit(1);
 }
 
+struct Atlas {
+	const char* name;
+	int subatlases = 0;
+};
+
+void TextureLoadTest() {
+
+	romfsInit();
+	gfxInitDefault();
+	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
+
+	char dir[64];
+	getcwd(&dir[0], 64);
+
+	if (strcmp(dir, "/") == 0)
+		assetDir = "3ds/StarCraft/romfs/";
+	else
+		assetDir = "StarCraft/romfs/";
+
+	Atlas altases[] = {
+		{"bullet_flingy",1},
+		{"gui",1},
+		{"wirefram" ,2} ,
+		{"neutral",5},
+		{"terran",7},
+		{"protoss",12},
+		{"thingy",16},
+		{"zerg",24}
+
+	};
+
+	std::vector<std::string> textures;
+
+	for (auto a : altases) {
+		for (int i = 0; i < a.subatlases; ++i) {
+			std::string tex =  std::string(a.name) + "_" + std::to_string(i) + ".t3x";
+			textures.push_back(tex);
+		}
+	}
+
+	console = consoleInit(GFX_BOTTOM, nullptr);
+
+	printf("free space %iMB\n",   linearSpaceFree() / (1024 * 1024));
+
+
+	int i = 0;
+
+	size_t texMemoryUsed = 0;
+
+	while (aptMainLoop())
+	{
+		svcSleepThread(1);
+		hidScanInput();
+
+		u32 kDown = hidKeysDown();
+		if (kDown & KEY_START)
+			break;
+
+		if (i >= textures.size())
+			FatalError("Done loading %i textures", textures.size());
+
+		std::string file = assetDir + "atlases/" + textures[i];
+
+		FILE* f = fopen(file.data(), "rb");
+
+		if (f == nullptr)
+			FatalError("Failed to open %s", textures[i].data());
+
+		printf("Loading %s (%i/%i)\n", textures[i].data(), ++i, textures.size());
+
+		C3D_Tex tex;
+		auto loaded = Tex3DS_TextureImportStdio(f, &tex, nullptr, false);
+		Tex3DS_TextureImport
+		if (loaded == nullptr)
+			FatalError("Failed to load texture! Used Memory %iMB", texMemoryUsed/(1024*1024));
+
+		texMemoryUsed += tex.size;
+
+		fclose(f);
+	}
+}
+
 int main()
 {
+	//TextureLoadTest();
+
 	Init();
 
 	mainTimer = svcGetSystemTick();
@@ -150,7 +237,7 @@ void Init() {
 
 	romfsInit();
 	gfxInitDefault();
-	
+	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
 
 	// Enable N3DS 804MHz operation, where available
 	//osSetSpeedupEnable(true);
@@ -159,19 +246,18 @@ void Init() {
 	//if (r)
 	//	FatalError("svcReleaseSemaphore failed with %s", R_SUMMARY(r));
 
-	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
 
 	LoadShader();
 
-	C2D_Init(C2D_DEFAULT_MAX_OBJECTS );
-	C2D_Prepare(); 
+	C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
+	C2D_Prepare();
 	top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
 	bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
 	screens[0] = { top, nullptr, {400,240} };
 	screens[1] = { bottom, nullptr, {320,240} };
 	screens[0].Init();
 	screens[1].Init();
-	
+
 
 	ndspInit();
 	ndspSetOutputMode(NDSP_OUTPUT_STEREO);

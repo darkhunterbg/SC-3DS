@@ -16,14 +16,20 @@ namespace DataManager.Assets
 
 		public IEnumerable<SpriteSubAtlas> SubAtlases => subAtlases;
 
-		public void AddSubAtlas(IEnumerable<ImageList> assets)
+		[Ignore]
+		public string InfoFilePath => $"{ AssetManager.SpriteAtlasDir}{Name}.t3s";
+
+		public void AddSubAtlas(IEnumerable<ImageFrameAtlasData> assets)
 		{
 			subAtlases.Add(new SpriteSubAtlas()
 			{
 				AtlasName = Name,
 				AtlasIndex = subAtlases.Count,
-				ImageLists = assets.ToList(),
+				Images = assets.ToList(),
 			});
+
+			foreach (var f in subAtlases.Last().Images)
+				f.AtlasName = subAtlases.Last().FullName;
 		}
 
 
@@ -50,33 +56,8 @@ namespace DataManager.Assets
 		[Ignore]
 		public string FullName => $"{AtlasName}_{AtlasIndex}";
 
-		[Ignore]
-		public string InfoFilePath => $"{ AssetManager.SpriteAtlasDir}{FullName}.t3s";
-
-		[Ignore]
-		public List<ImageList> ImageLists { get; set; } = new List<ImageList>();
 
 
-		public List<SpriteSheet> GenerateSpriteSheets()
-		{
-			List<SpriteSheet> result = new List<SpriteSheet>();
-			for(int i = 0; i < ImageLists.Count; ++i)
-			{
-				result.Add(new SpriteSheet(this, i));
-			}
-			return result;
-		}
-
-		public ImageList GetImageListAtOffset(int offset)
-		{
-			int i = 0;
-			while (offset >= ImageLists[i].Frames.Count)
-			{
-				offset -= ImageLists[i].Frames.Count;
-				++i;
-			}
-
-			return ImageLists[i];
-		}
+		public List<ImageFrameAtlasData> Images { get;  set; } = new List<ImageFrameAtlasData>();
 	}
 }

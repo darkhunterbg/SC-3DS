@@ -12,6 +12,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using Color = Microsoft.Xna.Framework.Color;
+using CsvHelper;
+using System.IO;
+using System.Diagnostics;
 
 namespace DataManager.Build
 {
@@ -22,7 +25,7 @@ namespace DataManager.Build
 		public class AtlasFrame
 		{
 			public Rectangle rect;
-			public GuiTexture texture;
+			public ImageFrame image;
 		}
 
 		public class Node
@@ -70,10 +73,10 @@ namespace DataManager.Build
 
 		public Microsoft.Xna.Framework.Point Dimensions => root.Region.Size;
 
-		bool TryAdd(GuiTexture texture, Node node)
+		bool TryAdd(ImageFrame image, Node node)
 		{
 			Rectangle rect = node.Region;
-			rect.Size = new Microsoft.Xna.Framework.Point(texture.Texture.Width, texture.Texture.Height);
+			rect.Size = image.rect.Size;
 			rect.Location = node.Region.Location;
 
 			if (!node.Region.Contains(rect))
@@ -87,7 +90,7 @@ namespace DataManager.Build
 				node.Children[0].Children[0].Frame = new AtlasFrame()
 				{
 					rect = rect,
-					texture = texture
+					image = image
 				};
 
 				++frames;
@@ -100,7 +103,7 @@ namespace DataManager.Build
 				if (child.Frame != null)
 					continue;
 
-				if (TryAdd(texture, child))
+				if (TryAdd(image, child))
 					return true;
 			}
 
@@ -187,9 +190,9 @@ namespace DataManager.Build
 			return result;
 		}
 
-		public bool TryAdd(GuiTexture texture)
+		public bool TryAdd(ImageFrame image)
 		{
-			return TryAdd(texture, root);
+			return TryAdd(image, root);
 		}
 
 		public AtlasBSPTree Clone()
@@ -225,6 +228,7 @@ namespace DataManager.Build
 		int totalJobs = 0;
 		int currentJob = 0;
 
+		public List<SpriteAtlas> GeneratedAtlases { get; private set; } = new List<SpriteAtlas>();
 
 		private SpriteBatch spriteBatch = new SpriteBatch(AppGame.Device);
 
@@ -242,9 +246,13 @@ namespace DataManager.Build
 			cancelled = true;
 		}
 
-		private IEnumerator SaveAtlasCrt(List<AtlasBSPTree> subAtlases, SpriteAtlasEntry atlas)
+		private IEnumerator SaveAtlasTextureCrt(List<AtlasBSPTree> subAtlases, SpriteAtlasEntry atlas)
 		{
+			SpriteAtlas generated = new SpriteAtlas(atlas.OutputName);
+			GeneratedAtlases.Add(generated);
+
 			int i = 0;
+
 			foreach (var subAtlas in subAtlases)
 			{
 				if (cancelled)
@@ -252,13 +260,11 @@ namespace DataManager.Build
 
 				var tree = subAtlas;
 
-
-
 				using (var texture = new RenderTarget2D(AppGame.Device, tree.Dimensions.X, tree.Dimensions.Y))
 				{
 
 					texture.GraphicsDevice.SetRenderTarget(texture);
-					texture.GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Transparent);
+					texture.GraphicsDevice.Clear(Color.Transparent);
 
 					var frames = tree.GetFrames();
 
@@ -266,7 +272,7 @@ namespace DataManager.Build
 
 					foreach (var f in frames)
 					{
-						spriteBatch.Draw(f.texture.Texture, f.rect.Location.ToVector2(), Microsoft.Xna.Framework.Color.White);
+						spriteBatch.Draw(f.image.Image.Texture, f.rect.Location.ToVector2(), Color.White);
 					}
 					if (DrawAtlasOutiline)
 					{
@@ -295,9 +301,15 @@ namespace DataManager.Build
 
 					spriteBatch.End();
 
-					texture.SaveAsPng($"{AssetManager.SpriteAtlasDir}gen\\{atlas.OutputName}_{i++}.png");
+					generated.AddSubAtlas(frames.Select(s =>
+					new ImageFrameAtlasData( s.image,  s.rect.Location.ToVector2().ToVec2()))
+						.ToList());
+
+					texture.SaveAsPng($"{AssetManager.SpriteAtlasDir}{atlas.OutputName}_{i}.png");
+
 				}
 
+				i++;
 				yield return null;
 			}
 		}
@@ -317,9 +329,7 @@ namespace DataManager.Build
 				foreach (var frame in imageList.Frames.OrderByDescending(t => t.rect.Size.Y)
 					.ThenBy(t => t.rect.Size.X))
 				{
-					var texture = AppGame.AssetManager.GetSheetImage(imageList.RelativePath, frame.FrameIndex);
-
-					if (!test.TryAdd(texture))
+					if (!test.TryAdd(frame))
 					{
 						success = false;
 						break;
@@ -398,13 +408,11 @@ namespace DataManager.Build
 				foreach (var frame in imageList.Frames.OrderByDescending(t => t.rect.Size.Y)
 					.ThenBy(t => t.rect.Size.X))
 				{
-					var texture = AppGame.AssetManager.GetSheetImage(imageList.RelativePath, frame.FrameIndex);
-
 					bool success = false;
 
 					foreach (var sub in subAtlases.Where(t => t.FreeSpace >= frame.TakenSpace))
 					{
-						if (sub.TryAdd(texture))
+						if (sub.TryAdd(frame))
 						{
 							success = true;
 							break;
@@ -415,7 +423,7 @@ namespace DataManager.Build
 					if (!success)
 					{
 						var newAtlas = new AtlasBSPTree();
-						newAtlas.TryAdd(texture);
+						newAtlas.TryAdd(frame);
 						subAtlases.Add(newAtlas);
 					}
 				}
@@ -461,7 +469,7 @@ namespace DataManager.Build
 
 						foreach (var f in frames)
 						{
-							if (!test.TryAdd(f.texture))
+							if (!test.TryAdd(f.image))
 							{
 								success = false;
 								break;
@@ -476,15 +484,82 @@ namespace DataManager.Build
 					scaledSubAtlases.Add(tree);
 				}
 
-				var crt = AppGame.RunCoroutine(SaveAtlasCrt(scaledSubAtlases, atlas));
+				var crt = AppGame.RunCoroutine(SaveAtlasTextureCrt(scaledSubAtlases, atlas));
 
 				while (!crt.done && !cancelled)
 					Thread.Sleep(1);
 
+			}
 
+
+			if (cancelled)
+				return;
+
+			SaveAtlasTable();
+
+			BuildT3XFiles(op);
+		}
+
+		private void SaveAtlasTable()
+		{
+			var frames = GeneratedAtlases.SelectMany(s => s.SubAtlases).SelectMany(s => s.Images)
+				.OrderBy(s => s.ImageListName).ThenBy(s => s.FrameIndex);
+
+			using (var csv = new CsvWriter(new StreamWriter(AssetManager.FramesDataPath), AssetManager.CsvConfig))
+			{
+				csv.WriteRecords(frames);
+			}
+
+			var atlases = GeneratedAtlases.SelectMany(s => s.SubAtlases).OrderBy(a => a.AtlasName)
+				.ThenBy(a => a.AtlasIndex);
+
+			using (var csv = new CsvWriter(new StreamWriter(AssetManager.SpriteAtlasDataPath), AssetManager.CsvConfig))
+			{
+				csv.WriteRecords(atlases);
 			}
 		}
 
+		
+		private void BuildT3XFiles(AsyncOperation op)
+		{
+			int i = 0;
+
+			foreach(var atlas in GeneratedAtlases.SelectMany(s=>s.SubAtlases))
+			{
+				if (cancelled)
+					return;
+
+				op.ItemName = $"{atlas.FullName}.t3x";
+
+				op.Progress = i / (float)GeneratedAtlases.SelectMany(s => s.SubAtlases).Count();
+
+				string inputTexture = Path.GetFullPath($"{AssetManager.SpriteAtlasDir}{atlas.FullName}") + ".png";
+				string outAtlas = Path.GetFullPath(Path.Combine(AssetManager.SpriteBuildDir, atlas.FullName)) + ".t3x";
+
+				string args = $" -f auto-etc1 -z auto -q high -o {outAtlas} {inputTexture}";
+				var process = new ProcessStartInfo(AssetManager.tex3dsPath, args);
+				process.UseShellExecute = false;
+				process.CreateNoWindow = true;
+				process.RedirectStandardOutput = true;
+				process.RedirectStandardError = true;
+				var p = new Process()
+				{
+					StartInfo = process
+				};
+
+
+				p.Start();
+
+				p.WaitForExit();
+
+				string error = p.StandardError.ReadToEnd();
+				if (!string.IsNullOrEmpty(error))
+					throw new Exception($"Failed to build atlas {atlas.FullName}: {error}");
+
+
+				++i;
+			}
+		}
 		public void Dispose()
 		{
 

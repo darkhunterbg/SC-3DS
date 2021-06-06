@@ -223,7 +223,7 @@ namespace DataManager
 
 			for (int i = 0; i < list.Frames.Count; ++i)
 			{
-				var tex = AppGame.AssetManager.GetSheetImage(list.RelativePath, i);
+				var tex = AppGame.AssetManager.GetImageFrame(list.RelativePath, i);
 
 				if (i % 16 > 0)
 					ImGui.SameLine();

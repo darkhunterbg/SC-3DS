@@ -1,8 +1,0 @@
---atlas -f auto-etc1 -z auto -q high
-../../data_out/unit/thingy/tileset/desert/HDBMoss/000.png
-../../data_out/unit/thingy/tileset/desert/HDBTent/000.png
-../../data_out/unit/thingy/tileset/desert/HDLbox01/000.png
-../../data_out/unit/thingy/tileset/desert/HDMachn2/000.png
-../../data_out/unit/thingy/tileset/desert/HDPlnt03/000.png
-../../data_out/unit/thingy/tileset/desert/JGBcomm/000.png
-../../data_out/unit/thingy/tileset/desert/JGBFact/000.png

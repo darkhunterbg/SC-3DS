@@ -65,10 +65,11 @@ namespace DataManager
 		public static readonly string tex3dsPath = "C:\\devkitPro\\tools\\bin\\tex3ds.exe";
 
 		public static readonly string SpriteAtlasDataPath = $"{GameDataDir}atlases.csv";
-		public static readonly string SpriteSheetDataPath = $"{GameDataDir}spritesheets.csv";
+		public static readonly string FramesDataPath = $"{GameDataDir}frames.csv";
+
 		public static readonly string ImagesDataPath = $"{GameDataDir}images.csv";
 		public static readonly string SpritesDataPath = $"{GameDataDir}sprites.csv";
-		public static readonly string FramesDataPath = $"{GameDataDir}frames.csv";
+	
 		public static readonly string UpgradesDataPath = $"{GameDataDir}upgrades.csv";
 		public static readonly string FlingyDataPath = $"{GameDataDir}flingy.csv";
 		public static readonly string WeaponsDataPath = $"{GameDataDir}weapons.csv";
@@ -77,21 +78,15 @@ namespace DataManager
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();
 
 		public List<ImageList> ImageLists { get; private set; } = new List<ImageList>();
-		//public List<SpriteAtlas> SpriteAtlases { get; private set; } = new List<SpriteAtlas>();
-		//public List<SpriteSheet> SpriteSheets { get; private set; } = new List<SpriteSheet>();
-
 
 		public List<ImageFrame> Icons { get; private set; } = new List<ImageFrame>();
 		public List<ImageFrame> UnitSelection { get; private set; } = new List<ImageFrame>();
-
 
 		private Dictionary<string, List<GuiTexture>> loadedSheetImages = new Dictionary<string, List<GuiTexture>>();
 
 		public static readonly CsvConfiguration CsvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
 		{
 			Delimiter = ",",
-
-
 		};
 
 		public Dictionary<Type, IAssetDatabase> Assets { get; private set; } = new Dictionary<Type, IAssetDatabase>();
@@ -132,7 +127,6 @@ namespace DataManager
 		{
 			return (Assets[typeof(TAsset)] as AssetDatabase<TAsset>).Assets;
 		}
-
 
 		public void LoadEverything()
 		{
@@ -181,19 +175,19 @@ namespace DataManager
 
 		}
 
-		public GuiTexture GetSheetImage(string sheetName, int frameIndex)
+		public GuiTexture GetImageFrame(string imageName, int frameIndex)
 		{
-			loadedSheetImages.TryGetValue(sheetName, out var images);
+			loadedSheetImages.TryGetValue(imageName, out var images);
 
 			if (images == null)
 			{
-				var sheet = ImageLists.FirstOrDefault(s => s.Key == sheetName);
+				var sheet = ImageLists.FirstOrDefault(s => s.Key == imageName);
 
 				if (sheet == null)
 					return null;
 
 				images = new List<GuiTexture>();
-				loadedSheetImages[sheetName] = images;
+				loadedSheetImages[imageName] = images;
 
 				for (int i = 0; i < sheet.Frames.Count; ++i)
 				{
@@ -352,50 +346,5 @@ namespace DataManager
 			}
 		}
 
-		public AsyncOperation BuildAtlas(SpriteAtlas asset)
-		{
-			Process p = null;
-			bool done = false;
-
-			return new AsyncOperation((op) =>
-			{
-				int i = 0;
-				foreach (var subatlas in asset.SubAtlases)
-				{
-					++i;
-					if (done)
-						break;
-
-					string infoFile = subatlas.InfoFilePath;
-					string outAtlas = Path.GetFullPath(Path.Combine(SpriteBuildDir, subatlas.FullName)) + ".t3x";
-
-					string args = $"-i {infoFile} -o {outAtlas}";
-					var process = new ProcessStartInfo(tex3dsPath, args);
-					process.UseShellExecute = false;
-					process.CreateNoWindow = true;
-					process.RedirectStandardOutput = true;
-					process.RedirectStandardError = true;
-					p = new Process()
-					{
-						StartInfo = process
-					};
-
-
-					p.Start();
-
-					p.WaitForExit();
-
-					string error = p.StandardError.ReadToEnd();
-					if (!string.IsNullOrEmpty(error))
-						throw new Exception($"Failed to build subatlas {subatlas.FullName}: {error}");
-
-					op.Progress = ((float)i / (float)asset.SubAtlases.Count());
-				}
-			}, () =>
-			{
-				p.Kill();
-			});
-
-		}
 	}
 }
