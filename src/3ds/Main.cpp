@@ -80,6 +80,8 @@ struct Atlas {
 	int subatlases = 0;
 };
 
+u32 __ctru_heap_size = (30 << 20);
+
 void TextureLoadTest() {
 
 	romfsInit();
@@ -117,7 +119,7 @@ void TextureLoadTest() {
 
 	console = consoleInit(GFX_BOTTOM, nullptr);
 
-	printf("free space %iMB\n",   linearSpaceFree() / (1024 * 1024));
+	printf("free space %iMB / %iMB\n", envGetHeapSize() / (1024 * 1024),  linearSpaceFree() / (1024 * 1024));
 
 
 	int i = 0;
@@ -147,7 +149,6 @@ void TextureLoadTest() {
 
 		C3D_Tex tex;
 		auto loaded = Tex3DS_TextureImportStdio(f, &tex, nullptr, false);
-		Tex3DS_TextureImport
 		if (loaded == nullptr)
 			FatalError("Failed to load texture! Used Memory %iMB", texMemoryUsed/(1024*1024));
 

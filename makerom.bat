@@ -1,1 +1,1 @@
-makerom.exe -f cia -o SC.cia -target t -rsf RSF  -elf SC.elf -icon SC.smdh
+makerom.exe -f cia -o SC.cia -target t -rsf RSF  -elf SC.elf -icon SC.smdh -banner banner.bnr
