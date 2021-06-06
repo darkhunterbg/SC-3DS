@@ -317,7 +317,7 @@ namespace DataManager.Build
 				foreach (var frame in imageList.Frames.OrderByDescending(t => t.rect.Size.Y)
 					.ThenBy(t => t.rect.Size.X))
 				{
-					var texture = AppGame.AssetManager.GetSheetImage(imageList.RelativePath, frame.index);
+					var texture = AppGame.AssetManager.GetSheetImage(imageList.RelativePath, frame.FrameIndex);
 
 					if (!test.TryAdd(texture))
 					{
@@ -398,7 +398,7 @@ namespace DataManager.Build
 				foreach (var frame in imageList.Frames.OrderByDescending(t => t.rect.Size.Y)
 					.ThenBy(t => t.rect.Size.X))
 				{
-					var texture = AppGame.AssetManager.GetSheetImage(imageList.RelativePath, frame.index);
+					var texture = AppGame.AssetManager.GetSheetImage(imageList.RelativePath, frame.FrameIndex);
 
 					bool success = false;
 

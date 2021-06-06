@@ -89,18 +89,13 @@ namespace DataManager.Panels
 
 		private void DrawEntries()
 		{
-
 			ImGui.BeginChild("##sag.entries");
 
 			if (ImGui.Button("Normalize##sag.entries.normalize"))
 			{
 				NormalizeEntries();
 			}
-			ImGui.SameLine();
-			if (ImGui.Button("Generate##sag.entries.generate"))
-			{
-				AppGame.RunCoroutine(GenerateCrt());
-			}
+
 			ImGui.SameLine();
 			if (ImGui.Button("Build All##sag.entries.buildall"))
 			{
@@ -151,22 +146,13 @@ namespace DataManager.Panels
 					modalSelectedAssets.AddRange(entry.Assets);
 				}
 
-				bool generated = AppGame.AssetManager.SpriteAtlases.Any(f => f.Name == entry.OutputName);
-
 
 				ImGui.SameLine();
 
-				if (generated)
+				if (ImGui.Button($"Build##sag.entries.build.{entry.Id}"))
 				{
-					if (ImGui.Button($"Build##sag.entries.build.{entry.Id}"))
-					{
-						AppGame.RunCoroutine(BuildAtlasCrt(entry));
+					AppGame.RunCoroutine(BuildAtlasCrt(entry));
 
-					}
-				}
-				else
-				{
-					ImGui.Text("Generate atlas to build it");
 				}
 
 				ImGui.SameLine();
@@ -219,6 +205,9 @@ namespace DataManager.Panels
 				ImGui.Text(text);
 			else
 				ImGui.TextDisabled(text);
+
+			if (ImGui.IsItemHovered())
+				AppGame.Gui.HoverObject = file;
 
 		}
 
@@ -331,29 +320,6 @@ namespace DataManager.Panels
 				}
 			}
 
-
-		}
-
-		private IEnumerator GenerateCrt()
-		{
-			foreach (var file in Directory.GetFiles(AssetManager.SpriteAtlasDir))
-				File.Delete(file);
-
-			AppGame.AssetManager.SpriteAtlases.Clear();
-
-			int i = 0;
-			foreach (var entry in entries)
-			{
-				if (!AppGui.ProgressDialog("Generating atlases", ++i, entries.Count, true))
-					yield break;
-
-				AppGame.AssetManager.ExportAtlas(entry.Assets, entry.OutputName);
-
-				yield return null;
-			}
-
-
-			AppGame.AssetManager.ReloadAssets();
 
 		}
 

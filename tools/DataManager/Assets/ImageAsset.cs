@@ -13,7 +13,7 @@ namespace DataManager.Assets
 	public class ImageAsset : Asset
 	{
 		[Ignore]
-		public SpriteSheet SpriteSheet { get; private set; }
+		public ImageList SpriteSheet { get; private set; }
 
 		[Index(0),Name("SpriteSheet")]
 		public string SpriteSheetName { get; set; }
@@ -42,15 +42,15 @@ namespace DataManager.Assets
 
 		public ImageAsset() : base() { }
 
-		public ImageAsset(SpriteSheet asset)
+		public ImageAsset(ImageList asset)
 		{
 			SpriteSheet = asset;
-			SpriteSheetName = asset.SheetName;
+			SpriteSheetName = asset.Key;
 		}
 
 		public override void OnAfterDeserialize()
 		{
-			SpriteSheet = AppGame.AssetManager.SpriteSheets.FirstOrDefault(s => s.SheetName == SpriteSheetName);
+			SpriteSheet = AppGame.AssetManager.ImageLists.FirstOrDefault(s => s.Key == SpriteSheetName);
 		}
 	}
 }

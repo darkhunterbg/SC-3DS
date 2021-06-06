@@ -77,11 +77,13 @@ namespace DataManager
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();
 
 		public List<ImageList> ImageLists { get; private set; } = new List<ImageList>();
-		public List<SpriteAtlas> SpriteAtlases { get; private set; } = new List<SpriteAtlas>();
-		public List<SpriteSheet> SpriteSheets { get; private set; } = new List<SpriteSheet>();
+		//public List<SpriteAtlas> SpriteAtlases { get; private set; } = new List<SpriteAtlas>();
+		//public List<SpriteSheet> SpriteSheets { get; private set; } = new List<SpriteSheet>();
 
 
-		public List<SpriteFrame> Icons { get; private set; } = new List<SpriteFrame>();
+		public List<ImageFrame> Icons { get; private set; } = new List<ImageFrame>();
+		public List<ImageFrame> UnitSelection { get; private set; } = new List<ImageFrame>();
+
 
 		private Dictionary<string, List<GuiTexture>> loadedSheetImages = new Dictionary<string, List<GuiTexture>>();
 
@@ -136,7 +138,29 @@ namespace DataManager
 		{
 			LoadPalettes();
 			LoadImageLists();
-			LoadSpriteAtlases();
+
+
+			var iconsSheet = ImageLists.FirstOrDefault(s => s.Key == "unit\\cmdbtns\\cmdicons");
+			if (iconsSheet != null)
+			{
+				Icons.AddRange(iconsSheet.Frames);
+			}
+
+
+			foreach (var s in CustomEnumValues.SelectionTypes)
+			{
+				string sheet = s;
+				sheet = sheet.Substring(0, sheet.Length - 2);
+				if (sheet.Length < 3)
+					sheet = $"0{sheet}";
+				sheet = $"unit\\thingy\\o{sheet}";
+
+				var ss = AppGame.AssetManager.ImageLists.FirstOrDefault(f => f.Key == sheet);
+				if (ss == null)
+					continue;
+				UnitSelection.Add(ss.Frames[0]);
+			}
+
 			ReloadAssets();
 		}
 
@@ -157,84 +181,13 @@ namespace DataManager
 
 		}
 
-		public void LoadSpriteAtlases()
-		{
-			foreach (var tex in loadedSheetImages.SelectMany(s => s.Value))
-				tex.Dispose();
-
-			loadedSheetImages.Clear();
-
-			SpriteAtlases.Clear();
-			SpriteSheets.Clear();
-			Icons.Clear();
-
-			if (!File.Exists(SpriteAtlasDataPath) || !File.Exists(SpriteSheetDataPath))
-				return;
-
-			List<IGrouping<string, SpriteSubAtlas>> atlasRecords = null;
-
-			using (var csv = new CsvReader(new StreamReader(SpriteAtlasDataPath), CsvConfig))
-			{
-				atlasRecords = csv.GetRecords<SpriteSubAtlas>().GroupBy(g => g.AtlasName)
-					.ToList();
-			}
-
-			var sheets = Directory.GetFileSystemEntries($"{SpriteAtlasDir}", "*.t3s");
-			Dictionary<string, List<string>> sheetsInfoFiles = new Dictionary<string, List<string>>();
-
-			foreach (var sheet in sheets)
-			{
-				var info = File.ReadAllLines(sheet).Skip(1).ToList();
-				string sheetName = Path.GetFileNameWithoutExtension(sheet);
-				sheetsInfoFiles[sheetName] = info
-					.Select(f => Path.GetDirectoryName(f))
-					.Distinct()
-					.Select(i => i.Substring(ConvertedAssetDir.Length) + "\\info.txt").ToList();
-
-			}
-
-
-			foreach (var r in atlasRecords.SelectMany(s => s))
-			{
-				var atlasInfoFiles = sheetsInfoFiles[r.FullName];
-				var images = ImageLists.Where(s => atlasInfoFiles.Contains(s.InfoFilePath)).ToList();
-				r.ImageLists = images;
-			}
-
-			foreach (var group in atlasRecords)
-			{
-				var s = new SpriteAtlas(group.Key);
-				SpriteAtlases.Add(s);
-
-				s.SetSubAtlases(group);
-			}
-
-
-			using (var csv = new CsvReader(new StreamReader(SpriteSheetDataPath), CsvConfig))
-			{
-				SpriteSheets.AddRange(csv.GetRecords<SpriteSheet>());
-			}
-
-
-			foreach (var sheet in SpriteSheets)
-			{
-				sheet.OnAfterDeserialize();
-			}
-
-			var iconsSheet = SpriteSheets.FirstOrDefault(s => s.SheetName == "unit\\cmdbtns\\cmdicons");
-			if (iconsSheet != null)
-			{
-				Icons.AddRange(iconsSheet.Frames);
-			}
-		}
-
 		public GuiTexture GetSheetImage(string sheetName, int frameIndex)
 		{
 			loadedSheetImages.TryGetValue(sheetName, out var images);
 
 			if (images == null)
 			{
-				var sheet = SpriteSheets.FirstOrDefault(s => s.SheetName == sheetName);
+				var sheet = ImageLists.FirstOrDefault(s => s.Key == sheetName);
 
 				if (sheet == null)
 					return null;
@@ -242,9 +195,9 @@ namespace DataManager
 				images = new List<GuiTexture>();
 				loadedSheetImages[sheetName] = images;
 
-				for (int i = 0; i < sheet.TotalFrames; ++i)
+				for (int i = 0; i < sheet.Frames.Count; ++i)
 				{
-					var tex = Texture2D.FromFile(AppGame.Device, sheet.ImageAsset.GetFrameFilePath(i));
+					var tex = Texture2D.FromFile(AppGame.Device, sheet.GetFrameFilePath(i));
 					images.Add(new GuiTexture(tex));
 				}
 				//var list = sheet.SubAtlas.ImageLists[sheet.]
@@ -396,84 +349,6 @@ namespace DataManager
 				++i;
 
 				File.WriteAllLines(Path.Combine(subDir, $"info.txt"), info);
-			}
-		}
-
-		public void ExportAtlas(IEnumerable<ImageList> assets, string atlasName)
-		{
-			Rectangle rect = new Rectangle(0, 0, 1024, 1024);
-
-			List<ImageList> group = new List<ImageList>();
-
-			SpriteAtlas spriteAtlas = new SpriteAtlas(atlasName);
-
-			int freeSpace = (1024 * 1024) / 100;
-
-			var r = new SpriteSubAtlas();
-
-			foreach (var asset in assets)
-			{
-				if (group.Sum(s => s.TakenSpace) + asset.TakenSpace < freeSpace)
-				{
-					group.Add(asset);
-				}
-				else
-				{
-					spriteAtlas.AddSubAtlas(group);
-					group.Clear();
-					group.Add(asset);
-				}
-			}
-
-			if (group.Count > 0)
-			{
-				spriteAtlas.AddSubAtlas(group);
-			}
-
-			foreach (var atlas in spriteAtlas.SubAtlases)
-			{
-
-				string file = atlas.InfoFilePath;
-				string outDir = $"../../{ConvertedAssetDirRelative}";
-
-				using (StreamWriter sw = new StreamWriter(file))
-				{
-					sw.WriteLine($"--atlas -f auto-etc1 -z auto -q high");
-					foreach (var asset in atlas.ImageLists)
-					{
-						foreach (var frame in asset.Frames)
-						{
-							sw.WriteLine($"{outDir}{asset.RelativePath}/{frame.fileName}".Replace("\\", "/"));
-						}
-					}
-
-				}
-			}
-
-
-			SpriteAtlases.RemoveAll(t => t.Name == atlasName);
-			SpriteAtlases.Add(spriteAtlas);
-
-			SpriteSheets.RemoveAll(t => t.Atlas == atlasName);
-			SpriteSheets.AddRange(spriteAtlas.SubAtlases.SelectMany(a => a.GenerateSpriteSheets()));
-
-			var records = SpriteAtlases.SelectMany(s => s.SubAtlases).OrderBy(t => t.AtlasName).ThenBy(t => t.AtlasIndex);
-
-			var frames = SpriteSheets.SelectMany(s => s.Frames).OrderBy(f => f.SpriteSheetName).ToList();
-
-			using (var csv = new CsvWriter(new StreamWriter(SpriteAtlasDataPath), CsvConfig))
-			{
-				csv.WriteRecords(records);
-			}
-
-			using (var csv = new CsvWriter(new StreamWriter(SpriteSheetDataPath), CsvConfig))
-			{
-				csv.WriteRecords(SpriteSheets);
-			}
-
-			using (var csv = new CsvWriter(new StreamWriter(FramesDataPath), CsvConfig))
-			{
-				csv.WriteRecords(frames);
 			}
 		}
 

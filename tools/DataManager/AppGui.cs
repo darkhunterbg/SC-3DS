@@ -109,7 +109,7 @@ namespace DataManager
 				panel.Draw(clientSize);
 			}
 
-			
+
 			TooltipForObject(HoverObject);
 
 			EditorModalSelect.DrawSelectItemModal();
@@ -191,39 +191,48 @@ namespace DataManager
 			if (obj == null)
 				return;
 
-			
+
 			if (obj is ImageAsset)
 			{
 				ImGui.BeginTooltip();
 
-				DrawSpriteSheetInfo(((ImageAsset)obj).SpriteSheet);
+				DrawImageListInfo(((ImageAsset)obj).SpriteSheet);
 
 				ImGui.EndTooltip();
+				return;
+			}
+			if (obj is ImageList)
+			{
+				ImGui.BeginTooltip();
+
+				DrawImageListInfo(((ImageList)obj));
+
+				ImGui.EndTooltip();
+				return;
 			}
 		}
 
-		public static void DrawSpriteSheetInfo(SpriteSheet ss)
+		public static void DrawImageListInfo(ImageList list)
 		{
-			ImGui.Text($"Dimensions: {ss.Width}x{ss.Height}");
+			ImGui.Text($"Dimensions: {list.FrameSize.X}x{list.FrameSize.Y}");
 			ImGui.SameLine();
 
 
-			if (ss.SubAtlas != null)
+
+			ImGui.Text($"Frames: {list.Frames.Count}");
+
+			for (int i = 0; i < list.Frames.Count; ++i)
 			{
-				ImGui.Text($"Frames: {ss.TotalFrames}");
+				var tex = AppGame.AssetManager.GetSheetImage(list.RelativePath, i);
 
-				for (int i = 0; i < ss.TotalFrames; ++i)
-				{
-					var tex = AppGame.AssetManager.GetSheetImage(ss.SheetName, i);
+				if (i % 16 > 0)
+					ImGui.SameLine();
 
-					if (i % 16 > 0)
-						ImGui.SameLine();
-
-					ImGui.Image(tex.GuiImage, new Vector2(tex.Texture.Width, tex.Texture.Height));
-
-				}
+				ImGui.Image(tex.GuiImage, new Vector2(tex.Texture.Width, tex.Texture.Height));
 
 			}
+
+
 		}
 
 		public static bool ProgressDialog(string text, int count, int total, bool cancelable = false)

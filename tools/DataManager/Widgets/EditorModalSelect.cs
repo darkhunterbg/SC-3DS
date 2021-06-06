@@ -93,9 +93,9 @@ namespace DataManager.Widgets
 				ImGui.Text(asset?.AssetName ?? string.Empty);
 
 			}
-			if (objType == typeof(SpriteFrame))
+			if (objType == typeof(ImageFrame))
 			{
-				int id = (selected as SpriteFrame)?.FrameIndex ?? -1;
+				int id = (selected as ImageFrame)?.FrameIndex ?? -1;
 				string text = id != -1 ? id.ToString() : string.Empty;
 				ImGui.Text(text);
 			}
@@ -108,7 +108,7 @@ namespace DataManager.Widgets
 				return;
 			}
 			
-			if (objType == typeof(SpriteFrame))
+			if (objType == typeof(ImageFrame))
 			{
 				IconContent();
 				return;
@@ -161,7 +161,7 @@ namespace DataManager.Widgets
 
 		private static void IconContent()
 		{
-			var image = selected as SpriteFrame;
+			var image = selected as ImageFrame;
 			var query = AppGame.AssetManager.Icons;
 
 			int i = 0;

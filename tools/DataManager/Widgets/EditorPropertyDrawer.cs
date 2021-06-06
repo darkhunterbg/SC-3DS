@@ -176,12 +176,12 @@ namespace DataManager.Widgets
 
 		private static bool IconEditor(PropertyInfo prop, EditorAttribute attr, object item)
 		{
-			var icon = prop.GetValue(item) as SpriteFrame;
+			var icon = prop.GetValue(item) as ImageFrame;
 
 			if (icon == null)
 				return false;
 
-			if (ImGui.ImageButton(icon.Image.GuiImage, icon.SpriteSheet.FrameSize, Vector2.Zero,
+			if (ImGui.ImageButton(icon.Image.GuiImage, icon.ImageList.FrameSize, Vector2.Zero,
 				Vector2.One, 0,
 				Vector4.Zero,
 				Microsoft.Xna.Framework.Color.Yellow.ToVec4()))

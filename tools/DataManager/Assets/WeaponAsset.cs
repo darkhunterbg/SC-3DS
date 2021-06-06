@@ -14,7 +14,7 @@ namespace DataManager.Assets
 
 		[Index(0), TypeConverter(typeof(IconConverter)),Name("IconId")]
 		[IconEditor()]
-		public SpriteFrame Icon { get; set; }
+		public ImageFrame Icon { get; set; }
 		[Index(1)]
 		[DefaultEditor]
 		public string Name { get; set; }
@@ -41,7 +41,7 @@ namespace DataManager.Assets
 		public UpgradeAsset Upgrade { get; set; }
 
 		public WeaponAsset() : base() { }
-		public WeaponAsset(SpriteFrame asset, UpgradeAsset upgrade) : this()
+		public WeaponAsset(ImageFrame asset, UpgradeAsset upgrade) : this()
 		{
 			Icon = asset;
 			Upgrade = upgrade;

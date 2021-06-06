@@ -12,7 +12,7 @@ namespace DataManager.Assets
 
 		[Index(0), TypeConverter(typeof(IconConverter)), Name("IconId")]
 		[IconEditor()]
-		public SpriteFrame Icon { get; set; }
+		public ImageFrame Icon { get; set; }
 
 		[DefaultEditor()]
 		[Index(1)]
@@ -54,7 +54,7 @@ namespace DataManager.Assets
 		public override GuiTexture Preview => Icon?.Image;
 
 		public UpgradeAsset() : base() { }
-		public UpgradeAsset(SpriteFrame asset) : this()
+		public UpgradeAsset(ImageFrame asset) : this()
 		{
 			Icon = asset;
 		}

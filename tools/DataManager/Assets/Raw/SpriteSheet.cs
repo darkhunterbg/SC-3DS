@@ -40,10 +40,6 @@ namespace DataManager.Assets
 		[Ignore]
 		public Vector2 FrameSize => ImageAsset.FrameSize;
 
-		[Ignore]
-		public List<SpriteFrame> Frames { get; private set; } = new List<SpriteFrame>();
-
-
 		public SpriteSheet() { }
 		public SpriteSheet(SpriteSubAtlas subAtlas, int imageListIndex)
 		{
@@ -62,25 +58,6 @@ namespace DataManager.Assets
 				UnitColorOffset = 0;
 
 			SubAtlas = subAtlas;
-
-			for (int i = 0; i < TotalFrames; ++i)
-			{
-				Frames.Add(new SpriteFrame(this, i));
-			}
-		}
-
-		public void OnAfterDeserialize()
-		{
-			SubAtlas = AppGame.AssetManager.SpriteAtlases.FirstOrDefault(a => a.Name == Atlas)
-				.SubAtlases.FirstOrDefault(s => s.AtlasIndex == SubAtlasId);
-			
-			ImageAsset= SubAtlas.ImageLists.FirstOrDefault(s => s.RelativePath == SheetName); 
-			//ImageAsset = SubAtlas.GetImageListAtOffset(SubAtlasOffset);
-			for (int i = 0; i < TotalFrames; ++i)
-			{
-				Frames.Add(new SpriteFrame(this, i));
-			}
-
 		}
 
 

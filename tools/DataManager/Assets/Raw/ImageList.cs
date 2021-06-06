@@ -9,27 +9,57 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
+
+	public class ImageFrame
+	{
+		public string fileName;
+		public Microsoft.Xna.Framework.Rectangle rect;
+		public readonly int FrameIndex;
+
+		public Vector2 Position => rect.Location.ToVector2().ToVec2();
+		public Vector2 Size => rect.Size.ToVector2().ToVec2();
+
+		public int TakenSpace => (rect.Width + 1) * (rect.Height + 1);
+
+		public ImageList ImageList { get; private set; }
+		public GuiTexture Image => AppGame.AssetManager.GetSheetImage(ImageList.Key, FrameIndex);
+
+		public Vector2 GetOffset(bool hFlip = false)
+		{
+			Vector2 offset = Position - ImageList.FrameSize / 2;
+			if (hFlip)
+				offset.X = ImageList.FrameSize.X / 2 - Position.X - (int)Size.X;
+
+			return offset;
+		}
+
+		public ImageFrame(ImageList list,int i)
+		{
+			ImageList = list;
+			FrameIndex = i;
+		}
+
+
+	}
+
 	public class ImageList
 	{
-		public class FrameData
-		{
-			public string fileName;
-			public Microsoft.Xna.Framework.Rectangle rect;
-			public int index;
-
-			public int TakenSpace => (rect.Width + 1) * (rect.Height + 1);
-		}
+		
 
 		public string InfoFilePath { get; private set; }
 		public string RelativePath { get; private set; }
+		public string Key => RelativePath;
 		public string Name { get; private set; }
 		public string Dir { get; private set; }
 
 		public Vector2 FrameSize { get; private set; }
 
-		public List<FrameData> Frames { get; private set; } = new List<FrameData>();
+		public List<ImageFrame> Frames { get; private set; } = new List<ImageFrame>();
 
 		public int TakenSpace => Frames.Sum(f => f.TakenSpace);
+
+
+		public int UnitColorOffset { get; private set; }
 
 		public ImageList(string infoFile)
 		{
@@ -54,13 +84,21 @@ namespace DataManager.Assets
 
 				string name = spl[0];
 
-				Frames.Add(new FrameData()
+				Frames.Add(new ImageFrame(this, Frames.Count)
 				{
 					fileName = name,
 					rect = rect,
-					index = Frames.Count
 				});
 			}
+
+			UnitColorOffset = Frames.IndexOf(f => f.fileName.StartsWith("cm_"));
+			if (UnitColorOffset < 0)
+				UnitColorOffset = 0;
+		}
+
+		public int GetUnitColorFrameIndex(int frame)
+		{
+			return frame + UnitColorOffset;
 		}
 
 		public string GetFrameFilePath(int i)

@@ -23,26 +23,12 @@ namespace DataManager.Panels
 
 		private AssetTableEditor<SpriteAsset> table = new AssetTableEditor<SpriteAsset>("##se.table");
 
-		private List<SpriteFrame> selectionFrames = new List<SpriteFrame>();
-
 		private Microsoft.Xna.Framework.Color BarColor = new Microsoft.Xna.Framework.Color(0xff249824);
 		private RenderTargetImage spritePreview = new RenderTargetImage(new Vector2(256, 256));
 
 		public SpriteEditor()
 		{
-			foreach (var s in CustomEnumValues.SelectionTypes)
-			{
-				string sheet = s;
-				sheet = sheet.Substring(0, sheet.Length - 2);
-				if (sheet.Length < 3)
-					sheet = $"0{sheet}";
-				sheet = $"unit\\thingy\\o{sheet}";
-
-				var ss = AppGame.AssetManager.SpriteSheets.FirstOrDefault(f => f.SheetName == sheet);
-				if (ss == null)
-					continue;
-				selectionFrames.Add(ss.Frames[0]);
-			}
+		
 
 		}
 
@@ -96,9 +82,9 @@ namespace DataManager.Panels
 
 				if (showSelectionMarker && itemPreview.SelectionType >= 0)
 				{
-					if (selectionFrames.Count > itemPreview.SelectionType)
+					if (AppGame.AssetManager.UnitSelection.Count > itemPreview.SelectionType)
 					{
-						var selection = selectionFrames[itemPreview.SelectionType];
+						var selection = AppGame.AssetManager.UnitSelection[itemPreview.SelectionType];
 						pos = center + selection.GetOffset();
 						pos.Y += itemPreview.SelectionOffset;
 						sb.Draw(selection.Image.Texture, pos.ToVector2(), Microsoft.Xna.Framework.Color.LightGreen);
