@@ -7,12 +7,20 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets.Raw
 {
+	public enum SpriteAtlasPackStrategy
+	{
+		Group,
+		Tight,
+	}
+
 	public class SpriteAtlasEntry
 	{
 		[JsonProperty]
 		public string OutputName = string.Empty;
 		[JsonProperty(PropertyName = "ImageList")]
 		private List<string> imageList = new List<string>();
+		[JsonProperty]
+		public SpriteAtlasPackStrategy PackStrategy;
 
 		[JsonIgnore]
 		public List<ImageList> Assets = new List<ImageList>();

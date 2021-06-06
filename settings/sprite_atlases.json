@@ -26,7 +26,8 @@
       "unit\\cmdbtns\\pcmdbtns",
       "unit\\cmdbtns\\tcmdbtns",
       "unit\\cmdbtns\\zcmdbtns"
-    ]
+    ],
+    "PackStrategy": 1
   },
   {
     "OutputName": "wirefram",
@@ -499,7 +500,8 @@
       "unit\\wirefram\\wirefram\\225",
       "unit\\wirefram\\wirefram\\226",
       "unit\\wirefram\\wirefram\\227"
-    ]
+    ],
+    "PackStrategy": 1
   },
   {
     "OutputName": "thingy",
@@ -997,7 +999,8 @@
       "unit\\thingy\\zdvPuke",
       "unit\\thingy\\zrubblel",
       "unit\\thingy\\zrubbles"
-    ]
+    ],
+    "PackStrategy": 0
   },
   {
     "OutputName": "neutral",
@@ -1063,7 +1066,8 @@
       "unit\\neutral\\tgnShad",
       "unit\\neutral\\tpdShad",
       "unit\\neutral\\Uraj"
-    ]
+    ],
+    "PackStrategy": 0
   },
   {
     "OutputName": "protoss",
@@ -1145,7 +1149,8 @@
       "unit\\protoss\\XWarpFir",
       "unit\\protoss\\XWarpGat",
       "unit\\protoss\\zealot"
-    ]
+    ],
+    "PackStrategy": 0
   },
   {
     "OutputName": "terran",
@@ -1250,7 +1255,8 @@
       "unit\\terran\\weaponpt",
       "unit\\terran\\wessel",
       "unit\\terran\\wesselt"
-    ]
+    ],
+    "PackStrategy": 0
   },
   {
     "OutputName": "zerg",
@@ -1363,7 +1369,8 @@
       "unit\\zerg\\zzedeath",
       "unit\\zerg\\zzeshad",
       "unit\\zerg\\zzluShad"
-    ]
+    ],
+    "PackStrategy": 0
   },
   {
     "OutputName": "bullet_flingy",
@@ -1401,6 +1408,7 @@
       "unit\\flingy\\pg5deb",
       "unit\\flingy\\pscdeb",
       "unit\\flingy\\tg5deb"
-    ]
+    ],
+    "PackStrategy": 1
   }
 ]

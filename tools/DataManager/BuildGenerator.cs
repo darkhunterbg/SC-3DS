@@ -11,11 +11,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace DataManager.Build
 {
 	class AtlasBSPTree
 	{
+		const int MaxTextureSize = 1024;
+
 		public class AtlasFrame
 		{
 			public Rectangle rect;
@@ -55,12 +58,17 @@ namespace DataManager.Build
 			}
 		}
 
-		Node root = new Node()
-		{
-			Region = new Rectangle(0, 0, 1024, 1024)
-		};
+		Node root;
 
 		int frames = 0;
+
+		public int FreeSpace { get; private set; }
+
+		public int TotalSpace => root.Region.Width * root.Region.Height;
+
+		public int TakenSpace => TotalSpace - FreeSpace;
+
+		public Microsoft.Xna.Framework.Point Dimensions => root.Region.Size;
 
 		bool TryAdd(GuiTexture texture, Node node)
 		{
@@ -74,7 +82,6 @@ namespace DataManager.Build
 			if (node.Children == null)
 			{
 				SplitNodeX(node, rect.Height + 1);
-
 				SplitNodeY(node.Children[0], rect.Width + 1);
 
 				node.Children[0].Children[0].Frame = new AtlasFrame()
@@ -84,6 +91,7 @@ namespace DataManager.Build
 				};
 
 				++frames;
+				FreeSpace -= (rect.Width + 1) * (rect.Height + 1);
 				return true;
 			}
 
@@ -171,7 +179,6 @@ namespace DataManager.Build
 			}
 		}
 
-
 		public List<AtlasFrame> GetFrames()
 		{
 			List<AtlasFrame> result = new List<AtlasFrame>();
@@ -190,11 +197,22 @@ namespace DataManager.Build
 			return new AtlasBSPTree()
 			{
 				root = root.Clone(),
-				frames = frames
+				frames = frames,
+				FreeSpace = FreeSpace
 			};
 		}
 
+		public AtlasBSPTree(int width = MaxTextureSize, int height = MaxTextureSize)
+		{
+			root = new Node()
+			{
+				Region = new Rectangle(0, 0, width, height)
+			};
+
+			FreeSpace = width * height;
+		}
 	}
+
 
 	public class BuildGenerator : IDisposable
 	{
@@ -202,13 +220,19 @@ namespace DataManager.Build
 
 		private volatile bool cancelled = false;
 
-		private RenderTarget2D texture = new RenderTarget2D(AppGame.Device, 1024, 1024, false, SurfaceFormat.Color, DepthFormat.None);
+		public bool DrawAtlasOutiline { get; set; }
+
+		int totalJobs = 0;
+		int currentJob = 0;
+
 
 		private SpriteBatch spriteBatch = new SpriteBatch(AppGame.Device);
 
 		public AsyncOperation BuildAtlases(List<SpriteAtlasEntry> atlases)
 		{
 			this.atlases = atlases;
+
+			totalJobs = atlases.Count;
 
 			return new AsyncOperation(BuildAsync, OnCancelAsync);
 		}
@@ -220,162 +244,250 @@ namespace DataManager.Build
 
 		private IEnumerator SaveAtlasCrt(List<AtlasBSPTree> subAtlases, SpriteAtlasEntry atlas)
 		{
-
 			int i = 0;
-			foreach (var tree in subAtlases)
+			foreach (var subAtlas in subAtlases)
 			{
 				if (cancelled)
 					yield break;
 
-				texture.GraphicsDevice.SetRenderTarget(texture);
-				texture.GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Transparent);
+				var tree = subAtlas;
 
-				var frames = tree.GetFrames();
 
-				spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
-				foreach (var f in frames)
+				using (var texture = new RenderTarget2D(AppGame.Device, tree.Dimensions.X, tree.Dimensions.Y))
 				{
-					spriteBatch.Draw(f.texture.Texture, f.rect.Location.ToVector2(), Microsoft.Xna.Framework.Color.White);
-				}
 
-				foreach (var f in tree.GetNodes()){
+					texture.GraphicsDevice.SetRenderTarget(texture);
+					texture.GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Transparent);
 
-					spriteBatch.DrawRectangle(f.Region.Location.ToVector2().ToVec2(),
+					var frames = tree.GetFrames();
+
+					spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+
+					foreach (var f in frames)
+					{
+						spriteBatch.Draw(f.texture.Texture, f.rect.Location.ToVector2(), Microsoft.Xna.Framework.Color.White);
+					}
+					if (DrawAtlasOutiline)
+					{
+						foreach (var f in tree.GetNodes())
+						{
+							spriteBatch.DrawRectangle(f.Region.Location.ToVector2().ToVec2(),
 				new Vector2(1, f.Region.Size.Y),
-				 Microsoft.Xna.Framework.Color.Magenta);
+				 Color.Magenta);
 
-					spriteBatch.DrawRectangle(f.Region.Location.ToVector2().ToVec2()
-						+ new Vector2(f.Region.Size.X - 1, 0),
-					new Vector2(1, f.Region.Size.Y),
-					 Microsoft.Xna.Framework.Color.Magenta);
 
-					spriteBatch.DrawRectangle(f.Region.Location.ToVector2().ToVec2(),
-						new Vector2(f.Region.Size.X, 1),
-						 Microsoft.Xna.Framework.Color.Magenta);
+							spriteBatch.DrawRectangle(f.Region.Location.ToVector2().ToVec2()
+								+ new Vector2(f.Region.Size.X - 1, 0),
+							new Vector2(1, f.Region.Size.Y),
+							 Color.Magenta);
 
-					spriteBatch.DrawRectangle(f.Region.Location.ToVector2().ToVec2()
-						+ new Vector2(0, f.Region.Size.Y - 1),
-					new Vector2(f.Region.Size.X, 1),
-					 Microsoft.Xna.Framework.Color.Magenta);
+							spriteBatch.DrawRectangle(f.Region.Location.ToVector2().ToVec2(),
+								new Vector2(f.Region.Size.X, 1),
+								 Color.Magenta);
+
+							spriteBatch.DrawRectangle(f.Region.Location.ToVector2().ToVec2()
+								+ new Vector2(0, f.Region.Size.Y - 1),
+							new Vector2(f.Region.Size.X, 1),
+							 Color.Magenta);
+						}
+					}
+
+					spriteBatch.End();
+
+					texture.SaveAsPng($"{AssetManager.SpriteAtlasDir}gen\\{atlas.OutputName}_{i++}.png");
 				}
-
-				spriteBatch.End();
-
-				texture.SaveAsPng($"{AssetManager.SpriteAtlasDir}gen\\{atlas.OutputName}_{i++}.png");
 
 				yield return null;
 			}
-
-
 		}
 
-		private void BuildAsync(AsyncOperation op)
+		private ImageList FindFittingImageList(List<ImageList> assets, AtlasBSPTree tree, out AtlasBSPTree packedTree)
 		{
-			int total = atlases.Sum(s => s.Assets.Count);
-			int progress = 0;
+			packedTree = null;
 
-			List<ImageList> problematic = new List<ImageList>();
-
-			foreach (var atlas in atlases)
+			foreach (var imageList in assets.Where(t => t.TakenSpace <= tree.FreeSpace))
 			{
-				op.ItemName = atlas.OutputName;
+				if (cancelled)
+					return null;
 
-				List<AtlasBSPTree> subAtlases = new List<AtlasBSPTree>();
+				AtlasBSPTree test = tree.Clone();
+				bool success = true;
 
-				AtlasBSPTree current = new AtlasBSPTree();
-
-				problematic.Clear();
-
-				foreach (var imageList in atlas.Assets.OrderByDescending(t => t.FrameSize.X * t.FrameSize.Y))
+				foreach (var frame in imageList.Frames.OrderByDescending(t => t.rect.Size.Y)
+					.ThenBy(t => t.rect.Size.X))
 				{
-					if (cancelled)
-						return;
+					var texture = AppGame.AssetManager.GetSheetImage(imageList.RelativePath, frame.index);
 
-
-					AtlasBSPTree test = current.Clone();
-					bool success = true;
-
-
-					foreach (var frame in imageList.Frames.OrderByDescending(t => t.rect.Size.X * t.rect.Size.Y))
+					if (!test.TryAdd(texture))
 					{
-						var texture = AppGame.AssetManager.GetSheetImage(imageList.RelativePath, frame.index);
+						success = false;
+						break;
+					}
+				}
 
-						if (!test.TryAdd(texture))
+				if (success)
+				{
+					packedTree = test;
+					return imageList;
+				}
+			}
+
+			return null;
+		}
+
+		private List<AtlasBSPTree> GenerateAtlasTree(SpriteAtlasEntry atlas, AsyncOperation op)
+		{
+			AtlasBSPTree current = new AtlasBSPTree();
+
+			List<AtlasBSPTree> subAtlases = new List<AtlasBSPTree>();
+
+			List<ImageList> assets = atlas.Assets.OrderByDescending(t => t.FrameSize.Y)
+				.ThenBy(t => t.FrameSize.X)
+				.ThenBy(t => t.TakenSpace).ToList();
+
+			int assetTotal = assets.Count;
+			int assetProgress = 1;
+			op.ItemName = $"{atlas.OutputName} {assetProgress}/{totalJobs}";
+
+			if (atlas.PackStrategy == SpriteAtlasPackStrategy.Tight)
+				goto TightPacking;
+
+
+			while (assets.Count > 0)
+			{
+
+				var add = FindFittingImageList(assets, current, out var packed);
+				if (cancelled)
+					return null;
+
+				if (add != null)
+				{
+					assets.Remove(add);
+
+					current = packed;
+
+					++assetProgress;
+					op.Progress = ((float)assetProgress / (float)assetTotal);
+					op.ItemName = $"{atlas.OutputName} {currentJob}/{totalJobs}";
+				}
+				else
+				{
+					if (current.IsEmpty())
+					{
+						// Cant  find anything to fit in empty, remaining should be tighlty-apcked
+						break;
+					}
+					subAtlases.Add(current);
+					current = new AtlasBSPTree();
+				}
+			}
+
+			if (!current.IsEmpty())
+			{
+				subAtlases.Add(current);
+				current = new AtlasBSPTree();
+			}
+
+		TightPacking:
+			foreach (var imageList in assets)
+			{
+				if (cancelled)
+					return subAtlases;
+
+				foreach (var frame in imageList.Frames.OrderByDescending(t => t.rect.Size.Y)
+					.ThenBy(t => t.rect.Size.X))
+				{
+					var texture = AppGame.AssetManager.GetSheetImage(imageList.RelativePath, frame.index);
+
+					bool success = false;
+
+					foreach (var sub in subAtlases.Where(t => t.FreeSpace >= frame.TakenSpace))
+					{
+						if (sub.TryAdd(texture))
 						{
-							success = false;
+							success = true;
 							break;
 						}
 					}
 
+
 					if (!success)
 					{
-						subAtlases.Add(current);
-						current = new AtlasBSPTree();
-						test = new AtlasBSPTree();
+						var newAtlas = new AtlasBSPTree();
+						newAtlas.TryAdd(texture);
+						subAtlases.Add(newAtlas);
+					}
+				}
 
-						success = true;
 
-						foreach (var frame in imageList.Frames)
+				++assetProgress;
+				op.Progress = ((float)assetProgress / (float)assetTotal);
+				op.ItemName = $"{atlas.OutputName} {currentJob}/{totalJobs}";
+
+			}
+
+			if (!current.IsEmpty())
+			{
+				subAtlases.Add(current);
+				current = new AtlasBSPTree();
+			}
+
+			return subAtlases;
+		}
+
+		private void BuildAsync(AsyncOperation op)
+		{
+			foreach (var atlas in atlases)
+			{
+				++currentJob;
+				List<AtlasBSPTree> subAtlases = GenerateAtlasTree(atlas, op);
+
+				if (cancelled)
+					return;
+
+				List<AtlasBSPTree> scaledSubAtlases = new List<AtlasBSPTree>();
+
+				foreach (var subAtlas in subAtlases)
+				{
+					var tree = subAtlas;
+
+					while (tree.TakenSpace < (tree.TotalSpace / 4) && tree.TotalSpace >= 128 * 128)
+					{
+						bool success = true;
+
+						var test = new AtlasBSPTree(tree.Dimensions.X / 2, tree.Dimensions.Y / 2);
+						var frames = tree.GetFrames();
+
+						foreach (var f in frames)
 						{
-							var texture = AppGame.AssetManager.GetSheetImage(imageList.RelativePath, frame.index);
-
-							if (!test.TryAdd(texture))
+							if (!test.TryAdd(f.texture))
 							{
-								problematic.Add(imageList);
 								success = false;
 								break;
 							}
 						}
+						if (!success)
+							break;
+
+						tree = test;
 					}
 
-					if (success)
-					{
-						current = test;
-						progress++;
-						op.Progress = ((float)progress / (float)total);
-					}
+					scaledSubAtlases.Add(tree);
 				}
 
-				foreach (var imageList in problematic)
-				{
-					if (cancelled)
-						return;
-
-					foreach (var frame in imageList.Frames.OrderByDescending(t => t.rect.Size.X * t.rect.Size.Y))
-					{
-						var texture = AppGame.AssetManager.GetSheetImage(imageList.RelativePath, frame.index);
-
-						if (!current.TryAdd(texture))
-						{
-							subAtlases.Add(current);
-							current = new AtlasBSPTree();
-							current.TryAdd(texture);
-						}
-					}
-
-					progress++;
-					op.Progress = ((float)progress / (float)total);
-
-				}
-
-				if (!current.IsEmpty())
-				{
-					subAtlases.Add(current);
-					current = new AtlasBSPTree();
-				}
-
-				var crt = AppGame.RunCoroutine(SaveAtlasCrt(subAtlases, atlas));
+				var crt = AppGame.RunCoroutine(SaveAtlasCrt(scaledSubAtlases, atlas));
 
 				while (!crt.done && !cancelled)
 					Thread.Sleep(1);
+
 
 			}
 		}
 
 		public void Dispose()
 		{
-			texture?.Dispose();
+
 		}
 	}
 }

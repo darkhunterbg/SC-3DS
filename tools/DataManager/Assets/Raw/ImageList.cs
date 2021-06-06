@@ -16,6 +16,8 @@ namespace DataManager.Assets
 			public string fileName;
 			public Microsoft.Xna.Framework.Rectangle rect;
 			public int index;
+
+			public int TakenSpace => (rect.Width + 1) * (rect.Height + 1);
 		}
 
 		public string InfoFilePath { get; private set; }
@@ -27,7 +29,7 @@ namespace DataManager.Assets
 
 		public List<FrameData> Frames { get; private set; } = new List<FrameData>();
 
-		public int TakenSpace => Frames.Sum(f => f.rect.Width * f.rect.Height + 2);
+		public int TakenSpace => Frames.Sum(f => f.TakenSpace);
 
 		public ImageList(string infoFile)
 		{

@@ -1,6 +1,7 @@
 ﻿using DataManager.Assets;
 using DataManager.Assets.Raw;
 using DataManager.Build;
+using DataManager.Widgets;
 using GlobExpressions;
 using ImGuiNET;
 using Newtonsoft.Json;
@@ -115,6 +116,7 @@ namespace DataManager.Panels
 				var entry = entries[i];
 				text = entry.OutputName;
 
+
 				int count = entry.Assets.Sum(s => s.Frames.Count);
 				bool expand = ImGui.TreeNodeEx($"[{count}]##sag.entries.node.{entry.Id}");
 
@@ -123,6 +125,16 @@ namespace DataManager.Panels
 				if (ImGui.InputText($"##sag.entries.path.{entry.Id}", ref text, 256))
 				{
 					entry.OutputName = text;
+					changed = true;
+				}
+
+				ImGui.SameLine();
+				int number = (int)entry.PackStrategy;
+				var enumValues = EnumCacheValues.GetValues(typeof(SpriteAtlasPackStrategy));
+				ImGui.SetNextItemWidth(100);
+				if (ImGui.Combo($"##sag.entries.packstrat.{entry.Id}", ref number, enumValues, enumValues.Length))
+				{
+					entry.PackStrategy = (SpriteAtlasPackStrategy)number;
 					changed = true;
 				}
 
@@ -142,12 +154,6 @@ namespace DataManager.Panels
 				bool generated = AppGame.AssetManager.SpriteAtlases.Any(f => f.Name == entry.OutputName);
 
 
-				ImGui.SameLine();
-
-				if (ImGui.Button($"Generate##sag,entries.gen.{entry.Id}"))
-				{
-					GenerateSingle(entry);
-				}
 				ImGui.SameLine();
 
 				if (generated)
@@ -328,12 +334,6 @@ namespace DataManager.Panels
 
 		}
 
-		private void GenerateSingle(SpriteAtlasEntry entry)
-		{
-			AppGame.AssetManager.ExportAtlas(entry.Assets, entry.OutputName);
-			AppGame.AssetManager.ReloadAssets();
-		}
-
 		private IEnumerator GenerateCrt()
 		{
 			foreach (var file in Directory.GetFiles(AssetManager.SpriteAtlasDir))
@@ -359,28 +359,27 @@ namespace DataManager.Panels
 
 		private IEnumerator BuildAtlasCrt(SpriteAtlasEntry entry)
 		{
-			var atlas = AppGame.AssetManager.SpriteAtlases.FirstOrDefault(f => f.Name == entry.OutputName);
+			Stopwatch timer = new Stopwatch();
+			timer.Start();
 
-			if (atlas == null)
-				yield break;
+			BuildGenerator build = new BuildGenerator();
 
-			var op = AppGame.AssetManager.BuildAtlas(atlas);
-
+			var op = build.BuildAtlases(new List<SpriteAtlasEntry>() { entry });
 
 			while (!op.Completed)
 			{
-				float tmpProgress = op.Progress;
+				var elapsed = TimeSpan.FromSeconds((int)timer.Elapsed.TotalSeconds);
 
-				if (!AppGui.ProgressDialog($"Building atlas: {atlas.Name}", tmpProgress, true))
+				if (!AppGui.ProgressDialog($"Building: {op.ItemName} ({elapsed.ToString("c")}) ", op.Progress, true))
 				{
 					op.Cancel();
-					yield break;
+					break;
 
 				}
-
-
 				yield return null;
 			}
+
+			build.Dispose();
 		}
 
 		private IEnumerator BuildAllCrt()

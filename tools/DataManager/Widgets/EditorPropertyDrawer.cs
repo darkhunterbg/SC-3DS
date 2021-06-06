@@ -20,6 +20,29 @@ namespace DataManager.Widgets
 
 		static bool? delayedChangedValue = null;
 
+		public static EditorDrawAction GetPropertyDrawer<TType>( bool readOnly = false)
+		{
+			return GetPropertyDrawer(typeof(TType), readOnly);
+		}
+		public static EditorDrawAction GetPropertyDrawer(Type type, bool readOnly= false)
+		{
+			if (readOnly)
+				return ReadOnlyEditor;
+
+			if (type == typeof(string))
+				return StringEditor;
+
+			if (type == typeof(int))
+				return IntEditor;
+
+			if (type.IsEnum)
+				return EnumEditor;
+
+			if (type.IsSubclassOf(typeof(Asset)))
+				return AssetEditor;
+
+			return ReadOnlyEditor;
+		}
 		public static EditorDrawAction GetPropertyDrawer(PropertyInfo prop, EditorAttribute attr)
 		{
 			if (!prop.CanWrite || attr.ReadOnly)
@@ -27,19 +50,7 @@ namespace DataManager.Widgets
 
 			if (attr is DefaultEditorAttribute)
 			{
-				var type = prop.PropertyType;
-
-				if (type == typeof(string))
-					return StringEditor;
-
-				if (type == typeof(int))
-					return IntEditor;
-
-				if (type.IsEnum)
-					return EnumEditor;
-
-				if (type.IsSubclassOf(typeof(Asset)))
-					return AssetEditor;
+				return GetPropertyDrawer(prop.PropertyType, false);
 			}
 			else
 			{
