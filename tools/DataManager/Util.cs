@@ -24,11 +24,12 @@ namespace DataManager
 			return instance;
 		}
 
-		public static IEnumerable<T> TextFilter<T>(IEnumerable<T> query, string text, Func<T, string> filterBy)
+		public static IEnumerable<T> TextFilter<T>(IEnumerable<T> query, string text, Func<T, string> filterBy, bool semiMatch = true)
 		{
 			if (!string.IsNullOrEmpty(text))
 			{
-				if (!text.Contains('*') &&
+				if (semiMatch &&
+					!text.Contains('*') &&
 					!text.Contains('?') &&
 					!text.Contains('[') &&
 					!text.Contains('{'))

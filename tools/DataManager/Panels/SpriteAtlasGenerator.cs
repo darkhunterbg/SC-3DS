@@ -25,9 +25,10 @@ namespace DataManager.Panels
 		public static readonly string SettingsFileName = "sprite_atlases";
 
 		bool changed = false;
-		bool selectItemsModal = false;
+
 		SpriteAtlasEntry selectItemsFor = null;
-		List<ImageList> modalSelectedAssets = new List<ImageList>();
+		int selectEditDirIndex = -1;
+
 		string assetFilter = string.Empty;
 
 		public SpriteAtlasGenerator()
@@ -36,7 +37,8 @@ namespace DataManager.Panels
 				new List<SpriteAtlasEntry>();
 
 			foreach (var e in entries)
-				e.Init();
+				e.ReloadAssets();
+
 		}
 
 		public void Draw(Vector2 clientSize)
@@ -56,7 +58,7 @@ namespace DataManager.Panels
 
 			ImGui.End();
 
-			if (selectItemsModal)
+			if (selectItemsFor != null)
 			{
 				DrawSelectItemsModal();
 			}
@@ -91,10 +93,6 @@ namespace DataManager.Panels
 		{
 			ImGui.BeginChild("##sag.entries");
 
-			if (ImGui.Button("Normalize##sag.entries.normalize"))
-			{
-				NormalizeEntries();
-			}
 
 			ImGui.SameLine();
 			if (ImGui.Button("Build All##sag.entries.buildall"))
@@ -134,18 +132,7 @@ namespace DataManager.Panels
 				}
 
 				ImGui.SameLine();
-				ImGui.Text($"Atlas Size {(int)(entry.Used * 100)}%% ");
-
-				ImGui.SameLine();
-				if (ImGui.Button($"Edit List##sag.entries.edit.{entry.Id}"))
-				{
-					selectItemsModal = true;
-					selectItemsFor = entry;
-
-					modalSelectedAssets.Clear();
-					modalSelectedAssets.AddRange(entry.Assets);
-				}
-
+				ImGui.Text($"Atlas Size {(int)(entry.Usage*100)}%% ");
 
 				ImGui.SameLine();
 
@@ -160,7 +147,7 @@ namespace DataManager.Panels
 
 				if (expand)
 				{
-					DrawEntryAssetList(entry);
+					DrawEntryExtendedItem(entry);
 
 					ImGui.TreePop();
 				}
@@ -180,20 +167,48 @@ namespace DataManager.Panels
 			ImGui.EndChild();
 		}
 
-		private void DrawEntryAssetList(SpriteAtlasEntry entry)
+		private void DrawEntryExtendedItem(SpriteAtlasEntry entry)
 		{
-			for (int j = 0; j < entry.Assets.Count; ++j)
+			int i = 0;
+
+			for (int j = 0; j < entry.Directories.Count; ++j)
 			{
-				var asset = entry.Assets[j];
-				DrawImageAssetListItem(asset);
+				var path = entry.Directories[j];
+
+				ImGui.PushID(++i);
+
+				ImGui.Text(path);
+				ImGui.SameLine();
+
+				ImGui.SameLine();
+				if (ImGui.Button($"Edit##sag.entries.edit.{entry.Id}"))
+				{
+					selectEditDirIndex = j;
+					selectItemsFor = entry;
+					modalSearchText = selectItemsFor.Directories[selectEditDirIndex];
+				}
+
+				ImGui.SameLine();
+				if (ImGui.Button($"Delete##sag.entries.delete.{entry.Id}"))
+				{
+					entry.Directories.Remove(path);
+				}
+
+				ImGui.PopID();
 			}
+
+			if (ImGui.Button($"New Entry##sag.entries.add.{entry.Id}"))
+			{
+				selectEditDirIndex = -1;
+				selectItemsFor = entry;
+			}
+
+
 		}
 
 		private void DrawImageAssetListItem(ImageList file, bool enabled = true)
 		{
-			float usage = SpriteAtlasEntry.CalculateUsage(file) * 100;
-
-			string text = $"[{file.Frames.Count}] [{file.FrameSize.X}x{file.FrameSize.Y}] {file.Key} [{usage.ToString("F1")}%%]";
+			string text = $"[{file.Frames.Count}] [{file.FrameSize.X}x{file.FrameSize.Y}] {file.Key}";
 
 			if (enabled)
 				ImGui.Text(text);
@@ -215,106 +230,55 @@ namespace DataManager.Panels
 
 		}
 
+		string modalSearchText = string.Empty;
 		private void DrawSelectItemsModal()
 		{
-			ImGui.OpenPopup("sag.entries.add");
+			ImGui.OpenPopup("sag.entries.edit");
+			bool opened = selectItemsFor != null;
+			ImGui.BeginPopupModal("sag.entries.edit", ref opened, ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysAutoResize);
 
-			ImGui.BeginPopupModal("sag.entries.add", ref selectItemsModal, ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysAutoResize);
 
-			float total = modalSelectedAssets.Sum(s => SpriteAtlasEntry.CalculateUsage(s)) * 100;
+			ImGui.InputText($"##sag.entries.edit.filter", ref modalSearchText, 256);
 
-			ImGui.Text($"{total.ToString("F1")}%%");
-			ImGui.SameLine();
+			IEnumerable<ImageList> query = Util.TextFilter(AppGame.AssetManager.ImageLists, modalSearchText, a => a.Key, false);
 
-			var query = DrawImageListAssetsFilter("sag.entries.add.filter");
+			ImGui.BeginChild("sag.entries.edit.items", new Vector2(600, 600));
 
-			ImGui.SameLine();
-
-			if (ImGui.Button("Toggle Selection##sag.entries.add.toggle"))
-			{
-				foreach (var asset in query)
-				{
-					if (modalSelectedAssets.Contains(asset))
-						modalSelectedAssets.Remove(asset);
-					else
-						modalSelectedAssets.Add(asset);
-				}
-			}
-
-			ImGui.SameLine();
-
-			if (ImGui.Button("Clear Selection##sag.entries.add.clear"))
-			{
-				modalSelectedAssets.Clear();
-			}
-
-			query = query.OrderByDescending(asset => modalSelectedAssets.Contains(asset));
-
-			int i = 0;
-
-			ImGui.BeginChild("sag.entries.add.items", new Vector2(600, 600));
+			ImGui.Text($"{query.Count()} entries.");
 
 			foreach (var asset in query)
 			{
-				bool selected = modalSelectedAssets.Contains(asset);
-
-				if (ImGui.Selectable($"##sag.select.{i++}", selected))
-				{
-					if (selected)
-					{
-						modalSelectedAssets.Remove(asset);
-					}
-					else
-					{
-						modalSelectedAssets.Add(asset);
-					}
-				}
-				ImGui.SameLine();
 				DrawImageAssetListItem(asset);
 			}
 
 			ImGui.EndChild();
 
-			if (ImGui.Button("Cancel##sag.entries.add.cancel"))
+			if (ImGui.Button("Cancel##sag.entries.edit.cancel"))
 			{
-				selectItemsModal = false;
-				modalSelectedAssets.Clear();
+				selectItemsFor = null;
+				modalSearchText = string.Empty;
 			}
 
 			ImGui.SameLine();
 
-			if (ImGui.Button("Ok##sag.entries.add.ok"))
+			if (!string.IsNullOrEmpty(modalSearchText))
 			{
-				selectItemsModal = false;
-				selectItemsFor.SetAssets(modalSelectedAssets);
-				modalSelectedAssets.Clear();
-				changed = true;
-			}
-
-			ImGui.EndPopup();
-		}
-
-		private void NormalizeEntries()
-		{
-			List<ImageList> assets = new List<ImageList>();
-
-			foreach (var entry in entries)
-			{
-				foreach (var a in entry.Assets.ToArray())
+				if (ImGui.Button("Ok##sag.entries.edit.ok"))
 				{
-					if (assets.Contains(a))
-					{
-						entry.RemoveAsset(a);
-						changed = true;
-					}
-					else
-					{
-						assets.Add(a);
-					}
+
+					if (selectEditDirIndex != -1)
+						selectItemsFor.Directories.Remove(selectItemsFor.Directories[selectEditDirIndex]);
+					selectItemsFor.Directories.Add(modalSearchText);
+					selectItemsFor.Directories = selectItemsFor.Directories.OrderBy(t => t).ToList();
+					selectItemsFor.ReloadAssets();
+					//selectItemsFor.SetAssets(modalSelectedAssets);
+					modalSearchText = string.Empty;
+					changed = true;
+					selectItemsFor = null;
+
 				}
 			}
-
-
+			ImGui.EndPopup();
 		}
 
 		private IEnumerator BuildAllCrt()

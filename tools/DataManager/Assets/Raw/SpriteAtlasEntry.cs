@@ -18,80 +18,40 @@ namespace DataManager.Assets.Raw
 		[JsonProperty]
 		public string OutputName = string.Empty;
 		[JsonProperty(PropertyName = "ImageList")]
-		private List<string> imageList = new List<string>();
+		public List<string> Directories = new List<string>();
 		[JsonProperty]
 		public SpriteAtlasPackStrategy PackStrategy;
 
 		[JsonIgnore]
-		public List<ImageList> Assets = new List<ImageList>();
+		public List<ImageList> Assets { get; private set; } = new List<ImageList>();
+
 		[JsonIgnore]
 		public readonly int Id = -1;
-		[JsonIgnore]
-		public float Used { get; private set; }
 
 		static int id = 0;
+
+		[JsonIgnore]
+		public float Usage { get; set; }
 
 		public SpriteAtlasEntry()
 		{
 			Id = ++id;
 		}
 
-		public void Init()
+		public void ReloadAssets()
 		{
 			Assets.Clear();
+			Usage = 0;
 
-			foreach (var l in imageList)
+			foreach (var path in Directories)
 			{
-				var item = AppGame.AssetManager.ImageLists.FirstOrDefault(a => a.Key == l);
-				if (item == null || Assets.Contains(item))
-					continue;
-
-				Assets.Add(item);
+				Assets.AddRange(Util.TextFilter(AppGame.AssetManager.ImageLists, path, f => f.Key, false));
 			}
 
-			Assets = Assets.OrderBy(a => a.Key).ToList();
-			imageList.Sort();
+			Assets = Assets.Distinct().OrderBy(a => a.Key).ToList();
 
-			RecalculateUsed();
+			Usage = Assets.Sum(s => s.TakenSpace) / (float)(1024 * 1024);
 		}
 
-		public void SetAssets(IEnumerable<ImageList> assets)
-		{
-			imageList.Clear();
-			Assets.Clear();
-
-
-			Assets.AddRange(assets.Distinct());
-			Assets = Assets.OrderBy(a => a.Key).ToList();
-
-			imageList.AddRange(Assets.Select(s => s.Key));
-
-			imageList.Sort();
-
-			RecalculateUsed();
-		}
-
-		public void RemoveAsset(ImageList asset)
-		{
-			Assets.Remove(asset);
-			imageList.Remove(asset.Key);
-			RecalculateUsed();
-		}
-
-		public static float CalculateUsage(ImageList asset)
-		{
-			int size = 1024 * 1024;
-			int used = asset.TakenSpace;
-
-			return (float)used / (float)size;
-		}
-
-		private void RecalculateUsed()
-		{
-			int size = 1024 * 1024;
-			int used = Assets.Sum(a => a.TakenSpace);
-
-			Used = (float)used / (float)size;
-		}
 	}
 }

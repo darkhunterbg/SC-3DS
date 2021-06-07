@@ -418,7 +418,8 @@ namespace DataManager.Build
 
 			List<AtlasBSPTree> subAtlases = new List<AtlasBSPTree>();
 
-			List<ImageList> assets = atlas.Assets.OrderByDescending(t => t.FrameSize.Y)
+			List<ImageList> assets = atlas.Assets
+				.OrderByDescending(t => t.FrameSize.Y)
 				.ThenBy(t => t.FrameSize.X)
 				.ThenBy(t => t.TakenSpace).ToList();
 
