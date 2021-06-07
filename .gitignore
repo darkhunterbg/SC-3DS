@@ -371,6 +371,5 @@ bin/
 *.smdh
 
 mpq/
-assets/
 assets_extracted/
 /SC.cia

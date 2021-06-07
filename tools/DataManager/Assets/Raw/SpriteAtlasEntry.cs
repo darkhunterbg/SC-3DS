@@ -42,14 +42,14 @@ namespace DataManager.Assets.Raw
 
 			foreach (var l in imageList)
 			{
-				var item = AppGame.AssetManager.ImageLists.FirstOrDefault(a => a.RelativePath == l);
+				var item = AppGame.AssetManager.ImageLists.FirstOrDefault(a => a.Key == l);
 				if (item == null || Assets.Contains(item))
 					continue;
 
 				Assets.Add(item);
 			}
 
-			Assets = Assets.OrderBy(a => a.RelativePath).ToList();
+			Assets = Assets.OrderBy(a => a.Key).ToList();
 			imageList.Sort();
 
 			RecalculateUsed();
@@ -62,9 +62,9 @@ namespace DataManager.Assets.Raw
 
 
 			Assets.AddRange(assets.Distinct());
-			Assets = Assets.OrderBy(a => a.RelativePath).ToList();
+			Assets = Assets.OrderBy(a => a.Key).ToList();
 
-			imageList.AddRange(Assets.Select(s => s.RelativePath));
+			imageList.AddRange(Assets.Select(s => s.Key));
 
 			imageList.Sort();
 
@@ -74,7 +74,7 @@ namespace DataManager.Assets.Raw
 		public void RemoveAsset(ImageList asset)
 		{
 			Assets.Remove(asset);
-			imageList.Remove(asset.RelativePath);
+			imageList.Remove(asset.Key);
 			RecalculateUsed();
 		}
 

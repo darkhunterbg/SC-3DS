@@ -11,11 +11,10 @@ namespace DataManager.Assets
 {
 	public class ImageList
 	{
-		public string InfoFilePath { get; private set; }
-		public string RelativePath { get; private set; }
+		//public string InfoFilePath { get; private set; }
+		private string RelativePath;
 		public string Key => RelativePath;
-		public string Name { get; private set; }
-		public string Dir { get; private set; }
+		public string AssetDir { get; private set; }
 
 		public Vector2 FrameSize { get; private set; }
 
@@ -23,19 +22,45 @@ namespace DataManager.Assets
 
 		public int TakenSpace => Frames.Sum(f => f.TakenSpace);
 
-
 		public int UnitColorOffset { get; private set; }
 
-		public ImageList(string infoFile)
+		private ImageList() { }
+
+		public static ImageList FromPng(string pngFile)
 		{
-			Dir = Path.GetDirectoryName(infoFile);
-			RelativePath = Dir.Substring(AssetManager.AssetsDir.Length);
-			InfoFilePath = infoFile.Substring(AssetManager.AssetsDir.Length);
-			Name = Path.GetFileNameWithoutExtension(Dir);
+			var i = new ImageList();
+			i.AssetDir = Path.GetDirectoryName(pngFile);
+			i.RelativePath = pngFile.Substring(AssetManager.AssetsDir.Length);
+			i.RelativePath = i.RelativePath.Substring(0, i.RelativePath.Length - 4);
+
+			using (var stream = File.OpenRead(pngFile))
+			{
+				BigGustave.Png image = BigGustave.Png.Open(stream);
+
+				i.FrameSize = new Vector2(image.Width, image.Height);
+
+				i.Frames.Add(new ImageFrame(i, 0)
+				{
+					fileName = Path.GetFileName(pngFile),
+					rect = new Microsoft.Xna.Framework.Rectangle(0, 0, image.Width, image.Height)
+				});
+			}
+
+			return i;
+			// Read header and stuff
+		}
+
+		public static ImageList FromInfoFile(string infoFile)
+		{
+			var i = new ImageList();
+
+			i.AssetDir = Path.GetDirectoryName(infoFile);
+			i.RelativePath = i.AssetDir.Substring(AssetManager.ExtractedAssetsDir.Length);
+			//InfoFilePath = infoFile.Substring(AssetManager.AssetsDir.Length);
 
 			string[] info = File.ReadAllLines(infoFile);
 			var spl = info[0].Split(' ');
-			FrameSize = new Vector2(int.Parse(spl[0]), int.Parse(spl[1]));
+			i.FrameSize = new Vector2(int.Parse(spl[0]), int.Parse(spl[1]));
 
 			foreach (var e in info.Skip(1))
 			{
@@ -49,16 +74,18 @@ namespace DataManager.Assets
 
 				string name = spl[0];
 
-				Frames.Add(new ImageFrame(this, Frames.Count)
+				i.Frames.Add(new ImageFrame(i, i.Frames.Count)
 				{
 					fileName = name,
 					rect = rect,
 				});
 			}
 
-			UnitColorOffset = Frames.IndexOf(f => f.fileName.StartsWith("cm_"));
-			if (UnitColorOffset < 0)
-				UnitColorOffset = 0;
+			i.UnitColorOffset = i.Frames.IndexOf(f => f.fileName.StartsWith("cm_"));
+			if (i.UnitColorOffset < 0)
+				i.UnitColorOffset = 0;
+
+			return i;
 		}
 
 		public int GetUnitColorFrameIndex(int frame)
@@ -68,7 +95,7 @@ namespace DataManager.Assets
 
 		public string GetFrameFilePath(int i)
 		{
-			return $"{AssetManager.AssetsDir}{RelativePath}\\{Frames[i].fileName}";
+			return $"{AssetDir}\\{Frames[i].fileName}";
 		}
 	}
 }

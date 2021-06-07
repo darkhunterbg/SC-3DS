@@ -22,6 +22,20 @@
       "cursor\\targy",
       "cursor\\time",
       "game\\blink",
+      "game\\icons\\min",
+      "game\\icons\\pgas",
+      "game\\icons\\psupply",
+      "game\\icons\\tgas",
+      "game\\icons\\tsupply",
+      "game\\icons\\zgas",
+      "game\\icons\\zsupply",
+      "game\\pconsole",
+      "game\\pconsoleup",
+      "game\\progressbar",
+      "game\\tconsole",
+      "game\\tconsoleup",
+      "game\\zconsole",
+      "game\\zconsoleup",
       "unit\\cmdbtns\\cmdicons",
       "unit\\cmdbtns\\pcmdbtns",
       "unit\\cmdbtns\\tcmdbtns",
@@ -1408,6 +1422,16 @@
       "unit\\flingy\\pg5deb",
       "unit\\flingy\\pscdeb",
       "unit\\flingy\\tg5deb"
+    ],
+    "PackStrategy": 1
+  },
+  {
+    "OutputName": "portrait",
+    "ImageList": [
+      "portrait\\mineral",
+      "portrait\\tadvisor",
+      "portrait\\tmarine",
+      "portrait\\tscv"
     ],
     "PackStrategy": 1
   }

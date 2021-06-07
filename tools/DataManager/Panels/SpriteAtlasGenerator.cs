@@ -149,12 +149,6 @@ namespace DataManager.Panels
 
 				ImGui.SameLine();
 
-				if (ImGui.Button($"Build##sag.entries.build.{entry.Id}"))
-				{
-					AppGame.RunCoroutine(BuildAtlasCrt(entry));
-
-				}
-
 				ImGui.SameLine();
 				if (ImGui.Button($"Delete##sag.entries.del.{entry.Id}"))
 				{
@@ -199,7 +193,7 @@ namespace DataManager.Panels
 		{
 			float usage = SpriteAtlasEntry.CalculateUsage(file) * 100;
 
-			string text = $"[{file.Frames.Count}] [{file.FrameSize.X}x{file.FrameSize.Y}] {file.RelativePath} [{usage.ToString("F1")}%%]";
+			string text = $"[{file.Frames.Count}] [{file.FrameSize.X}x{file.FrameSize.Y}] {file.Key} [{usage.ToString("F1")}%%]";
 
 			if (enabled)
 				ImGui.Text(text);
@@ -213,7 +207,7 @@ namespace DataManager.Panels
 
 		private IEnumerable<ImageList> DrawImageListAssetsFilter(string id)
 		{
-			IEnumerable<ImageList> query = Util.TextFilter(AppGame.AssetManager.ImageLists, assetFilter, a => a.RelativePath);
+			IEnumerable<ImageList> query = Util.TextFilter(AppGame.AssetManager.ImageLists, assetFilter, a => a.Key);
 
 			ImGui.InputText($"##{id}", ref assetFilter, 256);
 
@@ -321,31 +315,6 @@ namespace DataManager.Panels
 			}
 
 
-		}
-
-		private IEnumerator BuildAtlasCrt(SpriteAtlasEntry entry)
-		{
-			Stopwatch timer = new Stopwatch();
-			timer.Start();
-
-			BuildGenerator build = new BuildGenerator();
-
-			var op = build.BuildAtlases(new List<SpriteAtlasEntry>() { entry });
-
-			while (!op.Completed)
-			{
-				var elapsed = TimeSpan.FromSeconds((int)timer.Elapsed.TotalSeconds);
-
-				if (!AppGui.ProgressDialog($"Building: {op.ItemName} ({elapsed.ToString("c")}) ", op.Progress, true))
-				{
-					op.Cancel();
-					break;
-
-				}
-				yield return null;
-			}
-
-			build.Dispose();
 		}
 
 		private IEnumerator BuildAllCrt()

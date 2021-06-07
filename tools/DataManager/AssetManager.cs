@@ -57,9 +57,9 @@ namespace DataManager
 	{
 		public static readonly string PalettePath = "../../palettes/";
 		public static readonly string StarcraftAssetDir = "../../mpq/";
-		public static readonly string AssetsDirRelative = "assets/";
-		public static readonly string AssetsDir = $"../../{AssetsDirRelative}";
+		public static readonly string AssetsDir = $"../../assets/";
 		public static readonly string ExtractedAssetsDir = $"../../assets_extracted/";
+
 		public static readonly string GameDataDir = "../../data/";
 		public static readonly string SpriteAtlasDir = "../../data/atlases/";
 		public static readonly string SpriteBuildDir = "../../gfxbuild/atlases/";
@@ -78,6 +78,8 @@ namespace DataManager
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();
 
 		public List<ImageList> ImageLists { get; private set; } = new List<ImageList>();
+
+
 
 		public List<ImageFrame> Icons { get; private set; } = new List<ImageFrame>();
 		public List<ImageFrame> UnitSelection { get; private set; } = new List<ImageFrame>();
@@ -174,31 +176,35 @@ namespace DataManager
 
 			foreach (var file in Directory.GetFiles(ExtractedAssetsDir, "info.txt", SearchOption.AllDirectories))
 			{
-				ImageLists.Add(new ImageList(file));
+				ImageLists.Add(ImageList.FromInfoFile(file));
+			}
+
+			foreach (var file in Directory.GetFiles(AssetsDir, "*.png", SearchOption.AllDirectories))
+			{
+				ImageLists.Add(ImageList.FromPng(file));
 			}
 
 		}
 
-		public GuiTexture GetImageFrame(string imageName, int frameIndex)
+		public GuiTexture GetImageFrame(string key, int frameIndex)
 		{
-			loadedSheetImages.TryGetValue(imageName, out var images);
+			loadedSheetImages.TryGetValue(key, out var images);
 
 			if (images == null)
 			{
-				var sheet = ImageLists.FirstOrDefault(s => s.Key == imageName);
+				var sheet = ImageLists.FirstOrDefault(s => s.Key == key);
 
 				if (sheet == null)
 					return null;
 
 				images = new List<GuiTexture>();
-				loadedSheetImages[imageName] = images;
+				loadedSheetImages[key] = images;
 
 				for (int i = 0; i < sheet.Frames.Count; ++i)
 				{
 					var tex = Texture2D.FromFile(AppGame.Device, sheet.GetFrameFilePath(i));
 					images.Add(new GuiTexture(tex));
 				}
-				//var list = sheet.SubAtlas.ImageLists[sheet.]
 			}
 			return images[frameIndex];
 		}
@@ -347,6 +353,5 @@ namespace DataManager
 				File.WriteAllLines(Path.Combine(subDir, $"info.txt"), info);
 			}
 		}
-
 	}
 }

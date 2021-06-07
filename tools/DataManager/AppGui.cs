@@ -217,13 +217,11 @@ namespace DataManager
 			ImGui.Text($"Dimensions: {list.FrameSize.X}x{list.FrameSize.Y}");
 			ImGui.SameLine();
 
-
-
 			ImGui.Text($"Frames: {list.Frames.Count}");
 
 			for (int i = 0; i < list.Frames.Count; ++i)
 			{
-				var tex = AppGame.AssetManager.GetImageFrame(list.RelativePath, i);
+				var tex = AppGame.AssetManager.GetImageFrame(list.Key, i);
 
 				if (i % 16 > 0)
 					ImGui.SameLine();
@@ -231,8 +229,6 @@ namespace DataManager
 				ImGui.Image(tex.GuiImage, new Vector2(tex.Texture.Width, tex.Texture.Height));
 
 			}
-
-
 		}
 
 		public static bool ProgressDialog(string text, int count, int total, bool cancelable = false)
