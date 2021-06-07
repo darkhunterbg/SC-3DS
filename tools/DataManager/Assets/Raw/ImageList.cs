@@ -29,6 +29,11 @@ namespace DataManager.Assets
 
 		private ImageList() { }
 
+		static BigGustave.PngOpenerSettings pngSettings = new BigGustave.PngOpenerSettings()
+		{
+			ChunkVisitor = null,
+		};
+
 		public static ImageList FromPng(string pngFile)
 		{
 			var i = new ImageList();
@@ -36,10 +41,9 @@ namespace DataManager.Assets
 			i.RelativePath = pngFile.Substring(AssetManager.AssetsDir.Length);
 			i.RelativePath = i.RelativePath.Substring(0, i.RelativePath.Length - 4);
 
-			using (var stream = File.OpenRead(pngFile))
-			{
-				BigGustave.Png image = BigGustave.Png.Open(stream);
 
+			using (var image = SixLabors.ImageSharp.Image.Load(pngFile))
+			{
 				i.FrameSize = new Vector2(image.Width, image.Height);
 
 				i.Frames.Add(new ImageFrame(i, 0)
@@ -50,7 +54,6 @@ namespace DataManager.Assets
 			}
 
 			return i;
-			// Read header and stuff
 		}
 
 		public static ImageList FromInfoFile(string infoFile)
