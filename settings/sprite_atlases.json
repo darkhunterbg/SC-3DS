@@ -4,7 +4,7 @@
     "ImageList": [
       "portrait\\*"
     ],
-    "PackStrategy": 0
+    "PackStrategy": 1
   },
   {
     "OutputName": "gui",
@@ -13,14 +13,14 @@
       "game\\*",
       "unit\\cmdbtns\\*"
     ],
-    "PackStrategy": 0
+    "PackStrategy": 1
   },
   {
     "OutputName": "wireframe",
     "ImageList": [
       "unit\\wirefram\\**"
     ],
-    "PackStrategy": 0
+    "PackStrategy": 1
   },
   {
     "OutputName": "neutral",

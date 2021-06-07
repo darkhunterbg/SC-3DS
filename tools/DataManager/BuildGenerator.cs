@@ -236,6 +236,12 @@ namespace DataManager.Build
 		{
 			this.atlases = atlases;
 
+			Directory.Delete(AssetManager.SpriteAtlasOutDir, true);
+			Directory.Delete(AssetManager.SpriteAtlas3DSBuildDir, true);
+
+			Directory.CreateDirectory(AssetManager.SpriteAtlasOutDir);
+			Directory.CreateDirectory(AssetManager.SpriteAtlas3DSBuildDir);
+
 			totalJobs = atlases.Count;
 
 			return new AsyncOperation(BuildAsync, OnCancelAsync);
@@ -368,10 +374,10 @@ namespace DataManager.Build
 					spriteBatch.End();
 
 					generated.AddSubAtlas(frames.Select(s =>
-					new ImageFrameAtlasData( s.image,  s.rect.Location.ToVector2().ToVec2()))
+					new ImageFrameAtlasData(s.image, s.rect.Location.ToVector2().ToVec2()))
 						.ToList());
 
-					texture.SaveAsPng($"{AssetManager.SpriteAtlasDir}{atlas.OutputName}_{i}.png");
+					texture.SaveAsPng($"{AssetManager.SpriteAtlasOutDir}{generated.SubAtlases.Last().FullName}.png");
 
 				}
 
@@ -534,7 +540,7 @@ namespace DataManager.Build
 		{
 			int i = 0;
 
-			foreach(var atlas in GeneratedAtlases.SelectMany(s=>s.SubAtlases))
+			foreach (var atlas in GeneratedAtlases.SelectMany(s => s.SubAtlases))
 			{
 				if (cancelled)
 					return;
@@ -543,8 +549,8 @@ namespace DataManager.Build
 
 				op.Progress = i / (float)GeneratedAtlases.SelectMany(s => s.SubAtlases).Count();
 
-				string inputTexture = Path.GetFullPath($"{AssetManager.SpriteAtlasDir}{atlas.FullName}") + ".png";
-				string outAtlas = Path.GetFullPath(Path.Combine(AssetManager.SpriteBuildDir, atlas.FullName)) + ".t3x";
+				string inputTexture = Path.GetFullPath($"{AssetManager.SpriteAtlasOutDir}{atlas.FullName}") + ".png";
+				string outAtlas = Path.GetFullPath(Path.Combine(AssetManager.SpriteAtlas3DSBuildDir, atlas.FullName)) + ".t3x";
 
 				string args = $" -f auto-etc1 -z auto -q high -o {outAtlas} {inputTexture}";
 				var process = new ProcessStartInfo(AssetManager.tex3dsPath, args);

@@ -288,7 +288,7 @@ namespace DataManager.Panels
 
 			BuildGenerator build = new BuildGenerator();
 
-			foreach (var file in Directory.GetFiles(AssetManager.SpriteBuildDir))
+			foreach (var file in Directory.GetFiles(AssetManager.SpriteAtlas3DSBuildDir))
 				File.Delete(file);
 
 

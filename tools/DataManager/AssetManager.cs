@@ -60,9 +60,9 @@ namespace DataManager
 		public static readonly string AssetsDir = $"../../assets/";
 		public static readonly string ExtractedAssetsDir = $"../../assets_extracted/";
 
-		public static readonly string GameDataDir = "../../data/";
-		public static readonly string SpriteAtlasDir = "../../data/atlases/";
-		public static readonly string SpriteBuildDir = "../../gfxbuild/atlases/";
+		public static readonly string GameDataDir = $"{AssetsDir}data/";
+		public static readonly string SpriteAtlasOutDir = $"{AssetsDir}atlases/";
+		public static readonly string SpriteAtlas3DSBuildDir = "../../gfxbuild/atlases/";
 		public static readonly string tex3dsPath = "C:\\devkitPro\\tools\\bin\\tex3ds.exe";
 
 		public static readonly string SpriteAtlasDataPath = $"{GameDataDir}atlases.csv";
@@ -99,15 +99,14 @@ namespace DataManager
 			if (!Directory.Exists(AssetsDir))
 				Directory.CreateDirectory(AssetsDir);
 
-
 			if (!Directory.Exists(ExtractedAssetsDir))
 				Directory.CreateDirectory(ExtractedAssetsDir);
 
-			if (!Directory.Exists(SpriteAtlasDir))
-				Directory.CreateDirectory(SpriteAtlasDir);
+			if (!Directory.Exists(SpriteAtlasOutDir))
+				Directory.CreateDirectory(SpriteAtlasOutDir);
 
-			if (!Directory.Exists(SpriteBuildDir))
-				Directory.CreateDirectory(SpriteBuildDir);
+			if (!Directory.Exists(SpriteAtlas3DSBuildDir))
+				Directory.CreateDirectory(SpriteAtlas3DSBuildDir);
 
 
 			AddNewAssetDatabase<ImageAsset>(ImagesDataPath);
