@@ -241,6 +241,72 @@ namespace DataManager.Build
 			return new AsyncOperation(BuildAsync, OnCancelAsync);
 		}
 
+		private void BuildAsync(AsyncOperation op)
+		{
+			foreach (var atlas in atlases)
+			{
+				++currentJob;
+				List<AtlasBSPTree> subAtlases = GenerateAtlasTree(atlas, op);
+
+				if (cancelled)
+					return;
+
+				List<AtlasBSPTree> scaledSubAtlases = SimplifyAtlasTrees(subAtlases);
+
+				var crt = AppGame.RunCoroutine(SaveAtlasTextureCrt(scaledSubAtlases, atlas));
+
+				while (!crt.done && !cancelled)
+					Thread.Sleep(1);
+
+			}
+
+
+			if (cancelled)
+				return;
+
+			SaveAtlasTable();
+
+			if (cancelled)
+				return;
+
+			BuildT3XFiles(op);
+		}
+
+		private static List<AtlasBSPTree> SimplifyAtlasTrees(List<AtlasBSPTree> subAtlases)
+		{
+			List<AtlasBSPTree> scaledSubAtlases = new List<AtlasBSPTree>();
+
+			foreach (var subAtlas in subAtlases)
+			{
+				var tree = subAtlas;
+
+				while (tree.TakenSpace < (tree.TotalSpace / 4) && tree.TotalSpace >= 128 * 128)
+				{
+					bool success = true;
+
+					var test = new AtlasBSPTree(tree.Dimensions.X / 2, tree.Dimensions.Y / 2);
+					var frames = tree.GetFrames();
+
+					foreach (var f in frames)
+					{
+						if (!test.TryAdd(f.image))
+						{
+							success = false;
+							break;
+						}
+					}
+					if (!success)
+						break;
+
+					tree = test;
+				}
+
+				scaledSubAtlases.Add(tree);
+			}
+
+			return scaledSubAtlases;
+		}
+
 		private void OnCancelAsync()
 		{
 			cancelled = true;
@@ -444,62 +510,6 @@ namespace DataManager.Build
 			return subAtlases;
 		}
 
-		private void BuildAsync(AsyncOperation op)
-		{
-			foreach (var atlas in atlases)
-			{
-				++currentJob;
-				List<AtlasBSPTree> subAtlases = GenerateAtlasTree(atlas, op);
-
-				if (cancelled)
-					return;
-
-				List<AtlasBSPTree> scaledSubAtlases = new List<AtlasBSPTree>();
-
-				foreach (var subAtlas in subAtlases)
-				{
-					var tree = subAtlas;
-
-					while (tree.TakenSpace < (tree.TotalSpace / 4) && tree.TotalSpace >= 128 * 128)
-					{
-						bool success = true;
-
-						var test = new AtlasBSPTree(tree.Dimensions.X / 2, tree.Dimensions.Y / 2);
-						var frames = tree.GetFrames();
-
-						foreach (var f in frames)
-						{
-							if (!test.TryAdd(f.image))
-							{
-								success = false;
-								break;
-							}
-						}
-						if (!success)
-							break;
-
-						tree = test;
-					}
-
-					scaledSubAtlases.Add(tree);
-				}
-
-				var crt = AppGame.RunCoroutine(SaveAtlasTextureCrt(scaledSubAtlases, atlas));
-
-				while (!crt.done && !cancelled)
-					Thread.Sleep(1);
-
-			}
-
-
-			if (cancelled)
-				return;
-
-			SaveAtlasTable();
-
-			BuildT3XFiles(op);
-		}
-
 		private void SaveAtlasTable()
 		{
 			var frames = GeneratedAtlases.SelectMany(s => s.SubAtlases).SelectMany(s => s.Images)
@@ -519,7 +529,6 @@ namespace DataManager.Build
 			}
 		}
 
-		
 		private void BuildT3XFiles(AsyncOperation op)
 		{
 			int i = 0;

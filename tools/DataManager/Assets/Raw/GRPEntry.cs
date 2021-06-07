@@ -14,7 +14,7 @@ namespace DataManager.Assets
 		public GRPEntry(string file)
 		{
 			Path = file;
-			DisplayName = file.Substring(AssetManager.RawAssetDir.Length);
+			DisplayName = file.Substring(AssetManager.StarcraftAssetDir.Length);
 		}
 	}
 

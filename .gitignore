@@ -371,7 +371,6 @@ bin/
 *.smdh
 
 mpq/
-data_out/
-music/
-sound/
+assets/
+assets_extracted/
 /SC.cia

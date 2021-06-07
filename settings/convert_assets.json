@@ -48,10 +48,6 @@
     "Path": "unit/thingy/tbang*"
   },
   {
-    "Mode": 6,
-    "Path": "unit/**/*sha*"
-  },
-  {
     "Mode": 3,
     "Path": "unit/wirefram/*"
   },
@@ -62,5 +58,9 @@
   {
     "Mode": 5,
     "Path": "game/blink*"
+  },
+  {
+    "Mode": 6,
+    "Path": "*sha*"
   }
 ]

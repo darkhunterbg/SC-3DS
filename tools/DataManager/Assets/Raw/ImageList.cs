@@ -29,8 +29,8 @@ namespace DataManager.Assets
 		public ImageList(string infoFile)
 		{
 			Dir = Path.GetDirectoryName(infoFile);
-			RelativePath = Dir.Substring(AssetManager.ConvertedAssetDir.Length);
-			InfoFilePath = infoFile.Substring(AssetManager.ConvertedAssetDir.Length);
+			RelativePath = Dir.Substring(AssetManager.AssetsDir.Length);
+			InfoFilePath = infoFile.Substring(AssetManager.AssetsDir.Length);
 			Name = Path.GetFileNameWithoutExtension(Dir);
 
 			string[] info = File.ReadAllLines(infoFile);
@@ -68,7 +68,7 @@ namespace DataManager.Assets
 
 		public string GetFrameFilePath(int i)
 		{
-			return $"{AssetManager.ConvertedAssetDir}{RelativePath}\\{Frames[i].fileName}";
+			return $"{AssetManager.AssetsDir}{RelativePath}\\{Frames[i].fileName}";
 		}
 	}
 }

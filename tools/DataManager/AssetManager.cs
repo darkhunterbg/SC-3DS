@@ -56,9 +56,10 @@ namespace DataManager
 	public class AssetManager
 	{
 		public static readonly string PalettePath = "../../palettes/";
-		public static readonly string RawAssetDir = "../../mpq/";
-		public static readonly string ConvertedAssetDir = "../../data_out/";
-		public static readonly string ConvertedAssetDirRelative = "data_out/";
+		public static readonly string StarcraftAssetDir = "../../mpq/";
+		public static readonly string AssetsDirRelative = "assets/";
+		public static readonly string AssetsDir = $"../../{AssetsDirRelative}";
+		public static readonly string ExtractedAssetsDir = $"../../assets_extracted/";
 		public static readonly string GameDataDir = "../../data/";
 		public static readonly string SpriteAtlasDir = "../../data/atlases/";
 		public static readonly string SpriteBuildDir = "../../gfxbuild/atlases/";
@@ -69,7 +70,6 @@ namespace DataManager
 
 		public static readonly string ImagesDataPath = $"{GameDataDir}images.csv";
 		public static readonly string SpritesDataPath = $"{GameDataDir}sprites.csv";
-	
 		public static readonly string UpgradesDataPath = $"{GameDataDir}upgrades.csv";
 		public static readonly string FlingyDataPath = $"{GameDataDir}flingy.csv";
 		public static readonly string WeaponsDataPath = $"{GameDataDir}weapons.csv";
@@ -94,8 +94,12 @@ namespace DataManager
 		public AssetManager()
 		{
 
-			if (!Directory.Exists(ConvertedAssetDir))
-				Directory.CreateDirectory(ConvertedAssetDir);
+			if (!Directory.Exists(AssetsDir))
+				Directory.CreateDirectory(AssetsDir);
+
+
+			if (!Directory.Exists(ExtractedAssetsDir))
+				Directory.CreateDirectory(ExtractedAssetsDir);
 
 			if (!Directory.Exists(SpriteAtlasDir))
 				Directory.CreateDirectory(SpriteAtlasDir);
@@ -168,7 +172,7 @@ namespace DataManager
 		{
 			ImageLists.Clear();
 
-			foreach (var file in Directory.GetFiles(ConvertedAssetDir, "info.txt", SearchOption.AllDirectories))
+			foreach (var file in Directory.GetFiles(ExtractedAssetsDir, "info.txt", SearchOption.AllDirectories))
 			{
 				ImageLists.Add(new ImageList(file));
 			}
@@ -254,7 +258,6 @@ namespace DataManager
 					}
 			}
 		}
-
 		private void HandleGRPConvert(GRPEntry asset, Palette pal)
 		{
 			string f = asset.DisplayName;
@@ -262,7 +265,7 @@ namespace DataManager
 			List<string> info = new List<string>();
 			GRPImage img = new GRPImage(asset.Path);
 			int i = 0;
-			string dst = Path.Combine(ConvertedAssetDir, Path.GetDirectoryName(f), Path.GetFileNameWithoutExtension(f));
+			string dst = Path.Combine(ExtractedAssetsDir, Path.GetDirectoryName(f), Path.GetFileNameWithoutExtension(f));
 			Directory.CreateDirectory(dst);
 			info.Add($"{img.MaxWidth} {img.MaxHeight}");
 
@@ -303,12 +306,11 @@ namespace DataManager
 
 			File.WriteAllLines(Path.Combine(dst, $"info.txt"), info);
 		}
-
 		private void HandleWireframeGRPConvert(GRPEntry asset)
 		{
 			string f = asset.DisplayName;
 			GRPImage img = new GRPImage(asset.Path);
-			string dst = Path.Combine(ConvertedAssetDir, Path.GetDirectoryName(f), Path.GetFileNameWithoutExtension(f));
+			string dst = Path.Combine(ExtractedAssetsDir, Path.GetDirectoryName(f), Path.GetFileNameWithoutExtension(f));
 			Directory.CreateDirectory(dst);
 
 			var p = Palettes["Units"];

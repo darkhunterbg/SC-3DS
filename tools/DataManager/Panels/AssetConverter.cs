@@ -70,7 +70,7 @@ namespace DataManager.Panels
 
 		public AssetConverter()
 		{
-			rawAssets = Directory.GetFiles(AssetManager.RawAssetDir, "*.grp", SearchOption.AllDirectories)
+			rawAssets = Directory.GetFiles(AssetManager.StarcraftAssetDir, "*.grp", SearchOption.AllDirectories)
 				.Select(s => new GRPEntry(s)).ToList();
 
 			Texture2D tex = new Texture2D(AppGame.Device, 1024, 1024, false, SurfaceFormat.Color);
@@ -220,8 +220,8 @@ namespace DataManager.Panels
 
 			if (ImGui.Button("Convert all##AssetConverter.ConvertSettings.ConvertAll"))
 			{
-				if (Directory.Exists(AssetManager.ConvertedAssetDir))
-					Directory.Delete(AssetManager.ConvertedAssetDir, true);
+				if (Directory.Exists(AssetManager.AssetsDir))
+					Directory.Delete(AssetManager.AssetsDir, true);
 				AppGui.RunGuiCoroutine(ConvertCrt(convertEntries));
 			}
 			ImGui.SameLine();
