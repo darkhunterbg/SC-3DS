@@ -29,11 +29,6 @@ namespace DataManager.Assets
 
 		private ImageList() { }
 
-		static BigGustave.PngOpenerSettings pngSettings = new BigGustave.PngOpenerSettings()
-		{
-			ChunkVisitor = null,
-		};
-
 		public static ImageList FromPng(string pngFile)
 		{
 			var i = new ImageList();
