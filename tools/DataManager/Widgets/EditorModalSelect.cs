@@ -85,7 +85,7 @@ namespace DataManager.Widgets
 
 				if (asset?.Preview != null)
 				{
-				
+
 					ImGui.Image(asset.Preview.GuiImage, new Vector2(32, 32));
 
 				}
@@ -93,11 +93,16 @@ namespace DataManager.Widgets
 				ImGui.Text(asset?.AssetName ?? string.Empty);
 
 			}
-			if (objType == typeof(ImageFrame))
+			if (objType == typeof(IconRef))
 			{
-				int id = (selected as ImageFrame)?.FrameIndex ?? -1;
-				string text = id != -1 ? id.ToString() : string.Empty;
-				ImGui.Text(text);
+				if (selected == null)
+					ImGui.Text(string.Empty);
+				else
+				{
+					int id = ((IconRef)selected).Id;
+					string text = id != -1 ? id.ToString() : string.Empty;
+					ImGui.Text(text);
+				}
 			}
 		}
 		private static void Content()
@@ -107,14 +112,13 @@ namespace DataManager.Widgets
 				AssetContent();
 				return;
 			}
-			
-			if (objType == typeof(ImageFrame))
+
+			if (objType == typeof(IconRef))
 			{
 				IconContent();
 				return;
 			}
 		}
-
 
 		private static void AssetContent()
 		{
@@ -144,7 +148,7 @@ namespace DataManager.Widgets
 				{
 					ImGui.SameLine();
 					ImGui.Image(asset.Preview.GuiImage, new Vector2(32, 32));
-				
+
 				}
 
 				ImGui.SameLine();
@@ -161,7 +165,7 @@ namespace DataManager.Widgets
 
 		private static void IconContent()
 		{
-			var image = selected as ImageFrame;
+			var icon = selected != null ? (IconRef)selected : IconRef.None;
 			var query = AppGame.AssetManager.Icons;
 
 			int i = 0;
@@ -180,7 +184,7 @@ namespace DataManager.Widgets
 				}
 
 				i++;
-				bool isSelectedItem = image == asset;
+				bool isSelectedItem = icon.Image == asset;
 
 				Vector4 color = isSelectedItem ? Vector4.One : Vector4.Zero;
 
@@ -192,7 +196,7 @@ namespace DataManager.Widgets
 					if (isSelectedItem)
 						selected = null;
 					else
-						selected = asset;
+						selected = new IconRef(asset);
 				}
 
 

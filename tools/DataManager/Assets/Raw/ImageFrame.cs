@@ -1,5 +1,8 @@
 ﻿
+using CsvHelper;
+using CsvHelper.Configuration;
 using CsvHelper.Configuration.Attributes;
+using CsvHelper.TypeConversion;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -57,10 +60,14 @@ namespace DataManager.Assets
 	public class ImageFrame
 	{
 		public string fileName;
+
 		public Microsoft.Xna.Framework.Rectangle rect;
 
+
 		public Vector2 Position => rect.Location.ToVector2().ToVec2();
+
 		public Vector2 Size => rect.Size.ToVector2().ToVec2();
+
 		public int TakenSpace => (rect.Width + 1) * (rect.Height + 1);
 
 		public ImageList ImageList { get; private set; }
@@ -88,6 +95,54 @@ namespace DataManager.Assets
 		{
 			ImageList = list;
 			FrameIndex = i;
+		}
+	}
+
+	public struct ImageFrameRef
+	{
+		public readonly string Key;
+
+		public readonly ImageFrame Frame;
+
+		public static readonly ImageFrameRef None = new ImageFrameRef(string.Empty, null);
+
+		public ImageFrameRef( ImageFrame frame)
+		{
+			Frame = frame;
+			Key = $"{frame.ImageListName}:{frame.FrameIndex}";
+		}
+
+		public ImageFrameRef(string key, ImageFrame frame)
+		{
+			Key = key;
+			Frame = frame;
+		}
+		public class CsvConverter : DefaultTypeConverter
+		{
+			public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
+			{
+				if (string.IsNullOrEmpty(text))
+					return ImageFrameRef.None;
+
+				var s = text.Split(":");
+
+				string key = s[0];
+				int index = 0;
+
+				if (s.Length > 1) int.TryParse(s[1], out index);
+
+				var asset = AppGame.AssetManager.ImageLists.FirstOrDefault(f => f.Key == text);
+				ImageFrame frame = null;
+				if (asset != null)
+					frame =  asset.Frames.Skip(index).FirstOrDefault();
+
+				return new ImageFrameRef(text, frame);
+			}
+			public override string ConvertToString(object value, IWriterRow row, MemberMapData memberMapData)
+			{
+				var frame = (ImageFrameRef)value;
+				return $"{frame.Key}";
+			}
 		}
 	}
 }

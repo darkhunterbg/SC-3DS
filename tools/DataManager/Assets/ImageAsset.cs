@@ -12,31 +12,31 @@ namespace DataManager.Assets
 	/// </summary>
 	public class ImageAsset : Asset
 	{
-		[Ignore]
-		public ImageList SpriteSheet { get; private set; }
+		[Index(0)]
+		public string Name { get; set; }
 
-		[Index(0),Name("SpriteSheet")]
-		public string SpriteSheetName { get; set; }
-
-		[Index(1)]
-		public bool GraphicsTurns { get; set; }
+		[Index(1), TypeConverter(typeof(ImageListRef.CsvConverter))]
+		public ImageListRef SpriteSheet { get; set; }
 
 		[Index(2)]
+		public bool GraphicsTurns { get; set; }
+
+		[Index(3)]
 		public bool UnitColor { get; set; }
 
-		public override string AssetName => SpriteSheetName;
+		public override string AssetName => Name;
 		public override GuiTexture Preview
 		{
 			get
 			{
-				if (SpriteSheet == null)
+				if (SpriteSheet.Image == null)
 					return null;
 
 				int f = GraphicsTurns ? 12 : 0;
-				if (SpriteSheet.Frames.Count <= f)
+				if (SpriteSheet.Image.Frames.Count <= f)
 					return null;
 
-				return SpriteSheet.Frames[f].Image;
+				return SpriteSheet.Image.Frames[f].Image;
 			}
 		}
 
@@ -44,13 +44,8 @@ namespace DataManager.Assets
 
 		public ImageAsset(ImageList asset)
 		{
-			SpriteSheet = asset;
-			SpriteSheetName = asset.Key;
-		}
-
-		public override void OnAfterDeserialize()
-		{
-			SpriteSheet = AppGame.AssetManager.ImageLists.FirstOrDefault(s => s.Key == SpriteSheetName);
+			SpriteSheet = new ImageListRef(asset);
+			Name = asset.Key;
 		}
 	}
 }

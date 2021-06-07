@@ -9,12 +9,12 @@ namespace DataManager.Assets
 {
 	public class WeaponAsset : Asset
 	{
-		public override string AssetName => throw new NotImplementedException();
-		public override GuiTexture Preview => Icon?.Image;
+		public override string AssetName => Name;
+		public override GuiTexture Preview => Icon.Image?.Image;
 
-		[Index(0), TypeConverter(typeof(IconConverter)),Name("IconId")]
-		[IconEditor()]
-		public ImageFrame Icon { get; set; }
+		[Index(0), TypeConverter(typeof(IconRef.IconConverter)),Name("IconId")]
+		[DefaultEditor()]
+		public IconRef Icon { get; set; }
 		[Index(1)]
 		[DefaultEditor]
 		public string Name { get; set; }
@@ -41,9 +41,9 @@ namespace DataManager.Assets
 		public UpgradeAsset Upgrade { get; set; }
 
 		public WeaponAsset() : base() { }
-		public WeaponAsset(ImageFrame asset, UpgradeAsset upgrade) : this()
+		public WeaponAsset(IconRef icon, UpgradeAsset upgrade) : this()
 		{
-			Icon = asset;
+			Icon = icon;
 			Upgrade = upgrade;
 		}
 	}

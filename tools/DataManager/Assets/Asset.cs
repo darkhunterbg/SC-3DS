@@ -52,7 +52,6 @@ namespace DataManager.Assets
 
 		public virtual void OnAfterDeserialize() { }
 
-
 		public class AssetConverter : DefaultTypeConverter
 		{
 			public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
@@ -71,21 +70,6 @@ namespace DataManager.Assets
 			}
 		}
 
-		public class IconConverter : DefaultTypeConverter
-		{
-			public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
-			{
-				int.TryParse(text, out int index);
-
-				var icon = AppGame.AssetManager.Icons.Skip(index).FirstOrDefault();
-
-				return icon;
-			}
-			public override string ConvertToString(object value, IWriterRow row, MemberMapData memberMapData)
-			{
-				return ((Asset)value).AssetName;
-			}
-		}
 	}
 
 
@@ -116,6 +100,17 @@ namespace DataManager.Assets
 			FilePath = file;
 		}
 
+		static void AddConverters(CsvContext context)
+		{
+			context.TypeConverterCache.AddConverter<Asset.AssetConverter>(new Asset.AssetConverter());
+
+			context.TypeConverterCache.AddConverter<IconRef.IconConverter>(new IconRef.IconConverter());
+
+			context.TypeConverterCache.AddConverter<ImageListRef.CsvConverter>(new ImageListRef.CsvConverter());
+
+			context.TypeConverterCache.AddConverter<ImageFrameRef.CsvConverter>(new ImageFrameRef.CsvConverter());
+		}
+
 		public void Reload()
 		{
 			Assets.Clear();
@@ -123,11 +118,7 @@ namespace DataManager.Assets
 				return;
 			using (var csv = new CsvReader(new StreamReader(FilePath), AssetManager.CsvConfig))
 			{
-				csv.Context.TypeConverterCache.AddConverter<Asset.AssetConverter>(
-				new Asset.AssetConverter());
-
-				csv.Context.TypeConverterCache.AddConverter<Asset.IconConverter>(
-			new Asset.IconConverter());
+				AddConverters(csv.Context);
 
 				Assets.AddRange(csv.GetRecords<TAsset>());
 			}
@@ -142,11 +133,7 @@ namespace DataManager.Assets
 		{
 			using (var csv = new CsvWriter(new StreamWriter(FilePath), AssetManager.CsvConfig))
 			{
-				csv.Context.TypeConverterCache.AddConverter<Asset.AssetConverter>(
-				new Asset.AssetConverter());
-
-				csv.Context.TypeConverterCache.AddConverter<Asset.IconConverter>(
-		new Asset.IconConverter());
+				AddConverters(csv.Context);
 
 				csv.WriteRecords(Assets);
 			}

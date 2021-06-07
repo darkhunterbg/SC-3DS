@@ -196,7 +196,7 @@ namespace DataManager
 			{
 				ImGui.BeginTooltip();
 
-				DrawImageListInfo(((ImageAsset)obj).SpriteSheet);
+				DrawImageListInfo(((ImageAsset)obj).SpriteSheet.Image);
 
 				ImGui.EndTooltip();
 				return;

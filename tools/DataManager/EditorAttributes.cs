@@ -29,11 +29,6 @@ namespace DataManager
 
 	}
 
-	public class IconEditorAttribute : EditorAttribute
-	{
-
-	}
-
 	public class CustomEnumEditorAttribute : EditorAttribute
 	{
 		public CustomEnumType EnumType;

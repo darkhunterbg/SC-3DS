@@ -1,4 +1,7 @@
 ﻿
+using CsvHelper;
+using CsvHelper.Configuration;
+using CsvHelper.TypeConversion;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -96,6 +99,45 @@ namespace DataManager.Assets
 		public string GetFrameFilePath(int i)
 		{
 			return $"{AssetDir}\\{Frames[i].fileName}";
+		}
+
+	}
+
+	public struct ImageListRef
+	{
+		public readonly string Key;
+
+		public readonly ImageList Image;
+
+		public static readonly ImageListRef None = new ImageListRef(string.Empty,null);
+
+		public ImageListRef( ImageList image)
+		{
+			Key = image.Key;
+			Image = image;
+		}
+
+		public ImageListRef(string key, ImageList image)
+		{
+			Key = key;
+			Image = image;
+		}
+
+		public class CsvConverter : DefaultTypeConverter
+		{
+			public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
+			{
+				if (string.IsNullOrEmpty(text))
+					return ImageListRef.None;
+
+				var i = AppGame.AssetManager.ImageLists.FirstOrDefault(f => f.Key == text);
+
+				return new ImageListRef(text, i);
+			}
+			public override string ConvertToString(object value, IWriterRow row, MemberMapData memberMapData)
+			{
+				return ((ImageList)value).Key ?? string.Empty;
+			}
 		}
 	}
 }

@@ -64,7 +64,7 @@ namespace DataManager.Panels
 		{
 
 			ImGui.TableNextColumn();
-			ImGui.Text(item.SpriteSheetName);
+			ImGui.Text(item.AssetName);
 			if (ImGui.IsItemHovered())
 			{
 				AppGame.Gui.HoverObject = item;
@@ -103,7 +103,7 @@ namespace DataManager.Panels
 		private IEnumerable<ImageAsset> QueryData(string f)
 		{
 			IEnumerable<ImageAsset> query =
-					 Util.TextFilter(AppGame.AssetManager.GetAssets<ImageAsset>(), f, a => a.SpriteSheetName);
+					 Util.TextFilter(AppGame.AssetManager.GetAssets<ImageAsset>(), f, a => a.AssetName);
 
 			var sort = ImGui.TableGetSortSpecs();
 
@@ -112,7 +112,7 @@ namespace DataManager.Panels
 				case 0:
 					{
 						query = sort.Specs.SortDirection == ImGuiSortDirection.Ascending ?
-							query.OrderBy(q => q.SpriteSheetName) : query.OrderByDescending(q => q.SpriteSheetName);
+							query.OrderBy(q => q.AssetName) : query.OrderByDescending(q => q.AssetName);
 						break;
 					}
 				case 1:

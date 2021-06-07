@@ -38,6 +38,9 @@ namespace DataManager.Widgets
 			if (type.IsEnum)
 				return EnumEditor;
 
+			if (type == typeof(IconRef))
+				return IconEditor;
+
 			if (type.IsSubclassOf(typeof(Asset)))
 				return AssetEditor;
 
@@ -56,10 +59,6 @@ namespace DataManager.Widgets
 			{
 				if (attr is CustomEnumEditorAttribute)
 					return CustomEnumEditor;
-
-		
-				if (attr is IconEditorAttribute)
-					return IconEditor;
 
 				if (attr is FrameTimeEditorAttribute)
 					return FrameTimeEditor;
@@ -176,15 +175,12 @@ namespace DataManager.Widgets
 
 		private static bool IconEditor(PropertyInfo prop, EditorAttribute attr, object item)
 		{
-			var icon = prop.GetValue(item) as ImageFrame;
+			var icon = (IconRef)prop.GetValue(item) ;
 
-			if (icon == null)
+			if (icon.Image == null)
 				return false;
 
-			if (ImGui.ImageButton(icon.Image.GuiImage, icon.ImageList.FrameSize, Vector2.Zero,
-				Vector2.One, 0,
-				Vector4.Zero,
-				Microsoft.Xna.Framework.Color.Yellow.ToVec4()))
+			if (ImGui.ImageButton(icon.Image.Image.GuiImage, icon.Image.ImageList.FrameSize))
 			{
 				ModalSelect(prop, item);
 			}

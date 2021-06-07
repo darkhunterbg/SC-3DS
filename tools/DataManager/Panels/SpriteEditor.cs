@@ -77,7 +77,7 @@ namespace DataManager.Panels
 				if (itemPreview.Image.GraphicsTurns)
 					frameIndex += 12;
 
-				var frame = itemPreview.Image.SpriteSheet.Frames[frameIndex];
+				var frame = itemPreview.Image.SpriteSheet.Image.Frames[frameIndex];
 
 
 				if (showSelectionMarker && itemPreview.SelectionType >= 0)
@@ -97,9 +97,9 @@ namespace DataManager.Panels
 
 				if (itemPreview.Image.UnitColor)
 				{
-					frameIndex = itemPreview.Image.SpriteSheet.GetUnitColorFrameIndex(frameIndex);
+					frameIndex = itemPreview.Image.SpriteSheet.Image.GetUnitColorFrameIndex(frameIndex);
 
-					frame = itemPreview.Image.SpriteSheet.Frames[frameIndex];
+					frame = itemPreview.Image.SpriteSheet.Image.Frames[frameIndex];
 					sb.Draw(frame.Image.Texture, pos.ToVector2(), Microsoft.Xna.Framework.Color.Magenta);
 				}
 

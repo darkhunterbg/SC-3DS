@@ -78,9 +78,6 @@ namespace DataManager
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();
 
 		public List<ImageList> ImageLists { get; private set; } = new List<ImageList>();
-
-
-
 		public List<ImageFrame> Icons { get; private set; } = new List<ImageFrame>();
 		public List<ImageFrame> UnitSelection { get; private set; } = new List<ImageFrame>();
 
@@ -167,6 +164,7 @@ namespace DataManager
 		{
 			foreach (var db in Assets.Values)
 				db.Reload();
+
 		}
 
 		public void LoadImageLists()

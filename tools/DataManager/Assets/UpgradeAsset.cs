@@ -10,9 +10,9 @@ namespace DataManager.Assets
 	public class UpgradeAsset : Asset
 	{
 
-		[Index(0), TypeConverter(typeof(IconConverter)), Name("IconId")]
-		[IconEditor()]
-		public ImageFrame Icon { get; set; }
+		[Index(0), TypeConverter(typeof(IconRef.IconConverter)), Name("IconId")]
+		[DefaultEditor()]
+		public IconRef Icon { get; set; }
 
 		[DefaultEditor()]
 		[Index(1)]
@@ -51,12 +51,12 @@ namespace DataManager.Assets
 		public RaceEnum Race { get; set; }
 
 		public override string AssetName => Name;
-		public override GuiTexture Preview => Icon?.Image;
+		public override GuiTexture Preview => Icon.Image?.Image;
 
 		public UpgradeAsset() : base() { }
-		public UpgradeAsset(ImageFrame asset) : this()
+		public UpgradeAsset(IconRef icon) : this()
 		{
-			Icon = asset;
+			Icon = icon;
 		}
 	}
 }
