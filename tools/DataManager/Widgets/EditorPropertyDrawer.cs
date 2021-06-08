@@ -16,15 +16,15 @@ namespace DataManager.Widgets
 	public static class EditorPropertyDrawer
 	{
 		static string text;
-		static  int number;
+		static int number;
 
 		static bool? delayedChangedValue = null;
 
-		public static EditorDrawAction GetPropertyDrawer<TType>( bool readOnly = false)
+		public static EditorDrawAction GetPropertyDrawer<TType>(bool readOnly = false)
 		{
 			return GetPropertyDrawer(typeof(TType), readOnly);
 		}
-		public static EditorDrawAction GetPropertyDrawer(Type type, bool readOnly= false)
+		public static EditorDrawAction GetPropertyDrawer(Type type, bool readOnly = false)
 		{
 			if (readOnly)
 				return ReadOnlyEditor;
@@ -35,11 +35,17 @@ namespace DataManager.Widgets
 			if (type == typeof(int))
 				return IntEditor;
 
+			if (type == typeof(bool))
+				return BoolEditor;
+
 			if (type.IsEnum)
 				return EnumEditor;
 
 			if (type == typeof(IconRef))
 				return IconEditor;
+
+			if (type == typeof(ImageListRef))
+				return ImageListEditor;
 
 			if (type.IsSubclassOf(typeof(Asset)))
 				return AssetEditor;
@@ -108,9 +114,21 @@ namespace DataManager.Widgets
 			number = (int)prop.GetValue(item);
 
 			AppGui.StrechNextItem();
-			if (ImGui.InputInt(string.Empty ,ref number))
+			if (ImGui.InputInt(string.Empty, ref number))
 			{
 				prop.SetValue(item, number);
+				return true;
+			}
+			return false;
+		}
+		private static bool BoolEditor(PropertyInfo prop, EditorAttribute attr, object item)
+		{
+			bool value = (bool)prop.GetValue(item);
+
+			AppGui.StrechNextItem();
+			if (ImGui.Checkbox(string.Empty, ref value))
+			{
+				prop.SetValue(item, value);
 				return true;
 			}
 			return false;
@@ -145,7 +163,7 @@ namespace DataManager.Widgets
 			}
 			return false;
 		}
-		
+
 		private static bool AssetEditor(PropertyInfo prop, EditorAttribute attr, object item)
 		{
 			var asset = prop.GetValue(item) as Asset;
@@ -175,7 +193,7 @@ namespace DataManager.Widgets
 
 		private static bool IconEditor(PropertyInfo prop, EditorAttribute attr, object item)
 		{
-			var icon = (IconRef)prop.GetValue(item) ;
+			var icon = (IconRef)prop.GetValue(item);
 
 			if (icon.Image == null)
 				return false;
@@ -220,7 +238,26 @@ namespace DataManager.Widgets
 
 			return changed;
 		}
+		private static bool ImageListEditor(PropertyInfo prop, EditorAttribute attr, object item)
+		{
+			var obj = prop.GetValue(item);
 
+			string text = "None";
+
+			if (obj != null)
+			{
+				var image = (ImageListRef)obj;
+
+				if (!string.IsNullOrEmpty(image.Key))
+					text = image.Key;
+			}
+
+			if (ImGui.Button(text))
+			{
+				ModalSelect(prop, item);
+			}
+			return DelayedChangedValue();
+		}
 
 	}
 }

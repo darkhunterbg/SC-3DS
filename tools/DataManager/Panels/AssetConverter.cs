@@ -55,6 +55,9 @@ namespace DataManager.Panels
 			}
 		}
 
+
+		public string WindowName => "Asset Converter";
+
 		private List<GRPEntry> rawAssets;
 		private List<GRPConverEntry> convertEntries = new List<GRPConverEntry>();
 		private GRPImage loaded;
@@ -127,10 +130,6 @@ namespace DataManager.Panels
 
 		public void Draw(Vector2 clientSize)
 		{
-
-			if (!ImGui.Begin("Asset Converter##AssetConverter"))
-				return;
-
 			Update();
 
 			ImGui.Columns(2);
@@ -138,8 +137,6 @@ namespace DataManager.Panels
 
 			ImGui.NextColumn();
 			DrawRawAssets();
-
-			ImGui.End();
 		}
 
 		private void DrawRawAssets()

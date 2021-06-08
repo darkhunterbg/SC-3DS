@@ -418,19 +418,52 @@ namespace DataManager.Build
 			return null;
 		}
 
-		private List<AtlasBSPTree> GenerateAtlasTree(SpriteAtlasEntry atlas, AsyncOperation op)
+		private List<ImageList> GetUsedImageLists(SpriteAtlasEntry atlas)
 		{
-			AtlasBSPTree current = new AtlasBSPTree();
+			List<ImageList> lists = new List<ImageList>();
 
-			List<AtlasBSPTree> subAtlases = new List<AtlasBSPTree>();
+			foreach(var assetDb in AppGame.AssetManager.Assets.Values)
+			{
+				var props = assetDb.Type.GetProperties().Where(p => p.PropertyType == typeof(ImageListRef)).ToList();
 
-			List<ImageList> assets = atlas.Assets
+				foreach(var asset in assetDb.Assets)
+				{
+					foreach (var prop in props)
+					{
+						var value = prop.GetValue(asset);
+						if (value == null)
+							continue;
+
+						var img = ((ImageListRef)value).Image;
+						if (lists.Contains(img))
+							continue;
+
+						if (atlas.Assets.Contains(img))
+							lists.Add(img);
+					}
+				}
+			}
+			
+			 lists = lists
 				.OrderByDescending(t => t.FrameSize.Y)
 				.ThenBy(t => t.FrameSize.X)
 				.ThenBy(t => t.TakenSpace).ToList();
 
+			return lists;
+
+		}
+
+		private List<AtlasBSPTree> GenerateAtlasTree(SpriteAtlasEntry atlas, AsyncOperation op)
+		{
+			var assets = GetUsedImageLists(atlas);
+
 			int assetTotal = assets.Count;
 			int assetProgress = 1;
+
+			AtlasBSPTree current = new AtlasBSPTree();
+
+			List<AtlasBSPTree> subAtlases = new List<AtlasBSPTree>();
+
 			op.ItemName = $"{atlas.OutputName} {assetProgress}/{totalJobs}";
 
 			if (atlas.PackStrategy == SpriteAtlasPackStrategy.Tight)

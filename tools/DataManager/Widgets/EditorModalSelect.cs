@@ -91,7 +91,7 @@ namespace DataManager.Widgets
 				}
 				ImGui.SameLine();
 				ImGui.Text(asset?.AssetName ?? string.Empty);
-
+				return;
 			}
 			if (objType == typeof(IconRef))
 			{
@@ -103,6 +103,37 @@ namespace DataManager.Widgets
 					string text = id != -1 ? id.ToString() : string.Empty;
 					ImGui.Text(text);
 				}
+				return;
+			}
+			if (objType == typeof(ImageListRef))
+			{
+				if (selected == null)
+					ImGui.Text(string.Empty);
+				else
+				{
+
+					string id = ((ImageListRef)selected).Key;
+					ImGui.Text(string.IsNullOrEmpty(id) ? "None" : id);
+				}
+				return;
+			}
+
+			if (objType == typeof(ImageFrameRef))
+			{
+				if (selected == null)
+					ImGui.Text(string.Empty);
+				else
+				{
+					var obj = ((ImageFrameRef)selected);
+					if (obj.Frame.Image != null)
+					{
+						ImGui.Image(obj.Frame.Image.GuiImage, new Vector2(32, 32));
+						ImGui.SameLine();
+					}
+					string id = obj.Key;
+					ImGui.Text(string.IsNullOrEmpty(id) ? "None" : id);
+				}
+				return;
 			}
 		}
 		private static void Content()
@@ -116,6 +147,12 @@ namespace DataManager.Widgets
 			if (objType == typeof(IconRef))
 			{
 				IconContent();
+				return;
+			}
+
+			if (objType == typeof(ImageListRef))
+			{
+				ImageListContent();
 				return;
 			}
 		}
@@ -202,6 +239,44 @@ namespace DataManager.Widgets
 
 				if (i % 10 != 0)
 					ImGui.SameLine();
+			}
+		}
+
+		private static void ImageListContent()
+		{
+			var tmp = selected != null ? (ImageListRef)selected : ImageListRef.None;
+
+			IEnumerable<ImageList> query = AppGame.AssetManager.ImageLists;
+			query = Util.TextFilter(query, textFilter, t => t.Key);
+			query = query.OrderBy(asset => asset.Key);
+
+			int i = 0;
+
+			foreach (var asset in query)
+			{
+				ImGui.PushID(i++);
+
+				bool isSelectedItem = tmp.Key == asset.Key;
+
+				if (ImGui.Selectable(string.Empty, isSelectedItem))
+				{
+					if (isSelectedItem)
+						selected = ImageListRef.None;
+					else
+						selected = new ImageListRef(asset);
+				}
+
+				if (ImGui.IsItemHovered())
+				{
+					AppGame.Gui.HoverObject = asset;
+
+				}
+
+				ImGui.SameLine();
+				ImGui.Text(asset.Key);
+
+
+				ImGui.PopID();
 			}
 		}
 	}

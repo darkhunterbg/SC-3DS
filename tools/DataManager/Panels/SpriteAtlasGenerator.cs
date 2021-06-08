@@ -31,6 +31,8 @@ namespace DataManager.Panels
 
 		string assetFilter = string.Empty;
 
+		public string WindowName => "Atlas Generator";
+
 		public SpriteAtlasGenerator()
 		{
 			entries = AppSettings.Load<List<SpriteAtlasEntry>>(SettingsFileName) ??
@@ -45,9 +47,6 @@ namespace DataManager.Panels
 		{
 			changed = false;
 
-			if (!ImGui.Begin("Sprite Atlas Generator##sag"))
-				return;
-
 			ImGui.Columns(2);
 
 			DrawEntries();
@@ -55,8 +54,6 @@ namespace DataManager.Panels
 			ImGui.NextColumn();
 
 			DrawImageListAssets();
-
-			ImGui.End();
 
 			if (selectItemsFor != null)
 			{

@@ -140,8 +140,11 @@ namespace DataManager.Assets
 			}
 			public override string ConvertToString(object value, IWriterRow row, MemberMapData memberMapData)
 			{
+				if (value == null)
+					return string.Empty;
+
 				var frame = (ImageFrameRef)value;
-				return $"{frame.Key}";
+				return frame.Key;
 			}
 		}
 	}

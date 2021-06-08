@@ -16,7 +16,21 @@ namespace DataManager
 
 			var props = typeof(TType).GetProperties().Where(t => t.CanRead && t.CanWrite).ToList();
 
-			foreach(var p in props)
+			foreach (var p in props)
+			{
+				p.SetValue(instance, p.GetValue(copy));
+			}
+
+			return instance;
+		}
+
+		public static object ShallowCopyProperties(Type type, object copy)
+		{
+			var instance = Activator.CreateInstance(type);
+
+			var props = type.GetProperties().Where(t => t.CanRead && t.CanWrite).ToList();
+
+			foreach (var p in props)
 			{
 				p.SetValue(instance, p.GetValue(copy));
 			}

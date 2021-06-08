@@ -55,25 +55,18 @@ namespace DataManager
 
 	public class AssetManager
 	{
-		public static readonly string PalettePath = "../../palettes/";
-		public static readonly string StarcraftAssetDir = "../../mpq/";
-		public static readonly string AssetsDir = $"../../assets/";
-		public static readonly string ExtractedAssetsDir = $"../../assets_extracted/";
+		public static readonly string PalettePath = "..\\..\\palettes\\";
+		public static readonly string StarcraftAssetDir = "..\\..\\mpq\\";
+		public static readonly string AssetsDir = $"..\\..\\assets\\";
+		public static readonly string ExtractedAssetsDir = $"..\\..\\assets_extracted\\";
 
-		public static readonly string GameDataDir = $"{AssetsDir}data/";
-		public static readonly string SpriteAtlasOutDir = $"{AssetsDir}atlases/";
-		public static readonly string SpriteAtlas3DSBuildDir = "../../gfxbuild/atlases/";
+		public static readonly string GameDataDir = $"{AssetsDir}data\\";
+		public static readonly string SpriteAtlasOutDir = $"{AssetsDir}atlases\\";
+		public static readonly string SpriteAtlas3DSBuildDir = "..\\..\\gfxbuild\\atlases\\";
 		public static readonly string tex3dsPath = "C:\\devkitPro\\tools\\bin\\tex3ds.exe";
 
 		public static readonly string SpriteAtlasDataPath = $"{GameDataDir}atlases.csv";
 		public static readonly string FramesDataPath = $"{GameDataDir}frames.csv";
-
-		public static readonly string ImagesDataPath = $"{GameDataDir}images.csv";
-		public static readonly string SpritesDataPath = $"{GameDataDir}sprites.csv";
-		public static readonly string UpgradesDataPath = $"{GameDataDir}upgrades.csv";
-		public static readonly string FlingyDataPath = $"{GameDataDir}flingy.csv";
-		public static readonly string WeaponsDataPath = $"{GameDataDir}weapons.csv";
-		public static readonly string UnitsDataPath = $"{GameDataDir}units.csv";
 
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();
 
@@ -105,13 +98,7 @@ namespace DataManager
 			if (!Directory.Exists(SpriteAtlas3DSBuildDir))
 				Directory.CreateDirectory(SpriteAtlas3DSBuildDir);
 
-
-			AddNewAssetDatabase<ImageAsset>(ImagesDataPath);
-			AddNewAssetDatabase<SpriteAsset>(SpritesDataPath);
-			AddNewAssetDatabase<UpgradeAsset>(UpgradesDataPath);
-			AddNewAssetDatabase<FlingyAsset>(FlingyDataPath);
-			AddNewAssetDatabase<WeaponAsset>(WeaponsDataPath);
-			AddNewAssetDatabase<UnitAsset>(UnitsDataPath);
+			AddNewAssetDatabase<SpriteAsset>($"{GameDataDir}sprites.csv");
 
 		}
 
@@ -178,6 +165,10 @@ namespace DataManager
 
 			foreach (var file in Directory.GetFiles(AssetsDir, "*.png", SearchOption.AllDirectories))
 			{
+				if (file.StartsWith(SpriteAtlasOutDir))
+					continue;
+
+
 				ImageLists.Add(ImageList.FromPng(file));
 			}
 

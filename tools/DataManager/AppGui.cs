@@ -21,6 +21,12 @@ namespace DataManager
 
 	}
 
+	public class AppGuiWindow
+	{
+		public string Name;
+		public IGuiPanel Panel;
+	}
+
 	public class AppGui
 	{
 		public AppGame Game { get; private set; }
@@ -29,7 +35,7 @@ namespace DataManager
 		public RenderTarget2D BackBuffer { get; private set; }
 		private IntPtr guiRenderTarget;
 
-		private List<IGuiPanel> panels = new List<IGuiPanel>();
+		private List<AppGuiWindow> windows = new List<AppGuiWindow>();
 
 		private List<GuiCoroutine> coroutines = new List<GuiCoroutine>();
 
@@ -60,7 +66,13 @@ namespace DataManager
 
 			foreach (var t in types)
 			{
-				panels.Add(Activator.CreateInstance(t) as IGuiPanel);
+				var p = Activator.CreateInstance(t) as IGuiPanel;
+				var window = new AppGuiWindow() {
+					Name = p.WindowName,
+					Panel = p,
+				};
+
+				windows.Add(window);
 			}
 		}
 
@@ -103,16 +115,21 @@ namespace DataManager
 			AppGame.Device.SetRenderTarget(BackBuffer);
 			AppGame.Device.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
 
-			foreach (var panel in panels)
+			foreach (var win in windows)
 			{
 				ImGui.SetNextWindowSize(new Vector2(800, 600), ImGuiCond.FirstUseEver);
-				panel.Draw(clientSize);
+
+				if (ImGui.Begin(win.Name))
+				{
+					win.Panel.Draw(clientSize);
+					ImGui.End();
+				}
 			}
 
 
-			TooltipForObject(HoverObject);
-
 			EditorModalSelect.DrawSelectItemModal();
+
+			TooltipForObject(HoverObject);
 
 			UpdateCoroutines();
 
@@ -192,15 +209,6 @@ namespace DataManager
 				return;
 
 
-			if (obj is ImageAsset)
-			{
-				ImGui.BeginTooltip();
-
-				DrawImageListInfo(((ImageAsset)obj).SpriteSheet.Image);
-
-				ImGui.EndTooltip();
-				return;
-			}
 			if (obj is ImageList)
 			{
 				ImGui.BeginTooltip();
@@ -211,6 +219,7 @@ namespace DataManager
 				return;
 			}
 		}
+
 
 		public static void DrawImageListInfo(ImageList list)
 		{

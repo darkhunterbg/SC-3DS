@@ -9,45 +9,41 @@ namespace DataManager.Assets
 {
 	public class SpriteAsset : Asset
 	{
-		[Index(0)]
-		[DefaultEditor()]
-		public string Name { get; set; } = string.Empty;
-
-
-		[Index(1)]
-		[DefaultEditor]
-		[TypeConverter(typeof(AssetConverter))]
-		public ImageAsset Image { get; set; }
-
-
-		[Index(2)]
-		[DefaultEditor]
-		public int BarSize { get; set; }
-
-		[Index(3)]
-		[Name("BarY")]
-		[DefaultEditor]
-		public int BarOffset { get; set; }
-
-		[Index(4)]
-		[Name("SelType")]
-		[CustomEnumEditor(CustomEnumType.SelectionTypes)]
-		public int SelectionType { get; set; }
-
-		[Index(5)]
-		[Name("SelY")]
-		[DefaultEditor]
-		public int SelectionOffset { get; set; }
-
 		public override string AssetName => Name;
-		public override GuiTexture Preview => Image?.Preview;
-
-		public SpriteAsset() : base() { }
-
-		public SpriteAsset(ImageAsset asset) : this()
+		public override GuiTexture Preview
 		{
-			Image = asset;
+			get
+			{
+				if (Image.Key == null)
+					return null;
+
+				int frame = 0;
+
+				if (IsRotating && Image.Image.Frames.Count < 12)
+					frame += 12;
+
+				return Image.Image.Frames.Count >= frame ? null :
+					Image.Image.Frames[frame].Image;
+			}
+
 		}
 
+		[Index(0)]
+		[DefaultEditor]
+		public string Name { get; set; }
+
+		[DefaultEditor]
+		[Optional, TypeConverter(typeof(ImageListRef.CsvConverter))]
+		public ImageListRef Image { get; set; }
+
+		[DefaultEditor]
+		[Optional]
+		public bool IsRotating { get; set; }
+
+		[DefaultEditor]
+		[Optional]
+		public bool HasUnitColoring { get; set; }
+
+		public SpriteAsset() : base() { }
 	}
 }

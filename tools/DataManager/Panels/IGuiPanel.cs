@@ -9,6 +9,8 @@ namespace DataManager.Panels
 {
 	public interface IGuiPanel
 	{
-		public void Draw(Vector2 client);
+		string WindowName { get; }
+
+		void Draw(Vector2 client);
 	}
 }

@@ -36,7 +36,7 @@ namespace DataManager.Assets
 
 		public virtual Asset Clone()
 		{
-			return Util.ShallowCopyProperties(this);
+			return (Asset)Util.ShallowCopyProperties(GetType(), this);
 		}
 
 		public static TAsset New<TAsset>(TAsset copy) where TAsset : Asset

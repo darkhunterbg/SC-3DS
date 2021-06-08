@@ -43,6 +43,9 @@ namespace DataManager.Assets
 			}
 			public override string ConvertToString(object value, IWriterRow row, MemberMapData memberMapData)
 			{
+				if (value == null)
+					return string.Empty;
+
 				return ((IconRef)value).Id.ToString();
 			}
 		}

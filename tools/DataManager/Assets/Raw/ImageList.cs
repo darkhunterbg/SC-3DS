@@ -134,7 +134,10 @@ namespace DataManager.Assets
 			}
 			public override string ConvertToString(object value, IWriterRow row, MemberMapData memberMapData)
 			{
-				return ((ImageList)value).Key ?? string.Empty;
+				if (value == null)
+					return string.Empty;
+
+				return ((ImageListRef)value).Key;
 			}
 		}
 	}
