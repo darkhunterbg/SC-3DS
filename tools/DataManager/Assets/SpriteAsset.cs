@@ -14,15 +14,15 @@ namespace DataManager.Assets
 		{
 			get
 			{
-				if (Image.Key == null)
+				if (Image.Image == null)
 					return null;
 
 				int frame = 0;
 
-				if (IsRotating && Image.Image.Frames.Count < 12)
+				if (IsRotating && Image.Image.Frames.Count > 12)
 					frame += 12;
 
-				return Image.Image.Frames.Count >= frame ? null :
+				return frame >= Image.Image.Frames.Count ? null :
 					Image.Image.Frames[frame].Image;
 			}
 
@@ -32,7 +32,6 @@ namespace DataManager.Assets
 		public string Path { get { return Name; } set { Name = value; } }
 
 		[Index(0)]
-		[DefaultEditor]
 		public string Name { get; set; }
 
 		[Index(1)]
@@ -48,7 +47,6 @@ namespace DataManager.Assets
 		[DefaultEditor]
 		public bool HasUnitColoring { get; set; }
 
-		public SpriteAsset() : base() {
-		}
+		public SpriteAsset() : base() { }
 	}
 }

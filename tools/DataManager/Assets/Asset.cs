@@ -13,7 +13,7 @@ using CsvHelper.TypeConversion;
 namespace DataManager.Assets
 {
 
-	public abstract class Asset
+	public abstract class Asset 
 	{
 		[Ignore]
 		public abstract string AssetName { get; }

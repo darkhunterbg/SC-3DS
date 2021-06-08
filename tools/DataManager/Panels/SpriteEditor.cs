@@ -21,6 +21,8 @@ namespace DataManager.Panels
 			RootName = "Sprites"
 		};
 
+		private TablePropertyEditor propertyEditor = new TablePropertyEditor("propertyEditor");
+
 		public SpriteEditor()
 		{
 			treeView.NewItemAction = NewItem;
@@ -58,13 +60,17 @@ namespace DataManager.Panels
 
 			ImGui.EndChild();
 
+			ImGui.NextColumn();
+
 			ImGui.BeginChild("##settings");
 
-			ImGui.NextColumn();
+			propertyEditor.EditingItem = treeView.Selected;
+
+			propertyEditor.Draw();
 
 			ImGui.EndChild();
 
-			if (treeView.ItemModified)
+			if (treeView.ItemModified || propertyEditor.Changed)
 				AppGame.AssetManager.GetAssetDatabase<SpriteAsset>().Save();
 		}
 	}

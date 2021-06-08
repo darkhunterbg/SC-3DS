@@ -230,13 +230,26 @@ namespace DataManager
 				return;
 
 
-			if (obj is ImageList)
+			if (obj is ImageList imgList)
 			{
 				ImGui.BeginTooltip();
 
-				DrawImageListInfo(((ImageList)obj));
+				DrawImageListInfo(imgList);
 
 				ImGui.EndTooltip();
+				return;
+			}
+
+			if (obj is ImageListRef imgRef)
+			{
+				if (imgRef.Image != null)
+				{
+					ImGui.BeginTooltip();
+
+					DrawImageListInfo(imgRef.Image);
+
+					ImGui.EndTooltip();
+				}
 				return;
 			}
 		}
@@ -249,6 +262,12 @@ namespace DataManager
 
 			ImGui.Text($"Frames: {list.Frames.Count}");
 
+			float scale = 1;
+			if (list.FrameSize.X < 16 || list.FrameSize.Y < 16)
+				scale = 2;
+			else if (list.FrameSize.X > 200 || list.FrameSize.Y > 200)
+				scale = 0.5f;
+
 			for (int i = 0; i < list.Frames.Count; ++i)
 			{
 				var tex = AppGame.AssetManager.GetImageFrame(list.Key, i);
@@ -256,7 +275,7 @@ namespace DataManager
 				if (i % 16 > 0)
 					ImGui.SameLine();
 
-				ImGui.Image(tex.GuiImage, new Vector2(tex.Texture.Width, tex.Texture.Height));
+				ImGui.Image(tex.GuiImage, new Vector2(tex.Texture.Width, tex.Texture.Height) * scale);
 
 			}
 		}

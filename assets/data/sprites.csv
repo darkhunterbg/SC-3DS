@@ -1,3 +1,4 @@
 Name,Image,IsRotating,HasUnitColoring
-terran\Marine,,False,False
-terran\test,,False,False
+terran\Marine,unit\terran\marine,True,False
+terran\MarineShadow,unit\terran\tmashad,True,False
+terran\MarineRenmants,unit\terran\tmadeath,False,False

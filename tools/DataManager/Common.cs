@@ -34,7 +34,7 @@ namespace DataManager
 			if (!cache.TryGetValue(type, out var items))
 			{
 				items = Enum.GetNames(type);
-				cache[type] = items.Select(t => Regex.Replace(t, "(\\B[A-Z])", " $1")).ToArray(); 
+				cache[type] = items.Select(t => Regex.Replace(t, "(\\B[A-Z])", " $1")).ToArray();
 			}
 
 			return items;
@@ -121,7 +121,7 @@ namespace DataManager
 
 	public interface ITreeViewItem
 	{
-		 string Path { get; set; }
-
+		string Path { get; set; }
+		GuiTexture Preview { get; }
 	}
 }

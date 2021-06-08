@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -211,7 +212,12 @@ namespace DataManager.Widgets
 			{
 				//ImGui.Indent(ImGui.GetTreeNodeToLabelSpacing());
 
-				ImGui.Bullet();
+				if (node.Item.Preview == null)
+					ImGui.Bullet();
+				else
+					ImGui.Image(node.Item.Preview.GuiImage, new Vector2(24, 24), Vector2.Zero, Vector2.One,
+						Vector4.One,  Vector4.One);
+				
 				ImGui.SameLine();
 
 				if (renameNode == node)
@@ -234,7 +240,6 @@ namespace DataManager.Widgets
 			}
 			else
 			{
-
 				ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanAvailWidth
 					| ImGuiTreeNodeFlags.OpenOnDoubleClick;
 
@@ -242,8 +247,6 @@ namespace DataManager.Widgets
 					flags |= ImGuiTreeNodeFlags.DefaultOpen;
 
 
-
-		
 				if (renameNode == node)
 				{
 					node.Opened = ImGui.TreeNodeEx(string.Empty, flags);
@@ -267,7 +270,6 @@ namespace DataManager.Widgets
 					}
 
 					ItemContextMenu(node);
-
 				}
 
 

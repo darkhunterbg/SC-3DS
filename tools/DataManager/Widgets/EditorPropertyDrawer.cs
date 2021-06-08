@@ -244,6 +244,7 @@ namespace DataManager.Widgets
 
 			string text = "None";
 
+
 			if (obj != null)
 			{
 				var image = (ImageListRef)obj;
@@ -252,7 +253,14 @@ namespace DataManager.Widgets
 					text = image.Key;
 			}
 
-			if (ImGui.Button(text))
+			ImGui.Text(text);
+
+			if (ImGui.IsItemHovered())
+				AppGame.Gui.HoverObject = obj;
+
+			ImGui.SameLine();
+
+			if (ImGui.Button("Change"))
 			{
 				ModalSelect(prop, item);
 			}

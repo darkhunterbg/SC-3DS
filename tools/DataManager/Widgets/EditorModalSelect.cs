@@ -17,6 +17,7 @@ namespace DataManager.Widgets
 		private static object selected;
 		private static Action<object> callback;
 		private static string textFilter = string.Empty;
+		private static int focus = 0;
 
 		public static void SelectItemModal(PropertyInfo info, object obj, Action onChanged)
 		{
@@ -31,6 +32,7 @@ namespace DataManager.Widgets
 			EditorModalSelect.objType = objType;
 			EditorModalSelect.selected = selected;
 			callback = selectionCompleted;
+			focus = 5;
 		}
 
 		public static void DrawSelectItemModal()
@@ -39,6 +41,7 @@ namespace DataManager.Widgets
 
 			if (!opened)
 				return;
+
 			ImGui.OpenPopup("modal.select");
 
 			if (!ImGui.BeginPopupModal("modal.select", ref opened, ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysAutoResize))
@@ -46,7 +49,17 @@ namespace DataManager.Widgets
 
 
 			Header();
-			ImGui.InputText("##modal.select.filter", ref textFilter, 255);
+
+			ImGui.InputText("##modal.select.filter", ref textFilter, 255,   ImGuiInputTextFlags.AutoSelectAll);
+			if(focus> 0)
+			{
+				ImGui.SetKeyboardFocusHere();
+				--focus;
+				//focus = false;
+				//ImGui.EndPopup();
+				//return;
+
+			}
 			ImGui.BeginChild("modal.select.items", new Vector2(800, 800));
 
 			Content();
