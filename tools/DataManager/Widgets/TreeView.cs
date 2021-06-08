@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,6 +54,22 @@ namespace DataManager.Widgets
 
 				return string.Join("\\", result);
 			}
+
+			public bool UpdateItemPath(TreeItem root)
+			{
+				if (Item != null)
+					Item.Path = GetPath(root);
+
+				bool anyUpdate = Item != null;
+
+				foreach (var child in Children)
+				{
+					if (child.UpdateItemPath(root))
+						anyUpdate = true;
+				}
+
+				return anyUpdate;
+			}
 		}
 
 		private IEnumerable<ITreeViewItem> dataSource;
@@ -75,25 +92,41 @@ namespace DataManager.Widgets
 
 		private TreeItem root = new TreeItem(null) { Name = "Items", Opened = true };
 		public readonly string Id;
-		public ITreeViewItem Selected { get; set; }
+
+		private TreeItem selectedNode;
+		public ITreeViewItem Selected => selectedNode?.Item;
+		public string ItemName = "Item";
+		public string RootName
+		{
+			get { return root.Name; }
+			set { root.Name = value; }
+		}
+
+		private TreeItem renameNode;
+		private string renameText = string.Empty;
+		private bool renameFocusRequest = false;
+
+		public bool ItemModified { get; private set; }
 
 		public TreeView(string id)
 		{
 			Id = id;
 		}
 
-		private void NewItem(TreeItem parent, IEnumerable<string> path, ITreeViewItem item = null)
+		private TreeItem NewItem(TreeItem parent, IEnumerable<string> path, ITreeViewItem item = null)
 		{
 			string itemName = path.FirstOrDefault();
 			bool isLastItem = path.Count() == 1;
 
 			if (isLastItem)
 			{
-				parent.Children.Add(new TreeItem(parent)
+				TreeItem newChild = new TreeItem(parent)
 				{
 					Name = itemName,
 					Item = item,
-				});
+				};
+				parent.Children.Add(newChild);
+				return newChild;
 			}
 			else
 			{
@@ -105,7 +138,7 @@ namespace DataManager.Widgets
 						Name = itemName,
 					});
 				}
-				NewItem(next, path.Skip(1), item);
+				return NewItem(next, path.Skip(1), item);
 			}
 
 
@@ -135,41 +168,108 @@ namespace DataManager.Widgets
 				NewItem(root, s, item);
 			}
 		}
+		private bool NodeExists(TreeItem node, TreeItem root)
+		{
+			if (root == node)
+				return true;
+
+			foreach (var child in root.Children)
+			{
+				if (NodeExists(node, child))
+					return true;
+			}
+
+			return false;
+		}
 
 		public void Draw()
 		{
+			ItemModified = false;
 			DrawTreeItem(root);
+
+			if (selectedNode != null)
+			{
+				if (AppGame.Gui.IsButtonPressed(Keys.F2))
+					RenameNode(selectedNode);
+				if (AppGame.Gui.IsButtonPressed(Keys.Delete))
+					DeleteItem(selectedNode);
+
+				if (AppGame.Gui.IsButtonPressed(Keys.D) && ImGui.GetIO().KeyCtrl)
+				{
+					if (Selected != null)
+						DuplicateNode(selectedNode);
+				}
+			}
 		}
 		private void DrawTreeItem(TreeItem node)
 		{
 			ImGui.PushID(node.Id);
 
-			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags.SpanAvailWidth;
-
-			if (node.Opened)
-				flags |= ImGuiTreeNodeFlags.DefaultOpen;
-
+			bool selected = selectedNode == node;
 
 			if (!node.IsDir || node.Children.Count == 0)
 			{
-				bool selected = Selected != null && (Selected == node.Item);
-				ImGui.Indent(ImGui.GetTreeNodeToLabelSpacing());
-				if (ImGui.Selectable(node.Name, selected))
+				//ImGui.Indent(ImGui.GetTreeNodeToLabelSpacing());
+
+				ImGui.Bullet();
+				ImGui.SameLine();
+
+				if (renameNode == node)
 				{
-					if (selected)
-						Selected = null;
-					else
-						Selected = node.Item;
+					DrawRenameNode();
 				}
-				ImGui.Unindent(ImGui.GetTreeNodeToLabelSpacing());
+				else
+				{
+					if (ImGui.Selectable(node.Name, selected))
+					{
+						if (selected)
+							selectedNode = null;
+						else
+							selectedNode = node;
+					}
+				}
+				//ImGui.Unindent(ImGui.GetTreeNodeToLabelSpacing());
 
 				ItemContextMenu(node);
 			}
 			else
 			{
-				node.Opened = ImGui.TreeNodeEx(node.Name, flags);
 
-				ItemContextMenu(node);
+				ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanAvailWidth
+					| ImGuiTreeNodeFlags.OpenOnDoubleClick;
+
+				if (node.Opened)
+					flags |= ImGuiTreeNodeFlags.DefaultOpen;
+
+
+
+		
+				if (renameNode == node)
+				{
+					node.Opened = ImGui.TreeNodeEx(string.Empty, flags);
+					ImGui.SameLine();
+					DrawRenameNode();
+				}
+				else
+				{
+					if (selectedNode == node)
+						flags |= ImGuiTreeNodeFlags.Selected;
+
+					string text = $"{node.Name} ({node.Children.Count})";
+					node.Opened = ImGui.TreeNodeEx(text, flags);
+
+					if (ImGui.IsItemClicked())
+					{
+						if (selected)
+							selectedNode = null;
+						else
+							selectedNode = node;
+					}
+
+					ItemContextMenu(node);
+
+				}
+
 
 				if (node.Opened)
 				{
@@ -184,43 +284,85 @@ namespace DataManager.Widgets
 			ImGui.PopID();
 		}
 
+		private void DrawRenameNode()
+		{
+			AppGui.StrechNextItem();
+			ImGui.InputText(string.Empty, ref renameText, 255,
+								ImGuiInputTextFlags.CallbackCompletion | ImGuiInputTextFlags.AutoSelectAll);
+
+			if (renameFocusRequest)
+			{
+				ImGui.SetKeyboardFocusHere();
+				renameFocusRequest = false;
+				return;
+			}
+
+			if (!ImGui.IsItemFocused())
+			{
+				renameNode.Name = renameText;
+
+				if (renameNode.UpdateItemPath(root))
+					ItemModified = true;
+
+				renameNode = null;
+			}
+			if (AppGame.Gui.IsConfirmPressed)
+			{
+				renameNode.Name = renameText;
+
+				if (renameNode.UpdateItemPath(root))
+					ItemModified = true;
+
+				renameNode = null;
+
+			}
+			if (AppGame.Gui.IsCancelPressed)
+			{
+				renameNode = null;
+			}
+
+
+		}
+
 		private void ItemContextMenu(TreeItem node)
 		{
 			if (ImGui.BeginPopupContextItem())
 			{
+				selectedNode = node;
+
+				if (node != root)
+				{
+					if (ImGui.Selectable("Rename"))
+					{
+						RenameNode(node);
+						ImGui.CloseCurrentPopup();
+					}
+				}
+
 				if (node.IsDir)
 				{
 					if (ImGui.Selectable("New Folder"))
 					{
-						NewItem(node, new string[] { "New Folder" });
+						var child = NewItem(node, new string[] { "New Folder" });
 						node.Opened = true;
+						RenameNode(child);
 						ImGui.CloseCurrentPopup();
 					}
 					if (NewItemAction != null)
 					{
-						if (ImGui.Selectable("New Item"))
+						string newItemName = $"New {ItemName}";
+
+						if (ImGui.Selectable(newItemName))
 						{
 							var item = NewItemAction(null);
 							if (node != root)
-								item.Path = node.GetPath(root) + "\\New Item";
+								item.Path = node.GetPath(root) + $"\\{newItemName}";
 							else
-								item.Path = "New Item";
-							NewItem(node, new string[] { "New Item" }, item);
+								item.Path = newItemName;
+							var child = NewItem(node, new string[] { newItemName }, item);
 							node.Opened = true;
-							ImGui.CloseCurrentPopup();
-						}
-					}
-
-					if (node != root && DeleteItemAction != null)
-					{
-						if (ImGui.Selectable("Delete"))
-						{
-							List<ITreeViewItem> items = new List<ITreeViewItem>();
-							GetItemsInChildren(node, items);
-
-							node.Parent.Children.Remove(node);
-							foreach (var item in items)
-								DeleteItemAction(item);
+							ItemModified = true;
+							RenameNode(child);
 							ImGui.CloseCurrentPopup();
 						}
 					}
@@ -231,28 +373,59 @@ namespace DataManager.Widgets
 					{
 						if (ImGui.Selectable("Duplicate"))
 						{
-							var item = NewItemAction(node.Item);
-							string name = $"Copy of {node.Name}";
-							if (node != root)
-								item.Path = node.GetPath(root) + $"\\{name}";
-							else
-								item.Path = name;
-							NewItem(node.Parent, new string[] { name }, item);
+							DuplicateNode(node);
 							ImGui.CloseCurrentPopup();
 						}
-					}
-					if (DeleteItemAction != null)
-					{
-						if (ImGui.Selectable("Delete"))
-						{
-							node.Parent.Children.Remove(node);
-							DeleteItemAction(node.Item);
-							ImGui.CloseCurrentPopup();
-						}
+
 					}
 				}
+
+				if (node != root)
+					if (ImGui.Selectable("Delete"))
+					{
+						DeleteItem(node);
+						ImGui.CloseCurrentPopup();
+					}
 				ImGui.EndPopup();
 			}
+		}
+
+		private void DuplicateNode(TreeItem node)
+		{
+			var item = NewItemAction(node.Item);
+			string name = $"Copy of {node.Name}";
+			if (node != root)
+				item.Path = node.GetPath(root) + $"\\{name}";
+			else
+				item.Path = name;
+			var child = NewItem(node.Parent, new string[] { name }, item);
+			ItemModified = true;
+			RenameNode(child);
+		}
+
+		private void RenameNode(TreeItem node)
+		{
+			renameNode = node;
+			renameText = renameNode.Name;
+			renameFocusRequest = true;
+		}
+
+		private void DeleteItem(TreeItem node)
+		{
+			if (DeleteItemAction == null)
+				return;
+
+			List<ITreeViewItem> items = new List<ITreeViewItem>();
+			GetItemsInChildren(node, items);
+
+			node.Parent.Children.Remove(node);
+			foreach (var item in items)
+				DeleteItemAction(item);
+			if (items.Any())
+				ItemModified = true;
+
+			if (!NodeExists(selectedNode, node))
+				selectedNode = null;
 		}
 	}
 }

@@ -3,6 +3,7 @@ using DataManager.Panels;
 using DataManager.Widgets;
 using ImGuiNET;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -41,6 +42,11 @@ namespace DataManager
 
 		public object HoverObject;
 
+		public bool IsConfirmPressed { get; private set; }
+		public bool IsCancelPressed { get; private set; }
+
+		private KeyboardState keyboardState, prevKeyboardState;
+
 		public static GuiCoroutine RunGuiCoroutine(IEnumerator crt)
 		{
 			lock (AppGame.Gui.coroutines)
@@ -67,7 +73,8 @@ namespace DataManager
 			foreach (var t in types)
 			{
 				var p = Activator.CreateInstance(t) as IGuiPanel;
-				var window = new AppGuiWindow() {
+				var window = new AppGuiWindow()
+				{
 					Name = p.WindowName,
 					Panel = p,
 				};
@@ -75,7 +82,6 @@ namespace DataManager
 				windows.Add(window);
 			}
 		}
-
 
 		private void ResizeRenderTarget(Vector2 size)
 		{
@@ -115,6 +121,8 @@ namespace DataManager
 			AppGame.Device.SetRenderTarget(BackBuffer);
 			AppGame.Device.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
 
+			UpdateInput();
+
 			foreach (var win in windows)
 			{
 				ImGui.SetNextWindowSize(new Vector2(800, 600), ImGuiCond.FirstUseEver);
@@ -134,6 +142,19 @@ namespace DataManager
 			UpdateCoroutines();
 
 			AppGame.Device.SetRenderTarget(null);
+		}
+
+		private void UpdateInput()
+		{
+			prevKeyboardState = keyboardState;
+			keyboardState = Keyboard.GetState();
+			IsCancelPressed = IsButtonPressed(Keys.Escape);
+			IsConfirmPressed = IsButtonPressed(Keys.Enter);
+		}
+
+		public bool IsButtonPressed(Keys key)
+		{
+			return prevKeyboardState.IsKeyDown(key) && keyboardState.IsKeyUp(key);
 		}
 
 		public bool UpdateCoroutines()

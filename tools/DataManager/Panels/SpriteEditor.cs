@@ -1,5 +1,6 @@
 ﻿using DataManager.Assets;
 using DataManager.Widgets;
+using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,14 +14,11 @@ namespace DataManager.Panels
 	{
 		public string WindowName => "Sprite Editor";
 
-		private AssetTableEditor<SpriteAsset> table = new AssetTableEditor<SpriteAsset>("table");
-
-		private bool changed = false;
-
 		private TreeView treeView = new TreeView("tree")
 		{
 			DataSource = AppGame.AssetManager.GetAssets<SpriteAsset>(),
-
+			ItemName = "Sprite",
+			RootName = "Sprites"
 		};
 
 		public SpriteEditor()
@@ -32,27 +30,42 @@ namespace DataManager.Panels
 		private ITreeViewItem NewItem(ITreeViewItem item)
 		{
 			var asset = item as SpriteAsset;
-			changed = true;
 			return AppGame.AssetManager.GetAssetDatabase<SpriteAsset>().New(asset);
 		}
 
 		private void DeleteItem(ITreeViewItem item)
 		{
 			var asset = item as SpriteAsset;
-			changed = true;
 			AppGame.AssetManager.GetAssetDatabase<SpriteAsset>().Delete(asset);
 		}
 
+		bool first = true;
+
 		public void Draw(Vector2 client)
 		{
-			changed = false;
+
+			ImGui.Columns(2);
+
+			if (first)
+			{
+				ImGui.SetColumnOffset(0, -300);
+				first = false;
+			}
+
+			ImGui.BeginChild("##items");
 
 			treeView.Draw();
 
-			if (changed)
+			ImGui.EndChild();
+
+			ImGui.BeginChild("##settings");
+
+			ImGui.NextColumn();
+
+			ImGui.EndChild();
+
+			if (treeView.ItemModified)
 				AppGame.AssetManager.GetAssetDatabase<SpriteAsset>().Save();
-			//table.Draw();
-			//table.SaveChanges();
 		}
 	}
 }
