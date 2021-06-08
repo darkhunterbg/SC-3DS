@@ -144,7 +144,7 @@ namespace DataManager.Assets
 					return string.Empty;
 
 				var frame = (ImageFrameRef)value;
-				return frame.Key;
+				return frame.Key ?? string.Empty;
 			}
 		}
 	}

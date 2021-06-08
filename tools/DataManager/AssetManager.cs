@@ -102,17 +102,18 @@ namespace DataManager
 
 		}
 
-		private void AddNewAssetDatabase<TAsset>(string filePath) where TAsset : Asset
+		private void AddNewAssetDatabase<TAsset>(string filePath) where TAsset : Asset, new()
 		{
 			Assets[typeof(TAsset)] = new AssetDatabase<TAsset>(filePath);
 		}
 
-		public AssetDatabase<TAsset> GetAssetDatabase<TAsset>() where TAsset : Asset
+		public AssetDatabase<TAsset> GetAssetDatabase<TAsset>() where TAsset : Asset,
+			new()
 		{
 			return Assets[typeof(TAsset)] as AssetDatabase<TAsset>;
 		}
 
-		public List<TAsset> GetAssets<TAsset>() where TAsset : Asset
+		public List<TAsset> GetAssets<TAsset>() where TAsset : Asset, new()
 		{
 			return (Assets[typeof(TAsset)] as AssetDatabase<TAsset>).Assets;
 		}

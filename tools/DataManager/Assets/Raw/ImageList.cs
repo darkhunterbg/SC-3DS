@@ -137,7 +137,7 @@ namespace DataManager.Assets
 				if (value == null)
 					return string.Empty;
 
-				return ((ImageListRef)value).Key;
+				return ((ImageListRef)value).Key ?? string.Empty;
 			}
 		}
 	}

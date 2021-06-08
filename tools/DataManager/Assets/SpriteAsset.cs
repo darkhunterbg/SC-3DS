@@ -35,18 +35,20 @@ namespace DataManager.Assets
 		[DefaultEditor]
 		public string Name { get; set; }
 
+		[Index(1)]
 		[DefaultEditor]
-		[Optional, TypeConverter(typeof(ImageListRef.CsvConverter))]
-		public ImageListRef Image { get; set; }
+		[TypeConverter(typeof(ImageListRef.CsvConverter))]
+		public ImageListRef Image { get; set; } = ImageListRef.None;
 
+		[Index(2)]
 		[DefaultEditor]
-		[Optional]
 		public bool IsRotating { get; set; }
 
+		[Index(3)]
 		[DefaultEditor]
-		[Optional]
 		public bool HasUnitColoring { get; set; }
 
-		public SpriteAsset() : base() { }
+		public SpriteAsset() : base() {
+		}
 	}
 }

@@ -72,7 +72,6 @@ namespace DataManager.Assets
 
 	}
 
-
 	public interface IAssetDatabase
 	{
 		Type Type { get; }
@@ -84,7 +83,7 @@ namespace DataManager.Assets
 	}
 
 	public class AssetDatabase<TAsset> : IAssetDatabase where TAsset
-		: Asset
+		: Asset , new()
 	{
 		private readonly Type type = typeof(TAsset);
 		public string FilePath { get; private set; }
@@ -137,6 +136,18 @@ namespace DataManager.Assets
 
 				csv.WriteRecords(Assets);
 			}
+		}
+
+
+		public TAsset New(TAsset copy)
+		{
+			var asset = copy == null ? new TAsset() : Util.ShallowCopyProperties(copy);
+			Assets.Add(asset);
+			return asset;
+		}
+		public void Delete(TAsset asset)
+		{
+			Assets.Remove(asset);
 		}
 	}
 }

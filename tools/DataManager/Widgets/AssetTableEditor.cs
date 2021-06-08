@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DataManager.Widgets
 {
-	public class AssetTableEditor<TAsset>: TableEditor<TAsset> where TAsset : Asset
+	public class AssetTableEditor<TAsset>: TableEditor<TAsset> where TAsset : Asset,new ()
 	{
 		public AssetTableEditor(string id) : base(id)
 		{
