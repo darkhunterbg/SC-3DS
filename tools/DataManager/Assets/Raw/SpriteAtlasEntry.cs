@@ -9,8 +9,14 @@ namespace DataManager.Assets.Raw
 {
 	public enum SpriteAtlasPackStrategy
 	{
-		Group,
-		Tight,
+		GroupPacking,
+		TightPacking,
+	}
+
+	public enum SpriteAtlasFilterStrategy
+	{
+		OnlyReferenced,
+		All
 	}
 
 	public class SpriteAtlasEntry
@@ -21,6 +27,8 @@ namespace DataManager.Assets.Raw
 		public List<string> Directories = new List<string>();
 		[JsonProperty]
 		public SpriteAtlasPackStrategy PackStrategy;
+		[JsonProperty]
+		public SpriteAtlasFilterStrategy FilterStrategy;
 
 		[JsonIgnore]
 		public List<ImageList> Assets { get; private set; } = new List<ImageList>();
@@ -53,5 +61,55 @@ namespace DataManager.Assets.Raw
 			Usage = Assets.Sum(s => s.TakenSpace) / (float)(1024 * 1024);
 		}
 
+
+		public List<ImageList> GetImageListsForBuild()
+		{
+			List<ImageList> lists = new List<ImageList>();
+
+			switch (FilterStrategy)
+			{
+				case SpriteAtlasFilterStrategy.All:
+					{
+						lists.AddRange(Assets);
+						break;
+					}
+				case SpriteAtlasFilterStrategy.OnlyReferenced:
+					{
+						foreach (var assetDb in AppGame.AssetManager.Assets.Values)
+						{
+							var props = assetDb.Type.GetProperties().Where(p => p.PropertyType == typeof(ImageListRef)).ToList();
+
+							foreach (var asset in assetDb.Assets)
+							{
+								foreach (var prop in props)
+								{
+									var value = prop.GetValue(asset);
+									if (value == null)
+										continue;
+
+									var img = ((ImageListRef)value).Image;
+									if (lists.Contains(img))
+										continue;
+
+									if (Assets.Contains(img))
+										lists.Add(img);
+								}
+							}
+						}
+
+						break;
+					}
+			}
+
+		
+
+			lists = lists
+			   .OrderByDescending(t => t.FrameSize.Y)
+			   .ThenBy(t => t.FrameSize.X)
+			   .ThenBy(t => t.TakenSpace).ToList();
+
+			return lists;
+
+		}
 	}
 }

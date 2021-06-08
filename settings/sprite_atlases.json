@@ -4,7 +4,8 @@
     "ImageList": [
       "portrait\\*"
     ],
-    "PackStrategy": 1
+    "PackStrategy": 1,
+    "FilterStrategy": 0
   },
   {
     "OutputName": "gui",
@@ -13,49 +14,56 @@
       "game\\*",
       "unit\\cmdbtns\\*"
     ],
-    "PackStrategy": 1
+    "PackStrategy": 1,
+    "FilterStrategy": 1
   },
   {
     "OutputName": "wireframe",
     "ImageList": [
       "unit\\wirefram\\**"
     ],
-    "PackStrategy": 1
+    "PackStrategy": 1,
+    "FilterStrategy": 0
   },
   {
     "OutputName": "neutral",
     "ImageList": [
       "unit\\neutral\\**"
     ],
-    "PackStrategy": 0
+    "PackStrategy": 0,
+    "FilterStrategy": 0
   },
   {
     "OutputName": "protoss",
     "ImageList": [
       "unit\\protoss\\**"
     ],
-    "PackStrategy": 0
+    "PackStrategy": 0,
+    "FilterStrategy": 0
   },
   {
     "OutputName": "terran",
     "ImageList": [
       "unit\\terran\\**"
     ],
-    "PackStrategy": 0
+    "PackStrategy": 0,
+    "FilterStrategy": 0
   },
   {
     "OutputName": "zerg",
     "ImageList": [
       "unit\\zerg\\**"
     ],
-    "PackStrategy": 0
+    "PackStrategy": 0,
+    "FilterStrategy": 0
   },
   {
     "OutputName": "thingy",
     "ImageList": [
       "unit\\thingy\\*"
     ],
-    "PackStrategy": 0
+    "PackStrategy": 0,
+    "FilterStrategy": 0
   },
   {
     "OutputName": "bullet_flingy",
@@ -63,6 +71,7 @@
       "unit\\bullet\\**",
       "unit\\flingy\\**"
     ],
-    "PackStrategy": 0
+    "PackStrategy": 0,
+    "FilterStrategy": 0
   }
 ]

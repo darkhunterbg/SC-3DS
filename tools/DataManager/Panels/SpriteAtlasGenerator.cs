@@ -111,7 +111,7 @@ namespace DataManager.Panels
 				bool expand = ImGui.TreeNodeEx($"[{count}]##sag.entries.node.{entry.Id}");
 
 				ImGui.SameLine();
-				ImGui.SetNextItemWidth(400);
+				ImGui.SetNextItemWidth(300);
 				if (ImGui.InputText($"##sag.entries.path.{entry.Id}", ref text, 256))
 				{
 					entry.OutputName = text;
@@ -121,12 +121,23 @@ namespace DataManager.Panels
 				ImGui.SameLine();
 				int number = (int)entry.PackStrategy;
 				var enumValues = EnumCacheValues.GetValues(typeof(SpriteAtlasPackStrategy));
-				ImGui.SetNextItemWidth(100);
+				ImGui.SetNextItemWidth(200);
 				if (ImGui.Combo($"##sag.entries.packstrat.{entry.Id}", ref number, enumValues, enumValues.Length))
 				{
 					entry.PackStrategy = (SpriteAtlasPackStrategy)number;
 					changed = true;
 				}
+
+				ImGui.SameLine();
+				 number = (int)entry.FilterStrategy;
+				 enumValues = EnumCacheValues.GetValues(typeof(SpriteAtlasFilterStrategy));
+				ImGui.SetNextItemWidth(200);
+				if (ImGui.Combo($"##sag.entries.filterStart.{entry.Id}", ref number, enumValues, enumValues.Length))
+				{
+					entry.FilterStrategy = (SpriteAtlasFilterStrategy)number;
+					changed = true;
+				}
+
 
 				ImGui.SameLine();
 				ImGui.Text($"Atlas Size {(int)(entry.Usage*100)}%% ");

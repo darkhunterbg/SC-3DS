@@ -418,44 +418,11 @@ namespace DataManager.Build
 			return null;
 		}
 
-		private List<ImageList> GetUsedImageLists(SpriteAtlasEntry atlas)
-		{
-			List<ImageList> lists = new List<ImageList>();
-
-			foreach(var assetDb in AppGame.AssetManager.Assets.Values)
-			{
-				var props = assetDb.Type.GetProperties().Where(p => p.PropertyType == typeof(ImageListRef)).ToList();
-
-				foreach(var asset in assetDb.Assets)
-				{
-					foreach (var prop in props)
-					{
-						var value = prop.GetValue(asset);
-						if (value == null)
-							continue;
-
-						var img = ((ImageListRef)value).Image;
-						if (lists.Contains(img))
-							continue;
-
-						if (atlas.Assets.Contains(img))
-							lists.Add(img);
-					}
-				}
-			}
-			
-			 lists = lists
-				.OrderByDescending(t => t.FrameSize.Y)
-				.ThenBy(t => t.FrameSize.X)
-				.ThenBy(t => t.TakenSpace).ToList();
-
-			return lists;
-
-		}
+	
 
 		private List<AtlasBSPTree> GenerateAtlasTree(SpriteAtlasEntry atlas, AsyncOperation op)
 		{
-			var assets = GetUsedImageLists(atlas);
+			var assets = atlas.GetImageListsForBuild(); ;
 
 			int assetTotal = assets.Count;
 			int assetProgress = 1;
@@ -466,7 +433,7 @@ namespace DataManager.Build
 
 			op.ItemName = $"{atlas.OutputName} {assetProgress}/{totalJobs}";
 
-			if (atlas.PackStrategy == SpriteAtlasPackStrategy.Tight)
+			if (atlas.PackStrategy == SpriteAtlasPackStrategy.TightPacking)
 				goto TightPacking;
 
 
