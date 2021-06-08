@@ -1,2 +1,3 @@
-Name,Image,IsRotating,HasUnitColoring
-Marine,unit\terran\marine,True,True
+"Name","Image","IsRotating","HasUnitColoring"
+"terran\Marine","unit\terran\marine","True","True"
+"terran\marine\Shadow","unit\terran\tmashad","True","False"

@@ -15,10 +15,20 @@ namespace DataManager.Panels
 
 		private AssetTableEditor<SpriteAsset> table = new AssetTableEditor<SpriteAsset>("table");
 
+		private TreeView treeView = new TreeView("tree")
+		{
+
+			DataSource = AppGame.AssetManager.GetAssets<SpriteAsset>()
+		};
+
+
+
 		public void Draw(Vector2 client)
 		{
-			table.Draw();
-			table.SaveChanges();
+			treeView.Draw();
+
+			//table.Draw();
+			//table.SaveChanges();
 		}
 	}
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
-	public class SpriteAsset : Asset
+	public class SpriteAsset : Asset, ITreeViewItem
 	{
 		public override string AssetName => Name;
 		public override GuiTexture Preview
@@ -27,6 +27,9 @@ namespace DataManager.Assets
 			}
 
 		}
+
+		[Ignore]
+		public string Path { get { return Name; } set { Name = value; } }
 
 		[Index(0)]
 		[DefaultEditor]

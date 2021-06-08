@@ -119,5 +119,9 @@ namespace DataManager
 	}
 
 
+	public interface ITreeViewItem
+	{
+		 string Path { get; set; }
 
+	}
 }
