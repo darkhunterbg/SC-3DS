@@ -67,8 +67,6 @@ namespace DataManager.Panels
 			AppGame.AssetManager.GetAssetDatabase<SpriteAsset>().Delete(asset);
 		}
 
-		bool first = true;
-
 		bool clipModified = false;
 
 		public void Draw(Vector2 client)
@@ -76,14 +74,7 @@ namespace DataManager.Panels
 			clipModified = false;
 			selectionChanged = false;
 
-			ImGui.Columns(3,"spriteeditor");
-
-			//if (first)
-			//{
-			//	ImGui.SetColumnWidth(0, -1);
-			//	ImGui.SetColumnWidth(1, client.X - 512 - ImGui.GetColumnWidth(0));
-			//	first = false;
-			//}
+			ImGui.Columns(3, "spriteeditor");
 
 			ImGui.BeginChild("##items");
 			{
@@ -102,7 +93,18 @@ namespace DataManager.Panels
 			ImGui.BeginChild("##settings");
 			{
 				propertyEditor.EditingItem = treeView.Selected;
-				propertyEditor.Draw();
+				propertyEditor.Draw(new Vector2(0, 100));
+				ImGui.Separator();
+				ImGui.Spacing();
+				DrawSpriteFrames(ImGui.GetColumnWidth());
+
+			}
+			ImGui.EndChild();
+
+
+			ImGui.BeginChild("##spritelist");
+			{
+
 			}
 			ImGui.EndChild();
 
@@ -122,6 +124,54 @@ namespace DataManager.Panels
 			if (clipModified)
 				AppGame.AssetManager.GetAssetDatabase<SpriteAnimClipAsset>().Save();
 
+		}
+
+		private void DrawSpriteFrames(float width)
+		{
+			if (Selected != null && Selected.Image.Image != null)
+			{
+				float x = 0;
+
+				float scale = 1;
+				if (Selected.Image.Image.FrameSize.X <= 64 || Selected.Image.Image.FrameSize.Y <= 90)
+					scale *= 2;
+
+				if (Selected.Image.Image.FrameSize.X <= 16 || Selected.Image.Image.FrameSize.Y <= 20)
+					scale *= 2;
+
+				int i = 0;
+
+				foreach (var frame in Selected.Image.Image.Frames)
+				{
+					if (Selected.Image.Image.HasUnitColor && Selected.Image.Image.UnitColorOffset <= frame.FrameIndex)
+						break;
+
+					++i;
+					x += frame.Size.X * scale;
+					if (x >= width - 140)
+					{
+						x = frame.Size.X * scale;
+						i = 1;
+					}
+					else
+					{
+						if (!Selected.IsRotating || i <= 17)
+						{
+							ImGui.SameLine();
+						}
+						else
+						{
+							i = 1;
+							x = frame.Size.X * scale;
+						}
+					}
+
+
+					ImGui.Image(frame.Image.GuiImage, frame.Size * scale);
+					if (ImGui.IsItemHovered())
+						AppGame.Gui.HoverObject = frame;
+				}
+			}
 		}
 
 		private void DrawAnimationEditor(float width)
@@ -174,7 +224,7 @@ namespace DataManager.Panels
 
 			ImGui.BeginChild("##instructions");
 
-			ImGui.Columns(2,"script");
+			ImGui.Columns(2, "script");
 
 
 			if (ImGui.InputTextMultiline(string.Empty, ref buffer, 1024, new Vector2(-1, -1),
@@ -235,14 +285,14 @@ namespace DataManager.Panels
 
 			var lines = editorText.Split('\n');
 
-			foreach(var line in lines)
+			foreach (var line in lines)
 			{
 				var split = line.Split(' ');
 				string instruction = split.FirstOrDefault();
 
 				if (instruction != null)
 				{
-					if(SpriteAnimClipAsset.InstructionDefs.Any(i=>i.Instruction== instruction))
+					if (SpriteAnimClipAsset.InstructionDefs.Any(i => i.Instruction == instruction))
 					{
 						result.Add(line);
 						continue;

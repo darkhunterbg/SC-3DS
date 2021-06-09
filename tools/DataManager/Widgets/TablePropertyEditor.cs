@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -68,11 +69,11 @@ namespace DataManager.Widgets
 			}
 		}
 
-		public void Draw()
+		public void Draw(Vector2 size = new Vector2())
 		{
 			Changed = false;
 
-			if (!ImGui.BeginTable(id, 2,  ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg |ImGuiTableFlags.Resizable))
+			if (!ImGui.BeginTable(id, 2,  ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg |ImGuiTableFlags.Resizable, size))
 				return;
 
 			ImGui.TableSetupScrollFreeze(0, 1);

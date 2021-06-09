@@ -43,9 +43,8 @@ namespace DataManager.Assets
 		[DefaultEditor]
 		public bool IsRotating { get; set; }
 
-		[Index(3)]
-		[DefaultEditor]
-		public bool HasUnitColoring { get; set; }
+		[Ignore]
+		public bool HasUnitColoring => Image.Image?.HasUnitColor ?? false;
 
 		[Ignore]
 		public List<SpriteAnimClipAsset> Clips { get; set; } = new List<SpriteAnimClipAsset>();

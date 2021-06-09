@@ -27,6 +27,8 @@ namespace DataManager.Assets
 
 		public int UnitColorOffset { get; private set; }
 
+		public bool HasUnitColor => UnitColorOffset != 0;
+
 		private ImageList() { }
 
 		public static ImageList FromPng(string pngFile)

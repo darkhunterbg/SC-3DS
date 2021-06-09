@@ -252,6 +252,28 @@ namespace DataManager
 				}
 				return;
 			}
+
+			if (obj is ImageFrame frame)
+			{
+				ImGui.BeginTooltip();
+				DrawImageFrameInfo(frame);
+				ImGui.EndTooltip();
+				return;
+			}
+
+
+			if (obj is ImageFrameRef imgFrameRef)
+			{
+				if (imgFrameRef.Frame != null)
+				{
+					ImGui.BeginTooltip();
+
+					DrawImageFrameInfo(imgFrameRef.Frame);
+
+					ImGui.EndTooltip();
+				}
+				return;
+			}
 		}
 
 
@@ -259,8 +281,12 @@ namespace DataManager
 		{
 			ImGui.Text($"Dimensions: {list.FrameSize.X}x{list.FrameSize.Y}");
 			ImGui.SameLine();
-
 			ImGui.Text($"Frames: {list.Frames.Count}");
+			if (list.HasUnitColor)
+			{
+				ImGui.SameLine();
+				ImGui.Text($"With unit coloring.");
+			}
 
 			float scale = 1;
 			if (list.FrameSize.X < 16 || list.FrameSize.Y < 16)
@@ -279,7 +305,14 @@ namespace DataManager
 
 			}
 		}
-
+		public static void DrawImageFrameInfo(ImageFrame frame)
+		{
+			ImGui.Text($"{frame.ImageListName}:{frame.FrameIndex}");
+			ImGui.Text($"Index: {frame.FrameIndex / 17} rotated, {frame.FrameIndex % 17} orientation");
+			ImGui.Text($"Frame: {frame.ImageList.FrameSize.X}x{frame.ImageList.FrameSize.Y}");
+			ImGui.Text($"Size: {frame.Size.X}x{frame.Size.Y}");
+			ImGui.Text($"Offset: {frame.XOffset}x{frame.YOffset}");
+		}
 		public static bool ProgressDialog(string text, int count, int total, bool cancelable = false)
 		{
 			float progress = (float)count / (float)total;
