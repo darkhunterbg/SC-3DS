@@ -1,0 +1,2 @@
+Sprite,Type,Instructions
+terran\Marine,Init,"playfram 0,wait 1,playfram 1,wait 1,playfram 2"

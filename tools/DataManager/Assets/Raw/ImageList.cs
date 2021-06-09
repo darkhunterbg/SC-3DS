@@ -94,6 +94,11 @@ namespace DataManager.Assets
 			return frame + UnitColorOffset;
 		}
 
+		public ImageFrame GetUnitColorFrame(int frame)
+		{
+			return Frames[frame + UnitColorOffset];
+		}
+
 		public string GetFrameFilePath(int i)
 		{
 			return $"{AssetDir}\\{Frames[i].fileName}";

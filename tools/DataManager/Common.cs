@@ -26,6 +26,30 @@ namespace DataManager
 		SelectionTypes
 	}
 
+	public enum AnimationType
+	{
+		Init,
+		Death,
+		GroundAttackInit,
+		AirAttackInit,
+		SpecialAbility1,
+		GroundAttackRepeat,
+		AirAttackRepeat,
+		SpecialAbility2,
+		GroundAttackToIdle,
+		AirAttackToIdle,
+		SpecialAbility3,
+		Walking,
+		Other,
+		BurrowInit,
+		ConstructHarvest,
+		IsWorking,
+		Landing,
+		LiftOff,
+		Burrow,
+		UnBorrow,
+	}
+
 	public static class EnumCacheValues
 	{
 		private static Dictionary<Type, string[]> cache = new Dictionary<Type, string[]>();

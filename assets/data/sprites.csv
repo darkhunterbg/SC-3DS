@@ -1,4 +1,8 @@
 Name,Image,IsRotating,HasUnitColoring
-terran\Marine,unit\terran\marine,True,False
+terran\Marine,unit\terran\marine,True,True
 terran\MarineShadow,unit\terran\tmashad,True,False
 terran\MarineRenmants,unit\terran\tmadeath,False,False
+terran\SCV,unit\terran\scv,True,True
+terran\Marine\Copy of Marine,unit\terran\marine,True,True
+terran\Marine\Copy of Marine,unit\terran\marine,True,True
+terran\Medic,unit\terran\medic,True,True

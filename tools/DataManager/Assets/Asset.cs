@@ -36,7 +36,8 @@ namespace DataManager.Assets
 
 		public virtual Asset Clone()
 		{
-			return (Asset)Util.ShallowCopyProperties(GetType(), this);
+			var asset = (Asset)Util.ShallowCopyProperties(GetType(), this);
+			return asset;
 		}
 
 		public static TAsset New<TAsset>(TAsset copy) where TAsset : Asset
@@ -47,9 +48,12 @@ namespace DataManager.Assets
 				r.OnAfterDeserialize();
 				return r;
 			}
-			return copy.Clone() as TAsset;
+			var clone = copy.Clone() as TAsset;
+
+			return clone;
 		}
 
+		public virtual void OnBeforeSerizalize() { }
 		public virtual void OnAfterDeserialize() { }
 
 		public class AssetConverter : DefaultTypeConverter
@@ -130,6 +134,11 @@ namespace DataManager.Assets
 
 		public void Save()
 		{
+			foreach (var s in Assets)
+			{
+				s.OnBeforeSerizalize();
+			}
+
 			using (var csv = new CsvWriter(new StreamWriter(FilePath), AssetManager.CsvConfig))
 			{
 				AddConverters(csv.Context);
@@ -141,7 +150,7 @@ namespace DataManager.Assets
 
 		public TAsset New(TAsset copy)
 		{
-			var asset = copy == null ? new TAsset() : Util.ShallowCopyProperties(copy);
+			var asset = Asset.New(copy);
 			Assets.Add(asset);
 			return asset;
 		}

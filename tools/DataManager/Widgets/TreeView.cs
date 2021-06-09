@@ -208,7 +208,7 @@ namespace DataManager.Widgets
 
 			bool selected = selectedNode == node;
 
-			if (!node.IsDir || node.Children.Count == 0)
+			if ( !node.IsDir)
 			{
 				//ImGui.Indent(ImGui.GetTreeNodeToLabelSpacing());
 
@@ -347,6 +347,7 @@ namespace DataManager.Widgets
 					{
 						var child = NewItem(node, new string[] { "New Folder" });
 						node.Opened = true;
+						selectedNode = child;
 						RenameNode(child);
 						ImGui.CloseCurrentPopup();
 					}
@@ -363,6 +364,7 @@ namespace DataManager.Widgets
 								item.Path = newItemName;
 							var child = NewItem(node, new string[] { newItemName }, item);
 							node.Opened = true;
+							selectedNode = child;
 							ItemModified = true;
 							RenameNode(child);
 							ImGui.CloseCurrentPopup();
@@ -402,6 +404,8 @@ namespace DataManager.Widgets
 				item.Path = name;
 			var child = NewItem(node.Parent, new string[] { name }, item);
 			ItemModified = true;
+			selectedNode = child;
+
 			RenameNode(child);
 		}
 
@@ -426,7 +430,7 @@ namespace DataManager.Widgets
 			if (items.Any())
 				ItemModified = true;
 
-			if (!NodeExists(selectedNode, node))
+			if (!NodeExists(selectedNode, root))
 				selectedNode = null;
 		}
 	}

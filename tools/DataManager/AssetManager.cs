@@ -99,6 +99,7 @@ namespace DataManager
 				Directory.CreateDirectory(SpriteAtlas3DSBuildDir);
 
 			AddNewAssetDatabase<SpriteAsset>($"{GameDataDir}sprites.csv");
+			AddNewAssetDatabase<SpriteAnimClipAsset>($"{GameDataDir}animclips.csv");
 
 		}
 

@@ -47,6 +47,19 @@ namespace DataManager.Assets
 		[DefaultEditor]
 		public bool HasUnitColoring { get; set; }
 
+		[Ignore]
+		public List<SpriteAnimClipAsset> Clips { get; set; } = new List<SpriteAnimClipAsset>();
+
 		public SpriteAsset() : base() { }
+
+		public override Asset Clone()
+		{
+			var clone = base.Clone() as SpriteAsset;
+			clone.Clips = Clips.Select(s => s.Clone() as SpriteAnimClipAsset).ToList();
+			foreach (var c in clone.Clips)
+				c.Sprite = clone;
+
+			return clone;
+		}
 	}
 }

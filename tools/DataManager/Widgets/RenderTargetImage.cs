@@ -41,7 +41,7 @@ namespace DataManager.Widgets
 
 
 
-		public SpriteBatch BeginDraw()
+		public SpriteBatch StartDrawOn()
 		{
 			AppGame.Device.SetRenderTarget(RenderTarget);
 			AppGame.Device.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
@@ -57,7 +57,7 @@ namespace DataManager.Widgets
 			return AppGame.Gui.SpriteBatch;
 		}
 
-		public void EndDraw()
+		public void EndDrawOn()
 		{
 			AppGame.Device.SetRenderTarget(AppGame.Gui.BackBuffer);
 		}
