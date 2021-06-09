@@ -1,4 +1,4 @@
 Sprite,Type,Instructions
 terran\Marine,Init,"playfram 0,wait 1,playfram 1,wait 1,playfram 2,wait 1,playfram 1"
 terran\Marine,Death,"playfram 13,wait 1"
-terran\Medic,Init,"playfram 1,wait 1,playfram 2,wait 1,playfram 3"
+terran\Medic,Init,"playfram 0,wait 1,playfram 1,wait 1,playfram 2,wait 1,playfram 4,wait 1,playfram 5,wait 1,playfram 4,wait 1,playfram 5,wait 1,playfram 4,wait 1,playfram 5"

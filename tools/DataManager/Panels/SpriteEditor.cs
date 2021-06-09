@@ -10,31 +10,27 @@ using System.Threading.Tasks;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using Color = Microsoft.Xna.Framework.Color;
 using Microsoft.Xna.Framework.Graphics;
+using DataManager.Gameplay;
 
 namespace DataManager.Panels
 {
-	class AnimationState
-	{
-		public Vector2 offset;
-		public int instructionId;
-		public int frameDelay;
-		public int orientation;
-		public int frameIndex = 0;
-
-		public bool flip = false;
-
-		public float timeDelay = 0;
-	}
 
 	public class SpriteEditor : IGuiPanel
 	{
+		class SpriteAnimData
+		{
+			public AnimationState State = new AnimationState();
+			public bool Flipped;
+			public float TimeDelay;
+		}
+
 		public string WindowName => "Sprite Editor";
 
 		private RenderTargetImage animPreview = new RenderTargetImage(new Vector2(256, 256));
 
 		private int animTypeIndex = 0;
 
-		private AnimationState animState = new AnimationState();
+		private SpriteAnimData animData = new SpriteAnimData();
 
 		private SpriteAsset prevSelection = null;
 		private SpriteAsset Selected => treeView.Selected as SpriteAsset;
@@ -101,13 +97,6 @@ namespace DataManager.Panels
 			}
 			ImGui.EndChild();
 
-
-			ImGui.BeginChild("##spritelist");
-			{
-
-			}
-			ImGui.EndChild();
-
 			ImGui.NextColumn();
 			ImGui.BeginChild("##anim");
 			{
@@ -166,7 +155,11 @@ namespace DataManager.Panels
 						}
 					}
 
-
+					if(frame.FrameIndex == animData.State.GetActualFrameIndex(Selected))
+					{
+						ImGui.Image(frame.Image.GuiImage, frame.Size * scale- Vector2.One *2, Vector2.Zero, Vector2.One, Vector4.One, Vector4.One);
+					}
+					else 
 					ImGui.Image(frame.Image.GuiImage, frame.Size * scale);
 					if (ImGui.IsItemHovered())
 						AppGame.Gui.HoverObject = frame;
@@ -176,7 +169,6 @@ namespace DataManager.Panels
 
 		private void DrawAnimationEditor(float width)
 		{
-
 			var animType = (AnimationType)animTypeIndex;
 
 			DrawAnimation(animType);
@@ -200,10 +192,10 @@ namespace DataManager.Panels
 			if (ImGui.Combo("Animation", ref animTypeIndex, items, items.Length) || selectionChanged)
 			{
 				animType = (AnimationType)animTypeIndex;
-				animState = new AnimationState()
-				{
-					orientation = animState.orientation
-				};
+				int orientation = animData.State.Orientation;
+				animData = new SpriteAnimData();
+				animData.State.SetOrientation(orientation);
+
 				clip = Selected.Clips.FirstOrDefault(c => c.Type == animType);
 				buffer = clip == null ? string.Empty : string.Join('\n', clip.Instructions);
 				instructions = ParseClipInstructions(buffer);
@@ -212,12 +204,10 @@ namespace DataManager.Panels
 			if (Selected.IsRotating)
 			{
 				ImGui.SetNextItemWidth(-200);
-				if (ImGui.InputInt("Orientation", ref animState.orientation))
+				int orient = animData.State.Orientation;
+				if (ImGui.InputInt("Orientation", ref orient))
 				{
-					if (animState.orientation < 0)
-						animState.orientation = 32 + (animState.orientation % 32);
-					else
-						animState.orientation %= 32;
+					animData.State.SetOrientation(orient);
 				}
 			}
 
@@ -272,8 +262,6 @@ namespace DataManager.Panels
 
 			ImGui.EndChild();
 
-
-
 		}
 
 		List<string> instructions = new List<string>();
@@ -292,8 +280,9 @@ namespace DataManager.Panels
 
 				if (instruction != null)
 				{
-					if (SpriteAnimClipAsset.InstructionDefs.Any(i => i.Instruction == instruction))
+					if (AnimClipInstructionDatabase.Instructions.TryGetValue(instruction, out _))
 					{
+						// TODO: param validation
 						result.Add(line);
 						continue;
 					}
@@ -319,41 +308,27 @@ namespace DataManager.Panels
 				var clip = Selected.Clips.FirstOrDefault(c => c.Type == type);
 				if (clip != null)
 				{
-					if (animState.timeDelay > 0)
+					if (animData.TimeDelay > 0)
 					{
-						animState.timeDelay -= 0.016f;
+						animData.TimeDelay -= 0.016f;
 					}
 					else
 					{
-						ClipInstructionExec(animState, clip);
-
-						int frameDelay = Math.Max(animState.frameDelay, 1);
-						animState.timeDelay = frameDelay / 15.0f;
+						animData.State.ExecuteInstructions(clip);
+				
+						int frameDelay = Math.Max(animData.State.FrameDelay, 1);
+						animData.TimeDelay = frameDelay / 15.0f;
 					}
 				}
 
-				int frameIndex = animState.frameIndex;
+				int frameIndex = animData.State.GetActualFrameIndex(Selected);
 
-				if (Selected.IsRotating)
-					frameIndex *= 17;
-
-				if (animState.orientation > 16)
-				{
-					animState.flip = true;
-					frameIndex += 32 - animState.orientation;
-				}
-				else
-				{
-					animState.flip = false;
-					frameIndex += animState.orientation;
-				}
-
-				SpriteEffects eff = animState.flip ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+				SpriteEffects eff = animData.State.FlipSprite ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
 				var frame = Selected.Image.Image.GetFrame(frameIndex);
 
 				if (frame != null)
 				{
-					Vector2 offset = frame.GetOffset(animState.flip) + animState.offset;
+					Vector2 offset = frame.GetOffset(animData.State.FlipSprite) + animData.State.Offset;
 
 
 					sb.Draw(frame.Image.Texture, (pos + offset).ToVector2(), null, Color.White, 0, Vector2.Zero.ToVector2(), 1, eff, 1);
@@ -363,7 +338,7 @@ namespace DataManager.Panels
 
 						if (frame != null)
 						{
-							offset = frame.GetOffset(animState.flip) + animState.offset;
+							offset = frame.GetOffset(animData.State.FlipSprite) + animData.State.Offset;
 
 							sb.Draw(frame.Image.Texture, (pos + offset).ToVector2(), null, Color.Magenta, 0, Vector2.Zero.ToVector2(), 1, eff, 1);
 						}
@@ -375,55 +350,5 @@ namespace DataManager.Panels
 			animPreview.EndDrawOn();
 		}
 
-		private void ClipInstructionExec(AnimationState state, SpriteAnimClipAsset clip)
-		{
-			bool end = false;
-
-			state.frameDelay = 0;
-
-			while (!end)
-			{
-				if (state.instructionId >= clip.Instructions.Count)
-				{
-					state.instructionId = 0;
-					return;
-				}
-
-				var instr = clip.Instructions[state.instructionId];
-
-				if (!string.IsNullOrEmpty(instr))
-				{
-
-					var s = instr.Split(' ');
-
-
-					switch (s[0])
-					{
-						case "wait":
-							{
-								if (s.Length < 2)
-									break;
-								int.TryParse(s[1], out state.frameDelay); end = true; break;
-							}
-						case "playfram":
-							{
-								if (s.Length < 2)
-									break;
-								int.TryParse(s[1], out int next);
-								animState.frameIndex = next;
-
-								break;
-							}
-					}
-				}
-
-				++state.instructionId;
-				if (state.instructionId >= clip.Instructions.Count)
-				{
-					state.instructionId = 0;
-					break;
-				}
-			}
-		}
 	}
 }

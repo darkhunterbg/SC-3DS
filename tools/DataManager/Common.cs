@@ -8,47 +8,13 @@ using System.Threading.Tasks;
 
 namespace DataManager
 {
-	public enum RaceEnum
-	{
-		Zerg,
-		Terran,
-		Protoss
-	}
-
-	public enum MoveControlType
-	{
-		FlingyData,
-		Script
-	}
 
 	public enum CustomEnumType
 	{
 		SelectionTypes
 	}
 
-	public enum AnimationType
-	{
-		Init,
-		Death,
-		GroundAttackInit,
-		AirAttackInit,
-		SpecialAbility1,
-		GroundAttackRepeat,
-		AirAttackRepeat,
-		SpecialAbility2,
-		GroundAttackToIdle,
-		AirAttackToIdle,
-		SpecialAbility3,
-		Walking,
-		Other,
-		BurrowInit,
-		ConstructHarvest,
-		IsWorking,
-		Landing,
-		LiftOff,
-		Burrow,
-		UnBorrow,
-	}
+
 
 	public static class EnumCacheValues
 	{
