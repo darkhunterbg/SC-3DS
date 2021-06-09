@@ -108,5 +108,12 @@ namespace DataManager.Assets
 		{
 			InstructionsText = string.Join(',', Instructions);
 		}
+
+		public void SetInstructions(IEnumerable<string> instructions)
+		{
+			Instructions.Clear();
+			Instructions.AddRange(instructions.Where(s => !string.IsNullOrEmpty(s)).Select(s => s.Trim()));
+			InstructionsText = string.Join(',', instructions);
+		}
 	}
 }

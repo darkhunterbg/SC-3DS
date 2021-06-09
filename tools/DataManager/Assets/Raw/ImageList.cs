@@ -96,7 +96,18 @@ namespace DataManager.Assets
 
 		public ImageFrame GetUnitColorFrame(int frame)
 		{
-			return Frames[frame + UnitColorOffset];
+			int i = frame + UnitColorOffset;
+			if (i >= Frames.Count)
+				return null;
+			return Frames[i];
+		}
+
+
+		public ImageFrame GetFrame(int i)
+		{
+			if (i >= Frames.Count)
+				return null;
+			return Frames[i];
 		}
 
 		public string GetFrameFilePath(int i)

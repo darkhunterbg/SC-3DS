@@ -1,4 +1,5 @@
-﻿using ImGuiNET;
+﻿using DataManager.Widgets;
+using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -54,8 +55,10 @@ namespace DataManager
 			SDL_MaximizeWindow(Window.Handle);
 
 			GuiRenderer = new ImGUIRenderer(this).Initialize();
+
 			font = ImGui.GetIO().Fonts.AddFontFromFileTTF(@"C:\Windows\Fonts\ARIAL.TTF", 24);
 			ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.DockingEnable;
+			//ImGui.StyleColorsDark();
 			ImGui.GetStyle().Alpha = 1.0f;
 			ImGui.GetIO().ConfigDockingAlwaysTabBar = true;
 			GuiRenderer.RebuildFontAtlas();
@@ -72,6 +75,8 @@ namespace DataManager
 			AssetManager = new AssetManager();
 			AssetManager.LoadEverything();
 			Gui = new AppGui(this);
+
+			var version = ImGui.GetVersion();
 		}
 
 		protected override void Update(GameTime gameTime)
@@ -84,6 +89,7 @@ namespace DataManager
 
 		protected override void Draw(GameTime gameTime)
 		{
+
 			base.Draw(gameTime);
 			GraphicsDevice.Clear(Color.Black);
 
