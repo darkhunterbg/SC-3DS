@@ -34,6 +34,7 @@ namespace DataManager.Panels
 			public string Text = string.Empty;
 		}
 
+
 		public string WindowName => "Sprite Editor";
 
 		private RenderTargetImage animPreview = new RenderTargetImage(new Vector2(256, 256));
@@ -52,7 +53,7 @@ namespace DataManager.Panels
 		}
 		private bool selectionChanged = false;
 		private AnimationType selectedAnimType = 0;
-
+		private int gameSpeed = 15;
 
 		private TreeView treeView = new TreeView("tree")
 		{
@@ -224,6 +225,8 @@ namespace DataManager.Panels
 				instructions = ParseClipInstructions(buffer);
 			}
 
+			ImGui.DragInt("Animation Speed", ref gameSpeed, 0.05f, 6, 24);
+
 			if (Selected.IsRotating)
 			{
 				ImGui.SetNextItemWidth(-200);
@@ -233,6 +236,7 @@ namespace DataManager.Panels
 					animData.State.SetOrientation(orient);
 				}
 			}
+
 		}
 
 		List<AnimInstructionView> instructions = new List<AnimInstructionView>();
@@ -379,7 +383,6 @@ namespace DataManager.Panels
 			}
 		}
 
-
 		private bool DrawInstructionEditor(AnimInstructionView instr)
 		{
 			int paramId = 0;
@@ -483,7 +486,7 @@ namespace DataManager.Panels
 					if (animData.State.InstructionId != animData.BreakpointAt)
 					{
 						if (animData.TimeDelay > 0)
-							animData.TimeDelay -= 0.016f;
+							animData.TimeDelay -= (gameSpeed / 60.0f);
 						else
 						{
 							animData.State.FrameDelay = 0;
@@ -494,8 +497,8 @@ namespace DataManager.Panels
 									break;
 							}
 
-							int frameDelay = Math.Max(animData.State.FrameDelay, 1);
-							animData.TimeDelay = frameDelay / 15.0f;
+							int frameDelay = animData.State.FrameDelay;
+							animData.TimeDelay = frameDelay;
 						}
 					}
 				}
