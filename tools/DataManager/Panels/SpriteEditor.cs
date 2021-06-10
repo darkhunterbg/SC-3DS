@@ -14,14 +14,23 @@ using DataManager.Gameplay;
 
 namespace DataManager.Panels
 {
-
 	public class SpriteEditor : IGuiPanel
 	{
 		class SpriteAnimData
 		{
 			public AnimationState State = new AnimationState();
-			public bool Flipped;
 			public float TimeDelay;
+		}
+
+		class AnimInstructionView
+		{
+			public AnimClipInstruction Instruction;
+
+			public object[] Parameters;
+
+			public bool Valid;
+
+			public string Text = string.Empty;
 		}
 
 		public string WindowName => "Sprite Editor";
@@ -201,8 +210,8 @@ namespace DataManager.Panels
 			string[] items = EnumCacheValues.GetValues<AnimationType>();
 
 			//ImGui.SetNextItemWidth(-200);
-		
-			if(EditorFieldDrawer.Enum("Animation", ref selectedAnimType) || selectionChanged)
+
+			if (EditorFieldDrawer.Enum("Animation", ref selectedAnimType) || selectionChanged)
 			{
 				int orientation = animData.State.Orientation;
 				animData = new SpriteAnimData();
@@ -224,7 +233,7 @@ namespace DataManager.Panels
 			}
 		}
 
-		List<string> instructions = new List<string>();
+		List<AnimInstructionView> instructions = new List<AnimInstructionView>();
 		string buffer = string.Empty;
 
 		private void DrawScriptEditor()
@@ -261,7 +270,10 @@ namespace DataManager.Panels
 						Selected.Clips.Add(clip);
 					}
 
-					clip.SetInstructions(instructions);
+					if (!instructions.Any(s => s.Valid))
+						clip.SetInstructions(Enumerable.Empty<string>());
+					else
+						clip.SetInstructions(instructions.Select(s=>s.Text));
 				}
 
 			}
@@ -274,50 +286,70 @@ namespace DataManager.Panels
 				foreach (var instr in instructions)
 				{
 					ImGui.PushID(++i);
-					ImGui.Text(instr);
+					AppGui.StrechNextItem();
+					if (!instr.Valid)
+					{
+						Vector2 p = ImGui.GetCursorScreenPos();
+						p.X -= 2;
+						Vector2 s = new Vector2(ImGui.CalcItemWidth(), ImGui.CalcTextSize(instr.Text).Y);
+						s.X += 4;
+						Color c = Color.Red;
+						c.A = 100;
+						ImGui.GetForegroundDrawList().AddRectFilled(p, p + s, c.PackedValue, 2);
+					}
+					
+					{
+						ImGui.Text(instr.Text);
+					}
+				
 					ImGui.PopID();
 					ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 4);
 				}
 			}
 		}
 
-		private List<string> ParseClipInstructions(string editorText)
+		private List<AnimInstructionView> ParseClipInstructions(string editorText)
 		{
-			List<string> result = new List<string>();
+			List<AnimInstructionView> result = new List<AnimInstructionView>();
 
 			var lines = editorText.Split('\n');
 
 			foreach (var line in lines)
 			{
+				AnimInstructionView view = new AnimInstructionView()
+				{
+					Text = line
+				};
+				result.Add(view);
+
 				var split = line.Split(' ');
 				string instText = split.FirstOrDefault();
 
-				if (instText != null)
-				{
-					if (AnimClipInstructionDatabase.Instructions.TryGetValue(instText, out var instr))
-					{
-						if (instr.Parameters.Count <= split.Length - 1)
-						{
-							bool success = true;
+				if (instText == null)
+					continue;
 
-							for (int j = 0; j < instr.Parameters.Count; ++j)
-							{
-								if (!instr.Parameters[j].Validate(split[j + 1]))
-								{
-									success = false;
-									break;
-								}
-							}
-							if (success)
-							{
-								result.Add(line);
-								continue;
-							}
-						}
+				if (!AnimClipInstructionDatabase.Instructions.TryGetValue(instText, out view.Instruction))
+					continue;
+
+				if (view.Instruction.Parameters.Count != split.Length - 1)
+					continue;
+
+				view.Parameters = new object[view.Instruction.Parameters.Count];
+				view.Valid = true;
+
+				for (int j = 0; j < view.Instruction.Parameters.Count; ++j)
+				{
+					var paramObj = view.Instruction.Parameters[j].Parse(split[j + 1], out view.Valid);
+
+					if (!view.Valid)
+					{
+						break;
+					}
+					else
+					{
+						view.Parameters[j] = paramObj;
 					}
 				}
-
-				result.Add(string.Empty);
 			}
 
 			return result;
