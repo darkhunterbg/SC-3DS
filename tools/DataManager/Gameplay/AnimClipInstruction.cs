@@ -34,7 +34,7 @@ namespace DataManager.Gameplay
 						return a;
 
 
-				return Type.IsByRef ? null : Activator.CreateInstance(Type); 
+				return Type.IsByRef ? null : Activator.CreateInstance(Type);
 			}
 
 			public bool Validate(string input)
@@ -57,7 +57,7 @@ namespace DataManager.Gameplay
 
 		public bool Process(AnimationState state, object[] parameters) => ProcessAction(state, parameters);
 
-		public string Serialize(params object[] parameters)
+		public string Serialize(object[] parameters)
 		{
 			List<string> s = new List<string>() { Instruction };
 			for (int i = 0; i < parameters.Count(); ++i)
@@ -65,7 +65,7 @@ namespace DataManager.Gameplay
 				s.Add(parameters[i].ToString());
 			}
 
-			return string.Join(',', s);
+			return string.Join(' ', s);
 		}
 
 

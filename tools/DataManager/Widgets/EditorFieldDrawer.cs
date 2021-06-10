@@ -31,11 +31,9 @@ namespace DataManager.Widgets
 
 		public static void ReadOnly(string name, object obj)
 		{
-			DrawName(name);
-			ImGui.Text(obj.ToString() ?? string.Empty);
+			//DrawName(name);
+			ImGui.Text(obj?.ToString() ?? string.Empty);
 		}
-
-		static string editText = string.Empty;
 
 		public static object Object(string name, object obj, Type type, out bool changed)
 		{
@@ -115,22 +113,22 @@ namespace DataManager.Widgets
 			return obj;
 		}
 
+
 		public static bool String(string name,ref string text)
 		{
-			DrawName(name);
-			return ImGui.InputText(string.Empty, ref text, 1024);
+			//DrawName(name);
+			return ImGui.InputText(name, ref text, 1024);
 		}
 		public static string String(string name, string text, out bool changed)
 		{
-			editText = text;
-			changed = String(name, ref editText);
-			return editText;
+			changed = String(name, ref text);
+			return text;
 		}
 
 		public static bool Int(string name, ref int number)
 		{
-			DrawName(name);
-			return ImGui.InputInt(string.Empty, ref number);
+			//DrawName(name);
+			return ImGui.InputInt(name, ref number);
 		}
 		public static int Int(string name, int number, out bool changed)
 		{
@@ -140,8 +138,8 @@ namespace DataManager.Widgets
 
 		public static bool Bool(string name, ref bool b)
 		{
-			DrawName(name);
-			return ImGui.Checkbox(string.Empty, ref b);
+			//DrawName(name);
+			return ImGui.Checkbox(name, ref b);
 		}
 		public static bool Bool(string name, bool b, out bool changed)
 		{
@@ -151,10 +149,10 @@ namespace DataManager.Widgets
 
 		public static bool Enum<TType>(string name, ref TType value) where TType : struct, Enum
 		{
-			DrawName(name);
+			//DrawName(name);
 			var values = EnumCacheValues.GetValues<TType>();
 			int editNumber = (int)(object)(value);
-			if (ImGui.Combo(string.Empty, ref editNumber, values, values.Length))
+			if (ImGui.Combo(name, ref editNumber, values, values.Length))
 			{
 				value = (TType)(object)editNumber;
 				return true;
@@ -169,10 +167,10 @@ namespace DataManager.Widgets
 		}
 		public static bool Enum(string name, ref Enum value)
 		{
-			DrawName(name);
+			//DrawName(name);
 			var values = EnumCacheValues.GetValues(value.GetType());
 			int editNumber = (int)(object)(value);
-			if (ImGui.Combo(string.Empty, ref editNumber, values, values.Length))
+			if (ImGui.Combo(name, ref editNumber, values, values.Length))
 			{
 				value = (Enum)((object)editNumber);
 				return true;
@@ -187,11 +185,11 @@ namespace DataManager.Widgets
 
 		public static bool CustomEnum<TType>(string name,CustomEnumType type, ref TType value) where TType : struct, Enum
 		{
-			DrawName(name);
+			//DrawName(name);
 			var values = CustomEnumValues.CustomEnums[(int)type];
 
 			int editNumber = (int)(object)(value);
-			if (ImGui.Combo(string.Empty, ref editNumber, values, values.Length))
+			if (ImGui.Combo(name, ref editNumber, values, values.Length))
 			{
 				value = (TType)(object)editNumber;
 				return true;
@@ -207,10 +205,10 @@ namespace DataManager.Widgets
 
 		public static bool CustomEnum(string name, CustomEnumType type, ref Enum value)
 		{
-			DrawName(name);
+			//DrawName(name);
 			var values = CustomEnumValues.CustomEnums[(int)type];
 			int editNumber = (int)(object)(value);
-			if (ImGui.Combo(string.Empty, ref editNumber, values, values.Length))
+			if (ImGui.Combo(name, ref editNumber, values, values.Length))
 			{
 				value = (Enum)((object)editNumber);
 				return true;
@@ -225,7 +223,7 @@ namespace DataManager.Widgets
 
 		public static Asset Asset(string name, Asset asset, out bool changed)
 		{
-			DrawName(name);
+			//DrawName(name);
 			if (asset?.Preview != null)
 			{
 				ImGui.Image(asset.Preview.GuiImage, new Vector2(32, 32));
@@ -254,7 +252,7 @@ namespace DataManager.Widgets
 		}
 		private static IconRef Icon(string name, IconRef icon, out bool changed)
 		{
-			DrawName(name);
+			//DrawName(name);
 			changed = false;
 			if (icon.Image == null)
 				return icon;
@@ -274,7 +272,7 @@ namespace DataManager.Widgets
 		{
 			string text = "None";
 
-			DrawName(name);
+			//DrawName(name);
 
 			if (!string.IsNullOrEmpty(image.Key))
 				text = image.Key;
@@ -300,10 +298,10 @@ namespace DataManager.Widgets
 
 		public static int FrameTime(string name, int number, out bool changed)
 		{
-			DrawName(name);
+			//DrawName(name);
 
 			ImGui.SetNextItemWidth(100);
-			changed = ImGui.InputInt(string.Empty, ref number, 0);
+			changed = ImGui.InputInt(name, ref number, 0);
 			ImGui.SameLine();
 			ImGui.Text($"{(number / 15.0f).ToString("F1")} sec");
 			return number;
@@ -311,10 +309,10 @@ namespace DataManager.Widgets
 		}
 		public static int Supply(string name, int number, out bool changed)
 		{
-			DrawName(name);
+			//DrawName(name);
 
 			ImGui.SetNextItemWidth(100);
-			changed = ImGui.InputInt(string.Empty, ref number, 0);
+			changed = ImGui.InputInt(name, ref number, 0);
 			ImGui.SameLine();
 			ImGui.Text($"{(number / 2.0f)}");
 			return number;

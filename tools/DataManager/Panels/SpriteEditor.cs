@@ -245,11 +245,24 @@ namespace DataManager.Panels
 
 			ImGui.Columns(2, "script");
 
+			float start = ImGui.GetCursorPosY();
+
+			ImGui.SetCursorPosY(start + 4);
+
+			for (int i = 0; i < instructions.Count; ++i)
+			{
+				ImGui.TextDisabled($"{i:D2}");
+				ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 4);
+			}
+
+			ImGui.SetCursorPos(new Vector2(40, start));
+
 			if (ImGui.InputTextMultiline(string.Empty, ref buffer, 1024, new Vector2(-1, -1),
 				ImGuiInputTextFlags.Multiline))
 			{
 				if (string.IsNullOrWhiteSpace(buffer))
 				{
+					instructions.Clear();
 					if (clip != null)
 					{
 						clipModified = true;
@@ -270,47 +283,101 @@ namespace DataManager.Panels
 						Selected.Clips.Add(clip);
 					}
 
-					if (!instructions.Any(s => s.Valid))
-						clip.SetInstructions(Enumerable.Empty<string>());
-					else
-						clip.SetInstructions(instructions.Select(s=>s.Text));
+					UpdateCipInstructions(clip);
 				}
 
 			}
+			int j = 0;
+
+			ImGui.SetCursorPos(new Vector2(40, start + 4));
+			foreach (var instr in instructions)
+			{
+				if (!instr.Valid)
+				{
+					Vector2 p = ImGui.GetCursorScreenPos();
+					Vector2 s = new Vector2(ImGui.CalcItemWidth(), ImGui.CalcTextSize(instr.Text).Y);
+					p.Y += j * s.Y;
+
+					Color c = Color.Red;
+					c.A = 100;
+					ImGui.GetForegroundDrawList().AddRectFilled(p, p + s, c.PackedValue, 2);
+				}
+
+				++j;
+			}
+
 
 			ImGui.NextColumn();
 
 			if (clip != null)
 			{
-				int i = 0;
+				int instrId = 0;
+
+				bool instructionsEdited = false;
+
 				foreach (var instr in instructions)
 				{
-					ImGui.PushID(++i);
-					AppGui.StrechNextItem();
-					if (!instr.Valid)
+					ImGui.PushID(++instrId);
+					if (instr.Instruction == null)
 					{
-						Vector2 p = ImGui.GetCursorScreenPos();
-						p.X -= 2;
-						Vector2 s = new Vector2(ImGui.CalcItemWidth(), ImGui.CalcTextSize(instr.Text).Y);
-						s.X += 4;
-						Color c = Color.Red;
-						c.A = 100;
-						ImGui.GetForegroundDrawList().AddRectFilled(p, p + s, c.PackedValue, 2);
+						ImGui.Text(string.Empty);
+						continue;
 					}
-					
-					{
-						ImGui.Text(instr.Text);
-					}
-				
+					ImGui.Text(instr.Instruction.Instruction);
+					int paramId = 0;
+					bool edited = false;
+
+					if (instr.Parameters != null)
+						foreach (var param in instr.Parameters)
+						{
+							ImGui.SameLine();
+							ImGui.SetCursorPosX(ImGui.GetCursorPosX() + 10);
+							ImGui.PushID(paramId);
+							ImGui.SetNextItemWidth(100);
+							object newVal = EditorFieldDrawer.Object(string.Empty, param, out bool changed);
+							if (changed)
+							{
+								instr.Parameters[paramId] = newVal;
+								instructionsEdited = true;
+								edited = true;
+							}
+							++paramId;
+							ImGui.PopID();
+
+							if (edited)
+							{
+								instr.Text = instr.Instruction.Serialize(instr.Parameters);
+							}
+						}
+
 					ImGui.PopID();
 					ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 4);
 				}
+
+				if (instructionsEdited)
+				{
+					UpdateCipInstructions(clip);
+					buffer = string.Join('\n', clip.Instructions);
+				}
 			}
+		}
+
+		private void UpdateCipInstructions(SpriteAnimClipAsset clip)
+		{
+			if (!instructions.Any(s => s.Valid))
+				clip.SetInstructions(Enumerable.Empty<string>());
+			else
+				clip.SetInstructions(instructions.Select(s => s.Text));
+
+			clipModified = true;
 		}
 
 		private List<AnimInstructionView> ParseClipInstructions(string editorText)
 		{
 			List<AnimInstructionView> result = new List<AnimInstructionView>();
+
+			if (string.IsNullOrEmpty(editorText))
+				return result;
 
 			var lines = editorText.Split('\n');
 

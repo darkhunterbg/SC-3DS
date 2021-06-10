@@ -43,14 +43,14 @@ namespace DataManager.Widgets
 		private static bool ReadOnlyEditor(PropertyInfo prop, EditorAttribute attr, object item)
 		{
 			AppGui.StrechNextItem();
-			EditorFieldDrawer.ReadOnly(null, prop.GetValue(item));
+			EditorFieldDrawer.ReadOnly(string.Empty, prop.GetValue(item));
 			return false;
 		}
 		private static bool GenerirPropertyDrawer(PropertyInfo p, EditorAttribute a, object i)
 		{
 			var v = p.GetValue(i);
 			AppGui.StrechNextItem();
-			v = EditorFieldDrawer.Object(null, v, out bool changed);
+			v = EditorFieldDrawer.Object(string.Empty, v, out bool changed);
 			if (changed)
 				p.SetValue(i, v);
 
@@ -63,7 +63,7 @@ namespace DataManager.Widgets
 
 			Enum val = (Enum)prop.GetValue(item);
 			AppGui.StrechNextItem();
-			val = EditorFieldDrawer.CustomEnum(null, customAttr.EnumType, val, out bool changed);
+			val = EditorFieldDrawer.CustomEnum(string.Empty, customAttr.EnumType, val, out bool changed);
 			if (changed)
 			{
 				prop.SetValue(item, val);
@@ -76,7 +76,7 @@ namespace DataManager.Widgets
 		{
 			int number = (int)prop.GetValue(item);
 
-			EditorFieldDrawer.FrameTime(null, number, out bool changed);
+			EditorFieldDrawer.FrameTime(string.Empty, number, out bool changed);
 			if (changed)
 			{
 				prop.SetValue(item, number);
@@ -88,7 +88,7 @@ namespace DataManager.Widgets
 		{
 			int number = (int)prop.GetValue(item);
 
-			EditorFieldDrawer.Supply(null, number, out bool changed);
+			EditorFieldDrawer.Supply(string.Empty, number, out bool changed);
 			if (changed)
 			{
 				prop.SetValue(item, number);
