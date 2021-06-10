@@ -202,9 +202,7 @@ namespace DataManager.Panels
 
 			//ImGui.SetNextItemWidth(-200);
 		
-			ImGui.Text("Animation");
-			ImGui.SameLine();
-			if(EditorFieldDrawer.Enum(ref selectedAnimType) || selectionChanged)
+			if(EditorFieldDrawer.Enum("Animation", ref selectedAnimType) || selectionChanged)
 			{
 				int orientation = animData.State.Orientation;
 				animData = new SpriteAnimData();
@@ -224,7 +222,7 @@ namespace DataManager.Panels
 			{
 				ImGui.SetNextItemWidth(-200);
 				int orient = animData.State.Orientation;
-				if (ImGui.InputInt("Orientation", ref orient))
+				if (EditorFieldDrawer.Int("Orientation", ref orient))
 				{
 					animData.State.SetOrientation(orient);
 				}
