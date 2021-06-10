@@ -39,19 +39,28 @@ namespace DataManager.Gameplay
 		public int FrameDelay;
 		public int Orientation { get; private set; }
 
-		public int FrameIndex = 0;
+		private int localFrame = 0;
+		public int OrientationOffset = 0;
 
 		public bool FlipSprite => Orientation > 16;
 
-		public void SetFrameOrientated(int frameIndex)
-		{
-			frameIndex *= 17;
-			if (FlipSprite)
-				frameIndex += 32 - Orientation;
-			else
-				frameIndex += Orientation;
+		public int FrameIndex => localFrame + OrientationOffset;
 
-			FrameIndex = frameIndex;
+		public void SetInstruction(int id)
+		{
+			InstructionId = id;
+			FrameDelay = 0;
+		}
+
+		public void SetFrame(int frame)
+		{
+			localFrame = frame;
+		}
+
+		public void AddOrientation(int orientation)
+		{
+			Orientation += orientation;
+			SetOrientation(Orientation);
 		}
 
 		public void SetOrientation(int orientation)
@@ -62,54 +71,48 @@ namespace DataManager.Gameplay
 				Orientation = 32 + (Orientation % 32);
 			else
 				Orientation %= 32;
+
+			if (FlipSprite)
+				OrientationOffset = 32 - Orientation;
+			else
+				OrientationOffset = Orientation;
 		}
 
 
-
-		public void ExecuteInstructions(SpriteAnimClipAsset clip)
+		public bool ExecuteInstruction(SpriteAnimClipAsset clip)
 		{
-			bool end = false;
-
-			FrameDelay = 0;
-
-			while (!end)
+			++InstructionId;
+			if (InstructionId >= clip.Instructions.Count)
 			{
-				if (InstructionId >= clip.Instructions.Count)
+				InstructionId = -1;
+				return false;
+			}
+
+			var instr = clip.Instructions[InstructionId];
+
+			if (!string.IsNullOrEmpty(instr))
+			{
+				var s = instr.Split(' ');
+
+				if (AnimClipInstructionDatabase.Instructions.TryGetValue(s[0], out var instruction))
 				{
-					InstructionId = 0;
-					return;
-				}
-
-				var instr = clip.Instructions[InstructionId];
-
-				if (!string.IsNullOrEmpty(instr))
-				{
-					var s = instr.Split(' ');
-
-					if (AnimClipInstructionDatabase.Instructions.TryGetValue(s[0], out var instruction))
+					if (instruction.Parameters.Count < s.Length)
 					{
-
-						if (instruction.Parameters.Count < s.Length)
+						var parsed = new object[instruction.Parameters.Count];
+						for (int i = 0; i < parsed.Length; ++i)
 						{
-							var parsed = new object[instruction.Parameters.Count];
-							for (int i = 0; i < parsed.Length; ++i)
-							{
-								parsed[i] = instruction.Parameters[i].Parse(s[i + 1], clip.Sprite, out bool success);
-								if (!success)
-									continue;
-							}
-							end = instruction.Process(this, parsed);
+							parsed[i] = instruction.Parameters[i].Parse(s[i + 1], clip.Sprite, out bool success);
+							if (!success)
+								return false;
 						}
+						return !instruction.Process(this, parsed);
 					}
 				}
-
-				++InstructionId;
-				if (InstructionId >= clip.Instructions.Count)
-				{
-					InstructionId = 0;
-					break;
-				}
 			}
+
+			return true;
 		}
+
+
 	}
 }

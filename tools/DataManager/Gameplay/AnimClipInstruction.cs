@@ -19,7 +19,7 @@ namespace DataManager.Gameplay
 
 			public override string ToString()
 			{
-				return $"[{Type.Name}] {Name}";
+				return Name;
 			}
 
 			public ParamDef(string name, Type type)
@@ -67,6 +67,7 @@ namespace DataManager.Gameplay
 		public readonly List<ParamDef> Parameters = new List<ParamDef>();
 		public readonly AnimClipInstructionAction ProcessAction;
 
+
 		public AnimClipInstruction(string instruction, AnimClipInstructionAction action, params ParamDef[] parameters)
 		{
 			Instruction = instruction;
@@ -92,24 +93,43 @@ namespace DataManager.Gameplay
 	{
 		public static AnimClipInstruction.ParamDef NewParam<TType>(string name) => new AnimClipInstruction.ParamDef(name, typeof(TType));
 
+		static Random random = new Random();
+
+
 		public static readonly AnimClipInstruction Frame = new AnimClipInstruction("frame", (state, p) =>
 		  {
-			  state.FrameIndex = ((int)p[0]);
+			  state.SetFrame ((int)p[0]);
 			  return false;
 		  }, NewParam<int>("frameIndex"));
 
-		public static readonly AnimClipInstruction FrameOrientated = new AnimClipInstruction("frameo", (state, p) =>
+		public static readonly AnimClipInstruction Face = new AnimClipInstruction("face", (state, p) =>
 		{
-			state.SetFrameOrientated(((int)p[0]));
+			state.SetOrientation((int)p[0]);
 			return false;
-		}, NewParam<int>("frameIndex"));
+		}, NewParam<int>("orientation"));
 
 		public static readonly AnimClipInstruction Wait = new AnimClipInstruction("wait", (state, p) =>
 		{
 			state.FrameDelay = (int)p[0];
 			return true;
 		}, NewParam<int>("frameCount"));
-
+		public static readonly AnimClipInstruction WaitRandom = new AnimClipInstruction("waitrand", (state, p) =>
+		{
+			int min = (int)p[0];
+			int max = Math.Max(min, (int)p[1]);
+			state.FrameDelay = random.Next(min, max);
+			return true;
+		}, NewParam<int>("frameMin"), NewParam<int>("frameMax"));
+		public static readonly AnimClipInstruction TurnClockWise = new AnimClipInstruction("turncw", (state, p) =>
+		{
+			state.AddOrientation((int)p[0]);
+			return true;
+		}, NewParam<int>("rotation"));
+		public static readonly AnimClipInstruction TurnClocCounterkWise = new AnimClipInstruction("turnccw", (state, p) =>
+		{
+			state.AddOrientation(-(int)p[0]);
+			return true;
+		}, NewParam<int>("rotation"));
 
 		public static readonly Dictionary<string, AnimClipInstruction> Instructions = new Dictionary<string, AnimClipInstruction>();
 

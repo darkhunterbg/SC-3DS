@@ -20,6 +20,7 @@ namespace DataManager.Panels
 		{
 			public AnimationState State = new AnimationState();
 			public float TimeDelay;
+			public int BreakpointAt = int.MinValue;
 		}
 
 		class AnimInstructionView
@@ -252,7 +253,42 @@ namespace DataManager.Panels
 
 			for (int i = 0; i < instructions.Count; ++i)
 			{
+				if (i == animData.State.InstructionId)
+				{
+					Vector2 p = ImGui.GetCursorScreenPos();
+					p.X -= 10;
+					Vector2 s = new Vector2(ImGui.GetColumnWidth(), 25);
+
+					Color c = Color.Yellow;
+					c.A = 50;
+					ImGui.GetForegroundDrawList().AddRectFilled(p, p + s, c.PackedValue, 2);
+				}
+
+				if (i == animData.BreakpointAt)
+				{
+					Vector2 p = ImGui.GetCursorScreenPos();
+					//p.X -= 10;
+					p += new Vector2(12, 12);
+					//Vector2 s = new Vector2(ImGui.GetColumnWidth(), 25);
+
+					Color c = Color.Red;
+					c.A = 100;
+					ImGui.GetForegroundDrawList().AddCircleFilled(p, 14, c.PackedValue);
+				}
+
 				ImGui.TextDisabled($"{i:D2}");
+				if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+				{
+					animData.TimeDelay = 0;
+					animData.State.SetInstruction(i);
+				}
+				if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+				{
+					if (i == animData.BreakpointAt)
+						animData.BreakpointAt = int.MinValue;
+					else
+						animData.BreakpointAt = i;
+				}
 				ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 4);
 			}
 
@@ -260,7 +296,7 @@ namespace DataManager.Panels
 
 			if (ImGui.InputTextMultiline(string.Empty, ref buffer, 1024, new Vector2(-1, -1),
 				ImGuiInputTextFlags.Multiline))
-		{
+			{
 				if (string.IsNullOrWhiteSpace(buffer))
 				{
 					instructions.Clear();
@@ -324,7 +360,7 @@ namespace DataManager.Panels
 					else
 					{
 						ImGui.Text(instr.Instruction.Instruction);
-						foreach(var param in instr.Instruction.Parameters)
+						foreach (var param in instr.Instruction.Parameters)
 						{
 							ImGui.SameLine();
 							ImGui.TextDisabled(param.ToString());
@@ -444,16 +480,23 @@ namespace DataManager.Panels
 				var clip = SelectedAnimClip;
 				if (clip != null)
 				{
-					if (animData.TimeDelay > 0)
+					if (animData.State.InstructionId != animData.BreakpointAt)
 					{
-						animData.TimeDelay -= 0.016f;
-					}
-					else
-					{
-						animData.State.ExecuteInstructions(clip);
+						if (animData.TimeDelay > 0)
+							animData.TimeDelay -= 0.016f;
+						else
+						{
+							animData.State.FrameDelay = 0;
 
-						int frameDelay = Math.Max(animData.State.FrameDelay, 1);
-						animData.TimeDelay = frameDelay / 15.0f;
+							while (animData.State.ExecuteInstruction(clip))
+							{
+								if (animData.State.InstructionId == animData.BreakpointAt)
+									break;
+							}
+
+							int frameDelay = Math.Max(animData.State.FrameDelay, 1);
+							animData.TimeDelay = frameDelay / 15.0f;
+						}
 					}
 				}
 
