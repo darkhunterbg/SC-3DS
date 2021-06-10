@@ -278,5 +278,23 @@ namespace DataManager.Widgets
 			changed = DelayedChangedValue();
 			return image;
 		}
+
+		public static int FrameTime(int number, out bool changed)
+		{
+			ImGui.SetNextItemWidth(100);
+			changed = ImGui.InputInt(string.Empty, ref number, 0);
+			ImGui.SameLine();
+			ImGui.Text($"{(number / 15.0f).ToString("F1")} sec");
+			return number;
+
+		}
+		public static int Supply(int number, out bool changed)
+		{
+			ImGui.SetNextItemWidth(100);
+			changed = ImGui.InputInt(string.Empty, ref number, 0);
+			ImGui.SameLine();
+			ImGui.Text($"{(number / 2.0f)}");
+			return number;
+		}
 	}
 }

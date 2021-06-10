@@ -200,11 +200,12 @@ namespace DataManager.Panels
 
 			string[] items = EnumCacheValues.GetValues<AnimationType>();
 
-			ImGui.SetNextItemWidth(-200);
-			int animIndex = (int)selectedAnimType;
-			if (ImGui.Combo("Animation", ref animIndex, items, items.Length) || selectionChanged)
+			//ImGui.SetNextItemWidth(-200);
+		
+			ImGui.Text("Animation");
+			ImGui.SameLine();
+			if(EditorFieldDrawer.Enum(ref selectedAnimType) || selectionChanged)
 			{
-				selectedAnimType = (AnimationType)animIndex;
 				int orientation = animData.State.Orientation;
 				animData = new SpriteAnimData();
 				animData.State.SetOrientation(orientation);
@@ -213,6 +214,11 @@ namespace DataManager.Panels
 				buffer = clip == null ? string.Empty : string.Join('\n', clip.Instructions);
 				instructions = ParseClipInstructions(buffer);
 			}
+			//if (ImGui.Combo("Animation", ref animIndex, items, items.Length) || selectionChanged)
+			//{
+			//	selectedAnimType = (AnimationType)animIndex;
+			
+			//}
 
 			if (Selected.IsRotating)
 			{

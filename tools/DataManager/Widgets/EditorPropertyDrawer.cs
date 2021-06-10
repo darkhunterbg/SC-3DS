@@ -40,9 +40,6 @@ namespace DataManager.Widgets
 			return ReadOnlyEditor;
 		}
 
-
-
-
 		private static bool ReadOnlyEditor(PropertyInfo prop, EditorAttribute attr, object item)
 		{
 			AppGui.StrechNextItem();
@@ -80,16 +77,11 @@ namespace DataManager.Widgets
 		{
 			int number = (int)prop.GetValue(item);
 
-			bool changed = false;
-
-			ImGui.SetNextItemWidth(100);
-			if (ImGui.InputInt(string.Empty, ref number, 0))
+			EditorFieldDrawer.FrameTime(number, out bool changed);
+			if (changed)
 			{
 				prop.SetValue(item, number);
-				changed = true;
 			}
-			ImGui.SameLine();
-			ImGui.Text($"{(number / 15.0f).ToString("F1")} sec");
 
 			return changed;
 		}
@@ -97,16 +89,11 @@ namespace DataManager.Widgets
 		{
 			int number = (int)prop.GetValue(item);
 
-			bool changed = false;
-
-			ImGui.SetNextItemWidth(100);
-			if (ImGui.InputInt(string.Empty, ref number, 0))
+			EditorFieldDrawer.Supply(number, out bool changed);
+			if (changed)
 			{
 				prop.SetValue(item, number);
-				changed = true;
 			}
-			ImGui.SameLine();
-			ImGui.Text($"{(number / 2.0f)}");
 
 			return changed;
 		}
