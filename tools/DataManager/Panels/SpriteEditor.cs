@@ -212,11 +212,6 @@ namespace DataManager.Panels
 				buffer = clip == null ? string.Empty : string.Join('\n', clip.Instructions);
 				instructions = ParseClipInstructions(buffer);
 			}
-			//if (ImGui.Combo("Animation", ref animIndex, items, items.Length) || selectionChanged)
-			//{
-			//	selectedAnimType = (AnimationType)animIndex;
-			
-			//}
 
 			if (Selected.IsRotating)
 			{
@@ -301,19 +296,24 @@ namespace DataManager.Panels
 				{
 					if (AnimClipInstructionDatabase.Instructions.TryGetValue(instText, out var instr))
 					{
-						if (instr.Parameters.Count > split.Length - 1)
-							continue;
-
-						for (int j = 0; j < instr.Parameters.Count; ++j)
+						if (instr.Parameters.Count <= split.Length - 1)
 						{
+							bool success = true;
 
-							if (!instr.Parameters[j].Validate(split[j + 1]))
+							for (int j = 0; j < instr.Parameters.Count; ++j)
+							{
+								if (!instr.Parameters[j].Validate(split[j + 1]))
+								{
+									success = false;
+									break;
+								}
+							}
+							if (success)
+							{
+								result.Add(line);
 								continue;
+							}
 						}
-						// TODO: param validation
-
-						result.Add(line);
-						continue;
 					}
 				}
 

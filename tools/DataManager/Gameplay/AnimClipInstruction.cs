@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DataManager.Gameplay
 {
-	public delegate bool AnimClipInstructionAction(AnimationState state, string[] parameters);
+	public delegate bool AnimClipInstructionAction(AnimationState state, object[] parameters);
 
 	public class AnimClipInstruction
 	{
@@ -22,15 +22,25 @@ namespace DataManager.Gameplay
 				Type = type;
 			}
 
-			public bool Validate(string input)
+			public object Parse(string input, out bool success)
 			{
+				success = false;
+
 				if (string.IsNullOrEmpty(input))
-					return false;
+					return Type.IsByRef ? null : Activator.CreateInstance(Type);
 
 				if (Type == typeof(int))
-					return int.TryParse(input,out _);
+					if (success = int.TryParse(input, out var a))
+						return a;
 
-				return false;
+
+				return Type.IsByRef ? null : Activator.CreateInstance(Type); 
+			}
+
+			public bool Validate(string input)
+			{
+				Parse(input, out bool success);
+				return success;
 			}
 		}
 
@@ -45,7 +55,7 @@ namespace DataManager.Gameplay
 			Parameters.AddRange(parameters);
 		}
 
-		public bool Process(AnimationState state, string[] parameters) => ProcessAction(state, parameters);
+		public bool Process(AnimationState state, object[] parameters) => ProcessAction(state, parameters);
 
 		public string Serialize(params object[] parameters)
 		{
@@ -67,15 +77,13 @@ namespace DataManager.Gameplay
 
 		public static readonly AnimClipInstruction PlayFrame = new AnimClipInstruction("playfram", (state, p) =>
 		  {
-			  int.TryParse(p[0], out int f);
-			  state.FrameIndex = f;
+			  state.FrameIndex = (int)p[0];
 			  return false;
 		  }, NewParam<int>("frameIndex"));
 
 		public static readonly AnimClipInstruction Wait = new AnimClipInstruction("wait", (state, p) =>
 		{
-			int.TryParse(p[0], out int f);
-			state.FrameDelay = f;
+			state.FrameDelay = (int)p[0];
 			return true;
 		}, NewParam<int>("frameCount"));
 
@@ -84,9 +92,9 @@ namespace DataManager.Gameplay
 
 		static AnimClipInstructionDatabase()
 		{
-			var props = typeof(AnimClipInstructionDatabase).GetFields(BindingFlags.Static| BindingFlags.Public).Where(t => t.FieldType == typeof(AnimClipInstruction)).ToArray();
+			var props = typeof(AnimClipInstructionDatabase).GetFields(BindingFlags.Static | BindingFlags.Public).Where(t => t.FieldType == typeof(AnimClipInstruction)).ToArray();
 
-			foreach(var i in props.Select(p => (AnimClipInstruction)p.GetValue(null)))
+			foreach (var i in props.Select(p => (AnimClipInstruction)p.GetValue(null)))
 			{
 				Instructions[i.Instruction] = i;
 			}

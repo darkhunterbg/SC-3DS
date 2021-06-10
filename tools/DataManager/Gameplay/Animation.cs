@@ -96,8 +96,18 @@ namespace DataManager.Gameplay
 
 					if (AnimClipInstructionDatabase.Instructions.TryGetValue(s[0], out var instruction))
 					{
-						if (instruction.Parameters.Count < s.Length )
-							end = instruction.Process(this, s.Skip(1).ToArray());
+
+						if (instruction.Parameters.Count < s.Length)
+						{
+							var parsed = new object[instruction.Parameters.Count];
+							for(int i=0;i<parsed.Length;++i)
+							{
+								parsed[i] = instruction.Parameters[i].Parse(s[i + 1], out bool success);
+								if (!success)
+									continue;
+							}
+							end = instruction.Process(this, parsed);
+						}
 					}
 				}
 
