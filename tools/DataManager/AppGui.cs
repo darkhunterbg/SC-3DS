@@ -123,6 +123,10 @@ namespace DataManager
 
 			UpdateInput();
 
+			EditorFieldDrawer.ResetIds();
+			
+			EditorModalSelect.DrawSelectItemModal();
+
 			foreach (var win in windows)
 			{
 				ImGui.SetNextWindowSize(new Vector2(800, 600), ImGuiCond.FirstUseEver);
@@ -133,9 +137,6 @@ namespace DataManager
 					ImGui.End();
 				}
 			}
-
-
-			EditorModalSelect.DrawSelectItemModal();
 
 			TooltipForObject(HoverObject);
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataManager.Assets;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -16,13 +17,18 @@ namespace DataManager.Gameplay
 			public string Name;
 			public Type Type;
 
+			public override string ToString()
+			{
+				return $"[{Type.Name}] {Name}";
+			}
+
 			public ParamDef(string name, Type type)
 			{
 				Name = name;
 				Type = type;
 			}
 
-			public object Parse(string input, out bool success)
+			public object Parse(string input, SpriteAsset sprite, out bool success)
 			{
 				success = false;
 
@@ -33,13 +39,26 @@ namespace DataManager.Gameplay
 					if (success = int.TryParse(input, out var a))
 						return a;
 
+				if (Type == typeof(ImageFrameRef))
+				{
+					if (success = int.TryParse(input, out var a))
+					{
+						var image = sprite.Image.Image;
+						var frame = image.GetFrame(a);
+						if (frame == null)
+							success = false;
+						else
+							return new ImageFrameRef(frame);
+					}
+				}
+
 
 				return Type.IsByRef ? null : Activator.CreateInstance(Type);
 			}
 
-			public bool Validate(string input)
+			public bool Validate(string input, SpriteAsset sprite)
 			{
-				Parse(input, out bool success);
+				Parse(input, sprite, out bool success);
 				return success;
 			}
 		}
@@ -67,19 +86,23 @@ namespace DataManager.Gameplay
 
 			return string.Join(' ', s);
 		}
-
-
 	}
 
 	public static class AnimClipInstructionDatabase
 	{
 		public static AnimClipInstruction.ParamDef NewParam<TType>(string name) => new AnimClipInstruction.ParamDef(name, typeof(TType));
 
-		public static readonly AnimClipInstruction PlayFrame = new AnimClipInstruction("playfram", (state, p) =>
+		public static readonly AnimClipInstruction Frame = new AnimClipInstruction("frame", (state, p) =>
 		  {
-			  state.FrameIndex = (int)p[0];
+			  state.FrameIndex = ((int)p[0]);
 			  return false;
 		  }, NewParam<int>("frameIndex"));
+
+		public static readonly AnimClipInstruction FrameOrientated = new AnimClipInstruction("frameo", (state, p) =>
+		{
+			state.SetFrameOrientated(((int)p[0]));
+			return false;
+		}, NewParam<int>("frameIndex"));
 
 		public static readonly AnimClipInstruction Wait = new AnimClipInstruction("wait", (state, p) =>
 		{

@@ -11,15 +11,10 @@ namespace DataManager.Widgets
 {
 	public static class EditorFieldDrawer
 	{
-		static bool? delayedChangedValue = null;
-		private static bool DelayedChangedValue()
-		{
-			if (delayedChangedValue == null)
-				return false;
+		static int dialogId = 0;
+		static object dialogResult = null;
+		static int dialogResultFor = 0;
 
-			delayedChangedValue = null;
-			return true;
-		}
 		private static void DrawName(string text)
 		{
 			if (!string.IsNullOrEmpty(text))
@@ -27,6 +22,12 @@ namespace DataManager.Widgets
 				ImGui.Text(text);
 				ImGui.SameLine();
 			}
+		}
+		public static void ResetIds()
+		{
+			dialogId = 0;
+			dialogResultFor = 0;
+			dialogResult = null;
 		}
 
 		public static void ReadOnly(string name, object obj)
@@ -71,6 +72,11 @@ namespace DataManager.Widgets
 				ImageListRef b = obj == null ? ImageListRef.None : (ImageListRef)obj;
 				return ImageList(name, b, out changed);
 			}
+			if (type == typeof(ImageFrameRef))
+			{
+				ImageFrameRef b = obj == null ? ImageFrameRef.None : (ImageFrameRef)obj;
+				return ImageFrame(name, b, out changed);
+			}
 
 			changed = false;
 			ReadOnly(name, obj);
@@ -103,9 +109,13 @@ namespace DataManager.Widgets
 			{
 				return Icon(name, ic, out changed);
 			}
-			if(obj is ImageListRef il)
+			if (obj is ImageListRef il)
 			{
 				return ImageList(name, il, out changed);
+			}
+			if (obj is ImageFrameRef imf)
+			{
+				return ImageFrame(name, imf, out changed);
 			}
 
 			changed = false;
@@ -113,8 +123,7 @@ namespace DataManager.Widgets
 			return obj;
 		}
 
-
-		public static bool String(string name,ref string text)
+		public static bool String(string name, ref string text)
 		{
 			//DrawName(name);
 			return ImGui.InputText(name, ref text, 1024);
@@ -183,7 +192,7 @@ namespace DataManager.Widgets
 			return value;
 		}
 
-		public static bool CustomEnum<TType>(string name,CustomEnumType type, ref TType value) where TType : struct, Enum
+		public static bool CustomEnum<TType>(string name, CustomEnumType type, ref TType value) where TType : struct, Enum
 		{
 			//DrawName(name);
 			var values = CustomEnumValues.CustomEnums[(int)type];
@@ -197,7 +206,7 @@ namespace DataManager.Widgets
 
 			return false;
 		}
-		public static TType Enum<TType>(string name,CustomEnumType type, TType value, out bool changed) where TType : struct, Enum
+		public static TType Enum<TType>(string name, CustomEnumType type, TType value, out bool changed) where TType : struct, Enum
 		{
 			changed = CustomEnum(name, type, ref value);
 			return value;
@@ -223,6 +232,7 @@ namespace DataManager.Widgets
 
 		public static Asset Asset(string name, Asset asset, out bool changed)
 		{
+			int id = ++dialogId;
 			//DrawName(name);
 			if (asset?.Preview != null)
 			{
@@ -243,15 +253,18 @@ namespace DataManager.Widgets
 			{
 				EditorModalSelect.SelectItemModal(typeof(Asset), asset, (o) =>
 				{
-					asset = o as Asset; delayedChangedValue = true;
+					dialogResultFor = id;
+					dialogResult = o;
 				});
 			}
 
-			changed = DelayedChangedValue();
-			return asset;
+			changed = dialogResultFor == dialogId;
+			return changed ? (Asset)dialogResult : asset;
 		}
+
 		private static IconRef Icon(string name, IconRef icon, out bool changed)
 		{
+			int id = ++dialogId;
 			//DrawName(name);
 			changed = false;
 			if (icon.Image == null)
@@ -261,15 +274,19 @@ namespace DataManager.Widgets
 			{
 				EditorModalSelect.SelectItemModal(typeof(IconRef), icon, (o) =>
 				{
-					icon = (IconRef)o; delayedChangedValue = true;
+					dialogResultFor = id;
+					dialogResult = o;
 				});
 			}
-			changed = DelayedChangedValue();
-			return icon;
+
+			changed = dialogResultFor == dialogId;
+			return changed ? (IconRef)dialogResult : icon;
 		}
 
 		private static ImageListRef ImageList(string name, ImageListRef image, out bool changed)
 		{
+			int id = ++dialogId;
+
 			string text = "None";
 
 			//DrawName(name);
@@ -285,15 +302,44 @@ namespace DataManager.Widgets
 
 			ImGui.SameLine();
 
+
 			if (ImGui.Button("Change"))
 			{
 				EditorModalSelect.SelectItemModal(typeof(ImageListRef), image, (o) =>
 				{
-					image = (ImageListRef)o; delayedChangedValue = true;
+					dialogResultFor = id;
+					dialogResult = o;
 				});
 			}
-			changed = DelayedChangedValue();
-			return image;
+
+			changed = dialogResultFor == dialogId;
+			return changed ? (ImageListRef)dialogResult : image;
+		}
+
+		private static ImageFrameRef ImageFrame(string name, ImageFrameRef frame, out bool changed)
+		{
+			int id = ++dialogId;
+			string text = "None";
+
+			//DrawName(name);
+
+			if (!string.IsNullOrEmpty(frame.Key))
+				text = frame.Key;
+
+			if (ImGui.IsItemHovered())
+				AppGame.Gui.HoverObject = frame;
+
+			if (ImGui.ImageButton(frame.Frame.Image.GuiImage, new Vector2(24, 24)))
+			{
+				EditorModalSelect.SelectItemModal(typeof(ImageFrameRef), frame, (o) =>
+				{
+					dialogResultFor = id;
+					dialogResult = o;
+				});
+			}
+
+			changed = dialogResultFor == dialogId;
+			return changed ? (ImageFrameRef)dialogResult : frame;
 		}
 
 		public static int FrameTime(string name, int number, out bool changed)

@@ -98,6 +98,8 @@ namespace DataManager.Assets
 		}
 	}
 
+
+
 	public struct ImageFrameRef
 	{
 		public readonly string Key;

@@ -43,23 +43,15 @@ namespace DataManager.Gameplay
 
 		public bool FlipSprite => Orientation > 16;
 
-
-		public int GetActualFrameIndex(SpriteAsset sprite)
+		public void SetFrameOrientated(int frameIndex)
 		{
-			int frameIndex = FrameIndex;
-
-			if (sprite.IsRotating)
-				frameIndex *= 17;
-
+			frameIndex *= 17;
 			if (FlipSprite)
-			{
 				frameIndex += 32 - Orientation;
-			}
 			else
-			{
 				frameIndex += Orientation;
-			}
-			return frameIndex;
+
+			FrameIndex = frameIndex;
 		}
 
 		public void SetOrientation(int orientation)
@@ -100,9 +92,9 @@ namespace DataManager.Gameplay
 						if (instruction.Parameters.Count < s.Length)
 						{
 							var parsed = new object[instruction.Parameters.Count];
-							for(int i=0;i<parsed.Length;++i)
+							for (int i = 0; i < parsed.Length; ++i)
 							{
-								parsed[i] = instruction.Parameters[i].Parse(s[i + 1], out bool success);
+								parsed[i] = instruction.Parameters[i].Parse(s[i + 1], clip.Sprite, out bool success);
 								if (!success)
 									continue;
 							}

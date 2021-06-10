@@ -55,8 +55,10 @@ namespace DataManager.Assets
 		{
 			var clone = base.Clone() as SpriteAsset;
 			clone.Clips = Clips.Select(s => s.Clone() as SpriteAnimClipAsset).ToList();
-			foreach (var c in clone.Clips)
+			foreach (var c in clone.Clips) 
 				c.Sprite = clone;
+
+			AppGame.AssetManager.GetAssets<SpriteAnimClipAsset>().AddRange(clone.Clips);
 
 			return clone;
 		}

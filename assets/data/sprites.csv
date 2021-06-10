@@ -2,7 +2,3 @@ Name,Image,IsRotating
 terran\Marine,unit\terran\marine,True
 terran\MarineShadow,unit\terran\tmashad,True
 terran\MarineRenmants,unit\terran\tmadeath,False
-terran\SCV,unit\terran\scv,True
-terran\Marine\Copy of Marine,unit\terran\marine,True
-terran\Marine\Copy of Marine,unit\terran\marine,True
-terran\Medic,unit\terran\medic,True

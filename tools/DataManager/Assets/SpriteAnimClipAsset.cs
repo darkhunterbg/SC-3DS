@@ -8,11 +8,8 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
-
 	public class SpriteAnimClipAsset : Asset
 	{
-
-
 		[Index(0), TypeConverter(typeof(Asset.AssetConverter))]
 		public SpriteAsset Sprite { get; set; }
 
@@ -27,7 +24,6 @@ namespace DataManager.Assets
 		public List<string> Instructions { get; set; } = new List<string>();
 
 		public override string AssetName => $"{Sprite.Name}:{Type}";
-
 
 		public override void OnAfterDeserialize()
 		{
@@ -57,6 +53,13 @@ namespace DataManager.Assets
 			Instructions.Clear();
 			Instructions.AddRange(instructions.Where(s => !string.IsNullOrEmpty(s)).Select(s => s.Trim()));
 			InstructionsText = string.Join(',', instructions);
+		}
+
+		public override Asset Clone()
+		{
+			var clone = base.Clone() as SpriteAnimClipAsset;
+			clone.Instructions = Instructions.ToList();
+			return clone;
 		}
 	}
 }

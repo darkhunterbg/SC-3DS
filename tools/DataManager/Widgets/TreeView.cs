@@ -59,7 +59,9 @@ namespace DataManager.Widgets
 			public bool UpdateItemPath(TreeItem root)
 			{
 				if (Item != null)
+				{
 					Item.Path = GetPath(root);
+				}
 
 				bool anyUpdate = Item != null;
 
@@ -93,6 +95,8 @@ namespace DataManager.Widgets
 
 		private TreeItem root = new TreeItem(null) { Name = "Items", Opened = true };
 		public readonly string Id;
+
+		private bool focused = false;
 
 		private TreeItem selectedNode;
 		public ITreeViewItem Selected => selectedNode?.Item;
@@ -131,7 +135,7 @@ namespace DataManager.Widgets
 			}
 			else
 			{
-				TreeItem next = parent.Children.FirstOrDefault(t => t.Name == itemName);
+				TreeItem next = parent.Children.FirstOrDefault(t => t.Name == itemName && t.IsDir);
 				if (next == null)
 				{
 					parent.Children.Add(next = new TreeItem(parent)
@@ -185,10 +189,11 @@ namespace DataManager.Widgets
 
 		public void Draw()
 		{
+			focused = false;
 			ItemModified = false;
 			DrawTreeItem(root);
 
-			if (selectedNode != null)
+			if (selectedNode != null && focused)
 			{
 				if (AppGame.Gui.IsButtonPressed(Keys.F2))
 					RenameNode(selectedNode);
@@ -202,13 +207,14 @@ namespace DataManager.Widgets
 				}
 			}
 		}
+
 		private void DrawTreeItem(TreeItem node)
 		{
 			ImGui.PushID(node.Id);
 
 			bool selected = selectedNode == node;
 
-			if ( !node.IsDir)
+			if (!node.IsDir)
 			{
 				//ImGui.Indent(ImGui.GetTreeNodeToLabelSpacing());
 
@@ -216,8 +222,8 @@ namespace DataManager.Widgets
 					ImGui.Bullet();
 				else
 					ImGui.Image(node.Item.Preview.GuiImage, new Vector2(24, 24), Vector2.Zero, Vector2.One,
-						Vector4.One,  Vector4.One);
-				
+						Vector4.One, Vector4.One);
+
 				ImGui.SameLine();
 
 				if (renameNode == node)
@@ -228,12 +234,12 @@ namespace DataManager.Widgets
 				{
 					if (ImGui.Selectable(node.Name, selected))
 					{
-						if (selected)
-							selectedNode = null;
-						else
-							selectedNode = node;
+						selectedNode = node;
 					}
 				}
+
+				if (ImGui.IsItemFocused())
+					focused = true;
 				//ImGui.Unindent(ImGui.GetTreeNodeToLabelSpacing());
 
 				ItemContextMenu(node);
@@ -261,12 +267,12 @@ namespace DataManager.Widgets
 					string text = $"{node.Name} ({node.Children.Count})";
 					node.Opened = ImGui.TreeNodeEx(text, flags);
 
+					if (ImGui.IsItemFocused())
+						focused = true;
+
 					if (ImGui.IsItemClicked())
 					{
-						if (selected)
-							selectedNode = null;
-						else
-							selectedNode = node;
+						selectedNode = node;
 					}
 
 					ItemContextMenu(node);
@@ -299,31 +305,21 @@ namespace DataManager.Widgets
 				return;
 			}
 
-			if (!ImGui.IsItemFocused())
+			if (!ImGui.IsItemFocused() || AppGame.Gui.IsConfirmPressed)
 			{
-				renameNode.Name = renameText;
+				if (!string.IsNullOrWhiteSpace(renameText) && renameNode.Name != renameText)
+				{
+					renameNode.Name = renameText;
 
-				if (renameNode.UpdateItemPath(root))
-					ItemModified = true;
-
+					if (renameNode.UpdateItemPath(root))
+						ItemModified = true;
+				}
 				renameNode = null;
-			}
-			if (AppGame.Gui.IsConfirmPressed)
-			{
-				renameNode.Name = renameText;
-
-				if (renameNode.UpdateItemPath(root))
-					ItemModified = true;
-
-				renameNode = null;
-
 			}
 			if (AppGame.Gui.IsCancelPressed)
 			{
 				renameNode = null;
 			}
-
-
 		}
 
 		private void ItemContextMenu(TreeItem node)
