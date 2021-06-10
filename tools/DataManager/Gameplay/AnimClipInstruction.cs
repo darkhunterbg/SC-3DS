@@ -21,6 +21,17 @@ namespace DataManager.Gameplay
 				Name = name;
 				Type = type;
 			}
+
+			public bool Validate(string input)
+			{
+				if (string.IsNullOrEmpty(input))
+					return false;
+
+				if (Type == typeof(int))
+					return int.TryParse(input,out _);
+
+				return false;
+			}
 		}
 
 		public readonly string Instruction;
@@ -46,6 +57,7 @@ namespace DataManager.Gameplay
 
 			return string.Join(',', s);
 		}
+
 
 	}
 

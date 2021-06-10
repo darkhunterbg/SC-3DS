@@ -28,13 +28,21 @@ namespace DataManager.Panels
 
 		private RenderTargetImage animPreview = new RenderTargetImage(new Vector2(256, 256));
 
-		private int animTypeIndex = 0;
-
 		private SpriteAnimData animData = new SpriteAnimData();
 
 		private SpriteAsset prevSelection = null;
 		private SpriteAsset Selected => treeView.Selected as SpriteAsset;
+		private SpriteAnimClipAsset SelectedAnimClip
+		{
+			get
+			{
+				if (Selected == null) return null;
+				return Selected.Clips.FirstOrDefault(c => c.Type == selectedAnimType);
+			}
+		}
 		private bool selectionChanged = false;
+		private AnimationType selectedAnimType = 0;
+
 
 		private TreeView treeView = new TreeView("tree")
 		{
@@ -70,7 +78,7 @@ namespace DataManager.Panels
 			clipModified = false;
 			selectionChanged = false;
 
-			ImGui.Columns(3, "spriteeditor");
+			ImGui.Columns(4, "spriteeditor");
 
 			ImGui.BeginChild("##items");
 			{
@@ -86,21 +94,30 @@ namespace DataManager.Panels
 
 			ImGui.NextColumn();
 
-			ImGui.BeginChild("##settings");
+			ImGui.BeginChild("##script");
 			{
 				propertyEditor.EditingItem = treeView.Selected;
 				propertyEditor.Draw(new Vector2(0, 100));
 				ImGui.Separator();
-				ImGui.Spacing();
-				DrawSpriteFrames(ImGui.GetColumnWidth());
-
+				DrawScriptEditor();
 			}
 			ImGui.EndChild();
 
 			ImGui.NextColumn();
+
 			ImGui.BeginChild("##anim");
 			{
 				DrawAnimationEditor(ImGui.GetColumnWidth());
+
+				ImGui.NewLine();
+			}
+			ImGui.EndChild();
+
+			ImGui.NextColumn();
+
+			ImGui.BeginChild("assetview");
+			{
+				DrawSpriteFrames(ImGui.GetColumnWidth());
 			}
 			ImGui.EndChild();
 
@@ -155,12 +172,12 @@ namespace DataManager.Panels
 						}
 					}
 
-					if(frame.FrameIndex == animData.State.GetActualFrameIndex(Selected))
+					if (frame.FrameIndex == animData.State.GetActualFrameIndex(Selected))
 					{
-						ImGui.Image(frame.Image.GuiImage, frame.Size * scale- Vector2.One *2, Vector2.Zero, Vector2.One, Vector4.One, Vector4.One);
+						ImGui.Image(frame.Image.GuiImage, frame.Size * scale - Vector2.One * 2, Vector2.Zero, Vector2.One, Vector4.One, Vector4.One);
 					}
-					else 
-					ImGui.Image(frame.Image.GuiImage, frame.Size * scale);
+					else
+						ImGui.Image(frame.Image.GuiImage, frame.Size * scale);
 					if (ImGui.IsItemHovered())
 						AppGame.Gui.HoverObject = frame;
 				}
@@ -169,11 +186,9 @@ namespace DataManager.Panels
 
 		private void DrawAnimationEditor(float width)
 		{
-			var animType = (AnimationType)animTypeIndex;
+			DrawAnimation();
 
-			DrawAnimation(animType);
-
-			int max = Math.Min((int)width, animPreview.RenderTarget.Width * 2);
+			int max = (int)width;// Math.Min((int)width, animPreview.RenderTarget.Width * 2);
 
 			var sb = AppGui.SpriteBatchBegin(new Vector2(max, max), SamplerState.PointClamp);
 			sb.Draw(animPreview.RenderTarget, new Rectangle(0, 0, (int)max, (int)max), Color.White);
@@ -185,18 +200,16 @@ namespace DataManager.Panels
 
 			string[] items = EnumCacheValues.GetValues<AnimationType>();
 
-
-			SpriteAnimClipAsset clip = Selected.Clips.FirstOrDefault(c => c.Type == animType);
-
 			ImGui.SetNextItemWidth(-200);
-			if (ImGui.Combo("Animation", ref animTypeIndex, items, items.Length) || selectionChanged)
+			int animIndex = (int)selectedAnimType;
+			if (ImGui.Combo("Animation", ref animIndex, items, items.Length) || selectionChanged)
 			{
-				animType = (AnimationType)animTypeIndex;
+				selectedAnimType = (AnimationType)animIndex;
 				int orientation = animData.State.Orientation;
 				animData = new SpriteAnimData();
 				animData.State.SetOrientation(orientation);
 
-				clip = Selected.Clips.FirstOrDefault(c => c.Type == animType);
+				SpriteAnimClipAsset clip = SelectedAnimClip;
 				buffer = clip == null ? string.Empty : string.Join('\n', clip.Instructions);
 				instructions = ParseClipInstructions(buffer);
 			}
@@ -210,12 +223,19 @@ namespace DataManager.Panels
 					animData.State.SetOrientation(orient);
 				}
 			}
+		}
 
+		List<string> instructions = new List<string>();
+		string buffer = string.Empty;
 
-			ImGui.BeginChild("##instructions");
+		private void DrawScriptEditor()
+		{
+			if (Selected == null)
+				return;
+
+			var clip = SelectedAnimClip;
 
 			ImGui.Columns(2, "script");
-
 
 			if (ImGui.InputTextMultiline(string.Empty, ref buffer, 1024, new Vector2(-1, -1),
 				ImGuiInputTextFlags.Multiline))
@@ -237,7 +257,7 @@ namespace DataManager.Panels
 
 					if (clip == null)
 					{
-						clip = new SpriteAnimClipAsset(Selected, animType);
+						clip = new SpriteAnimClipAsset(Selected, selectedAnimType);
 						AppGame.AssetManager.GetAssetDatabase<SpriteAnimClipAsset>().Assets.Add(clip);
 						Selected.Clips.Add(clip);
 					}
@@ -257,15 +277,10 @@ namespace DataManager.Panels
 					ImGui.PushID(++i);
 					ImGui.Text(instr);
 					ImGui.PopID();
+					ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 4);
 				}
 			}
-
-			ImGui.EndChild();
-
 		}
-
-		List<string> instructions = new List<string>();
-		string buffer = string.Empty;
 
 		private List<string> ParseClipInstructions(string editorText)
 		{
@@ -276,13 +291,23 @@ namespace DataManager.Panels
 			foreach (var line in lines)
 			{
 				var split = line.Split(' ');
-				string instruction = split.FirstOrDefault();
+				string instText = split.FirstOrDefault();
 
-				if (instruction != null)
+				if (instText != null)
 				{
-					if (AnimClipInstructionDatabase.Instructions.TryGetValue(instruction, out _))
+					if (AnimClipInstructionDatabase.Instructions.TryGetValue(instText, out var instr))
 					{
+						if (instr.Parameters.Count > split.Length - 1)
+							continue;
+
+						for (int j = 0; j < instr.Parameters.Count; ++j)
+						{
+
+							if (!instr.Parameters[j].Validate(split[j + 1]))
+								continue;
+						}
 						// TODO: param validation
+
 						result.Add(line);
 						continue;
 					}
@@ -294,7 +319,7 @@ namespace DataManager.Panels
 			return result;
 		}
 
-		private void DrawAnimation(AnimationType type)
+		private void DrawAnimation()
 		{
 			SpriteBatch sb = animPreview.StartDrawOn();
 			sb.Begin();
@@ -305,7 +330,7 @@ namespace DataManager.Panels
 
 			if (Selected != null && Selected.Image.Image != null)
 			{
-				var clip = Selected.Clips.FirstOrDefault(c => c.Type == type);
+				var clip = SelectedAnimClip;
 				if (clip != null)
 				{
 					if (animData.TimeDelay > 0)
@@ -315,7 +340,7 @@ namespace DataManager.Panels
 					else
 					{
 						animData.State.ExecuteInstructions(clip);
-				
+
 						int frameDelay = Math.Max(animData.State.FrameDelay, 1);
 						animData.TimeDelay = frameDelay / 15.0f;
 					}
@@ -349,6 +374,5 @@ namespace DataManager.Panels
 			sb.End();
 			animPreview.EndDrawOn();
 		}
-
 	}
 }
