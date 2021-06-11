@@ -69,6 +69,7 @@ namespace DataManager
 		public static readonly string tex3dsPath = "C:\\devkitPro\\tools\\bin\\tex3ds.exe";
 
 		public static readonly string SpriteAtlasDataPath = $"{GameDataDir}atlases.csv";
+		public static readonly string ImagesDataPath = $"{GameDataDir}images.csv";
 		public static readonly string FramesDataPath = $"{GameDataDir}frames.csv";
 
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();

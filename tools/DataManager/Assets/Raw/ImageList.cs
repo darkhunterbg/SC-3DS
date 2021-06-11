@@ -1,6 +1,7 @@
 ﻿
 using CsvHelper;
 using CsvHelper.Configuration;
+using CsvHelper.Configuration.Attributes;
 using CsvHelper.TypeConversion;
 using DataManager.Build;
 using System;
@@ -13,6 +14,42 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
+	[BinaryData(DataItemType.Images)]
+	public class ImageListAtlasData
+	{
+		[Index(0), Name("Image")]
+		[Binary(BinaryType.String, 32)]
+		public string Name { get; set; }
+
+		[Index(1), Name("FrameOffset")]
+		[Binary(BinaryType.UInt, 2)]
+		public int FrameOffset { get; set; }
+
+		[Index(2), Name("FrameCount")]
+		[Binary(BinaryType.UInt, 2)]
+		public int FrameCount { get; set; }
+
+		[Index(3), Name("Width")]
+		[Binary(BinaryType.UInt, 2)]
+		public int Width { get; set; }
+
+		[Index(4), Name("Height")]
+		[Binary(BinaryType.UInt, 2)]
+		public int Height { get; set; }
+
+		[Ignore]
+		public ImageList List { get; private set; }
+		public ImageListAtlasData(ImageList list)
+		{
+			List = list;
+			Name = list.Key;
+			FrameCount = list.Frames.Count;
+			Width = (int)list.FrameSize.X;
+			Height = (int)list.FrameSize.Y;
+		}
+	}
+
+
 	public class ImageList
 	{
 		//public string InfoFilePath { get; private set; }
@@ -126,14 +163,14 @@ namespace DataManager.Assets
 
 		public readonly ImageList Image;
 
-		public static readonly ImageListRef None = new ImageListRef(string.Empty,null);
+		public static readonly ImageListRef None = new ImageListRef(string.Empty, null);
 
 		public override string ToString()
 		{
 			return Key;
 		}
 
-		public ImageListRef( ImageList image)
+		public ImageListRef(ImageList image)
 		{
 			Key = image.Key;
 			Image = image;

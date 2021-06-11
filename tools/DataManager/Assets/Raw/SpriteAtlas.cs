@@ -29,8 +29,6 @@ namespace DataManager.Assets
 				Images = assets.ToList(),
 			});
 
-			foreach (var f in subAtlases.Last().Images)
-				f.AtlasName = subAtlases.Last().FullName;
 		}
 
 
