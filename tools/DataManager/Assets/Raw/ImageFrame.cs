@@ -18,7 +18,7 @@ namespace DataManager.Assets
 	public class ImageFrameAtlasData
 	{
 		[Index(0), Name("Image")]
-		[Binary(BinaryType.String, 64)]
+		[Binary(BinaryType.String, 32)]
 		public string ImageListName { get; set; }
 
 		[Index(1), Name("Frame")]
@@ -42,7 +42,7 @@ namespace DataManager.Assets
 		public int Height { get; set; }
 
 		[Index(4), Name("Atlas")]
-		[Binary(BinaryType.String, 32)]
+		[Binary(BinaryType.String, 16)]
 		public string AtlasName { get; set; }
 
 		[Index(5), Name("AtlasX")]
