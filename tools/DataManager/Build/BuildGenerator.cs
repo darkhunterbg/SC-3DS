@@ -15,6 +15,7 @@ using Color = Microsoft.Xna.Framework.Color;
 using CsvHelper;
 using System.IO;
 using System.Diagnostics;
+using DataManager.Gameplay;
 
 namespace DataManager.Build
 {
@@ -431,6 +432,16 @@ namespace DataManager.Build
 
 		private void BuildData()
 		{
+			List<AnimClipInstructionData> instructionData = new List<AnimClipInstructionData>();
+
+			foreach(var clip in  AppGame.AssetManager.GetAssets<SpriteAnimClipAsset>()
+				.OrderBy(s => s.Sprite.AssetName).ThenBy(s => s.Type))
+			{
+				clip._InstructionStart = (uint)instructionData.Count;
+
+				instructionData.AddRange(clip.Instructions.Select(s => new AnimClipInstructionData(clip, s)));
+			}
+
 			List<DataItem> data = new List<DataItem>();
 			data.Add(new DataItem()
 			{
@@ -447,6 +458,12 @@ namespace DataManager.Build
 				Name = "Frames",
 				Data = GeneratedFrames,
 			});
+			data.Add(new DataItem()
+			{
+				Name = "Animation Instructions",
+				Data = instructionData,
+			});
+
 
 			foreach (var assetDb in AppGame.AssetManager.Assets.Values)
 			{
@@ -466,6 +483,7 @@ namespace DataManager.Build
 			Progress(currentJob, totalJobs);
 
 			DataItemHeader[] headers = data.Select(s => s.GetHeader()).ToArray();
+		
 
 			uint offset = (uint)(headers.Length * DataItemHeader.Size);
 

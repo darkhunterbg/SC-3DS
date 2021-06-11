@@ -45,7 +45,7 @@ namespace DataManager.Assets
 
 		[Index(2)]
 		[DefaultEditor]
-		[Binary(BinaryType.Bool, 1)]
+		[Binary(BinaryType.UInt, 1)]
 		public bool IsRotating { get; set; }
 
 		[Ignore]

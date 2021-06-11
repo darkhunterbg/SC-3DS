@@ -25,6 +25,14 @@ namespace DataManager.Assets
 		public string InstructionsText { get; set; }
 
 		[Ignore]
+		[Binary(BinaryType.UInt, 4)]
+		public uint _InstructionStart { get; set; }
+
+		[Ignore]
+		[Binary(BinaryType.UInt, 1)]
+		public int InstructionCount => Instructions.Count;
+
+		[Ignore]
 #warning TODO: Serialize Instructions
 		public List<string> Instructions { get; set; } = new List<string>();
 
@@ -42,7 +50,8 @@ namespace DataManager.Assets
 		}
 
 		public SpriteAnimClipAsset() : base() { }
-		public SpriteAnimClipAsset(SpriteAsset asset, AnimationType type) : this() {
+		public SpriteAnimClipAsset(SpriteAsset asset, AnimationType type) : this()
+		{
 			Sprite = asset;
 			Type = type;
 			Sprite.Clips.Add(this);
@@ -66,5 +75,6 @@ namespace DataManager.Assets
 			clone.Instructions = Instructions.ToList();
 			return clone;
 		}
+
 	}
 }

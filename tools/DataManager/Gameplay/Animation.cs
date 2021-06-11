@@ -101,7 +101,7 @@ namespace DataManager.Gameplay
 						var parsed = new object[instruction.Parameters.Count];
 						for (int i = 0; i < parsed.Length; ++i)
 						{
-							parsed[i] = instruction.Parameters[i].Parse(s[i + 1], clip.Sprite, out bool success);
+							parsed[i] = instruction.Parameters[i].Parse(s[i + 1], out bool success);
 							if (!success)
 								return false;
 						}

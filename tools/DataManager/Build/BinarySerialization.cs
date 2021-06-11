@@ -11,7 +11,8 @@ namespace DataManager.Build
 		Int,
 		UInt,
 		String,
-		Bool,
+		Raw,
+		
 	}
 
 
@@ -29,24 +30,58 @@ namespace DataManager.Build
 
 		public byte[] Serialize(object obj)
 		{
+			return Serialize(obj, Type, Size);
+		}
+		public static byte[] Serialize(object obj, Type type)
+		{
+			if (type == typeof(string))
+				return Serialize(obj, BinaryType.String, 32);
+			if (type == typeof(bool))
+				return Serialize(obj, BinaryType.UInt, 1);
+			if (type.IsEnum)
+				return Serialize(obj, type.GetEnumUnderlyingType());
+			if (type == typeof(int))
+				return Serialize(obj, BinaryType.Int, 4);
+			if (type == typeof(short))
+				return Serialize(obj, BinaryType.Int, 2);
+			if (type == typeof(sbyte))
+				return Serialize(obj, BinaryType.Int, 1);
+
+			if (type == typeof(uint))
+				return Serialize(obj, BinaryType.UInt, 4);
+			if (type == typeof(ushort))
+				return Serialize(obj, BinaryType.UInt, 2);
+			if (type == typeof(byte))
+				return Serialize(obj, BinaryType.UInt, 1);
+
+
+			return null;
+		}
+		public static byte[] Serialize(object obj, BinaryType type, int size)
+		{
 			try
 			{
+				if(type== BinaryType.Raw)
+				{
+					return (obj as IEnumerable<byte>).Take(size).ToArray();
+				}
+
 				string s = GetObjectString(obj);
 
-				switch (Type)
+				switch (type)
 				{
 					case BinaryType.Int:
 						{
-							return IntSerialize(s);
+							return IntSerialize(s, size);
 						}
 
 					case BinaryType.UInt:
 						{
-							return UIntSerialize(s);
+							return UIntSerialize(s, size);
 						}
 					case BinaryType.String:
 						{
-							return StringSerialize(s);
+							return StringSerialize(s, size);
 						}
 				}
 			}
@@ -56,10 +91,10 @@ namespace DataManager.Build
 				throw;
 			}
 
-			return new byte[Size];
+			return new byte[size];
 		}
 
-		private string GetObjectString(object obj)
+		private static string GetObjectString(object obj)
 		{
 			if (obj == null)
 				return string.Empty;
@@ -70,30 +105,29 @@ namespace DataManager.Build
 			{
 				return ((int)obj).ToString();
 			}
-			if(obj is bool)
+			if (obj is bool)
 			{
 				return (((bool)obj) ? 1 : 0).ToString();
 			}
 
 			return obj.ToString();
 		}
-
-		private byte[] IntSerialize(string text)
+		private static byte[] IntSerialize(string text, int size)
 		{
 			int i = int.Parse(text);
 
-			switch (Size)
+			switch (size)
 			{
 				case 1: return new byte[] { Convert.ToByte((sbyte)i) };
 				case 2: return BitConverter.GetBytes((short)i);
 				default: return BitConverter.GetBytes(i);
 			}
 		}
-		private byte[] UIntSerialize(string text)
+		private static byte[] UIntSerialize(string text, int size)
 		{
 			uint i = uint.Parse(text);
 
-			switch (Size)
+			switch (size)
 			{
 				case 1: return new byte[] { Convert.ToByte((byte)i) };
 				case 2: return BitConverter.GetBytes((ushort)i);
@@ -101,9 +135,9 @@ namespace DataManager.Build
 			}
 		}
 
-		private byte[] StringSerialize(string text)
+		private static byte[] StringSerialize(string text, int size)
 		{
-			byte[] data = new byte[Size];
+			byte[] data = new byte[size];
 
 			var s = Encoding.ASCII.GetBytes(text);
 			for (int i = 0; i < text.Length; ++i)

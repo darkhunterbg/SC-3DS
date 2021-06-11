@@ -406,7 +406,7 @@ namespace DataManager.Panels
 
 					if (edited)
 					{
-						instr.Text = instr.Instruction.Serialize(instr.Parameters);
+						instr.Text = instr.Instruction.StringSerialize(instr.Parameters);
 					}
 				}
 
@@ -457,7 +457,7 @@ namespace DataManager.Panels
 
 				for (int j = 0; j < view.Instruction.Parameters.Count; ++j)
 				{
-					var paramObj = view.Instruction.Parameters[j].Parse(split[j + 1], Selected, out view.Valid);
+					var paramObj = view.Instruction.Parameters[j].Parse(split[j + 1],  out view.Valid);
 
 					if (!view.Valid)
 						break;

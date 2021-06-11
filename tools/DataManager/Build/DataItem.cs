@@ -17,6 +17,7 @@ namespace DataManager.Build
 		Frames = 3,
 		Sprites = 4,
 		AnimClips = 5,
+		AnimInstructions = 6,
 	}
 
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
