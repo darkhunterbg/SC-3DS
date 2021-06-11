@@ -198,7 +198,7 @@ PublishScripts/
 # The packages folder can be ignored because of Package Restore
 **/[Pp]ackages/*
 # except build/, which is used as an MSBuild target.
-!**/[Pp]ackages/build/
+#!**/[Pp]ackages/build/
 # Uncomment if necessary however generally it will be regenerated when needed
 #!**/[Pp]ackages/repositories.config
 # NuGet v3's project.json files produces more ignorable files
@@ -361,7 +361,7 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-build/
+/build/
 tmp/
 gfxbuild/
 bin/
@@ -370,8 +370,8 @@ bin/
 *.elf
 *.smdh
 
-mpq/
-assets_extracted/
+/mpq/
+/assets_extracted/
 /SC.cia
-assets/atlases/
-assets/data/*.bin
+/assets/atlases/
+/assets/data/*.bin
