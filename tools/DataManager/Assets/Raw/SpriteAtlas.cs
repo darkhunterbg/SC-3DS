@@ -1,4 +1,5 @@
 ﻿using CsvHelper.Configuration.Attributes;
+using DataManager.Build;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -45,18 +46,17 @@ namespace DataManager.Assets
 		}
 	}
 
+	[BinaryData(DataItemType.Atlases)]
 	public class SpriteSubAtlas
 	{
-		[Index(0)]
+		[Index(0),Binary(BinaryType.String, 32)]
 		public string AtlasName { get; set; }
 
-		[Index(1)]
+		[Index(1), Binary(BinaryType.UInt, 2)]
 		public int AtlasIndex { get; set; }
 
 		[Ignore]
 		public string FullName => $"{AtlasName}_{AtlasIndex}";
-
-
 
 		public List<ImageFrameAtlasData> Images { get;  set; } = new List<ImageFrameAtlasData>();
 	}

@@ -374,3 +374,4 @@ mpq/
 assets_extracted/
 /SC.cia
 assets/atlases/
+assets/data/*.bin

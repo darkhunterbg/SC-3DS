@@ -1,4 +1,5 @@
 ﻿using CsvHelper.Configuration.Attributes;
+using DataManager.Build;
 using DataManager.Gameplay;
 using System;
 using System.Collections.Generic;
@@ -8,19 +9,23 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
+	[BinaryData(DataItemType.AnimClips)]
 	public class SpriteAnimClipAsset : Asset
 	{
+		[Binary(BinaryType.String, 32)]
 		[Index(0), TypeConverter(typeof(Asset.AssetConverter))]
 		public SpriteAsset Sprite { get; set; }
 
 		[Index(1)]
 		[DefaultEditor]
+		[Binary(BinaryType.UInt, 1)]
 		public AnimationType Type { get; set; }
 
 		[Index(2), Name("Instructions")]
 		public string InstructionsText { get; set; }
 
 		[Ignore]
+#warning TODO: Serialize Instructions
 		public List<string> Instructions { get; set; } = new List<string>();
 
 		public override string AssetName => $"{Sprite.Name}:{Type}";

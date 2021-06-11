@@ -1,4 +1,5 @@
 ﻿using CsvHelper.Configuration.Attributes;
+using DataManager.Build;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
+	[BinaryData(DataItemType.Sprites)]
 	public class SpriteAsset : Asset, ITreeViewItem
 	{
 		public override string AssetName => Name;
@@ -32,15 +34,18 @@ namespace DataManager.Assets
 		public string Path { get { return Name; } set { Name = value; } }
 
 		[Index(0)]
+		[Binary(BinaryType.String, 32)]
 		public string Name { get; set; }
 
 		[Index(1)]
 		[DefaultEditor]
 		[TypeConverter(typeof(ImageListRef.CsvConverter))]
+		[Binary(BinaryType.String, 32)]
 		public ImageListRef Image { get; set; } = ImageListRef.None;
 
 		[Index(2)]
 		[DefaultEditor]
+		[Binary(BinaryType.Bool, 1)]
 		public bool IsRotating { get; set; }
 
 		[Ignore]
@@ -55,7 +60,7 @@ namespace DataManager.Assets
 		{
 			var clone = base.Clone() as SpriteAsset;
 			clone.Clips = Clips.Select(s => s.Clone() as SpriteAnimClipAsset).ToList();
-			foreach (var c in clone.Clips) 
+			foreach (var c in clone.Clips)
 				c.Sprite = clone;
 
 			AppGame.AssetManager.GetAssets<SpriteAnimClipAsset>().AddRange(clone.Clips);

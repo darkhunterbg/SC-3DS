@@ -102,6 +102,7 @@ namespace DataManager
 				catch (Exception ex)
 				{
 					this.ex = ex;
+					System.Diagnostics.Debugger.Break();
 				}
 				completed = true;
 			}).ConfigureAwait(false);

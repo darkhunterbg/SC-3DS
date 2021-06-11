@@ -2,6 +2,7 @@
 using CsvHelper;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
+using DataManager.Build;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -126,6 +127,11 @@ namespace DataManager.Assets
 		public readonly ImageList Image;
 
 		public static readonly ImageListRef None = new ImageListRef(string.Empty,null);
+
+		public override string ToString()
+		{
+			return Key;
+		}
 
 		public ImageListRef( ImageList image)
 		{

@@ -3,6 +3,7 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using CsvHelper.Configuration.Attributes;
 using CsvHelper.TypeConversion;
+using DataManager.Build;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,33 +14,43 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
+	[BinaryData(DataItemType.Frames)]
 	public class ImageFrameAtlasData
 	{
 		[Index(0), Name("Image")]
+		[Binary(BinaryType.String, 64)]
 		public string ImageListName { get; set; }
 
 		[Index(1), Name("Frame")]
-		public int FrameIndex { get;  set; }
+		[Binary(BinaryType.UInt, 2)]
+		public int FrameIndex { get; set; }
 
 		[Index(2), Name("X")]
+		[Binary(BinaryType.Int, 2)]
 		public int XOffset { get; set; }
 
 		[Index(3), Name("Y")]
+		[Binary(BinaryType.Int, 2)]
 		public int YOffset { get; set; }
 
 		[Index(2), Name("Width")]
+		[Binary(BinaryType.UInt, 2)]
 		public int Width { get; set; }
 
 		[Index(3), Name("Height")]
+		[Binary(BinaryType.UInt, 2)]
 		public int Height { get; set; }
 
 		[Index(4), Name("Atlas")]
+		[Binary(BinaryType.String, 32)]
 		public string AtlasName { get; set; }
 
 		[Index(5), Name("AtlasX")]
+		[Binary(BinaryType.UInt, 2)]
 		public int AtlasX { get; set; }
 
 		[Index(6), Name("AtlasY")]
+		[Binary(BinaryType.UInt, 2)]
 		public int AtlasY { get; set; }
 
 		public ImageFrameAtlasData(ImageFrame frame, Vector2 atlasPos)
@@ -108,7 +119,7 @@ namespace DataManager.Assets
 
 		public static readonly ImageFrameRef None = new ImageFrameRef(string.Empty, null);
 
-		public ImageFrameRef( ImageFrame frame)
+		public ImageFrameRef(ImageFrame frame)
 		{
 			Frame = frame;
 			Key = $"{frame.ImageListName}:{frame.FrameIndex}";
@@ -136,7 +147,7 @@ namespace DataManager.Assets
 				var asset = AppGame.AssetManager.ImageLists.FirstOrDefault(f => f.Key == text);
 				ImageFrame frame = null;
 				if (asset != null)
-					frame =  asset.Frames.Skip(index).FirstOrDefault();
+					frame = asset.Frames.Skip(index).FirstOrDefault();
 
 				return new ImageFrameRef(text, frame);
 			}
