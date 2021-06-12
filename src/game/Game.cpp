@@ -62,6 +62,9 @@ void Game::FrameEnd() {
 void Game::Start() {
 
 	JobSystem::Init();
+
+	AssetLoader::LoadDatabase();
+
 	SystemFont12 = AssetLoader::LoadFont("font.bcfnt",12);
 	SystemFont10 = AssetLoader::LoadFont("font.bcfnt", 10);
 	SystemFont8 = AssetLoader::LoadFont("font.bcfnt", 8);

@@ -3,13 +3,13 @@
 #include "MathLib.h"
 #include "Color.h"
 
-typedef void* Texture;
+typedef void* TextureId;
 typedef void* Surface;
 
 struct Sprite {
 	Rectangle16 rect;
 	Vector2 uv[4];
-	Texture textureId;
+	TextureId textureId;
 
 	inline Rectangle GetRect() const {
 		return { Vector2Int(rect.position), Vector2Int(rect.size) };
@@ -29,7 +29,7 @@ enum class DrawCommandType : uint8_t {
 };
 
 struct DrawCommand {
-	Texture texture;
+	TextureId texture;
 	uint16_t start;
 	uint16_t count;
 	DrawCommandType type;

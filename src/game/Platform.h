@@ -29,14 +29,14 @@ public:
 
 	// ================ File System ======================
 	
-	static const SpriteAtlas* LoadAtlas(const char* path);
+	static TextureId LoadTexture(const char* path, Vector2Int16& outSize);
 	static const Font* LoadFont(const char* path, int size);
 	static FILE* OpenAsset(const char* path);
 	static std::string GetUserDirectory();
 
 	// =============== Graphics =========================
 
-	static Sprite NewSprite(Texture texture, Rectangle16 src);
+	static Sprite NewSprite(TextureId texture, Rectangle16 src);
 	static void DrawOnScreen(ScreenId screen);
 	static void DrawOnSurface(Surface surface);
 	static void ChangeBlendingMode(BlendMode mode);

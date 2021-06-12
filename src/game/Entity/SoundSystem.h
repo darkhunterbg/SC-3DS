@@ -8,7 +8,7 @@
 class EntityManager;
 class Camera;
 struct AudioChannelState;
-class RaceDef;
+struct RaceDef;
 
 class SoundSystem {
 	

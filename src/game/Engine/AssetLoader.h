@@ -11,14 +11,15 @@ class AssetLoader {
 
 	enum class AssetType : uint8_t {
 		Unknown = 0,
-		SpriteAtlas = 1,
+		Texture = 1,
 		Font = 2,
 		AudioClip = 3,
 		AudioStream = 4,
+		Database = 5
 	};
 
-	std::array< const char*, 5> AssetTypeName = {
-		   "Unknown", "SpriteAtlas", "Font", "AudioClip", "AudioStream"
+	std::array< const char*, 6> AssetTypeName = {
+		   "Unknown", "Texture", "Font", "AudioClip", "AudioStream", "Database"
 	};
 
 	struct AssetEntry {
@@ -48,9 +49,12 @@ private:
 
 public:
 	
+	static void LoadDatabase();
 
-	static const SpriteAtlas* LoadAtlas(const char* path);
+	static const Texture* LoadTexture(const char* path);
 	static const Font* LoadFont(const char* path, int size);
 	static AudioClip LoadAudioClip(const char* path);
 	static AudioStream* LoadAudioStream(const char* path);
+
+	static const SpriteAtlas* LoadAtlas(const char* path);
 };

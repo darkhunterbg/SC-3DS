@@ -9,6 +9,21 @@
 
 #include "Engine/GraphicsPrimitives.h"
 
+class Texture {
+private:
+	TextureId id;
+	Vector2Int16 size;
+	std::string name;
+public:
+	Texture(const std::string& name, Vector2Int16 size, TextureId id) :
+		id(id), size(size), name(name)   {}
+
+	inline const std::string& GetName() const {
+		return name;
+	}
+	inline const Vector2Int16& GetSize() const { return size; };
+	inline TextureId GetTextureId() const { return id; }
+};
 
 class SpriteAtlas {
 private:

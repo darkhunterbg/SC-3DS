@@ -2,33 +2,38 @@
 #include "Platform.h"
 #include "Debug.h"
 #include "../Loader/Wave.h"
+#include "../Loader/BinaryData.h"
 
 static constexpr const int AudioStreamBufferSize = 4096;
 static AudioClip LoadAudioClipFromFile(const char* path);
 static AudioStream* LoadAudioStreamFromFile(const char* path);
 
+static constexpr const char* DataFile = "data.bin";
+
 static std::hash<int> intHasher;
 
 AssetLoader AssetLoader::instance;
 
-const SpriteAtlas* AssetLoader::LoadAtlas(const char* path)
+const Texture* AssetLoader::LoadTexture(const char* path)
 {
 	std::string p = path;
 	AssetId id = instance.hasher(p);
 	AssetEntry& e = instance.loadedAssets[id];
 
 	if (e.id == 0) {
-		e.data = Platform::LoadAtlas(p.data());
-		e.type = AssetType::SpriteAtlas;
+		Vector2Int16 size;
+		TextureId texId = Platform::LoadTexture(p.data(),size);
+		e.data = new Texture(p, size, texId);
+		e.type = AssetType::Texture;
 		e.id = id;
 	}
 	else {
-		if (e.type != AssetType::SpriteAtlas)
+		if (e.type != AssetType::Texture)
 			EXCEPTION("Tried to load '%s' as %i but it was %i!",
-				p.data(), GetAssetTypeName(AssetType::SpriteAtlas), GetAssetTypeName(e.type));
+				p.data(), GetAssetTypeName(AssetType::Texture), GetAssetTypeName(e.type));
 	}
 
-	return  (const SpriteAtlas*)e.data;
+	return (const Texture*)e.data;
 }
 
 const Font* AssetLoader::LoadFont(const char* path, int size)
@@ -52,7 +57,6 @@ const Font* AssetLoader::LoadFont(const char* path, int size)
 	return (const Font*)e.data;
 }
 
-
 AudioClip AssetLoader::LoadAudioClip(const char* path)
 {
 	std::string p = path;
@@ -72,7 +76,6 @@ AudioClip AssetLoader::LoadAudioClip(const char* path)
 
 	return  *(const AudioClip*)e.data;
 }
-
 
 AudioStream* AssetLoader::LoadAudioStream(const char* path)
 {
@@ -95,6 +98,10 @@ AudioStream* AssetLoader::LoadAudioStream(const char* path)
 	return  (AudioStream*)e.data;
 }
 
+const SpriteAtlas* AssetLoader::LoadAtlas(const char* path)
+{
+	EXCEPTION("Oboslete function: LoadAtlas");
+}
 
 static uint16_t audioClipId = 0;
 
@@ -121,6 +128,7 @@ static AudioClip LoadAudioClipFromFile(const char* path) {
 	return clip;
 
 }
+
 static AudioStream* LoadAudioStreamFromFile(const char* path) {
 	FILE* f = Platform::OpenAsset(path);
 
@@ -135,4 +143,30 @@ static AudioStream* LoadAudioStreamFromFile(const char* path) {
 	AudioStream* stream = new AudioStream(info, AudioStreamBufferSize, f);
 
 	return stream;
+}
+
+void AssetLoader::LoadDatabase()
+{
+	FILE* f = Platform::OpenAsset(DataFile);
+
+	if (!f)
+		EXCEPTION("Failed to load file %s", DataFile);
+
+	std::string p = DataFile;
+	AssetId id = instance.hasher(p);
+	AssetEntry& e = instance.loadedAssets[id];
+
+	GameDatabase* db = new GameDatabase(f);
+
+	e.id = id;
+	e.type = AssetType::Database;
+	e.data = db;
+
+	for (const AtlasDef& atlases : db->Atlases) {
+		std::string name = atlases.GetAtlasName();
+		name = "atlases\\" + name;
+		LoadTexture(name.data());
+	}
+
+	fclose(f);
 }

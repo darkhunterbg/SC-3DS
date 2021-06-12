@@ -375,3 +375,4 @@ bin/
 /SC.cia
 /assets/atlases/
 /assets/data/*.bin
+/cooked_assets/

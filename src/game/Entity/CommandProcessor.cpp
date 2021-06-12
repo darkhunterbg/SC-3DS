@@ -93,8 +93,6 @@ void CommandProcessor::CancelBuildQueue(PlayerId player, const std::vector<Entit
 
 void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 {
-	int add = sizeof(PlayerCommand);
-
 	for (int i = lastExecuted; i < commands.size(); ++i) {
 		const PlayerCommand& cmd = commands[i];
 
@@ -164,8 +162,6 @@ void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 		}
 
 	}
-
-	bool record = lastExecuted < commands.size();
 
 	lastExecuted = commands.size();
 }

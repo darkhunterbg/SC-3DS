@@ -44,61 +44,30 @@ constexpr Uint8 SDL_FloatToUint8(float x) {
 
 static 	void AudioCallback(void* userdata, Uint8* stream, int len);
 
-GPU_Image* LoadTexture(const std::string& path, Vector2Int& size) {
-	GPU_Image* tex = GPU_LoadImage(path.data());
+
+TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize) {
+
+	std::filesystem::path p = assetDir;
+	p.append(path);
+	p.concat(".png");
+
+	GPU_Image* tex = GPU_LoadImage(p.string().data());
 
 	if (tex == nullptr) {
 		auto error = SDL_GetError();
 		EXCEPTION("Load texture %s failed with error %i.", path.data(), error);
 	}
 
-	size = { tex->w, tex->h };
+	outSize.x = (short)tex->w;
+	outSize.y = (short)tex->h;
 
 	return tex;
-}
-
-const SpriteAtlas* Platform::LoadAtlas(const char* path) {
-
-	std::filesystem::path p = assetDir;
-	p.append("gfx");
-	p.append(path);
-	p.replace_extension("t3s");
-
-	std::ifstream file(p);
-
-	if (!file.is_open())
-	{
-		EXCEPTION("Open atlas %s failed!", p.generic_string().data());
-	}
-
-	SpriteAtlas* asset = new SpriteAtlas();
-
-	std::string str;
-	std::getline(file, str);
-
-	while (std::getline(file, str)) {
-		std::filesystem::path f = assetDir;
-		f.append("gfx");
-		f.append(str);
-
-		Vector2Int size;
-		GPU_Image* tex = LoadTexture(f.generic_string(), size);
-		if (tex == nullptr)
-		{
-			delete asset;
-			return nullptr;
-		}
-		Rectangle16 rect = { {0,0},Vector2Int16(size) };
-		Sprite s = { rect ,  {{0,0},{1,0}, {0,1},{1,1} }, tex };
-		asset->AddSprite(s);
-	}
-
-	return asset;
+	
 }
 const Font* Platform::LoadFont(const char* path, int size) {
 
 	std::filesystem::path fullPath = assetDir;
-	fullPath.append("gfx").append(path).replace_extension("ttf");
+	fullPath = fullPath.parent_path().append("gfx").append(path).replace_extension("ttf");
 
 	FC_Font* font = FC_CreateFont();
 	auto lf = FC_LoadFont(font, fullPath.generic_string().data(), size, FC_MakeColor(255, 255, 255, 255), TTF_STYLE_NORMAL);
@@ -164,7 +133,7 @@ RenderSurface Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering) {
 	s.uv[3] = { 1,1 };
 	return { surface , s };
 }
-Sprite Platform::NewSprite(Texture texture, Rectangle16 src) {
+Sprite Platform::NewSprite(TextureId texture, Rectangle16 src) {
 	GPU_Image* img = (GPU_Image*)texture;
 	Vector2 start = Vector2(src.position) / Vector2(img->w, img->h);
 	Vector2 end = Vector2(src.GetMax()) / Vector2(img->w, img->h);

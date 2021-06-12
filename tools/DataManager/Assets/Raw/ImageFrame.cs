@@ -34,10 +34,6 @@ namespace DataManager.Assets
 		[Binary(BinaryType.UInt, 2)]
 		public int Height { get; set; }
 
-		[Index(4), Name("Atlas")]
-		[Binary(BinaryType.UInt, 1)]
-		public int AtlasId { get; set; }
-
 		[Index(5), Name("AtlasX")]
 		[Binary(BinaryType.UInt, 2)]
 		public int AtlasX { get; set; }
@@ -46,14 +42,18 @@ namespace DataManager.Assets
 		[Binary(BinaryType.UInt, 2)]
 		public int AtlasY { get; set; }
 
+		[Index(4), Name("Atlas")]
+		[Binary(BinaryType.UInt, 1)]
+		public int AtlasId { get; set; }
+
 		[Ignore]
 		public ImageFrame Frame { get; private set; }
 
 		public ImageFrameAtlasData(ImageFrame frame, Vector2 atlasPos)
 		{
 			Frame = frame;
-			XOffset = XOffset;
-			YOffset = YOffset;
+			XOffset = frame.XOffset;
+			YOffset = frame.YOffset;
 			Width = (int)frame.Size.X;
 			Height = (int)frame.Size.Y;
 			AtlasX = (int)atlasPos.X;

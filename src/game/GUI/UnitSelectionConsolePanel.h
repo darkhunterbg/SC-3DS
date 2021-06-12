@@ -9,9 +9,9 @@
 #include <vector>
 
 class EntityManager;
-class UnitComponent;
-class UnitDataComponent;
-class UnitHealthComponent;
+struct UnitComponent;
+struct UnitDataComponent;
+struct UnitHealthComponent;
 
 class UnitSelectionConsolePanel {
 

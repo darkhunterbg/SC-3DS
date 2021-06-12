@@ -11,7 +11,7 @@ class GraphicsRenderer {
 
 private:
 
-	Texture texture = nullptr;
+	TextureId texture = nullptr;
 	DrawCommandType cmdType = DrawCommandType::None;
 	unsigned vbPos = 0;
 	Vertex* vb = nullptr;
@@ -21,8 +21,8 @@ private:
 
 	void AddVertex(const Vector2& pos, const Vector2& uv, const Color32& c);
 
-	DrawCommand& NewDrawCommand(Texture texture);
-	DrawCommand& GetDrawCommand(Texture texture);
+	DrawCommand& NewDrawCommand(TextureId texture);
+	DrawCommand& GetDrawCommand(TextureId texture);
 	DrawCommand& GetDrawCommand(DrawCommandType type);
 
 	GraphicsRenderer() {}
@@ -88,5 +88,5 @@ public:
 
 	static void ClearCurrentSurface(Color color);
 
-	static Sprite NewSprite(Texture texture, const Rectangle16& rect);
+	static Sprite NewSprite(TextureId texture, const Rectangle16& rect);
 };

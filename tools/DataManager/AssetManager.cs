@@ -62,9 +62,11 @@ namespace DataManager
 
 		public static readonly string GameDataDir = $"{AssetsDir}data\\";
 
-		public static readonly string BuildDataFile = $"{GameDataDir}data.bin";
+		public static readonly string CookedAssetsDir = $"..\\..\\cooked_assets\\";
 
-		public static readonly string SpriteAtlasOutDir = $"{AssetsDir}atlases\\";
+		public static readonly string BuildDataFile = $"{CookedAssetsDir}data.bin";
+		public static readonly string SpriteAtlasOutDir = $"{CookedAssetsDir}atlases\\";
+
 		public static readonly string SpriteAtlas3DSBuildDir = "..\\..\\gfxbuild\\atlases\\";
 		public static readonly string tex3dsPath = "C:\\devkitPro\\tools\\bin\\tex3ds.exe";
 

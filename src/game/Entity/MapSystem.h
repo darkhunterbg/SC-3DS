@@ -12,7 +12,7 @@
 class EntityManager;
 class Camera;
 class PlayerVision;
-class EntityChangedData;
+struct EntityChangedData;
 
 class MapSystem {
 	struct MinimapData {

@@ -73,7 +73,7 @@ class RenderSystem {
 			worldPos.clear();
 			offset.clear();
 			outBB.clear();
-			depth.capacity();
+			depth.clear();
 		}
 		inline size_t size() {
 			return outPos.size();

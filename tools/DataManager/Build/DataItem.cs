@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DataManager.Build
 {
-	public enum DataItemType : byte
+	public enum DataItemType : uint
 	{
 		None = 0,
 		Atlases = 1,
@@ -31,13 +31,12 @@ namespace DataManager.Build
 		}
 	}
 
-	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
+	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 4)]
 	struct DataItemHeader
 	{
 		public DataItemType Type;
 		public uint Count;
 		public uint Offset;
-
 
 		public static int Size => Marshal.SizeOf<DataItemHeader>();
 

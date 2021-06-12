@@ -47,7 +47,7 @@ DrawCommand& GraphicsRenderer::GetDrawCommand(DrawCommandType type)
 	return instance.drawCommands.back();
 }
 
-DrawCommand& GraphicsRenderer::NewDrawCommand(Texture texture)
+DrawCommand& GraphicsRenderer::NewDrawCommand(TextureId texture)
 {
 	instance.drawCommands.push_back({ texture , (uint16_t)instance.vbPos,0 ,DrawCommandType::TexturedTriangle });
 	instance.texture = texture;
@@ -56,7 +56,7 @@ DrawCommand& GraphicsRenderer::NewDrawCommand(Texture texture)
 	return instance.drawCommands.back();
 }
 
-DrawCommand& GraphicsRenderer::GetDrawCommand(Texture texture)
+DrawCommand& GraphicsRenderer::GetDrawCommand(TextureId texture)
 {
 	if (instance.texture != texture)
 	{
@@ -258,7 +258,7 @@ void GraphicsRenderer::ClearCurrentSurface(Color color)
 	Platform::ClearBuffer(color);
 }
 
-Sprite GraphicsRenderer::NewSprite(Texture texture, const Rectangle16& rect)
+Sprite GraphicsRenderer::NewSprite(TextureId texture, const Rectangle16& rect)
 {
 	return  Platform::NewSprite(texture , rect);
 }

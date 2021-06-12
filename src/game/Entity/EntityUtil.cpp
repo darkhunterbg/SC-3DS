@@ -224,7 +224,7 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 	mapBB.size = mapBB.size.Floor(2, 2);
 	mapBB.position -= mapBB.size / 2;
 
-	if (playerId == 0 & def.IsResourceContainer) {
+	if (playerId == 0 && def.IsResourceContainer) {
 		em.MapObjectArchetype.MinimapColorId.NewComponent(e, 15);
 	}
 	else {

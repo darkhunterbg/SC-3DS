@@ -9,7 +9,7 @@
 #include <array>
 
 class EntityManager;
-class AbilityDef;
+struct AbilityDef;
 
 class UnitCommandsPanel {
 private:

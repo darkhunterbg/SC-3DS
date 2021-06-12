@@ -16,6 +16,14 @@ namespace DataManager.Assets
 		[Index(0), TypeConverter(typeof(Asset.AssetConverter))]
 		public SpriteAsset Sprite { get; set; }
 
+		[Ignore]
+		[Binary(BinaryType.UInt, 4)]
+		public uint _InstructionStart { get; set; }
+
+		[Ignore]
+		[Binary(BinaryType.UInt, 1)]
+		public int InstructionCount => Instructions.Count;
+
 		[Index(1)]
 		[DefaultEditor]
 		[Binary(BinaryType.UInt, 1)]
@@ -24,13 +32,6 @@ namespace DataManager.Assets
 		[Index(2), Name("Instructions")]
 		public string InstructionsText { get; set; }
 
-		[Ignore]
-		[Binary(BinaryType.UInt, 4)]
-		public uint _InstructionStart { get; set; }
-
-		[Ignore]
-		[Binary(BinaryType.UInt, 1)]
-		public int InstructionCount => Instructions.Count;
 
 		[Ignore]
 #warning TODO: Serialize Instructions

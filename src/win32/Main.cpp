@@ -50,6 +50,7 @@ int main(int argc, char** argv) {
 	GPU_UpdateImageBytes(white, &rect, data, sizeof(data));
 
 	assetDir = std::filesystem::current_path().parent_path();
+	assetDir = assetDir.append("cooked_assets");
 	userDir = std::filesystem::current_path();
 	userDir = userDir.append("User");
 
