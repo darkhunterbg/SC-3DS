@@ -42,7 +42,8 @@ struct AnimClipDef {
 };
 
 union InstructionParams {
-	uint8_t byte[4];
+	uint8_t bytes[4];
+	uint16_t shorts[2];
 };
 
 struct AnimInstructionDef {

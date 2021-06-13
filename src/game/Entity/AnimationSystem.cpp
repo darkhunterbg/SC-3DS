@@ -1,6 +1,7 @@
 #include "AnimationSystem.h"
 #include "../Data/AssetDataDefs.h"
 #include "EntityManager.h"
+#include "EntityUtil.h"
 
 typedef void(*InstructionAction)(const InstructionParams& params, EntityId id, EntityManager& em);
 
@@ -23,7 +24,9 @@ void AnimationSystem::TickAnimations(EntityManager& em)
 
 			if (state.wait > 0)
 				--state.wait;
-			else {
+
+
+			if (state.wait == 0) {
 				animData.entities.push_back(id);
 
 				animData.components.push_back(em.AnimationArchetype.AnimationComponents.GetComponent(id));
@@ -46,7 +49,7 @@ void AnimationSystem::RunAnimations(EntityManager& em)
 		const auto& anim = animData.components[i];
 
 
-		while (state.wait != 0 ||  
+		while (state.wait == 0 &&
 			state.instructionId < anim.instructionEnd)
 		{
 			const auto& instr = instructionCache[state.instructionId];
@@ -54,27 +57,42 @@ void AnimationSystem::RunAnimations(EntityManager& em)
 
 			++state.instructionId;
 		}
+
+		if (state.instructionId == anim.instructionEnd)
+			state.instructionId = anim.instructionStart;
 	}
 }
 
 
 static void Frame(const InstructionParams& params, EntityId id, EntityManager& em) {
+	auto& state = em.AnimationArchetype.StateComponents.GetComponent(id);
+	state.animFrame = params.shorts[0];
 
+	EntityUtil::UpdateAnimationVisual(id);
 }
 static void Wait(const InstructionParams& params, EntityId id, EntityManager& em) {
-
+	em.AnimationArchetype.StateComponents.GetComponent(id).wait =
+		params.shorts[0];
 }
 static void WaitRandom(const InstructionParams& params, EntityId id, EntityManager& em) {
 
+	uint16_t size = params.shorts[1] - params.shorts[0];
+	uint16_t i = (std::rand() % size) + params.shorts[1];
+	em.AnimationArchetype.StateComponents.GetComponent(id).wait = i;
 }
 static void Face(const InstructionParams& params, EntityId id, EntityManager& em) {
-
+	EntityUtil::SetOrientation(id, (int)params.bytes[0]);
+	EntityUtil::UpdateAnimationVisual(id);
 }
 static void TurnCW(const InstructionParams& params, EntityId id, EntityManager& em) {
-
+	int orientation = em.OrientationComponents.GetComponent(id);
+	EntityUtil::SetOrientation(id, orientation + (int)params.bytes[0]);
+	EntityUtil::UpdateAnimationVisual(id);
 }
 static void TurnCCW(const InstructionParams& params, EntityId id, EntityManager& em) {
-
+	int orientation = em.OrientationComponents.GetComponent(id);
+	EntityUtil::SetOrientation(id, orientation - (int)params.bytes[0]);
+	EntityUtil::UpdateAnimationVisual(id);
 }
 
 static InstructionAction instructionMap[] =

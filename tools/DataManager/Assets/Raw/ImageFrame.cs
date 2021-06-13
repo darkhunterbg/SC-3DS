@@ -84,7 +84,7 @@ namespace DataManager.Assets
 
 		public int XOffset => (int)Position.X;
 
-		public int YOffset => (int)Position.X;
+		public int YOffset => (int)Position.Y;
 
 		public Vector2 GetOffset(bool hFlip = false)
 		{

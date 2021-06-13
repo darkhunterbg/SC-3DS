@@ -52,6 +52,10 @@ public:
 	static void CopyFlag(EntityId from, EntityId to, ComponentFlags flag);
 
 	static uint8_t GetOrientationToPosition(EntityId id, Vector2Int16 pos);
+
+	static void SetOrientation(EntityId id, int orientation);
+
+	static void UpdateAnimationVisual(EntityId id);
 };
 
 class UnitEntityUtil {

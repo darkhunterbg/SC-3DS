@@ -135,6 +135,7 @@ struct AnimationComponent {
 
 struct AnimationStateComponent {
 	uint32_t instructionId;
+	uint16_t animFrame = 0;
 	uint8_t wait;
 };
 

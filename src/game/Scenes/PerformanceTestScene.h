@@ -10,5 +10,5 @@ public:
 	virtual void Draw() override;
 private:
 	Camera camera;
-	EntityManager entityManager;
+	EntityManager em;
 };

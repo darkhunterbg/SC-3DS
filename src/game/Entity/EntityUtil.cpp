@@ -88,6 +88,31 @@ uint8_t EntityUtil::GetOrientationToPosition(EntityId id, Vector2Int16 target) {
 	return result;
 }
 
+void EntityUtil::SetOrientation(EntityId id, int orientation)
+{
+	EntityManager& em = GetManager();
+
+	if (orientation < 0)
+		orientation = 32 + (orientation % 32);
+	else
+		orientation %= 32;
+
+	em.OrientationComponents.GetComponent(id) = (uint8_t)orientation;
+}
+
+void EntityUtil::UpdateAnimationVisual(EntityId id)
+{
+	EntityManager& em = GetManager();
+	const uint8_t& orientation = em.OrientationComponents.GetComponent(id);
+	const auto& anim = em.AnimationArchetype.AnimationComponents.GetComponent(id);
+	const auto& state = em.AnimationArchetype.StateComponents.GetComponent(id);
+
+	unsigned frameId = state.animFrame;
+	bool flip = orientation > 16;
+	frameId += flip ? 32 - orientation : orientation;
+	SetImageFrame(id, *anim.baseImage, frameId, flip);
+}
+
 
 void EntityUtil::CopyFlag(EntityId from, EntityId to, ComponentFlags flag) {
 	EntityManager& em = GetManager();
