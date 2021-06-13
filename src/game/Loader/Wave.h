@@ -5,7 +5,7 @@
 #include "../Assets.h"
 #include <stdio.h>
 
-#pragma pack(1)
+#pragma pack(push,1)
 struct  WaveHeader
 {
 	/* RIFF Chunk Descriptor */
@@ -25,11 +25,11 @@ struct  WaveHeader
 
 };
 
-#pragma pack(1)
 struct RiffSubchunkHeader {
 	char SubchunkID[4];
 	uint32_t  SubchunkSize;
 };
+#pragma pack(pop)
 
 class WaveLoader {
 private:

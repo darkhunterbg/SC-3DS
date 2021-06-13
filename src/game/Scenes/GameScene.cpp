@@ -5,7 +5,6 @@
 #include "../Engine/AudioManager.h"
 #include "../Entity/EntityManager.h"
 #include "../Profiler.h"
-#include "../Data/UnitDatabase.h"
 #include "../Data/RaceDatabase.h"
 #include "../Entity/EntityUtil.h"
 
@@ -25,8 +24,6 @@ void GameScene::Start() {
 	camera.Position = { 0,0 };
 	camera.Size = { 400,240 };
 	camera.Limits = { {0,0,}, size };
-
-	UnitDatabase::LoadAllUnitResources();
 
 	entityManager = new EntityManager();
 	//entityManager->DrawBoundingBoxes = true;
@@ -57,7 +54,7 @@ void GameScene::Start() {
 	view->SetPlayer(1, race);
 
 
-	UnitEntityUtil::NewUnit(UnitDatabase::MineralField1, 0,
+	/*UnitEntityUtil::NewUnit(UnitDatabase::MineralField1, 0,
 		Vector2Int16(128, 256));
 
 	for (int i = 0; i < 1; ++i) {
@@ -66,7 +63,7 @@ void GameScene::Start() {
 	}
 
 	EntityId e = UnitEntityUtil::NewUnit(UnitDatabase::CommandCenter, 1,
-		Vector2Int16(256, 128));
+		Vector2Int16(256, 128));*/
 
 
 
@@ -79,9 +76,9 @@ void GameScene::Start() {
 	for (int y = 2; y > 0; --y) {
 		for (int x = 1; x > 0; --x) {
 			Color c = color[(i) % 12];
-			auto& def = *UnitDatabase::Units[1];
-			 UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
-				Vector2Int16(Vector2Int{ x * 32 + 48,y * 32 + 48 }));
+			//auto& def = *UnitDatabase::Units[1];
+			// UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
+			//	Vector2Int16(Vector2Int{ x * 32 + 48,y * 32 + 48 }));
 
 			i += 1;
 

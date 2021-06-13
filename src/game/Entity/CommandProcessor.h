@@ -4,7 +4,7 @@
 #include "../MathLib.h"
 #include "../Entity/Entity.h"
 #include "../Data/AbilityDef.h"
-
+#include "../Data/UnitDef.h"
 
 #include <array>
 #include <vector>

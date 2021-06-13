@@ -9,10 +9,10 @@ void RaceDef::LoadResourses() {
 
 	CommandIconsLoad();
 
-	const SpriteAtlas* icons = AssetLoader::LoadAtlas("game_icons.t3x");
-	SupplyIcon = icons->GetSprite(SupplyIconId);
+	//const SpriteAtlas* icons = AssetLoader::LoadAtlas("game_icons.t3x");
+	//SupplyIcon = icons->GetSprite(SupplyIconId);
 
-	GasIcon = icons->GetSprite(GasIconId);
+	//GasIcon = icons->GetSprite(GasIconId);
 
 	for (auto& musicDef : GameMusic)
 		musicDef.Load();

@@ -33,6 +33,9 @@ private:
 public:
 	static void Init();
 	static void BufferDraw(std::vector<BatchDrawCommand>& cmd);
+
+	static void Draw(const Texture& texture, Vector2Int position, Color32 color = 0xFFFFFFFF);
+
 	static void Draw(const Sprite& sprite, Vector2Int position, Color32 color = 0xFFFFFFFF);
 	static void Draw(const Sprite& sprite, const Rectangle& dst, Color32 color = 0xFFFFFFFF);
 

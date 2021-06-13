@@ -1,16 +1,9 @@
 #include "Assets.h"
+#include "Data/AssetDataDefs.h"
+#include "Debug.h"
 
 #include "Platform.h"
 #include <stdio.h>
-
-
-SpriteAtlas::SpriteAtlas(int initialSize) {
-	sprites.reserve(initialSize);
-}
-
-void SpriteAtlas::AddSprite(const Sprite& sprite) {
-	sprites.push_back(sprite);
-}
 
 bool AudioStream::FillNextBuffer() {
 
@@ -65,21 +58,6 @@ int AudioStream::GetRemaining() const {
 	return info.GetTotalSize() - streamPos;
 }
 
-void AnimationClip::AddSpritesFromAtlas(const SpriteAtlas* atlas, int start, int count, Vector2Int offset)
-{
-	for (int i = 0; i < count; ++i) {
-		AddFrame({ atlas->GetSprite(start + i), Vector2Int16(offset) });
-	}
-}
-
-SpriteFrameAtlas::SpriteFrameAtlas(const SpriteAtlas* atlas)
-	:atlas(atlas)
-{
-	frames.reserve(atlas->GetSprites().Size());
-	for (const Sprite& s : atlas->GetSprites()) {
-		frames.push_back({ s,{0,0} });
-	}
-}
 
 void AnimationClip::AddFrameCentered(const SpriteFrame& frame, Vector2Int16 frameSize, bool hFlip) {
 	auto& f = frames[frameCount++] = frame;
@@ -93,9 +71,9 @@ void AnimationClip::AddFrameCentered(const SpriteFrame& frame, Vector2Int16 fram
 
 UnitAnimationClip::UnitAnimationClip() {
 	for (auto& sf : frames) {
-		sf.sprite.textureId = nullptr ;
-		sf.shadowSprite.textureId =  nullptr ;
-		sf.colorSprite.textureId = nullptr ;
+		sf.sprite.textureId = nullptr;
+		sf.shadowSprite.textureId = nullptr;
+		sf.colorSprite.textureId = nullptr;
 	}
 }
 uint8_t UnitAnimationClip::AddFrameCentered(const SpriteFrame& frame, Vector2Int16 frameSize, bool hFlip)
@@ -117,7 +95,7 @@ void UnitAnimationClip::AddShadowFrameCentered(uint8_t index, const SpriteFrame&
 	Vector2Int16 offset = frame.offset - frameSize / 2;
 	if (frames[index].hFlip)
 		offset.x = frameSize.x / 2 - frame.offset.x - frame.sprite.rect.size.x;
-	frames[index].shadowOffset = offset +additionalOffset;
+	frames[index].shadowOffset = offset + additionalOffset;
 }
 void UnitAnimationClip::AddColorFrame(uint8_t index, const SpriteFrame& frame)
 {
@@ -128,3 +106,29 @@ Vector2Int Font::MeasureString(const char* text) const
 {
 	return Platform::MeasureString(*this, text);
 }
+
+ImageFrame::ImageFrame(const Texture& texture, const ImageFrameDef& def)
+	:texture(&texture), offset(def.offset), size(def.size)
+{
+	uv[0] = Vector2(def.atlasOffset) / Vector2(texture.GetSize());
+	uv[1] = Vector2(def.atlasOffset + size) / Vector2(texture.GetSize());
+}
+
+
+Image::Image(const ImageFrame* frameStart, const ImageDef& def)
+	: name(def.name),
+	size(def.size),
+	frameStart(frameStart),
+	frameCount(def.frameCount)
+{
+
+}
+
+const ImageFrame& Image::GetFrame(unsigned index) const
+{
+	if (index >= frameCount)
+		EXCEPTION("Tried to get frame %i out of %i frames in image %s!", index, frameCount, name.data());
+
+	return frameStart[index];
+}
+

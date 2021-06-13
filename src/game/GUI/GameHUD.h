@@ -27,7 +27,6 @@ private:
 	UnitCommandsPanel commandsPanel;
 
 	const Font* font;
-	const SpriteAtlas* iconsAtlas;
 
 	Vector2 minimapUpscale;
 

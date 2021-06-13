@@ -5,6 +5,7 @@
 #include <string>
 #include <unordered_map>
 #include <array>
+#include "../Data/GameDatabase.h"
 
 class AssetLoader {
 	typedef std::size_t AssetId;
@@ -32,6 +33,8 @@ private:
 
 	std::hash<std::string> hasher;
 
+	GameDatabase* db = nullptr;
+
 	AssetLoader(const AssetLoader&) = delete;
 	AssetLoader& operator=(const AssetLoader&) = delete;
 	AssetLoader() {}
@@ -48,13 +51,14 @@ private:
 	}
 
 public:
-	
+	inline static GameDatabase& GetDatabase() {
+		return *instance.db;
+	}
+
 	static void LoadDatabase();
 
 	static const Texture* LoadTexture(const char* path);
 	static const Font* LoadFont(const char* path, int size);
 	static AudioClip LoadAudioClip(const char* path);
 	static AudioStream* LoadAudioStream(const char* path);
-
-	static const SpriteAtlas* LoadAtlas(const char* path);
 };

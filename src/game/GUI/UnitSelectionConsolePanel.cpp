@@ -292,11 +292,11 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 	GraphicsRenderer::DrawText(*Game::SystemFont12, pos + Vector2Int{ 68, 4 }, "Building", Colors::UILightGray);
 
 
-	const Sprite& pb = AssetLoader::LoadAtlas("game_gui.t3x")->GetSprite(0);
+	//const Sprite& pb = AssetLoader::LoadAtlas("game_gui.t3x")->GetSprite(0);
 
-	dst.position = pos + Vector2Int{ 38,24 };
-	dst.size = Vector2Int(pb.rect.size);
-	GraphicsRenderer::Draw(pb, dst);
+	//dst.position = pos + Vector2Int{ 38,24 };
+	//dst.size = Vector2Int(pb.rect.size);
+	//GraphicsRenderer::Draw(pb, dst);
 
 	dst.position += {3, 3};
 	dst.size = { 2,3 };

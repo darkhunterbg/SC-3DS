@@ -9,14 +9,20 @@
 
 #include "Engine/GraphicsPrimitives.h"
 
+struct ImageDef;
+struct ImageFrameDef;
+
 class Texture {
 private:
 	TextureId id;
 	Vector2Int16 size;
 	std::string name;
 public:
+	Texture(const Texture&) = delete;
+
+
 	Texture(const std::string& name, Vector2Int16 size, TextureId id) :
-		id(id), size(size), name(name)   {}
+		id(id), size(size), name(name) {}
 
 	inline const std::string& GetName() const {
 		return name;
@@ -25,17 +31,6 @@ public:
 	inline TextureId GetTextureId() const { return id; }
 };
 
-class SpriteAtlas {
-private:
-	std::vector<Sprite> sprites;
-public:
-	inline const Span<Sprite> GetSprites() const { return { sprites.data(),sprites.size() }; }
-	inline const Sprite& GetSprite(int pos) const { return sprites[pos]; };
-
-	SpriteAtlas(int initialSize = 0);
-
-	void AddSprite(const Sprite& sprite);
-};
 
 class Font {
 private:
@@ -52,6 +47,31 @@ public:
 	TFontType* GetFontId() const { return reinterpret_cast<TFontType*>(fontId); }
 	inline float GetScale() const { return scale; }
 	inline void* GetFontIdRaw() const { return fontId; }
+};
+
+struct ImageFrame {
+	const Texture* texture = nullptr;
+	Vector2Int16 offset;
+	Vector2Int16 size;
+	Vector2 uv[2];
+
+	ImageFrame() {}
+	ImageFrame(const Texture& texture, const ImageFrameDef& def);
+};
+
+class Image {
+private:
+	std::string name;
+	Vector2Int16 size;
+	const ImageFrame* frameStart;
+	uint16_t frameCount;
+public:
+	Image() {}
+	Image(const ImageFrame* frameStart, const ImageDef& def);
+
+	inline const std::string GetName()const { return name; }
+
+	const ImageFrame& GetFrame(unsigned index) const;
 };
 
 struct AudioInfo {
@@ -135,11 +155,9 @@ struct SpriteFrame {
 };
 class SpriteFrameAtlas {
 private:
-	const SpriteAtlas* atlas;
 	std::vector<SpriteFrame> frames;
 public:
 	Vector2Int FrameSize;
-	SpriteFrameAtlas(const SpriteAtlas* atlas);
 	inline void SetOffset(int index, Vector2Int offset) {
 		frames[index].offset = Vector2Int16(offset);
 	}
@@ -158,12 +176,11 @@ private:
 	std::array< SpriteFrame, 16> frames;
 	Vector2Int16 frameSize;
 public:
-	
+
 	AnimationClip() {}
 	AnimationClip(const AnimationClip&) = delete;
 	AnimationClip& operator=(const AnimationClip&) = delete;
 
-	void AddSpritesFromAtlas(const SpriteAtlas* atlas, int start, int count, Vector2Int offset = { 0,0 });
 
 	inline Vector2Int16 GetFrameSize() const { return frameSize; }
 	inline void AddFrame(const SpriteFrame& frame) {
@@ -202,7 +219,7 @@ private:
 	std::array<UnitSpriteFrame, 16> frames;
 	Vector2Int16 frameSize;
 public:
-	
+
 	UnitAnimationClip();
 	UnitAnimationClip(const UnitAnimationClip&) = delete;
 	UnitAnimationClip& operator=(const UnitAnimationClip&) = delete;

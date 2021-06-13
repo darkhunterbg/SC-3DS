@@ -1,5 +1,4 @@
 #include "AbilityDatabase.h"
-#include "Generated.h"
 
 AbilityDef AbilityDatabase::Move,
 AbilityDatabase::Stop,
@@ -63,10 +62,10 @@ void AbilityDatabase::Init()
 
 	ReturnCargo.TargetingData.EntitySelectedAction = (UnitAIState::ReturnCargo);
 
-	const auto& sa = *SpriteDatabase::Load_unit_cmdbtns_cmdicons();
+	//const auto& sa = *SpriteDatabase::Load_unit_cmdbtns_cmdicons();
 
-	for (auto& def : Abilities) {
-		def->AbilityId = Id++;
-		def->Sprite = sa.GetFrame(def->IconId);
-	}
+	//for (auto& def : Abilities) {
+	//	def->AbilityId = Id++;
+	//	def->Sprite = sa.GetFrame(def->IconId);
+	//}
 }

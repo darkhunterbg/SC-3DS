@@ -5,8 +5,6 @@
 #include "../Game.h"
 #include "../Engine/JobSystem.h"
 
-#include "../Data/GraphicsDatabase.h"
-
 // =============================== Unit System =================================
 
 UnitSystem::UnitSystem()

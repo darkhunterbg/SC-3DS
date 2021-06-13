@@ -113,6 +113,27 @@ void GraphicsRenderer::BufferDraw(std::vector<BatchDrawCommand>& cmd)
 
 }
 
+void GraphicsRenderer::Draw(const Texture& texture, Vector2Int position, Color32 color)
+{
+	instance.GetDrawCommand(texture.GetTextureId()).count += 6;
+
+	Vector2Int size = Vector2Int(texture.GetSize());
+
+
+	const Vector2& tL = { 0,0 };
+	const Vector2& tR = { 1,0 };
+	const Vector2& bL = { 0,1 };
+	const Vector2& bR = { 1,1 };
+
+	instance.AddVertex(Vector2(position), tL, color);
+	instance.AddVertex(Vector2(position + Vector2Int(size.x, 0)), tR, color);
+	instance.AddVertex(Vector2(position + size), bR, color);
+
+	instance.AddVertex(Vector2(position + size), bR, color);
+	instance.AddVertex(Vector2(position + Vector2Int(0, size.y)), bL, color);
+	instance.AddVertex(Vector2(position), tL, color);
+}
+
 void GraphicsRenderer::Draw(const Sprite& sprite, Vector2Int position, Color32 color)
 {
 	instance.GetDrawCommand(sprite.textureId).count += 6;

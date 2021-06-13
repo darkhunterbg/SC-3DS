@@ -13,7 +13,7 @@ void MapSystem::SetSize(Vector2Int16 size)
 	gridSize = size / 32;
 	minimapTextureSize = size.x / 32;
 
-	tile = AssetLoader::LoadAtlas("tileset_tile.t3x")->GetSprite(0);
+	//tile = AssetLoader::LoadAtlas("tileset/tile")->GetSprite(0);
 }
 
 void MapSystem::UpdateMapObjectPositions(EntityManager& em, const EntityChangedData& changed) {

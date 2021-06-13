@@ -4,7 +4,6 @@
 
 #include "../Data/AbilityDatabase.h"
 #include "../Entity/EntityManager.h"
-#include "../Data/Generated.h"
 #include "../Entity/Common.h"
 #include "../Entity/EntityUtil.h"
 
@@ -148,7 +147,7 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 	if (context.IsTargetSelectionMode) {
 		unitCommands[8].enabled = true;
 		unitCommands[8].pressed = unitCommands[8].active = InputManager::Gamepad.IsButtonDown(GamepadButton::B);
-		unitCommands[8].commandIcon = &SpriteDatabase::Load_unit_cmdbtns_cmdicons()->GetFrame(236);
+		//unitCommands[8].commandIcon = &SpriteDatabase::Load_unit_cmdbtns_cmdicons()->GetFrame(236);
 		return;
 	}
 

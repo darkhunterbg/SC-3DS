@@ -98,11 +98,6 @@ AudioStream* AssetLoader::LoadAudioStream(const char* path)
 	return  (AudioStream*)e.data;
 }
 
-const SpriteAtlas* AssetLoader::LoadAtlas(const char* path)
-{
-	EXCEPTION("Oboslete function: LoadAtlas");
-}
-
 static uint16_t audioClipId = 0;
 
 static AudioClip LoadAudioClipFromFile(const char* path) {
@@ -156,17 +151,13 @@ void AssetLoader::LoadDatabase()
 	AssetId id = instance.hasher(p);
 	AssetEntry& e = instance.loadedAssets[id];
 
-	GameDatabase* db = new GameDatabase(f);
+	instance.db = BinaryDataLoader::LoadDatabase(f);
 
 	e.id = id;
 	e.type = AssetType::Database;
-	e.data = db;
+	e.data = instance.db;
 
-	for (const AtlasDef& atlases : db->Atlases) {
-		std::string name = atlases.GetAtlasName();
-		name = "atlases\\" + name;
-		LoadTexture(name.data());
-	}
+	instance.db->LoadAssetReferences();
 
 	fclose(f);
 }

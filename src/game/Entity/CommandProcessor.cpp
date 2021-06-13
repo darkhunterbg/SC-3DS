@@ -4,8 +4,6 @@
 #include "EntityManager.h"
 
 #include "../Data/AbilityDatabase.h"
-#include "../Data/UnitDatabase.h"
-
 #include "../Platform.h"
 
 #include <stdio.h>
@@ -149,12 +147,12 @@ void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 			break;
 		}
 		case  PlayerCommandTargetType::UnitType: {
-			const UnitDef& unit = *UnitDatabase::Units[cmd.target.itemId];
+			//const UnitDef& unit = *UnitDatabase::Units[cmd.target.itemId];
 
 			for (int j = 0; j < cmd.entityCount; ++j) {
 				EntityId id = cmd.entities[j];
 
-				em.GetUnitSystem().EnqueueBuildUpdateCheck(id,unit);
+				//em.GetUnitSystem().EnqueueBuildUpdateCheck(id,unit);
 
 			}
 			break;

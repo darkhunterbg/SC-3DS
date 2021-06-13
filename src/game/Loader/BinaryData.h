@@ -1,10 +1,11 @@
 #pragma once
 
-#include "MathLib.h"
-#include <string>
+#include <cstdint>
 #include <vector>
 #include <cstdio>
 
+
+class GameDatabase;
 
 enum class DataSectionType : uint32_t
 {
@@ -24,59 +25,10 @@ struct DataSectionHeader {
 	uint32_t offset;
 };
 
-struct AtlasDef {
-	char name[32];
-	uint16_t index;
-
-	std::string GetAtlasName() const {
-		return std::string(name) + "_" + std::to_string(index);
-	}
-};
-struct ImageDef {
-	char name[32];
-	uint16_t frameStart;
-	uint16_t frameCount;
-	Vector2Int16 size;
-};
-
-#pragma pack(1)
-struct ImageFrameDef {
-	Vector2Int16 offset;
-	Vector2Int16 size;
-	Vector2Int16 atlasOffset;
-	uint8_t atlasId;
-};
-
-#pragma pack(1)
-struct SpriteDef {
-	char name[32];
-	uint16_t imageId;
-	bool isRotating;
-};
-
-#pragma pack(1)
-struct AnimClipDef {
-	uint16_t spriteId;
-	uint32_t instructionStart;
-	uint8_t instructionCount;
-	uint8_t type;
-};
-
-#pragma pack(1)
-struct AnimInstructionDef {
-	uint8_t id;
-	uint8_t params[4];
-};
-
-class GameDatabase {
-
+class BinaryDataLoader {
+private:
+	BinaryDataLoader() = delete;
+	~BinaryDataLoader() = delete;
 public:
-	GameDatabase(FILE* f);
-
-	std::vector<AtlasDef> Atlases;
-	std::vector<ImageDef> Images;
-	std::vector<ImageFrameDef> Frames;
-	std::vector<SpriteDef> Sprites;
-	std::vector<AnimClipDef> AnimationClips;
-	std::vector<AnimInstructionDef> AnimationInstructions;
+	static GameDatabase* LoadDatabase(FILE* f);
 };

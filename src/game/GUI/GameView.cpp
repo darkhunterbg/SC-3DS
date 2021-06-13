@@ -13,7 +13,6 @@
 #include "../Engine/GraphicsRenderer.h"
 #include "../Engine/InputManager.h"
 
-#include "../Data/GraphicsDatabase.h"
 #include "../Data/AbilityDatabase.h"
 
 static std::array<Color, 3> GreyHPBarColorPalette = { 0xb0b0b0ff, 0x98948cff, 0x585858ff };
@@ -264,7 +263,7 @@ void GameView::DrawMarkers(const Camera& camera) {
 		if (!camRect.Contains(marker.pos))
 			continue;
 
-		const SpriteFrame& frame = GraphicsDatabase::Cursor.targg.GetFrame(1);
+		const SpriteFrame& frame = {};// GraphicsDatabase::Cursor.targg.GetFrame(1);
 
 		Rectangle dst = { {0,0},  Vector2Int(frame.sprite.rect.size) };
 

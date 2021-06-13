@@ -1,4 +1,5 @@
 #include "BinaryData.h"
+#include "../Data/GameDatabase.h"
 #include "../Debug.h"
 
 template <class TDataType>
@@ -9,8 +10,10 @@ static void LoadData(uint32_t size, FILE* f, std::vector<TDataType>& outData) {
 	fread(outData.data(), sizeof(TDataType), size, f);
 }
 
-GameDatabase::GameDatabase(FILE* f)
+GameDatabase* BinaryDataLoader::LoadDatabase(FILE* f)
 {
+	GameDatabase* db = new GameDatabase();
+
 	uint32_t headerCount = 0;
 	fread(&headerCount, sizeof(headerCount), 1, f);
 
@@ -25,17 +28,17 @@ GameDatabase::GameDatabase(FILE* f)
 		switch (header.type)
 		{
 		case DataSectionType::Atlases:
-			LoadData(header.size, f, Atlases); break;
+			LoadData(header.size, f, db->AtlasDefs); break;
 		case DataSectionType::Images:
-			LoadData(header.size, f, Images); break;
+			LoadData(header.size, f, db->ImageDefs); break;
 		case DataSectionType::Frames:
-			LoadData(header.size, f, Frames); break;
+			LoadData(header.size, f, db->FrameDefs); break;
 		case DataSectionType::Sprites:
-			LoadData(header.size, f, Sprites); break;
+			LoadData(header.size, f, db->SpriteDefs); break;
 		case DataSectionType::AnimClips:
-			LoadData(header.size, f, AnimationClips); break;
+			LoadData(header.size, f, db->AnimClipDefs); break;
 		case DataSectionType::AnimInstructions:
-			LoadData(header.size, f, AnimationInstructions); break;
+			LoadData(header.size, f, db->AnimInstructionDefs); break;
 		default:
 			EXCEPTION("Unknown data section type %i at position %i", header.type, i);
 			break;
@@ -43,4 +46,6 @@ GameDatabase::GameDatabase(FILE* f)
 	}
 
 	delete[] headers;
+
+	return db;
 }

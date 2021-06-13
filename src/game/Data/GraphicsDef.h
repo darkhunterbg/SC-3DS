@@ -7,10 +7,10 @@
 
 struct SpriteAtlasDef {
 	const char* Path = nullptr;
-	const SpriteAtlas* Atlas = nullptr;
+	//const SpriteAtlas* Atlas = nullptr;
 
 	inline const Sprite& GetSprite(unsigned index) const {
-		return Atlas->GetSprite(index);
+		return {};
 	}
 
 	SpriteAtlasDef() {}

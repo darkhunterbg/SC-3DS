@@ -5,7 +5,6 @@
 #include "../Entity/EntityManager.h"
 #include "../Util.h"
 #include "../Entity/EntityUtil.h"
-#include "../Data/GraphicsDatabase.h"
 #include "GameViewContext.h"
 #include <algorithm>
 
@@ -16,8 +15,8 @@ static constexpr const float Speed = 10;
 static constexpr const int AnimFrameCount = 6;
 
 Cursor::Cursor() {
-	atlas = AssetLoader::LoadAtlas("cursor.t3x");
-	currentClip = &GraphicsDatabase::Cursor.arrow;
+	//atlas = AssetLoader::LoadAtlas("cursor.t3x");
+	//currentClip = &GraphicsDatabase::Cursor.arrow;
 }
 
 
@@ -101,7 +100,7 @@ void Cursor::Update(Camera& camera, GameViewContext& context) {
 
 	if (corner.LengthSquared() != 0) {
 		int index = (corner.x + 1) + (corner.y + 1) * 3;
-		newClip = GraphicsDatabase::Cursor.scrollAnim[index];
+		//newClip = GraphicsDatabase::Cursor.scrollAnim[index];
 		Vector2 v = Vector2::Normalize(Vector2(corner));
 		camera.Position += Vector2Int16(v * camera.GetCameraSpeed());
 	}
@@ -156,7 +155,7 @@ void Cursor::UpdateDefaultState(Camera& camera, GameViewContext& context)
 
 	if (corner == Vector2Int{ 0,0 })
 	{
-		if (!holding || !dragging)
+		/*if (!holding || !dragging)
 		{
 			if (hover == Entity::None) {
 				newClip = &GraphicsDatabase::Cursor.arrow;
@@ -177,13 +176,13 @@ void Cursor::UpdateDefaultState(Camera& camera, GameViewContext& context)
 		else {
 			newClip = &GraphicsDatabase::Cursor.drag;
 
-		}
+		}*/
 	}
 }
 
 void Cursor::UpdateTargetSelectionState(Camera& camera, GameViewContext& context)
 {
-	if (hover == Entity::None) {
+	/*if (hover == Entity::None) {
 		newClip = &GraphicsDatabase::Cursor.targn;
 	}
 	else {
@@ -197,5 +196,5 @@ void Cursor::UpdateTargetSelectionState(Camera& camera, GameViewContext& context
 			newClip = &GraphicsDatabase::Cursor.targy;
 		}
 
-	}
+	}*/
 }

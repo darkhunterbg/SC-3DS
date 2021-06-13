@@ -1,5 +1,4 @@
 #include "PerformanceTestScene.h"
-#include "../Data/UnitDatabase.h"
 #include "../Data/RaceDatabase.h"
 #include "../Profiler.h"
 
@@ -11,7 +10,6 @@
 
 void PerformanceTestScene::Start() {
 
-	UnitDatabase::LoadAllUnitResources();
 	RaceDatabase::Terran.LoadResourses();
 
 	camera.Position = { 400 ,240 };
@@ -25,7 +23,7 @@ void PerformanceTestScene::Start() {
 	for (int i = 0; i < 2000; ++i) {
 		EntityId e = entityManager.NewEntity();
 		entityManager.UnitArchetype.RenderArchetype.Archetype.AddEntity(e);
-		EntityUtil::SetRenderFromAnimationClip(e, UnitDatabase::Marine.Graphics->IdleAnimations[0], 0);
+	/*	EntityUtil::SetRenderFromAnimationClip(e, UnitDatabase::Marine.Graphics->IdleAnimations[0], 0);*/
 		Vector2Int16 pos = Vector2Int16((i % 100) * 32 + 16, (i  / 100)*32 + 16);
 		EntityUtil::SetPosition(e,pos);
 		entityManager.UnitArchetype.RenderArchetype.RenderComponents.GetComponent(e).unitColor =

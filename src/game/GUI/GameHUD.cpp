@@ -11,8 +11,6 @@
 #include "../Engine/AssetLoader.h"
 #include "../Engine/InputManager.h"
 
-#include "../Data/GraphicsDatabase.h"
-
 #include "../Profiler.h"
 
 
@@ -25,7 +23,7 @@ static Rectangle portraitPanelDst = { {248, 20},{ 60, 56 } };
 GameHUD::GameHUD(Vector2Int16 mapSize)
 {
 	font = Game::SystemFont12;
-	iconsAtlas = AssetLoader::LoadAtlas("game_icons.t3x");
+	//iconsAtlas = AssetLoader::LoadAtlas("game_icons.t3x");
 	minimapUpscale = Vector2(mapSize) / Vector2(minimapDst.size);
 
 	consolePanel.PanelDst = consolePanelDst;
@@ -80,7 +78,7 @@ void GameHUD::UpperScreenGUI(const Camera& camera, GameViewContext& context) {
 	Color color = Colors::UIGreen;
 
 	// Minerals
-	DrawResource(iconsAtlas->GetSprite(0), { 160, 2 }, color, "%i", minerals.shown);
+	//DrawResource(iconsAtlas->GetSprite(0), { 160, 2 }, color, "%i", minerals.shown);
 	// Gas
 	DrawResource(context.race->GasIcon, { 240, 2 }, color, "%i", gas.shown);
 	// Supply

@@ -5,11 +5,7 @@
 #include "Scenes/PerformanceTestScene.h"
 #include "StringLib.h"
 #include "Profiler.h"
-#include "Data/UnitDatabase.h"
-#include "Data/GraphicsDatabase.h"
 #include "Data/RaceDatabase.h"
-#include "Data/WeaponDatabase.h"
-#include "Data/AbilityDatabase.h"
 
 #include "Engine/GraphicsRenderer.h"
 #include "Engine/JobSystem.h"
@@ -23,7 +19,7 @@
 
 static Scene* currentScene;
 
-static const SpriteAtlas* title;
+static const Texture* title;
 static bool startup;
 static std::string error;
 static double frameStartTime = 0;
@@ -40,7 +36,7 @@ float Game::DeltaTime = 0;
 
 static void ShowTitleScreen() {
 	GraphicsRenderer::DrawOnScreen(ScreenId::Top);
-	GraphicsRenderer::Draw(title->GetSprite(0), { 0,0 });
+	GraphicsRenderer::Draw(*title, { 0,0 });
 }
 static void InitialScene() {
 	Game::SetCurrentScene(new GameScene());
@@ -69,17 +65,13 @@ void Game::Start() {
 	SystemFont10 = AssetLoader::LoadFont("font.bcfnt", 10);
 	SystemFont8 = AssetLoader::LoadFont("font.bcfnt", 8);
 	ButtonAudio = AssetLoader::LoadAudioClip("sound/misc/button.wav");
-	title = AssetLoader::LoadAtlas("glue_title.t3x");
+	title = AssetLoader::LoadTexture("glue/title");
 	startup = true;
 	frameStartTime = Platform::ElaspedTime();
 	AudioManager::Init();
 	GraphicsRenderer::Init();
 
 
-	GraphicsDatabase::Init();
-	AbilityDatabase::Init();
-	WeaponDatabase::Init();
-	UnitDatabase::Init();
 	RaceDatabase::Init();
 }
 bool Game::Update() {

@@ -70,12 +70,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\UnitDef.h">
       <Filter>Data</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\UnitDatabase.h">
-      <Filter>Data</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\Generated.h">
-      <Filter>Data</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\AnimationDef.h">
       <Filter>Data</Filter>
     </ClInclude>
@@ -93,9 +87,6 @@
       <Filter>Data</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\GraphicsDef.h">
-      <Filter>Data</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\GraphicsDatabase.h">
       <Filter>Data</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\TimingSystem.h">
@@ -121,9 +112,6 @@
       <Filter>Entity</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\WeaponDef.h">
-      <Filter>Data</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\WeaponDatabase.h">
       <Filter>Data</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitStateMachine.h">
@@ -186,6 +174,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\BinaryData.h">
       <Filter>Loader</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\GameDatabase.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\AssetDataDefs.h">
+      <Filter>Data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -223,12 +217,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\NavigationSystem.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\UnitDatabase.cpp">
-      <Filter>Data</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\Generated.cpp">
-      <Filter>Data</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\AnimationDef.cpp">
       <Filter>Data</Filter>
     </ClCompile>
@@ -245,9 +233,6 @@
       <Filter>Entity</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\SoundDef.cpp">
-      <Filter>Data</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\GraphicsDatabase.cpp">
       <Filter>Data</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\TimingSystem.cpp">
@@ -274,9 +259,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Util.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitSystem.cpp">
       <Filter>Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\WeaponDatabase.cpp">
-      <Filter>Data</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitStateMachine.cpp">
       <Filter>Entity</Filter>
@@ -325,6 +307,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\BinaryData.cpp">
       <Filter>Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\GameDatabase.cpp">
+      <Filter>Data</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
