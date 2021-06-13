@@ -113,7 +113,10 @@ namespace DataManager
 		{
 			Assets[typeof(TAsset)] = new AssetDatabase<TAsset>(filePath);
 		}
-
+		public IAssetDatabase GetAssetDatabase(Type type)
+        {
+			return Assets[type];
+        }
 		public AssetDatabase<TAsset> GetAssetDatabase<TAsset>() where TAsset : Asset,
 			new()
 		{

@@ -84,6 +84,7 @@ namespace DataManager.Assets
 
 		void Reload();
 		void Save();
+		void PrepareForSerialization();
 	}
 
 	public class AssetDatabase<TAsset> : IAssetDatabase where TAsset
@@ -158,5 +159,12 @@ namespace DataManager.Assets
 		{
 			Assets.Remove(asset);
 		}
-	}
+
+        public void PrepareForSerialization()
+        {
+			var a = Assets.OrderBy(s => s.AssetName).ToList();
+			Assets.Clear();
+			Assets.AddRange(a);
+        }
+    }
 }

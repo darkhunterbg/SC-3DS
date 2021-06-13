@@ -37,7 +37,7 @@ GameDatabase::GameDatabase(FILE* f)
 		case DataSectionType::AnimInstructions:
 			LoadData(header.size, f, AnimationInstructions); break;
 		default:
-			//EXCEPTION("Unknown data section type %i at position,", header.type, i);
+			EXCEPTION("Unknown data section type %i at position %i", header.type, i);
 			break;
 		}
 	}

@@ -40,8 +40,12 @@ namespace DataManager.Assets
 		[Index(1)]
 		[DefaultEditor]
 		[TypeConverter(typeof(ImageListRef.CsvConverter))]
-		[Binary(BinaryType.String, 32)]
+
 		public ImageListRef Image { get; set; } = ImageListRef.None;
+
+		[Ignore]
+		[Binary(BinaryType.Int, 2)]
+		public int _ImageListIndex { get; set; }
 
 		[Index(2)]
 		[DefaultEditor]

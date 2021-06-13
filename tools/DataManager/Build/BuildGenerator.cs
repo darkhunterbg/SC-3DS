@@ -442,6 +442,11 @@ namespace DataManager.Build
                 instructionData.AddRange(clip.Instructions.Select(s => new AnimClipInstructionData(clip, s)));
             }
 
+            foreach(var asset in AppGame.AssetManager.GetAssetDatabase<SpriteAsset>().Assets)
+            {
+                asset._ImageListIndex = GeneratedImages.IndexOf(i => i.List == asset.Image.Image);
+            }
+
             List<DataItem> data = new List<DataItem>();
             data.Add(new DataItem()
             {
@@ -467,6 +472,7 @@ namespace DataManager.Build
 
             foreach (var assetDb in AppGame.AssetManager.Assets.Values)
             {
+                assetDb.PrepareForSerialization();
                 data.Add(new DataItem()
                 {
                     Name = assetDb.Type.Name,

@@ -50,13 +50,13 @@ struct ImageFrameDef {
 #pragma pack(1)
 struct SpriteDef {
 	char name[32];
-	char image[32];
+	uint16_t imageId;
 	bool isRotating;
 };
 
 #pragma pack(1)
 struct AnimClipDef {
-	char sprite[32];
+	uint16_t spriteId;
 	uint32_t instructionStart;
 	uint8_t instructionCount;
 	uint8_t type;
