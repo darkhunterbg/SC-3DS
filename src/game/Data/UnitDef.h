@@ -5,9 +5,7 @@
 
 #include "../Assets.h"
 #include "../MathLib.h"
-#include "AnimationDef.h"
 #include "SoundDef.h"
-#include "GraphicsDef.h"
 #include "WeaponDef.h"
 
 struct UnitDef {
@@ -42,12 +40,11 @@ struct UnitDef {
 	} Sounds;
 
 	
-	const UnitGraphicsDef* Graphics = nullptr;
 	const WeaponDef* Weapon = nullptr;
 
-	Sprite ArmorIcon;
-	Sprite Portrait;
-	SpriteFrame Icon;
+	ImageFrame ArmorIcon;
+	ImageFrame Portrait;
+	ImageFrame Icon;
 	int ArmorIconId = -1;
 	int PortraitId;
 	int IconId;

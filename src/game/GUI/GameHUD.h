@@ -25,6 +25,7 @@ public:
 private:
 	UnitSelectionConsolePanel consolePanel;
 	UnitCommandsPanel commandsPanel;
+	ImageFrame mineralIcon;
 
 	const Font* font;
 
@@ -46,7 +47,7 @@ private:
 	Resource gas = { 0,0 };
 	Supply supply = { 0,0 };
 
-	void DrawResource(Sprite icon, Vector2Int pos, Color color, const char* text, ...);
+	void DrawResource(const ImageFrame& icon, Vector2Int pos, Color color, const char* text, ...);
 	void DrawMinimap(const Camera& camera, GameViewContext& context);
 
 	void UpdateInfo(GameViewContext& context);

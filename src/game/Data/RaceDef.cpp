@@ -2,18 +2,23 @@
 
 #include "../Engine/AssetLoader.h"
 
+
 void RaceDef::LoadResourses() {
-	ConsoleSprite.Load();
 	AdvisorErrorSounds.LoadSoundClips();
 	AdvisorUpdateSounds.LoadSoundClips();
 
-	CommandIconsLoad();
+	CommandIcons = &AssetLoader::GetDatabase().GetImage(commandIconsPath);
+	ConsoleLowerSprite = AssetLoader::GetDatabase().GetImage(consolePath).GetFrame(0);
+	ConsoleUpperSprite = AssetLoader::GetDatabase().GetImage(consolePath + "up").GetFrame(0);
 
-	//const SpriteAtlas* icons = AssetLoader::LoadAtlas("game_icons.t3x");
-	//SupplyIcon = icons->GetSprite(SupplyIconId);
 
-	//GasIcon = icons->GetSprite(GasIconId);
+	SupplyIcon  = AssetLoader::GetDatabase().GetImage(supplyIconPath).GetFrame(0);
+	GasIcon = AssetLoader::GetDatabase().GetImage(gasIconPath).GetFrame(0);
+		//const SpriteAtlas* icons = AssetLoader::LoadAtlas("game_icons.t3x");
+		//SupplyIcon = icons->GetSprite(SupplyIconId);
 
-	for (auto& musicDef : GameMusic)
-		musicDef.Load();
+		//GasIcon = icons->GetSprite(GasIconId);
+
+		for (auto& musicDef : GameMusic)
+			musicDef.Load();
 }

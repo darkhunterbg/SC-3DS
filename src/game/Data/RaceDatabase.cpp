@@ -13,9 +13,10 @@ void RaceDatabase::Init()
 		d.SupplyNamePlural = "Supplies";
 		d.SupplyBuildingNamePlural = "Supply Depots";
 		d.Type = RaceType::Terran;
-		d.ConsoleSprite.Path = "game_tconsole.t3x";
-		d.SupplyIconId = 5;
-		d.GasIconId = 2;
+		d.consolePath= "game\\tconsole";
+		d.commandIconsPath = "unit\\cmdbtns\\tcmdbtns";
+		d.supplyIconPath = "game\\icons\\tsupply";
+		d.gasIconPath = "game\\icons\\tgas";
 		d.AdvisorErrorSounds.SoundPath = "sound/terran/advisor/taderr";
 		d.AdvisorErrorSounds.SoundIds = { 0,1,2,3,4,6 };
 		d.AdvisorUpdateSounds.SoundPath = "sound/terran/advisor/tadupd";
@@ -23,7 +24,7 @@ void RaceDatabase::Init()
 		d.GameMusic.push_back({ "music/terran1.wav" });
 		d.GameMusic.push_back({ "music/terran2.wav" });
 		d.GameMusic.push_back({ "music/terran3.wav" });
-		/*d.CommandIconsLoad = []() { Terran.CommandIconsAtlas = SpriteDatabase::Load_unit_cmdbtns_tcmdbtns(); };*/
+
 	}
 	// ============= Zerg =========================
 	{
@@ -32,9 +33,10 @@ void RaceDatabase::Init()
 		d.SupplyNamePlural = "Controls";
 		d.SupplyBuildingNamePlural = "Overlords";
 		d.Type = RaceType::Zerg;
-		d.ConsoleSprite.Path = "game_zconsole.t3x";
-		d.SupplyIconId = 4;
-		d.GasIconId = 1;
+		d.consolePath = "game\\zconsole";
+		d.commandIconsPath = "unit\\cmdbtns\\zcmdbtns";
+		d.supplyIconPath = "game\\icons\\zsupply";
+		d.gasIconPath = "game\\icons\\zgas";
 		d.AdvisorErrorSounds.SoundPath = "sound/zerg/advisor/zaderr";
 		d.AdvisorErrorSounds.SoundIds = { 0,1,2,6 };
 		d.AdvisorUpdateSounds.SoundPath = "sound/zerg/advisor/zadupd";
@@ -42,7 +44,7 @@ void RaceDatabase::Init()
 		d.GameMusic.push_back({ "music/zerg1.wav" });
 		d.GameMusic.push_back({ "music/zerg2.wav" });
 		d.GameMusic.push_back({ "music/zerg3.wav" });
-		//d.CommandIconsLoad = []() { Zerg.CommandIconsAtlas = SpriteDatabase::Load_unit_cmdbtns_zcmdbtns(); };
+
 	}
 	// ============= Protoss ======================
 	{
@@ -51,9 +53,10 @@ void RaceDatabase::Init()
 		d.SupplyNamePlural = "Psi";
 		d.SupplyBuildingNamePlural = "Pylons";
 		d.Type = RaceType::Protoss;
-		d.ConsoleSprite.Path = "game_pconsole.t3x";
-		d.SupplyIconId = 6;
-		d.GasIconId = 3;
+		d.consolePath = "game\\pconsole";
+		d.commandIconsPath = "unit\\cmdbtns\\pcmdbtns";
+		d.supplyIconPath = "game\\icons\\psupply";
+		d.gasIconPath = "game\\icons\\pgas";
 		d.AdvisorErrorSounds.SoundPath = "sound/protoss/advisor/paderr";
 		d.AdvisorErrorSounds.SoundIds = { 0,1,2,6 };
 		d.AdvisorUpdateSounds.SoundPath = "sound/protoss/advisor/padupd";
@@ -61,7 +64,6 @@ void RaceDatabase::Init()
 		d.GameMusic.push_back({ "music/protoss1.wav" });
 		d.GameMusic.push_back({ "music/protoss2.wav" });
 		d.GameMusic.push_back({ "music/protoss3.wav" });
-		//d.CommandIconsLoad = []() { Protoss.CommandIconsAtlas = SpriteDatabase::Load_unit_cmdbtns_pcmdbtns(); };
 	}
 }
 

@@ -1,6 +1,7 @@
 #include "Assets.h"
 #include "Data/AssetDataDefs.h"
 #include "Debug.h"
+#include "Data/AssetDataDefs.h"
 
 #include "Platform.h"
 #include <stdio.h>
@@ -59,48 +60,6 @@ int AudioStream::GetRemaining() const {
 }
 
 
-void AnimationClip::AddFrameCentered(const SpriteFrame& frame, Vector2Int16 frameSize, bool hFlip) {
-	auto& f = frames[frameCount++] = frame;
-	f.hFlip = hFlip;
-	f.offset -= frameSize / 2;
-	if (hFlip)
-		f.offset.x = frameSize.x / 2 - frame.offset.x - frame.sprite.rect.size.x;
-
-	this->frameSize = frameSize;
-}
-
-UnitAnimationClip::UnitAnimationClip() {
-	for (auto& sf : frames) {
-		sf.sprite.textureId = nullptr;
-		sf.shadowSprite.textureId = nullptr;
-		sf.colorSprite.textureId = nullptr;
-	}
-}
-uint8_t UnitAnimationClip::AddFrameCentered(const SpriteFrame& frame, Vector2Int16 frameSize, bool hFlip)
-{
-	frames[frameCount].sprite = frame.sprite;
-	frames[frameCount].hFlip = hFlip;
-	Vector2Int16 offset = frame.offset - frameSize / 2;
-	if (hFlip)
-		offset.x = frameSize.x / 2 - frame.offset.x - frame.sprite.rect.size.x;
-	frames[frameCount].offset = offset;
-
-	this->frameSize = frameSize;
-
-	return frameCount++;
-}
-void UnitAnimationClip::AddShadowFrameCentered(uint8_t index, const SpriteFrame& frame, Vector2Int16 frameSize, Vector2Int16 additionalOffset)
-{
-	frames[index].shadowSprite = frame.sprite;
-	Vector2Int16 offset = frame.offset - frameSize / 2;
-	if (frames[index].hFlip)
-		offset.x = frameSize.x / 2 - frame.offset.x - frame.sprite.rect.size.x;
-	frames[index].shadowOffset = offset + additionalOffset;
-}
-void UnitAnimationClip::AddColorFrame(uint8_t index, const SpriteFrame& frame)
-{
-	frames[index].colorSprite = frame.sprite;
-}
 
 Vector2Int Font::MeasureString(const char* text) const
 {
@@ -108,12 +67,11 @@ Vector2Int Font::MeasureString(const char* text) const
 }
 
 ImageFrame::ImageFrame(const Texture& texture, const ImageFrameDef& def)
-	:texture(&texture), offset(def.offset), size(def.size)
+	:texture(&texture), offset(def.offset)
 {
-	uv[0] = Vector2(def.atlasOffset) / Vector2(texture.GetSize());
-	uv[1] = Vector2(def.atlasOffset + size) / Vector2(texture.GetSize());
+	Rectangle16 src = { def.atlasOffset, def.size };
+	uv = Platform::GenerateUV(texture.GetTextureId(), src);
 }
-
 
 Image::Image(const ImageFrame* frameStart, const ImageDef& def)
 	: name(def.name),

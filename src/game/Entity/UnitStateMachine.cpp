@@ -4,6 +4,7 @@
 #include "../Game.h"
 #include "../Profiler.h"
 #include "../Engine/JobSystem.h"
+#include "../Debug.h"
 
 #include <algorithm>
 
@@ -46,8 +47,8 @@ void UnitIdleState::EnterState(
 
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
 
-		em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
-			.GetComponent(id).clips = unit.def->Graphics->IdleAnimations;
+		//em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
+		//	.GetComponent(id).clips = unit.def->Graphics->IdleAnimations;
 
 		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
 
@@ -72,8 +73,8 @@ void UnitTurningState::EnterState(
 
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
 
-		em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
-			.GetComponent(id).clips = unit.def->Graphics->IdleAnimations;
+		//em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
+		//	.GetComponent(id).clips = unit.def->Graphics->IdleAnimations;
 
 		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
 
@@ -119,8 +120,8 @@ void UnitMovingState::EnterState(
 		const auto& orientation = em.OrientationComponents.GetComponent(id);
 		const auto& velocity = em.UnitArchetype.MovementComponents.GetComponent(id).movementSpeed;
 
-		em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
-			.GetComponent(id).clips = unit.def->Graphics->MovementAnimations;
+		//em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
+		//	.GetComponent(id).clips = unit.def->Graphics->MovementAnimations;
 
 		flags.set(ComponentFlags::NavigationWork);
 		flags.set(ComponentFlags::AnimationSetChanged);
@@ -178,8 +179,8 @@ static void  UnitAttackingEnterStateJob(int start, int end) {
 		em.OrientationComponents.GetComponent(id) = orientation;
 
 
-		em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
-			.GetComponent(id).clips = unit.def->Graphics->AttackAnimations;
+		//em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
+		//	.GetComponent(id).clips = unit.def->Graphics->AttackAnimations;
 
 		flags.set(ComponentFlags::AnimationSetChanged);
 		flags.set(ComponentFlags::AnimationEnabled);
@@ -214,7 +215,7 @@ static void  UnitAttackingEnterStateJob(int start, int end) {
 		TimingActionComponent& timerAction = em.TimingArchetype.ActionComponents.GetComponent(id);
 
 		// TODO: from weapon component because speed can be modified
-		timer.NewTimer(unit.def->Graphics->AttackAnimations[0].GetDuration());
+		//timer.NewTimer(unit.def->Graphics->AttackAnimations[0].GetDuration());
 		timerAction.action = TimerExpiredAction::WeaponAttack;
 		flags.set(ComponentFlags::UpdateTimers);
 		flags.set(ComponentFlags::UnitAIPaused);
@@ -222,21 +223,21 @@ static void  UnitAttackingEnterStateJob(int start, int end) {
 	
 		// Particle Effect
 
-		targetCollider.Shrink(unit.def->Weapon->TargetEffect[0].GetFrameSize()>> 1);
+		//targetCollider.Shrink(unit.def->Weapon->TargetEffect[0].GetFrameSize()>> 1);
 
 		Vector2Int16 spawnAt = targetCollider.Closest(em.PositionComponents.GetComponent(id));
 
 		EntityId e = scratch[i];
 
-		em.TimingArchetype.TimingComponents.GetComponent(e).NewTimer(unit.def->Weapon->TargetEffect[0].GetDuration());
+		//em.TimingArchetype.TimingComponents.GetComponent(e).NewTimer(unit.def->Weapon->TargetEffect[0].GetDuration());
 		em.TimingArchetype.ActionComponents.GetComponent(e).action = TimerExpiredAction::DeleteEntity;
 		em.FlagComponents.NewComponent(e).set(ComponentFlags::UpdateTimers);
 		em.FlagComponents.GetComponent(e).set(ComponentFlags::PositionChanged);
 		em.RenderArchetype.RenderComponents.GetComponent(e).depth = 1;
 		em.PositionComponents.NewComponent(e, spawnAt);
 
-		EntityUtil::PlayAnimation(e, unit.def->Weapon->TargetEffect[0]);
-		EntityUtil::SetRenderFromAnimationClip(e, unit.def->Weapon->TargetEffect[0], 0);
+		//EntityUtil::PlayAnimation(e, unit.def->Weapon->TargetEffect[0]);
+		//EntityUtil::SetRenderFromAnimationClip(e, unit.def->Weapon->TargetEffect[0], 0);
 		EntityUtil::SetMapObjectBoundingBoxFromRender(e);
 
 	}
@@ -296,13 +297,13 @@ void UnitDeathState::EnterState(
 			em.ParentArchetype.Archetype.RemoveEntity(id);
 		}
 
-		if (unit.def->Graphics->HasDeathAnimation()) {
-			EntityUtil::PlayAnimation(id, unit.def->Graphics->DeathAnimation);
-			EntityUtil::StartTimer(id, unit.def->Graphics->DeathAnimation.GetDuration(), TimerExpiredAction::UnitDeathAfterEffect);
-		}
-		else {
-			EntityUtil::StartTimer(id, 1, TimerExpiredAction::UnitDeathAfterEffect);
-		}
+		//if (unit.def->Graphics->HasDeathAnimation()) {
+		//	EntityUtil::PlayAnimation(id, unit.def->Graphics->DeathAnimation);
+		//	EntityUtil::StartTimer(id, unit.def->Graphics->DeathAnimation.GetDuration(), TimerExpiredAction::UnitDeathAfterEffect);
+		//}
+		//else {
+		//	EntityUtil::StartTimer(id, 1, TimerExpiredAction::UnitDeathAfterEffect);
+		//}
 
 		int i = std::rand() % unit.def->Sounds.Death.TotalClips;
 		const auto& clip = unit.def->Sounds.Death.Clips[i];
@@ -382,8 +383,8 @@ void UnitMiningState::EnterState(UnitStateMachineChangeData& data, EntityManager
 		em.OrientationComponents.GetComponent(id) = orientation;
 
 
-		em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
-			.GetComponent(id).clips = unit.def->Graphics->AttackAnimations;
+		//em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
+		//	.GetComponent(id).clips = unit.def->Graphics->AttackAnimations;
 
 		flags.set(ComponentFlags::AnimationSetChanged);
 		flags.set(ComponentFlags::AnimationEnabled);
@@ -420,10 +421,10 @@ void UnitMiningState::EnterState(UnitStateMachineChangeData& data, EntityManager
 		em.RenderArchetype.RenderComponents.GetComponent(e).depth = 1;
 		em.PositionComponents.NewComponent(e, spawnAt);
 
-		EntityUtil::PlayAnimation(e, unit.def->Weapon->TargetEffect[0]);
-		EntityUtil::SetRenderFromAnimationClip(e, unit.def->Weapon->TargetEffect[0], 0);
-		EntityUtil::SetMapObjectBoundingBoxFromRender(e);
-		em.AnimationArchetype.TrackerComponents.GetComponent(e).looping = true;
+		//EntityUtil::PlayAnimation(e, unit.def->Weapon->TargetEffect[0]);
+		//EntityUtil::SetRenderFromAnimationClip(e, unit.def->Weapon->TargetEffect[0], 0);
+		//EntityUtil::SetMapObjectBoundingBoxFromRender(e);
+		//em.AnimationArchetype.TrackerComponents.GetComponent(e).looping = true;
 	}
 }
 void UnitMiningState::ExitState(UnitStateMachineChangeData& data, EntityManager& em)

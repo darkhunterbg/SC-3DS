@@ -2,19 +2,12 @@
 
 #include "MathLib.h"
 #include "Color.h"
+#include "../Assets.h"
 
-typedef void* TextureId;
-typedef void* Surface;
+struct ImageFrameDef;
 
-struct Sprite {
-	Rectangle16 rect;
-	Vector2 uv[4];
-	TextureId textureId;
+typedef void* SurfaceId;
 
-	inline Rectangle GetRect() const {
-		return { Vector2Int(rect.position), Vector2Int(rect.size) };
-	}
-};
 
 struct Vertex {
 	Vector2 position;
@@ -29,7 +22,7 @@ enum class DrawCommandType : uint8_t {
 };
 
 struct DrawCommand {
-	TextureId texture;
+	const Texture* texture;
 	uint16_t start;
 	uint16_t count;
 	DrawCommandType type;
@@ -38,7 +31,7 @@ struct DrawCommand {
 
 struct BatchDrawCommand {
 	int order;
-	Sprite sprite;
+	ImageFrame sprite;
 	Vector2Int16 position;
 	Vector2 scale;
 	Color32 color;
@@ -59,11 +52,11 @@ enum class BlendMode {
 
 
 struct RenderSurface {
-	Surface surfaceId = nullptr;
-	Sprite sprite;
+	SurfaceId surfaceId = nullptr;
+	ImageFrame sprite;
 
 	inline Vector2Int GetSize() const {
-		return Vector2Int(sprite.rect.size);
+		return Vector2Int(sprite.GetSize());
 	}
 	inline Rectangle GetRect() const {
 		return sprite.GetRect();

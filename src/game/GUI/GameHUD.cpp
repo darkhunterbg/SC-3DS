@@ -23,14 +23,14 @@ static Rectangle portraitPanelDst = { {248, 20},{ 60, 56 } };
 GameHUD::GameHUD(Vector2Int16 mapSize)
 {
 	font = Game::SystemFont12;
-	//iconsAtlas = AssetLoader::LoadAtlas("game_icons.t3x");
 	minimapUpscale = Vector2(mapSize) / Vector2(minimapDst.size);
 
+	mineralIcon = AssetLoader::GetDatabase().GetImage("game\\icons\\min").GetFrame(0);
 	consolePanel.PanelDst = consolePanelDst;
 	commandsPanel.PanelDst = commandsPanelDst;
 }
 
-void GameHUD::DrawResource(Sprite icon, Vector2Int pos, Color color, const char* fmt, ...) {
+void GameHUD::DrawResource(const ImageFrame& icon, Vector2Int pos, Color color, const char* fmt, ...) {
 	va_list args;
 	va_start(args, fmt);
 	stbsp_vsnprintf(textBuffer, sizeof(textBuffer), fmt, args);
@@ -78,7 +78,7 @@ void GameHUD::UpperScreenGUI(const Camera& camera, GameViewContext& context) {
 	Color color = Colors::UIGreen;
 
 	// Minerals
-	//DrawResource(iconsAtlas->GetSprite(0), { 160, 2 }, color, "%i", minerals.shown);
+	DrawResource(mineralIcon, { 160, 2 }, color, "%i", minerals.shown);
 	// Gas
 	DrawResource(context.race->GasIcon, { 240, 2 }, color, "%i", gas.shown);
 	// Supply
@@ -94,11 +94,13 @@ void GameHUD::UpperScreenGUI(const Camera& camera, GameViewContext& context) {
 	GraphicsRenderer::DrawText(*font, pos + Vector2Int{ 1,1 }, textBuffer, Colors::Black);
 	GraphicsRenderer::DrawText(*font, pos, textBuffer, Colors::UIGreen);
 
-	const auto& sprite = context.race->ConsoleSprite.GetSprite(1);
-	GraphicsRenderer::Draw(sprite, { {0, 240 - sprite.rect.size.y,}, Vector2Int(sprite.rect.size) });
+
+	const auto& sprite = context.race->ConsoleUpperSprite;
+	GraphicsRenderer::Draw(sprite, { 0, 240 - sprite.GetSize().y });
+
 
 	if (context.IsTargetSelectionMode) {
-		pos = { 0, 240 - sprite.rect.size.y };
+		pos = { 0, 240 - sprite.GetSize().y };
 		pos.y -= 16;
 		pos.x += 160;
 		GraphicsRenderer::DrawText(*font, pos + Vector2Int{ 1, 1 }, "Select Target", Colors::Black);
@@ -117,8 +119,7 @@ void GameHUD::LowerScreenGUI(const Camera& camera, GameViewContext& context) {
 		GraphicsRenderer::Draw(def.Portrait, portraitPanelDst);
 	}
 
-	GraphicsRenderer::Draw(context.race->ConsoleSprite.GetSprite(0), { {0, 0,},{ 320, 240} });
-
+	GraphicsRenderer::Draw(context.race->ConsoleLowerSprite, { 0,0 });
 
 	DrawMinimap(camera, context);
 

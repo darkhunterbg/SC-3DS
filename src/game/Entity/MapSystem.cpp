@@ -5,7 +5,7 @@
 #include "../Engine/GraphicsRenderer.h"
 #include "../Engine/AssetLoader.h"
 
-static Sprite tile;
+static ImageFrame tile;
 
 void MapSystem::SetSize(Vector2Int16 size)
 {
@@ -127,9 +127,9 @@ void MapSystem::UpdateVisibleRenderUnits(EntityManager& em) {
 
 	removedEntities.clear();
 
-	for (EntityId id : em.UnitArchetype.RenderArchetype.Archetype.GetEntities()) {
-		if (!em.MapObjectArchetype.Archetype.HasEntity(id))
-			continue;
+	//for (EntityId id : em.UnitArchetype.RenderArchetype.Archetype.GetEntities()) {
+	//	if (!em.MapObjectArchetype.Archetype.HasEntity(id))
+	//		continue;
 
 		// TODO: culling by MapObjectDestination is not very accurate for items that extend beyound shadows,
 		// While culling by RenderBoundingBox is not very accurate when to reveal hidden units due proximity
@@ -137,14 +137,14 @@ void MapSystem::UpdateVisibleRenderUnits(EntityManager& em) {
 		// Accurate culling: renderBB-> mapBB-> spriteBB
 		// Or when unit becomes visible by renderBB, render only portion that is in los (slow)
 
-		const Rectangle16& dst = em.MapObjectArchetype.DestinationComponents.GetComponent(id);
-		bool visible = vision.IsVisible(dst);
+	//	const Rectangle16& dst = em.MapObjectArchetype.DestinationComponents.GetComponent(id);
+	//	bool visible = vision.IsVisible(dst);
 
-		if (!visible && FogOfWarVisible) {
-			removedEntities.push_back(id);
-			em.FlagComponents.GetComponent(id).set(ComponentFlags::SoundMuted);
-		}
-	}
+	//	if (!visible && FogOfWarVisible) {
+	//		removedEntities.push_back(id);
+	//		em.FlagComponents.GetComponent(id).set(ComponentFlags::SoundMuted);
+	//	}
+	//}
 
 	addedEntities.clear();
 
@@ -160,10 +160,10 @@ void MapSystem::UpdateVisibleRenderUnits(EntityManager& em) {
 		}
 	}
 
-	em.UnitArchetype.RenderArchetype.Archetype.RemoveSortedEntities(removedEntities);
+	//em.UnitArchetype.RenderArchetype.Archetype.RemoveSortedEntities(removedEntities);
 	em.UnitArchetype.HiddenArchetype.Archetype.AddSortedEntities(removedEntities);
 	em.UnitArchetype.HiddenArchetype.Archetype.RemoveSortedEntities(addedEntities);
-	em.UnitArchetype.RenderArchetype.Archetype.AddSortedEntities(addedEntities);
+	//em.UnitArchetype.RenderArchetype.Archetype.AddSortedEntities(addedEntities);
 }
 
 static MapSystem* s;
@@ -179,10 +179,10 @@ void MapSystem::InitFowVisibleEntitiesJob(int start, int end) {
 
 		em.PositionComponents.CopyComponent(from, id);
 
-		em.UnitArchetype.RenderArchetype.RenderComponents.CopyComponent(from, id);
+/*		em.UnitArchetype.RenderArchetype.RenderComponents.CopyComponent(from, id);
 		em.UnitArchetype.RenderArchetype.BoundingBoxComponents.CopyComponent(from, id);
 		em.UnitArchetype.RenderArchetype.OffsetComponents.CopyComponent(from, id);
-		em.UnitArchetype.RenderArchetype.DestinationComponents.CopyComponent(from, id);
+		em.UnitArchetype.RenderArchetype.DestinationComponents.CopyComponent(from, id)*/;
 
 		em.UnitArchetype.OwnerComponents.CopyComponent(from, id);
 
@@ -230,7 +230,7 @@ void MapSystem::UpdateFowVisibleUnits(EntityManager& em) {
 		{
 			scratch.clear();
 			em.NewEntities(fowVisible.size(), scratch);
-			em.UnitArchetype.RenderArchetype.Archetype.AddSortedEntities(scratch);
+			//em.UnitArchetype.RenderArchetype.Archetype.AddSortedEntities(scratch);
 			em.UnitArchetype.FowVisibleArchetype.Archetype.AddSortedEntities(scratch);
 
 			s = this;
@@ -306,7 +306,7 @@ void MapSystem::DrawFogOfWar(const Camera& camera) {
 	static constexpr const int CamDownscale = 32 / Upscale;
 	Rectangle16 src = { (camRect.position / CamDownscale), (camRect.size / CamDownscale) };
 
-	Sprite sprite = GraphicsRenderer::NewSprite(fogOfWarTexture.sprite.textureId, src);
+	ImageFrame sprite = GraphicsRenderer::NewSprite(*fogOfWarTexture.sprite.texture, src);
 
 	GraphicsRenderer::Draw(sprite, { {0,0},{400,240} });
 

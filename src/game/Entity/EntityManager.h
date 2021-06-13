@@ -8,7 +8,6 @@
 #include "../Span.h"
 
 #include "RenderSystem.h"
-#include "AnimationSystem.h"
 #include "KinematicSystem.h"
 #include "NavigationSystem.h"
 #include "TimingSystem.h"
@@ -35,7 +34,6 @@ private:
 	EntityManagerCollection entities;
 
 	RenderSystem renderSystem;
-	AnimationSystem animationSystem;
 	KinematicSystem kinematicSystem;
 	NavigationSystem navigationSystem;
 	TimingSystem timingSystem;
@@ -79,13 +77,6 @@ public:
 
 	struct {
 		EntityArchetype Archetype = EntityArchetype("Animation");
-		ComponentCollection<AnimationComponent> AnimationComponents;
-		ComponentCollection<AnimationTrackerComponent> TrackerComponents;
-
-		struct {
-			EntityArchetype Archetype = EntityArchetype("Animation.Orientation");
-			ComponentCollection< AnimationOrientationComponent> AnimOrientationComponents;
-		} OrientationArchetype;
 	} AnimationArchetype;
 
 	struct {
@@ -105,26 +96,6 @@ public:
 
 	struct {
 		EntityArchetype Archetype = EntityArchetype("Unit");
-
-		struct {
-			EntityArchetype Archetype = EntityArchetype("Unit.Render");
-			ComponentCollection<RenderUnitComponent> RenderComponents;
-			ComponentCollection<RenderUnitOffsetComponent> OffsetComponents;
-			ComponentCollection<RenderUnitDestinationComponent> DestinationComponents;
-			ComponentCollection<Rectangle16> BoundingBoxComponents;
-		}  RenderArchetype;
-
-		struct {
-			EntityArchetype Archetype = EntityArchetype("Unit.Animation");
-			ComponentCollection<UnitAnimationComponent> AnimationComponents;
-
-			struct {
-				EntityArchetype Archetype = EntityArchetype("Unit.Animation.Orientation");
-				ComponentCollection<UnitAnimationOrientationComponent> AnimOrientationComponents;
-			} OrientationArchetype;
-
-		} AnimationArchetype;
-
 
 		struct {
 			EntityArchetype Archetype = EntityArchetype("Unit.Hidden");

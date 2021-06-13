@@ -1,5 +1,20 @@
 #include "GameDatabase.h"
 #include "../Engine/AssetLoader.h"
+#include "../Debug.h"
+
+const Image& GameDatabase::GetImage(const std::string& path) const
+{
+	auto r = imageNamesMap.find(path);
+	if (r == imageNamesMap.end())
+		EXCEPTION("Tried to get invalid image path '%s'", path.data());
+
+	return *r->second;
+}
+
+const ImageFrame& GameDatabase::GetCommandIcons(unsigned id) const
+{
+	return commandIcons->GetFrame(id);
+}
 
 void GameDatabase::LoadAssetReferences()
 {
@@ -25,6 +40,8 @@ void GameDatabase::LoadAssetReferences()
 		const ImageFrame* f = &frames[imageDef.frameStart];
 		images.push_back(Image(f, imageDef));
 		const auto& img = images.back();
-		imageNamesMap[img.GetName()] = images.size() - 1;
+		imageNamesMap[img.GetName()] = &img;
 	}
+
+	commandIcons = imageNamesMap["unit\\cmdbtns\\cmdicons"];
 }

@@ -320,7 +320,6 @@ void UnitAIGatherResoureState::Think(UnitAIThinkData& data, EntityManager& em)
 					em.RenderArchetype.RenderComponents.GetComponent(e2).depth = 0;
 					em.RenderArchetype.Archetype.AddEntity(e2);
 					em.AnimationArchetype.Archetype.AddEntity(e2);
-					em.AnimationArchetype.OrientationArchetype.Archetype.AddEntity(e2);
 					/*em.AnimationArchetype.OrientationArchetype.AnimOrientationComponents.GetComponent(e2)
 						.clips = GraphicsDatabase::MineralOre.Animations;*/
 

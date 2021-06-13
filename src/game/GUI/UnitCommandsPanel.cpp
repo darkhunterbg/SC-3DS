@@ -27,9 +27,9 @@ void UnitCommandsPanel::UpdateInput(GameViewContext& context)
 
 	Rectangle dst = PanelDst;
 
-	const Sprite& f = context.GetCommandIconsAtlas().GetFrame(0).sprite;
+	const ImageFrame& f = context.GetCommandIcons().GetFrame(0);
 
-	dst.size = Vector2Int(f.rect.size);
+	dst.size = Vector2Int(f.GetSize());
 
 	if (InputManager::Pointer.IsDown()) {
 
@@ -79,8 +79,8 @@ void UnitCommandsPanel::DrawCommands(GameViewContext& context) {
 
 	Rectangle dst = PanelDst;
 
-	const Sprite& normal = context.GetCommandIconsAtlas().GetFrame(0).sprite;
-	const Sprite& pressed = context.GetCommandIconsAtlas().GetFrame(1).sprite;
+	const ImageFrame& normal = context.GetCommandIcons().GetFrame(0);
+	const ImageFrame& pressed = context.GetCommandIcons().GetFrame(1);
 
 	for (int y = 0; y < 3; y++) {
 		for (int x = 0; x < 3; ++x) {
@@ -93,19 +93,19 @@ void UnitCommandsPanel::DrawCommands(GameViewContext& context) {
 			Vector2Int offset = { x * 46, y * 40 };
 
 
-			const Sprite& f = cmd.pressed ? pressed : normal;
-			dst.size = Vector2Int(f.rect.size);
+			const ImageFrame& f = cmd.pressed ? pressed : normal;
+			dst.size = Vector2Int(f.GetSize());
 
 			Rectangle d = dst;
 			d.position += offset;
 			GraphicsRenderer::Draw(f, d);
 
-			const SpriteFrame& commandIcon = cmd.commandIcon != nullptr ?
+			const ImageFrame& commandIcon = cmd.commandIcon != nullptr ?
 				*cmd.commandIcon : cmd.ability->Sprite;
 
-			d.size = Vector2Int(commandIcon.sprite.rect.size);
+			d.size = Vector2Int(commandIcon.GetSize());
 			d.position = dst.position + offset +
-				(Vector2Int{ 36, 35 } - Vector2Int(commandIcon.offset + commandIcon.sprite.rect.size)) / 2;
+				(Vector2Int{ 36, 35 } - Vector2Int(commandIcon.offset + commandIcon.GetSize())) / 2;
 
 
 			if (cmd.pressed) {
@@ -123,7 +123,7 @@ void UnitCommandsPanel::DrawCommands(GameViewContext& context) {
 
 
 
-			GraphicsRenderer::Draw(commandIcon.sprite, d, color);
+			GraphicsRenderer::Draw(commandIcon, d, color);
 		}
 	}
 }

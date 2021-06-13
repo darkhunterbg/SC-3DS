@@ -4,6 +4,7 @@
 
 #include "../Profiler.h"
 #include "../Util.h"
+#include "../Debug.h"
 
 #include <algorithm>
 
@@ -16,16 +17,12 @@ EntityManager::EntityManager() {
 	archetypes.push_back(&CollisionArchetype.Archetype);
 	archetypes.push_back(&MovementArchetype.Archetype);
 	archetypes.push_back(&UnitArchetype.Archetype);
-	archetypes.push_back(&UnitArchetype.RenderArchetype.Archetype);
-	archetypes.push_back(&UnitArchetype.AnimationArchetype.Archetype);
 	archetypes.push_back(&TimingArchetype.Archetype);
 	archetypes.push_back(&ParentArchetype.Archetype);
 	archetypes.push_back(&HiddenArchetype.Archetype);
 	archetypes.push_back(&UnitArchetype.HiddenArchetype.Archetype);
 	archetypes.push_back(&MapObjectArchetype.Archetype);
 	archetypes.push_back(&UnitArchetype.FowVisibleArchetype.Archetype);
-	archetypes.push_back(&AnimationArchetype.OrientationArchetype.Archetype);
-	archetypes.push_back(&UnitArchetype.AnimationArchetype.OrientationArchetype.Archetype);
 	archetypes.push_back(&SoundArchetype.Archetype);
 
 	EntityUtil::emInstance = this;
@@ -188,7 +185,7 @@ void EntityManager::Update1() {
 
 	unitSystem.UnitAIUpdate(*this);
 
-	animationSystem.TickAnimations(*this);
+	//animationSystem.TickAnimations(*this);
 }
 // Update 24 per second (60 fps) 
 void EntityManager::Update2() {
@@ -208,11 +205,11 @@ void EntityManager::Update2() {
 
 	UpdateChildren();
 
-	animationSystem.UpdateAnimationsForOrientation(*this);
+	//animationSystem.UpdateAnimationsForOrientation(*this);
 
 	mapSystem.UpdateVisibleEntities(*this);
 
-	animationSystem.UpdateAnimations(*this);
+	//animationSystem.UpdateAnimations(*this);
 
 	CollectEntityChanges();
 

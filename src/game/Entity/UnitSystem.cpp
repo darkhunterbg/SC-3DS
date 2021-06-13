@@ -278,7 +278,7 @@ void UnitSystem::UpdateBuilding(EntityManager& em)
 
 				iterate.position += em.PositionComponents.GetComponent(id);
 
-				Vector2Int16 bound = def->Graphics->Collider.size;
+				Vector2Int16 bound = { 0,0 };// def->Graphics->Collider.size;
 
 				iterate.position = iterate.position - bound / 2;
 				iterate.size = iterate.size + bound;
@@ -304,7 +304,7 @@ void UnitSystem::UpdateBuilding(EntityManager& em)
 
 				for (Vector2Int16 pos : testPositions)
 				{
-					Rectangle16 dstCollider = def->Graphics->Collider;
+					Rectangle16 dstCollider = {  };// def->Graphics->Collider;
 					dstCollider.SetCenter(pos);
 
 					if (!em.GetKinematicSystem().CollidesWithAny(dstCollider, Entity::None))

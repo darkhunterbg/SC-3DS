@@ -47,7 +47,7 @@ DrawCommand& GraphicsRenderer::GetDrawCommand(DrawCommandType type)
 	return instance.drawCommands.back();
 }
 
-DrawCommand& GraphicsRenderer::NewDrawCommand(TextureId texture)
+DrawCommand& GraphicsRenderer::NewDrawCommand(const Texture* texture)
 {
 	instance.drawCommands.push_back({ texture , (uint16_t)instance.vbPos,0 ,DrawCommandType::TexturedTriangle });
 	instance.texture = texture;
@@ -56,7 +56,7 @@ DrawCommand& GraphicsRenderer::NewDrawCommand(TextureId texture)
 	return instance.drawCommands.back();
 }
 
-DrawCommand& GraphicsRenderer::GetDrawCommand(TextureId texture)
+DrawCommand& GraphicsRenderer::GetDrawCommand(const Texture* texture)
 {
 	if (instance.texture != texture)
 	{
@@ -69,22 +69,25 @@ DrawCommand& GraphicsRenderer::GetDrawCommand(TextureId texture)
 
 void GraphicsRenderer::BufferDraw(std::vector<BatchDrawCommand>& cmd)
 {
+	if (cmd.size() == 0)
+		return;
 
 	if (instance.drawCommands.size() == 0)
-		instance.drawCommands.push_back({ cmd.front().sprite.textureId , (uint16_t)instance.vbPos,0 , DrawCommandType::TexturedTriangle });
+		instance.drawCommands.push_back({ cmd.front().sprite.texture , (uint16_t)instance.vbPos,0 , DrawCommandType::TexturedTriangle });
 
 	DrawCommand* dc = &instance.drawCommands.front();
 
 	for (const auto& c : cmd) {
 
-		Vector2Int16 size = c.sprite.rect.size;
+		Vector2Int16 size = c.sprite.GetSize();
 		size.x *= c.scale.x;
 		size.y *= c.scale.y;
 
-		Vector2 tL = c.sprite.uv[0];
-		Vector2 tR = c.sprite.uv[1];
-		Vector2 bL = c.sprite.uv[2];
-		Vector2 bR = c.sprite.uv[3];
+
+		Vector2 tL = c.sprite.uv.coords[0];
+		Vector2 tR = c.sprite.uv.coords[1];
+		Vector2 bL = c.sprite.uv.coords[2];
+		Vector2 bR = c.sprite.uv.coords[3];
 
 		if (size.x < 0) {
 			size.x = -size.x;
@@ -93,8 +96,8 @@ void GraphicsRenderer::BufferDraw(std::vector<BatchDrawCommand>& cmd)
 		}
 
 
-		if (dc->texture != c.sprite.textureId) {
-			dc = &instance.NewDrawCommand(c.sprite.textureId);
+		if (dc->texture != c.sprite.texture) {
+			dc = &instance.NewDrawCommand(c.sprite.texture);
 		}
 
 
@@ -115,7 +118,7 @@ void GraphicsRenderer::BufferDraw(std::vector<BatchDrawCommand>& cmd)
 
 void GraphicsRenderer::Draw(const Texture& texture, Vector2Int position, Color32 color)
 {
-	instance.GetDrawCommand(texture.GetTextureId()).count += 6;
+	instance.GetDrawCommand(&texture).count += 6;
 
 	Vector2Int size = Vector2Int(texture.GetSize());
 
@@ -134,16 +137,21 @@ void GraphicsRenderer::Draw(const Texture& texture, Vector2Int position, Color32
 	instance.AddVertex(Vector2(position), tL, color);
 }
 
-void GraphicsRenderer::Draw(const Sprite& sprite, Vector2Int position, Color32 color)
+void GraphicsRenderer::Draw(const ImageFrame& sprite, Vector2Int position, Color32 color)
 {
-	instance.GetDrawCommand(sprite.textureId).count += 6;
+	if (sprite.texture == nullptr)
+		return;
 
-	Vector2Int size = Vector2Int(sprite.rect.size);
+	position += Vector2Int(sprite.offset);
 
-	const Vector2& tL = sprite.uv[0];
-	const Vector2& tR = sprite.uv[1];
-	const Vector2& bL = sprite.uv[2];
-	const Vector2& bR = sprite.uv[3];
+	instance.GetDrawCommand(sprite.texture).count += 6;
+
+	Vector2Int size = Vector2Int(sprite.GetSize());
+
+	const Vector2& tL = sprite.uv.coords[0];
+	const Vector2& tR = sprite.uv.coords[1];
+	const Vector2& bL = sprite.uv.coords[2];
+	const Vector2& bR = sprite.uv.coords[3];
 
 	instance.AddVertex(Vector2(position), tL, color);
 	instance.AddVertex(Vector2(position + Vector2Int(size.x, 0)), tR, color);
@@ -154,16 +162,19 @@ void GraphicsRenderer::Draw(const Sprite& sprite, Vector2Int position, Color32 c
 	instance.AddVertex(Vector2(position), tL, color);
 }
 
-void GraphicsRenderer::Draw(const Sprite& sprite, const Rectangle& dst, Color32 color)
+void GraphicsRenderer::Draw(const ImageFrame& sprite, const Rectangle& dst, Color32 color)
 {
-	instance.GetDrawCommand(sprite.textureId).count += 6;
+	if (sprite.texture == nullptr)
+		return;
+
+	instance.GetDrawCommand(sprite.texture).count += 6;
 
 	Vector2Int size = dst.size;
 
-	const Vector2& tL = sprite.uv[0];
-	const Vector2& tR = sprite.uv[1];
-	const Vector2& bL = sprite.uv[2];
-	const Vector2& bR = sprite.uv[3];
+	const Vector2& tL = sprite.uv.coords[0];
+	const Vector2& tR = sprite.uv.coords[1];
+	const Vector2& bL = sprite.uv.coords[2];
+	const Vector2& bR = sprite.uv.coords[3];
 
 	instance.AddVertex(Vector2(dst.position), tL, color);
 	instance.AddVertex(Vector2(dst.position + Vector2Int(size.x, 0)), tR, color);
@@ -259,7 +270,15 @@ void GraphicsRenderer::DrawOnCurrentScreen()
 
 RenderSurface GraphicsRenderer::NewRenderSurface(Vector2Int size, bool pixelFiltering)
 {
-	return Platform::NewRenderSurface(size, pixelFiltering);
+	TextureId t;
+	SurfaceId  s = Platform::NewRenderSurface(size, pixelFiltering, t);
+	RenderSurface rs;
+
+	rs.surfaceId = s;
+	rs.sprite.texture = new Texture("RenderTarget", Vector2Int16(size), t);
+	rs.sprite.uv = Platform::GenerateUV(t, { {0,0}, Vector2Int16(size) });
+
+	return rs;
 }
 
 void GraphicsRenderer::ChangeBlendingMode(BlendMode mode)
@@ -279,7 +298,7 @@ void GraphicsRenderer::ClearCurrentSurface(Color color)
 	Platform::ClearBuffer(color);
 }
 
-Sprite GraphicsRenderer::NewSprite(TextureId texture, const Rectangle16& rect)
+ImageFrame GraphicsRenderer::NewSprite(const Texture& texture, const Rectangle16& rect)
 {
-	return  Platform::NewSprite(texture , rect);
+	return  {};
 }

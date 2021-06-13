@@ -75,19 +75,19 @@ void TimingSystem::UnitDeathAfterEffect(std::vector<EntityId>& entities, EntityM
 			EntityId old = entities[item];
 
 			const auto def = em.UnitArchetype.UnitComponents.GetComponent(old).def;
-			const auto& clip = def->Graphics->DeathAfterEffect.Clip;
+			//const auto& clip = def->Graphics->DeathAfterEffect.Clip;
 
 			em.PositionComponents.NewComponent(id) = em.PositionComponents.GetComponent(old);
 
-			EntityUtil::SetRenderFromAnimationClip(id, clip, 0);
-			em.RenderArchetype.RenderComponents.GetComponent(id).depth = def->Graphics->DeathAfterEffect.Depth;
+			//EntityUtil::SetRenderFromAnimationClip(id, clip, 0);
+			//em.RenderArchetype.RenderComponents.GetComponent(id).depth = def->Graphics->DeathAfterEffect.Depth;
 			em.RenderArchetype.BoundingBoxComponents.GetComponent(id)
 				.SetCenter(em.PositionComponents.GetComponent(id));
 
 			em.MapObjectArchetype.BoundingBoxComponents.CopyComponent(old, id);
 			em.MapObjectArchetype.DestinationComponents.CopyComponent(old, id);
-			EntityUtil::StartTimer(id, clip.GetDuration(), TimerExpiredAction::DeleteEntity);
-			EntityUtil::PlayAnimation(id, clip);
+			//EntityUtil::StartTimer(id, clip.GetDuration(), TimerExpiredAction::DeleteEntity);
+			//EntityUtil::PlayAnimation(id, clip);
 			EntityUtil::CopyFlag(old, id, ComponentFlags::RenderEnabled);
 		}
 

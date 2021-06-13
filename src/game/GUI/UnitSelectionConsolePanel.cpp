@@ -15,7 +15,7 @@ static char buffer[64];
 
 struct UnitItemInfo {
 
-	const Sprite* sprite;
+	const ImageFrame* sprite;
 	uint8_t counter;
 };
 
@@ -125,7 +125,7 @@ void UnitSelectionConsolePanel::UpdateSelection(GameViewContext& context)
 
 void UnitSelectionConsolePanel::DrawMultiSelection(Rectangle dst, GameViewContext& context)
 {
-	const Sprite& f = context.GetCommandIconsAtlas().GetFrame(14).sprite;
+	const ImageFrame& f = context.GetCommandIcons().GetFrame(14);
 
 	int max = std::min((int)context.selection.size(), 12);
 
@@ -139,7 +139,7 @@ void UnitSelectionConsolePanel::DrawMultiSelection(Rectangle dst, GameViewContex
 
 		Vector2Int offset = Vector2Int(i / 2, i % 2) * 36;
 
-		GraphicsRenderer::Draw(f, { pos + offset, Vector2Int(f.rect.size) });
+		GraphicsRenderer::Draw(f, { pos + offset, Vector2Int(f.GetSize()) });
 
 		EntityId entityId = context.selection[i];
 
@@ -149,7 +149,7 @@ void UnitSelectionConsolePanel::DrawMultiSelection(Rectangle dst, GameViewContex
 		Color wfColor[4];
 		GetUnitWireframeColors(entityId, health, wfColor);
 
-		const auto& wfBase = unit.def->Graphics->Wireframe.GetGroupBase();
+		const auto& wfBase = ImageFrame();// unit.def->Graphics->Wireframe.GetGroupBase();
 
 		offset += {1, 1};
 
@@ -159,12 +159,12 @@ void UnitSelectionConsolePanel::DrawMultiSelection(Rectangle dst, GameViewContex
 		Platform::Draw(wfBase.sprite, wfDst);*/
 
 		for (int i = 0; i < 4; ++i) {
-			const auto& wfPart = unit.def->Graphics->Wireframe.GetGroupPart(i);
+			const auto& wfPart = ImageFrame();// unit.def->Graphics->Wireframe.GetGroupPart(i);
 
 			Rectangle wfDst = { pos + offset , {0,0} };
 			wfDst.position += Vector2Int(wfPart.offset);
-			wfDst.size = Vector2Int(wfPart.sprite.rect.size);
-			GraphicsRenderer::Draw(wfPart.sprite, wfDst, wfColor[i]);
+			wfDst.size = Vector2Int(wfPart.GetSize());
+			GraphicsRenderer::Draw(wfPart, wfDst, wfColor[i]);
 		}
 	}
 }
@@ -232,7 +232,7 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 	pos.x += 8;
 	pos.y -= 16;
 
-	const Sprite& f = context.GetCommandIconsAtlas().GetFrame(2).sprite;
+	const ImageFrame& f = context.GetCommandIcons().GetFrame(2);
 	//const Sprite& f2 = context.GetCommandIconsAtlas().GetFrame(4).sprite;
 	//const Sprite& a = context.GetCommandIconsAtlas().GetFrame(11).sprite;
 
@@ -249,16 +249,16 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 
 	for (int i = 0; i < data.productionQueue.size(); ++i) {
 
-		dst.size = Vector2Int(f.rect.size);
+		dst.size = Vector2Int(f.GetSize());
 		GraphicsRenderer::Draw(f, dst);
 
 		if (i < data.queueSize) {
-			const SpriteFrame& n = data.productionQueue[i]->Icon;
+			const ImageFrame& n = data.productionQueue[i]->Icon;
 			Rectangle nDst = dst;
-			nDst.size = Vector2Int(n.sprite.rect.size);
+			nDst.size = Vector2Int(n.GetSize());
 			nDst.position += Vector2Int(n.offset) + Vector2Int{ 2,2 };
 
-			GraphicsRenderer::Draw(n.sprite, nDst, Colors::IconYellow);
+			GraphicsRenderer::Draw(n, nDst, Colors::IconYellow);
 
 			stbsp_snprintf(buffer, sizeof(buffer), "%i", i + 1);
 
@@ -267,11 +267,11 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 			GraphicsRenderer::DrawText(font, nDst.position + Vector2Int{ 25,19 }, buffer, c);
 		}
 		else {
-			const Sprite& n = context.GetCommandIconsAtlas().GetFrame(6 + i).sprite;
+			const ImageFrame& n = context.GetCommandIcons().GetFrame(6 + i);
 
 			Rectangle nDst = dst;
 
-			nDst.size = Vector2Int(n.rect.size);
+			nDst.size = Vector2Int(n.GetSize());
 			nDst.position += (dst.size - nDst.size) / 2;
 
 			GraphicsRenderer::Draw(n, nDst);
@@ -337,7 +337,7 @@ void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, con
 
 	pos.x = space.position.x;
 
-	const Sprite& f = context.GetCommandIconsAtlas().GetFrame(12).sprite;
+	const ImageFrame& f = context.GetCommandIcons().GetFrame(12);
 
 
 	UnitItemInfo info[4];
@@ -357,7 +357,7 @@ void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, con
 	}
 
 	for (int i = 0; i < infoCount; ++i) {
-		Rectangle dst = { pos ,Vector2Int(f.rect.size) };
+		Rectangle dst = { pos ,Vector2Int(f.GetSize()) };
 
 		Rectangle icoDst = dst;
 		icoDst.position += {2, 2};
@@ -413,19 +413,19 @@ void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, EntityId entityId,
 
 	// ================== Wireframe ========================
 
-	if (unit.def->Graphics->Wireframe.parts == 1) {
-		const auto& wfPart = unit.def->Graphics->Wireframe.GetBase();
-		Rectangle wfDst = wireframe;
-		wfDst.position += Vector2Int(wfPart.offset);
-		wfDst.size = Vector2Int(wfPart.sprite.rect.size);
-		GraphicsRenderer::Draw(wfPart.sprite, wfDst, Colors::White);
-	}
-	else {
+	//if (unit.def->Graphics->Wireframe.parts == 1) {
+	//	const auto& wfPart = unit.def->Graphics->Wireframe.GetBase();
+	//	Rectangle wfDst = wireframe;
+	//	wfDst.position += Vector2Int(wfPart.offset);
+	//	wfDst.size = Vector2Int(wfPart.sprite.rect.size);
+	//	GraphicsRenderer::Draw(wfPart.sprite, wfDst, Colors::White);
+	//}
+	//else {
 
-		Color wfColor[4];
-		GetUnitWireframeColors(entityId, health, wfColor);
+	//	Color wfColor[4];
+	//	GetUnitWireframeColors(entityId, health, wfColor);
 
-		const auto& wfBase = unit.def->Graphics->Wireframe.GetBase();
+	//	const auto& wfBase = unit.def->Graphics->Wireframe.GetBase();
 
 		
 	/*	Rectangle wfDst = wireframe;
@@ -434,7 +434,7 @@ void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, EntityId entityId,
 		GraphicsRenderer::Draw(wfBase.sprite, wfDst);
 		*/
 
-		for (int i = 0; i < 4; ++i) {
+	/*	for (int i = 0; i < 4; ++i) {
 			const auto& wfPart = unit.def->Graphics->Wireframe.GetPart(i);
 
 			Rectangle wfDst = wireframe;
@@ -442,7 +442,7 @@ void UnitSelectionConsolePanel::DrawUnitInfo(Rectangle space, EntityId entityId,
 			wfDst.size = Vector2Int(wfPart.sprite.rect.size);
 			GraphicsRenderer::Draw(wfPart.sprite, wfDst, wfColor[i]);
 		}
-	}
+	}*/
 }
 
 void UnitSelectionConsolePanel::GetUnitWireframeColors(EntityId id, const UnitHealthComponent& health, Color outColors[4])

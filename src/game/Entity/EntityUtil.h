@@ -45,31 +45,6 @@ public:
 	/// </summary>
 	static void SetPosition(EntityId e, Vector2Int16 pos);
 
-	/// <summary>
-	/// Copies Unit.Render archetype to Render archetype
-	/// </summary>
-	static void CopyUnitRenderSettings(EntityId e);
-
-	/// <summary>
-	/// Start regular animation
-	/// </summary>
-	static void PlayAnimation(EntityId e, const AnimationClip& clip);
-	
-	/// <summary>
-	/// Start unit animation
-	/// </summary>
-	static void PlayAnimation(EntityId e, const UnitAnimationClip& clip);
-
-	/// <summary>
-	/// Set render to show a frame from animation clip
-	/// </summary>
-	static void SetRenderFromAnimationClip(EntityId e, const AnimationClip& clip, uint8_t frame);
-
-	/// <summary>
-	/// Set render to show a frame from unit animation clip
-	/// </summary>
-	static void SetRenderFromAnimationClip(EntityId e, const UnitAnimationClip& clip, uint8_t frame);
-
 	static void SetMapObjectBoundingBoxFromRender(EntityId e);
 
 	static void CopyFlag(EntityId from, EntityId to, ComponentFlags flag);

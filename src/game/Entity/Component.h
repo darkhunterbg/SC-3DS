@@ -14,8 +14,6 @@
 
 #include "Common.h"
 
-#include "Debug.h"
-
 template <class TComponent, unsigned MaxComponents = Entity::MaxEntities>
 class ComponentCollection
 {
@@ -116,47 +114,14 @@ struct ChildComponent {
 };
 
 struct RenderComponent {
-	Sprite sprite;
+	ImageFrame sprite;
 	int8_t depth = 0;
 	bool hFlip = false;
-
-	inline void SetSpriteFrame(const SpriteFrame& s) {
-		sprite = s.sprite;
-		hFlip = s.hFlip;
-	}
-};
-
-struct RenderUnitComponent {
-	Color32 unitColor;
-	Sprite sprite;
-	Sprite shadowSprite;
-	Sprite colorSprite;
-	int8_t depth = 0;
-	bool hFlip = false;
-
-	inline void SetSpriteFrame(const UnitSpriteFrame& s) {
-		sprite = s.sprite;
-		shadowSprite = s.shadowSprite;
-		colorSprite = s.colorSprite;
-		hFlip = s.hFlip;
-	}
-};
-
-
-struct RenderUnitOffsetComponent {
-	Vector2Int16 offset;
-	Vector2Int16 shadowOffset;
 
 };
 
 struct RenderDestinationComponent {
 	Vector2Int16 dst;
-	int order = 0;
-};
-
-struct RenderUnitDestinationComponent {
-	Vector2Int16 dst;
-	Vector2Int16 shadowDst;
 	int order = 0;
 };
 
@@ -370,66 +335,6 @@ struct UnitWeaponComponent {
 		remainingCooldown = cooldown;
 	}
 	inline bool IsReady() const { return remainingCooldown == 0; }
-};
-
-struct AnimationOrientationComponent {
-	const AnimationClip* clips;
-	inline const AnimationClip& GetClip(int pos) const { return clips[pos]; }
-};
-
-struct AnimationTrackerComponent {
-	int8_t clipFrame = 0;
-	uint8_t frameCountdown = 1;
-	uint8_t totalFrames = 0;
-	uint8_t frameTime = 1;
-	bool looping = false;
-
-	inline void Restart() {
-		clipFrame = -1;
-		frameCountdown = frameTime;
-	}
-
-	inline void PlayClip(const AnimationClip* clip) {
-		if (clip) {
-			totalFrames = clip->GetFrameCount();
-			looping = clip->looping;
-			clipFrame = 0;
-			frameCountdown = frameTime = clip->frameTime;
-		}
-		else {
-			totalFrames = 0;
-			clipFrame = 0;
-			frameCountdown = 1;
-		}
-	}
-
-	inline void PlayClip(const UnitAnimationClip* clip) {
-		if (clip) {
-			totalFrames = clip->GetFrameCount();
-			looping = clip->looping;
-			clipFrame = 0;
-			frameCountdown = frameTime = clip->frameTime;
-		}
-		else {
-			totalFrames = 0;
-			clipFrame = 0;
-			frameCountdown = 1;
-		}
-	}
-};
-
-struct UnitAnimationOrientationComponent {
-	const UnitAnimationClip* clips;
-	inline const UnitAnimationClip& GetClip(int pos) const { return clips[pos]; }
-};
-
-
-struct UnitAnimationComponent {
-	const UnitAnimationClip* clip;
-};
-
-struct AnimationComponent {
-	const AnimationClip* clip;
 };
 
 

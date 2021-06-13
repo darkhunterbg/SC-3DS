@@ -15,7 +15,7 @@ class UnitCommandsPanel {
 private:
 	struct UnitCommand {
 		const AbilityDef* ability = nullptr;
-		const SpriteFrame* commandIcon = nullptr;
+		const ImageFrame* commandIcon = nullptr;
 		const UnitDef* abilityProduce = nullptr;
 
 		bool active = false;

@@ -19,10 +19,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Color.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\AbilityDatabase.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\AbilityDef.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\AnimationDef.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\AssetDataDefs.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\GameDatabase.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\GraphicsDef.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\RaceDatabase.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\RaceDef.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\SoundDef.h" />
@@ -37,7 +35,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\InputDevices.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\InputManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\JobSystem.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\Archetype.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\CommandProcessor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\Common.h" />
@@ -80,9 +77,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Assets.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Camera.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\AbilityDatabase.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\AnimationDef.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\GameDatabase.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\GraphicsDef.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\RaceDatabase.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\RaceDef.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\SoundDef.cpp" />
@@ -92,7 +87,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\InputDevices.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\InputManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\JobSystem.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\Archetype.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\CommandProcessor.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\Entity.cpp" />

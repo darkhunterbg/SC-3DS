@@ -7,10 +7,26 @@
 #include <string>
 #include <array>
 
-#include "Engine/GraphicsPrimitives.h"
+typedef void* TextureId;
 
 struct ImageDef;
 struct ImageFrameDef;
+
+union SubImageCoord {
+	
+	Vector2 coords[4];
+
+	struct {
+		Vector2 topLeft;
+		Vector2 topRight;
+		Vector2 lowerLeft;
+		Vector2 lowerRight;
+	} ;
+
+	inline Vector2 GetSize() const {
+		return lowerRight - topLeft;
+	}
+};
 
 class Texture {
 private:
@@ -52,11 +68,21 @@ public:
 struct ImageFrame {
 	const Texture* texture = nullptr;
 	Vector2Int16 offset;
-	Vector2Int16 size;
-	Vector2 uv[2];
+
+	SubImageCoord uv = {  };
 
 	ImageFrame() {}
 	ImageFrame(const Texture& texture, const ImageFrameDef& def);
+	inline Vector2Int16 GetSize() const {
+		return  Vector2Int16(Vector2(texture->GetSize()) * uv.GetSize());
+	}
+
+	inline Rectangle GetRect() const {
+		return { Vector2Int(offset), Vector2Int(GetSize()) };
+	}
+	inline Rectangle16 GetRect16() const {
+		return { offset, GetSize() };
+	}
 };
 
 class Image {
@@ -145,97 +171,4 @@ private:
 	FILE* stream;
 	int activeBufferIndex = 1;
 	int streamPos = 0;
-};
-
-
-struct SpriteFrame {
-	Sprite sprite;
-	Vector2Int16 offset;
-	bool hFlip = false;
-};
-class SpriteFrameAtlas {
-private:
-	std::vector<SpriteFrame> frames;
-public:
-	Vector2Int FrameSize;
-	inline void SetOffset(int index, Vector2Int offset) {
-		frames[index].offset = Vector2Int16(offset);
-	}
-	inline const SpriteFrame& GetFrame(int index) const {
-		return frames[index];
-	}
-};
-
-class AnimationClip {
-
-public:
-	uint8_t frameTime = 1;
-	bool looping = false;
-private:
-	uint8_t frameCount = 0;
-	std::array< SpriteFrame, 16> frames;
-	Vector2Int16 frameSize;
-public:
-
-	AnimationClip() {}
-	AnimationClip(const AnimationClip&) = delete;
-	AnimationClip& operator=(const AnimationClip&) = delete;
-
-
-	inline Vector2Int16 GetFrameSize() const { return frameSize; }
-	inline void AddFrame(const SpriteFrame& frame) {
-		frames[frameCount++] = frame;
-	}
-	void AddFrameCentered(const SpriteFrame& frame, Vector2Int16 frameSize, bool hFlip = false);
-	inline void SetFrameOffset(uint8_t frame, Vector2Int16 offset) {
-		frames[frame].offset = offset;
-	}
-	inline uint16_t GetDuration() const { return frameCount * (uint16_t)frameTime; }
-	inline Span<SpriteFrame> GetFrames() const {
-		return { frames.data(), frameCount };
-	}
-	inline uint8_t GetFrameCount() const { return frameCount; }
-	inline const SpriteFrame& GetFrame(uint8_t index) const {
-		return frames[index];
-	}
-};
-
-struct UnitSpriteFrame {
-	Sprite sprite;
-	Vector2Int16 offset;
-	Sprite shadowSprite;
-	Vector2Int16 shadowOffset;
-	Sprite colorSprite;
-	bool hFlip = false;
-};
-
-class UnitAnimationClip {
-
-public:
-	uint8_t frameTime = 1;
-	bool looping = false;
-private:
-	uint8_t frameCount = 0;
-	std::array<UnitSpriteFrame, 16> frames;
-	Vector2Int16 frameSize;
-public:
-
-	UnitAnimationClip();
-	UnitAnimationClip(const UnitAnimationClip&) = delete;
-	UnitAnimationClip& operator=(const UnitAnimationClip&) = delete;
-
-	inline Vector2Int16 GetFrameSize() const { return frameSize; }
-	inline uint16_t GetDuration() const { return frameCount * (uint16_t)frameTime; }
-	inline const Span<UnitSpriteFrame> GetFrames() const {
-		return { frames.data(), frameCount };
-	}
-	inline uint8_t GetFrameCount() const { return frameCount; }
-	inline const UnitSpriteFrame& GetFrame(uint8_t index) const {
-		return frames[index];
-	}
-
-	uint8_t AddFrameCentered(const SpriteFrame& frame, Vector2Int16 frameSize, bool hFlip = false);
-	void AddShadowFrameCentered(uint8_t frameIndex, const SpriteFrame& frame, Vector2Int16 frameSize, Vector2Int16 additionalOffset = { 0,0 });
-	void AddColorFrame(uint8_t frameIndex, const SpriteFrame& frame);
-
 };

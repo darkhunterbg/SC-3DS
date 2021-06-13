@@ -3,8 +3,8 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <functional>
 
-#include "GraphicsDef.h"
 #include "SoundDef.h"
 
 enum class RaceType :uint8_t {
@@ -18,24 +18,27 @@ enum class RaceType :uint8_t {
 struct RaceDef {
 	RaceType Type;
 	std::string Name;
-	SpriteAtlasDef ConsoleSprite;
 
-	const SpriteFrameAtlas* CommandIconsAtlas;
+	std::string consolePath;
+	std::string commandIconsPath;
 
-	Sprite SupplyIcon;
-	uint8_t SupplyIconId;
+	ImageFrame ConsoleLowerSprite;
+	ImageFrame ConsoleUpperSprite;
+	const Image* CommandIcons;
+
+	ImageFrame SupplyIcon;
+	std::string supplyIconPath;
+
 	std::string SupplyNamePlural;
 	std::string SupplyBuildingNamePlural;
 
-	Sprite GasIcon;
-	uint8_t GasIconId;
+	ImageFrame GasIcon;
+	std::string gasIconPath;
 
 	AdvisorSounds AdvisorErrorSounds;
 	AdvisorSounds AdvisorUpdateSounds;
 
 	std::vector<AudioStreamDef> GameMusic;
-
-	std::function<void()> CommandIconsLoad;
 
 	RaceDef() {  }
 	RaceDef(const RaceDef&) = delete;

@@ -1,6 +1,5 @@
 #include "NavigationSystem.h"
 #include "EntityManager.h"
-#include "AnimationSystem.h"
 #include "../Engine/JobSystem.h"
 #include "EntityUtil.h"
 

@@ -263,9 +263,9 @@ void GameView::DrawMarkers(const Camera& camera) {
 		if (!camRect.Contains(marker.pos))
 			continue;
 
-		const SpriteFrame& frame = {};// GraphicsDatabase::Cursor.targg.GetFrame(1);
+		const ImageFrame& frame = {};// GraphicsDatabase::Cursor.targg.GetFrame(1);
 
-		Rectangle dst = { {0,0},  Vector2Int(frame.sprite.rect.size) };
+		Rectangle dst = { {0,0},  Vector2Int(frame.GetSize()) };
 
 		if (marker.state == 0)
 		{
@@ -285,7 +285,7 @@ void GameView::DrawMarkers(const Camera& camera) {
 		Vector2Int16 p = camera.WorldToScreen(marker.pos);
 		dst.SetCenter(Vector2Int(p));
 
-		GraphicsRenderer::Draw(frame.sprite, dst);
+		GraphicsRenderer::Draw(frame, dst);
 	}
 
 }
@@ -297,8 +297,9 @@ void GameView::DrawUnitBars(const Camera& camera) {
 	for (EntityId id : context.selection) {
 
 		Vector2Int16 pos = em.PositionComponents.GetComponent(id);
-		pos.y += em.UnitArchetype.UnitComponents.GetComponent(id).def->Graphics->Selection.BarVerticalOffset;
-		int barSize = em.UnitArchetype.UnitComponents.GetComponent(id).def->Graphics->Selection.BarSize;
+	/*	pos.y += em.UnitArchetype.UnitComponents.GetComponent(id).def->Graphics->Selection.BarVerticalOffset;
+		int barSize = em.UnitArchetype.UnitComponents.GetComponent(id).def->Graphics->Selection.BarSize;*/
+		int barSize = 3;
 
 		barSize /= camera.Scale;
 

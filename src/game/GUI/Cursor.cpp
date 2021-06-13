@@ -24,14 +24,16 @@ void Cursor::Draw() {
 
 	clipCountdown--;
 
-	if (clipCountdown <= 0) {
-		clipCountdown = AnimFrameCount;
-		clipFrame = (++clipFrame) % currentClip->GetFrameCount();
-	}
+	//if (clipCountdown <= 0) {
+	//	clipCountdown = AnimFrameCount;
+	//	clipFrame = (++clipFrame) % currentClip->GetFrameCount();
+	//}
 
-	const SpriteFrame& frame = currentClip->GetFrame(clipFrame);
+	//const SpriteFrame& frame = currentClip->GetFrame(clipFrame);
 
-	Rectangle dst = { Vector2Int(Position + frame.offset), Vector2Int(frame.sprite.rect.size) };
+	ImageFrame frame;
+
+	Rectangle dst = { Vector2Int(Position + frame.offset), Vector2Int(frame.offset) };
 
 	if (regionRect.size.LengthSquaredInt() > 0) {
 
@@ -41,7 +43,7 @@ void Cursor::Draw() {
 		Util::DrawTransparentRectangle(regionRect, 2, Colors::UIGreen);
 	}
 
-	GraphicsRenderer::Draw(frame.sprite, dst);
+	GraphicsRenderer::Draw(frame, dst);
 }
 
 void Cursor::Update(Camera& camera, GameViewContext& context) {
@@ -89,7 +91,7 @@ void Cursor::Update(Camera& camera, GameViewContext& context) {
 
 	dragging = (worldPos - holdStart).LengthSquared() != 0;
 
-	newClip = currentClip;
+	//newClip = currentClip;
 
 	if (context.IsTargetSelectionMode) {
 		UpdateTargetSelectionState(camera, context);
@@ -105,11 +107,11 @@ void Cursor::Update(Camera& camera, GameViewContext& context) {
 		camera.Position += Vector2Int16(v * camera.GetCameraSpeed());
 	}
 
-	if (newClip != currentClip) {
-		currentClip = newClip;
-		clipFrame = 0;
-		clipCountdown = AnimFrameCount;
-	}
+	//if (newClip != currentClip) {
+	//	currentClip = newClip;
+	//	clipFrame = 0;
+	//	clipCountdown = AnimFrameCount;
+	//}
 }
 
 void Cursor::UpdateDefaultState(Camera& camera, GameViewContext& context)

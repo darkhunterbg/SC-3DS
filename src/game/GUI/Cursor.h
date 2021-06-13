@@ -14,7 +14,7 @@ public:
 	Vector2Int16 Position = { 0,0 };
 	Rectangle16 Limits = { {0,0},{400,240} };
 private:
-	const AnimationClip* currentClip;
+	//const AnimationClip* currentClip;
 	int clipFrame = 0;
 	int clipCountdown = 0;
 
@@ -24,7 +24,7 @@ private:
 	bool holding, dragging;
 	EntityId hover;
 	Vector2Int16 worldPos;
-	const AnimationClip* newClip;
+	//const AnimationClip* newClip;
 
 	void UpdateDefaultState(Camera& camera, GameViewContext& context);
 	void UpdateTargetSelectionState(Camera& camera, GameViewContext& context);

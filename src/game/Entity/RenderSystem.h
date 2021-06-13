@@ -28,19 +28,6 @@ class RenderSystem {
 		}
 	};
 
-	struct RenderUnitData {
-		std::vector<RenderUnitDestinationComponent> pos;
-		std::vector<RenderUnitComponent> ren;
-
-		inline void clear() {
-			pos.clear();
-			ren.clear();
-		}
-		inline size_t size() const {
-			return pos.size();
-		}
-	};
-
 	struct RenderUpdatePosData {
 		std::vector<RenderDestinationComponent*> outDst;
 		std::vector<Rectangle16*> outBB;
@@ -61,27 +48,8 @@ class RenderSystem {
 		}
 	};
 
-	struct RenderUnitUpdatePosData {
-		std::vector<RenderUnitDestinationComponent*> outPos;
-		std::vector<Rectangle16*> outBB;
-		std::vector<Vector2Int16> worldPos;
-		std::vector<RenderUnitOffsetComponent> offset;
-		std::vector<int8_t> depth;
-
-		inline void clear() {
-			outPos.clear();
-			worldPos.clear();
-			offset.clear();
-			outBB.clear();
-			depth.clear();
-		}
-		inline size_t size() {
-			return outPos.size();
-		}
-	};
-
 	struct RenderUnitSelectionData {
-		std::vector<SpriteFrame> graphics;
+		std::vector<ImageFrame> graphics;
 		std::vector<Vector2Int16> position;
 		std::vector<int> order;
 		std::vector<short> verticalOffset;
@@ -105,12 +73,9 @@ private:
 	std::vector<Color32> selectionColor;
 
 	RenderData renderData;
-	RenderUnitData renderUnitData;
 	RenderUpdatePosData updatePosData;
-	RenderUnitUpdatePosData unitUpdatePosData;
 	RenderUnitSelectionData unitSelectionData;
 
-	static void UpdateUnitRenderPositionsJob(int start, int end);
 	static void UpdateRenderPositionsJob(int start, int end);
 	static bool RenderSort(const BatchDrawCommand& a, const BatchDrawCommand& b);
 
@@ -118,7 +83,6 @@ private:
 	void UnitSelectionCameraCull(const Rectangle16& rect, EntityManager& em);
 
 	void DrawEntities(const Camera& camera, const Rectangle16& camRect);
-	void DrawUnits(const Camera& camera, const Rectangle16& camRect);
 	void DrawSelection(const Camera& camera, const Rectangle16& camRect);
 public:
 	void Draw(const Camera& camera, EntityManager& em);

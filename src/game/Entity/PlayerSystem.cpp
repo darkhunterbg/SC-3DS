@@ -3,6 +3,8 @@
 #include "../Profiler.h"
 #include "../MathLib.h"
 #include "../Engine/JobSystem.h"
+#include "../Debug.h"
+
 #include <algorithm>
 
 static constexpr const uint8_t TileVisibilityTimer = 40;

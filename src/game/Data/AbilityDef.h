@@ -13,7 +13,7 @@ struct AbilityDef {
 	std::string Name;
 	int IconId;
 
-	SpriteFrame Sprite;
+	ImageFrame Sprite;
 
 	struct {
 		bool HasTargetSelection = false;

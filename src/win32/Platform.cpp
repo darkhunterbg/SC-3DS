@@ -101,7 +101,7 @@ void Platform::DrawOnScreen(ScreenId screen) {
 	target = (screens[(int)currentRT])->target;
 
 }
-void Platform::DrawOnSurface(Surface surface) {
+void Platform::DrawOnSurface(SurfaceId surface) {
 	auto t = (GPU_Target*)surface;
 
 	if (t == nullptr)
@@ -109,7 +109,7 @@ void Platform::DrawOnSurface(Surface surface) {
 	else
 		target = t;
 }
-RenderSurface Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering) {
+SurfaceId Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering, TextureId& outTexture) {
 	GPU_Image* tex = nullptr;
 
 	tex = GPU_CreateImage(size.x, size.y, GPU_FORMAT_RGBA);
@@ -124,20 +124,18 @@ RenderSurface Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering) {
 
 	GPU_Target* surface = GPU_LoadTarget(tex);
 	GPU_SetWrapMode(tex, GPU_WRAP_NONE, GPU_WRAP_NONE);
-	Sprite s;
-	s.rect = { {0,0}, Vector2Int16(size) };
-	s.textureId = tex;
-	s.uv[0] = { 0,0 };
-	s.uv[1] = { 1,0 };
-	s.uv[2] = { 0,1 };
-	s.uv[3] = { 1,1 };
-	return { surface , s };
+	outTexture = tex;
+
+	return surface;
 }
-Sprite Platform::NewSprite(TextureId texture, Rectangle16 src) {
+SubImageCoord Platform::GenerateUV(TextureId texture, Rectangle16 src) {
 	GPU_Image* img = (GPU_Image*)texture;
 	Vector2 start = Vector2(src.position) / Vector2(img->w, img->h);
 	Vector2 end = Vector2(src.GetMax()) / Vector2(img->w, img->h);
-	return { src,  {start,{end.x, start.y}, {start.x, end.y }, end} , texture };
+
+	SubImageCoord uv = { start,{end.x, start.y}, {start.x, end.y }, end };
+
+	return uv;
 }
 
 void Platform::ChangeBlendingMode(BlendMode mode) {
@@ -197,7 +195,7 @@ void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
 		{
 		case DrawCommandType::TexturedTriangle: {
 
-			GPU_Image* img = (GPU_Image*)cmd.texture;
+			GPU_Image* img = (GPU_Image*)cmd.texture->GetTextureId();
 			/*
 			for (int i = cmd.start; i < cmd.start + cmd.count; i += 6) {
 

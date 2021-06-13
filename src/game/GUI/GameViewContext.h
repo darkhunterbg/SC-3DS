@@ -73,8 +73,8 @@ public:
 		return *em;
 	}
 
-	inline const SpriteFrameAtlas& GetCommandIconsAtlas() const {
-		return *race->CommandIconsAtlas;
+	inline const Image& GetCommandIcons() const {
+		return *race->CommandIcons;
 	}
 
 	void SelectUnitsInRegion(Rectangle16 region);

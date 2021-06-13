@@ -11,7 +11,7 @@ class GraphicsRenderer {
 
 private:
 
-	TextureId texture = nullptr;
+	const Texture* texture = nullptr;
 	DrawCommandType cmdType = DrawCommandType::None;
 	unsigned vbPos = 0;
 	Vertex* vb = nullptr;
@@ -21,8 +21,8 @@ private:
 
 	void AddVertex(const Vector2& pos, const Vector2& uv, const Color32& c);
 
-	DrawCommand& NewDrawCommand(TextureId texture);
-	DrawCommand& GetDrawCommand(TextureId texture);
+	DrawCommand& NewDrawCommand(const Texture* texture);
+	DrawCommand& GetDrawCommand(const Texture* texture);
 	DrawCommand& GetDrawCommand(DrawCommandType type);
 
 	GraphicsRenderer() {}
@@ -36,8 +36,8 @@ public:
 
 	static void Draw(const Texture& texture, Vector2Int position, Color32 color = 0xFFFFFFFF);
 
-	static void Draw(const Sprite& sprite, Vector2Int position, Color32 color = 0xFFFFFFFF);
-	static void Draw(const Sprite& sprite, const Rectangle& dst, Color32 color = 0xFFFFFFFF);
+	static void Draw(const ImageFrame& sprite, Vector2Int position, Color32 color = 0xFFFFFFFF);
+	static void Draw(const ImageFrame& sprite, const Rectangle& dst, Color32 color = 0xFFFFFFFF);
 
 	inline static void Draw(const RenderSurface& surface, Vector2Int position, Color32 color = 0xFFFFFFFF) {
 		Draw(surface.sprite, position, color);
@@ -47,10 +47,10 @@ public:
 		Draw(surface.sprite, dst, color);
 	}
 
-	inline static void Draw(const Sprite& sprite, Vector2Int position , Color color ) {
+	inline static void Draw(const ImageFrame& sprite, Vector2Int position , Color color ) {
 		Draw(sprite, position, Color32(color));
 	}
-	inline static void Draw(const Sprite& sprite, const Rectangle& dst, Color color ) {
+	inline static void Draw(const ImageFrame& sprite, const Rectangle& dst, Color color ) {
 		Draw(sprite, dst, Color32(color));
 	}
 	inline static void Draw(const RenderSurface& surface, Vector2Int position, Color color ) {
@@ -91,5 +91,5 @@ public:
 
 	static void ClearCurrentSurface(Color color);
 
-	static Sprite NewSprite(TextureId texture, const Rectangle16& rect);
+	static ImageFrame NewSprite(const Texture& texture, const Rectangle16& rect);
 };

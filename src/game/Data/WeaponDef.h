@@ -2,7 +2,6 @@
 
 #include "../MathLib.h"
 #include "SoundDef.h"
-#include "AnimationDef.h"
 #include "../Assets.h"
 #include <string>
 #include <functional>
@@ -15,10 +14,8 @@ struct WeaponDef {
 	uint8_t Cooldown = 1;
 
 	UnitSound Sound;
-	DirectionalAnimationDef TargetEffectDef;
-	AnimationClip TargetEffect[32];
 
-	Sprite Icon ;
+	ImageFrame Icon ;
 	int IconId = 0;
 
 	WeaponDef() {}

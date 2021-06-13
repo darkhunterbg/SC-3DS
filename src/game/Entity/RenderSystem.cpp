@@ -33,27 +33,6 @@ void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
 		renderData.ren.push_back(em.RenderArchetype.RenderComponents[i]);
 	}
 
-	renderUnitData.clear();
-
-	for (EntityId id : em.UnitArchetype.RenderArchetype.Archetype.GetEntities()) {
-
-		auto& arch = em.UnitArchetype.RenderArchetype;
-
-		int i = Entity::ToIndex(id);
-
-		if (!em.FlagComponents[i].test(ComponentFlags::RenderEnabled))
-			continue;
-
-		const Rectangle16& bb = arch.BoundingBoxComponents[i];
-
-		if (!camRect.Intersects(bb))
-			continue;
-
-		renderUnitData.pos.push_back(arch.DestinationComponents[i]);
-		renderUnitData.ren.push_back(arch.RenderComponents[i]);
-
-	}
-
 	UnitSelectionCameraCull(camRect, em);
 }
 
@@ -64,7 +43,7 @@ void RenderSystem::UnitSelectionCameraCull(const Rectangle16& camRect, EntityMan
 	for (EntityId id : selectedUnits) {
 		++j;
 
-		auto& arch = em.UnitArchetype.RenderArchetype;
+		auto& arch = em.RenderArchetype;
 
 		int i = Entity::ToIndex(id);
 
@@ -78,13 +57,13 @@ void RenderSystem::UnitSelectionCameraCull(const Rectangle16& camRect, EntityMan
 
 		const auto* def = em.UnitArchetype.UnitComponents.GetComponent(id).def;
 
-		unitSelectionData.graphics.push_back(def->Graphics->Selection.Atlas->GetFrame(0));
+	/*	unitSelectionData.graphics.push_back(def->Graphics->Selection.Atlas->GetFrame(0));
 		Vector2Int16 pos = em.PositionComponents.GetComponent(id);
 		pos -= Vector2Int16(def->Graphics->Selection.Atlas->FrameSize / 2);
 		unitSelectionData.position.push_back(pos);
 		unitSelectionData.order.push_back(arch.DestinationComponents.GetComponent(id).order);
 		unitSelectionData.verticalOffset.push_back(def->Graphics->Selection.VecticalOffset);
-		unitSelectionData.color.push_back(selectionColor[j]);
+		unitSelectionData.color.push_back(selectionColor[j]);*/
 
 	}
 }
@@ -115,51 +94,6 @@ void RenderSystem::DrawEntities(const Camera& camera, const Rectangle16& camRect
 		render.push_back(cmd);
 	}
 }
-void RenderSystem::DrawUnits(const Camera& camera, const Rectangle16& camRect) {
-	constexpr const Color32 shadowColor = Color32(0.0f, 0.0f, 0.0f, 0.5f);
-
-	float camMul = 1.0f / camera.Scale;
-
-	Vector2 scale[] = { {camMul,camMul},{-camMul,camMul} };
-
-	int entitiesCount = renderUnitData.size();
-
-	for (int i = 0; i < entitiesCount; ++i) {
-		const auto& rp = renderUnitData.pos[i];
-		const auto& r = renderUnitData.ren[i];
-
-		Vector2Int16 dst = rp.dst;
-		dst -= camRect.position;
-		dst /= camera.Scale;
-
-		Vector2Int16 shadowDst = rp.shadowDst;
-		shadowDst -= camRect.position;
-		shadowDst /= camera.Scale;
-
-
-		BatchDrawCommand cmd;
-		cmd.order = rp.order;
-		cmd.sprite = r.shadowSprite;
-		cmd.position = shadowDst;
-		cmd.scale = scale[r.hFlip];
-		cmd.color = shadowColor;
-		if (cmd.sprite.textureId)
-			render.push_back(cmd);
-
-		cmd.order += 2;
-		cmd.sprite = r.sprite;
-		cmd.position = dst;
-		cmd.color = Color32(Colors::White);
-
-		render.push_back(cmd);
-
-		cmd.order++;
-		cmd.sprite = r.colorSprite;
-		cmd.color = Color32(r.unitColor);
-		if (cmd.sprite.textureId)
-			render.push_back(cmd);
-	}
-}
 void RenderSystem::DrawSelection(const Camera& camera, const Rectangle16& camRect) {
 
 	int entitiesCount = unitSelectionData.size();
@@ -181,7 +115,7 @@ void RenderSystem::DrawSelection(const Camera& camera, const Rectangle16& camRec
 		dst /= camera.Scale;
 
 		cmd.order = unitSelectionData.order[i] + 1;
-		cmd.sprite = frame.sprite;
+		cmd.sprite = frame;
 		cmd.position = dst;
 		cmd.color = unitSelectionData.color[i];
 
@@ -199,7 +133,6 @@ void RenderSystem::Draw(const Camera& camera, EntityManager& em) {
 	render.clear();
 
 	DrawEntities(camera, camRect);
-	DrawUnits(camera, camRect);
 	DrawSelection(camera, camRect);
 
 	std::sort(render.begin(), render.end(), RenderSort);
@@ -214,9 +147,9 @@ void RenderSystem::DrawBoundingBoxes(const Camera& camera, EntityManager& em) {
 	Color c = Colors::UIGreen;
 	c.a = 0.5f;
 
-	for (EntityId id : em.UnitArchetype.RenderArchetype.Archetype.GetEntities()) {
+	for (EntityId id : em.RenderArchetype.Archetype.GetEntities()) {
 
-		auto& arch = em.UnitArchetype.RenderArchetype;
+		auto& arch = em.RenderArchetype;
 
 		int i = Entity::ToIndex(id);
 
@@ -274,29 +207,9 @@ void RenderSystem::UpdateRenderPositionsJob(int start, int end) {
 		data.outBB[i]->SetCenter(data.worldPos[i]);
 	}
 }
-void RenderSystem::UpdateUnitRenderPositionsJob(int start, int end) {
-	RenderUnitUpdatePosData& data = s->unitUpdatePosData;
-
-	for (int i = start; i < end; ++i) {
-		RenderUnitDestinationComponent& p = *data.outPos[i];
-		p.dst = data.worldPos[i] + data.offset[i].offset;
-		p.shadowDst = data.worldPos[i] + data.offset[i].shadowOffset;
-		p.order = data.depth[i] * 10'000'000 + p.dst.y * 1000 + p.dst.x * 4;
-
-		data.outBB[i]->SetCenter(data.worldPos[i]);
-	}
-}
 
 void RenderSystem::UpdatePositions(EntityManager& em, const EntityChangedData& changed) {
 	updatePosData.clear();
-	unitUpdatePosData.clear();
-
-	for (EntityId id : changed.entity) {
-		if (em.RenderArchetype.Archetype.HasEntity(id) ||
-			em.UnitArchetype.RenderArchetype.Archetype.HasEntity(id))
-
-			em.FlagComponents.GetComponent(id).set(ComponentFlags::RenderChanged);
-	}
 
 	for (EntityId id : em.RenderArchetype.Archetype.GetEntities()) {
 		int i = Entity::ToIndex(id);
@@ -318,31 +231,9 @@ void RenderSystem::UpdatePositions(EntityManager& em, const EntityChangedData& c
 		}
 	}
 
-	for (EntityId id : em.UnitArchetype.RenderArchetype.Archetype.GetEntities()) {
-
-		int i = Entity::ToIndex(id);
-		FlagsComponent& flag = em.FlagComponents[i];
-
-		if (!flag.test(ComponentFlags::RenderEnabled))
-			continue;
-
-		auto& arch = em.UnitArchetype.RenderArchetype;
-
-		if (flag.test(ComponentFlags::RenderChanged)) {
-
-			flag.clear(ComponentFlags::RenderChanged);
-			unitUpdatePosData.outPos.push_back(&arch.DestinationComponents[i]);
-			unitUpdatePosData.worldPos.push_back(em.PositionComponents[i]);
-			unitUpdatePosData.offset.push_back(arch.OffsetComponents[i]);
-			unitUpdatePosData.outBB.push_back(&arch.BoundingBoxComponents[i]);
-			unitUpdatePosData.depth.push_back(arch.RenderComponents[i].depth);
-		}
-	}
-
 	s = this;
 
 	JobSystem::RunJob(updatePosData.size(), JobSystem::DefaultJobSize, UpdateRenderPositionsJob);
-	JobSystem::RunJob(unitUpdatePosData.size(), JobSystem::DefaultJobSize, UpdateUnitRenderPositionsJob);
 }
 
 void RenderSystem::ClearSelection() {
