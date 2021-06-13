@@ -79,7 +79,7 @@ void GraphicsRenderer::BufferDraw(std::vector<BatchDrawCommand>& cmd)
 
 	for (const auto& c : cmd) {
 
-		Vector2Int16 size = c.sprite.GetSize();
+		Vector2Int16 size = c.sprite.size;
 		size.x *= c.scale.x;
 		size.y *= c.scale.y;
 
@@ -122,7 +122,6 @@ void GraphicsRenderer::Draw(const Texture& texture, Vector2Int position, Color32
 
 	Vector2Int size = Vector2Int(texture.GetSize());
 
-
 	const Vector2& tL = { 0,0 };
 	const Vector2& tR = { 1,0 };
 	const Vector2& bL = { 0,1 };
@@ -146,7 +145,7 @@ void GraphicsRenderer::Draw(const ImageFrame& sprite, Vector2Int position, Color
 
 	instance.GetDrawCommand(sprite.texture).count += 6;
 
-	Vector2Int size = Vector2Int(sprite.GetSize());
+	Vector2Int size = Vector2Int(sprite.size);
 
 	const Vector2& tL = sprite.uv.coords[0];
 	const Vector2& tR = sprite.uv.coords[1];

@@ -56,7 +56,7 @@ struct RenderSurface {
 	ImageFrame sprite;
 
 	inline Vector2Int GetSize() const {
-		return Vector2Int(sprite.GetSize());
+		return Vector2Int(sprite.size);
 	}
 	inline Rectangle GetRect() const {
 		return sprite.GetRect();

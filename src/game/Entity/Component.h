@@ -115,9 +115,10 @@ struct ChildComponent {
 
 struct RenderComponent {
 	ImageFrame sprite;
+	const ImageFrame* colorMask = nullptr;
+	Color32 color = 0xFFFFFFFF;
 	int8_t depth = 0;
 	bool hFlip = false;
-
 };
 
 struct RenderDestinationComponent {

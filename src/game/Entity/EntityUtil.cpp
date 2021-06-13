@@ -43,6 +43,25 @@ void EntityUtil::SetPosition(EntityId e, Vector2Int16 pos) {
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::PositionChanged);
 }
 
+void EntityUtil::SetImageFrame(EntityId e, const Image& img, unsigned frameId, bool hFlip)
+{
+	EntityManager& em = GetManager();
+	const auto& frame = img.GetFrame(frameId);
+
+	Vector2Int16 offset = frame.offset - (img.GetSize() >> 1);
+	if (hFlip)
+		offset.x = (img.GetSize().x >> 1) - frame.offset.x - frame.size.x;
+
+
+	em.RenderArchetype.BoundingBoxComponents.GetComponent(e).size = img.GetSize();
+	em.RenderArchetype.OffsetComponents.GetComponent(e) = offset;
+	RenderComponent& render = em.RenderArchetype.RenderComponents.GetComponent(e);
+	render.sprite = frame;
+	render.hFlip = hFlip;
+	render.colorMask = img.GetColorMaskFrame(frameId);
+	em.FlagComponents.GetComponent(e).set(ComponentFlags::RenderChanged);
+}
+
 void EntityUtil::SetMapObjectBoundingBoxFromRender(EntityId e)
 {
 	EntityManager& em = GetManager();

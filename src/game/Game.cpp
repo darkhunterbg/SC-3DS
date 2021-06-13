@@ -39,8 +39,8 @@ static void ShowTitleScreen() {
 	GraphicsRenderer::Draw(*title, { 0,0 });
 }
 static void InitialScene() {
-	Game::SetCurrentScene(new GameScene());
-	//Game::SetCurrentScene(new PerformanceTestScene());
+	//Game::SetCurrentScene(new GameScene());
+	Game::SetCurrentScene(new PerformanceTestScene());
 }
 
 void Game::FrameStart() {

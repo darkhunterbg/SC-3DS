@@ -139,7 +139,7 @@ void UnitSelectionConsolePanel::DrawMultiSelection(Rectangle dst, GameViewContex
 
 		Vector2Int offset = Vector2Int(i / 2, i % 2) * 36;
 
-		GraphicsRenderer::Draw(f, { pos + offset, Vector2Int(f.GetSize()) });
+		GraphicsRenderer::Draw(f, { pos + offset, Vector2Int(f.size) });
 
 		EntityId entityId = context.selection[i];
 
@@ -163,7 +163,7 @@ void UnitSelectionConsolePanel::DrawMultiSelection(Rectangle dst, GameViewContex
 
 			Rectangle wfDst = { pos + offset , {0,0} };
 			wfDst.position += Vector2Int(wfPart.offset);
-			wfDst.size = Vector2Int(wfPart.GetSize());
+			wfDst.size = Vector2Int(wfPart.size);
 			GraphicsRenderer::Draw(wfPart, wfDst, wfColor[i]);
 		}
 	}
@@ -249,13 +249,13 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 
 	for (int i = 0; i < data.productionQueue.size(); ++i) {
 
-		dst.size = Vector2Int(f.GetSize());
+		dst.size = Vector2Int(f.size);
 		GraphicsRenderer::Draw(f, dst);
 
 		if (i < data.queueSize) {
 			const ImageFrame& n = data.productionQueue[i]->Icon;
 			Rectangle nDst = dst;
-			nDst.size = Vector2Int(n.GetSize());
+			nDst.size = Vector2Int(n.size);
 			nDst.position += Vector2Int(n.offset) + Vector2Int{ 2,2 };
 
 			GraphicsRenderer::Draw(n, nDst, Colors::IconYellow);
@@ -271,7 +271,7 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 
 			Rectangle nDst = dst;
 
-			nDst.size = Vector2Int(n.GetSize());
+			nDst.size = Vector2Int(n.size);
 			nDst.position += (dst.size - nDst.size) / 2;
 
 			GraphicsRenderer::Draw(n, nDst);
@@ -357,7 +357,7 @@ void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, con
 	}
 
 	for (int i = 0; i < infoCount; ++i) {
-		Rectangle dst = { pos ,Vector2Int(f.GetSize()) };
+		Rectangle dst = { pos ,Vector2Int(f.size) };
 
 		Rectangle icoDst = dst;
 		icoDst.position += {2, 2};

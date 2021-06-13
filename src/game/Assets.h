@@ -13,7 +13,7 @@ struct ImageDef;
 struct ImageFrameDef;
 
 union SubImageCoord {
-	
+
 	Vector2 coords[4];
 
 	struct {
@@ -21,7 +21,7 @@ union SubImageCoord {
 		Vector2 topRight;
 		Vector2 lowerLeft;
 		Vector2 lowerRight;
-	} ;
+	};
 
 	inline Vector2 GetSize() const {
 		return lowerRight - topLeft;
@@ -68,20 +68,18 @@ public:
 struct ImageFrame {
 	const Texture* texture = nullptr;
 	Vector2Int16 offset;
+	Vector2Int16 size;
 
 	SubImageCoord uv = {  };
 
 	ImageFrame() {}
 	ImageFrame(const Texture& texture, const ImageFrameDef& def);
-	inline Vector2Int16 GetSize() const {
-		return  Vector2Int16(Vector2(texture->GetSize()) * uv.GetSize());
-	}
 
 	inline Rectangle GetRect() const {
-		return { Vector2Int(offset), Vector2Int(GetSize()) };
+		return { Vector2Int(offset), Vector2Int(size) };
 	}
 	inline Rectangle16 GetRect16() const {
-		return { offset, GetSize() };
+		return { offset, size };
 	}
 };
 
@@ -91,13 +89,17 @@ private:
 	Vector2Int16 size;
 	const ImageFrame* frameStart;
 	uint16_t frameCount;
+	uint16_t colorMaskOffset;
 public:
 	Image() {}
 	Image(const ImageFrame* frameStart, const ImageDef& def);
 
-	inline const std::string GetName()const { return name; }
+	inline const std::string GetName() const { return name; }
+	inline const Vector2Int16 GetSize() const { return size; }
 
 	const ImageFrame& GetFrame(unsigned index) const;
+
+	const ImageFrame* GetColorMaskFrame(unsigned index) const;
 };
 
 struct AudioInfo {

@@ -29,7 +29,7 @@ void UnitCommandsPanel::UpdateInput(GameViewContext& context)
 
 	const ImageFrame& f = context.GetCommandIcons().GetFrame(0);
 
-	dst.size = Vector2Int(f.GetSize());
+	dst.size = Vector2Int(f.size);
 
 	if (InputManager::Pointer.IsDown()) {
 
@@ -94,7 +94,7 @@ void UnitCommandsPanel::DrawCommands(GameViewContext& context) {
 
 
 			const ImageFrame& f = cmd.pressed ? pressed : normal;
-			dst.size = Vector2Int(f.GetSize());
+			dst.size = Vector2Int(f.size);
 
 			Rectangle d = dst;
 			d.position += offset;
@@ -103,9 +103,9 @@ void UnitCommandsPanel::DrawCommands(GameViewContext& context) {
 			const ImageFrame& commandIcon = cmd.commandIcon != nullptr ?
 				*cmd.commandIcon : cmd.ability->Sprite;
 
-			d.size = Vector2Int(commandIcon.GetSize());
+			d.size = Vector2Int(commandIcon.size);
 			d.position = dst.position + offset +
-				(Vector2Int{ 36, 35 } - Vector2Int(commandIcon.offset + commandIcon.GetSize())) / 2;
+				(Vector2Int{ 36, 35 } - Vector2Int(commandIcon.offset + commandIcon.size)) / 2;
 
 
 			if (cmd.pressed) {

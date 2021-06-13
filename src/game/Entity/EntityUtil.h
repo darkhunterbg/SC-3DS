@@ -45,6 +45,8 @@ public:
 	/// </summary>
 	static void SetPosition(EntityId e, Vector2Int16 pos);
 
+	static void SetImageFrame(EntityId e, const Image& img, unsigned frameId, bool hFlip);
+
 	static void SetMapObjectBoundingBoxFromRender(EntityId e);
 
 	static void CopyFlag(EntityId from, EntityId to, ComponentFlags flag);

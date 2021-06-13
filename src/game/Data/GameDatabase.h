@@ -16,6 +16,8 @@ private:
 
 	std::unordered_map<std::string, const Image*> imageNamesMap;
 public:
+	static const GameDatabase* instance;
+
 	std::vector<AtlasDef> AtlasDefs;
 	std::vector<ImageDef> ImageDefs;
 	std::vector<ImageFrameDef> FrameDefs;
@@ -24,7 +26,7 @@ public:
 	std::vector<AnimInstructionDef> AnimInstructionDefs;
 
 
-	GameDatabase(){}
+	GameDatabase();
 	GameDatabase(const GameDatabase&) = delete;
 	GameDatabase& operator=(const GameDatabase&) = delete;
 

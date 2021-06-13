@@ -265,7 +265,7 @@ void GameView::DrawMarkers(const Camera& camera) {
 
 		const ImageFrame& frame = {};// GraphicsDatabase::Cursor.targg.GetFrame(1);
 
-		Rectangle dst = { {0,0},  Vector2Int(frame.GetSize()) };
+		Rectangle dst = { {0,0},  Vector2Int(frame.size) };
 
 		if (marker.state == 0)
 		{

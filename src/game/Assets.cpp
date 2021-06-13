@@ -67,7 +67,7 @@ Vector2Int Font::MeasureString(const char* text) const
 }
 
 ImageFrame::ImageFrame(const Texture& texture, const ImageFrameDef& def)
-	:texture(&texture), offset(def.offset)
+	:texture(&texture), offset(def.offset), size(def.size)
 {
 	Rectangle16 src = { def.atlasOffset, def.size };
 	uv = Platform::GenerateUV(texture.GetTextureId(), src);
@@ -78,6 +78,7 @@ Image::Image(const ImageFrame* frameStart, const ImageDef& def)
 	size(def.size),
 	frameStart(frameStart),
 	frameCount(def.frameCount)
+	,colorMaskOffset (def.colorMaskOffset)
 {
 
 }
@@ -88,5 +89,13 @@ const ImageFrame& Image::GetFrame(unsigned index) const
 		EXCEPTION("Tried to get frame %i out of %i frames in image %s!", index, frameCount, name.data());
 
 	return frameStart[index];
+}
+
+const ImageFrame* Image::GetColorMaskFrame(unsigned index) const
+{
+	if (colorMaskOffset && index + colorMaskOffset >= frameCount)
+		return nullptr;
+
+	return frameStart + index + colorMaskOffset;
 }
 

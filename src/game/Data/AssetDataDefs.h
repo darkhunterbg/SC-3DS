@@ -17,6 +17,7 @@ struct ImageDef {
 	uint16_t frameStart;
 	uint16_t frameCount;
 	Vector2Int16 size;
+	uint16_t colorMaskOffset;
 };
 
 

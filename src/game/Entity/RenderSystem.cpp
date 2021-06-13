@@ -92,6 +92,14 @@ void RenderSystem::DrawEntities(const Camera& camera, const Rectangle16& camRect
 		cmd.color = Color32(Colors::White);
 
 		render.push_back(cmd);
+
+		if (r.colorMask) {
+			++cmd.order;
+			cmd.sprite = *r.colorMask;
+			cmd.color = r.color;
+		}
+
+		render.push_back(cmd);
 	}
 }
 void RenderSystem::DrawSelection(const Camera& camera, const Rectangle16& camRect) {

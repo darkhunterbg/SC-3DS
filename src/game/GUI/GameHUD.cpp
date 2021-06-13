@@ -96,11 +96,11 @@ void GameHUD::UpperScreenGUI(const Camera& camera, GameViewContext& context) {
 
 
 	const auto& sprite = context.race->ConsoleUpperSprite;
-	GraphicsRenderer::Draw(sprite, { 0, 240 - sprite.GetSize().y });
+	GraphicsRenderer::Draw(sprite, { 0, 240 - sprite.size.y });
 
 
 	if (context.IsTargetSelectionMode) {
-		pos = { 0, 240 - sprite.GetSize().y };
+		pos = { 0, 240 - sprite.size.y };
 		pos.y -= 16;
 		pos.x += 160;
 		GraphicsRenderer::DrawText(*font, pos + Vector2Int{ 1, 1 }, "Select Target", Colors::Black);

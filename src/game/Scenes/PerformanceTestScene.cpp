@@ -6,6 +6,8 @@
 #include "../Entity/EntityUtil.h"
 #include "../Engine/GraphicsRenderer.h"
 
+#include "../Data/GameDatabase.h"
+
 #include <algorithm>
 
 void PerformanceTestScene::Start() {
@@ -20,8 +22,14 @@ void PerformanceTestScene::Start() {
 	entityManager.GetPlayerSystem().AddPlayer(RaceDatabase::Terran, Colors::White);
 	entityManager.GetMapSystem().FogOfWarVisible = false;
 
+	const auto& img = GameDatabase::instance->GetImage("unit\\terran\\marine");
+
 	for (int i = 0; i < 2000; ++i) {
 		EntityId e = entityManager.NewEntity();
+		entityManager.RenderArchetype.Archetype.AddEntity(e);
+		entityManager.FlagComponents.GetComponent(e).set(ComponentFlags::RenderEnabled);
+
+		EntityUtil::SetImageFrame(e, img, 12, false);
 	/*	EntityUtil::SetRenderFromAnimationClip(e, UnitDatabase::Marine.Graphics->IdleAnimations[0], 0);*/
 		Vector2Int16 pos = Vector2Int16((i % 100) * 32 + 16, (i  / 100)*32 + 16);
 		EntityUtil::SetPosition(e,pos);

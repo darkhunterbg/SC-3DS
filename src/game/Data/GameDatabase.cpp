@@ -2,6 +2,13 @@
 #include "../Engine/AssetLoader.h"
 #include "../Debug.h"
 
+const GameDatabase* GameDatabase::instance = nullptr;
+
+GameDatabase::GameDatabase()
+{
+	instance = this;
+}
+
 const Image& GameDatabase::GetImage(const std::string& path) const
 {
 	auto r = imageNamesMap.find(path);
