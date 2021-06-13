@@ -15,6 +15,7 @@
 #include "MapSystem.h"
 #include "UnitSystem.h"
 #include "SoundSystem.h"
+#include "AnimationSystem.h"
 #include "CommandProcessor.h"
 
 #include "../Data/UnitDef.h"
@@ -41,6 +42,7 @@ private:
 	MapSystem mapSystem;
 	UnitSystem unitSystem;
 	SoundSystem soundSystem;
+	AnimationSystem animationSystem;
 	CommandProcessor commandProcessor;
 
 	bool ready = false;
@@ -77,6 +79,8 @@ public:
 
 	struct {
 		EntityArchetype Archetype = EntityArchetype("Animation");
+		ComponentCollection<AnimationComponent> AnimationComponents;
+		ComponentCollection<AnimationStateComponent> StateComponents;
 	} AnimationArchetype;
 
 	struct {

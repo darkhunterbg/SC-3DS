@@ -35,6 +35,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\InputDevices.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\InputManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\JobSystem.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\Archetype.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\CommandProcessor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\Common.h" />
@@ -87,6 +88,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\InputDevices.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\InputManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\JobSystem.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\Archetype.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\CommandProcessor.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\Entity.cpp" />

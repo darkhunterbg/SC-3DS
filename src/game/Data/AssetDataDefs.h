@@ -41,9 +41,13 @@ struct AnimClipDef {
 	uint8_t type;
 };
 
+union InstructionParams {
+	uint8_t byte[4];
+};
+
 struct AnimInstructionDef {
 	uint8_t id;
-	uint8_t params[4];
+	InstructionParams param = {};
 };
 
 #pragma pack(pop)

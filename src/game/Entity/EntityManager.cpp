@@ -185,7 +185,7 @@ void EntityManager::Update1() {
 
 	unitSystem.UnitAIUpdate(*this);
 
-	//animationSystem.TickAnimations(*this);
+	animationSystem.TickAnimations(*this);
 }
 // Update 24 per second (60 fps) 
 void EntityManager::Update2() {
@@ -203,13 +203,11 @@ void EntityManager::Update2() {
 
 	kinematicSystem.MoveEntities(*this);
 
+	animationSystem.RunAnimations(*this);
+
 	UpdateChildren();
 
-	//animationSystem.UpdateAnimationsForOrientation(*this);
-
 	mapSystem.UpdateVisibleEntities(*this);
-
-	//animationSystem.UpdateAnimations(*this);
 
 	CollectEntityChanges();
 

@@ -145,17 +145,12 @@ namespace DataManager.Gameplay
 			  return false;
 		  }, NewParam<ushort>("frameIndex"));
 
-		public static readonly AnimClipInstruction Face = new AnimClipInstruction("face", (state, p) =>
-		{
-			state.SetOrientation((byte)p[0]);
-			return false;
-		}, NewParam<byte>("orientation"));
-
 		public static readonly AnimClipInstruction Wait = new AnimClipInstruction("wait", (state, p) =>
 		{
 			state.FrameDelay = (ushort)p[0];
 			return true;
 		}, NewParam<ushort>("frameCount"));
+
 		public static readonly AnimClipInstruction WaitRandom = new AnimClipInstruction("waitrand", (state, p) =>
 		{
 			int min = (ushort)p[0];
@@ -163,11 +158,19 @@ namespace DataManager.Gameplay
 			state.FrameDelay = random.Next(min, max);
 			return true;
 		}, NewParam<ushort>("frameMin"), NewParam<ushort>("frameMax"));
+
+		public static readonly AnimClipInstruction Face = new AnimClipInstruction("face", (state, p) =>
+		{
+			state.SetOrientation((byte)p[0]);
+			return false;
+		}, NewParam<byte>("orientation"));
+
 		public static readonly AnimClipInstruction TurnClockWise = new AnimClipInstruction("turncw", (state, p) =>
 		{
 			state.AddOrientation((byte)p[0]);
 			return true;
 		}, NewParam<byte>("rotation"));
+
 		public static readonly AnimClipInstruction TurnClocCounterkWise = new AnimClipInstruction("turnccw", (state, p) =>
 		{
 			state.AddOrientation(-(byte)p[0]);

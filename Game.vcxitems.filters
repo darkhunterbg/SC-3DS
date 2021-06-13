@@ -171,6 +171,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\AssetDataDefs.h">
       <Filter>Data</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationSystem.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -292,6 +295,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\GameDatabase.cpp">
       <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationSystem.cpp">
+      <Filter>Entity</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

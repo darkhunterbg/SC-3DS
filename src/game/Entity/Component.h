@@ -65,9 +65,9 @@ enum class ComponentFlags {
 	RenderEnabled = 1,
 	RenderChanged = 2,
 	OrientationChanged = 3,
-	AnimationSetChanged = 4,
+	//AnimationWait = 4,
 	AnimationEnabled = 5,
-	AnimationFrameChanged = 6,
+	//AnimationFrameChanged = 6,
 	NavigationWork = 7,
 	UpdateTimers = 8,
 	UnitStateChanged = 9,
@@ -124,6 +124,18 @@ struct RenderComponent {
 struct RenderDestinationComponent {
 	Vector2Int16 dst;
 	int order = 0;
+};
+
+struct AnimationComponent {
+	const Image* baseImage;
+	uint8_t animationId;
+	uint8_t instructionStart;
+	uint8_t instructionEnd;
+};
+
+struct AnimationStateComponent {
+	uint32_t instructionId;
+	uint8_t wait;
 };
 
 struct NavigationComponent {

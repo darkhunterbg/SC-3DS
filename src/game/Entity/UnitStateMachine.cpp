@@ -53,7 +53,6 @@ void UnitIdleState::EnterState(
 		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
 
 		flags.set(ComponentFlags::AnimationEnabled);
-		flags.set(ComponentFlags::AnimationSetChanged);
 	}
 }
 void UnitIdleState::ExitState(
@@ -80,7 +79,6 @@ void UnitTurningState::EnterState(
 
 		flags.set(ComponentFlags::NavigationWork);
 		flags.set(ComponentFlags::AnimationEnabled);
-		flags.set(ComponentFlags::AnimationSetChanged);
 
 		if (unit.HasMovementGlow()) {
 			EntityId glow = unit.movementGlowEntity;
@@ -124,7 +122,6 @@ void UnitMovingState::EnterState(
 		//	.GetComponent(id).clips = unit.def->Graphics->MovementAnimations;
 
 		flags.set(ComponentFlags::NavigationWork);
-		flags.set(ComponentFlags::AnimationSetChanged);
 		flags.set(ComponentFlags::AnimationEnabled);
 
 		if (unit.HasMovementGlow()) {
@@ -182,7 +179,6 @@ static void  UnitAttackingEnterStateJob(int start, int end) {
 		//em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
 		//	.GetComponent(id).clips = unit.def->Graphics->AttackAnimations;
 
-		flags.set(ComponentFlags::AnimationSetChanged);
 		flags.set(ComponentFlags::AnimationEnabled);
 		flags.set(ComponentFlags::OrientationChanged);
 
@@ -290,7 +286,6 @@ void UnitDeathState::EnterState(
 		// Clear this in order to remove unit animation change on death 
 		// or just replace death animation with directional ones
 		flags.clear(ComponentFlags::OrientationChanged);
-		flags.clear(ComponentFlags::AnimationSetChanged);
 
 		if (unit.HasMovementGlow()) {
 			em.DeleteEntity(unit.movementGlowEntity);
@@ -386,7 +381,6 @@ void UnitMiningState::EnterState(UnitStateMachineChangeData& data, EntityManager
 		//em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
 		//	.GetComponent(id).clips = unit.def->Graphics->AttackAnimations;
 
-		flags.set(ComponentFlags::AnimationSetChanged);
 		flags.set(ComponentFlags::AnimationEnabled);
 		flags.set(ComponentFlags::OrientationChanged);
 
