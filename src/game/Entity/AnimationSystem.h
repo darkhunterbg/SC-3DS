@@ -29,6 +29,4 @@ public:
 	void TickAnimations(EntityManager& em);
 
 	void RunAnimations(EntityManager& em);
-
-	static void BuildInstructionCache(const Span<AnimInstructionDef> instructions);
 };

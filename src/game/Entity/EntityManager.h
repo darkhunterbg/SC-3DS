@@ -17,6 +17,7 @@
 #include "SoundSystem.h"
 #include "AnimationSystem.h"
 #include "CommandProcessor.h"
+#include "../Random.h"
 
 #include "../Data/UnitDef.h"
 #include "../Camera.h"
@@ -59,6 +60,8 @@ public:
 	ComponentCollection<Vector2Int16> PositionComponents;
 	ComponentCollection<FlagsComponent> FlagComponents;
 	ComponentCollection<uint8_t> OrientationComponents;
+
+	Random rand;
 
 	struct {
 		EntityArchetype Archetype = EntityArchetype("Parent");
