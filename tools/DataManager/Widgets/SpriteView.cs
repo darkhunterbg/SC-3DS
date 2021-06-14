@@ -15,6 +15,8 @@ namespace DataManager.Widgets
 {
     public class SpriteView
     {
+        static readonly Color SCGreen = new Color(0xff249824);
+
         public class SpriteAnimData
         {
             public AnimationState State = new AnimationState();
@@ -49,6 +51,14 @@ namespace DataManager.Widgets
         private AnimationType selectedAnimType;
         public AnimationType SelectedAnimType => selectedAnimType;
 
+        public int SelectionType = -1;
+        public int SelectionOffset;
+        public bool ShowSelection = false;
+
+        public int BarSize = 0;
+        public int BarOffset = 0;
+        public bool ShowBars = false;
+
         public bool SelectionChanged { get; private set; } = false;
         public bool ClipChanged { get; private set; } = false;
         public SpriteAnimData AnimData { get; private set; } = new SpriteAnimData();
@@ -57,7 +67,21 @@ namespace DataManager.Widgets
         {
             ClipChanged = false;
 
-            DrawSprite();
+            SpriteBatch sb = animPreview.StartDrawOn();
+            sb.Begin();
+
+            Vector2 pos = new Vector2(animPreview.RenderTarget.Width, animPreview.RenderTarget.Height);
+            pos /= 2;
+
+            if (ShowSelection)
+                DrawSelection(pos, sb);
+            DrawSprite(pos, sb);
+            if (ShowBars)
+                DrawBars(pos, sb);
+
+            sb.End();
+
+            animPreview.EndDrawOn();
             DrawControls(size);
 
             SelectionChanged = false;
@@ -99,15 +123,8 @@ namespace DataManager.Widgets
             }
         }
 
-        private void DrawSprite()
+        private void DrawSprite(Vector2 pos, SpriteBatch sb)
         {
-            SpriteBatch sb = animPreview.StartDrawOn();
-            sb.Begin();
-
-
-            Vector2 pos = new Vector2(animPreview.RenderTarget.Width, animPreview.RenderTarget.Height);
-            pos /= 2;
-
             if (Sprite != null && Sprite.Image.Image != null)
             {
                 if (Clip != null)
@@ -156,9 +173,40 @@ namespace DataManager.Widgets
                     }
                 }
             }
+        }
 
-            sb.End();
-            animPreview.EndDrawOn();
+
+        private void DrawSelection(Vector2 pos, SpriteBatch sb)
+        {
+            if (SelectionType < 0 || SelectionType >= AppGame.AssetManager.UnitSelection.Count)
+                return;
+
+            var selectionImage = AppGame.AssetManager.UnitSelection[SelectionType];
+
+            pos += selectionImage.GetOffset();
+            pos.Y += SelectionOffset;
+
+            sb.Draw(selectionImage.Image.Texture, pos.ToVector2(), Color.LightGreen);
+        }
+
+        private void DrawBars(Vector2 pos, SpriteBatch sb)
+        {
+            if (BarSize < 1)
+                return;
+
+            Vector2 bar = new Vector2(BarSize * 3 + 1, 5);
+            pos.X -= (int)(bar.X / 2);
+            pos.Y += BarOffset;
+
+            sb.DrawRectangle(pos, bar, Color.Black);
+
+            pos += Vector2.One;
+
+            for(int i=0;i<BarSize;++i)
+            {
+                sb.DrawRectangle(pos, new Vector2(2, 3), SCGreen);
+                pos.X += 3;
+            }    
         }
     }
 }

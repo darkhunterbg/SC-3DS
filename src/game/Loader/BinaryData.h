@@ -16,6 +16,7 @@ enum class DataSectionType : uint32_t
 	Sprites = 4,
 	AnimClips = 5,
 	AnimInstructions = 6,
+	Units = 7
 };
 
 

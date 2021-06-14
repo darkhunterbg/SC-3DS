@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
-    [BinaryData(DataItemType.Sprites)]
+    [BinaryData(DataItemType.Units)]
     public class UnitAsset : Asset , ITreeViewItem
     {
         public override string AssetName => Path;

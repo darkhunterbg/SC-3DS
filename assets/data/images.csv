@@ -37,6 +37,8 @@ unit\cmdbtns\cmdicons,114,386,36,34,0
 unit\cmdbtns\pcmdbtns,500,37,72,72,0
 unit\cmdbtns\tcmdbtns,537,37,72,72,0
 unit\cmdbtns\zcmdbtns,574,37,72,72,0
-unit\terran\marine,611,452,64,64,229
-unit\terran\tmadeath,1063,3,64,64,0
-unit\terran\tmashad,1066,221,44,44,0
+unit\terran\control,611,12,128,160,6
+unit\terran\marine,623,452,64,64,229
+unit\terran\scv,1075,102,72,72,51
+unit\terran\tmadeath,1177,3,64,64,0
+unit\terran\tmashad,1180,221,44,44,0

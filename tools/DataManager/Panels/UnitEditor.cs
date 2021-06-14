@@ -17,10 +17,14 @@ namespace DataManager.Panels
         private TreeView tree = new TreeView("tree")
         {
             ItemName = "Unit",
-            DataSource = AppGame.AssetManager.GetAssets<UnitAsset>()
+            DataSource = AppGame.AssetManager.GetAssets<UnitAsset>(),
         };
         private TablePropertyEditor propertyEditor = new TablePropertyEditor("propertyEditor");
-        private SpriteView spriteView = new SpriteView();
+        private SpriteView spriteView = new SpriteView()
+        {
+            ShowSelection = true,
+            ShowBars = true,
+        };
 
         public UnitEditor()
         {
@@ -47,7 +51,12 @@ namespace DataManager.Panels
             {
                 tree.Draw();
                 propertyEditor.EditingItem = tree.Selected;
-                spriteView.Sprite = (tree.Selected as UnitAsset)?.Sprite;
+                var selected = (tree.Selected as UnitAsset);
+                spriteView.Sprite = selected?.Sprite;
+                spriteView.SelectionType = selected?.SelectonSize ?? -1;
+                spriteView.SelectionOffset = selected?.SelectionOffset ?? 0;
+                spriteView.BarSize = selected?.BarSize ?? 0;
+                spriteView.BarOffset = selected?.BarOffset ?? 0;
             }
             ImGui.EndChild();
 
