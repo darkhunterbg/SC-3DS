@@ -108,6 +108,9 @@ namespace DataManager
 			AddNewAssetDatabase<SpriteAsset>($"{GameDataDir}sprites.csv");
 			AddNewAssetDatabase<SpriteAnimClipAsset>($"{GameDataDir}animclips.csv");
 			AddNewAssetDatabase<UnitAsset>($"{GameDataDir}units.csv");
+			AddNewAssetDatabase<AbilityAsset>($"{GameDataDir}abilities.csv");
+			AddNewAssetDatabase<EffectAsset>($"{GameDataDir}effects.csv");
+			AddNewAssetDatabase<UpgradeAsset>($"{GameDataDir}upgrades.csv");
 		}
 
 		private void AddNewAssetDatabase<TAsset>(string filePath) where TAsset : Asset, new()

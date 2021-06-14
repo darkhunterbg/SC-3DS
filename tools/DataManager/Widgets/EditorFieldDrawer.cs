@@ -268,15 +268,26 @@ namespace DataManager.Widgets
             //DrawName(name);
             changed = false;
             if (icon.Image == null)
-                return icon;
-
-            if (ImGui.ImageButton(icon.Image.Image.GuiImage, new Vector2(24)))
             {
-                EditorModalSelect.SelectItemModal(typeof(IconRef), icon, (o) =>
+                if (ImGui.Button("None"))
                 {
-                    dialogResultFor = id;
-                    dialogResult = o;
-                });
+                    EditorModalSelect.SelectItemModal(typeof(IconRef), icon, (o) =>
+                    {
+                        dialogResultFor = id;
+                        dialogResult = o;
+                    });
+                }
+            }
+            else
+            {
+                if (ImGui.ImageButton(icon.Image.Image.GuiImage, new Vector2(24)))
+                {
+                    EditorModalSelect.SelectItemModal(typeof(IconRef), icon, (o) =>
+                    {
+                        dialogResultFor = id;
+                        dialogResult = o;
+                    });
+                }
             }
 
             changed = dialogResultFor == dialogId;
