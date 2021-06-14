@@ -22,7 +22,7 @@ namespace DataManager.Widgets
 
 			if (attr is DefaultEditorAttribute)
 			{
-				return GenerirPropertyDrawer;
+				return GenericPropertyDrawer;
 			}
 			else
 			{
@@ -46,11 +46,11 @@ namespace DataManager.Widgets
 			EditorFieldDrawer.ReadOnly(string.Empty, prop.GetValue(item));
 			return false;
 		}
-		private static bool GenerirPropertyDrawer(PropertyInfo p, EditorAttribute a, object i)
+		private static bool GenericPropertyDrawer(PropertyInfo p, EditorAttribute a, object i)
 		{
 			var v = p.GetValue(i);
 			AppGui.StrechNextItem();
-			v = EditorFieldDrawer.Object(string.Empty, v, out bool changed);
+			v = EditorFieldDrawer.Object(string.Empty, v, p.PropertyType, out bool changed);
 			if (changed)
 				p.SetValue(i, v);
 

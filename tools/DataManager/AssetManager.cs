@@ -73,6 +73,7 @@ namespace DataManager
 		public static readonly string SpriteAtlasDataPath = $"{GameDataDir}atlases.csv";
 		public static readonly string ImagesDataPath = $"{GameDataDir}images.csv";
 		public static readonly string FramesDataPath = $"{GameDataDir}frames.csv";
+	
 
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();
 
@@ -106,7 +107,7 @@ namespace DataManager
 
 			AddNewAssetDatabase<SpriteAsset>($"{GameDataDir}sprites.csv");
 			AddNewAssetDatabase<SpriteAnimClipAsset>($"{GameDataDir}animclips.csv");
-
+			AddNewAssetDatabase<UnitAsset>($"{GameDataDir}units.csv");
 		}
 
 		private void AddNewAssetDatabase<TAsset>(string filePath) where TAsset : Asset, new()

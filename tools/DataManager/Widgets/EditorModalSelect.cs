@@ -98,7 +98,7 @@ namespace DataManager.Widgets
 
         private static void Header()
         {
-            if (objType.IsSubclassOf(typeof(Asset)))
+            if (objType == typeof(Asset) || objType.IsSubclassOf(typeof(Asset)))
             {
                 var asset = selected as Asset;
 
@@ -157,7 +157,7 @@ namespace DataManager.Widgets
         }
         private static void Content(int moveIter)
         {
-            if (objType.IsSubclassOf(typeof(Asset)))
+            if (objType== typeof(Asset) || objType.IsSubclassOf(typeof(Asset)))
             {
                 AssetContent(moveIter);
                 return;
