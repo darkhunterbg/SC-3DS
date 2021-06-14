@@ -23,8 +23,7 @@ void PerformanceTestScene::Start() {
 	em.GetMapSystem().FogOfWarVisible = false;
 	//em.DrawBoundingBoxes = true;
 
-	const auto& img = GameDatabase::instance->GetImage("unit\\terran\\marine");
-	const auto& clip = GameDatabase::instance->AnimClipDefs[1];
+	const auto& clip = GameDatabase::instance->AnimClipDefs[0];
 
 	for (int i = 0; i < 2000; ++i) {
 		EntityId e = em.NewEntity();
@@ -32,11 +31,9 @@ void PerformanceTestScene::Start() {
 		em.AnimationArchetype.Archetype.AddEntity(e);
 		em.FlagComponents.GetComponent(e).set(ComponentFlags::RenderEnabled);
 		em.FlagComponents.GetComponent(e).set(ComponentFlags::AnimationEnabled);
-		auto& anim = em.AnimationArchetype.AnimationComponents.NewComponent(e);
-		anim.baseImage = &img;
-		anim.instructionStart = clip.instructionStart;
-		anim.instructionEnd = clip.instructionStart + clip.instructionCount;
-		em.AnimationArchetype.StateComponents.NewComponent(e).instructionId = clip.instructionStart;
+		EntityUtil::PlayAnimation(e, clip);
+
+
 		//EntityUtil::SetImageFrame(e, img, 12, false);
 		Vector2Int16 pos = Vector2Int16((i % 100) * 32 + 16, (i / 100) * 32 + 16);
 		EntityUtil::SetPosition(e, pos);

@@ -19,6 +19,9 @@ namespace DataManager.Assets
 		public abstract string AssetName { get; }
 
 		[Ignore]
+		public virtual string SortKey => AssetName;
+
+		[Ignore]
 		public virtual GuiTexture Preview => null;
 
 		[Ignore]
@@ -135,6 +138,8 @@ namespace DataManager.Assets
 
 		public void Save()
 		{
+			PrepareForSerialization();
+
 			foreach (var s in Assets)
 			{
 				s.OnBeforeSerizalize();
@@ -162,7 +167,7 @@ namespace DataManager.Assets
 
         public void PrepareForSerialization()
         {
-			var a = Assets.OrderBy(s => s.AssetName).ToList();
+			var a = Assets.OrderBy(s => s.SortKey).ToList();
 			Assets.Clear();
 			Assets.AddRange(a);
         }

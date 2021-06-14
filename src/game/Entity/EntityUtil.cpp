@@ -1,5 +1,6 @@
 #include "EntityUtil.h"
 #include "EntityManager.h"
+#include "../Data/GameDatabase.h"
 
 EntityManager* EntityUtil::emInstance = nullptr;
 EntityManager* UnitEntityUtil::emInstance = nullptr;
@@ -111,6 +112,21 @@ void EntityUtil::UpdateAnimationVisual(EntityId id)
 	bool flip = orientation > 16;
 	frameId += flip ? 32 - orientation : orientation;
 	SetImageFrame(id, *anim.baseImage, frameId, flip);
+}
+
+void EntityUtil::PlayAnimation(EntityId id, const AnimClipDef& clip)
+{
+	EntityManager& em = GetManager();
+	auto& anim = em.AnimationArchetype.AnimationComponents.GetComponent(id);
+	const auto& sprite = GameDatabase::instance->SpriteDefs[clip.spriteId];
+	anim.baseImage = &GameDatabase::instance->GetImage(sprite.imageId);
+	anim.instructionStart = clip.instructionStart;
+	anim.instructionEnd = clip.InstructionEnd();
+
+	auto& state = em.AnimationArchetype.StateComponents.GetComponent(id);
+	state.animFrame = 0;
+	state.wait = 0;
+	state.instructionId = anim.instructionStart;
 }
 
 

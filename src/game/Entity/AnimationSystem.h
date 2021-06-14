@@ -3,6 +3,7 @@
 #include "../Span.h"
 #include "../MathLib.h"
 #include "Component.h"
+
 #include <vector>
 
 struct AnimInstructionDef;

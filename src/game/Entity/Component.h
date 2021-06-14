@@ -128,7 +128,6 @@ struct RenderDestinationComponent {
 
 struct AnimationComponent {
 	const Image* baseImage;
-	uint8_t animationId;
 	uint8_t instructionStart;
 	uint8_t instructionEnd;
 };

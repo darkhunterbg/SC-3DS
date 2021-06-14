@@ -4,6 +4,7 @@
 #include "EntityUtil.h"
 
 #include "AnimationPlayer.h"
+#include "../Profiler.h"
 
 void AnimationSystem::TickAnimations(EntityManager& em)
 {
@@ -31,6 +32,8 @@ void AnimationSystem::TickAnimations(EntityManager& em)
 
 void AnimationSystem::RunAnimations(EntityManager& em)
 {
+	//SectionProfiler p("RunAnimations");
+
 	int start = 0;
 	int end = animData.size();
 

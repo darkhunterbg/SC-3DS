@@ -30,6 +30,7 @@ public:
 	GameDatabase(const GameDatabase&) = delete;
 	GameDatabase& operator=(const GameDatabase&) = delete;
 
+	inline const Image& GetImage(unsigned id) const { return images[id]; }
 	const Image& GetImage(const std::string& path) const;
 	const ImageFrame& GetCommandIcons(unsigned id) const;
 

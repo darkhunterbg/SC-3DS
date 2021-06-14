@@ -36,6 +36,7 @@ namespace DataManager.Assets
         public List<string> Instructions { get; set; } = new List<string>();
 
         public override string AssetName => $"{Sprite.Name}:{Type}";
+        public override string SortKey => $"{Sprite.Name}:{(int)Type}";
 
         public override void OnAfterDeserialize()
         {

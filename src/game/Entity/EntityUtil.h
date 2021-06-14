@@ -4,6 +4,7 @@
 #include "../Assets.h"
 #include "Component.h"
 #include "Entity.h"
+#include "../Data/AssetDataDefs.h"
 
 class EntityManager;
 
@@ -56,6 +57,8 @@ public:
 	static void SetOrientation(EntityId id, int orientation);
 
 	static void UpdateAnimationVisual(EntityId id);
+
+	static void PlayAnimation(EntityId id, const AnimClipDef& clip);
 };
 
 class UnitEntityUtil {

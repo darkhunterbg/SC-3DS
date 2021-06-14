@@ -47,7 +47,6 @@ private:
 	CommandProcessor commandProcessor;
 
 	bool ready = false;
-	bool doneUpdatingVision = false;
 
 	EntityChangedData changedData;
 
