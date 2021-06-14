@@ -14,10 +14,12 @@ namespace DataManager.Assets
         public override string AssetName => Path;
         public override GuiTexture Preview => Icon.Image?.Image;
 
+
         [Index(0)]
         [Binary(BinaryType.String, 32)]
         public string Path { get; set; }
 
+        [Section("Assets")]
         [DefaultEditor]
         [Index(1), TypeConverter(typeof(IconRef.IconConverter))]
         public IconRef Icon { get; set; } = IconRef.None;
@@ -56,6 +58,7 @@ namespace DataManager.Assets
         [Optional]
         public int BarOffset { get; set; } = 0;
 
+        [Section("Selection")]
         [CustomEnumEditor(CustomEnumType.SelectionTypes)]
         [Binary(BinaryType.UInt, 2)]
         [Optional]

@@ -7,6 +7,13 @@ using System.Threading.Tasks;
 namespace DataManager
 {
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+	public class SectionAttribute : Attribute
+    {
+		public readonly string Name;
+		public SectionAttribute(string name) { Name = name; }
+    }
+
+	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
 	public abstract class EditorAttribute : Attribute
 	{
 		public string Name { get; set; }
