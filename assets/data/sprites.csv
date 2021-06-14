@@ -1,4 +1,5 @@
 Name,Image,IsRotating
+terran\CommandCenter,unit\terran\control,False
 terran\Marine,unit\terran\marine,True
 terran\MarineRenmants,unit\terran\tmadeath,False
 terran\MarineShadow,unit\terran\tmashad,True

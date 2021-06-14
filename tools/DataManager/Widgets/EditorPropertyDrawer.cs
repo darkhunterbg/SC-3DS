@@ -61,7 +61,7 @@ namespace DataManager.Widgets
 		{
 			var customAttr = attr as CustomEnumEditorAttribute;
 
-			Enum val = (Enum)prop.GetValue(item);
+			int val = (int)prop.GetValue(item);
 			AppGui.StrechNextItem();
 			val = EditorFieldDrawer.CustomEnum(string.Empty, customAttr.EnumType, val, out bool changed);
 			if (changed)

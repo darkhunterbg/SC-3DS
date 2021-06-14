@@ -212,19 +212,19 @@ namespace DataManager.Widgets
             return value;
         }
 
-        public static bool CustomEnum(string name, CustomEnumType type, ref Enum value)
+        public static bool CustomEnum(string name, CustomEnumType type, ref int value)
         {
             //DrawName(name);
             var values = CustomEnumValues.CustomEnums[(int)type];
             int editNumber = (int)(object)(value);
             if (ImGui.Combo(name, ref editNumber, values, values.Length))
             {
-                value = (Enum)((object)editNumber);
+                value = (int)((object)editNumber);
                 return true;
             }
             return false;
         }
-        public static Enum CustomEnum(string name, CustomEnumType type, Enum value, out bool changed)
+        public static int CustomEnum(string name, CustomEnumType type, int value, out bool changed)
         {
             changed = CustomEnum(name, type, ref value);
             return value;

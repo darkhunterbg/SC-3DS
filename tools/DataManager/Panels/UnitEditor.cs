@@ -20,7 +20,7 @@ namespace DataManager.Panels
             DataSource = AppGame.AssetManager.GetAssets<UnitAsset>()
         };
         private TablePropertyEditor propertyEditor = new TablePropertyEditor("propertyEditor");
-
+        private SpriteView spriteView = new SpriteView();
 
         public UnitEditor()
         {
@@ -42,16 +42,25 @@ namespace DataManager.Panels
 
         public void Draw(Vector2 client)
         {
-            ImGui.Columns(2, "columns");
+            ImGui.Columns(3, "columns");
             ImGui.BeginChild("items");
             {
                 tree.Draw();
+                propertyEditor.EditingItem = tree.Selected;
+                spriteView.Sprite = (tree.Selected as UnitAsset)?.Sprite;
             }
             ImGui.EndChild();
+
             ImGui.NextColumn();
+
             ImGui.BeginChild("properties");
-            propertyEditor.EditingItem = tree.Selected;
             propertyEditor.Draw();
+            ImGui.EndChild();
+
+            ImGui.NextColumn();
+
+            ImGui.BeginChild("preview");
+            spriteView.Draw(ImGui.GetColumnWidth());
             ImGui.EndChild();
 
             if (tree.ItemModified || propertyEditor.Changed)

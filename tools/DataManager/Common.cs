@@ -8,13 +8,10 @@ using System.Threading.Tasks;
 
 namespace DataManager
 {
-
 	public enum CustomEnumType
 	{
 		SelectionTypes
 	}
-
-
 
 	public static class EnumCacheValues
 	{

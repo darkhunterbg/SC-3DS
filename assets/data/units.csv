@@ -1,3 +1,4 @@
-Path,Icon,Sprite
-terran\Marine,0,terran\Marine
-terran\SCV,7,terran\SCV
+Path,Icon,Sprite,Name,Subtitle,Health,BarSize,BarOffset,SelectonSize,SelectionOffset
+terran\CommandCenter,106,terran\CommandCenter,Terran Command Center,,1500,32,0,0,0
+terran\Marine,0,terran\Marine,Terran Marine,Private,40,6,0,0,0
+terran\SCV,7,terran\SCV,Terran SCV,Private,60,7,0,0,0
