@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace DataManager.Panels
 {
-    public class UpgradeEditor : AssetTreeEditor<UpgradeAsset>
-    {
-        public UpgradeEditor() : base("Upgade", "Upgrades", "Upgrade Editor") { }
-    }
+	public class UpgradeEditor : AssetTreeEditor<UpgradeAsset>
+	{
+		public UpgradeEditor() : base("Upgade", "Upgrades", "Upgrade Editor") { }
+	}
 }

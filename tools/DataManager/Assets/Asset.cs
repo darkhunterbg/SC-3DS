@@ -13,7 +13,7 @@ using CsvHelper.TypeConversion;
 namespace DataManager.Assets
 {
 
-	public abstract class Asset 
+	public abstract class Asset
 	{
 		[Ignore]
 		public abstract string AssetName { get; }
@@ -91,7 +91,7 @@ namespace DataManager.Assets
 	}
 
 	public class AssetDatabase<TAsset> : IAssetDatabase where TAsset
-		: Asset , new()
+		: Asset, new()
 	{
 		private readonly Type type = typeof(TAsset);
 		public string FilePath { get; private set; }
@@ -156,9 +156,9 @@ namespace DataManager.Assets
 		}
 
 		public void Add(TAsset asset)
-        {
+		{
 			_assets.Add(asset);
-        }
+		}
 		public void AddRange(IEnumerable<TAsset> asset)
 		{
 			_assets.AddRange(asset);
@@ -172,11 +172,61 @@ namespace DataManager.Assets
 		public void Delete(TAsset asset)
 		{
 			_assets.Remove(asset);
+
+			foreach (var db in AppGame.AssetManager.Assets)
+			{
+				if (db.Key == typeof(TAsset))
+					continue;
+
+				var refProp = db.Key.GetProperties().Where(t => t.PropertyType == typeof(TAsset))
+					.ToList();
+
+				if (refProp.Count == 0)
+					continue;
+
+				foreach (var a in db.Value.Assets)
+				{
+					foreach (var p in refProp)
+					{
+						var v = p.GetValue(a);
+						if (v == asset)
+						{
+							p.SetValue(a, null);
+						}
+					}
+				}
+			}
 		}
 		public void DeleteAll(Predicate<TAsset> predicate)
-        {
-			_assets.RemoveAll(predicate);
-        }
+		{
+			var removed = _assets.Where(t => predicate(t)).ToList();
+
+			_assets.RemoveAll(t=>removed.Contains(t));
+
+			foreach (var db in AppGame.AssetManager.Assets)
+			{
+				if (db.Key == typeof(TAsset))
+					continue;
+
+				var refProp = db.Key.GetProperties().Where(t => t.PropertyType == typeof(TAsset))
+					.ToList();
+
+				if (refProp.Count == 0)
+					continue;
+
+				foreach (var a in db.Value.Assets)
+				{
+					foreach (var p in refProp)
+					{
+						var v = p.GetValue(a);
+						if (removed.Contains(v))
+						{
+							p.SetValue(a, null);
+						}
+					}
+				}
+			}
+		}
 
 		public void PrepareForSerialization()
 		{
