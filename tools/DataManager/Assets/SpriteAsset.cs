@@ -87,7 +87,7 @@ namespace DataManager.Assets
             foreach (var c in clone.Clips)
                 c.Sprite = clone;
 
-            AppGame.AssetManager.GetAssets<SpriteAnimClipAsset>().AddRange(clone.Clips);
+            AppGame.AssetManager.GetAssetDatabase<SpriteAnimClipAsset>().AddRange(clone.Clips);
 
             return clone;
         }

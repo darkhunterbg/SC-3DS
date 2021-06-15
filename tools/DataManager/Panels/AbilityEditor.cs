@@ -9,6 +9,6 @@ namespace DataManager.Panels
 {
     public class AbilityEditor : AssetTreeEditor<AbilityAsset>
     {
-        public AbilityEditor() : base("Ability", "Ability Editor") { }
+        public AbilityEditor() : base("Ability","Abilities", "Ability Editor") { }
     }
 }

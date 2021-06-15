@@ -9,6 +9,6 @@ namespace DataManager.Panels
 {
     public class UpgradeEditor : AssetTreeEditor<UpgradeAsset>
     {
-        public UpgradeEditor() :base("Upgade", "Upgrade Editor") { }
+        public UpgradeEditor() : base("Upgade", "Upgrades", "Upgrade Editor") { }
     }
 }

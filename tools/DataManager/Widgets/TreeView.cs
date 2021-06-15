@@ -6,11 +6,18 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace DataManager.Widgets
 {
     public class TreeView
     {
+        enum ContextOperation
+        {
+            Copy,
+            Cut
+        }
+
         class TreeItem
         {
             public string Name = string.Empty;
@@ -21,7 +28,7 @@ namespace DataManager.Widgets
 
             public readonly int Id = ++_id;
 
-            public bool Opened = false;
+            public bool Expanded = false;
 
             public readonly List<TreeItem> Children = new List<TreeItem>();
 
@@ -93,7 +100,7 @@ namespace DataManager.Widgets
         public Func<ITreeViewItem, ITreeViewItem> NewItemAction;
         public Action<ITreeViewItem> DeleteItemAction;
 
-        private TreeItem root = new TreeItem(null) { Name = "Items", Opened = true };
+        private TreeItem root = new TreeItem(null) { Name = "Items", Expanded = true };
         public readonly string Id;
 
         private bool focused = false;
@@ -197,12 +204,12 @@ namespace DataManager.Widgets
                     ++index;
                     return parent.ChildrenView.Skip(index).First();
                 }
-                if (node.Children.Count > 0 && node.Opened)
+                if (node.Children.Count > 0 && node.Expanded)
                     return node.ChildrenView.First();
                 else
                     return NextNode(node.Parent);
             }
-            if (node.Children.Count > 0 && node.Opened)
+            if (node.Children.Count > 0 && node.Expanded)
                 return node.ChildrenView.First();
             return node;
         }
@@ -234,12 +241,18 @@ namespace DataManager.Widgets
             }
         }
 
+
+        private TreeItem contextNode = null;
+        private ContextOperation contextOp;
         private void ProcessInput()
         {
+            if (renameNode != null)
+                return;
+
             if (AppGame.Gui.IsButtonPressed(Keys.F2))
                 RenameNode(selectedNode);
             if (AppGame.Gui.IsButtonPressed(Keys.Delete))
-                DeleteItem(selectedNode);
+                DeleteNode(selectedNode);
 
             if (AppGame.Gui.IsButtonPressed(Keys.D) && ImGui.GetIO().KeyCtrl)
             {
@@ -249,8 +262,8 @@ namespace DataManager.Widgets
 
             if (AppGame.Gui.IsButtonPressed(Keys.Right))
             {
-                if (!selectedNode.Opened && selectedNode.IsDir)
-                    selectedNode.Opened = true;
+                if (!selectedNode.Expanded && selectedNode.IsDir)
+                    selectedNode.Expanded = true;
                 else if (selectedNode.Children.Count > 0)
                     selectedNode = selectedNode.Children[0];
 
@@ -258,8 +271,8 @@ namespace DataManager.Widgets
 
             if (AppGame.Gui.IsButtonPressed(Keys.Left))
             {
-                if (selectedNode.Opened && selectedNode.IsDir)
-                    selectedNode.Opened = false;
+                if (selectedNode.Expanded && selectedNode.IsDir)
+                    selectedNode.Expanded = false;
                 else if (selectedNode.Parent != null)
                     selectedNode = selectedNode.Parent;
 
@@ -273,6 +286,30 @@ namespace DataManager.Widgets
             if (AppGame.Gui.IsButtonPressed(Keys.Up))
             {
                 selectedNode = PrevNode(selectedNode);
+            }
+
+            if (AppGame.Gui.IsButtonPressed(Keys.C) && ImGui.GetIO().KeyCtrl)
+            {
+                contextNode = selectedNode;
+                contextOp = ContextOperation.Copy;
+            }
+            if (AppGame.Gui.IsButtonPressed(Keys.X) && ImGui.GetIO().KeyCtrl)
+            {
+                contextNode = selectedNode;
+                contextOp = ContextOperation.Cut;
+            }
+            if (AppGame.Gui.IsButtonPressed(Keys.V) && ImGui.GetIO().KeyCtrl && contextNode != null)
+            {
+                if (contextOp == ContextOperation.Copy)
+                    DuplicateNode(contextNode, selectedNode, true);
+                else
+                {
+                    if (contextOp == ContextOperation.Cut)
+                    {
+                        MoveNode(contextNode, selectedNode);
+                        contextNode = null;
+                    }
+                }
             }
         }
 
@@ -300,10 +337,16 @@ namespace DataManager.Widgets
                 }
                 else
                 {
+                    if (contextNode == node && contextOp == ContextOperation.Cut)
+                        ImGui.PushStyleColor(ImGuiCol.Text, Color.Gray.PackedValue);
+
                     if (ImGui.Selectable(node.Name, selected))
                     {
                         selectedNode = node;
                     }
+
+                    if (contextNode == node && contextOp == ContextOperation.Cut)
+                        ImGui.PopStyleColor();
                 }
 
                 if (ImGui.IsItemFocused())
@@ -317,23 +360,29 @@ namespace DataManager.Widgets
                 ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanAvailWidth
                     | ImGuiTreeNodeFlags.OpenOnDoubleClick;
 
-                if (node.Opened)
+                if (node.Expanded)
                     flags |= ImGuiTreeNodeFlags.DefaultOpen;
 
 
                 if (renameNode == node)
                 {
-                    node.Opened = ImGui.TreeNodeEx(string.Empty, flags);
+                    node.Expanded = ImGui.TreeNodeEx(string.Empty, flags);
                     ImGui.SameLine();
                     DrawRenameNode();
                 }
                 else
                 {
+                    if (contextNode == node && contextOp == ContextOperation.Cut)
+                        ImGui.PushStyleColor(ImGuiCol.Text, Color.Gray.PackedValue);
+                    
                     if (selectedNode == node)
                         flags |= ImGuiTreeNodeFlags.Selected;
 
                     string text = $"{node.Name} ({node.Children.Count})";
-                    node.Opened = ImGui.TreeNodeEx(text, flags);
+                    node.Expanded = ImGui.TreeNodeEx(text, flags);
+
+                    if (contextNode == node && contextOp == ContextOperation.Cut)
+                        ImGui.PopStyleColor();
 
                     if (ImGui.IsItemFocused())
                         focused = true;
@@ -347,7 +396,7 @@ namespace DataManager.Widgets
                 }
 
 
-                if (node.Opened)
+                if (node.Expanded)
                 {
                     foreach (var child in node.ChildrenView)
                     {
@@ -410,7 +459,7 @@ namespace DataManager.Widgets
                     if (ImGui.Selectable("New Folder"))
                     {
                         var child = NewItem(node, new string[] { "New Folder" });
-                        node.Opened = true;
+                        node.Expanded = true;
                         selectedNode = child;
                         RenameNode(child);
                         ImGui.CloseCurrentPopup();
@@ -427,7 +476,7 @@ namespace DataManager.Widgets
                             else
                                 item.Path = newItemName;
                             var child = NewItem(node, new string[] { newItemName }, item);
-                            node.Opened = true;
+                            node.Expanded = true;
                             selectedNode = child;
                             ItemModified = true;
                             RenameNode(child);
@@ -451,26 +500,62 @@ namespace DataManager.Widgets
                 if (node != root)
                     if (ImGui.Selectable("Delete"))
                     {
-                        DeleteItem(node);
+                        DeleteNode(node);
                         ImGui.CloseCurrentPopup();
                     }
                 ImGui.EndPopup();
             }
         }
 
-        private void DuplicateNode(TreeItem node)
+        private TreeItem DuplicateNode(TreeItem node, TreeItem dst = null, bool rename = true)
         {
+            dst = dst ?? node.Parent;
+            if (dst != null && !dst.IsDir)
+                dst = dst.Parent;
+
+            if (dst == null || dst == root)
+                return null;
+
             var item = NewItemAction(node.Item);
             string name = $"Copy of {node.Name}";
-            if (node != root)
-                item.Path = node.GetPath(root) + $"\\{name}";
+            if (dst != root)
+                item.Path = dst.GetPath(root) + $"\\{name}";
             else
                 item.Path = name;
-            var child = NewItem(node.Parent, new string[] { name }, item);
+            var child = NewItem(dst, new string[] { name }, item);
             ItemModified = true;
             selectedNode = child;
 
-            RenameNode(child);
+            if (rename)
+                RenameNode(child);
+
+            dst.Expanded = true;
+
+            return child;
+        }
+
+        private void MoveNode(TreeItem node, TreeItem dst)
+        {
+            dst = dst ?? node.Parent;
+            if (dst != null && !dst.IsDir)
+                dst = dst.Parent;
+
+            if (dst == null || dst == root)
+                return;
+
+            if (dst == node.Parent)
+                return;
+
+
+            node.Parent.Children.Remove(node);
+            dst.Children.Add(node);
+            dst.UpdateItemPath(root);
+
+            ItemModified = true;
+            selectedNode = node;
+
+            dst.Expanded = true;
+
         }
 
         private void RenameNode(TreeItem node)
@@ -480,7 +565,7 @@ namespace DataManager.Widgets
             renameFocusRequest = true;
         }
 
-        private void DeleteItem(TreeItem node)
+        private void DeleteNode(TreeItem node)
         {
             if (DeleteItemAction == null)
                 return;
@@ -496,6 +581,9 @@ namespace DataManager.Widgets
 
             if (!NodeExists(selectedNode, root))
                 selectedNode = null;
+
+            if (!NodeExists(contextNode, root))
+                contextNode = null;
         }
     }
 }

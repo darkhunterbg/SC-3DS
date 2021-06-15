@@ -17,6 +17,7 @@ namespace DataManager.Panels
         private TreeView tree = new TreeView("tree")
         {
             ItemName = "Unit",
+            RootName = "Units",
             DataSource = AppGame.AssetManager.GetAssets<UnitAsset>(),
         };
         private TablePropertyEditor propertyEditor = new TablePropertyEditor("propertyEditor");
@@ -72,7 +73,9 @@ namespace DataManager.Panels
             spriteView.Draw(ImGui.GetColumnWidth());
             ImGui.EndChild();
 
-            if (tree.ItemModified || propertyEditor.Changed)
+            if (tree.ItemModified)
+                AppGame.AssetManager.SaveAllAssets();
+            else if (propertyEditor.Changed)
                 AppGame.AssetManager.GetAssetDatabase<UnitAsset>().Save();
         }
     }

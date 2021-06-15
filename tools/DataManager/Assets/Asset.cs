@@ -98,9 +98,11 @@ namespace DataManager.Assets
 
 		Type IAssetDatabase.Type => type;
 
+
+		private List<TAsset> _assets = new List<TAsset>();
 		IEnumerable<Asset> IAssetDatabase.Assets => Assets;
 
-		public List<TAsset> Assets { get; private set; } = new List<TAsset>();
+		public IReadOnlyList<TAsset> Assets => _assets;
 
 		public AssetDatabase(string file)
 		{
@@ -120,14 +122,14 @@ namespace DataManager.Assets
 
 		public void Reload()
 		{
-			Assets.Clear();
+			_assets.Clear();
 			if (!File.Exists(FilePath))
 				return;
 			using (var csv = new CsvReader(new StreamReader(FilePath), AssetManager.CsvConfig))
 			{
 				AddConverters(csv.Context);
 
-				Assets.AddRange(csv.GetRecords<TAsset>());
+				_assets.AddRange(csv.GetRecords<TAsset>());
 			}
 
 			foreach (var s in Assets)
@@ -153,23 +155,34 @@ namespace DataManager.Assets
 			}
 		}
 
-
+		public void Add(TAsset asset)
+        {
+			_assets.Add(asset);
+        }
+		public void AddRange(IEnumerable<TAsset> asset)
+		{
+			_assets.AddRange(asset);
+		}
 		public TAsset New(TAsset copy)
 		{
 			var asset = Asset.New(copy);
-			Assets.Add(asset);
+			_assets.Add(asset);
 			return asset;
 		}
 		public void Delete(TAsset asset)
 		{
-			Assets.Remove(asset);
+			_assets.Remove(asset);
 		}
-
-        public void PrepareForSerialization()
+		public void DeleteAll(Predicate<TAsset> predicate)
         {
-			var a = Assets.OrderBy(s => s.SortKey).ToList();
-			Assets.Clear();
-			Assets.AddRange(a);
+			_assets.RemoveAll(predicate);
         }
-    }
+
+		public void PrepareForSerialization()
+		{
+			var a = Assets.OrderBy(s => s.SortKey).ToList();
+			_assets.Clear();
+			_assets.AddRange(a);
+		}
+	}
 }

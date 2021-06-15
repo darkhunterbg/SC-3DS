@@ -9,7 +9,7 @@ namespace DataManager.Panels
 {
     internal class EffectEditor : AssetTreeEditor<EffectAsset>
     {
-        public EffectEditor() : base("Effect", "Effect Editor")
+        public EffectEditor() : base("Effect","Effects", "Effect Editor")
         {
         }
     }

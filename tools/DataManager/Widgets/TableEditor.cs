@@ -21,7 +21,7 @@ namespace DataManager.Widgets
 		public TItem SelectedItem { get; set; }
 		public TItem HoverItem { get; private set; }
 
-		public List<TItem> DataSource { get; set; }
+		public IEnumerable<TItem> DataSource { get; set; }
 
 		public IEnumerable<TItem> View { get; private set; }
 
@@ -155,13 +155,13 @@ namespace DataManager.Widgets
 			{
 				int index = DataSource.IndexOf(item);
 				var newItem = OnNewItem(item);
-				DataSource.Insert(index + 1, newItem);
+				//DataSource.Insert(index + 1, newItem);
 				changed = true;
 			}
 			ImGui.SameLine();
 			if (ImGui.Button($"Delete"))
 			{
-				DataSource.Remove(item);
+				//DataSource.Remove(item);
 				changed = true;
 			}
 		}
@@ -174,7 +174,7 @@ namespace DataManager.Widgets
 			{
 				if (OnNewItem != null)
 				{
-					DataSource.Add(OnNewItem(null));
+					//DataSource.Add(OnNewItem(null));
 					changed = true;
 				}
 			}
@@ -189,7 +189,7 @@ namespace DataManager.Widgets
 					{
 						int index = DataSource.IndexOf(SelectedItem);
 						var newItem = OnNewItem(SelectedItem);
-						DataSource.Insert(index + 1, newItem);
+						//DataSource.Insert(index + 1, newItem);
 						SelectedItem = newItem;
 						changed = true;
 					}
@@ -201,7 +201,7 @@ namespace DataManager.Widgets
 				{
 					if (SelectedItem != null)
 					{
-						DataSource.Remove(SelectedItem);
+						//DataSource.Remove(SelectedItem);
 						changed = true;
 						SelectedItem = null;
 					}

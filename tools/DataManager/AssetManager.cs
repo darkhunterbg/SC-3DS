@@ -127,7 +127,7 @@ namespace DataManager
 			return Assets[typeof(TAsset)] as AssetDatabase<TAsset>;
 		}
 
-		public List<TAsset> GetAssets<TAsset>() where TAsset : Asset, new()
+		public IEnumerable<TAsset> GetAssets<TAsset>() where TAsset : Asset, new()
 		{
 			return (Assets[typeof(TAsset)] as AssetDatabase<TAsset>).Assets;
 		}
@@ -167,6 +167,12 @@ namespace DataManager
 			foreach (var db in Assets.Values)
 				db.Reload();
 
+		}
+
+		public void SaveAllAssets()
+        {
+			foreach (var db in Assets.Values)
+				db.Save();
 		}
 
 		public void LoadImageLists()

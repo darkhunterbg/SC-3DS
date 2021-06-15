@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace DataManager.Panels
 {
     public abstract class AssetTreeEditor<TAsset> : IGuiPanel
-        where TAsset : Asset, ITreeViewItem, new() 
+        where TAsset : Asset, ITreeViewItem, new()
     {
         public string WindowName { get; private set; }
 
@@ -22,10 +22,11 @@ namespace DataManager.Panels
         private TablePropertyEditor propertyEditor = new TablePropertyEditor("propertyEditor");
 
 
-        public AssetTreeEditor(string itemName, string windowName)
+        public AssetTreeEditor(string itemName, string rootName, string windowName)
         {
             WindowName = windowName;
             tree.ItemName = itemName;
+            tree.RootName = rootName;
             tree.NewItemAction = NewItem;
             tree.DeleteItemAction = DeleteItem;
         }
@@ -59,7 +60,10 @@ namespace DataManager.Panels
             propertyEditor.Draw();
             ImGui.EndChild();
 
-            if (tree.ItemModified || propertyEditor.Changed)
+            if (tree.ItemModified)
+                AppGame.AssetManager.SaveAllAssets();
+            else
+            if (propertyEditor.Changed)
                 AppGame.AssetManager.GetAssetDatabase<TAsset>().Save();
         }
     }
