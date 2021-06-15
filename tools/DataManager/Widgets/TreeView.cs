@@ -136,6 +136,7 @@ namespace DataManager.Widgets
 				{
 					Name = itemName,
 					Item = item,
+					Expanded = item == null
 				};
 				parent.Children.Add(newChild);
 				return newChild;
@@ -148,6 +149,7 @@ namespace DataManager.Widgets
 					parent.Children.Add(next = new TreeItem(parent)
 					{
 						Name = itemName,
+						Expanded = true
 					});
 				}
 				return NewItem(next, path.Skip(1), item);
@@ -201,6 +203,17 @@ namespace DataManager.Widgets
 				foreach (var c in node.Children)
 					GetVisibleNodes(c, result);
 		}
+		private IEnumerable<TreeItem> GetDirectories(TreeItem node)
+		{
+			if (node.IsDir)
+			{
+				yield return node;
+
+				foreach (var c in node.Children)
+					foreach (var n in GetDirectories(c))
+						yield return n;
+			}
+		}
 		private TreeItem NextNode(TreeItem node)
 		{
 			List<TreeItem> nodes = new List<TreeItem>();
@@ -235,7 +248,6 @@ namespace DataManager.Widgets
 				ProcessInput();
 			}
 		}
-
 
 		private TreeItem contextNode = null;
 		private ContextOperation contextOp;
@@ -355,13 +367,25 @@ namespace DataManager.Widgets
 				ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanAvailWidth
 					| ImGuiTreeNodeFlags.OpenOnDoubleClick;
 
-				if (node.Expanded)
-					flags |= ImGuiTreeNodeFlags.DefaultOpen;
+				ImGui.SetNextItemOpen(node.Expanded);
 
 
 				if (renameNode == node)
 				{
-					node.Expanded = ImGui.TreeNodeEx(string.Empty, flags);
+					bool expand = ImGui.TreeNodeEx(string.Empty, flags);
+
+					if (expand != node.Expanded)
+					{
+						if (ImGui.GetIO().KeyCtrl)
+						{
+							var n = GetDirectories(node).ToList();
+							foreach (var dir in n)
+								dir.Expanded = expand;
+						}
+					}
+
+					node.Expanded = expand;
+
 					ImGui.SameLine();
 					DrawRenameNode();
 				}
@@ -374,7 +398,19 @@ namespace DataManager.Widgets
 						flags |= ImGuiTreeNodeFlags.Selected;
 
 					string text = $"{node.Name} ({node.Children.Count})";
-					node.Expanded = ImGui.TreeNodeEx(text, flags);
+					bool expand = ImGui.TreeNodeEx(text, flags);
+
+					if (expand != node.Expanded)
+					{
+						if (ImGui.GetIO().KeyCtrl)
+						{
+							var n = GetDirectories(node).ToList();
+							foreach (var dir in n)
+								dir.Expanded = expand;
+						}
+					}
+
+					node.Expanded = expand;
 
 					if (contextNode == node && contextOp == ContextOperation.Cut)
 						ImGui.PopStyleColor();

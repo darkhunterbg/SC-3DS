@@ -10,115 +10,132 @@ using System.Threading.Tasks;
 
 namespace DataManager.Widgets
 {
-    public class TablePropertyEditor
-    {
-        public bool Changed { get; private set; }
+	public class TablePropertyEditor
+	{
+		class Section
+		{
+			public string Name = string.Empty;
 
-        private object editItem = null;
+			public List<PropertyInfo> editorProperties = new List<PropertyInfo>();
+			public List<EditorAttribute> editorAttributes = new List<EditorAttribute>();
+			public List<EditorDrawAction> editorDrawers = new List<EditorDrawAction>();
+			public List<string> propertyNames = new List<string>();
+		}
 
-        private readonly string id;
+		public bool Changed { get; private set; }
 
-        public object EditingItem
-        {
-            get { return editItem; }
-            set
-            {
-                if (editItem == value)
-                    return;
-                editItem = value;
-                RebindItem();
-            }
-        }
+		private object editItem = null;
 
-        private List<PropertyInfo> editorProperties = new List<PropertyInfo>();
-        private List<EditorAttribute> editorAttributes = new List<EditorAttribute>();
-        private List<EditorDrawAction> editorDrawers = new List<EditorDrawAction>();
-        private List<ValueTuple<string, int>> sections = new List<(string, int)>();
-        private List<string> propertyNames = new List<string>();
+		private readonly string id;
 
-        public TablePropertyEditor(string id)
-        {
-            this.id = id;
-        }
+		public object EditingItem
+		{
+			get { return editItem; }
+			set
+			{
+				if (editItem == value)
+					return;
+				editItem = value;
+				RebindItem();
+			}
+		}
 
-        private void RebindItem()
-        {
-            editorProperties.Clear();
-            editorAttributes.Clear();
-            editorDrawers.Clear();
-            propertyNames.Clear();
-            sections.Clear();
+		private List<Section> sections = new List<Section>();
 
-            if (editItem == null)
-                return;
+		public TablePropertyEditor(string id)
+		{
+			this.id = id;
+		}
 
-            var type = editItem.GetType();
-            editorProperties = type.GetProperties().Where(t => t.GetCustomAttribute<EditorAttribute>() != null).ToList();
-            editorAttributes = editorProperties.Select(t => t.GetCustomAttribute<EditorAttribute>()).ToList();
+		private void RebindItem()
+		{
+			sections.Clear();
+	
+			if (editItem == null)
+				return;
 
-            editorDrawers = new List<EditorDrawAction>();
-            for (int i = 0; i < editorProperties.Count; ++i)
-            {
-                editorDrawers.Add(EditorPropertyDrawer.GetPropertyDrawer(editorProperties[i], editorAttributes[i]));
-            }
-            int x = 0;
-            foreach (var p in editorProperties)
-            {
-                var editorAttr = p.GetCustomAttribute<EditorAttribute>();
-                string name = editorAttr.Name ?? p.Name;
-                name = Regex.Replace(name, "(\\B[A-Z])", " $1");
-                propertyNames.Add(name);
-                var sectAttr = p.GetCustomAttribute<SectionAttribute>();
-                if (sectAttr != null)
-                    sections.Add((sectAttr.Name, x));
-                x++;
-            }
-        }
+			sections.Add(new Section() { Name = "Properties" });
 
-        public void Draw(Vector2 size = new Vector2())
-        {
-            Changed = false;
+			var type = editItem.GetType();
+			var editorProperties = type.GetProperties().Where(t => t.GetCustomAttribute<EditorAttribute>() != null).ToList();
 
-            if (!ImGui.BeginTable(id, 2, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable, size))
-                return;
+			Section current = sections[0];
+			foreach (var p in editorProperties)
+			{
+				var sectAttr = p.GetCustomAttribute<SectionAttribute>();
+				if (sectAttr != null)
+				{
+					current = new Section()
+					{
+						Name = sectAttr.Name
+					};
+					sections.Add(current);
+				}
 
-            ImGui.TableSetupScrollFreeze(0, 1);
+				var editorAttr = p.GetCustomAttribute<EditorAttribute>();
+				current.editorAttributes.Add(editorAttr);
+				current.editorProperties.Add(p);
+				current.editorDrawers.Add(EditorPropertyDrawer.GetPropertyDrawer(p, editorAttr));
 
-            ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthFixed, 400);
-            ImGui.TableSetupColumn("Value");
+				string name = editorAttr.Name ?? p.Name;
+				name = Regex.Replace(name, "(\\B[A-Z])", " $1");
+				current.propertyNames.Add(name);
+			}
+			sections.RemoveAll(s => s.propertyNames.Count == 0);
+			sections = sections.OrderBy(s => s.Name).ToList();
+		}
 
-            ImGui.TableHeadersRow();
+		public void Draw(Vector2 size = new Vector2())
+		{
+			Changed = false;
 
-            
-            for (int i = 0; i < editorProperties.Count; ++i)
-            {
-                ImGui.TableNextRow();
-
-                ImGui.PushID(i);
-
-                ImGui.TableNextColumn();
-
-                var section = sections.LastOrDefault(s => s.Item2 <= i);
-
-                if (!string.IsNullOrEmpty(section.Item1))
-                    ImGui.Text($"{section.Item1} - { propertyNames[i]}");
-                else
-                    ImGui.Text(propertyNames[i]);
-
-                ImGui.TableNextColumn();
-
-                var attr = editorAttributes[i];
-                var prop = editorProperties[i];
-
-                if (editorDrawers[i](prop, attr, editItem))
-                    Changed = true;
+			int i = 0;
+			foreach (var section in sections)
+			{
+				ImGui.PushID(++i);
+				DrawSection(section);
+				ImGui.PopID();
+			}
 
 
+		}
 
-                ImGui.PopID();
-            }
+		private void DrawSection(Section section)
+		{
+			if (!ImGui.BeginTable(id, 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable))
+				return;
 
-            ImGui.EndTable();
-        }
-    }
+			ImGui.TableSetupScrollFreeze(0, 1);
+
+			ImGui.TableSetupColumn(section.Name, ImGuiTableColumnFlags.WidthFixed, 200);
+			ImGui.TableSetupColumn(string.Empty);
+
+			ImGui.TableHeadersRow();
+
+
+			for (int i = 0; i < section.editorProperties.Count; ++i)
+			{
+				ImGui.TableNextRow();
+
+				ImGui.PushID(i);
+
+				ImGui.TableNextColumn();
+
+				ImGui.Text(section.propertyNames[i]);
+
+				ImGui.TableNextColumn();
+
+				var attr = section.editorAttributes[i];
+				var prop = section.editorProperties[i];
+
+				if (section.editorDrawers[i](prop, attr, editItem))
+					Changed = true;
+
+
+				ImGui.PopID();
+			}
+
+			ImGui.EndTable();
+		}
+	}
 }
