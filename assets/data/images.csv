@@ -40,5 +40,6 @@ unit\cmdbtns\zcmdbtns,574,37,72,72,0
 unit\terran\control,611,12,128,160,6
 unit\terran\marine,623,452,64,64,229
 unit\terran\scv,1075,102,72,72,51
-unit\terran\tmadeath,1177,3,64,64,0
-unit\terran\tmashad,1180,221,44,44,0
+unit\terran\tccshad,1177,6,128,160,0
+unit\terran\tmadeath,1183,3,64,64,0
+unit\terran\tmashad,1186,221,44,44,0

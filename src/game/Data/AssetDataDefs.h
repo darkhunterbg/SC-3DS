@@ -64,7 +64,7 @@ struct AnimClipDef {
 
 struct SpriteDef {
 	char name[32];
-	uint16_t imageId;
+	int16_t imageId;
 	uint16_t animStart;
 	uint8_t animCount;
 	bool isRotating;

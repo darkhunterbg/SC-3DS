@@ -77,6 +77,11 @@ namespace DataManager.Widgets
                 ImageFrameRef b = obj == null ? ImageFrameRef.None : (ImageFrameRef)obj;
                 return ImageFrame(name, b, out changed);
             }
+            if(type == typeof(Vector2))
+			{
+                Vector2 b = obj == null ? System.Numerics.Vector2.Zero : (Vector2)obj;
+                return Vector2(name, b, out changed);
+			}
 
             changed = false;
             ReadOnly(name, obj);
@@ -117,6 +122,10 @@ namespace DataManager.Widgets
             {
                 return ImageFrame(name, imf, out changed);
             }
+            if(obj is Vector2 v2)
+			{
+                return Vector2(name, v2, out changed);
+			}
 
             changed = false;
             ReadOnly(name, obj);
@@ -229,6 +238,16 @@ namespace DataManager.Widgets
             changed = CustomEnum(name, type, ref value);
             return value;
         }
+
+        public static bool Vector2(string name, ref Vector2 value)
+		{
+            return ImGui.DragFloat2(name, ref value);
+		}
+        public static Vector2 Vector2(string name, Vector2 value, out bool result)
+		{
+            result = Vector2(name, ref value);
+            return value;
+		}
 
         public static Asset Asset(string name, Asset asset, Type assetType, out bool changed)
         {

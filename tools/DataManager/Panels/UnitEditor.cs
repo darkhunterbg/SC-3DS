@@ -25,6 +25,7 @@ namespace DataManager.Panels
         {
             ShowSelection = true,
             ShowBars = true,
+            ShowShadows = true,
         };
 
         public UnitEditor()
@@ -58,6 +59,8 @@ namespace DataManager.Panels
                 spriteView.SelectionOffset = selected?.SelectionOffset ?? 0;
                 spriteView.BarSize = selected?.BarSize ?? 0;
                 spriteView.BarOffset = selected?.BarOffset ?? 0;
+                spriteView.ShadowImage = selected?.Shadow ?? ImageListRef.None;
+                spriteView.ShadowOffset = selected?.ShadowOffset ?? Vector2.Zero;
             }
             ImGui.EndChild();
 

@@ -3,6 +3,7 @@ using DataManager.Build;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,7 +20,7 @@ namespace DataManager.Assets
         [Binary(BinaryType.String, 32)]
         public string Path { get; set; }
 
-        [Section("Assets")]
+        [Section("Art")]
         [DefaultEditor]
         [Index(1), TypeConverter(typeof(IconRef.IconConverter))]
         public IconRef Icon { get; set; } = IconRef.None;
@@ -43,10 +44,6 @@ namespace DataManager.Assets
         [Optional]
         public string Subtitle { get; set; } = string.Empty;
 
-        [DefaultEditor]
-        [Binary(BinaryType.UInt,2)]
-        [Optional]
-        public int Health { get; set; } = 100;
 
         [DefaultEditor]
         [Binary(BinaryType.UInt, 2)]
@@ -58,7 +55,6 @@ namespace DataManager.Assets
         [Optional]
         public int BarOffset { get; set; } = 0;
 
-        [Section("Selection")]
         [CustomEnumEditor(CustomEnumType.SelectionTypes)]
         [Binary(BinaryType.UInt, 2)]
         [Optional]
@@ -68,5 +64,21 @@ namespace DataManager.Assets
         [Binary(BinaryType.UInt, 2)]
         [Optional]
         public int SelectionOffset { get; set; } = 0;
+
+        [DefaultEditor]
+        [Binary(BinaryType.ImageRef, 2)]
+        [Optional, TypeConverter(typeof(ImageListRef.CsvConverter))]
+        public ImageListRef Shadow { get; set; } = ImageListRef.None;
+
+        [DefaultEditor]
+        [Binary(BinaryType.Vector2, 4)]
+        [Optional]
+        public Vector2 ShadowOffset { get; set; }
+
+        [Section("Data")]
+        [DefaultEditor]
+        [Binary(BinaryType.UInt, 2)]
+        [Optional]
+        public int Health { get; set; } = 100;
     }
 }

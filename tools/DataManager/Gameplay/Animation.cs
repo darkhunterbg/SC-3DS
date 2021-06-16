@@ -35,7 +35,7 @@ namespace DataManager.Gameplay
 	public class AnimationState
 	{
 		public Vector2 Offset;
-		public int InstructionId;
+		public int InstructionId = -1;
 		public int FrameDelay;
 		public int Orientation { get; private set; }
 
