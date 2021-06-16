@@ -198,10 +198,10 @@ void GameView::ContextualGamepadInput() {
 			const auto& data = context.GetEntityManager().UnitArchetype.DataComponents.GetComponent(id);
 			if (data.isBuilding) {
 				const auto& def = *context.GetEntityManager().UnitArchetype.UnitComponents.GetComponent(id).def;
-				if (!data.IsQueueFull() && def.ProductionUnit != nullptr) {
+				/*if (!data.IsQueueFull() && def.ProductionUnit != nullptr) {
 					context.ActivateAbility(&AbilityDatabase::BuildUnit,
 						*def.ProductionUnit);
-				}
+				}*/
 			}
 			else {
 

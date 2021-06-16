@@ -61,7 +61,7 @@ namespace DataManager.Assets
         public int SelectonSize { get; set; } = 0;
 
         [DefaultEditor]
-        [Binary(BinaryType.UInt, 2)]
+        [Binary(BinaryType.Int, 2)]
         [Optional]
         public int SelectionOffset { get; set; } = 0;
 

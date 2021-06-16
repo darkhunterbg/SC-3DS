@@ -356,7 +356,7 @@ void UnitAIReturnCargoState::Think(UnitAIThinkData& data, EntityManager& em)
 			if (em.UnitArchetype.OwnerComponents.GetComponent(t) != owner)
 				continue;
 
-			if (em.UnitArchetype.UnitComponents[t].def->IsResourceDepot) {
+			/*if (em.UnitArchetype.UnitComponents[t].def->IsResourceDepot) {
 
 				Rectangle16 collider = em.CollisionArchetype.ColliderComponents.GetComponent(t).collider;
 				collider.position += em.PositionComponents.GetComponent(t);
@@ -379,7 +379,7 @@ void UnitAIReturnCargoState::Think(UnitAIThinkData& data, EntityManager& em)
 				}
 
 				continue;
-			}
+			}*/
 		}
 	}
 }

@@ -14,7 +14,8 @@ bool PlayerInfo::HasEnoughSupply(const UnitDef& unit) const
 {
 	int available = std::min(GetMaxSupply(), (int)providedSupplyDoubled);
 	available -= usedSupplyDoubled + reserverdSupplyDoubled;
-	return available  >= unit.UseSupplyDoubled;
+	return true;
+	//return available  >= unit.UseSupplyDoubled;
 }
 
 

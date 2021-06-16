@@ -480,6 +480,8 @@ namespace DataManager.Build
                 });
             }
 
+            data.RemoveAll(t => t.Data.Count() == 0);
+
             foreach (var d in data)
                 d.Init();
 

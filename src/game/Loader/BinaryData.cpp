@@ -39,6 +39,12 @@ GameDatabase* BinaryDataLoader::LoadDatabase(FILE* f)
 			LoadData(header.size, f, db->AnimClipDefs); break;
 		case DataSectionType::AnimInstructions:
 			LoadData(header.size, f, db->AnimInstructionDefs); break;
+		case DataSectionType::Units:
+			LoadData(header.size, f, db->UnitDefs); break;
+		case DataSectionType::Abilities:
+		case DataSectionType::Upgrades:
+		case DataSectionType::Effects:
+			break;
 		default:
 			EXCEPTION("Unknown data section type %i at position %i", header.type, i);
 			break;

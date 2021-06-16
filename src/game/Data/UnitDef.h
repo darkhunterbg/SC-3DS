@@ -8,7 +8,40 @@
 #include "SoundDef.h"
 #include "WeaponDef.h"
 
+#include <cstring>
+
 struct UnitDef {
+	char Path[32];
+
+
+	struct {
+		uint16_t IconId;
+		uint16_t SpriteId;
+		char Name[32];
+		char Title[32];
+		uint16_t BarSize;
+		uint16_t BarOffset;
+		uint16_t SelectionSize;
+		int16_t SelectionOffset;
+		int16_t ShadowImageId;
+		Vector2Int16 ShadowOffset;
+
+	/*	inline const Image* GetShadowImage() const {
+			if (ShadowImageId < 0)
+				return nullptr;
+			return
+		}*/
+
+		inline bool HasTitle() const {
+			return  Title[0] != 0;
+		}
+
+	} Art;
+
+	uint16_t Health;
+
+	/*
+
 	uint16_t Id = 0;
 	std::string Name;
 	std::string Title;
@@ -75,4 +108,5 @@ struct UnitDef {
 				s[i].LoadSoundClips();
 		}
 	}
+	*/
 };

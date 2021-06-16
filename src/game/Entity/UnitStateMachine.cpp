@@ -189,13 +189,13 @@ static void  UnitAttackingEnterStateJob(int start, int end) {
 		//	em.FlagComponents.GetComponent(glow).clear(ComponentFlags::RenderEnabled);
 		//}
 
-		if (unit.def->Weapon->Sound.TotalClips > 0) {
-			int i = std::rand() % unit.def->Weapon->Sound.TotalClips;
+		//if (unit.def->Weapon->Sound.TotalClips > 0) {
+		//	int i = std::rand() % unit.def->Weapon->Sound.TotalClips;
 
-			em.SoundArchetype.SourceComponents.GetComponent(id).clip = &unit.def->Weapon->Sound.Clips[i];
-			em.SoundArchetype.SourceComponents.GetComponent(id).priority = unit.def->AudioPriority;
-			flags.set(ComponentFlags::SoundTrigger);
-		}
+		//	em.SoundArchetype.SourceComponents.GetComponent(id).clip = &unit.def->Weapon->Sound.Clips[i];
+		//	em.SoundArchetype.SourceComponents.GetComponent(id).priority = unit.def->AudioPriority;
+		//	flags.set(ComponentFlags::SoundTrigger);
+		//}
 
 		UnitWeaponComponent& weapon = em.UnitArchetype.WeaponComponents.GetComponent(id);
 		weapon.StartCooldown();
@@ -300,12 +300,12 @@ void UnitDeathState::EnterState(
 		//	EntityUtil::StartTimer(id, 1, TimerExpiredAction::UnitDeathAfterEffect);
 		//}
 
-		int i = std::rand() % unit.def->Sounds.Death.TotalClips;
-		const auto& clip = unit.def->Sounds.Death.Clips[i];
+		//int i = std::rand() % unit.def->Sounds.Death.TotalClips;
+		//const auto& clip = unit.def->Sounds.Death.Clips[i];
 
-		em.SoundArchetype.SourceComponents.GetComponent(id).clip = &clip;
-		em.SoundArchetype.SourceComponents.GetComponent(id).priority = 100 + unit.def->AudioPriority;
-		em.FlagComponents.GetComponent(id).set(ComponentFlags::SoundTrigger);
+		//em.SoundArchetype.SourceComponents.GetComponent(id).clip = &clip;
+		//em.SoundArchetype.SourceComponents.GetComponent(id).priority = 100 + unit.def->AudioPriority;
+		//em.FlagComponents.GetComponent(id).set(ComponentFlags::SoundTrigger);
 	}
 }
 
@@ -385,13 +385,13 @@ void UnitMiningState::EnterState(UnitStateMachineChangeData& data, EntityManager
 		flags.set(ComponentFlags::OrientationChanged);
 
 
-		if (unit.def->Weapon->Sound.TotalClips > 0) {
-			int i = std::rand() % unit.def->Weapon->Sound.TotalClips;
+		//if (unit.def->Weapon->Sound.TotalClips > 0) {
+		//	int i = std::rand() % unit.def->Weapon->Sound.TotalClips;
 
-			em.SoundArchetype.SourceComponents.GetComponent(id).clip = &unit.def->Weapon->Sound.Clips[i];
-			em.SoundArchetype.SourceComponents.GetComponent(id).priority = unit.def->AudioPriority;
-			flags.set(ComponentFlags::SoundTrigger);
-		}
+		//	em.SoundArchetype.SourceComponents.GetComponent(id).clip = &unit.def->Weapon->Sound.Clips[i];
+		//	em.SoundArchetype.SourceComponents.GetComponent(id).priority = unit.def->AudioPriority;
+		//	flags.set(ComponentFlags::SoundTrigger);
+		//}
 
 
 		TimingComponent& timer = em.TimingArchetype.TimingComponents.GetComponent(id);

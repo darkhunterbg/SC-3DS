@@ -116,7 +116,7 @@ void GameHUD::LowerScreenGUI(const Camera& camera, GameViewContext& context) {
 	EntityId selected = context.GetPriorityUnitSelected();
 	if (selected != Entity::None) {
 		auto& def = *context.GetEntityManager().UnitArchetype.UnitComponents.GetComponent(selected).def;
-		GraphicsRenderer::Draw(def.Portrait, portraitPanelDst);
+		//GraphicsRenderer::Draw(def.Portrait, portraitPanelDst);
 	}
 
 	GraphicsRenderer::Draw(context.race->ConsoleLowerSprite, { 0,0 });

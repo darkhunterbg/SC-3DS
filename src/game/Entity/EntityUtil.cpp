@@ -169,13 +169,13 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 	//	Vector2Int16(def.Graphics->IdleAnimations[0].GetFrame(0).shadowOffset)
 	//	});
 
-	if (def.Weapon)
-		em.UnitArchetype.WeaponComponents.NewComponent(e).FromDef(*def.Weapon);
+	//if (def.Weapon)
+	//	em.UnitArchetype.WeaponComponents.NewComponent(e).FromDef(*def.Weapon);
 
-	if (def.MovementSpeed > 0) {
-		em.NavigationArchetype.NavigationComponents.NewComponent(e);
-		em.NavigationArchetype.Archetype.AddEntity(e);
-	}
+	//if (def.MovementSpeed > 0) {
+	//	em.NavigationArchetype.NavigationComponents.NewComponent(e);
+	//	em.NavigationArchetype.Archetype.AddEntity(e);
+	//}
 
 	//em.CollisionArchetype.ColliderComponents.NewComponent(e).collider = def.Graphics->Collider;
 	em.CollisionArchetype.Archetype.AddEntity(e);
@@ -187,32 +187,32 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 	mapBB.size = mapBB.size.Floor(2, 2);
 	mapBB.position -= mapBB.size / 2;
 
-	if (playerId == 0 && def.IsResourceContainer) {
-		em.MapObjectArchetype.MinimapColorId.NewComponent(e, 15);
-	}
-	else {
-		em.MapObjectArchetype.MinimapColorId.NewComponent(e, playerId);
-	}
+	//if (playerId == 0 && def.IsResourceContainer) {
+	//	em.MapObjectArchetype.MinimapColorId.NewComponent(e, 15);
+	//}
+	//else {
+	//	em.MapObjectArchetype.MinimapColorId.NewComponent(e, playerId);
+	//}
 
 
 	em.MapObjectArchetype.BoundingBoxComponents.NewComponent(e, mapBB);
 	em.MapObjectArchetype.Archetype.AddEntity(e);
 
 
-	if (def.MovementSpeed > 0) {
-		em.MovementArchetype.MovementComponents.NewComponent(e);
-		em.MovementArchetype.Archetype.AddEntity(e);
-	}
+	//if (def.MovementSpeed > 0) {
+	//	em.MovementArchetype.MovementComponents.NewComponent(e);
+	//	em.MovementArchetype.Archetype.AddEntity(e);
+	//}
 
-	em.UnitArchetype.StateComponents.NewComponent(e);
+	//em.UnitArchetype.StateComponents.NewComponent(e);
 
-	if (def.IsBuilding) {
-		em.FlagComponents.GetComponent(e).set(ComponentFlags::UnitAIPaused);
-	}
-	else {
-		em.UnitArchetype.AIStateComponents.NewComponent(e, UnitAIState::Idle);
-		em.UnitArchetype.AIStateDataComponents.NewComponent(e);
-	}
+	//if (def.IsBuilding) {
+	//	em.FlagComponents.GetComponent(e).set(ComponentFlags::UnitAIPaused);
+	//}
+	//else {
+	//	em.UnitArchetype.AIStateComponents.NewComponent(e, UnitAIState::Idle);
+	//	em.UnitArchetype.AIStateDataComponents.NewComponent(e);
+	//}
 
 	em.SoundArchetype.Archetype.AddEntity(e);
 

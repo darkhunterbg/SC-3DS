@@ -162,12 +162,13 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 		UnitAIState state = em.UnitArchetype.AIStateComponents.GetComponent(entityId);
 
 
-		if (unit.def->Weapon) {
+		//if (unit.def->Weapon)
+		{
 			unitCommands[2].ability = &AbilityDatabase::Attack;
 			unitCommands[2].enabled = true;
 		}
 
-		if (unit.def->MovementSpeed > 0)
+		//if (unit.def->MovementSpeed > 0)
 		{
 			unitCommands[0].ability = &AbilityDatabase::Move;
 			unitCommands[0].enabled = true;
@@ -175,29 +176,29 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 			unitCommands[1].ability = &AbilityDatabase::Stop;
 			unitCommands[1].enabled = true;
 
-			if (unit.def->GathersResources) {
+			//if (unit.def->GathersResources) {
 
-				if (unit.HasCargo())
-				{
-					unitCommands[4].ability = &AbilityDatabase::ReturnCargo;
-					unitCommands[4].enabled = true;
+			//	if (unit.HasCargo())
+			//	{
+			//		unitCommands[4].ability = &AbilityDatabase::ReturnCargo;
+			//		unitCommands[4].enabled = true;
 
-				}
-				else {
-					unitCommands[4].ability = &AbilityDatabase::Gather;
-					unitCommands[4].enabled = true;
-				}
-			}
-			else {
+			//	}
+			//	else {
+			//		unitCommands[4].ability = &AbilityDatabase::Gather;
+			//		unitCommands[4].enabled = true;
+			//	}
+			//}
+			//else {
 				unitCommands[3].ability = &AbilityDatabase::Patrol;
 				unitCommands[3].enabled = true;
 
 				unitCommands[4].ability = &AbilityDatabase::HoldPosition;
 				unitCommands[4].enabled = true;
-			}
+			//}
 		}
 
-		if (unit.def->ProductionUnit != nullptr) {
+		/*if (unit.def->ProductionUnit != nullptr) {
 			if (!em.UnitArchetype.DataComponents.GetComponent(entityId).IsQueueFull())
 			{
 				unitCommands[0].ability = &AbilityDatabase::BuildUnit;
@@ -205,7 +206,7 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 				unitCommands[0].abilityProduce = unit.def->ProductionUnit;
 				unitCommands[0].commandIcon = &unit.def->ProductionUnit->Icon;
 			}
-		}
+		}*/
 
 
 		for (auto& cmd : unitCommands) {

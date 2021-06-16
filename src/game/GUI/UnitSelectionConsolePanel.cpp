@@ -64,6 +64,7 @@ void UnitSelectionConsolePanel::Draw(GameViewContext& context)
 		DrawProductionDetails(detailSpace, entityId, data, context);
 	}
 	else {
+		/*
 		if (unit.def->ProvideSupplyDoubled) {
 			DrawSupplyInfo(detailSpace, entityId, unit, context);
 		}
@@ -83,6 +84,7 @@ void UnitSelectionConsolePanel::Draw(GameViewContext& context)
 				GraphicsRenderer::DrawText(*Game::SystemFont12, off, buffer, Colors::UILightGray);
 			}
 		}
+		*/
 	}
 }
 
@@ -174,13 +176,13 @@ void UnitSelectionConsolePanel::DrawUnitName(Rectangle space, EntityId id, const
 
 	Vector2Int pos = space.position + Vector2Int(space.size.x / 2, 0);
 
-	int offset = font.MeasureString(unit.def->Name.data()).x;
-	GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), unit.def->Name.data(), Colors::UILightGray);
+	int offset = font.MeasureString(unit.def->Art.Name).x;
+	GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), unit.def->Art.Name, Colors::UILightGray);
 	pos.y += 16;
 
-	if (unit.def->Title.length()) {
-		offset = font.MeasureString(unit.def->Title.data()).x;
-		GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), unit.def->Title.data(), Colors::UILightGray);
+	if (unit.def->Art.HasTitle()) {
+		offset = font.MeasureString(unit.def->Art.Title).x;
+		GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), unit.def->Art.Title, Colors::UILightGray);
 	}
 }
 
@@ -205,7 +207,7 @@ void UnitSelectionConsolePanel::DrawSupplyInfo(Rectangle space, EntityId id, con
 	GraphicsRenderer::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray);
 	pos.y += 12;
 
-	stbsp_snprintf(buffer, sizeof(buffer), "%s Provided: %i", supplyName.data(), unit.def->ProvideSupplyDoubled >> 1);
+	//stbsp_snprintf(buffer, sizeof(buffer), "%s Provided: %i", supplyName.data(), unit.def->ProvideSupplyDoubled >> 1);
 	offset = 0;
 	GraphicsRenderer::DrawText(font, pos + Vector2Int(offset, 0), buffer, Colors::UILightGray);
 	pos.y += 12;
@@ -253,7 +255,7 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 		GraphicsRenderer::Draw(f, dst);
 
 		if (i < data.queueSize) {
-			const ImageFrame& n = data.productionQueue[i]->Icon;
+			const ImageFrame& n = ImageFrame();// data.productionQueue[i]->Icon;
 			Rectangle nDst = dst;
 			nDst.size = Vector2Int(n.size);
 			nDst.position += Vector2Int(n.offset) + Vector2Int{ 2,2 };
@@ -301,8 +303,8 @@ void UnitSelectionConsolePanel::DrawProductionDetails(Rectangle space, EntityId 
 	dst.position += {3, 3};
 	dst.size = { 2,3 };
 
-	int progress = data.productionQueue[0]->BuildTime - data.queueTimer;
-	progress = (progress * 100) / data.productionQueue[0]->BuildTime;
+	int progress = 0;// data.productionQueue[0]->BuildTime - data.queueTimer;
+	//progress = (progress * 100) / data.productionQueue[0]->BuildTime;
 
 	if (progress == 0)
 		return;
@@ -344,7 +346,7 @@ void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, con
 	int infoCount = 0;
 
 
-	if (unit.def->HasArmor()) {
+	/*if (unit.def->HasArmor()) {
 		info[infoCount].sprite = &unit.def->ArmorIcon;
 		info[infoCount].counter = 0;
 		++infoCount;
@@ -354,7 +356,7 @@ void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, con
 		info[infoCount].sprite = &unit.def->Weapon->Icon;
 		info[infoCount].counter = 0;
 		++infoCount;
-	}
+	}*/
 
 	for (int i = 0; i < infoCount; ++i) {
 		Rectangle dst = { pos ,Vector2Int(f.size) };

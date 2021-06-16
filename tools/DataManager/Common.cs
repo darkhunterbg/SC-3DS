@@ -1,6 +1,10 @@
-﻿using System;
+﻿using CsvHelper;
+using CsvHelper.Configuration;
+using CsvHelper.TypeConversion;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -11,6 +15,34 @@ namespace DataManager
 	public enum CustomEnumType
 	{
 		SelectionTypes
+	}
+
+	public static class CsvConverters
+	{
+		public class Vector2Coverter : DefaultTypeConverter
+		{
+			public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
+			{
+				var s = text.Split(",");
+				if (s.Length < 2)
+					return Vector2.Zero;
+
+				if(!int.TryParse(s[0],out int x))
+					return Vector2.Zero;
+
+				if (!int.TryParse(s[1], out int y))
+					return Vector2.Zero;
+
+				return new Vector2(x, y);
+			}
+			public override string ConvertToString(object value, IWriterRow row, MemberMapData memberMapData)
+			{
+				if (value == null)
+					return "0,0";
+				Vector2 v = (Vector2)(value);
+				return $"{(int)v.X},{(int)v.Y}";
+			}
+		}
 	}
 
 	public static class EnumCacheValues

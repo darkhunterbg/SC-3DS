@@ -186,7 +186,7 @@ static std::vector<Vector2Int16> testPositions;
 void UnitSystem::UpdateBuilding(EntityManager& em)
 {
 	spawn.clear();
-
+	/*
 	for (const auto& cmd : unitBuildUpdate) {
 
 		EntityId id = cmd.id;
@@ -317,17 +317,18 @@ void UnitSystem::UpdateBuilding(EntityManager& em)
 				}
 			}
 		}
-
+		
 	}
+	*/
 
 	PlayerSystem& ps = em.GetPlayerSystem();
 
-	for (const Spawn& s : spawn) {
+	/*for (const Spawn& s : spawn) {
 		EntityId e = UnitEntityUtil::NewUnit(*s.def, s.owner, s.pos);
 		em.OrientationComponents.GetComponent(e) = s.orientation;
 		ps.NewEvent(s.owner, PlayerEventType::NewUnit, e);
 		ps.ReserveSupply(s.owner, -s.def->UseSupplyDoubled);
-	}
+	}*/
 }
 
 void UnitSystem::DequeueItem(EntityId id, int itemId, EntityManager& em)
@@ -342,22 +343,22 @@ void UnitSystem::DequeueItem(EntityId id, int itemId, EntityManager& em)
 	if (def == nullptr)
 		return;
 
-	if (restoreSupply)
-		em.GetPlayerSystem().ReserveSupply(owner, -def->UseSupplyDoubled);
-	em.GetPlayerSystem().AddMinerals(owner, -def->MineralCost);
+	//if (restoreSupply)
+	//	em.GetPlayerSystem().ReserveSupply(owner, -def->UseSupplyDoubled);
+	//em.GetPlayerSystem().AddMinerals(owner, -def->MineralCost);
 
 	if (!data.IsQueueEmpty()) {
 		if (itemId == 0) {
 			def = data.productionQueue[0];
 
-			if (em.GetPlayerSystem().HasEnoughFreeSupply(owner, def->UseSupplyDoubled)) {
+	/*		if (em.GetPlayerSystem().HasEnoughFreeSupply(owner, def->UseSupplyDoubled)) {
 				data.build = true;
 				em.GetPlayerSystem().ReserveSupply(owner, def->UseSupplyDoubled);
 			}
 			else {
 				data.build = false;
 				em.GetPlayerSystem().NewEvent(owner, PlayerEventType::NotEnoughSupply, id);
-			}
+			}*/
 		}
 	}
 	else {

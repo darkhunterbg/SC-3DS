@@ -70,7 +70,7 @@ void CommandProcessor::UseAbility(PlayerId player, const std::vector<EntityId>& 
 	cmd.frameId = frame;
 	cmd.playerId = player;
 	cmd.abilityId = ability.AbilityId;
-	cmd.target.itemId = target.Id;
+	//cmd.target.itemId = target.Id;
 	cmd.targetType = PlayerCommandTargetType::UnitType;
 
 	GenerateCommands(cmd, group);

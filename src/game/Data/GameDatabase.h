@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "AssetDataDefs.h"
+#include "UnitDef.h"
 #include "../Assets.h"
 #include <algorithm>
 #include <unordered_map>
@@ -24,6 +25,7 @@ public:
 	std::vector<SpriteDef> SpriteDefs;
 	std::vector<AnimClipDef> AnimClipDefs;
 	std::vector<AnimInstructionDef> AnimInstructionDefs;
+	std::vector<UnitDef> UnitDefs;
 
 
 	GameDatabase();

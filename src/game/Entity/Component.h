@@ -206,13 +206,13 @@ struct UnitDataComponent {
 			return false;
 		}
 
-		productionQueue[queueSize] = &def;
+		//productionQueue[queueSize] = &def;
 
-		++queueSize;
-		if (queueTimer == 0) {
-			queueTimer = def.BuildTime;
-			build = false;
-		}
+		//++queueSize;
+		//if (queueTimer == 0) {
+		//	queueTimer = def.BuildTime;
+		//	build = false;
+		//}
 
 		return true;
 	}
@@ -230,7 +230,7 @@ struct UnitDataComponent {
 
 	inline const UnitDef* Dequeue() {
 		const UnitDef* result = productionQueue[0];
-		for (int i = 1; i < queueSize; ++i) {
+	/*	for (int i = 1; i < queueSize; ++i) {
 			productionQueue[i - 1] = productionQueue[i];
 		}
 
@@ -240,7 +240,7 @@ struct UnitDataComponent {
 			queueTimer = productionQueue[0]->BuildTime;
 		}
 		
-		build = false;
+		build = false;*/
 
 		return result;
 	}
@@ -248,7 +248,9 @@ struct UnitDataComponent {
 		if (queuePos >= queueSize)
 			return nullptr;
 
-		const UnitDef* result = productionQueue[queuePos];
+		return nullptr;
+
+		/*const UnitDef* result = productionQueue[queuePos];
 
 		for (int i = queuePos + 1; i < queueSize; ++i) {
 			productionQueue[i - 1] = productionQueue[i];
@@ -266,11 +268,11 @@ struct UnitDataComponent {
 			queueTimer = 0;
 		}
 
-		return result;
+		return result;*/
 	}
 
 	inline void FromDef(const UnitDef& def) {
-		supplyUsage = def.UseSupplyDoubled;
+	/*	supplyUsage = def.UseSupplyDoubled;
 		supplyProvides = def.ProvideSupplyDoubled;
 		vision = def.Vision + 1;
 		isBuilding = def.IsBuilding;
@@ -278,7 +280,7 @@ struct UnitDataComponent {
 			resources = 1500;
 		spawnOffset = def.SpawnOffset;
 		queueSize = 0;
-		queueTimer = 0;
+		queueTimer = 0;*/
 		ResetFireTimer();
 	}
 
@@ -316,7 +318,7 @@ struct UnitHealthComponent {
 	inline bool IsDead() const { return current == 0; }
 	inline void FromDef(const UnitDef& def) {
 		current = max = def.Health;
-		armor = def.Armor;
+		//armor = def.Armor;
 	}
 };
 
@@ -325,8 +327,8 @@ struct UnitMovementComponent {
 	uint8_t rotationSpeed;
 
 	inline void FromDef(const UnitDef& def) {
-		movementSpeed = def.MovementSpeed;
-		rotationSpeed = def.RotationSpeed;
+		/*movementSpeed = def.MovementSpeed;
+		rotationSpeed = def.RotationSpeed;*/
 	}
 };
 

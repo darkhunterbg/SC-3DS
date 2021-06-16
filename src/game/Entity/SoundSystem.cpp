@@ -231,7 +231,7 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 			const UnitDef* def = em.UnitArchetype.UnitComponents.GetComponent(currentChat.id).def;
 			const UnitSound* sound = nullptr;
 
-
+			/*
 			switch (currentChat.type)
 			{
 			case UnitChatType::Command: {
@@ -268,7 +268,7 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 			default:
 				break;
 			}
-
+			*/
 
 			if (sound) {
 				int i = 0;

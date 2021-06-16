@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
+using System.Numerics;
 
 namespace DataManager.Assets
 {
@@ -118,6 +119,8 @@ namespace DataManager.Assets
 			context.TypeConverterCache.AddConverter<ImageListRef.CsvConverter>(new ImageListRef.CsvConverter());
 
 			context.TypeConverterCache.AddConverter<ImageFrameRef.CsvConverter>(new ImageFrameRef.CsvConverter());
+
+			context.TypeConverterCache.AddConverter<Vector2>(new CsvConverters.Vector2Coverter());
 		}
 
 		public void Reload()
