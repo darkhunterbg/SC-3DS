@@ -18,10 +18,14 @@ class RenderSystem {
 	struct RenderData {
 		std::vector<RenderDestinationComponent> pos;
 		std::vector<RenderComponent> ren;
+		std::vector<FlagsComponent> flags;
+		std::vector<RenderShadowComponent> shadow;
 
 		inline void clear() {
 			pos.clear();
 			ren.clear();
+			flags.clear();
+			shadow.clear();
 		}
 		inline size_t size() const {
 			return pos.size();
@@ -33,13 +37,15 @@ class RenderSystem {
 		std::vector<Rectangle16*> outBB;
 		std::vector<Vector2Int16> worldPos;
 		std::vector<Vector2Int16> offset;
-		std::vector< int8_t> depth;
+		std::vector<Vector2Int16> shadowOffset;
+		std::vector<int8_t> depth;
 
 		inline void clear() {
 
 			outDst.clear();
 			worldPos.clear();
 			offset.clear();
+			shadowOffset.clear();
 			outBB.clear();
 			depth.clear();
 		}

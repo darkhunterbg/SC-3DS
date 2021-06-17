@@ -35,6 +35,7 @@ public:
 	inline const Image& GetImage(unsigned id) const { return images[id]; }
 	const Image& GetImage(const std::string& path) const;
 	const ImageFrame& GetCommandIcons(unsigned id) const;
+	const UnitDef* GetUnit(const char* path) const;
 
 	void LoadAssetReferences();
 };

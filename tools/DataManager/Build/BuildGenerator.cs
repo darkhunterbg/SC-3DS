@@ -21,6 +21,8 @@ namespace DataManager.Build
 {
     public class BuildGenerator : IDisposable
     {
+        public static BuildGenerator Instance { get; private set; }
+
         private List<SpriteAtlasEntry> atlases = null;
 
         private volatile bool cancelled = false;
@@ -31,6 +33,11 @@ namespace DataManager.Build
         int currentJob = 0;
 
         private AsyncOperation op;
+
+        public BuildGenerator()
+		{
+            Instance = this;
+		}
 
         private void DisplayItem(string text)
         {

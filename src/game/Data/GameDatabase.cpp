@@ -24,6 +24,15 @@ const ImageFrame& GameDatabase::GetCommandIcons(unsigned id) const
 	return commandIcons->GetFrame(id);
 }
 
+const UnitDef* GameDatabase::GetUnit(const char* path) const
+{
+	for (const UnitDef& def : UnitDefs)
+		if (std::strncmp(def.Path, path, sizeof(def.Path)) == 0)
+			return  &def;
+
+	return nullptr;
+}
+
 void GameDatabase::LoadAssetReferences()
 {
 	std::vector<const Texture*> textures;

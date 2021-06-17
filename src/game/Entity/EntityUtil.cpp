@@ -44,18 +44,14 @@ void EntityUtil::SetPosition(EntityId e, Vector2Int16 pos) {
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::PositionChanged);
 }
 
+
 void EntityUtil::SetImageFrame(EntityId e, const Image& img, unsigned frameId, bool hFlip)
 {
 	EntityManager& em = GetManager();
 	const auto& frame = img.GetFrame(frameId);
 
-	Vector2Int16 offset = frame.offset - (img.GetSize() >> 1);
-	if (hFlip)
-		offset.x = (img.GetSize().x >> 1) - frame.offset.x - frame.size.x;
-
-
 	em.RenderArchetype.BoundingBoxComponents.GetComponent(e).size = img.GetSize();
-	em.RenderArchetype.OffsetComponents.GetComponent(e) = offset;
+	em.RenderArchetype.OffsetComponents.GetComponent(e) = img.GetImageFrameOffset(frameId, hFlip);
 	RenderComponent& render = em.RenderArchetype.RenderComponents.GetComponent(e);
 	render.sprite = frame;
 	render.hFlip = hFlip;
@@ -112,6 +108,13 @@ void EntityUtil::UpdateAnimationVisual(EntityId id)
 	bool flip = orientation > 16;
 	frameId += flip ? 32 - orientation : orientation;
 	SetImageFrame(id, *anim.baseImage, frameId, flip);
+
+	if (em.FlagComponents.GetComponent(id).test(ComponentFlags::RenderShadows)) {
+		auto& shad = em.RenderArchetype.ShadowComponents.GetComponent(id);
+		const auto& img = em.AnimationArchetype.ShadowComponents.GetComponent(id);
+		shad.sprite = img.image->GetFrame(frameId);
+		shad.offset = img.offset + img.image->GetImageFrameOffset(frameId, flip);
+	}
 }
 
 void EntityUtil::PlayAnimation(EntityId id, const AnimClipDef& clip)

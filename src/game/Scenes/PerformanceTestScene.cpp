@@ -23,6 +23,7 @@ void PerformanceTestScene::Start() {
 	em.GetMapSystem().FogOfWarVisible = false;
 	//em.DrawBoundingBoxes = true;
 
+	const auto& def = *GameDatabase::instance->GetUnit("Terran\\Units\\Marine");
 	const auto& clip = GameDatabase::instance->AnimClipDefs[0];
 
 	for (int i = 0; i < 2000; ++i) {
@@ -31,6 +32,11 @@ void PerformanceTestScene::Start() {
 		em.AnimationArchetype.Archetype.AddEntity(e);
 		em.FlagComponents.GetComponent(e).set(ComponentFlags::RenderEnabled);
 		em.FlagComponents.GetComponent(e).set(ComponentFlags::AnimationEnabled);
+		em.FlagComponents.GetComponent(e).set(ComponentFlags::RenderShadows);
+		auto& s = em.AnimationArchetype.ShadowComponents.GetComponent(e);
+		s.image = def.Art.GetShadowImage();
+		s.offset = def.Art.ShadowOffset;
+
 		EntityUtil::PlayAnimation(e, clip);
 
 

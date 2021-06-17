@@ -73,6 +73,8 @@ public:
 		ComponentCollection<Vector2Int16> OffsetComponents;
 		ComponentCollection<RenderDestinationComponent> DestinationComponents;
 		ComponentCollection<Rectangle16> BoundingBoxComponents;
+		ComponentCollection<RenderShadowComponent> ShadowComponents;
+		ComponentCollection<Vector2Int16> ShadowDestinationComponents;
 	} RenderArchetype;
 
 	struct  {
@@ -83,6 +85,7 @@ public:
 		EntityArchetype Archetype = EntityArchetype("Animation");
 		ComponentCollection<AnimationComponent> AnimationComponents;
 		ComponentCollection<AnimationStateComponent> StateComponents;
+		ComponentCollection<AnimationShadowComponent> ShadowComponents;
 	} AnimationArchetype;
 
 	struct {

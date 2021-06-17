@@ -100,6 +100,9 @@ public:
 	const ImageFrame& GetFrame(unsigned index) const;
 
 	const ImageFrame* GetColorMaskFrame(unsigned index) const;
+
+	Vector2Int16 GetImageFrameOffset(unsigned frameId, bool hFlip) const;
+
 };
 
 struct AudioInfo {

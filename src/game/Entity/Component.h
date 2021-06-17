@@ -64,8 +64,8 @@ enum class ComponentFlags {
 	PositionChanged = 0,
 	RenderEnabled = 1,
 	RenderChanged = 2,
-	OrientationChanged = 3,
-	//AnimationWait = 4,
+	RenderShadows = 3,
+	OrientationChanged = 4,
 	AnimationEnabled = 5,
 	//AnimationFrameChanged = 6,
 	NavigationWork = 7,
@@ -123,7 +123,13 @@ struct RenderComponent {
 
 struct RenderDestinationComponent {
 	Vector2Int16 dst;
+	Vector2Int16 shadowDst;
 	int order = 0;
+};
+
+struct RenderShadowComponent {
+	ImageFrame sprite;
+	Vector2Int16 offset;
 };
 
 struct AnimationComponent {
@@ -136,6 +142,11 @@ struct AnimationStateComponent {
 	uint32_t instructionId;
 	uint16_t animFrame = 0;
 	uint8_t wait;
+};
+
+struct AnimationShadowComponent {
+	const Image* image;
+	Vector2Int16 offset;
 };
 
 struct NavigationComponent {

@@ -10,11 +10,14 @@
 
 #include <cstring>
 
+struct SpriteDef;
+
+
 struct UnitDef {
 	char Path[32];
 
 
-	struct {
+	struct  UnitArt {
 		uint16_t IconId;
 		uint16_t SpriteId;
 		char Name[32];
@@ -26,11 +29,14 @@ struct UnitDef {
 		int16_t ShadowImageId;
 		Vector2Int16 ShadowOffset;
 
-	/*	inline const Image* GetShadowImage() const {
-			if (ShadowImageId < 0)
-				return nullptr;
-			return
-		}*/
+		const SpriteDef& GetSprite() const;
+		const ImageFrame& GetIcon() const;
+		const Image* GetShadowImage() const;
+		/*	inline const Image* GetShadowImage() const {
+				if (ShadowImageId < 0)
+					return nullptr;
+				return
+			}*/
 
 		inline bool HasTitle() const {
 			return  Title[0] != 0;
@@ -72,7 +78,7 @@ struct UnitDef {
 		UnitSound Death;
 	} Sounds;
 
-	
+
 	const WeaponDef* Weapon = nullptr;
 
 	ImageFrame ArmorIcon;

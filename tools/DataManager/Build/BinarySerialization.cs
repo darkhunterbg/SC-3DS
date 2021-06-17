@@ -19,7 +19,6 @@ namespace DataManager.Build
 		ImageRef
 	}
 
-
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
 	public class BinaryAttribute : Attribute
 	{
@@ -84,11 +83,11 @@ namespace DataManager.Build
 					int index = AppGame.AssetManager.GetAssetDatabase(obj.GetType()).Assets.IndexOf(asset);
 					return UIntSerialize(index.ToString(), size);
 				}
-				if(type== BinaryType.ImageRef)
+				if(type == BinaryType.ImageRef)
 				{
 					var img = obj == null ? ImageListRef.None : (ImageListRef)obj;
 					var i = img.Image;
-					int index = AppGame.AssetManager.ImageLists.IndexOf(img.Image);
+					int index = BuildGenerator.Instance.GeneratedImages.IndexOf(i=>i.List ==  img.Image);
 					return IntSerialize(index.ToString(), size);
 				}
 				if (type == BinaryType.Vector2)

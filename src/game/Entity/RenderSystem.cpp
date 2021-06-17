@@ -21,7 +21,9 @@ void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
 
 		int i = Entity::ToIndex(id);
 
-		if (!em.FlagComponents[i].test(ComponentFlags::RenderEnabled))
+		const auto& flags = em.FlagComponents[i];
+
+		if (!flags.test(ComponentFlags::RenderEnabled))
 			continue;
 
 		const Rectangle16& bb = em.RenderArchetype.BoundingBoxComponents[i];
@@ -31,6 +33,8 @@ void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
 
 		renderData.pos.push_back(em.RenderArchetype.DestinationComponents[i]);
 		renderData.ren.push_back(em.RenderArchetype.RenderComponents[i]);
+		renderData.flags.push_back(flags);
+		renderData.shadow.push_back(em.RenderArchetype.ShadowComponents[i]);
 	}
 
 	UnitSelectionCameraCull(camRect, em);
@@ -70,6 +74,8 @@ void RenderSystem::UnitSelectionCameraCull(const Rectangle16& camRect, EntityMan
 
 void RenderSystem::DrawEntities(const Camera& camera, const Rectangle16& camRect) {
 
+	Color32 shadColor = Color32(0, 0, 0, 0.5f);
+
 	float camMul = 1.0f / camera.Scale;
 
 	Vector2 scale[] = { {camMul,camMul},{-camMul,camMul} };
@@ -79,13 +85,27 @@ void RenderSystem::DrawEntities(const Camera& camera, const Rectangle16& camRect
 	for (int i = 0; i < entitiesCount; ++i) {
 		Vector2Int16  dst = renderData.pos[i].dst;
 		const auto& r = renderData.ren[i];
+		bool hasShadows = renderData.flags[i].test(ComponentFlags::RenderShadows);
 
 		dst -= camRect.position;
 		dst /= camera.Scale;
 
 
+
 		BatchDrawCommand cmd;
-		cmd.order = renderData.pos[i].order;
+
+		if (hasShadows) {
+			const auto& shad = renderData.shadow[i];
+
+			cmd.order = renderData.pos[i].order + 1;
+			cmd.sprite = shad.sprite;
+			cmd.position = renderData.pos[i].shadowDst;
+			cmd.scale = scale[r.hFlip];
+			cmd.color = shadColor;
+			render.push_back(cmd);
+		}
+
+		cmd.order = renderData.pos[i].order + 2;
 		cmd.sprite = r.sprite;
 		cmd.position = dst;
 		cmd.scale = scale[r.hFlip];
@@ -210,6 +230,7 @@ void RenderSystem::UpdateRenderPositionsJob(int start, int end) {
 	for (int i = start; i < end; ++i) {
 		RenderDestinationComponent& p = *data.outDst[i];
 		p.dst = data.worldPos[i] + data.offset[i];
+		p.shadowDst = data.worldPos[i] + data.shadowOffset[i];
 		p.order = data.depth[i] * 10'000'000 + p.dst.y * 1000 + p.dst.x * 4;
 
 		data.outBB[i]->SetCenter(data.worldPos[i]);
@@ -236,6 +257,7 @@ void RenderSystem::UpdatePositions(EntityManager& em, const EntityChangedData& c
 			updatePosData.offset.push_back(arch.OffsetComponents[i]);
 			updatePosData.outBB.push_back(&arch.BoundingBoxComponents[i]);
 			updatePosData.depth.push_back(arch.RenderComponents[i].depth);
+			updatePosData.shadowOffset.push_back(arch.ShadowComponents[i].offset);
 		}
 	}
 

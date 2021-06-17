@@ -60,7 +60,6 @@ int AudioStream::GetRemaining() const {
 }
 
 
-
 Vector2Int Font::MeasureString(const char* text) const
 {
 	return Platform::MeasureString(*this, text);
@@ -99,3 +98,12 @@ const ImageFrame* Image::GetColorMaskFrame(unsigned index) const
 	return frameStart + index + colorMaskOffset;
 }
 
+Vector2Int16 Image::GetImageFrameOffset(unsigned frameId, bool hFlip) const {
+	const auto& frame = GetFrame(frameId);
+
+	Vector2Int16 offset = frame.offset - (size >> 1);
+	if (hFlip)
+		offset.x = (size.x >> 1) - frame.offset.x - frame.size.x;
+
+	return offset;
+}
