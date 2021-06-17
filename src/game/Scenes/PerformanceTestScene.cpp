@@ -26,7 +26,7 @@ void PerformanceTestScene::Start() {
 	const auto& def = *GameDatabase::instance->GetUnit("Terran\\Units\\Marine");
 	const auto& clip = GameDatabase::instance->AnimClipDefs[0];
 
-	for (int i = 0; i < 2000; ++i) {
+	for (int i = 0; i < 10000; ++i) {
 		EntityId e = em.NewEntity();
 		em.RenderArchetype.Archetype.AddEntity(e);
 		em.AnimationArchetype.Archetype.AddEntity(e);
@@ -59,9 +59,13 @@ int i = 0;
 void PerformanceTestScene::Update() {
 	++i;
 	em.FrameUpdate(camera);
+	for (int i = 0; i < 10000; ++i) {
+		EntityUtil::UpdateAnimationVisual(i); // Need optimizations
+		//EntityUtil::SetPosition(i, em.PositionComponents.GetComponent(i));
+	}
 
 	//EntityUtil::SetOrientation(0, i/4);
-	EntityUtil::UpdateAnimationVisual(0);
+	//EntityUtil::UpdateAnimationVisual(0);
 }
 
 void PerformanceTestScene::Draw() {
