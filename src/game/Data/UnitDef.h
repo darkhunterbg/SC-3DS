@@ -34,12 +34,6 @@ struct UnitDef {
 		const SpriteDef& GetSprite() const;
 		const ImageFrame& GetIcon() const;
 		const Image* GetShadowImage() const;
-		/*	inline const Image* GetShadowImage() const {
-				if (ShadowImageId < 0)
-					return nullptr;
-				return
-			}*/
-
 		inline bool HasTitle() const {
 			return  Title[0] != 0;
 		}

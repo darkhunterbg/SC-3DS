@@ -13,7 +13,7 @@
 #include "../Engine/GraphicsRenderer.h"
 #include "../Engine/InputManager.h"
 
-#include "../Data/AbilityDatabase.h"
+#include "../Data/GameDatabase.h"
 
 static std::array<Color, 3> GreyHPBarColorPalette = { 0xb0b0b0ff, 0x98948cff, 0x585858ff };
 static std::array<Color, 3> YellowHPBarColorPalette = { 0xfccc2cff, 0xdc9434ff, 0xb09018ff };
@@ -155,7 +155,7 @@ void GameView::ContextualGamepadInput() {
 
 		if (InputManager::Gamepad.IsButtonReleased(GamepadButton::A)) {
 
-			if (entity == Entity::None) {
+			/*if (entity == Entity::None) {
 				context.ActivateAbility(&AbilityDatabase::Attack, position);
 			}
 			else {
@@ -169,7 +169,7 @@ void GameView::ContextualGamepadInput() {
 					else
 						context.ActivateAbility(&AbilityDatabase::Move, entity);
 				}
-			}
+			}*/
 
 			commandTrigged = true;
 			commandHasTarget = true;
@@ -180,7 +180,7 @@ void GameView::ContextualGamepadInput() {
 			EntityId id = context.GetPriorityUnitSelected();
 
 			const auto& data = context.GetEntityManager().UnitArchetype.DataComponents.GetComponent(id);
-			if (data.isBuilding) {
+	/*		if (data.isBuilding) {
 				if (!data.IsQueueEmpty()) {
 					context.CancelBuildQueue(data.queueSize - 1);
 				}
@@ -188,7 +188,7 @@ void GameView::ContextualGamepadInput() {
 			else {
 				context.ActivateAbility(&AbilityDatabase::Stop);
 				commandTrigged = true;
-			}
+			}*/
 		}
 
 		if (InputManager::Gamepad.IsButtonReleased(GamepadButton::X)) {
@@ -205,10 +205,10 @@ void GameView::ContextualGamepadInput() {
 			}
 			else {
 
-				if (entity == Entity::None)
+		/*		if (entity == Entity::None)
 					context.ActivateAbility(&AbilityDatabase::Move, position);
 				else
-					context.ActivateAbility(&AbilityDatabase::Move, entity);
+					context.ActivateAbility(&AbilityDatabase::Move, entity);*/
 
 				commandTrigged = true;
 				commandHasTarget = true;

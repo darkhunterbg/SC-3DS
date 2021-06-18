@@ -31,7 +31,7 @@ struct PlayerCommand {
 
 	uint32_t frameId;
 	PlayerId playerId;
-	uint8_t abilityId;
+	AbilityId abilityId;
 	uint8_t entityCount = 0;
 	PlayerCommandTargetType targetType;
 };

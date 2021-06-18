@@ -2,8 +2,9 @@
 #include "CommandProcessor.h"
 #include "../Debug.h"
 #include "EntityManager.h"
+#include "../Data/GameDatabase.h"
 
-#include "../Data/AbilityDatabase.h"
+
 #include "../Platform.h"
 
 #include <stdio.h>
@@ -33,7 +34,7 @@ void CommandProcessor::UseAbility(PlayerId player, const std::vector<EntityId>& 
 
 	cmd.frameId = frame;
 	cmd.playerId = player;
-	cmd.abilityId = ability.AbilityId;
+	cmd.abilityId = ability.Id;
 	cmd.targetType = PlayerCommandTargetType::None;
 
 	GenerateCommands(cmd, group);
@@ -44,7 +45,7 @@ void CommandProcessor::UseAbility(PlayerId player, const std::vector<EntityId>& 
 
 	cmd.frameId = frame;
 	cmd.playerId = player;
-	cmd.abilityId = ability.AbilityId;
+	cmd.abilityId = ability.Id;
 	cmd.target.position = target;
 	cmd.targetType = PlayerCommandTargetType::Position;
 
@@ -56,7 +57,7 @@ void CommandProcessor::UseAbility(PlayerId player, const std::vector<EntityId>& 
 
 	cmd.frameId = frame;
 	cmd.playerId = player;
-	cmd.abilityId = ability.AbilityId;
+	cmd.abilityId = ability.Id;
 	cmd.target.entity = target;
 	cmd.targetType = PlayerCommandTargetType::Entity;
 
@@ -69,7 +70,7 @@ void CommandProcessor::UseAbility(PlayerId player, const std::vector<EntityId>& 
 
 	cmd.frameId = frame;
 	cmd.playerId = player;
-	cmd.abilityId = ability.AbilityId;
+	cmd.abilityId = ability.Id;
 	cmd.target.itemId = target.Id;
 	cmd.targetType = PlayerCommandTargetType::UnitType;
 
@@ -103,7 +104,9 @@ void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 			continue;
 		}
 
-		const auto& ability = *AbilityDatabase::Abilities[cmd.abilityId];
+		const auto& ability = *GameDatabase::instance->GetAbility(cmd.abilityId);
+
+		/*
 
 		switch (cmd.targetType)
 		{
@@ -159,6 +162,7 @@ void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 		}
 		}
 
+		*/
 	}
 
 	lastExecuted = commands.size();

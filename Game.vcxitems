@@ -17,7 +17,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Assets.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Camera.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Color.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\AbilityDatabase.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\AbilityDef.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\AssetDataDefs.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\GameDatabase.h" />
@@ -79,7 +78,7 @@
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Assets.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Camera.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\AbilityDatabase.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\AbilityDef.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\AssetDataDefs.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\GameDatabase.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\RaceDatabase.cpp" />

@@ -22,11 +22,19 @@ namespace DataManager.Assets
         [Binary(BinaryType.UInt, 4)]
         public AssetId AbilityId { get; set; }
 
+        [Section("Art")]
+
+        [DefaultEditor]
+        [Optional]
+        [Binary(BinaryType.String, 32)]
+        public string Name { get; set; } = string.Empty;
+
         [DefaultEditor]
         [Optional]
         [Binary(BinaryType.UInt, 2)]
         public IconRef Icon { get; set; } = IconRef.None;
 
+      
 
         public AbilityAsset() : base()
         {

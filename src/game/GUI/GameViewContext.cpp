@@ -93,11 +93,11 @@ void GameViewContext::SelectAbilityTarget(const AbilityDef& def)
 	currentAbility = &def;
 	IsTargetSelectionMode = true;
 
-	if (!def.TargetingData.HasTargetSelection)
-	{
-		ActivateCurrentAbility();
-		CancelTargetSelection();
-	}
+	//if (!def.TargetingData.HasTargetSelection)
+	//{
+	//	ActivateCurrentAbility();
+	//	CancelTargetSelection();
+	//}
 }
 
 void GameViewContext::CancelTargetSelection()

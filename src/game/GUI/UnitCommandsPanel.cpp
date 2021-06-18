@@ -2,13 +2,14 @@
 #include "../Color.h"
 #include "../Game.h"
 
-#include "../Data/AbilityDatabase.h"
 #include "../Entity/EntityManager.h"
 #include "../Entity/Common.h"
 #include "../Entity/EntityUtil.h"
 
 #include "../Engine/GraphicsRenderer.h"
 #include "../Engine/InputManager.h"
+
+#include "../Data/AbilityDef.h"
 
 void UnitCommandsPanel::Draw(GameViewContext& context)
 {
@@ -101,7 +102,7 @@ void UnitCommandsPanel::DrawCommands(GameViewContext& context) {
 			GraphicsRenderer::Draw(f, d);
 
 			const ImageFrame& commandIcon = cmd.commandIcon != nullptr ?
-				*cmd.commandIcon : cmd.ability->Sprite;
+				*cmd.commandIcon : cmd.ability->Art.GetIcon();
 
 			d.size = Vector2Int(commandIcon.size);
 			d.position = dst.position + offset +
@@ -164,17 +165,17 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 
 		//if (unit.def->Weapon)
 		{
-			unitCommands[2].ability = &AbilityDatabase::Attack;
-			unitCommands[2].enabled = true;
+	/*		unitCommands[2].ability = &AbilityDatabase::Attack;
+			unitCommands[2].enabled = true;*/
 		}
 
 		//if (unit.def->MovementSpeed > 0)
 		{
-			unitCommands[0].ability = &AbilityDatabase::Move;
+		/*	unitCommands[0].ability = &AbilityDatabase::Move;
 			unitCommands[0].enabled = true;
 
 			unitCommands[1].ability = &AbilityDatabase::Stop;
-			unitCommands[1].enabled = true;
+			unitCommands[1].enabled = true;*/
 
 			//if (unit.def->GathersResources) {
 
@@ -190,11 +191,11 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 			//	}
 			//}
 			//else {
-				unitCommands[3].ability = &AbilityDatabase::Patrol;
-				unitCommands[3].enabled = true;
+				//unitCommands[3].ability = &AbilityDatabase::Patrol;
+				//unitCommands[3].enabled = true;
 
-				unitCommands[4].ability = &AbilityDatabase::HoldPosition;
-				unitCommands[4].enabled = true;
+				//unitCommands[4].ability = &AbilityDatabase::HoldPosition;
+				//unitCommands[4].enabled = true;
 			//}
 		}
 
@@ -213,7 +214,7 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 			if (!cmd.IsUsable())
 				continue;
 
-			cmd.active = cmd.ability->TargetingData.IsState(state);
+			//cmd.active = cmd.ability->TargetingData.IsState(state);
 		}
 	}
 }
@@ -229,8 +230,8 @@ void UnitCommandsPanel::OnCommandPressed(GameViewContext& context, const UnitCom
 			context.ActivateCurrentAbility(*cmd.abilityProduce);
 		}
 
-		if (cmd.ability->TargetingData.EntitySelectedAction == UnitAIState::Nothing)
-			return;
+		//if (cmd.ability->TargetingData.EntitySelectedAction == UnitAIState::Nothing)
+		//	return;
 
 		context.SelectAbilityTarget(*cmd.ability);
 

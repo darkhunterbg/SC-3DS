@@ -6,29 +6,32 @@
 
 #include <string> 
 
+typedef uint32_t AbilityId;
+
 struct AbilityDef {
 
-	int AbilityId = 0;
+	char Path[32];
+	AbilityId Id;
 
-	std::string Name;
-	int IconId;
+	struct Art {
+		char Name[32];
+		uint16_t IconId;
 
-	ImageFrame Sprite;
+		const ImageFrame& GetIcon() const;
 
-	struct {
-		bool HasTargetSelection = false;
-		UnitAIState EntitySelectedAction = UnitAIState::Nothing;
-		UnitAIState PositionSelectedAction = UnitAIState::Nothing;
+	} Art;
 
-		inline void SetAllStates(UnitAIState s) {
-			EntitySelectedAction = PositionSelectedAction = s;
-		}
-		inline bool IsState(UnitAIState s) const {
-			return EntitySelectedAction == s || PositionSelectedAction == s;
-		}
-	} TargetingData;
+	//struct {
+	//	bool HasTargetSelection = false;
+	//	UnitAIState EntitySelectedAction = UnitAIState::Nothing;
+	//	UnitAIState PositionSelectedAction = UnitAIState::Nothing;
 
-	AbilityDef() {}
-	AbilityDef(const AbilityDef&) = delete;
-	AbilityDef& operator=(const AbilityDef&) = delete;
+	//	inline void SetAllStates(UnitAIState s) {
+	//		EntitySelectedAction = PositionSelectedAction = s;
+	//	}
+	//	inline bool IsState(UnitAIState s) const {
+	//		return EntitySelectedAction == s || PositionSelectedAction == s;
+	//	}
+	//} TargetingData;
+
 };

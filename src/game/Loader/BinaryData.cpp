@@ -42,6 +42,7 @@ GameDatabase* BinaryDataLoader::LoadDatabase(FILE* f)
 		case DataSectionType::Units:
 			LoadData(header.size, f, db->UnitDefs); break;
 		case DataSectionType::Abilities:
+			LoadData(header.size, f, db->AbilityDefs); break;
 		case DataSectionType::Upgrades:
 		case DataSectionType::Effects:
 			break;
