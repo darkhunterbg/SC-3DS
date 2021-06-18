@@ -16,6 +16,7 @@ private:
 	const Image* commandIcons;
 
 	std::unordered_map<std::string, const Image*> imageNamesMap;
+	std::unordered_map<UnitId, const UnitDef*> unitMap;
 public:
 	static const GameDatabase* instance;
 
@@ -36,6 +37,7 @@ public:
 	const Image& GetImage(const std::string& path) const;
 	const ImageFrame& GetCommandIcons(unsigned id) const;
 	const UnitDef* GetUnit(const char* path) const;
+	const UnitDef* GetUnit(UnitId id) const;
 
 	void LoadAssetReferences();
 };

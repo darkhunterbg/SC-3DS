@@ -33,6 +33,15 @@ const UnitDef* GameDatabase::GetUnit(const char* path) const
 	return nullptr;
 }
 
+const UnitDef* GameDatabase::GetUnit(UnitId id) const
+{
+	auto r = unitMap.find(id);
+	if (r == unitMap.end())
+		return nullptr;
+
+	return r->second;
+}
+
 void GameDatabase::LoadAssetReferences()
 {
 	std::vector<const Texture*> textures;

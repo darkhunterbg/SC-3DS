@@ -28,6 +28,10 @@ namespace DataManager.Assets
 			Image = image;
 		}
 
+		public override string ToString()
+		{
+			return Id.ToString();
+		}
 
 		public class IconConverter : DefaultTypeConverter
 		{

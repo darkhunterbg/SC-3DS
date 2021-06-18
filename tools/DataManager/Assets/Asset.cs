@@ -80,6 +80,49 @@ namespace DataManager.Assets
 
 	}
 
+	public  struct AssetId
+	{
+		static uint @base = (uint)(DateTime.Now - new DateTime(2021,1,1)).TotalSeconds;
+
+		public readonly uint Id;
+
+		public override string ToString()
+		{
+			return Id.ToString();	
+		}
+
+		public AssetId(uint id) { Id = id; }
+
+		internal static void Reseed(uint seed)
+		{
+			@base = seed;
+		}
+
+		public static AssetId New()
+		{
+			return new AssetId(++@base);
+		}
+
+		public class CsvConverter : DefaultTypeConverter
+		{
+			public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
+			{
+				if (!uint.TryParse(text, out uint id))
+					return AssetId.New();
+
+				if (id > AssetId.@base)
+					AssetId.Reseed(id);
+
+				return new AssetId(id);
+			}
+
+			public override string ConvertToString(object value, IWriterRow row, MemberMapData memberMapData)
+			{
+				return ((AssetId)value).Id.ToString();
+			}
+		}
+	}
+
 	public interface IAssetDatabase
 	{
 		Type Type { get; }
@@ -114,13 +157,16 @@ namespace DataManager.Assets
 		{
 			context.TypeConverterCache.AddConverter<Asset.AssetConverter>(new Asset.AssetConverter());
 
-			context.TypeConverterCache.AddConverter<IconRef.IconConverter>(new IconRef.IconConverter());
+			context.TypeConverterCache.AddConverter<IconRef>(new IconRef.IconConverter());
 
-			context.TypeConverterCache.AddConverter<ImageListRef.CsvConverter>(new ImageListRef.CsvConverter());
+			context.TypeConverterCache.AddConverter<ImageListRef>(new ImageListRef.CsvConverter());
 
-			context.TypeConverterCache.AddConverter<ImageFrameRef.CsvConverter>(new ImageFrameRef.CsvConverter());
+			context.TypeConverterCache.AddConverter<ImageFrameRef>(new ImageFrameRef.CsvConverter());
 
 			context.TypeConverterCache.AddConverter<Vector2>(new CsvConverters.Vector2Coverter());
+
+			context.TypeConverterCache.AddConverter<AssetId>(new AssetId.CsvConverter());
+
 		}
 
 		public void Reload()

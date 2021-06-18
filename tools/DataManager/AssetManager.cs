@@ -160,6 +160,8 @@ namespace DataManager
 			}
 
 			ReloadAssets();
+
+			//SaveAllAssets();
 		}
 
 		public void ReloadAssets()

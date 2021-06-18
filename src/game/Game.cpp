@@ -39,6 +39,8 @@ static void ShowTitleScreen() {
 	GraphicsRenderer::Draw(*title, { 0,0 });
 }
 static void InitialScene() {
+	AssetLoader::LoadDatabase();
+
 	//Game::SetCurrentScene(new GameScene());
 	Game::SetCurrentScene(new PerformanceTestScene());
 }
@@ -59,7 +61,6 @@ void Game::Start() {
 
 	JobSystem::Init();
 
-	AssetLoader::LoadDatabase();
 
 	SystemFont12 = AssetLoader::LoadFont("font.bcfnt",12);
 	SystemFont10 = AssetLoader::LoadFont("font.bcfnt", 10);

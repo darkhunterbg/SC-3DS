@@ -12,10 +12,12 @@
 
 struct SpriteDef;
 
+typedef uint32_t UnitId;
+
 
 struct UnitDef {
 	char Path[32];
-
+	UnitId Id;
 
 	struct  UnitArt {
 		uint16_t IconId;
@@ -44,7 +46,10 @@ struct UnitDef {
 
 	} Art;
 
-	uint16_t Health;
+	struct Data {
+		uint16_t Health;
+	} Data;
+
 
 	/*
 

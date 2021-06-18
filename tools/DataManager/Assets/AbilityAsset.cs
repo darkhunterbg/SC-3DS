@@ -18,12 +18,26 @@ namespace DataManager.Assets
         [Binary(BinaryType.String, 32)]
         public string Path { get; set; }
 
+        [Optional]
+        [Binary(BinaryType.UInt, 4)]
+        public AssetId AbilityId { get; set; }
+
         [DefaultEditor]
-        [Index(1), TypeConverter(typeof(IconRef.IconConverter))]
+        [Optional]
+        [Binary(BinaryType.UInt, 2)]
         public IconRef Icon { get; set; } = IconRef.None;
 
-        [Ignore]
-        [Binary(BinaryType.UInt, 2)]
-        public int _IconId => Icon.Id;
+
+        public AbilityAsset() : base()
+        {
+            AbilityId = AssetId.New();
+        }
+
+        public override Asset Clone()
+        {
+            AbilityAsset clone = (AbilityAsset)base.Clone();
+            clone.AbilityId = AssetId.New();
+            return clone;
+        }
     }
 }

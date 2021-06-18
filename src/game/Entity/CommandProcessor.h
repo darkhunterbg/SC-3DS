@@ -26,7 +26,7 @@ struct PlayerCommand {
 	{
 		EntityId entity;
 		Vector2Int16 position;
-		uint16_t itemId;
+		uint32_t itemId;
 	} target = { 0 };
 
 	uint32_t frameId;

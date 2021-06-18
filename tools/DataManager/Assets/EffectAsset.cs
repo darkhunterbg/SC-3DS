@@ -19,7 +19,7 @@ namespace DataManager.Assets
         public string Path { get; set; }
 
         [DefaultEditor]
-        [Index(1), TypeConverter(typeof(IconRef.IconConverter))]
+        [Index(1)]
         public IconRef Icon { get; set; } = IconRef.None;
 
         [DefaultEditor]

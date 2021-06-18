@@ -20,18 +20,21 @@ namespace DataManager.Assets
         [Binary(BinaryType.String, 32)]
         public string Path { get; set; }
 
+        [Optional]
+        [Binary(BinaryType.UInt, 4)]
+        public AssetId UnitId { get; set; }
+
         [Section("Art")]
         [DefaultEditor]
-        [Index(1), TypeConverter(typeof(IconRef.IconConverter))]
+        [Optional]
+        [Binary(BinaryType.UInt, 2)]
         public IconRef Icon { get; set; } = IconRef.None;
 
-        [Ignore]
-        [Binary(BinaryType.UInt, 2)]
-        public int _IconId => Icon.Id;
 
+        [Optional]
         [DefaultEditor]
         [Binary(BinaryType.AssetRef, 2)]
-        [Index(2), TypeConverter(typeof(Asset.AssetConverter))]
+        [TypeConverter(typeof(AssetConverter))]
         public SpriteAsset Sprite { get; set; }
 
         [DefaultEditor]
@@ -67,7 +70,7 @@ namespace DataManager.Assets
 
         [DefaultEditor]
         [Binary(BinaryType.ImageRef, 2)]
-        [Optional, TypeConverter(typeof(ImageListRef.CsvConverter))]
+        [Optional]
         public ImageListRef Shadow { get; set; } = ImageListRef.None;
 
         [DefaultEditor]
@@ -80,5 +83,19 @@ namespace DataManager.Assets
         [Binary(BinaryType.UInt, 2)]
         [Optional]
         public int Health { get; set; } = 100;
-    }
+
+		public UnitAsset() : base()
+		{
+            UnitId = AssetId.New();
+		}
+
+		public override Asset Clone()
+		{
+			UnitAsset clone = (UnitAsset) base.Clone();
+            clone.UnitId = AssetId.New();
+            return clone;
+		}
+	}
+
+   
 }

@@ -39,7 +39,6 @@ namespace DataManager.Assets
 
         [Index(1)]
         [DefaultEditor]
-        [TypeConverter(typeof(ImageListRef.CsvConverter))]
         [Binary(BinaryType.ImageRef, 2)]
         public ImageListRef Image { get; set; } = ImageListRef.None;
 
