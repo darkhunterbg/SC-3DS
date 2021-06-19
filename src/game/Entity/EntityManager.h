@@ -70,11 +70,10 @@ public:
 	struct {
 		EntityArchetype Archetype = EntityArchetype("Render");
 		ComponentCollection<RenderComponent> RenderComponents;
-		ComponentCollection<Vector2Int16> OffsetComponents;
+		ComponentCollection<RenderShadowComponent> ShadowComponents;
+		ComponentCollection<RenderOffsetComponent> OffsetComponents;
 		ComponentCollection<RenderDestinationComponent> DestinationComponents;
 		ComponentCollection<Rectangle16> BoundingBoxComponents;
-		ComponentCollection<RenderShadowComponent> ShadowComponents;
-		ComponentCollection<Vector2Int16> ShadowDestinationComponents;
 	} RenderArchetype;
 
 	struct  {

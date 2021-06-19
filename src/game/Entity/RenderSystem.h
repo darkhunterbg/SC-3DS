@@ -16,19 +16,13 @@ struct EntityChangedData;
 class RenderSystem {
 
 	struct RenderData {
-		std::vector<RenderDestinationComponent> pos;
-		std::vector<RenderComponent> ren;
-		std::vector<FlagsComponent> flags;
-		std::vector<RenderShadowComponent> shadow;
+		std::vector<EntityId> entities;
 
 		inline void clear() {
-			pos.clear();
-			ren.clear();
-			flags.clear();
-			shadow.clear();
+			entities.clear();
 		}
 		inline size_t size() const {
-			return pos.size();
+			return entities.size();
 		}
 	};
 
@@ -36,8 +30,7 @@ class RenderSystem {
 		std::vector<RenderDestinationComponent*> outDst;
 		std::vector<Rectangle16*> outBB;
 		std::vector<Vector2Int16> worldPos;
-		std::vector<Vector2Int16> offset;
-		std::vector<Vector2Int16> shadowOffset;
+		std::vector<RenderOffsetComponent> offset;
 		std::vector<int8_t> depth;
 
 		inline void clear() {
@@ -45,7 +38,6 @@ class RenderSystem {
 			outDst.clear();
 			worldPos.clear();
 			offset.clear();
-			shadowOffset.clear();
 			outBB.clear();
 			depth.clear();
 		}
@@ -88,7 +80,7 @@ private:
 	void CameraCull(const Rectangle16& rect, EntityManager& em);
 	void UnitSelectionCameraCull(const Rectangle16& rect, EntityManager& em);
 
-	void DrawEntities(const Camera& camera, const Rectangle16& camRect);
+	void DrawEntities(const Camera& camera, const Rectangle16& camRect, EntityManager& em);
 	void DrawSelection(const Camera& camera, const Rectangle16& camRect);
 public:
 	void Draw(const Camera& camera, EntityManager& em);

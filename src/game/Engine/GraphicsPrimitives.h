@@ -31,7 +31,7 @@ struct DrawCommand {
 
 struct BatchDrawCommand {
 	int order;
-	ImageFrame sprite;
+	const ImageFrame* sprite;
 	Vector2Int16 position;
 	Vector2 scale;
 	Color32 color;

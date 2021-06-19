@@ -14,9 +14,9 @@ void PerformanceTestScene::Start() {
 
 	RaceDatabase::Terran.LoadResourses();
 
-	camera.Position = { 200 ,120 };
+	camera.Position = { 400 ,240 };
 	camera.Size = { 400,240 };
-	camera.Scale = 1;
+	camera.Scale = 2;
 
 	em.Init({ 128 * 32,128 * 32 });
 	em.GetPlayerSystem().AddPlayer(RaceDatabase::Terran, Colors::White);

@@ -127,9 +127,13 @@ struct RenderDestinationComponent {
 	int order = 0;
 };
 
+struct RenderOffsetComponent {
+	Vector2Int16 offset;
+	Vector2Int16 shadowOffset;
+};
+
 struct RenderShadowComponent {
 	ImageFrame sprite;
-	Vector2Int16 offset;
 };
 
 struct AnimationComponent {

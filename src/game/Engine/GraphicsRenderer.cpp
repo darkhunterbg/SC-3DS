@@ -73,21 +73,21 @@ void GraphicsRenderer::BufferDraw(std::vector<BatchDrawCommand>& cmd)
 		return;
 
 	if (instance.drawCommands.size() == 0)
-		instance.drawCommands.push_back({ cmd.front().sprite.texture , (uint16_t)instance.vbPos,0 , DrawCommandType::TexturedTriangle });
+		instance.drawCommands.push_back({ cmd.front().sprite->texture , (uint16_t)instance.vbPos,0 , DrawCommandType::TexturedTriangle });
 
 	DrawCommand* dc = &instance.drawCommands.front();
 
 	for (const auto& c : cmd) {
 
-		Vector2Int16 size = c.sprite.size;
+		Vector2Int16 size = c.sprite->size;
 		size.x *= c.scale.x;
 		size.y *= c.scale.y;
 
 
-		Vector2 tL = c.sprite.uv.coords[0];
-		Vector2 tR = c.sprite.uv.coords[1];
-		Vector2 bL = c.sprite.uv.coords[2];
-		Vector2 bR = c.sprite.uv.coords[3];
+		Vector2 tL = c.sprite->uv.coords[0];
+		Vector2 tR = c.sprite->uv.coords[1];
+		Vector2 bL = c.sprite->uv.coords[2];
+		Vector2 bR = c.sprite->uv.coords[3];
 
 		if (size.x < 0) {
 			size.x = -size.x;
@@ -96,8 +96,8 @@ void GraphicsRenderer::BufferDraw(std::vector<BatchDrawCommand>& cmd)
 		}
 
 
-		if (dc->texture != c.sprite.texture) {
-			dc = &instance.NewDrawCommand(c.sprite.texture);
+		if (dc->texture != c.sprite->texture) {
+			dc = &instance.NewDrawCommand(c.sprite->texture);
 		}
 
 

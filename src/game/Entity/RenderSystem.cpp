@@ -11,8 +11,6 @@
 
 void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
 
-	SectionProfiler p("CameraCull");
-
 	renderData.clear();
 
 	// TODO: second camera cull for more accurate sprite culling???
@@ -31,10 +29,16 @@ void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
 		if (!camRect.Intersects(bb))
 			continue;
 
-		renderData.pos.push_back(em.RenderArchetype.DestinationComponents[i]);
-		renderData.ren.push_back(em.RenderArchetype.RenderComponents[i]);
-		renderData.flags.push_back(flags);
-		renderData.shadow.push_back(em.RenderArchetype.ShadowComponents[i]);
+		renderData.entities.push_back(id);
+
+		//const auto& dst = em.RenderArchetype.DestinationComponents[i];
+		//const auto& ren = em.RenderArchetype.RenderComponents[i];
+
+	/*	renderData.pos.push_back(dst.dst);
+		renderData.order.push_back(dst.order + 2);
+		renderData.flip.push_back(ren.hFlip);
+		renderData.color.push_back(0xFFFFFFFF);
+		renderData.sprite.push_back(ren.sprite);*/
 	}
 
 	UnitSelectionCameraCull(camRect, em);
@@ -61,18 +65,18 @@ void RenderSystem::UnitSelectionCameraCull(const Rectangle16& camRect, EntityMan
 
 		const auto* def = em.UnitArchetype.UnitComponents.GetComponent(id).def;
 
-	/*	unitSelectionData.graphics.push_back(def->Graphics->Selection.Atlas->GetFrame(0));
-		Vector2Int16 pos = em.PositionComponents.GetComponent(id);
-		pos -= Vector2Int16(def->Graphics->Selection.Atlas->FrameSize / 2);
-		unitSelectionData.position.push_back(pos);
-		unitSelectionData.order.push_back(arch.DestinationComponents.GetComponent(id).order);
-		unitSelectionData.verticalOffset.push_back(def->Graphics->Selection.VecticalOffset);
-		unitSelectionData.color.push_back(selectionColor[j]);*/
+		/*	unitSelectionData.graphics.push_back(def->Graphics->Selection.Atlas->GetFrame(0));
+			Vector2Int16 pos = em.PositionComponents.GetComponent(id);
+			pos -= Vector2Int16(def->Graphics->Selection.Atlas->FrameSize / 2);
+			unitSelectionData.position.push_back(pos);
+			unitSelectionData.order.push_back(arch.DestinationComponents.GetComponent(id).order);
+			unitSelectionData.verticalOffset.push_back(def->Graphics->Selection.VecticalOffset);
+			unitSelectionData.color.push_back(selectionColor[j]);*/
 
 	}
 }
 
-void RenderSystem::DrawEntities(const Camera& camera, const Rectangle16& camRect) {
+void RenderSystem::DrawEntities(const Camera& camera, const Rectangle16& camRect, EntityManager& em) {
 
 	Color32 shadColor = Color32(0, 0, 0, 0.5f);
 
@@ -83,43 +87,49 @@ void RenderSystem::DrawEntities(const Camera& camera, const Rectangle16& camRect
 	int entitiesCount = renderData.size();
 
 	for (int i = 0; i < entitiesCount; ++i) {
-		Vector2Int16  dst = renderData.pos[i].dst;
-		const auto& r = renderData.ren[i];
-		bool hasShadows = renderData.flags[i].test(ComponentFlags::RenderShadows);
+		EntityId id = renderData.entities[i];
+		
+		const auto& dst = em.RenderArchetype.DestinationComponents.GetComponent(id);
+		const auto& ren = em.RenderArchetype.RenderComponents.GetComponent(id);
+		Vector2Int16 pos = dst.dst;
 
-		dst -= camRect.position;
-		dst /= camera.Scale;
-
-
+		pos -= camRect.position;
+		pos /= camera.Scale;
 
 		BatchDrawCommand cmd;
 
-		if (hasShadows) {
-			const auto& shad = renderData.shadow[i];
+		if (em.FlagComponents.GetComponent(id).test(ComponentFlags::RenderShadows)) {
 
-			cmd.order = renderData.pos[i].order + 1;
-			cmd.sprite = shad.sprite;
-			cmd.position = renderData.pos[i].shadowDst;
-			cmd.scale = scale[r.hFlip];
+			const auto& shad = em.RenderArchetype.ShadowComponents.GetComponent(id);
+			Vector2Int16 shadPos = dst.shadowDst;
+			shadPos -= camRect.position;
+			shadPos /= camera.Scale;
+
+			cmd.order = dst.order + 1;
+			cmd.sprite = &shad.sprite;
+			cmd.position = shadPos;
+			cmd.scale = scale[ren.hFlip];
 			cmd.color = shadColor;
+
 			render.push_back(cmd);
 		}
 
-		cmd.order = renderData.pos[i].order + 2;
-		cmd.sprite = r.sprite;
-		cmd.position = dst;
-		cmd.scale = scale[r.hFlip];
-		cmd.color = Color32(Colors::White);
+		cmd.order = dst.order + 2;
+		cmd.sprite = &ren.sprite;
+		cmd.position = pos;
+		cmd.scale = scale[ren.hFlip];
+		cmd.color = 0xFFFFFFFF;
 
 		render.push_back(cmd);
 
-		if (r.colorMask) {
+		if (ren.colorMask) {
 			++cmd.order;
-			cmd.sprite = *r.colorMask;
-			cmd.color = r.color;
+			cmd.sprite = ren.colorMask;
+			cmd.color = ren.color;
+			render.push_back(cmd);
 		}
 
-		render.push_back(cmd);
+	
 	}
 }
 void RenderSystem::DrawSelection(const Camera& camera, const Rectangle16& camRect) {
@@ -143,7 +153,7 @@ void RenderSystem::DrawSelection(const Camera& camera, const Rectangle16& camRec
 		dst /= camera.Scale;
 
 		cmd.order = unitSelectionData.order[i] + 1;
-		cmd.sprite = frame;
+		cmd.sprite = &frame;
 		cmd.position = dst;
 		cmd.color = unitSelectionData.color[i];
 
@@ -154,13 +164,13 @@ void RenderSystem::DrawSelection(const Camera& camera, const Rectangle16& camRec
 void RenderSystem::Draw(const Camera& camera, EntityManager& em) {
 	Rectangle16 camRect = camera.GetRectangle16();
 
-	CameraCull(camRect, em);
-
 	SectionProfiler p("EntityDraw");
+
+	CameraCull(camRect, em);
 
 	render.clear();
 
-	DrawEntities(camera, camRect);
+	DrawEntities(camera, camRect, em);
 	DrawSelection(camera, camRect);
 
 	std::sort(render.begin(), render.end(), RenderSort);
@@ -229,8 +239,8 @@ void RenderSystem::UpdateRenderPositionsJob(int start, int end) {
 
 	for (int i = start; i < end; ++i) {
 		RenderDestinationComponent& p = *data.outDst[i];
-		p.dst = data.worldPos[i] + data.offset[i];
-		p.shadowDst = data.worldPos[i] + data.shadowOffset[i];
+		p.dst = data.worldPos[i] + data.offset[i].offset;
+		p.shadowDst = data.worldPos[i] + data.offset[i].shadowOffset;
 		p.order = data.depth[i] * 10'000'000 + p.dst.y * 1000 + p.dst.x * 4;
 
 		data.outBB[i]->SetCenter(data.worldPos[i]);
@@ -257,7 +267,6 @@ void RenderSystem::UpdatePositions(EntityManager& em, const EntityChangedData& c
 			updatePosData.offset.push_back(arch.OffsetComponents[i]);
 			updatePosData.outBB.push_back(&arch.BoundingBoxComponents[i]);
 			updatePosData.depth.push_back(arch.RenderComponents[i].depth);
-			updatePosData.shadowOffset.push_back(arch.ShadowComponents[i].offset);
 		}
 	}
 
