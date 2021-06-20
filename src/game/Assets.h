@@ -19,12 +19,12 @@ union SubImageCoord {
 	struct {
 		Vector2 topLeft;
 		Vector2 topRight;
-		Vector2 lowerLeft;
-		Vector2 lowerRight;
+		Vector2 bottomLeft;
+		Vector2 bottomRight;
 	} corners;
 
 	inline Vector2 GetSize() const {
-		return corners.lowerRight - corners.topLeft;
+		return corners.bottomRight - corners.topLeft;
 	}
 };
 

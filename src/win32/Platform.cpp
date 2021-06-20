@@ -133,7 +133,7 @@ SubImageCoord Platform::GenerateUV(TextureId texture, Rectangle16 src) {
 	Vector2 start = Vector2(src.position) / Vector2(img->w, img->h);
 	Vector2 end = Vector2(src.GetMax()) / Vector2(img->w, img->h);
 
-	SubImageCoord uv = { start,{end.x, start.y}, {start.x, end.y }, end };
+	SubImageCoord uv = SubImageCoord{ start,{end.x, start.y}, {start.x, end.y }, end };
 
 	return uv;
 }

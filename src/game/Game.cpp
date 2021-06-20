@@ -36,7 +36,7 @@ float Game::DeltaTime = 0;
 
 static void ShowTitleScreen() {
 	GraphicsRenderer::DrawOnScreen(ScreenId::Top);
-	GraphicsRenderer::Draw(*title, { 0,0 });
+	GraphicsRenderer::Draw(*title, { 0,0 }, { 400,240 });
 }
 static void InitialScene() {
 	AssetLoader::LoadDatabase();

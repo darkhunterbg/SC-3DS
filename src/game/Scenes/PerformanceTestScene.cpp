@@ -12,7 +12,7 @@
 
 void PerformanceTestScene::Start() {
 
-	RaceDatabase::Terran.LoadResourses();
+	//RaceDatabase::Terran.LoadResourses();
 
 	camera.Position = { 400 ,240 };
 	camera.Size = { 400,240 };
@@ -59,10 +59,10 @@ int i = 0;
 void PerformanceTestScene::Update() {
 	++i;
 	em.FrameUpdate(camera);
-	for (int i = 0; i < 10000; ++i) {
-		EntityUtil::UpdateAnimationVisual(i); // Need optimizations
-		//EntityUtil::SetPosition(i, em.PositionComponents.GetComponent(i));
-	}
+	//for (int i = 0; i < 10000; ++i) {
+	//	EntityUtil::UpdateAnimationVisual(i); // Need optimizations
+	//	//EntityUtil::SetPosition(i, em.PositionComponents.GetComponent(i));
+	//}
 
 	//EntityUtil::SetOrientation(0, i/4);
 	//EntityUtil::UpdateAnimationVisual(0);

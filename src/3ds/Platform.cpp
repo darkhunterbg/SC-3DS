@@ -8,12 +8,14 @@
 #include <vector>
 #include <fstream>
 #include <unordered_map>
+#include <algorithm>
 
 #include "StringLib.h"
 #include "NDSAudioChannel.h"
 #include "RenderTarget.h"
 
 #include "Debug.h"
+#include <cmath>
 
 
 extern RenderTarget screens[2];
@@ -27,6 +29,7 @@ static std::vector<RenderTarget> createdRenderTargets;
 static int currentScreen = 0;
 static std::unordered_map<std::string, C2D_Font> loadedFonts;
 static bool c2d_Prepared = true;
+static std::unordered_map<const C3D_Tex*, const Tex3DS_SubTexture*> loadedTextures;
 
 extern Span<Vertex> vertexBuffer;
 extern C3D_BufInfo vbInfo;
@@ -38,12 +41,18 @@ extern C3D_AttrInfo spriteBatchAttributeInfo;
 
 TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize) {
 	std::string assetPath = assetDir + path + ".t3x";
-	FILE* f = fopen(assetPath.data(),"rb");
+	std::replace(assetPath.begin(), assetPath.end(), '\\', '/');
+	FILE* f = fopen(assetPath.data(), "rb");
 	if (f == nullptr)
 		EXCEPTION("Failed to open file '%s'", assetPath.data());
+
+	setvbuf(f, NULL, _IOFBF, 64 * 1024);
+
 	C3D_Tex* tex = new	C3D_Tex();
 
 	auto t3x = Tex3DS_TextureImportStdio(f, tex, nullptr, false);
+
+	loadedTextures[tex] = Tex3DS_GetSubTexture(t3x, 0);
 
 	C3D_TexSetWrap(tex, GPU_TEXTURE_WRAP_PARAM::GPU_CLAMP_TO_EDGE, GPU_TEXTURE_WRAP_PARAM::GPU_CLAMP_TO_EDGE);
 	C3D_TexSetFilter(tex, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR);
@@ -54,41 +63,6 @@ TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize) {
 	return tex;
 }
 
-
-/*
-const SpriteAtlas* Platform::LoadAtlas(const char* path) {
-	std::string assetPath = assetDir + path;
-
-	C2D_SpriteSheet sheet = C2D_SpriteSheetLoad(assetPath.data());
-
-	if (sheet == nullptr) {
-		EXCEPTION("Load atlas %s failed!", path);
-	}
-
-	int count = C2D_SpriteSheetCount(sheet);
-	SpriteAtlas* atlas = new SpriteAtlas(count);
-
-	for (int i = 0; i < count; ++i) {
-		C2D_Image img = C2D_SpriteSheetGetImage(sheet, i);
-		Sprite s;
-		s.textureId = img.tex;
-
-		Tex3DS_SubTextureTopLeft(img.subtex, &s.uv[0].x, &s.uv[0].y);
-		Tex3DS_SubTextureTopRight(img.subtex, &s.uv[1].x, &s.uv[1].y);
-		Tex3DS_SubTextureBottomLeft(img.subtex, &s.uv[2].x, &s.uv[2].y);
-		Tex3DS_SubTextureBottomRight(img.subtex, &s.uv[3].x, &s.uv[3].y);
-
-		s.rect.size = { (short)img.subtex->width, (short)img.subtex->height };
-		s.rect.position = { img.subtex->left * img.tex->width , img.subtex->top * img.tex->height };
-
-		atlas->AddSprite(s);
-	}
-	C2D_Image img = C2D_SpriteSheetGetImage(sheet, 0);
-	C3D_TexSetWrap(img.tex, GPU_TEXTURE_WRAP_PARAM::GPU_CLAMP_TO_EDGE, GPU_TEXTURE_WRAP_PARAM::GPU_CLAMP_TO_EDGE);
-	C3D_TexSetFilter(img.tex, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR);
-
-	return atlas;
-}*/
 const Font* Platform::LoadFont(const char* path, int size) {
 
 	std::string fontPath = assetDir + path;
@@ -191,19 +165,20 @@ SurfaceId Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering, Textu
 
 	createdRenderTargets.push_back(renderTarget);
 
+	Tex3DS_SubTexture* sub = new Tex3DS_SubTexture();
+	sub->width = tex->width;
+	sub->height = tex->height;
+	sub->top = 1;
+	sub->left = 0;
+	sub->bottom = 0;
+	sub->right = 1;
+
+	loadedTextures[tex] = sub;
+
 	if (!pixelFiltering)
 		C3D_TexSetFilter(tex, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR);
 	else
 		C3D_TexSetFilter(tex, GPU_TEXTURE_FILTER_PARAM::GPU_NEAREST, GPU_TEXTURE_FILTER_PARAM::GPU_NEAREST);
-
-	//Sprite s;
-	//s.rect = { {0,0}, Vector2Int16(size) };
-	//s.uv[0] = { 0,1 };
-	//s.uv[1] = { 1,1 };
-	//s.uv[2] = { 0,0 };
-	//s.uv[3] = { 1,0 };
-	//s.textureId = tex;
-
 
 	return rt;
 }
@@ -222,17 +197,50 @@ void Platform::ClearBuffer(Color color) {
 SubImageCoord Platform::GenerateUV(TextureId texture, Rectangle16 src) {
 	C3D_Tex* tex = (C3D_Tex*)texture;
 
-	Vector2Int size = { tex->width, tex->height };
+	if (loadedTextures.find(tex) == loadedTextures.end())
+		EXCEPTION("Invalid texture for UV generation!");
 
-	Vector2 min = {
+	const Tex3DS_SubTexture* subTex = loadedTextures[tex];
+
+	Vector2Int size = { subTex->width, subTex->height };
+	Vector2 min = Vector2(src.GetMin()) / Vector2(size);
+	Vector2 max = Vector2(src.GetMax()) / Vector2(size);
+
+	Tex3DS_SubTexture st2 = *subTex;
+	st2.width = src.size.x;
+	st2.height = src.size.y;
+
+	st2.left = LerpF(subTex->left, subTex->right, min.x);
+	st2.top = LerpF(subTex->top, subTex->bottom, min.y);
+	st2.right = LerpF(subTex->left, subTex->right, max.x);
+	st2.bottom = LerpF(subTex->top, subTex->bottom, max.y);
+
+	SubImageCoord uv = { };
+
+	Tex3DS_SubTextureTopLeft(&st2, &uv.coords[0].x, &uv.coords[0].y);
+	Tex3DS_SubTextureTopRight(&st2, &uv.coords[1].x, &uv.coords[1].y);
+	Tex3DS_SubTextureBottomLeft(&st2, &uv.coords[2].x, &uv.coords[2].y);
+	Tex3DS_SubTextureBottomRight(&st2, &uv.coords[3].x, &uv.coords[3].y);
+
+	//uv.corners.topLeft += min;
+	//uv.corners.topRight.y += min.y;
+	////uv.corners.topRight.x = uv.corners.topLeft.x + uv.GetSize().y * (max - min).x;
+	//uv.corners.bottomLeft.x += min.x;
+
+	return uv;
+
+	/*Vector2 min = {
 	(float)src.position.x / (float)size.x ,
 	1.0f - (float)src.position.y / (float)size.y };
+
 	Vector2 max = {
 		(float)(src.position.x + src.size.x) / (float)size.x,
 		1 - (float)(src.position.y + src.size.y) / (float)size.y
-	};
+	};*/
 
-	return { min, {max.x, min.y}, {min.x, max.y}, max };
+	//return { Vector2{0,0},Vector2{0,1}, Vector2{1,0}, Vector2{1,1} };
+
+	//return { min, {min.x, max.y}, {max.x, min.y}, max };
 }
 //
 //Sprite Platform::NewSprite(Texture texture, Rectangle16 src) {
@@ -280,7 +288,7 @@ static void SetEnv(DrawCommandType type) {
 }
 
 void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
-	
+
 	if (c2d_Prepared) {
 		C2D_Flush();
 
@@ -320,7 +328,7 @@ void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
 		switch (cmd.type)
 		{
 		case DrawCommandType::TexturedTriangle: {
-			C3D_TexBind(0, (C3D_Tex*)cmd.texture);
+			C3D_TexBind(0, (C3D_Tex*)cmd.texture->GetTextureId());
 			C3D_DrawArrays(GPU_TRIANGLES, cmd.start, cmd.count);
 			break;
 		}

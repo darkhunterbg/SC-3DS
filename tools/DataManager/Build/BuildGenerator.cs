@@ -103,7 +103,7 @@ namespace DataManager.Build
             if (cancelled)
                 return;
 
-            //BuildT3XFiles();
+            BuildT3XFiles();
 
             if (cancelled)
                 return;
