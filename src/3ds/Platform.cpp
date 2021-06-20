@@ -35,6 +35,27 @@ extern DVLB_s* spriteBatchBlob;
 extern shaderProgram_s spriteBatchProgram;
 extern C3D_AttrInfo spriteBatchAttributeInfo;
 
+
+TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize) {
+	std::string assetPath = assetDir + path + ".t3x";
+	FILE* f = fopen(assetPath.data(),"rb");
+	if (f == nullptr)
+		EXCEPTION("Failed to open file '%s'", assetPath.data());
+	C3D_Tex* tex = new	C3D_Tex();
+
+	auto t3x = Tex3DS_TextureImportStdio(f, tex, nullptr, false);
+
+	C3D_TexSetWrap(tex, GPU_TEXTURE_WRAP_PARAM::GPU_CLAMP_TO_EDGE, GPU_TEXTURE_WRAP_PARAM::GPU_CLAMP_TO_EDGE);
+	C3D_TexSetFilter(tex, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR);
+
+	outSize.x = tex->width;
+	outSize.y = tex->height;
+
+	return tex;
+}
+
+
+/*
 const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 	std::string assetPath = assetDir + path;
 
@@ -67,7 +88,7 @@ const SpriteAtlas* Platform::LoadAtlas(const char* path) {
 	C3D_TexSetFilter(img.tex, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR);
 
 	return atlas;
-}
+}*/
 const Font* Platform::LoadFont(const char* path, int size) {
 
 	std::string fontPath = assetDir + path;
@@ -129,7 +150,7 @@ void Platform::ChangeBlendingMode(BlendMode mode) {
 	}
 }
 
-void Platform::DrawOnSurface(Surface surface) {
+void Platform::DrawOnSurface(SurfaceId surface) {
 
 	if (surface == nullptr) {
 		currentRT = screens[currentScreen];
@@ -148,6 +169,45 @@ void Platform::DrawOnSurface(Surface surface) {
 
 	EXCEPTION("RenderTarget not found!");
 }
+
+
+SurfaceId Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering, TextureId& outTexture) {
+	C3D_Tex* tex = new C3D_Tex();
+	if (!C3D_TexInitVRAM(tex, size.x, size.y, GPU_TEXCOLOR::GPU_RGBA8))
+		EXCEPTION("Failed to create texture with size %ix%i!", size.x, size.y);
+
+	C3D_RenderTarget* rt = C3D_RenderTargetCreateFromTex(tex, GPU_TEXFACE::GPU_TEXFACE_2D, 0, -1);
+
+	outTexture = tex;
+
+	if (rt == nullptr) {
+		EXCEPTION("Failed to create render target for texture with size %ix%i!", size.x, size.y);
+	}
+
+	C3D_RenderTargetClear(rt, C3D_ClearBits::C3D_CLEAR_COLOR, C2D_Color32(0, 0, 0, 255), 0);
+
+	RenderTarget renderTarget = { rt,tex, size };
+	renderTarget.Init();
+
+	createdRenderTargets.push_back(renderTarget);
+
+	if (!pixelFiltering)
+		C3D_TexSetFilter(tex, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR);
+	else
+		C3D_TexSetFilter(tex, GPU_TEXTURE_FILTER_PARAM::GPU_NEAREST, GPU_TEXTURE_FILTER_PARAM::GPU_NEAREST);
+
+	//Sprite s;
+	//s.rect = { {0,0}, Vector2Int16(size) };
+	//s.uv[0] = { 0,1 };
+	//s.uv[1] = { 1,1 };
+	//s.uv[2] = { 0,0 };
+	//s.uv[3] = { 1,0 };
+	//s.textureId = tex;
+
+
+	return rt;
+}
+
 void Platform::DrawOnScreen(ScreenId screen) {
 
 	currentScreen = (int)screen;
@@ -159,25 +219,41 @@ void Platform::ClearBuffer(Color color) {
 	C2D_TargetClear(currentRT.rt, Color32(color).value);
 }
 
-Sprite Platform::NewSprite(Texture texture, Rectangle16 src) {
+SubImageCoord Platform::GenerateUV(TextureId texture, Rectangle16 src) {
 	C3D_Tex* tex = (C3D_Tex*)texture;
 
 	Vector2Int size = { tex->width, tex->height };
 
-	Vector2 min = { 
-		(float)src.position.x / (float)size.x ,
-		1.0f - (float)src.position.y / (float)size.y };
-	Vector2 max = { 
+	Vector2 min = {
+	(float)src.position.x / (float)size.x ,
+	1.0f - (float)src.position.y / (float)size.y };
+	Vector2 max = {
 		(float)(src.position.x + src.size.x) / (float)size.x,
-		1 - (float)(src.position.y + src.size.y) / (float)size.y 
+		1 - (float)(src.position.y + src.size.y) / (float)size.y
 	};
 
-	return Sprite{
-		src, 
-		{ min, {max.x, min.y}, {min.x, max.y}, max },
-		tex 
-	};
+	return { min, {max.x, min.y}, {min.x, max.y}, max };
 }
+//
+//Sprite Platform::NewSprite(Texture texture, Rectangle16 src) {
+//	C3D_Tex* tex = (C3D_Tex*)texture;
+//
+//	Vector2Int size = { tex->width, tex->height };
+//
+//	Vector2 min = { 
+//		(float)src.position.x / (float)size.x ,
+//		1.0f - (float)src.position.y / (float)size.y };
+//	Vector2 max = { 
+//		(float)(src.position.x + src.size.x) / (float)size.x,
+//		1 - (float)(src.position.y + src.size.y) / (float)size.y 
+//	};
+//
+//	return Sprite{
+//		src, 
+//		{ min, {max.x, min.y}, {min.x, max.y}, max },
+//		tex 
+//	};
+//}
 
 Span<Vertex> Platform::GetVertexBuffer() {
 
@@ -280,40 +356,6 @@ void Platform::DrawText(const Font& font, Vector2Int position, const char* text,
 	C2D_DrawText(&t, C2D_WithColor, position.x, position.y, 0, font.GetScale(), font.GetScale(), c);
 }
 
-RenderSurface Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering) {
-	C3D_Tex* tex = new C3D_Tex();
-	if (!C3D_TexInitVRAM(tex, size.x, size.y, GPU_TEXCOLOR::GPU_RGBA8))
-		EXCEPTION("Failed to create texture with size %ix%i!", size.x, size.y);
-
-	C3D_RenderTarget* rt = C3D_RenderTargetCreateFromTex(tex, GPU_TEXFACE::GPU_TEXFACE_2D, 0, -1);
-
-	if (rt == nullptr) {
-		EXCEPTION("Failed to create render target for texture with size %ix%i!", size.x, size.y);
-	}
-
-	C3D_RenderTargetClear(rt, C3D_ClearBits::C3D_CLEAR_COLOR, C2D_Color32(0, 0, 0, 255), 0);
-
-	RenderTarget renderTarget = { rt,tex, size };
-	renderTarget.Init();
-
-	createdRenderTargets.push_back(renderTarget);
-
-	if (!pixelFiltering)
-		C3D_TexSetFilter(tex, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR);
-	else
-		C3D_TexSetFilter(tex, GPU_TEXTURE_FILTER_PARAM::GPU_NEAREST, GPU_TEXTURE_FILTER_PARAM::GPU_NEAREST);
-
-	Sprite s;
-	s.rect = { {0,0}, Vector2Int16(size) };
-	s.uv[0] = { 0,1 };
-	s.uv[1] = { 1,1 };
-	s.uv[2] = { 0,0 };
-	s.uv[3] = { 1,0 };
-	s.textureId = tex;
-
-
-	return { rt, s };
-}
 
 double Platform::ElaspedTime() {
 

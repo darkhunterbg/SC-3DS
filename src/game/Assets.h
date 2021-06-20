@@ -21,10 +21,10 @@ union SubImageCoord {
 		Vector2 topRight;
 		Vector2 lowerLeft;
 		Vector2 lowerRight;
-	};
+	} corners;
 
 	inline Vector2 GetSize() const {
-		return lowerRight - topLeft;
+		return corners.lowerRight - corners.topLeft;
 	}
 };
 

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <array>
+#include <cstddef>
 #include "../Span.h"
 typedef short EntityId;
 
