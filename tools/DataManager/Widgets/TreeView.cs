@@ -80,6 +80,16 @@ namespace DataManager.Widgets
 
 				return anyUpdate;
 			}
+		
+			public int GetItemCount()
+			{
+				int i = Item == null ? 0 : 1;
+
+				foreach (var c in Children)
+					i += c.GetItemCount();
+
+				return i;
+			}
 		}
 
 		private IEnumerable<ITreeViewItem> dataSource;
@@ -397,7 +407,7 @@ namespace DataManager.Widgets
 					if (selectedNode == node)
 						flags |= ImGuiTreeNodeFlags.Selected;
 
-					string text = $"{node.Name} ({node.Children.Count})";
+					string text = $"{node.Name} ({node.GetItemCount()})";
 					bool expand = ImGui.TreeNodeEx(text, flags);
 
 					if (expand != node.Expanded)

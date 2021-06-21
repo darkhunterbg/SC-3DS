@@ -100,7 +100,7 @@ namespace DataManager.Build
 			if (cancelled)
 				return;
 
-			SaveAtlasTable();
+			GenerateAtlasData();
 
 			if (cancelled)
 				return;
@@ -351,7 +351,7 @@ namespace DataManager.Build
 			return subAtlases;
 		}
 
-		private void SaveAtlasTable()
+		private void GenerateAtlasData()
 		{
 			GeneratedImages = GeneratedImages.OrderBy(t => t.Name).ToList();
 
@@ -551,7 +551,7 @@ namespace DataManager.Build
 
 		public void Dispose()
 		{
-
+			spriteBatch.Dispose();
 		}
 	}
 }
