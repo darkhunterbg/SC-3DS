@@ -37,6 +37,7 @@ namespace DataManager.Assets
 		[Binary(BinaryType.UInt, 4)]
 		public AssetId UnitId { get; set; }
 
+		#region Text
 		[Section("Text")]
 		[DefaultEditor]
 		[Binary(BinaryType.String, 32)]
@@ -47,7 +48,9 @@ namespace DataManager.Assets
 		[Binary(BinaryType.String, 32)]
 		[Optional]
 		public string Subtitle { get; set; } = string.Empty;
+		#endregion
 
+		#region Art
 		[Section("Art")]
 		[DefaultEditor]
 		[Optional]
@@ -100,8 +103,9 @@ namespace DataManager.Assets
 		[Binary(BinaryType.AssetRef, 2)]
 		[TypeConverter(typeof(AssetConverter))]
 		public UnitWireframeAsset Wireframe { get; set; }
+		#endregion
 
-
+		#region Combat
 		[Section("Combat")]
 		[DefaultEditor]
 		[Binary(BinaryType.UInt, 2)]
@@ -116,13 +120,17 @@ namespace DataManager.Assets
 		public UnitAttack Attack1 { get { return Attacks[0]; } set { Attacks[0] = value; } }
 		[Optional, HeaderPrefix("Attack2.")]
 		public UnitAttack Attack2 { get { return Attacks[1]; } set { Attacks[1] = value; } }
+		#endregion
 
+		#region Stats
 		[Section("Stats")]
 		[DefaultEditor]
 		[Binary(BinaryType.UInt, 2)]
 		[Optional]
 		public int Health { get; set; } = 100;
+		#endregion 
 
+		#region Movement
 		[Section("Movement")]
 		[DefaultEditor]
 		[Binary(BinaryType.UInt, 2)]
@@ -133,13 +141,38 @@ namespace DataManager.Assets
 		[Binary(BinaryType.UInt, 2)]
 		[Optional]
 		public int RotationSpeed { get; set; } = 0;
+		#endregion
 
+		#region Tech Tree
 		[Section("Tech Tree")]
 		[DefaultEditor]
 		[Binary(BinaryType.AssetRef, 2)]
 		[Optional, TypeConverter(typeof(AssetConverter))]
 		public UpgradeAsset ArmorType { get; set; }
+		#endregion
 
+		#region Sounds
+		[Section("Sounds")]
+		[DefaultEditor]
+		[Binary(BinaryType.AssetRef, 2)]
+		[Optional, TypeConverter(typeof(AssetConverter))]
+		public SoundSetAsset ReadySound { get; set; }
+
+		[DefaultEditor]
+		[Binary(BinaryType.AssetRef, 2)]
+		[Optional, TypeConverter(typeof(AssetConverter))]
+		public SoundSetAsset YesSound { get; set; }
+
+		[DefaultEditor]
+		[Binary(BinaryType.AssetRef, 2)]
+		[Optional, TypeConverter(typeof(AssetConverter))]
+		public SoundSetAsset WhatSound { get; set; }
+
+		[DefaultEditor]
+		[Binary(BinaryType.AssetRef, 2)]
+		[Optional, TypeConverter(typeof(AssetConverter))]
+		public SoundSetAsset AnnoyedSound { get; set; }
+		#endregion
 
 		public UnitAsset() : base()
 		{

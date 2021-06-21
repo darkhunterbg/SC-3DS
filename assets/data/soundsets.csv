@@ -1,0 +1,6 @@
+Path,Randomize,Clips
+Units\Terran\Marine\Annoyed,False,"sound\terran\marine\tmapss00,sound\terran\marine\tmapss01,sound\terran\marine\tmapss02,sound\terran\marine\tmapss03,sound\terran\marine\tmapss04,sound\terran\marine\tmapss05,sound\terran\marine\tmapss06"
+Units\Terran\Marine\Death,True,"sound\terran\marine\tmadth00,sound\terran\marine\tmadth01"
+Units\Terran\Marine\Ready,False,sound\terran\marine\tmardy00
+Units\Terran\Marine\What,True,"sound\terran\marine\tmawht00,sound\terran\marine\tmawht01,sound\terran\marine\tmawht02,sound\terran\marine\tmawht03"
+Units\Terran\Marine\Yes,True,"sound\terran\marine\tmayes00,sound\terran\marine\tmayes01,sound\terran\marine\tmayes02,sound\terran\marine\tmayes03"

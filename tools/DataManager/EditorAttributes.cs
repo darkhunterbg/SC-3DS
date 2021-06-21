@@ -70,5 +70,11 @@ namespace DataManager
 		{
 			ArraySize = arraySize;
 		}
+
+	}
+
+	public class ListEditorAttribute : EditorAttribute
+	{
+
 	}
 }

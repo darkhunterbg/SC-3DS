@@ -1,6 +1,7 @@
 ﻿using DataManager.Widgets;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.ImGui;
@@ -23,6 +24,8 @@ namespace DataManager
 		public static GraphicsDevice Device { get; private set; }
 		public static AssetManager AssetManager { get; private set; }
 
+		public static Random Rand = new Random();
+
 		private SpriteBatch sb;
 
 		[DllImport("SDL2.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -42,6 +45,8 @@ namespace DataManager
 			InactiveSleepTime = TimeSpan.Zero;
 
 			_graphics.GraphicsProfile = GraphicsProfile.HiDef;
+
+			SoundEffect.MasterVolume = 0.5f;
 		}
 
 		protected override void Initialize()

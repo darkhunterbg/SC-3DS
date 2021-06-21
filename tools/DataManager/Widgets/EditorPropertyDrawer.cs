@@ -1,6 +1,7 @@
 ﻿using DataManager.Assets;
 using ImGuiNET;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -38,9 +39,9 @@ namespace DataManager.Widgets
 				if (attr is ImageFrameEditorAttribute)
 					return ImageFrameEditor;
 
-				if (attr is ArrayEditorAttribute)
+				if (attr is ListEditorAttribute)
 				{
-					return ArrayEditor;
+					return ListEditor;
 				}
 			}
 
@@ -123,28 +124,49 @@ namespace DataManager.Widgets
 			return changed;
 		}
 
-		private static bool ArrayEditor(PropertyInfo prop, EditorAttribute attr, object item)
+		private static bool ListEditor(PropertyInfo prop, EditorAttribute attr, object item)
 		{
-			ArrayEditorAttribute a = attr as ArrayEditorAttribute;
+			var listElemType = prop.PropertyType.GetGenericArguments()[0];
 
-			var arrayElemType = prop.PropertyType.GetElementType();
-
-			var editorProperties = arrayElemType.GetProperties().Where(t => t.GetCustomAttribute<EditorAttribute>() != null).ToList();
-			var array = prop.GetValue(item) as Array;
+			var list = prop.GetValue(item) as IList;
 			bool changed = false;
 
-			for (int i = 0; i < a.ArraySize; ++i)
+
+			int j = 0;
+			for (int i = 0; i < list.Count; ++i)
 			{
-				if (array.GetValue(i) == null)
-					array.SetValue(Activator.CreateInstance(arrayElemType), i);
-
-
-				foreach (var p in editorProperties)
+				ImGui.PushID(++j);
+				object o = EditorFieldDrawer.Object(string.Empty, list[i], listElemType, out bool c);
+				if (c)
 				{
-					var pa = p.GetCustomAttribute<EditorAttribute>();
-					changed = GetPropertyDrawer(p, pa)(p, pa, array.GetValue(i));
+					changed = true;
+					list[i] = o;
 				}
+				ImGui.SameLine();
+				ImGui.SetCursorPosX(ImGui.GetCursorPosX() + 8);
+				if (ImGui.Button("Delete"))
+				{
+					list.RemoveAt(i);
+					--i;
+					changed = true;
+				}
+				ImGui.PopID();
 			}
+
+			if (ImGui.Button("Add"))
+			{
+				list.Add(Activator.CreateInstance(listElemType));
+				changed = true;
+			}
+			ImGui.SameLine();
+
+			if (ImGui.Button("Clear"))
+			{
+				list.Clear();
+				changed = true;
+			}
+
+			ImGui.Separator();
 
 			return changed;
 		}

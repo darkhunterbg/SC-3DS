@@ -368,6 +368,13 @@ namespace DataManager.Widgets
 
 				if (ImGui.IsItemFocused())
 					focused = true;
+
+				if((ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left) ||
+					ImGui.IsMouseClicked(ImGuiMouseButton.Middle)) && ImGui.IsItemFocused())
+				{
+					if (node.Item is IInteractableTreeViewItem inter)
+						inter.Activate();
+				}
 				//ImGui.Unindent(ImGui.GetTreeNodeToLabelSpacing());
 
 				ItemContextMenu(node);

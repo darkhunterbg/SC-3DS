@@ -145,4 +145,9 @@ namespace DataManager
 		string Path { get; set; }
 		GuiTexture Preview { get; }
 	}
+
+	public interface IInteractableTreeViewItem
+	{
+		void Activate();
+	}
 }

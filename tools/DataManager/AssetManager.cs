@@ -2,6 +2,7 @@
 using CsvHelper.Configuration;
 using CsvHelper.Configuration.Attributes;
 using DataManager.Assets;
+using DataManager.Assets.Raw;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections;
@@ -59,6 +60,9 @@ namespace DataManager
 		public static readonly string StarcraftAssetDir = "..\\..\\mpq\\";
 		public static readonly string AssetsDir = $"..\\..\\assets\\";
 		public static readonly string ExtractedAssetsDir = $"..\\..\\assets_extracted\\";
+		public static readonly string AudioDir = StarcraftAssetDir;
+
+		static readonly string[] AudioSearchDirs = new string[] { "sound", "music" };
 
 		public static readonly string GameDataDir = $"{AssetsDir}data\\";
 
@@ -73,11 +77,12 @@ namespace DataManager
 		public static readonly string SpriteAtlasDataPath = $"{GameDataDir}atlases.csv";
 		public static readonly string ImagesDataPath = $"{GameDataDir}images.csv";
 		public static readonly string FramesDataPath = $"{GameDataDir}frames.csv";
-	
+
 
 		public Dictionary<string, Palette> Palettes { get; private set; } = new Dictionary<string, Palette>();
 
 		public List<ImageList> ImageLists { get; private set; } = new List<ImageList>();
+		public List<AudioClip> AudioClips { get; private set; } = new List<AudioClip>();
 		public List<ImageFrame> Icons { get; private set; } = new List<ImageFrame>();
 		public List<ImageFrame> UnitSelection { get; private set; } = new List<ImageFrame>();
 
@@ -92,7 +97,6 @@ namespace DataManager
 
 		public AssetManager()
 		{
-
 			if (!Directory.Exists(AssetsDir))
 				Directory.CreateDirectory(AssetsDir);
 
@@ -105,6 +109,7 @@ namespace DataManager
 			if (!Directory.Exists(SpriteAtlas3DSBuildDir))
 				Directory.CreateDirectory(SpriteAtlas3DSBuildDir);
 
+			AddNewAssetDatabase<SoundSetAsset>($"{GameDataDir}soundsets.csv");
 			AddNewAssetDatabase<SpriteAsset>($"{GameDataDir}sprites.csv");
 			AddNewAssetDatabase<SpriteAnimClipAsset>($"{GameDataDir}animclips.csv");
 			AddNewAssetDatabase<AbilityAsset>($"{GameDataDir}abilities.csv");
@@ -120,9 +125,9 @@ namespace DataManager
 			Assets[typeof(TAsset)] = new AssetDatabase<TAsset>(filePath);
 		}
 		public IAssetDatabase GetAssetDatabase(Type type)
-        {
+		{
 			return Assets[type];
-        }
+		}
 		public AssetDatabase<TAsset> GetAssetDatabase<TAsset>() where TAsset : Asset,
 			new()
 		{
@@ -138,7 +143,7 @@ namespace DataManager
 		{
 			LoadPalettes();
 			LoadImageLists();
-
+			LoadAduioClips();
 
 			var iconsSheet = ImageLists.FirstOrDefault(s => s.Key == "unit\\cmdbtns\\cmdicons");
 			if (iconsSheet != null)
@@ -174,7 +179,7 @@ namespace DataManager
 		}
 
 		public void SaveAllAssets()
-        {
+		{
 			foreach (var db in Assets.Values)
 				db.Save();
 		}
@@ -193,10 +198,23 @@ namespace DataManager
 				if (file.StartsWith(SpriteAtlasOutDir))
 					continue;
 
-
 				ImageLists.Add(ImageList.FromPng(file));
 			}
 
+		}
+
+		public void LoadAduioClips()
+		{
+			AudioClips.Clear();
+
+			foreach (var subDir in AudioSearchDirs)
+			{
+				foreach (var file in Directory.GetFiles(Path.Combine(AudioDir, subDir), "*.wav", SearchOption.AllDirectories))
+				{
+
+					AudioClips.Add(new AudioClip(file));
+				}
+			}
 		}
 
 		public GuiTexture GetImageFrame(string key, int frameIndex)

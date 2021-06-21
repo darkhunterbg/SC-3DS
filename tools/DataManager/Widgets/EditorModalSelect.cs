@@ -1,4 +1,5 @@
 ﻿using DataManager.Assets;
+using DataManager.Assets.Raw;
 using DataManager.Panels;
 using ImGuiNET;
 using Microsoft.Xna.Framework.Input;
@@ -115,12 +116,22 @@ namespace DataManager.Widgets
 			if (objType == typeof(IconRef))
 			{
 				if (selected == null)
-					ImGui.Text(string.Empty);
+					ImGui.Text("None");
 				else
 				{
 					int id = ((IconRef)selected).Id;
 					string text = id != -1 ? id.ToString() : string.Empty;
 					ImGui.Text(text);
+				}
+				return;
+			}
+			if (objType == typeof(AudioClipRef))
+			{
+				if (selected == null)
+					ImGui.Text("None");
+				else
+				{
+					ImGui.Text(((AudioClipRef)selected).ToString());
 				}
 				return;
 			}
@@ -166,6 +177,12 @@ namespace DataManager.Widgets
 			if (objType == typeof(IconRef))
 			{
 				IconContent(moveIter);
+				return;
+			}
+
+			if (objType == typeof(AudioClipRef))
+			{
+				AudioClipContent(moveIter);
 				return;
 			}
 
@@ -327,7 +344,7 @@ namespace DataManager.Widgets
 		private static void ImageFrameContent(int moveIter)
 		{
 			var icon = selected != null ? (ImageFrameRef)selected : ImageFrameRef.None;
-			var query = AppGame.AssetManager.ImageLists.FirstOrDefault(f=>f.Key == icon.ImageListName)
+			var query = AppGame.AssetManager.ImageLists.FirstOrDefault(f => f.Key == icon.ImageListName)
 				?.Frames ?? Enumerable.Empty<ImageFrame>();
 
 			int i = 0;
@@ -364,6 +381,56 @@ namespace DataManager.Widgets
 
 				if (i % 10 != 0)
 					ImGui.SameLine();
+			}
+		}
+
+		private static void AudioClipContent(int moveIter)
+		{
+			var tmp = selected != null ? (AudioClipRef)selected : AudioClipRef.None;
+			IEnumerable<AudioClip> query = AppGame.AssetManager.AudioClips;
+
+			query = Util.TextFilter(query, textFilter, t => t.Key);
+			query = query.OrderBy(asset => asset.Key);
+
+			int i = 0;
+			foreach (var asset in query)
+			{
+				ImGui.PushID(i++);
+
+				bool isSelectedItem = tmp.Clip == asset;
+
+				if (!asset.IsPlaying)
+				{
+					if (ImGui.Button("Play"))
+						asset.Play();
+				}
+				else 
+				{
+					if (ImGui.Button("Stop"))
+						asset.Stop();
+				}
+				ImGui.SameLine();
+
+				if (ImGui.Selectable(string.Empty, isSelectedItem))
+				{
+					if (isSelectedItem)
+						selected = AudioClipRef.None;
+					else
+					{
+						selected = new AudioClipRef(asset);
+					}
+				}
+
+				if (ImGui.IsItemHovered())
+				{
+					AppGame.Gui.HoverObject = asset;
+				}
+
+				ImGui.SameLine();
+				ImGui.Text(asset.Key);
+				
+				ImGui.PopID();
+
 			}
 		}
 	}

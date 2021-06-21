@@ -10,6 +10,7 @@ using System.Reflection;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
 using System.Numerics;
+using DataManager.Assets.Raw;
 
 namespace DataManager.Assets
 {
@@ -26,6 +27,9 @@ namespace DataManager.Assets
 		public virtual GuiTexture Preview => null;
 
 		[Ignore]
+		public virtual string ActionButtonText => null;
+
+		[Ignore]
 		[UniqueKey]
 		public readonly int Id;
 
@@ -38,6 +42,8 @@ namespace DataManager.Assets
 			return AssetName;
 		}
 
+
+		public virtual void Activate() { }
 		public virtual Asset Clone()
 		{
 			var asset = (Asset)Util.ShallowCopyProperties(GetType(), this);
@@ -167,6 +173,7 @@ namespace DataManager.Assets
 
 			context.TypeConverterCache.AddConverter<AssetId>(new AssetId.CsvConverter());
 
+			context.TypeConverterCache.AddConverter<AudioClipRef>(new AudioClipRef.CsvConverter());
 		}
 
 		public void Reload()

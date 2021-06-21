@@ -1,4 +1,5 @@
 ﻿using DataManager.Assets;
+using DataManager.Assets.Raw;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -82,6 +83,11 @@ namespace DataManager.Widgets
 				Vector2 b = obj == null ? System.Numerics.Vector2.Zero : (Vector2)obj;
 				return Vector2(name, b, out changed);
 			}
+			if (type == typeof(AudioClipRef))
+			{
+				AudioClipRef b = obj == null ? AudioClipRef.None : (AudioClipRef)obj;
+				return AudioClip(name, b, out changed);
+			}
 
 			changed = false;
 			ReadOnly(name, obj);
@@ -125,6 +131,10 @@ namespace DataManager.Widgets
 			if (obj is Vector2 v2)
 			{
 				return Vector2(name, v2, out changed);
+			}
+			if (obj is AudioClipRef ac)
+			{
+				return AudioClip(name, ac, out changed);
 			}
 
 			changed = false;
@@ -270,6 +280,13 @@ namespace DataManager.Widgets
 				ImGui.SameLine();
 			}
 
+			if (asset?.ActionButtonText != null)
+			{
+				if (ImGui.Button(asset.ActionButtonText))
+					asset.Activate();
+				ImGui.SameLine();
+			}
+
 			ImGui.Text(asset?.AssetName ?? "None");
 
 			if (ImGui.IsItemHovered())
@@ -323,6 +340,44 @@ namespace DataManager.Widgets
 			changed = dialogResultFor == dialogId;
 			return changed ? (IconRef)dialogResult : icon;
 		}
+
+		public static AudioClipRef AudioClip(string name, AudioClipRef clip, out bool changed)
+		{
+			int id = ++dialogId;
+			//DrawName(name);
+			changed = false;
+			string text = string.IsNullOrEmpty(clip.Id) ? "None" : clip.Id;
+			if (clip.Clip != null)
+			{
+				if (!clip.Clip.IsPlaying)
+				{
+					if (ImGui.Button("Play"))
+						clip.Clip.Play();
+				}
+				else
+				{
+					if (ImGui.Button("Stop"))
+						clip.Clip.Stop();
+				}
+
+				ImGui.SameLine();
+			}
+
+			ImGui.Text(text);
+			ImGui.SameLine();
+			if (ImGui.Button("Change"))
+			{
+				EditorModalSelect.SelectItemModal(typeof(AudioClipRef), clip, (o) =>
+				{
+					dialogResultFor = id;
+					dialogResult = o;
+				});
+			}
+
+			changed = dialogResultFor == dialogId;
+			return changed ? (AudioClipRef)dialogResult : clip;
+		}
+
 
 		public static ImageListRef ImageList(string name, ImageListRef image, out bool changed)
 		{
