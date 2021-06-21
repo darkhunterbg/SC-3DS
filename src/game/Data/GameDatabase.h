@@ -15,6 +15,7 @@ private:
 	std::vector<Image> images;
 
 	const Image* commandIcons;
+	std::vector<const Image*> selections;
 
 	std::unordered_map<std::string, const Image*> imageNamesMap;
 	std::unordered_map<UnitId, const UnitDef*> unitMap;
@@ -36,6 +37,9 @@ public:
 	GameDatabase& operator=(const GameDatabase&) = delete;
 
 	inline const Image& GetImage(unsigned id) const { return images[id]; }
+	inline const Image& GetSelectionImage(unsigned id) const { return *selections[id]; }
+	
+
 	const Image& GetImage(const std::string& path) const;
 	const ImageFrame& GetCommandIcons(unsigned id) const;
 

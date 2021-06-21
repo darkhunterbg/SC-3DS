@@ -11,11 +11,15 @@ const ImageFrame& UnitDef::UnitArt::GetIcon() const
 	return GameDatabase::instance->GetCommandIcons(IconId);
 }
 
-
 const Image* UnitDef::UnitArt::GetShadowImage() const
 {
 	if (ShadowImageId < 0)
 		return nullptr;
 	
 	return &GameDatabase::instance->GetImage(ShadowImageId);
+}
+
+const Image& UnitDef::UnitArt::GetSelectionImage() const
+{
+	return GameDatabase::instance->GetSelectionImage(SelectionSize);
 }

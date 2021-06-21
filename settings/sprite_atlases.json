@@ -73,5 +73,13 @@
     ],
     "PackStrategy": 0,
     "FilterStrategy": 0
+  },
+  {
+    "OutputName": "thingy_selection",
+    "ImageList": [
+      "unit/thingy/o[0123456789d]*"
+    ],
+    "PackStrategy": 0,
+    "FilterStrategy": 1
   }
 ]

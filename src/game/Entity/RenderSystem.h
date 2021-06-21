@@ -47,21 +47,15 @@ class RenderSystem {
 	};
 
 	struct RenderUnitSelectionData {
-		std::vector<ImageFrame> graphics;
-		std::vector<Vector2Int16> position;
-		std::vector<int> order;
-		std::vector<short> verticalOffset;
+		std::vector<EntityId> entities;
 		std::vector<Color32> color;
 
 		inline void clear() {
-			graphics.clear();
-			position.clear();
-			order.clear();
-			verticalOffset.clear();
+			entities.clear();
 			color.clear();
 		}
 		inline size_t size() {
-			return graphics.size();
+			return entities.size();
 		}
 	};
 
@@ -81,7 +75,7 @@ private:
 	void UnitSelectionCameraCull(const Rectangle16& rect, EntityManager& em);
 
 	void DrawEntities(const Camera& camera, const Rectangle16& camRect, EntityManager& em);
-	void DrawSelection(const Camera& camera, const Rectangle16& camRect);
+	void DrawSelection(const Camera& camera, const Rectangle16& camRect, EntityManager& em);
 public:
 	void Draw(const Camera& camera, EntityManager& em);
 	void DrawBoundingBoxes(const Camera& camera, EntityManager& em);

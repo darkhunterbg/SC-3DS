@@ -96,4 +96,15 @@ void GameDatabase::LoadAssetReferences()
 	commandIcons = imageNamesMap["unit\\cmdbtns\\cmdicons"];
 
 	AnimationPlayer::BuildInstructionCache({ AnimInstructionDefs.data(), AnimInstructionDefs.size() });
+
+	selections.push_back(&GetImage("unit\\thingy\\o022"));
+	selections.push_back(&GetImage("unit\\thingy\\o032"));
+	selections.push_back(&GetImage("unit\\thingy\\o048"));
+	selections.push_back(&GetImage("unit\\thingy\\o062"));
+	selections.push_back(&GetImage("unit\\thingy\\o072"));
+	selections.push_back(&GetImage("unit\\thingy\\o094"));
+	selections.push_back(&GetImage("unit\\thingy\\o110"));
+	selections.push_back(&GetImage("unit\\thingy\\o122"));
+	selections.push_back(&GetImage("unit\\thingy\\o146"));
+	selections.push_back(&GetImage("unit\\thingy\\o224"));
 }

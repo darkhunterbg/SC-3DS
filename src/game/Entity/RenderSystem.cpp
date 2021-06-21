@@ -30,15 +30,6 @@ void RenderSystem::CameraCull(const Rectangle16& camRect, EntityManager& em) {
 			continue;
 
 		renderData.entities.push_back(id);
-
-		//const auto& dst = em.RenderArchetype.DestinationComponents[i];
-		//const auto& ren = em.RenderArchetype.RenderComponents[i];
-
-	/*	renderData.pos.push_back(dst.dst);
-		renderData.order.push_back(dst.order + 2);
-		renderData.flip.push_back(ren.hFlip);
-		renderData.color.push_back(0xFFFFFFFF);
-		renderData.sprite.push_back(ren.sprite);*/
 	}
 
 	UnitSelectionCameraCull(camRect, em);
@@ -63,16 +54,8 @@ void RenderSystem::UnitSelectionCameraCull(const Rectangle16& camRect, EntityMan
 		if (!camRect.Intersects(bb))
 			continue;
 
-		const auto* def = em.UnitArchetype.UnitComponents.GetComponent(id).def;
-
-		/*	unitSelectionData.graphics.push_back(def->Graphics->Selection.Atlas->GetFrame(0));
-			Vector2Int16 pos = em.PositionComponents.GetComponent(id);
-			pos -= Vector2Int16(def->Graphics->Selection.Atlas->FrameSize / 2);
-			unitSelectionData.position.push_back(pos);
-			unitSelectionData.order.push_back(arch.DestinationComponents.GetComponent(id).order);
-			unitSelectionData.verticalOffset.push_back(def->Graphics->Selection.VecticalOffset);
-			unitSelectionData.color.push_back(selectionColor[j]);*/
-
+		unitSelectionData.entities.push_back(id);
+		unitSelectionData.color.push_back(selectionColor[j]);
 	}
 }
 
@@ -105,7 +88,7 @@ void RenderSystem::DrawEntities(const Camera& camera, const Rectangle16& camRect
 			shadPos -= camRect.position;
 			shadPos /= camera.Scale;
 
-			cmd.order = dst.order + 1;
+			cmd.order = dst.order ;
 			cmd.sprite = &shad.sprite;
 			cmd.position = shadPos;
 			cmd.scale = scale[ren.hFlip];
@@ -132,7 +115,7 @@ void RenderSystem::DrawEntities(const Camera& camera, const Rectangle16& camRect
 	
 	}
 }
-void RenderSystem::DrawSelection(const Camera& camera, const Rectangle16& camRect) {
+void RenderSystem::DrawSelection(const Camera& camera, const Rectangle16& camRect, EntityManager& em) {
 
 	int entitiesCount = unitSelectionData.size();
 
@@ -142,18 +125,23 @@ void RenderSystem::DrawSelection(const Camera& camera, const Rectangle16& camRec
 
 
 	for (int i = 0; i < entitiesCount; ++i) {
-		auto& dst = unitSelectionData.position[i];
-		const auto& frame = unitSelectionData.graphics[i];
-		const short& offset = unitSelectionData.verticalOffset[i];
+		EntityId id = unitSelectionData.entities[i];
 
-		dst += frame.offset;
-		dst.y += offset;
+		const auto* def = em.UnitArchetype.UnitComponents.GetComponent(id).def;
+		int order = em.RenderArchetype.DestinationComponents.GetComponent(id).order;
+
+		Vector2Int16 dst = em.PositionComponents.GetComponent(id);
+	
+		const auto& selectionImage = def->Art.GetSelectionImage();
+
+		dst += selectionImage.GetImageFrameOffset(0, false);
+		dst.y += def->Art.SelectionOffset;
 
 		dst -= camRect.position;
 		dst /= camera.Scale;
 
-		cmd.order = unitSelectionData.order[i] + 1;
-		cmd.sprite = &frame;
+		cmd.order = order + 1;
+		cmd.sprite = &selectionImage.GetFrame(0);
 		cmd.position = dst;
 		cmd.color = unitSelectionData.color[i];
 
@@ -171,7 +159,7 @@ void RenderSystem::Draw(const Camera& camera, EntityManager& em) {
 	render.clear();
 
 	DrawEntities(camera, camRect, em);
-	DrawSelection(camera, camRect);
+	DrawSelection(camera, camRect, em);
 
 	std::sort(render.begin(), render.end(), RenderSort);
 
