@@ -247,7 +247,6 @@ void GraphicsRenderer::Submit()
 void GraphicsRenderer::DrawOnScreen(ScreenId screen)
 {
 	Submit();
-
 	Platform::DrawOnScreen(screen);
 }
 
@@ -270,6 +269,7 @@ RenderSurface GraphicsRenderer::NewRenderSurface(Vector2Int size, bool pixelFilt
 	RenderSurface rs;
 
 	rs.surfaceId = s;
+	rs.sprite.size = Vector2Int16(size);
 	rs.sprite.texture = new Texture("RenderTarget", Vector2Int16(size), t);
 	rs.sprite.uv = Platform::GenerateUV(t, { {0,0}, Vector2Int16(size) });
 

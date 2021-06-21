@@ -13,7 +13,7 @@ void MapSystem::SetSize(Vector2Int16 size)
 	gridSize = size / 32;
 	minimapTextureSize = size.x / 32;
 
-	//tile = AssetLoader::LoadAtlas("tileset/tile")->GetSprite(0);
+	tile = GraphicsRenderer::NewSprite(*AssetLoader::LoadTexture("tileset\\tile"), { {0,0},{192,192} });
 }
 
 void MapSystem::UpdateMapObjectPositions(EntityManager& em, const EntityChangedData& changed) {
@@ -84,12 +84,6 @@ void MapSystem::UpdateVisibleRenderEntities(EntityManager& em) {
 		bool visible = vision.IsVisible(dst);
 
 		if (!visible && FogOfWarVisible) {
-			/*	for (int i = 0; i < removedEntities.size(); ++i)
-				{
-					if (removedEntities[i] == id)
-						EXCEPTION("DUPLICATED ENTITIES!");
-				}*/
-
 			removedEntities.push_back(id);
 		}
 	}
@@ -106,15 +100,6 @@ void MapSystem::UpdateVisibleRenderEntities(EntityManager& em) {
 			em.FlagComponents.GetComponent(id).set(ComponentFlags::RenderChanged);
 		}
 	}
-
-	//for (int i = 0; i < removedEntities.size(); ++i)
-	//{
-	//	for (int j = i + 1; j < removedEntities.size(); ++j) {
-	//		if (removedEntities[i] == removedEntities[j])
-	//			EXCEPTION("DUPLICATED ENTITIES!");
-	//	}
-	//}
-
 
 	em.RenderArchetype.Archetype.RemoveSortedEntities(removedEntities);
 	em.HiddenArchetype.Archetype.AddSortedEntities(removedEntities);

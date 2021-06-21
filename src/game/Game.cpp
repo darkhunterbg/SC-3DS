@@ -41,8 +41,8 @@ static void ShowTitleScreen() {
 static void InitialScene() {
 	AssetLoader::LoadDatabase();
 
-	//Game::SetCurrentScene(new GameScene());
-	Game::SetCurrentScene(new PerformanceTestScene());
+	Game::SetCurrentScene(new GameScene());
+	//Game::SetCurrentScene(new PerformanceTestScene());
 }
 
 void Game::FrameStart() {

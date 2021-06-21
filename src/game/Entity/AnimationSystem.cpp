@@ -32,7 +32,7 @@ void AnimationSystem::TickAnimations(EntityManager& em)
 
 void AnimationSystem::RunAnimations(EntityManager& em)
 {
-	//SectionProfiler p("RunAnimations");
+	SectionProfiler p("RunAnimations");
 
 	int start = 0;
 	int end = animData.size();
