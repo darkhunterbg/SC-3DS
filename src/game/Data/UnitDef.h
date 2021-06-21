@@ -78,6 +78,11 @@ struct UnitDef {
 		uint16_t Health;
 	} Stats;
 
+	struct UnitMovement {
+		uint16_t MaxVelocity;
+		uint16_t RotationSpeed;
+	} Movement;
+
 	struct UnitTechTree {
 		int16_t ArmorUpgrateId;
 
@@ -85,6 +90,10 @@ struct UnitDef {
 	} TechTree;
 
 	Span<UnitAttack> GetAttacks() const;
+	inline bool HasMovement() const {
+		return Movement.MaxVelocity > 0;
+	}
+	
 
 	/*
 

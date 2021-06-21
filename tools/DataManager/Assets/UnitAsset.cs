@@ -123,6 +123,17 @@ namespace DataManager.Assets
 		[Optional]
 		public int Health { get; set; } = 100;
 
+		[Section("Movement")]
+		[DefaultEditor]
+		[Binary(BinaryType.UInt, 2)]
+		[Optional]
+		public int MaxVelocity { get; set; } = 0;
+
+		[DefaultEditor]
+		[Binary(BinaryType.UInt, 2)]
+		[Optional]
+		public int RotationSpeed { get; set; } = 0;
+
 		[Section("Tech Tree")]
 		[DefaultEditor]
 		[Binary(BinaryType.AssetRef, 2)]

@@ -343,8 +343,8 @@ struct UnitMovementComponent {
 	uint8_t rotationSpeed;
 
 	inline void FromDef(const UnitDef& def) {
-		/*movementSpeed = def.MovementSpeed;
-		rotationSpeed = def.RotationSpeed;*/
+		movementSpeed = def.Movement.MaxVelocity;
+		rotationSpeed = def.Movement.RotationSpeed;
 	}
 };
 

@@ -173,7 +173,7 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 	auto& s = em.AnimationArchetype.ShadowComponents.GetComponent(e);
 	s.image = def.Art.GetShadowImage();
 	s.offset = def.Art.ShadowOffset;
-	
+
 
 	if (def.Art.GetSprite().animCount)
 		EntityUtil::PlayAnimation(e, def.Art.GetSprite().GetClips()[0]);
@@ -182,10 +182,12 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 
 	em.UnitArchetype.WeaponComponents.NewComponent(e).FromAttack(def.Attacks[0]);
 
-	//if (def.MovementSpeed > 0) {
-	//	em.NavigationArchetype.NavigationComponents.NewComponent(e);
-	//	em.NavigationArchetype.Archetype.AddEntity(e);
-	//}
+	if (def.HasMovement()) {
+		em.NavigationArchetype.NavigationComponents.NewComponent(e);
+		em.NavigationArchetype.Archetype.AddEntity(e);
+		em.MovementArchetype.MovementComponents.NewComponent(e);
+		em.MovementArchetype.Archetype.AddEntity(e);
+	}
 
 	if (def.Art.GetSprite().HasCollider()) {
 		em.CollisionArchetype.Archetype.AddEntity(e);
@@ -212,8 +214,7 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 
 
 	//if (def.MovementSpeed > 0) {
-	//	em.MovementArchetype.MovementComponents.NewComponent(e);
-	//	em.MovementArchetype.Archetype.AddEntity(e);
+	//	
 	//}
 
 	em.UnitArchetype.StateComponents.NewComponent(e);
