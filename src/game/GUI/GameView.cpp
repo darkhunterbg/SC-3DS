@@ -263,8 +263,7 @@ void GameView::DrawMarkers(const Camera& camera) {
 		if (!camRect.Contains(marker.pos))
 			continue;
 
-		const ImageFrame& frame = {};// GraphicsDatabase::Cursor.targg.GetFrame(1);
-
+		const ImageFrame& frame = GameDatabase::instance->GetImage("cursor\\targg").GetFrame(1); 
 		Rectangle dst = { {0,0},  Vector2Int(frame.size) };
 
 		if (marker.state == 0)
@@ -297,9 +296,8 @@ void GameView::DrawUnitBars(const Camera& camera) {
 	for (EntityId id : context.selection) {
 
 		Vector2Int16 pos = em.PositionComponents.GetComponent(id);
-	/*	pos.y += em.UnitArchetype.UnitComponents.GetComponent(id).def->Graphics->Selection.BarVerticalOffset;
-		int barSize = em.UnitArchetype.UnitComponents.GetComponent(id).def->Graphics->Selection.BarSize;*/
-		int barSize = 3;
+		pos.y += em.UnitArchetype.UnitComponents.GetComponent(id).def->Art.BarOffset;
+		int barSize = em.UnitArchetype.UnitComponents.GetComponent(id).def->Art.BarSize;
 
 		barSize /= camera.Scale;
 
