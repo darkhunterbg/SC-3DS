@@ -34,6 +34,9 @@ namespace DataManager.Widgets
 
 				if (attr is SupplyEditorAttribute)
 					return SupplyEditor;
+
+				if (attr is ImageFrameEditorAttribute)
+					return ImageFrameEditor;
 			}
 
 
@@ -93,6 +96,24 @@ namespace DataManager.Widgets
 			{
 				prop.SetValue(item, number);
 			}
+
+			return changed;
+		}
+
+		private static bool ImageFrameEditor(PropertyInfo prop, EditorAttribute attr, object item)
+		{
+			var v = prop.GetValue(item);
+			var frame = v == null ? ImageFrameRef.None : (ImageFrameRef)v;
+
+			var a = attr as ImageFrameEditorAttribute;
+
+			if (frame.ImageListName == string.Empty)
+				frame = new ImageFrameRef(AppGame.AssetManager.ImageLists.FirstOrDefault(f => f.Key == a.ImagePath));
+
+			AppGui.StrechNextItem();
+			frame = EditorFieldDrawer.ImageFrame(string.Empty, frame, out bool changed);
+			if (changed)
+				prop.SetValue(item, frame);
 
 			return changed;
 		}

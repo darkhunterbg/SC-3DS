@@ -52,6 +52,14 @@ namespace DataManager
 		public string Name { get; set; }
 	}
 
+	public class ImageFrameEditorAttribute : EditorAttribute
+	{
+		public readonly string ImagePath;
 
+		public ImageFrameEditorAttribute(string imagePath)
+		{
+			ImagePath = imagePath;
+		}
+	}
 
 }

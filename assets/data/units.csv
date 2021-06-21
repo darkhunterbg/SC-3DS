@@ -1,4 +1,4 @@
-Path,UnitId,Name,Subtitle,Icon,Sprite,BarSize,BarOffset,SelectonSize,SelectionOffset,Shadow,ShadowOffset,Portrait,Health
-Terran\Buildings\Command Center,14561177,Terran Command Center,,106,terran\CommandCenter,36,57,8,10,unit\terran\tccshad,"0,0",portrait\tadvisor,1500
-Terran\Units\Marine,14561179,Terran Marine,Private,0,terran\Marine,6,19,0,9,unit\terran\tmashad,"0,0",portrait\tmarine,40
-Terran\Units\SCV,14561181,Terran SCV,Private,7,terran\SCV,7,20,0,10,unit\terran\scv,"-4,4",portrait\tscv,60
+Path,UnitId,Name,Subtitle,Icon,Sprite,BarSize,BarOffset,SelectonSize,SelectionOffset,Shadow,ShadowOffset,Portrait,Wireframe,Health
+Terran\Buildings\Command Center,14561177,Terran Command Center,,106,terran\CommandCenter,36,57,8,10,unit\terran\tccshad,"0,0",portrait\tadvisor,,1500
+Terran\Units\Marine,14561179,Terran Marine,Private,0,terran\Marine,6,19,0,9,unit\terran\tmashad,"0,0",portrait\tmarine,Terran\Marine,40
+Terran\Units\SCV,14561181,Terran SCV,Private,7,terran\SCV,7,20,0,10,unit\terran\scv,"-4,4",portrait\tscv,,60

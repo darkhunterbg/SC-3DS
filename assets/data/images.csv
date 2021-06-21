@@ -66,3 +66,6 @@ unit\thingy\od110,1426,1,144,144,0
 unit\thingy\od122,1427,1,144,144,0
 unit\thingy\od146,1428,1,168,168,0
 unit\thingy\od224,1429,1,252,252,0
+unit\wirefram\grpwire\000,1430,5,32,32,0
+unit\wirefram\tranwire\000,1435,5,64,64,0
+unit\wirefram\wirefram\000,1440,5,64,64,0

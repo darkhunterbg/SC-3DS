@@ -10,3 +10,9 @@ const Image& SpriteDef::GetImage() const
 {
 	return GameDatabase::instance->GetImage(imageId);
 }
+
+const Image& UnitWireframeDef::Wireframe::GetImage() const
+{
+	return GameDatabase::instance->GetImage(imageId);
+}
+

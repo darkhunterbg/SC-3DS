@@ -31,3 +31,11 @@ const Image& UnitDef::UnitArt::GetSelectionImage() const
 {
 	return GameDatabase::instance->GetSelectionImage(SelectionSize);
 }
+
+const UnitWireframeDef* UnitDef::UnitArt::GetWireframe() const
+{
+	if (WireframeId < 0)
+		return nullptr;
+
+	return &GameDatabase::instance->WireframeDefs[WireframeId];
+}

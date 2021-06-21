@@ -281,7 +281,7 @@ namespace DataManager.Widgets
             return changed ? (Asset)dialogResult : asset;
         }
 
-        private static IconRef Icon(string name, IconRef icon, out bool changed)
+        public static IconRef Icon(string name, IconRef icon, out bool changed)
         {
             int id = ++dialogId;
             //DrawName(name);
@@ -313,7 +313,7 @@ namespace DataManager.Widgets
             return changed ? (IconRef)dialogResult : icon;
         }
 
-        private static ImageListRef ImageList(string name, ImageListRef image, out bool changed)
+        public static ImageListRef ImageList(string name, ImageListRef image, out bool changed)
         {
             int id = ++dialogId;
 
@@ -346,7 +346,7 @@ namespace DataManager.Widgets
             return changed ? (ImageListRef)dialogResult : image;
         }
 
-        private static ImageFrameRef ImageFrame(string name, ImageFrameRef frame, out bool changed)
+        public static ImageFrameRef ImageFrame(string name, ImageFrameRef frame, out bool changed)
         {
             int id = ++dialogId;
             string text = "None";
@@ -356,16 +356,31 @@ namespace DataManager.Widgets
             if (!string.IsNullOrEmpty(frame.Key))
                 text = frame.Key;
 
-            if (ImGui.IsItemHovered())
-                AppGame.Gui.HoverObject = frame;
-
-            if (ImGui.ImageButton(frame.Frame.Image.GuiImage, new Vector2(24, 24)))
+            if (frame.Frame == null)
             {
-                EditorModalSelect.SelectItemModal(typeof(ImageFrameRef), frame, (o) =>
+                if (ImGui.Button(text))
                 {
-                    dialogResultFor = id;
-                    dialogResult = o;
-                });
+                    EditorModalSelect.SelectItemModal(typeof(ImageFrameRef), frame, (o) =>
+                    {
+                        dialogResultFor = id;
+                        dialogResult = o;
+                    });
+                }
+            }
+            else
+            {
+
+                if (ImGui.IsItemHovered())
+                    AppGame.Gui.HoverObject = frame;
+
+                if (ImGui.ImageButton(frame.Frame.Image.GuiImage, new Vector2(24, 24)))
+                {
+                    EditorModalSelect.SelectItemModal(typeof(ImageFrameRef), frame, (o) =>
+                    {
+                        dialogResultFor = id;
+                        dialogResult = o;
+                    });
+                }
             }
 
             changed = dialogResultFor == dialogId;

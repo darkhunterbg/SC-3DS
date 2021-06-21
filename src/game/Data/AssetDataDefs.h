@@ -5,6 +5,7 @@
 #include "../Span.h"
 
 class Image;
+struct ImageFrame;
 
 enum class AnimationType : uint8_t
 {
@@ -83,6 +84,20 @@ union InstructionParams {
 struct AnimInstructionDef {
 	uint8_t id;
 	InstructionParams param = {};
+};
+
+
+
+struct UnitWireframeDef {
+	struct Wireframe {
+		int16_t imageId;
+
+		const Image& GetImage() const;
+	};
+
+	Wireframe detail;
+	Wireframe train;
+	Wireframe group;
 };
 
 #pragma pack(pop)

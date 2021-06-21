@@ -22,6 +22,7 @@ namespace DataManager.Build
 		Abilities = 8,
 		Upgrades = 9,
 		Effects = 10,
+		Wireframe = 11,
 	}
 
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
@@ -75,7 +76,7 @@ namespace DataManager.Build
 			if (DataItemType == null)
 				return new MemoryStream();
 
-			var props = DataItemType.GetProperties(BindingFlags.Public| BindingFlags.Instance).Where(t => t.GetCustomAttribute<BinaryAttribute>() != null).ToList();
+			var props = DataItemType.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(t => t.GetCustomAttribute<BinaryAttribute>() != null).ToList();
 
 			var attr = props.Select(s => s.GetCustomAttribute<BinaryAttribute>()).ToList();
 

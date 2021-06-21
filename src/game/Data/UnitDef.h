@@ -11,6 +11,7 @@
 #include <cstring>
 
 struct SpriteDef;
+struct UnitWireframeDef;
 
 typedef uint32_t UnitId;
 
@@ -28,6 +29,10 @@ struct UnitDef {
 		}
 	} Text;
 
+	struct UnitWireframe {
+		int16_t ImageId;
+	};
+
 	struct  UnitArt {
 		uint16_t IconId;
 		uint16_t SpriteId;
@@ -38,7 +43,10 @@ struct UnitDef {
 		int16_t ShadowImageId;
 		Vector2Int16 ShadowOffset;
 		int16_t PortraitImageId;
+		int16_t WireframeId;
 
+
+		const UnitWireframeDef* GetWireframe() const;
 		const SpriteDef& GetSprite() const;
 		const ImageFrame& GetIcon() const;
 		const Image* GetShadowImage() const;

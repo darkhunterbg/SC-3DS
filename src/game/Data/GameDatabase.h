@@ -31,6 +31,7 @@ public:
 	std::vector<AnimInstructionDef> AnimInstructionDefs;
 	std::vector<UnitDef> UnitDefs;
 	std::vector<AbilityDef> AbilityDefs;
+	std::vector<UnitWireframeDef> WireframeDefs;
 
 	GameDatabase();
 	GameDatabase(const GameDatabase&) = delete;
@@ -38,7 +39,7 @@ public:
 
 	inline const Image& GetImage(unsigned id) const { return images[id]; }
 	inline const Image& GetSelectionImage(unsigned id) const { return *selections[id]; }
-	
+
 
 	const Image& GetImage(const std::string& path) const;
 	const ImageFrame& GetCommandIcons(unsigned id) const;

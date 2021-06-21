@@ -110,16 +110,27 @@ namespace DataManager.Assets
 
 		public readonly ImageFrame Frame;
 
+		public readonly string ImageListName;
+
 		public static readonly ImageFrameRef None = new ImageFrameRef(string.Empty, null);
+
+		public ImageFrameRef(ImageList imageList)
+		{
+			ImageListName = imageList?.Key ?? string.Empty;
+			Frame = null;
+			Key = string.Empty;
+		}
 
 		public ImageFrameRef(ImageFrame frame)
 		{
+			ImageListName = frame?.ImageListName ?? string.Empty;
 			Frame = frame;
-			Key = $"{frame.ImageListName}:{frame.FrameIndex}";
+			Key = $"{ImageListName}:{frame.FrameIndex}";
 		}
 
 		public ImageFrameRef(string key, ImageFrame frame)
 		{
+			ImageListName = frame?.ImageListName ?? string.Empty;
 			Key = key;
 			Frame = frame;
 		}
@@ -137,11 +148,12 @@ namespace DataManager.Assets
 
 				if (s.Length > 1) int.TryParse(s[1], out index);
 
-				var asset = AppGame.AssetManager.ImageLists.FirstOrDefault(f => f.Key == text);
+				var asset = AppGame.AssetManager.ImageLists.FirstOrDefault(f => f.Key == key);
 				ImageFrame frame = null;
 				if (asset != null)
+				{
 					frame = asset.Frames.Skip(index).FirstOrDefault();
-
+				}
 				return new ImageFrameRef(text, frame);
 			}
 			public override string ConvertToString(object value, IWriterRow row, MemberMapData memberMapData)

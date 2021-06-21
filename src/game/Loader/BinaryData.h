@@ -20,6 +20,7 @@ enum class DataSectionType : uint32_t
 	Abilities = 8,
 	Upgrades = 9,
 	Effects = 10,
+	Wireframe= 11,
 };
 
 

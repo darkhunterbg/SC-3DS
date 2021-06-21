@@ -82,10 +82,11 @@ namespace DataManager.Assets
 		[Binary(BinaryType.ImageRef, 2)]
 		public ImageListRef Portrait { get; set; } = ImageListRef.None;
 
-		//[DefaultEditor]
-		//[Optional]
-		//[Binary(BinaryType.UInt, 2)]
-		//public ImageListRef Wireframe { get; set; } = ImageListRef.None;
+		[Optional]
+		[DefaultEditor]
+		[Binary(BinaryType.AssetRef, 2)]
+		[TypeConverter(typeof(AssetConverter))]
+		public UnitWireframeAsset Wireframe { get; set; }
 
 		[Section("Combat")]
 		[DefaultEditor]
