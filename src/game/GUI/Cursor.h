@@ -4,6 +4,7 @@
 #include <vector>
 #include "../Entity/Entity.h"
 #include "../Entity/Common.h"
+#include "GUIAnimator.h"
 
 class Camera;
 class GameViewContext;
@@ -14,9 +15,9 @@ public:
 	Vector2Int16 Position = { 0,0 };
 	Rectangle16 Limits = { {0,0},{400,240} };
 private:
-	//const AnimationClip* currentClip;
-	int clipFrame = 0;
-	int clipCountdown = 0;
+	GUIAnimator animator;
+
+	std::string currentClip;
 
 	Vector2Int16 holdStart = { 0,0 };
 	Rectangle16 regionRect;
@@ -24,7 +25,8 @@ private:
 	bool holding, dragging;
 	EntityId hover;
 	Vector2Int16 worldPos;
-	//const AnimationClip* newClip;
+
+	std::string newClip;
 
 	void UpdateDefaultState(Camera& camera, GameViewContext& context);
 	void UpdateTargetSelectionState(Camera& camera, GameViewContext& context);

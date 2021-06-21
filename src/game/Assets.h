@@ -98,11 +98,12 @@ public:
 	inline const Vector2Int16 GetSize() const { return size; }
 
 	const ImageFrame& GetFrame(unsigned index) const;
+	const Span<ImageFrame> GetFrames() const { return { frameStart, frameCount }; }
 
 	const ImageFrame* GetColorMaskFrame(unsigned index) const;
 
 	Vector2Int16 GetImageFrameOffset(unsigned frameId, bool hFlip) const;
-
+	Vector2Int16 GetImageFrameOffset(const ImageFrame& frame, bool hFlip) const;
 };
 
 struct AudioInfo {

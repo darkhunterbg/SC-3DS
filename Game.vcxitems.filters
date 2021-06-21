@@ -175,6 +175,9 @@
       <Filter>Entity</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Random.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIAnimator.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -309,6 +312,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\AbilityDef.cpp">
       <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIAnimator.cpp">
+      <Filter>GUI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

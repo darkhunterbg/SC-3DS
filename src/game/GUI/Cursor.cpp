@@ -11,29 +11,30 @@
 #include "Game.h"
 #include "Engine/InputManager.h"
 
+#include "../Data/GameDatabase.h"
+
 static constexpr const float Speed = 10;
 static constexpr const int AnimFrameCount = 6;
 
+static std::string scrollAnim[] = {
+	"cursor\\scrollul", "cursor\\scrollu","cursor\\scrollur",
+	"cursor\\scrolll", "","cursor\\scrollr",
+	"cursor\\scrolldl", "cursor\\scrolld","cursor\\scrolldr",
+};
+
 Cursor::Cursor() {
-	//atlas = AssetLoader::LoadAtlas("cursor.t3x");
-	//currentClip = &GraphicsDatabase::Cursor.arrow;
+	currentClip = "cursor\\arrow";
+	animator.SetAnimationFromImage(currentClip, AnimFrameCount);
 }
 
 
 void Cursor::Draw() {
 
-	clipCountdown--;
+	animator.Update();
 
-	//if (clipCountdown <= 0) {
-	//	clipCountdown = AnimFrameCount;
-	//	clipFrame = (++clipFrame) % currentClip->GetFrameCount();
-	//}
+	const ImageFrame& frame = animator.GetImageFrame();
 
-	//const SpriteFrame& frame = currentClip->GetFrame(clipFrame);
-
-	ImageFrame frame;
-
-	Rectangle dst = { Vector2Int(Position + frame.offset), Vector2Int(frame.offset) };
+	Rectangle dst = { Vector2Int(Position + animator.GetImageFrameOffset()), Vector2Int( frame.size )};
 
 	if (regionRect.size.LengthSquaredInt() > 0) {
 
@@ -102,16 +103,15 @@ void Cursor::Update(Camera& camera, GameViewContext& context) {
 
 	if (corner.LengthSquared() != 0) {
 		int index = (corner.x + 1) + (corner.y + 1) * 3;
-		//newClip = GraphicsDatabase::Cursor.scrollAnim[index];
+		newClip = scrollAnim[index];
 		Vector2 v = Vector2::Normalize(Vector2(corner));
 		camera.Position += Vector2Int16(v * camera.GetCameraSpeed());
 	}
 
-	//if (newClip != currentClip) {
-	//	currentClip = newClip;
-	//	clipFrame = 0;
-	//	clipCountdown = AnimFrameCount;
-	//}
+	if (newClip != currentClip) {
+		currentClip = newClip;
+		animator.SetAnimationFromImage(newClip, AnimFrameCount);
+	}
 }
 
 void Cursor::UpdateDefaultState(Camera& camera, GameViewContext& context)
@@ -130,9 +130,9 @@ void Cursor::UpdateDefaultState(Camera& camera, GameViewContext& context)
 	}
 
 	if (InputManager::Gamepad.IsButtonReleased(GamepadButton::Y)) {
-	
-		if (dragging ) {
-		
+
+		if (dragging) {
+
 			Vector2Int16 start = holdStart;
 			Vector2Int16 end = worldPos;
 
@@ -157,46 +157,46 @@ void Cursor::UpdateDefaultState(Camera& camera, GameViewContext& context)
 
 	if (corner == Vector2Int{ 0,0 })
 	{
-		/*if (!holding || !dragging)
+		if (!holding || !dragging)
 		{
 			if (hover == Entity::None) {
-				newClip = &GraphicsDatabase::Cursor.arrow;
+				newClip = "cursor\\arrow";
 			}
 			else {
 				if (UnitEntityUtil::IsAlly(context.player, hover)) {
-					newClip = &GraphicsDatabase::Cursor.magg;
+					newClip = "cursor\\magg";
 				}
 				else if (UnitEntityUtil::IsEnemy(context.player, hover)) {
-					newClip = &GraphicsDatabase::Cursor.magr;
+					newClip = "cursor\\magr";
 				}
 				else {
-					newClip = &GraphicsDatabase::Cursor.magy;
+					newClip = "cursor\\magy";
 				}
 
 			}
 		}
 		else {
-			newClip = &GraphicsDatabase::Cursor.drag;
+			newClip = "cursor\\drag";
 
-		}*/
+		}
 	}
 }
 
 void Cursor::UpdateTargetSelectionState(Camera& camera, GameViewContext& context)
 {
-	/*if (hover == Entity::None) {
-		newClip = &GraphicsDatabase::Cursor.targn;
+	if (hover == Entity::None) {
+		newClip = "cursor\\targn";
 	}
 	else {
 		if (UnitEntityUtil::IsAlly(context.player, hover)) {
-			newClip = &GraphicsDatabase::Cursor.targg;
+			newClip = "cursor\\targg";
 		}
 		else if (UnitEntityUtil::IsEnemy(context.player, hover)) {
-			newClip = &GraphicsDatabase::Cursor.targr;
+			newClip = "cursor\\targr";
 		}
 		else {
-			newClip = &GraphicsDatabase::Cursor.targy;
+			newClip = "cursor\\targy";
 		}
 
-	}*/
+	}
 }

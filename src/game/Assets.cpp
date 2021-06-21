@@ -107,3 +107,11 @@ Vector2Int16 Image::GetImageFrameOffset(unsigned frameId, bool hFlip) const {
 
 	return offset;
 }
+Vector2Int16 Image::GetImageFrameOffset(const ImageFrame& frame, bool hFlip) const {
+
+	Vector2Int16 offset = frame.offset - (size >> 1);
+	if (hFlip)
+		offset.x = (size.x >> 1) - frame.offset.x - frame.size.x;
+
+	return offset;
+}

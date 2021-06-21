@@ -59,6 +59,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUD.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GameViewContext.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GameView.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIAnimator.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitCommandsPanel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitSelectionConsolePanel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\BinaryData.h" />
@@ -114,6 +115,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUD.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GameViewContext.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GameView.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIAnimator.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitCommandsPanel.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitSelectionConsolePanel.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\BinaryData.cpp" />
