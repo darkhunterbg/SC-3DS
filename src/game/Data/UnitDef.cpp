@@ -19,6 +19,14 @@ const Image* UnitDef::UnitArt::GetShadowImage() const
 	return &GameDatabase::instance->GetImage(ShadowImageId);
 }
 
+const Image* UnitDef::UnitArt::GetPortraitImage() const
+{
+	if (PortraitImageId < 0)
+		return nullptr;
+
+	return &GameDatabase::instance->GetImage(PortraitImageId);
+}
+
 const Image& UnitDef::UnitArt::GetSelectionImage() const
 {
 	return GameDatabase::instance->GetSelectionImage(SelectionSize);

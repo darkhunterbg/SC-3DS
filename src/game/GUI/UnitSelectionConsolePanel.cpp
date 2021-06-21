@@ -176,13 +176,13 @@ void UnitSelectionConsolePanel::DrawUnitName(Rectangle space, EntityId id, const
 
 	Vector2Int pos = space.position + Vector2Int(space.size.x / 2, 0);
 
-	int offset = font.MeasureString(unit.def->Art.Name).x;
-	GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), unit.def->Art.Name, Colors::UILightGray);
+	int offset = font.MeasureString(unit.def->Text.Name).x;
+	GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), unit.def->Text.Name, Colors::UILightGray);
 	pos.y += 16;
 
-	if (unit.def->Art.HasTitle()) {
-		offset = font.MeasureString(unit.def->Art.Title).x;
-		GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), unit.def->Art.Title, Colors::UILightGray);
+	if (unit.def->Text.HasTitle()) {
+		offset = font.MeasureString(unit.def->Text.Title).x;
+		GraphicsRenderer::DrawText(font, pos - Vector2Int(offset / 2, 0), unit.def->Text.Title, Colors::UILightGray);
 	}
 }
 

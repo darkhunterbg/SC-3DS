@@ -14,34 +14,40 @@ struct SpriteDef;
 
 typedef uint32_t UnitId;
 
-
+#pragma pack(push,2)
 struct UnitDef {
 	char Path[32];
 	UnitId Id;
 
+	struct UnitText {
+		char Name[32];
+		char Title[32];
+
+		inline bool HasTitle() const {
+			return  Title[0] != 0;
+		}
+	} Text;
+
 	struct  UnitArt {
 		uint16_t IconId;
 		uint16_t SpriteId;
-		char Name[32];
-		char Title[32];
 		uint16_t BarSize;
 		uint16_t BarOffset;
 		uint16_t SelectionSize;
 		int16_t SelectionOffset;
 		int16_t ShadowImageId;
 		Vector2Int16 ShadowOffset;
+		int16_t PortraitImageId;
 
 		const SpriteDef& GetSprite() const;
 		const ImageFrame& GetIcon() const;
 		const Image* GetShadowImage() const;
 		const Image& GetSelectionImage() const;
-		inline bool HasTitle() const {
-			return  Title[0] != 0;
-		}
+		const Image* GetPortraitImage() const;
 
 	} Art;
 
-	struct Data {
+	struct UnitData {
 		uint16_t Health;
 	} Data;
 
@@ -116,3 +122,5 @@ struct UnitDef {
 	}
 	*/
 };
+
+#pragma pack(pop)

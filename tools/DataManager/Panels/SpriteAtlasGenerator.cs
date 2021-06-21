@@ -94,7 +94,12 @@ namespace DataManager.Panels
 			ImGui.SameLine();
 			if (ImGui.Button("Build All##sag.entries.buildall"))
 			{
-				AppGame.RunCoroutine(BuildAllCrt());
+				AppGame.RunCoroutine(BuildCrt(true));
+			}
+			ImGui.SameLine();
+			if (ImGui.Button("Build PC##sag.entries.buildall"))
+			{
+				AppGame.RunCoroutine(BuildCrt(false));
 			}
 
 			ImGui.BeginChild("##sag.entries.items");
@@ -129,8 +134,8 @@ namespace DataManager.Panels
 				}
 
 				ImGui.SameLine();
-				 number = (int)entry.FilterStrategy;
-				 enumValues = EnumCacheValues.GetValues(typeof(SpriteAtlasFilterStrategy));
+				number = (int)entry.FilterStrategy;
+				enumValues = EnumCacheValues.GetValues(typeof(SpriteAtlasFilterStrategy));
 				ImGui.SetNextItemWidth(200);
 				if (ImGui.Combo($"##sag.entries.filterStart.{entry.Id}", ref number, enumValues, enumValues.Length))
 				{
@@ -140,7 +145,7 @@ namespace DataManager.Panels
 
 
 				ImGui.SameLine();
-				ImGui.Text($"Atlas Size {(int)(entry.Usage*100)}%% ");
+				ImGui.Text($"Atlas Size {(int)(entry.Usage * 100)}%% ");
 
 				ImGui.SameLine();
 
@@ -289,12 +294,13 @@ namespace DataManager.Panels
 			ImGui.EndPopup();
 		}
 
-		private IEnumerator BuildAllCrt()
+		private IEnumerator BuildCrt(bool build3DS)
 		{
 			Stopwatch timer = new Stopwatch();
 			timer.Start();
 
-			BuildGenerator build = new BuildGenerator();
+			BuildGenerator build = new BuildGenerator() { Build3DS = build3DS };
+
 
 			foreach (var file in Directory.GetFiles(AssetManager.SpriteAtlas3DSBuildDir))
 				File.Delete(file);
