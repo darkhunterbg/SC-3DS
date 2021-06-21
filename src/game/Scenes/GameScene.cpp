@@ -6,6 +6,7 @@
 #include "../Entity/EntityManager.h"
 #include "../Profiler.h"
 #include "../Data/RaceDatabase.h"
+#include "../Data//GameDatabase.h"
 #include "../Entity/EntityUtil.h"
 
 #include "../Engine/GraphicsRenderer.h"
@@ -72,13 +73,15 @@ void GameScene::Start() {
 	//EntityId e = UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 0,
 	//	Vector2Int16(48, 48));
 
+	const auto& def = *GameDatabase::instance->GetUnit("Terran\\Units\\Marine");
+
 	int i = 0;
 	for (int y = 2; y > 0; --y) {
 		for (int x = 1; x > 0; --x) {
 			Color c = color[(i) % 12];
 			//auto& def = *UnitDatabase::Units[1];
-			// UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
-			//	Vector2Int16(Vector2Int{ x * 32 + 48,y * 32 + 48 }));
+			 UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
+				Vector2Int16(Vector2Int{ x * 32 + 48,y * 32 + 48 }));
 
 			i += 1;
 

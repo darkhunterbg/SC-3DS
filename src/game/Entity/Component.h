@@ -287,6 +287,7 @@ struct UnitDataComponent {
 	}
 
 	inline void FromDef(const UnitDef& def) {
+		vision = 8;
 	/*	supplyUsage = def.UseSupplyDoubled;
 		supplyProvides = def.ProvideSupplyDoubled;
 		vision = def.Vision + 1;

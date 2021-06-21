@@ -4,6 +4,8 @@
 #include "../MathLib.h"
 #include "../Span.h"
 
+class Image;
+
 enum class AnimationType : uint8_t
 {
 	Init,
@@ -64,12 +66,13 @@ struct AnimClipDef {
 
 struct SpriteDef {
 	char name[32];
-	int16_t imageId;
+	uint16_t imageId;
 	uint16_t animStart;
 	uint8_t animCount;
 	bool isRotating;
 
 	const Span<AnimClipDef> GetClips() const;
+	const Image& GetImage() const;
 };
 
 union InstructionParams {

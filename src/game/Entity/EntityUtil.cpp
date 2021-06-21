@@ -166,12 +166,18 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 
 	em.TimingArchetype.Archetype.AddEntity(e);
 
-	/*em.UnitArchetype.RenderArchetype.RenderComponents.NewComponent(e, {
-		player.color }).SetSpriteFrame(def.Graphics->IdleAnimations[0].GetFrame(0));*/
-	//em.UnitArchetype.RenderArchetype.OffsetComponents.NewComponent(e, {
-	// Vector2Int16(def.Graphics->IdleAnimations[0].GetFrame(0).offset),
-	//	Vector2Int16(def.Graphics->IdleAnimations[0].GetFrame(0).shadowOffset)
-	//	});
+
+	em.RenderArchetype.Archetype.AddEntity(e);
+	em.AnimationArchetype.Archetype.AddEntity(e);
+	em.RenderArchetype.RenderComponents.GetComponent(e).color = player.color;
+	auto& s = em.AnimationArchetype.ShadowComponents.GetComponent(e);
+	s.image = def.Art.GetShadowImage();
+	s.offset = def.Art.ShadowOffset;
+	
+
+	if (def.Art.GetSprite().animCount)
+		EntityUtil::PlayAnimation(e, def.Art.GetSprite().GetClips()[0]);
+
 
 	//if (def.Weapon)
 	//	em.UnitArchetype.WeaponComponents.NewComponent(e).FromDef(*def.Weapon);
@@ -186,7 +192,7 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 
 	Rectangle16 mapBB;
 
-	Vector2Int16 size = { 0,0 };// def.Graphics->RenderSize;
+	Vector2Int16 size = def.Art.GetSprite().GetImage().GetSize();
 	mapBB.size = Vector2Int16(size >> 6) << 1;
 	mapBB.size = mapBB.size.Floor(2, 2);
 	mapBB.position -= mapBB.size / 2;
@@ -195,7 +201,7 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 	//	em.MapObjectArchetype.MinimapColorId.NewComponent(e, 15);
 	//}
 	//else {
-	//	em.MapObjectArchetype.MinimapColorId.NewComponent(e, playerId);
+	em.MapObjectArchetype.MinimapColorId.NewComponent(e, playerId);
 	//}
 
 
@@ -208,22 +214,25 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 	//	em.MovementArchetype.Archetype.AddEntity(e);
 	//}
 
-	//em.UnitArchetype.StateComponents.NewComponent(e);
+	em.UnitArchetype.StateComponents.NewComponent(e);
 
 	//if (def.IsBuilding) {
 	//	em.FlagComponents.GetComponent(e).set(ComponentFlags::UnitAIPaused);
 	//}
 	//else {
-	//	em.UnitArchetype.AIStateComponents.NewComponent(e, UnitAIState::Idle);
-	//	em.UnitArchetype.AIStateDataComponents.NewComponent(e);
+	em.UnitArchetype.AIStateComponents.NewComponent(e, UnitAIState::Idle);
+	em.UnitArchetype.AIStateDataComponents.NewComponent(e);
 	//}
 
 	em.SoundArchetype.Archetype.AddEntity(e);
 
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::PositionChanged);
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::RenderEnabled);
+	em.FlagComponents.GetComponent(e).set(ComponentFlags::AnimationEnabled);
+	em.FlagComponents.GetComponent(e).set(ComponentFlags::RenderShadows);
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::UnitStateChanged);
 	em.FlagComponents.GetComponent(e).set(ComponentFlags::OrientationChanged);
+
 
 	return e;
 }

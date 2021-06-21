@@ -11,6 +11,7 @@ const ImageFrame& UnitDef::UnitArt::GetIcon() const
 	return GameDatabase::instance->GetCommandIcons(IconId);
 }
 
+
 const Image* UnitDef::UnitArt::GetShadowImage() const
 {
 	if (ShadowImageId < 0)
