@@ -63,6 +63,8 @@ namespace DataManager.Widgets
 		public ImageListRef ShadowImage;
 		public Vector2 ShadowOffset;
 
+		public bool ShowCollider = false;
+
 		public bool SelectionChanged { get; private set; } = false;
 		public bool ClipChanged { get; private set; } = false;
 		public SpriteAnimData AnimData { get; private set; } = new SpriteAnimData();
@@ -87,6 +89,9 @@ namespace DataManager.Widgets
 
 			if (ShowBars)
 				DrawBars(pos, sb);
+
+			if (ShowCollider)
+				DrawCollider(pos, sb);
 
 			sb.End();
 
@@ -130,6 +135,8 @@ namespace DataManager.Widgets
 					AnimData.State.SetOrientation(orient);
 				}
 			}
+
+			EditorFieldDrawer.Bool("Show Collider", ref ShowCollider);
 		}
 
 		private void DrawSprite(Vector2 pos, SpriteBatch sb)
@@ -237,6 +244,23 @@ namespace DataManager.Widgets
 				sb.DrawRectangle(pos, new Vector2(2, 3), SCGreen);
 				pos.X += 3;
 			}
+		}
+
+		private void DrawCollider(Vector2 pos, SpriteBatch sb)
+		{
+			if (Sprite == null)
+				return;
+
+			if (Sprite.ColliderSize == Vector2.Zero)
+				return;
+
+			pos += Sprite.ColliderPosition;
+
+
+			Color c = Color.Green;
+			c.A = 65;
+
+			sb.DrawRectangle(pos, Sprite.ColliderSize, c);
 		}
 	}
 }

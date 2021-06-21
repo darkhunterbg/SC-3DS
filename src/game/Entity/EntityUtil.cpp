@@ -187,8 +187,10 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 	//	em.NavigationArchetype.Archetype.AddEntity(e);
 	//}
 
-	//em.CollisionArchetype.ColliderComponents.NewComponent(e).collider = def.Graphics->Collider;
-	em.CollisionArchetype.Archetype.AddEntity(e);
+	if (def.Art.GetSprite().HasCollider()) {
+		em.CollisionArchetype.Archetype.AddEntity(e);
+		em.CollisionArchetype.ColliderComponents.NewComponent(e).collider = def.Art.GetSprite().collider;
+	}
 
 	Rectangle16 mapBB;
 
