@@ -19,6 +19,7 @@ namespace DataManager
 
 	public static class CsvConverters
 	{
+
 		public class Vector2Coverter : DefaultTypeConverter
 		{
 			public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)

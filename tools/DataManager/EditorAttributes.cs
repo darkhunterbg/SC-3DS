@@ -18,6 +18,7 @@ namespace DataManager
 	{
 		public string Name { get; set; }
 		public bool ReadOnly { get; set; }
+
 	}
 
 
@@ -62,4 +63,12 @@ namespace DataManager
 		}
 	}
 
+	public class ArrayEditorAttribute : EditorAttribute
+	{
+		public readonly int ArraySize;
+		public ArrayEditorAttribute(int arraySize)
+		{
+			ArraySize = arraySize;
+		}
+	}
 }

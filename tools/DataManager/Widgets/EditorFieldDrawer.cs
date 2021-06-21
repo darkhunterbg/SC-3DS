@@ -239,10 +239,21 @@ namespace DataManager.Widgets
 			return value;
 		}
 
+		static int[] vector2 = new int[2];
+
 		public static bool Vector2(string name, ref Vector2 value)
 		{
-			return ImGui.DragFloat2(name, ref value);
+			vector2[0] = (int)value.X;
+			vector2[1] = (int)value.Y;
+			bool changed = ImGui.DragInt2(name, ref vector2[0], 0.025f);
+			if (changed)
+			{
+				value.X = vector2[0];
+				value.Y = vector2[1];
+			}
+			return changed;
 		}
+
 		public static Vector2 Vector2(string name, Vector2 value, out bool result)
 		{
 			result = Vector2(name, ref value);

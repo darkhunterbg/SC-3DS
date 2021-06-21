@@ -37,6 +37,11 @@ namespace DataManager.Widgets
 
 				if (attr is ImageFrameEditorAttribute)
 					return ImageFrameEditor;
+
+				if (attr is ArrayEditorAttribute)
+				{
+					return ArrayEditor;
+				}
 			}
 
 
@@ -114,6 +119,32 @@ namespace DataManager.Widgets
 			frame = EditorFieldDrawer.ImageFrame(string.Empty, frame, out bool changed);
 			if (changed)
 				prop.SetValue(item, frame);
+
+			return changed;
+		}
+
+		private static bool ArrayEditor(PropertyInfo prop, EditorAttribute attr, object item)
+		{
+			ArrayEditorAttribute a = attr as ArrayEditorAttribute;
+
+			var arrayElemType = prop.PropertyType.GetElementType();
+
+			var editorProperties = arrayElemType.GetProperties().Where(t => t.GetCustomAttribute<EditorAttribute>() != null).ToList();
+			var array = prop.GetValue(item) as Array;
+			bool changed = false;
+
+			for (int i = 0; i < a.ArraySize; ++i)
+			{
+				if (array.GetValue(i) == null)
+					array.SetValue(Activator.CreateInstance(arrayElemType), i);
+
+
+				foreach (var p in editorProperties)
+				{
+					var pa = p.GetCustomAttribute<EditorAttribute>();
+					changed = GetPropertyDrawer(p, pa)(p, pa, array.GetValue(i));
+				}
+			}
 
 			return changed;
 		}

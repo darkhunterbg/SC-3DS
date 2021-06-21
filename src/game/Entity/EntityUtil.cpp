@@ -179,8 +179,8 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 		EntityUtil::PlayAnimation(e, def.Art.GetSprite().GetClips()[0]);
 
 
-	//if (def.Weapon)
-	//	em.UnitArchetype.WeaponComponents.NewComponent(e).FromDef(*def.Weapon);
+
+	em.UnitArchetype.WeaponComponents.NewComponent(e).FromAttack(def.Attacks[0]);
 
 	//if (def.MovementSpeed > 0) {
 	//	em.NavigationArchetype.NavigationComponents.NewComponent(e);

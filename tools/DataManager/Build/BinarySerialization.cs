@@ -1,8 +1,10 @@
 ﻿using DataManager.Assets;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,7 +18,8 @@ namespace DataManager.Build
 		Raw,
 		AssetRef,
 		Vector2,
-		ImageRef
+		ImageRef,
+		Array,
 	}
 
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
@@ -30,6 +33,8 @@ namespace DataManager.Build
 			Type = type;
 			Size = size;
 		}
+
+
 
 		public byte[] Serialize(object obj)
 		{
@@ -61,10 +66,13 @@ namespace DataManager.Build
 				return Serialize(obj, BinaryType.AssetRef, 2);
 
 			if (type == typeof(Vector2))
-				return Serialize(obj, BinaryType.Vector2, 4);
+				return Serialize(obj, BinaryType.Vector2, 2);
 
 			if (type == typeof(ImageListRef))
 				return Serialize(obj, BinaryType.ImageRef, 2);
+
+			if (type == typeof(Array))
+				return Serialize(obj, BinaryType.Array, ((Array)obj).GetLength(0));
 
 			return null;
 		}
@@ -72,6 +80,34 @@ namespace DataManager.Build
 		{
 			try
 			{
+				if (type == BinaryType.Array)
+				{
+					Array array = (Array)obj;
+					var arrayType = array.GetValue(0).GetType();
+					var props = arrayType.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(t => t.GetCustomAttribute<BinaryAttribute>() != null).ToList();
+					var attr = props.Select(s => s.GetCustomAttribute<BinaryAttribute>()).ToList();
+					MemoryStream stream = new MemoryStream(size * attr.Sum(s => s.Size));
+
+					for (int i = 0; i < size; ++i)
+					{
+						var o = array.GetValue(i);
+
+						for (int j = 0; j < props.Count; ++j)
+						{
+							var p = props[j];
+							var a = attr[j];
+							var bin = a.Serialize(p.GetValue(o));
+							stream.Write(bin);
+						}
+
+					}
+
+					stream.Position = 0;
+
+
+					return stream.ToArray();
+				}
+
 				if (type == BinaryType.Raw)
 				{
 					return (obj as IEnumerable<byte>).Take(size).ToArray();
@@ -93,9 +129,9 @@ namespace DataManager.Build
 				if (type == BinaryType.Vector2)
 				{
 					Vector2 v = (Vector2)obj;
-					byte[] data = new byte[size];
-					var a = IntSerialize(((int)v.X).ToString(), size / 2);
-					var b = IntSerialize(((int)v.Y).ToString(), size / 2);
+					byte[] data = new byte[size * 2];
+					var a = IntSerialize(((int)v.X).ToString(), size);
+					var b = IntSerialize(((int)v.Y).ToString(), size);
 					for (int i = 0; i < a.Length; ++i)
 						data[i] = a[i];
 					for (int i = 0; i < b.Length; ++i)

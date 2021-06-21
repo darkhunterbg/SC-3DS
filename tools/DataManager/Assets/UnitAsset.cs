@@ -9,8 +9,21 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
+	public class UnitAttack
+	{
+		[DefaultEditor]
+		[Binary(BinaryType.AssetRef, 2)]
+		[Optional, TypeConverter(typeof(Asset.AssetConverter))]
+		public WeaponAsset Weapon { get; set; }
+
+		[DefaultEditor]
+		[Binary(BinaryType.Vector2, 2)]
+		[Optional]
+		public Vector2 Range { get; set; }
+	}
+
 	[BinaryData(DataItemType.Units)]
-	public class UnitAsset : Asset , ITreeViewItem
+	public class UnitAsset : Asset, ITreeViewItem
 	{
 		public override string AssetName => Path;
 		public override GuiTexture Preview => Icon.Image?.Image;
@@ -73,7 +86,7 @@ namespace DataManager.Assets
 		public ImageListRef Shadow { get; set; } = ImageListRef.None;
 
 		[DefaultEditor]
-		[Binary(BinaryType.Vector2, 4)]
+		[Binary(BinaryType.Vector2, 2)]
 		[Optional]
 		public Vector2 ShadowOffset { get; set; }
 
@@ -95,17 +108,14 @@ namespace DataManager.Assets
 		[Optional]
 		public int Armor { get; set; } = 0;
 
-		[Section("Combat - Attack 1")]
-		[DefaultEditor]
-		[Binary(BinaryType.AssetRef, 2)]
-		[Optional, TypeConverter(typeof(AssetConverter))]
-		public WeaponAsset Weapon1 { get; set; }
+		[ArrayEditor(2, Name = "Attack")]
+		[Binary(BinaryType.Array, 2)]
+		public UnitAttack[] Attacks { get; set; } = new UnitAttack[2];
 
-		[Section("Combat - Attack 2")]
-		[DefaultEditor]
-		[Binary(BinaryType.AssetRef, 2)]
-		[Optional, TypeConverter(typeof(AssetConverter))]
-		public WeaponAsset Weapon2 { get; set; }
+		[Optional, HeaderPrefix("Attack1.")]
+		public UnitAttack Attack1 { get { return Attacks[0]; } set { Attacks[0] = value; } }
+		[Optional, HeaderPrefix("Attack2.")]
+		public UnitAttack Attack2 { get { return Attacks[1]; } set { Attacks[1] = value; } }
 
 		[Section("Stats")]
 		[DefaultEditor]
@@ -127,11 +137,12 @@ namespace DataManager.Assets
 
 		public override Asset Clone()
 		{
-			UnitAsset clone = (UnitAsset) base.Clone();
+			UnitAsset clone = (UnitAsset)base.Clone();
 			clone.UnitId = AssetId.New();
+			clone.Attacks = clone.Attacks.Select(s => Util.ShallowCopyProperties(s)).ToArray();
 			return clone;
 		}
 	}
 
-   
+
 }
