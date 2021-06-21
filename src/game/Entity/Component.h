@@ -357,9 +357,9 @@ struct UnitWeaponComponent {
 	uint8_t remainingCooldown = 0;
 
 	inline void FromDef(const WeaponDef& def) {
-		maxRange = def.MaxRange;
-		cooldown = def.Cooldown;
-		damage = def.Damage;
+		//maxRange = def.MaxRange;
+		//cooldown = def.Cooldown;
+		//damage = def.Damage;
 	}
 
 	inline void StartCooldown() {

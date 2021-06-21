@@ -23,6 +23,7 @@ namespace DataManager.Build
 		Upgrades = 9,
 		Effects = 10,
 		Wireframe = 11,
+		Weapons = 12,
 	}
 
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]

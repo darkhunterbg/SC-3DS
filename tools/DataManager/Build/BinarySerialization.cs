@@ -79,9 +79,9 @@ namespace DataManager.Build
 				if (type == BinaryType.AssetRef)
 				{
 					var asset = obj as Asset;
-					if (asset == null) return UIntSerialize("0", size);
+					if (asset == null) return IntSerialize("-1", size);
 					int index = AppGame.AssetManager.GetAssetDatabase(obj.GetType()).Assets.IndexOf(asset);
-					return UIntSerialize(index.ToString(), size);
+					return IntSerialize(index.ToString(), size);
 				}
 				if (type == BinaryType.ImageRef)
 				{

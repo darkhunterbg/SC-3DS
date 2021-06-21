@@ -49,6 +49,8 @@ GameDatabase* BinaryDataLoader::LoadDatabase(FILE* f)
 			break;
 		case DataSectionType::Wireframe:
 			LoadData(header.size, f, db->WireframeDefs); break;
+		case DataSectionType::Weapons:
+			LoadData(header.size, f, db->WeaponDefs); break;
 		default:
 			EXCEPTION("Unknown data section type %i at position %i", header.type, i);
 			break;

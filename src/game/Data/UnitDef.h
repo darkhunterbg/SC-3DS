@@ -16,7 +16,17 @@ struct UnitWireframeDef;
 
 typedef uint32_t UnitId;
 
+
 #pragma pack(push,2)
+
+struct UnitAttack {
+	int16_t WeaponId;
+
+	const WeaponDef* GetWeapon() const;
+	inline bool IsValid() const { return WeaponId >= 0; }
+};
+
+
 struct UnitDef {
 	char Path[32];
 	UnitId Id;
@@ -60,6 +70,8 @@ struct UnitDef {
 		uint16_t Armor;
 	} Combat;
 
+	UnitAttack Attacks[2];
+
 	struct UnitStats {
 		uint16_t Health;
 	} Stats;
@@ -69,6 +81,9 @@ struct UnitDef {
 
 		const UpgradeDef* GetArmorUpgrade() const;
 	} TechTree;
+
+	Span<UnitAttack> GetAttacks() const;
+
 	/*
 
 	uint16_t Id = 0;

@@ -47,3 +47,26 @@ const UpgradeDef* UnitDef::UnitTechTree::GetArmorUpgrade() const
 
 	return &GameDatabase::instance->UpgradeDefs[ArmorUpgrateId];
 }
+
+const WeaponDef* UnitAttack::GetWeapon() const
+{
+	if (WeaponId < 0)
+		return nullptr;
+
+	return &GameDatabase::instance->WeaponDefs[WeaponId];
+}
+
+Span<UnitAttack> UnitDef::GetAttacks() const
+{
+	if (Attacks[0].IsValid()) {
+		if (Attacks[1].IsValid())
+			return{ Attacks, 2 };
+
+		return { Attacks,1 };
+	}
+
+	if (Attacks[1].IsValid())
+		return { Attacks + 1, 1 };
+
+	return { Attacks,0 };
+}

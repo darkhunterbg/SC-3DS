@@ -352,6 +352,12 @@ void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, con
 		++infoCount;
 	}
 
+	for (const UnitAttack& atk : unit.def->GetAttacks()) {
+		info[infoCount].sprite = &atk.GetWeapon()->GetIcon();
+		info[infoCount].counter = 0;
+		++infoCount;
+	}
+
 	/*if (unit.def->Weapon) {
 		info[infoCount].sprite = &unit.def->Weapon->Icon;
 		info[infoCount].counter = 0;

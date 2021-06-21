@@ -322,5 +322,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\UpgradeDef.cpp">
       <Filter>Data</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\WeaponDef.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

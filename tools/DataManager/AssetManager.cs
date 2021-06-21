@@ -108,6 +108,7 @@ namespace DataManager
 			AddNewAssetDatabase<SpriteAsset>($"{GameDataDir}sprites.csv");
 			AddNewAssetDatabase<SpriteAnimClipAsset>($"{GameDataDir}animclips.csv");
 			AddNewAssetDatabase<AbilityAsset>($"{GameDataDir}abilities.csv");
+			AddNewAssetDatabase<WeaponAsset>($"{GameDataDir}weapons.csv");
 			AddNewAssetDatabase<EffectAsset>($"{GameDataDir}effects.csv");
 			AddNewAssetDatabase<UpgradeAsset>($"{GameDataDir}upgrades.csv");
 			AddNewAssetDatabase<UnitWireframeAsset>($"{GameDataDir}wireframes.csv");

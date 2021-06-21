@@ -95,16 +95,17 @@ namespace DataManager.Assets
 		[Optional]
 		public int Armor { get; set; } = 0;
 
-	
-		//[DefaultEditor]
-		//[Optional]
-		//[Binary(BinaryType.Int, 2)]
-		//public IconRef ArmorIcon { get; set; }
+		[Section("Combat - Attack 1")]
+		[DefaultEditor]
+		[Binary(BinaryType.AssetRef, 2)]
+		[Optional, TypeConverter(typeof(AssetConverter))]
+		public WeaponAsset Weapon1 { get; set; }
 
-		//[DefaultEditor]
-		//[Optional]
-		//[Binary(BinaryType.String, 32)]
-		//public string ArmorText { get; set; }
+		[Section("Combat - Attack 2")]
+		[DefaultEditor]
+		[Binary(BinaryType.AssetRef, 2)]
+		[Optional, TypeConverter(typeof(AssetConverter))]
+		public WeaponAsset Weapon2 { get; set; }
 
 		[Section("Stats")]
 		[DefaultEditor]

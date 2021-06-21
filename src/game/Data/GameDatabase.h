@@ -34,6 +34,7 @@ public:
 	std::vector<AbilityDef> AbilityDefs;
 	std::vector<UnitWireframeDef> WireframeDefs;
 	std::vector<UpgradeDef> UpgradeDefs;
+	std::vector<WeaponDef> WeaponDefs;
 
 	GameDatabase();
 	GameDatabase(const GameDatabase&) = delete;
