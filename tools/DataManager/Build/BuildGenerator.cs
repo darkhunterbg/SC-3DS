@@ -29,6 +29,7 @@ namespace DataManager.Build
 
 		public bool DrawAtlasOutiline { get; set; }
 		public bool Build3DS { get; set; }
+		public bool GenerateCSVImageData { get; set; }
 
 		int totalJobs = 0;
 		int currentJob = 0;
@@ -374,22 +375,22 @@ namespace DataManager.Build
 				++i;
 			}
 
-			using (var csv = new CsvWriter(new StreamWriter(AssetManager.ImagesDataPath), AssetManager.CsvConfig))
+			if (GenerateCSVImageData)
 			{
-				csv.WriteRecords(GeneratedImages);
-			}
+				using (var csv = new CsvWriter(new StreamWriter(AssetManager.ImagesDataPath), AssetManager.CsvConfig))
+				{
+					csv.WriteRecords(GeneratedImages);
+				}
 
+				using (var csv = new CsvWriter(new StreamWriter(AssetManager.FramesDataPath), AssetManager.CsvConfig))
+				{
+					csv.WriteRecords(GeneratedFrames);
+				}
 
-			using (var csv = new CsvWriter(new StreamWriter(AssetManager.FramesDataPath), AssetManager.CsvConfig))
-			{
-				csv.WriteRecords(GeneratedFrames);
-			}
-
-
-
-			using (var csv = new CsvWriter(new StreamWriter(AssetManager.SpriteAtlasDataPath), AssetManager.CsvConfig))
-			{
-				csv.WriteRecords(GeneratedSubAtlases);
+				using (var csv = new CsvWriter(new StreamWriter(AssetManager.SpriteAtlasDataPath), AssetManager.CsvConfig))
+				{
+					csv.WriteRecords(GeneratedSubAtlases);
+				}
 			}
 		}
 

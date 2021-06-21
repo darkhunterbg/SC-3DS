@@ -19,7 +19,7 @@ const Image& GameDatabase::GetImage(const std::string& path) const
 	return *r->second;
 }
 
-const ImageFrame& GameDatabase::GetCommandIcons(unsigned id) const
+const ImageFrame& GameDatabase::GetIcon(unsigned id) const
 {
 	return commandIcons->GetFrame(id);
 }

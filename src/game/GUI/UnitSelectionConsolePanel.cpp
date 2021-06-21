@@ -68,10 +68,10 @@ void UnitSelectionConsolePanel::Draw(GameViewContext& context)
 		if (unit.def->ProvideSupplyDoubled) {
 			DrawSupplyInfo(detailSpace, entityId, unit, context);
 		}
-		else if (!unit.def->IsBuilding) {
-			DrawUnitDetail(detailSpace, entityId, unit, context);
-		}
-		else if (unit.def->IsResourceContainer) {
+		else if (!unit.def->IsBuilding) {*/
+		DrawUnitDetail(detailSpace, entityId, unit, context);
+	}
+	/*	else if (unit.def->IsResourceContainer) {
 
 
 			if (data.resources > 0) {
@@ -84,8 +84,8 @@ void UnitSelectionConsolePanel::Draw(GameViewContext& context)
 				GraphicsRenderer::DrawText(*Game::SystemFont12, off, buffer, Colors::UILightGray);
 			}
 		}
-		*/
-	}
+		}*/
+
 }
 
 void UnitSelectionConsolePanel::UpdateSelection(GameViewContext& context)
@@ -346,13 +346,13 @@ void UnitSelectionConsolePanel::DrawUnitDetail(Rectangle space, EntityId id, con
 	int infoCount = 0;
 
 
-	/*if (unit.def->HasArmor()) {
-		info[infoCount].sprite = &unit.def->ArmorIcon;
+	if (unit.def->TechTree.GetArmorUpgrade() != nullptr) {
+		info[infoCount].sprite = &unit.def->TechTree.GetArmorUpgrade()->GetIcon();
 		info[infoCount].counter = 0;
 		++infoCount;
 	}
 
-	if (unit.def->Weapon) {
+	/*if (unit.def->Weapon) {
 		info[infoCount].sprite = &unit.def->Weapon->Icon;
 		info[infoCount].counter = 0;
 		++infoCount;

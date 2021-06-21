@@ -83,11 +83,11 @@ namespace DataManager.Build
 					int index = AppGame.AssetManager.GetAssetDatabase(obj.GetType()).Assets.IndexOf(asset);
 					return UIntSerialize(index.ToString(), size);
 				}
-				if(type == BinaryType.ImageRef)
+				if (type == BinaryType.ImageRef)
 				{
 					var img = obj == null ? ImageListRef.None : (ImageListRef)obj;
 					var i = img.Image;
-					int index = BuildGenerator.Instance.GeneratedImages.IndexOf(i=>i.List ==  img.Image);
+					int index = BuildGenerator.Instance.GeneratedImages.IndexOf(i => i.List == img.Image);
 					return IntSerialize(index.ToString(), size);
 				}
 				if (type == BinaryType.Vector2)
@@ -153,7 +153,9 @@ namespace DataManager.Build
 		}
 		private static byte[] IntSerialize(string text, int size)
 		{
-			int i = int.Parse(text);
+			int i = -1;
+			if (!string.IsNullOrEmpty(text))
+				i = int.Parse(text);
 
 			switch (size)
 			{

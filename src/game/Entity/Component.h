@@ -333,8 +333,8 @@ struct UnitHealthComponent {
 
 	inline bool IsDead() const { return current == 0; }
 	inline void FromDef(const UnitDef& def) {
-		current = max = def.Data.Health;
-		//armor = def.Armor;
+		current = max = def.Stats.Health;
+		armor = def.Combat.Armor;
 	}
 };
 

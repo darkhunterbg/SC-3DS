@@ -15,28 +15,35 @@ namespace DataManager.Assets
         public override GuiTexture Preview => Icon.Image?.Image;
 
         [Index(0)]
-        [Binary(BinaryType.String, 32)]
         public string Path { get; set; }
 
         [Optional]
         [Binary(BinaryType.UInt, 4)]
-        public AssetId UpdateId { get; set; }
+        public AssetId UpgradeId { get; set; }
+
+        [Section("Art")]
 
         [DefaultEditor]
         [Optional]
         [Binary(BinaryType.UInt, 2)]
         public IconRef Icon { get; set; } = IconRef.None;
 
+        [Section("Text")]
+
+        [DefaultEditor]
+        [Optional]
+        [Binary(BinaryType.String, 32)]
+        public string Name { get; set; } = string.Empty;
 
         public UpgradeAsset() : base()
         {
-            UpdateId = AssetId.New();
+            UpgradeId = AssetId.New();
         }
 
         public override Asset Clone()
         {
             UpgradeAsset clone = (UpgradeAsset)base.Clone();
-            clone.UpdateId = AssetId.New();
+            clone.UpgradeId = AssetId.New();
             return clone;
         }
     }

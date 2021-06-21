@@ -5,6 +5,7 @@
 #include "AssetDataDefs.h"
 #include "UnitDef.h"
 #include "AbilityDef.h"
+#include "UpgradeDef.h"
 #include "../Assets.h"
 #include <algorithm>
 #include <unordered_map>
@@ -32,6 +33,7 @@ public:
 	std::vector<UnitDef> UnitDefs;
 	std::vector<AbilityDef> AbilityDefs;
 	std::vector<UnitWireframeDef> WireframeDefs;
+	std::vector<UpgradeDef> UpgradeDefs;
 
 	GameDatabase();
 	GameDatabase(const GameDatabase&) = delete;
@@ -42,7 +44,7 @@ public:
 
 
 	const Image& GetImage(const std::string& path) const;
-	const ImageFrame& GetCommandIcons(unsigned id) const;
+	const ImageFrame& GetIcon(unsigned id) const;
 
 	const UnitDef* GetUnit(const char* path) const;
 	const UnitDef* GetUnit(UnitId id) const;

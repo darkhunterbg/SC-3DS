@@ -3,5 +3,5 @@
 
 const ImageFrame& AbilityDef::Art::GetIcon() const
 {
-	return GameDatabase::instance->GetCommandIcons(IconId);
+	return GameDatabase::instance->GetIcon(IconId);
 }

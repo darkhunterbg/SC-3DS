@@ -580,6 +580,7 @@ namespace DataManager.Widgets
 
 			node.Parent.Children.Remove(node);
 			dst.Children.Add(node);
+			node.Parent = dst;
 			dst.UpdateItemPath(root);
 
 			ItemModified = true;

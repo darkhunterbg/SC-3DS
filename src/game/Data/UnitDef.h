@@ -7,6 +7,7 @@
 #include "../MathLib.h"
 #include "SoundDef.h"
 #include "WeaponDef.h"
+#include "UpgradeDef.h"
 
 #include <cstring>
 
@@ -55,11 +56,19 @@ struct UnitDef {
 
 	} Art;
 
-	struct UnitData {
+	struct UnitCombat {
+		uint16_t Armor;
+	} Combat;
+
+	struct UnitStats {
 		uint16_t Health;
-	} Data;
+	} Stats;
 
+	struct UnitTechTree {
+		int16_t ArmorUpgrateId;
 
+		const UpgradeDef* GetArmorUpgrade() const;
+	} TechTree;
 	/*
 
 	uint16_t Id = 0;

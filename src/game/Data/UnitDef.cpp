@@ -8,7 +8,7 @@ const SpriteDef& UnitDef::UnitArt::GetSprite() const
 
 const ImageFrame& UnitDef::UnitArt::GetIcon() const
 {
-	return GameDatabase::instance->GetCommandIcons(IconId);
+	return GameDatabase::instance->GetIcon(IconId);
 }
 
 const Image* UnitDef::UnitArt::GetShadowImage() const
@@ -38,4 +38,12 @@ const UnitWireframeDef* UnitDef::UnitArt::GetWireframe() const
 		return nullptr;
 
 	return &GameDatabase::instance->WireframeDefs[WireframeId];
+}
+
+const UpgradeDef* UnitDef::UnitTechTree::GetArmorUpgrade() const
+{
+	if (ArmorUpgrateId < 0)
+		return nullptr;
+
+	return &GameDatabase::instance->UpgradeDefs[ArmorUpgrateId];
 }

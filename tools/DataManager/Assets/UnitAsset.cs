@@ -88,11 +88,36 @@ namespace DataManager.Assets
 		[TypeConverter(typeof(AssetConverter))]
 		public UnitWireframeAsset Wireframe { get; set; }
 
+
 		[Section("Combat")]
 		[DefaultEditor]
 		[Binary(BinaryType.UInt, 2)]
 		[Optional]
+		public int Armor { get; set; } = 0;
+
+	
+		//[DefaultEditor]
+		//[Optional]
+		//[Binary(BinaryType.Int, 2)]
+		//public IconRef ArmorIcon { get; set; }
+
+		//[DefaultEditor]
+		//[Optional]
+		//[Binary(BinaryType.String, 32)]
+		//public string ArmorText { get; set; }
+
+		[Section("Stats")]
+		[DefaultEditor]
+		[Binary(BinaryType.UInt, 2)]
+		[Optional]
 		public int Health { get; set; } = 100;
+
+		[Section("Tech Tree")]
+		[DefaultEditor]
+		[Binary(BinaryType.AssetRef, 2)]
+		[Optional, TypeConverter(typeof(AssetConverter))]
+		public UpgradeAsset ArmorType { get; set; }
+
 
 		public UnitAsset() : base()
 		{
