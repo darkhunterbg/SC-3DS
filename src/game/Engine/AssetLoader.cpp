@@ -87,14 +87,24 @@ static AudioClip* LoadAudioClipFromFile(const char* path) {
 	FILE* f = Platform::OpenAsset(p.data());
 
 	if (f == nullptr)
-		EXCEPTION("Failed to open asset '%s'!", p.data());
+		EXCEPTION("Failed to open asset '%s': errno %i!", p.data());
 
 	AudioInfo info;
 
 	if (!WaveLoader::ReadWAVHeader(f, &info))
 		EXCEPTION("Failed to read WAV header in '%s'!", p.data());
 
-	AudioClip* stream = new AudioClip(info, AudioStreamBufferSize, f);
+	AudioClip* stream = nullptr;
+
+	if (info.GetTotalSize() < 1024 * 200) {
+		stream = new AudioClip(info, f);
+
+		fclose(f);
+
+	}
+	else {
+		stream = new AudioClip(info, AudioStreamBufferSize, f);
+	}
 
 	stream->id = ++audioClipId;
 

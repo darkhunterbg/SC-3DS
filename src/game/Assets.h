@@ -151,6 +151,13 @@ public:
 	AudioClip(const AudioClip&) = delete;
 	AudioClip& operator=(const AudioClip&) = delete;
 
+	/// <summary>
+	/// Create unbuffered clip (all data will be loaded in memory)
+	/// </summary>
+	AudioClip(AudioInfo info, FILE* stream);
+	/// <summary>
+	/// Create buffered clip (data will be streamed between 2 buffers)
+	/// </summary>
 	AudioClip(AudioInfo info, unsigned bufferSize, FILE* stream);
 	~AudioClip();
 

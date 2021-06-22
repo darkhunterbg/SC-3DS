@@ -7,6 +7,12 @@
 #include <stdio.h>
 
 bool AudioClip::FillNextBuffer() {
+	if (stream == nullptr) {
+		activeBufferIndex = 0;
+		activeBufferSize = buffers[activeBufferIndex].Size();
+		streamPos = activeBufferSize;
+		return true;
+	}
 
 	activeBufferIndex = (activeBufferIndex + 1) % BufferCount;
 	Span<uint8_t> buffer = buffers[activeBufferIndex];
@@ -31,6 +37,12 @@ bool AudioClip::FillNextBuffer() {
 
 bool AudioClip::Restart() {
 
+	if (stream == nullptr) {
+		streamPos = 0;
+		return true;
+	}
+
+
 	bool success = fseek(stream, 0, SEEK_SET);
 
 	if (success)
@@ -40,7 +52,6 @@ bool AudioClip::Restart() {
 }
 
 AudioClip::AudioClip(AudioInfo info, unsigned bufferSize, FILE* stream) {
-
 	this->info = info;
 	uint8_t* memory = new uint8_t[bufferSize * BufferCount];
 	this->stream = stream;
@@ -49,9 +60,22 @@ AudioClip::AudioClip(AudioInfo info, unsigned bufferSize, FILE* stream) {
 	}
 	activeBufferSize = 0;
 }
+AudioClip::AudioClip(AudioInfo info, FILE* stream) {
+	this->info = info;
+	uint8_t* memory = new uint8_t[info.GetTotalSize()];
+	this->stream = nullptr;
+	fread(memory, sizeof(uint8_t), info.GetTotalSize(), stream);
+	buffers[0] = { memory, (unsigned)info.GetTotalSize() };
+	buffers[1] = { memory, 0 };
+	activeBufferIndex = 0;
+	activeBufferSize = buffers[0].Size();
+}
 
 AudioClip::~AudioClip()
 {
+	if (stream != nullptr)
+		fclose(stream);
+
 	delete[] buffers[0].Data();
 }
 
@@ -77,7 +101,7 @@ Image::Image(const ImageFrame* frameStart, const ImageDef& def)
 	size(def.size),
 	frameStart(frameStart),
 	frameCount(def.frameCount)
-	,colorMaskOffset (def.colorMaskOffset)
+	, colorMaskOffset(def.colorMaskOffset)
 {
 
 }
