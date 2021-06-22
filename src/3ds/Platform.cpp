@@ -411,6 +411,7 @@ void Platform::UpdatePointerState(PointerState& state) {
 
 FILE* Platform::OpenAsset(const char* path) {
 	std::string f = assetDir + path;
+	std::replace(f.begin(), f.end(), '\\', '/');
 
 	return fopen(f.data(), "rb");
 }
