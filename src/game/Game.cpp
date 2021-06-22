@@ -65,7 +65,7 @@ void Game::Start() {
 	SystemFont12 = AssetLoader::LoadFont("font.bcfnt",12);
 	SystemFont10 = AssetLoader::LoadFont("font.bcfnt", 10);
 	SystemFont8 = AssetLoader::LoadFont("font.bcfnt", 8);
-	ButtonAudio = AssetLoader::LoadAudioClip("sound/misc/button.wav");
+	ButtonAudio = AssetLoader::LoadAudioClip("sound\\misc\\button");
 	title = AssetLoader::LoadTexture("glue\\title");
 	startup = true;
 	frameStartTime = Platform::ElaspedTime();

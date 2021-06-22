@@ -21,7 +21,9 @@ enum class DataSectionType : uint32_t
 	Upgrades = 9,
 	Effects = 10,
 	Wireframe = 11,
-	Weapons = 12
+	Weapons = 12,
+	SoundSets = 13,
+	AudioClips = 14,
 };
 
 

@@ -24,6 +24,8 @@ namespace DataManager.Build
 		Effects = 10,
 		Wireframe = 11,
 		Weapons = 12,
+		SoundSets = 13,
+		AudioClips = 14
 	}
 
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]

@@ -101,7 +101,9 @@ AudioStream* AssetLoader::LoadAudioStream(const char* path)
 static uint16_t audioClipId = 0;
 
 static AudioClip LoadAudioClipFromFile(const char* path) {
-	FILE* f = Platform::OpenAsset(path);
+	std::string p = path;
+	p += ".wav";
+	FILE* f = Platform::OpenAsset(p.data());
 
 	if (f == nullptr)
 		EXCEPTION("Failed to open asset '%s'!", path);

@@ -452,10 +452,17 @@ namespace DataManager.Build
 				instructionData.AddRange(clip.Instructions.Select(s => new AnimClipInstructionData(clip, s)));
 			}
 
-			//foreach(var asset in AppGame.AssetManager.GetAssetDatabase<SpriteAsset>().Assets)
-			//{
-			//    asset._ImageListIndex = GeneratedImages.IndexOf(i => i.List == asset.Image.Image);
-			//}
+			List<AudioClip> audioClipsData = new List<AudioClip>();
+
+			foreach (var asset in AppGame.AssetManager.GetAssets<SoundSetAsset>())
+			{
+				asset._ClipStart = audioClipsData.Count;
+				var items = asset.Clips.Where(s => !s.IsEmpty && s.Clip != null);
+				audioClipsData.AddRange(items.Select(s=>s.Clip));
+				asset._ClipCount = items.Count();
+			}
+
+
 
 			List<DataItem> data = new List<DataItem>();
 			data.Add(new DataItem()
@@ -477,6 +484,11 @@ namespace DataManager.Build
 			{
 				Name = "Animation Instructions",
 				Data = instructionData,
+			});
+			data.Add(new DataItem()
+			{
+				Name = "Audio Clips",
+				Data = audioClipsData.Select(s => (object)s)
 			});
 
 

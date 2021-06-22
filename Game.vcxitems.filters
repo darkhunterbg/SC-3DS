@@ -181,6 +181,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\UpgradeDef.h">
       <Filter>Data</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\SoundSetDef.h">
+      <Filter>Data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -323,6 +326,9 @@
       <Filter>Data</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\WeaponDef.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\SoundSetDef.cpp">
       <Filter>Data</Filter>
     </ClCompile>
   </ItemGroup>

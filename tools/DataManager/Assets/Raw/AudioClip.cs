@@ -1,6 +1,7 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
+using DataManager.Build;
 using Microsoft.Xna.Framework.Audio;
 using System;
 using System.Collections.Generic;
@@ -10,10 +11,14 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets.Raw
 {
+	[BinaryData(DataItemType.AudioClips)]
 	public class AudioClip
 	{
 		public readonly string FilePath;
+
 		public readonly string RelativePath;
+
+		[Binary(BinaryType.String, 32)]
 		public string Key => RelativePath;
 
 		private SoundEffectInstance _effect;
@@ -45,7 +50,11 @@ namespace DataManager.Assets.Raw
 	public struct AudioClipRef
 	{
 		public readonly string Id;
+
 		public readonly AudioClip Clip;
+
+
+		public bool IsEmpty => string.IsNullOrEmpty(Id);
 
 		public static readonly AudioClipRef None = new AudioClipRef(null);
 

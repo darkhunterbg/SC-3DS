@@ -6,7 +6,7 @@
 
 #include "../Data/RaceDef.h"
 #include "../MathLib.h"
-
+#include "../Data/SoundSetDef.h"
 
 #include "../Engine/AudioManager.h"
 
@@ -229,21 +229,21 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 	if (newRequest) {
 		if (em.UnitArchetype.Archetype.HasEntity(currentChat.id)) {
 			const UnitDef* def = em.UnitArchetype.UnitComponents.GetComponent(currentChat.id).def;
-			const UnitSound* sound = nullptr;
+			const SoundSetDef* sound = nullptr;
 
-			/*
+		
 			switch (currentChat.type)
 			{
 			case UnitChatType::Command: {
-				if (def->Sounds.Yes.TotalClips) {
-					sound = &def->Sounds.Yes;
+				if (def->Sounds.GetYesSound()) {
+					sound = def->Sounds.GetYesSound();
 					sameUnitCounter = 0;
 				}
 				break;
 			}
 			case UnitChatType::Ready: {
-				if (def->Sounds.Ready.TotalClips) {
-					sound = &def->Sounds.Ready;
+				if (def->Sounds.GetReadySound()) {
+					sound = def->Sounds.GetReadySound();
 					sameUnitCounter = 0;
 				}
 				break;
@@ -251,16 +251,16 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 			case UnitChatType::Select: {
 
 				if (sameUnitCounter >= 5 &&
-					(sameUnitCounter - 5) < def->Sounds.Annoyed.TotalClips)
+					(sameUnitCounter - 5) < def->Sounds.GetAnnoyedSound()->ClipCount)
 				{
-					sound = &def->Sounds.Annoyed;
+					sound = def->Sounds.GetAnnoyedSound();
 				}
 				else {
-					if (def->Sounds.What.TotalClips) {
-						sound = &def->Sounds.What;
+					if (def->Sounds.GetWhatSound()) {
+						sound = def->Sounds.GetWhatSound();
 					}
 				}
-				if (sameUnitCounter - 5 >= def->Sounds.Annoyed.TotalClips)
+				if (sameUnitCounter - 5 >= def->Sounds.GetAnnoyedSound()->ClipCount)
 					sameUnitCounter = 0;
 
 				break;
@@ -268,7 +268,7 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 			default:
 				break;
 			}
-			*/
+		
 
 			if (sound) {
 				int i = 0;
@@ -277,12 +277,12 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 				else
 				{
 					std::srand(seed);
-					i = std::rand() % sound->TotalClips;
+					i = std::rand() % sound->ClipCount;
 					seed = std::rand();
 				}
 
-				AudioManager::PlayClip(sound->Clips[i], channel.channel->ChannelId);
-				channel.clipId = sound->Clips[i].id;
+				AudioManager::PlayClip(sound->GetAudioClip(i), channel.channel->ChannelId);
+				channel.clipId = sound->GetAudioClip(i).id;
 
 			}
 		}

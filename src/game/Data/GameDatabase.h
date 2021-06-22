@@ -6,6 +6,8 @@
 #include "UnitDef.h"
 #include "AbilityDef.h"
 #include "UpgradeDef.h"
+#include "SoundSetDef.h"
+
 #include "../Assets.h"
 #include <algorithm>
 #include <unordered_map>
@@ -14,6 +16,7 @@ class GameDatabase {
 private:
 	std::vector<ImageFrame> frames;
 	std::vector<Image> images;
+	std::vector<AudioClip> audioClips;
 
 	const Image* commandIcons;
 	std::vector<const Image*> selections;
@@ -27,6 +30,7 @@ public:
 	std::vector<AtlasDef> AtlasDefs;
 	std::vector<ImageDef> ImageDefs;
 	std::vector<ImageFrameDef> FrameDefs;
+	std::vector<AudioClipDef> AudioClipDefs;
 	std::vector<SpriteDef> SpriteDefs;
 	std::vector<AnimClipDef> AnimClipDefs;
 	std::vector<AnimInstructionDef> AnimInstructionDefs;
@@ -35,6 +39,7 @@ public:
 	std::vector<UnitWireframeDef> WireframeDefs;
 	std::vector<UpgradeDef> UpgradeDefs;
 	std::vector<WeaponDef> WeaponDefs;
+	std::vector<SoundSetDef> SoundSetDefs;
 
 	GameDatabase();
 	GameDatabase(const GameDatabase&) = delete;
@@ -52,6 +57,8 @@ public:
 
 	const AbilityDef* GetAbility(const char* path) const;
 	const AbilityDef* GetAbility(AbilityId id) const;
+
+	inline const AudioClip& GetAudioClip(unsigned id) const { return audioClips[id]; }
 
 	void LoadAssetReferences();
 };

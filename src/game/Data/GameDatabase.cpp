@@ -69,8 +69,15 @@ void GameDatabase::LoadAssetReferences()
 		textures.push_back(tex);
 	}
 
+	audioClips.reserve(AudioClipDefs.size());
+	for (const AudioClipDef& clipDef : AudioClipDefs) {
+		AudioClip clip = AssetLoader::LoadAudioClip(clipDef.path);
+		audioClips.push_back(clip);
+	}
+
 	images.reserve(ImageDefs.size());
 	frames.reserve(frames.size());
+
 
 	for (const ImageFrameDef& frameDef : FrameDefs) {
 		const Texture* tex = textures[frameDef.atlasId];

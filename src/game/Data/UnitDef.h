@@ -13,6 +13,7 @@
 
 struct SpriteDef;
 struct UnitWireframeDef;
+struct SoundSetDef;
 
 typedef uint32_t UnitId;
 
@@ -26,6 +27,18 @@ struct UnitAttack {
 	const WeaponDef* GetWeapon() const;
 	inline bool IsValid() const { return WeaponId >= 0; }
 
+};
+
+struct UnitSounds {
+	int16_t ReadySoundId;
+	int16_t YesSoundId;
+	int16_t WhatSoundId;
+	int16_t AnnoyedSoundId;
+
+	const SoundSetDef* GetReadySound() const;
+	const SoundSetDef* GetYesSound() const;
+	const SoundSetDef* GetWhatSound() const;
+	const SoundSetDef* GetAnnoyedSound() const;
 };
 
 
@@ -89,11 +102,13 @@ struct UnitDef {
 		const UpgradeDef* GetArmorUpgrade() const;
 	} TechTree;
 
+	UnitSounds Sounds;
+
 	Span<UnitAttack> GetAttacks() const;
 	inline bool HasMovement() const {
 		return Movement.MaxVelocity > 0;
 	}
-	
+
 
 	/*
 

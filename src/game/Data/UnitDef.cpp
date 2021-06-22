@@ -70,3 +70,35 @@ Span<UnitAttack> UnitDef::GetAttacks() const
 
 	return { Attacks,0 };
 }
+
+const SoundSetDef* UnitSounds::GetReadySound() const
+{
+	if (ReadySoundId < 0)
+		return nullptr;
+
+	return &GameDatabase::instance->SoundSetDefs[ReadySoundId];
+}
+
+const SoundSetDef* UnitSounds::GetYesSound() const
+{
+	if (YesSoundId < 0)
+		return nullptr;
+
+	return &GameDatabase::instance->SoundSetDefs[YesSoundId];
+}
+
+const SoundSetDef* UnitSounds::GetWhatSound() const
+{
+	if (WhatSoundId < 0)
+		return nullptr;
+
+	return &GameDatabase::instance->SoundSetDefs[WhatSoundId];
+}
+
+const SoundSetDef* UnitSounds::GetAnnoyedSound() const
+{
+	if (AnnoyedSoundId < 0)
+		return nullptr;
+
+	return &GameDatabase::instance->SoundSetDefs[AnnoyedSoundId];
+}

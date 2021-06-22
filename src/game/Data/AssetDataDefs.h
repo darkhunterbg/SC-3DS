@@ -56,6 +56,10 @@ struct ImageFrameDef {
 	uint8_t atlasId;
 };
 
+struct AudioClipDef {
+	char path[32];
+};
+
 struct AnimClipDef {
 	uint16_t spriteId;
 	uint32_t instructionStart;
