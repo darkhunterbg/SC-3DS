@@ -39,13 +39,6 @@ enum class TimerExpiredAction : uint8_t {
 
 static constexpr const int TimerExpiredActionTypeCount = 5;
 
-enum UnitChatType {
-	None = 0,
-	Select = 1,
-	Command = 2,
-	Ready = 3,
-	Advisor = 4,
-};
 
 enum AdvisorErrorMessageType {
 	NotEnoughMinerals = 0,

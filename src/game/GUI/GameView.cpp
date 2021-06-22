@@ -24,6 +24,8 @@ static std::vector<PlayerEvent> newEvents;
 
 static constexpr const int MessageTimer = 60 * 3;
 
+static constexpr const int PreAnnoyedClickCount = 5;
+
 GameView::GameView(EntityManager& em, Vector2Int16 mapSizePixels)
 {
 	cursor = new Cursor();
@@ -85,7 +87,9 @@ void GameView::ProcessEvents()
 		switch (ev.type)
 		{
 		case PlayerEventType::NewUnit: {
-			context.GetEntityManager().GetSoundSystem().PlayUnitChat(ev.source, UnitChatType::Ready);
+			const auto& def = *context.GetEntityManager().UnitArchetype.UnitComponents.GetComponent(ev.source).def;
+
+			context.GetEntityManager().GetSoundSystem().PlayUnitReady(ev.source, def);
 			break;
 		}
 		case PlayerEventType::NotEnoughSupply: {
@@ -217,7 +221,7 @@ void GameView::ContextualGamepadInput() {
 	}
 
 	if (commandTrigged) {
-		context.PlayUnitSelectedAudio(UnitChatType::Command);
+		context.PlayUnitCommandAudio();
 
 		if (commandHasTarget) {
 			if (entity != Entity::None)

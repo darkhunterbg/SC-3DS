@@ -9,5 +9,5 @@ const AudioClip& SoundSetDef::GetAudioClip(int index) const
 Span<AudioClip> SoundSetDef::GetAudioClips() const
 {
 	const AudioClip* start = &GameDatabase::instance->GetAudioClip(ClipStart);
-	return { start, ClipStart };
+	return { start, ClipCount };
 }

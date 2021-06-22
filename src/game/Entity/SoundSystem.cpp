@@ -7,10 +7,13 @@
 #include "../Data/RaceDef.h"
 #include "../MathLib.h"
 #include "../Data/SoundSetDef.h"
+#include "../Data/UnitDef.h"
 
 #include "../Engine/AudioManager.h"
 
 #include <algorithm>
+
+static constexpr const int PreAnnoyedChatCount = 5;
 
 
 SoundSystem::SoundSystem()
@@ -30,7 +33,7 @@ SoundSystem::SoundSystem()
 	chatAudioChannel.channel = &channels[channels.Size() - 2];
 	uiAudioChannel.channel = &channels[channels.Size() - 1];
 
-	seed = std::rand();
+	rnd = Random(std::rand());
 }
 
 bool SoundSystem::EntityAudioSort(const EntityPriorityAudio& a, EntityPriorityAudio& b) {
@@ -177,11 +180,32 @@ void SoundSystem::UpdateEntityAudio(const Camera& camera, EntityManager& em)
 
 }
 
-void SoundSystem::PlayUnitChat(EntityId id, UnitChatType type)
-{
-	newChatRequest = { type, id };
-}
 
+void SoundSystem::PlayUnitReady(EntityId id, const UnitDef& unit) {
+	newChatRequest = { unit.Sounds.GetReadySound(), id };
+}
+void SoundSystem::PlayUnitSelect(EntityId id, const UnitDef& unit) {
+
+	if (currentChat.id == id) {
+		if (unit.Sounds.GetAnnoyedSound()) {
+			int annoyedCount = unit.Sounds.GetAnnoyedSound()->ClipCount;
+			if (sameUnitClipFinished >= PreAnnoyedChatCount + annoyedCount)
+				sameUnitClipFinished = 0;
+
+			if (sameUnitClipFinished >= PreAnnoyedChatCount) {
+				newChatRequest = { unit.Sounds.GetAnnoyedSound(), id };
+				return;
+			}
+		}
+	}
+
+	newChatRequest = { unit.Sounds.GetWhatSound(), id };
+
+
+}
+void SoundSystem::PlayUnitCommand(EntityId id, const UnitDef& unit) {
+	newChatRequest = { unit.Sounds.GetYesSound(), id };
+}
 void SoundSystem::PlayAdviserErrorMessage(const RaceDef& race, AdvisorErrorMessageType message)
 {
 	auto& clip = race.AdvisorErrorSounds.Clips[(int)message];
@@ -195,110 +219,90 @@ void SoundSystem::PlayAdviserErrorMessage(const RaceDef& race, AdvisorErrorMessa
 	if (clip.id == channel.clipId)
 		return;
 
-
-	currentChat.type = UnitChatType::Advisor;
 	channel.clipId = clip.id;
 
 	AudioManager::PlayClip(clip, channel.channel->ChannelId);
 }
-
 void SoundSystem::PlayUISound(const AudioClip& clip)
 {
 	AudioManager::PlayClip(clip, uiAudioChannel.channel->ChannelId);
 }
 
+void SoundSystem::RegenerateSoundQueue(const SoundSetDef& def) {
+	chatSoundQueue.clear();
+	for (const auto& audio : def.GetAudioClips())
+		chatSoundQueue.push_back(audio);
+
+	if (def.Randomize) {
+
+		for (int i = 0; i < chatSoundQueue.size() - 1; ++i) {
+			int j = rnd.Next(i, chatSoundQueue.size());
+			AudioClip swap = chatSoundQueue[i];
+			chatSoundQueue[i] = chatSoundQueue[j];
+			chatSoundQueue[j] = swap;
+		}
+	}
+
+}
+
 void SoundSystem::UpdateChatRequest(EntityManager& em)
 {
 	bool newRequest = false;
+	bool sameUnit = currentChat.id == newChatRequest.id;
+
+	auto& channel = chatAudioChannel;
+
 
 	if (newChatRequest.id != Entity::None &&
-		(currentChat.id != newChatRequest.id || currentChat.type != newChatRequest.type)) {
+		(!sameUnit || currentChat.sound != newChatRequest.sound ||
+			channel.channel->IsDone())) {
 
-		if (currentChat.id == newChatRequest.id)
-			sameUnitCounter++;
-		else
-			sameUnitCounter = 0;
+		if (currentChat.sound != newChatRequest.sound || !sameUnit) {
+			chatSoundQueue.clear();
+		}
+
+		if (!sameUnit)
+			sameUnitClipFinished = 0;
+
 		currentChat = newChatRequest;
 		newRequest = true;
 	}
 
-	newChatRequest = { UnitChatType::None, Entity::None, };
+	newChatRequest = { nullptr, Entity::None, };
 
-	auto& channel = chatAudioChannel;
 
-	if (newRequest) {
-		if (em.UnitArchetype.Archetype.HasEntity(currentChat.id)) {
-			const UnitDef* def = em.UnitArchetype.UnitComponents.GetComponent(currentChat.id).def;
-			const SoundSetDef* sound = nullptr;
+	if (newRequest && currentChat.sound) {
 
-		
-			switch (currentChat.type)
-			{
-			case UnitChatType::Command: {
-				if (def->Sounds.GetYesSound()) {
-					sound = def->Sounds.GetYesSound();
-					sameUnitCounter = 0;
-				}
-				break;
-			}
-			case UnitChatType::Ready: {
-				if (def->Sounds.GetReadySound()) {
-					sound = def->Sounds.GetReadySound();
-					sameUnitCounter = 0;
-				}
-				break;
-			}
-			case UnitChatType::Select: {
+		AudioClip play;
 
-				if (sameUnitCounter >= 5 &&
-					(sameUnitCounter - 5) < def->Sounds.GetAnnoyedSound()->ClipCount)
-				{
-					sound = def->Sounds.GetAnnoyedSound();
-				}
-				else {
-					if (def->Sounds.GetWhatSound()) {
-						sound = def->Sounds.GetWhatSound();
-					}
-				}
-				if (sameUnitCounter - 5 >= def->Sounds.GetAnnoyedSound()->ClipCount)
-					sameUnitCounter = 0;
-
-				break;
-			}
-			default:
-				break;
-			}
-		
-
-			if (sound) {
-				int i = 0;
-				if (sameUnitCounter >= 5)
-					i = sameUnitCounter - 5;
-				else
-				{
-					std::srand(seed);
-					i = std::rand() % sound->ClipCount;
-					seed = std::rand();
-				}
-
-				AudioManager::PlayClip(sound->GetAudioClip(i), channel.channel->ChannelId);
-				channel.clipId = sound->GetAudioClip(i).id;
-
-			}
+		if (chatSoundQueue.size() == 0) {
+			RegenerateSoundQueue(*currentChat.sound);
 		}
+
+		play = chatSoundQueue.front();
+		chatSoundQueue.erase(chatSoundQueue.begin());
+
+		AudioManager::PlayClip(play, channel.channel->ChannelId);
+		channel.clipId = play.id;
+
 
 	}
 
-	if (currentChat.type != UnitChatType::None) {
 
-		if (channel.channel->IsDone()) {
-			currentChat = { UnitChatType::None, currentChat.id };
+	if (currentChat.sound != nullptr) {
+
+		if (channel.channel->IsDone() && channel.clipId != 0xFFFF) {
+
+			++sameUnitClipFinished;
+
+			//currentChat = { currentChat.sound, currentChat.id };
 			channel.clipId = 0xFFFF;
 		}
 		else {
 			if (!em.UnitArchetype.Archetype.HasEntity(currentChat.id)) {
-				currentChat = { UnitChatType::None, Entity::None };
+				currentChat = { nullptr, Entity::None };
 				AudioManager::StopChannel(channel.channel->ChannelId);
+				sameUnitClipFinished = 0;
 				channel.clipId = 0xFFFF;
 			}
 		}

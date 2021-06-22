@@ -91,7 +91,8 @@ public:
 
 	Color GetAlliedUnitColor(EntityId id) const;
 
-	void PlayUnitSelectedAudio(UnitChatType type);
+	void PlayUnitSelectedAudio();
+	void PlayUnitCommandAudio();
 
 	const RaceDef& GetPlayerRaceDef() const;
 

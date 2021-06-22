@@ -4,8 +4,10 @@
 #include "../Entity/EntityUtil.h"
 #include "../Debug.h"
 #include "../Data/RaceDatabase.h"
+#include "../Data/SoundSetDef.h"
 
 #include <algorithm>
+
 
 void GameViewContext::ActivateAbility(const AbilityDef* ability)
 {
@@ -172,7 +174,7 @@ void GameViewContext::SelectUnitsInRegion(const Rectangle16 region)
 		}
 
 		if (HasSelectionControl())
-			PlayUnitSelectedAudio(UnitChatType::Select);
+			PlayUnitSelectedAudio();
 
 		selectionColor = GetAlliedUnitColor(selection[0]);
 
@@ -190,7 +192,7 @@ void GameViewContext::SelectUnitAtPosition(Vector2Int16 position)
 		selection.AddEntity(id);
 
 		if (HasSelectionControl())
-			PlayUnitSelectedAudio(UnitChatType::Select);
+			PlayUnitSelectedAudio();
 
 		selectionColor = GetAlliedUnitColor(selection[0]);
 
@@ -239,7 +241,7 @@ bool GameViewContext::HasSelectionControl() const
 	return UnitEntityUtil::IsAlly(player, selection[0]);
 }
 
-void GameViewContext::PlayUnitSelectedAudio(UnitChatType type)
+void GameViewContext::PlayUnitSelectedAudio()
 {
 	EntityId id = GetPriorityUnitSelected();
 
@@ -247,7 +249,21 @@ void GameViewContext::PlayUnitSelectedAudio(UnitChatType type)
 		EXCEPTION("Tried to play audio for entity id none in group!");
 	}
 
-	GetEntityManager().GetSoundSystem().PlayUnitChat(id, type);
+	const auto& def = *GetEntityManager().UnitArchetype.UnitComponents.GetComponent(id).def;
+
+	GetEntityManager().GetSoundSystem().PlayUnitSelect(id, def);
+
+}
+void GameViewContext::PlayUnitCommandAudio() {
+	EntityId id = GetPriorityUnitSelected();
+
+	if (id == Entity::None) {
+		EXCEPTION("Tried to play audio for entity id none in group!");
+	}
+
+	const auto& def = *GetEntityManager().UnitArchetype.UnitComponents.GetComponent(id).def;
+
+	GetEntityManager().GetSoundSystem().PlayUnitCommand(id, def);
 }
 
 const RaceDef& GameViewContext::GetPlayerRaceDef() const

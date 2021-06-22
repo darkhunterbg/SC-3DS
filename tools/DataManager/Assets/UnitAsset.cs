@@ -177,6 +177,7 @@ namespace DataManager.Assets
 		public UnitAsset() : base()
 		{
 			UnitId = AssetId.New();
+
 		}
 
 		public override Asset Clone()
