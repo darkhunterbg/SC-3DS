@@ -26,24 +26,18 @@ void AudioManager::Init() {
 	}
 }
 
-void AudioManager::PlayClip(const AudioClip& clip, int c) {
-	auto& channel = instance.channels[c];
-	channel.stream = nullptr;
-	channel.ClearQueue();
-	channel.QueueClip({ clip.GetData(), 0 });
-	Platform::EnableChannel(channel, true);
-}
-void AudioManager::PlayStream(AudioStream* stream, int c)
+
+void AudioManager::PlayClip(AudioClip* clip , int c)
 {
 	auto& channel = instance.channels[c];
 
-	stream->Restart();
-	stream->FillNextBuffer();
+	clip->Restart();
+	clip->FillNextBuffer();
 
-	channel.stream = stream;
+	channel.stream = clip;
 	channel.ClearQueue();
 
-	channel.QueueClip({ stream->GetData(),0 });
+	channel.QueueClip({ clip->GetData(),0 });
 
 	Platform::EnableChannel(channel, true);
 }
@@ -68,7 +62,7 @@ void AudioManager::UpdateAudio() {
 			auto* currentClip = channel.CurrentClip();
 
 			if (channel.stream && !channel.stream->IsAtEnd()) {
-				AudioStream& track = *channel.stream;
+				AudioClip& track = *channel.stream;
 
 				if (!channel.IsQueueFull()) {
 					track.FillNextBuffer();

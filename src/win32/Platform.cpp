@@ -62,7 +62,7 @@ TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize) {
 	outSize.y = (short)tex->h;
 
 	return tex;
-	
+
 }
 const Font* Platform::LoadFont(const char* path, int size) {
 
@@ -148,36 +148,21 @@ void Platform::ChangeBlendingMode(BlendMode mode) {
 		break;
 	case BlendMode::AlphaSet:
 		b = GPU_BLEND_SET_ALPHA;
-		//blendMode = SDL_ComposeCustomBlendMode(
-		//	SDL_BlendFactor::SDL_BLENDFACTOR_SRC_ALPHA, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
-		//	SDL_BlendOperation::SDL_BLENDOPERATION_ADD,
-		//	SDL_BlendFactor::SDL_BLENDFACTOR_SRC_ALPHA, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
-		//	SDL_BlendOperation::SDL_BLENDOPERATION_ADD);
 		break;
 	case BlendMode::AllSet:
 		b = GPU_BLEND_SET;
-		//blendMode = SDL_ComposeCustomBlendMode(
-		//	SDL_BlendFactor::SDL_BLENDFACTOR_ONE, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
-		//	SDL_BlendOperation::SDL_BLENDOPERATION_ADD,
-		//	SDL_BlendFactor::SDL_BLENDFACTOR_ONE, SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
-		//	SDL_BlendOperation::SDL_BLENDOPERATION_ADD);
 		break;
 	default:
 		break;
 	}
 
 	GPU_SetShapeBlendMode(b);
-	//if (error) {
-	//	const char* error = SDL_GetError();
-	//	EXCEPTION(error);
-	//}
 }
 
 void Platform::ClearBuffer(Color color) {
 	Color32 c(color);
 
 	GPU_ClearRGBA(target, c.GetR(), c.GetG(), c.GetB(), c.GetA());
-	//SDL_RenderClear(renderer);
 }
 
 
@@ -196,32 +181,6 @@ void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
 		case DrawCommandType::TexturedTriangle: {
 
 			GPU_Image* img = (GPU_Image*)cmd.texture->GetTextureId();
-			/*
-			for (int i = cmd.start; i < cmd.start + cmd.count; i += 6) {
-
-				Vertex start = vertexBuffer[i];
-				Color32 c = start.color.value;
-				SDL_Color color;
-
-				color.r = c.GetR();
-				color.g = c.GetG();
-				color.b = c.GetB();
-				color.a = c.GetA();
-
-
-				Vertex end = vertexBuffer[i + 2];
-
-				GPU_Rect src = { start.uv.x, start.uv.y, end.uv.x - start.uv.x, end.uv.y - start.uv.y };
-				src.x *= img->w;
-				src.y *= img->h;
-				src.w *= img->w;
-				src.h *= img->h;
-				GPU_Rect dst = { start.position.x, start.position.y, end.position.x - start.position.x, end.position.y - start.position.y };
-
-				GPU_SetColor(img, color);
-
-				GPU_BlitRect(img,&src,target,&dst);
-			}*/
 
 			GPU_PrimitiveBatchV(img, target, GPU_TRIANGLES, cmd.count, vertexBuffer + cmd.start, 0, nullptr, GPU_BATCH_XY_ST_RGBA8);
 
@@ -243,9 +202,6 @@ void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
 
 				GPU_RectangleFilled(target, start.x, start.y, end.x, end.y, color);
 			}
-
-			/*	GPU_PrimitiveBatchV(white, target, GPU_TRIANGLES, cmd.count, vertexBuffer + cmd.start, 0, nullptr, GPU_BATCH_XY_ST_RGBA8);*/
-
 			break;
 		}
 		default:
@@ -422,6 +378,7 @@ static void AudioCallback(void* userdata, Uint8* stream, int len) {
 
 	unsigned size = clip != nullptr ? clip->Remaining() : 0;
 	if (size == 0) {
+		state->DequeueClip();
 		printf("Voice starvation at channel %i\n", state->handle);
 		return;
 	}

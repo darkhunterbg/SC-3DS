@@ -16,7 +16,7 @@ class GameDatabase {
 private:
 	std::vector<ImageFrame> frames;
 	std::vector<Image> images;
-	std::vector<AudioClip> audioClips;
+	std::vector<AudioClip*> audioClips;
 
 	const Image* commandIcons;
 	std::vector<const Image*> selections;
@@ -58,7 +58,10 @@ public:
 	const AbilityDef* GetAbility(const char* path) const;
 	const AbilityDef* GetAbility(AbilityId id) const;
 
-	inline const AudioClip& GetAudioClip(unsigned id) const { return audioClips[id]; }
+	inline AudioClip& GetAudioClip(unsigned id) const { return *audioClips[id]; }
+	inline Span<AudioClip*> GetAudioClips(unsigned id, unsigned count) const {
+		return { &audioClips[id], count };
+	}
 
 	void LoadAssetReferences();
 };

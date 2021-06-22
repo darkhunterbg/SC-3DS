@@ -11,7 +11,7 @@ struct SoundSetDef {
 	uint8_t ClipCount;
 	bool Randomize;
 
-	const AudioClip& GetAudioClip(int index) const;
-	Span<AudioClip> GetAudioClips() const;
+	AudioClip& GetAudioClip(int index) const;
+	Span<AudioClip*> GetAudioClips() const;
 };
 #pragma pack(pop)

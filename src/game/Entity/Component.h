@@ -394,6 +394,6 @@ struct TimingActionComponent {
 
 
 struct SoundSourceComponent {
-	const AudioClip* clip;
+	AudioClip* clip = nullptr;
 	uint16_t priority = 0;
 };

@@ -5,8 +5,7 @@
 #include "../Loader/BinaryData.h"
 
 static constexpr const int AudioStreamBufferSize = 4096;
-static AudioClip LoadAudioClipFromFile(const char* path);
-static AudioStream* LoadAudioStreamFromFile(const char* path);
+static AudioClip* LoadAudioClipFromFile(const char* path);
 
 static constexpr const char* DataFile = "data.bin";
 
@@ -22,7 +21,7 @@ const Texture* AssetLoader::LoadTexture(const char* path)
 
 	if (e.id == 0) {
 		Vector2Int16 size;
-		TextureId texId = Platform::LoadTexture(p.data(),size);
+		TextureId texId = Platform::LoadTexture(p.data(), size);
 		e.data = new Texture(p, size, texId);
 		e.type = AssetType::Texture;
 		e.id = id;
@@ -57,14 +56,14 @@ const Font* AssetLoader::LoadFont(const char* path, int size)
 	return (const Font*)e.data;
 }
 
-AudioClip AssetLoader::LoadAudioClip(const char* path)
+AudioClip* AssetLoader::LoadAudioClip(const char* path)
 {
 	std::string p = path;
 	AssetId id = instance.hasher(p);
 	AssetEntry& e = instance.loadedAssets[id];
 
 	if (e.id == 0) {
-		e.data = new AudioClip(LoadAudioClipFromFile(p.data()));
+		e.data = LoadAudioClipFromFile(p.data());
 		e.type = AssetType::AudioClip;
 		e.id = id;
 	}
@@ -74,70 +73,30 @@ AudioClip AssetLoader::LoadAudioClip(const char* path)
 				p.data(), GetAssetTypeName(AssetType::AudioClip), GetAssetTypeName(e.type));
 	}
 
-	return  *(const AudioClip*)e.data;
+	return   (AudioClip*)e.data;
 }
 
-AudioStream* AssetLoader::LoadAudioStream(const char* path)
-{
-	std::string p = path;
-
-	AssetId id = instance.hasher(p);
-	AssetEntry& e = instance.loadedAssets[id];
-
-	if (e.id == 0) {
-		e.data = LoadAudioStreamFromFile(p.data());
-		e.type = AssetType::AudioStream;
-		e.id = id;
-	}
-	else {
-		if (e.type != AssetType::AudioStream)
-			EXCEPTION("Tried to load '%s' as %i but it was %i!",
-				p.data(), GetAssetTypeName(AssetType::AudioStream), GetAssetTypeName(e.type));
-	}
-
-	return  (AudioStream*)e.data;
-}
 
 static uint16_t audioClipId = 0;
 
-static AudioClip LoadAudioClipFromFile(const char* path) {
+
+static AudioClip* LoadAudioClipFromFile(const char* path) {
 	std::string p = path;
 	p += ".wav";
+
 	FILE* f = Platform::OpenAsset(p.data());
 
 	if (f == nullptr)
-		EXCEPTION("Failed to open asset '%s'!", path);
+		EXCEPTION("Failed to open asset '%s'!", p.data());
 
 	AudioInfo info;
 
 	if (!WaveLoader::ReadWAVHeader(f, &info))
-		EXCEPTION("Failed to read WAV header in '%s'!", path);
+		EXCEPTION("Failed to read WAV header in '%s'!", p.data());
 
-	uint8_t* data = new uint8_t[info.GetTotalSize()];
+	AudioClip* stream = new AudioClip(info, AudioStreamBufferSize, f);
 
-	if (!WaveLoader::LoadWAVData(f, { data, (unsigned)info.GetTotalSize() }, info))
-		EXCEPTION("Failed to load WAV data in '%s'!", path);
-
-	AudioClip clip = { info, data, ++audioClipId };
-
-	fclose(f);
-
-	return clip;
-
-}
-
-static AudioStream* LoadAudioStreamFromFile(const char* path) {
-	FILE* f = Platform::OpenAsset(path);
-
-	if (f == nullptr)
-		EXCEPTION("Failed to open asset '%s'!", path);
-
-	AudioInfo info;
-
-	if (!WaveLoader::ReadWAVHeader(f, &info))
-		EXCEPTION("Failed to read WAV header in '%s'!", path);
-
-	AudioStream* stream = new AudioStream(info, AudioStreamBufferSize, f);
+	stream->id = ++audioClipId;
 
 	return stream;
 }

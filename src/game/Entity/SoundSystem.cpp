@@ -76,7 +76,7 @@ void SoundSystem::CollectAudioFromSources(const Camera& camera, EntityManager& e
 
 			int i = 0;
 			for (const auto& clip : entityUniqueAudio) {
-				if (clip.id == src.clip->id)
+				if (clip->id == src.clip->id)
 				{
 					foundIndex = i;
 					break;
@@ -85,7 +85,7 @@ void SoundSystem::CollectAudioFromSources(const Camera& camera, EntityManager& e
 			}
 
 			if (foundIndex < 0) {
-				entityUniqueAudio.push_back(*src.clip);
+				entityUniqueAudio.push_back(src.clip);
 				uint16_t priority = src.priority;
 				float volume = isFullAudio ? 1.0f : 0.5f;
 				entityAudioPriority.push_back({ priority,  (uint16_t)entityAudioPriority.size(), volume });
@@ -104,7 +104,7 @@ void SoundSystem::CollectAudioFromSources(const Camera& camera, EntityManager& e
 
 	for (int i = 0; i < max; ++i) {
 		int index = entityAudioPriority[i].clipIndex;
-		const AudioClip& clip = entityUniqueAudio[index];
+		AudioClip* clip = entityUniqueAudio[index];
 		uint16_t priority = entityAudioPriority[i].priority;
 		float volume = entityAudioPriority[i].volume;
 
@@ -134,11 +134,11 @@ void SoundSystem::UpdateEntityAudio(const Camera& camera, EntityManager& em)
 			if (channel.queued)
 				continue;
 
-			if (channel.channel->IsDone() || channel.clipId == clip.id)
+			if (channel.channel->IsDone() || channel.clipId == clip->id)
 			{
 				AudioManager::SetChannelVolume(channel.channel->ChannelId, playWorldAudio[i].volume);
 				AudioManager::PlayClip(clip, channel.channel->ChannelId);
-				channel.clipId = clip.id;
+				channel.clipId = clip->id;
 				channel.queued = true;
 				channel.clipPriority = playWorldAudio[i].priority;
 				channelFound = true;
@@ -169,7 +169,7 @@ void SoundSystem::UpdateEntityAudio(const Camera& camera, EntityManager& em)
 
 				AudioManager::SetChannelVolume(channel.channel->ChannelId, playWorldAudio[i].volume);
 				AudioManager::PlayClip(clip, channel.channel->ChannelId);
-				channel.clipId = clip.id;
+				channel.clipId = clip->id;
 				channel.queued = true;
 				channel.clipPriority = playWorldAudio[i].priority;
 				channelFound = true;
@@ -208,36 +208,36 @@ void SoundSystem::PlayUnitCommand(EntityId id, const UnitDef& unit) {
 }
 void SoundSystem::PlayAdviserErrorMessage(const RaceDef& race, AdvisorErrorMessageType message)
 {
-	auto& clip = race.AdvisorErrorSounds.Clips[(int)message];
+	auto clip = race.AdvisorErrorSounds.Clips[(int)message];
 
-	if (clip.data == nullptr)
+	if (clip->GetData().Size() == 0)
 		return;
 
 
 	auto& channel = chatAudioChannel;
 
-	if (clip.id == channel.clipId)
+	if (clip->id == channel.clipId)
 		return;
 
-	channel.clipId = clip.id;
+	channel.clipId = clip->id;
 
 	AudioManager::PlayClip(clip, channel.channel->ChannelId);
 }
-void SoundSystem::PlayUISound(const AudioClip& clip)
+void SoundSystem::PlayUISound(AudioClip& clip)
 {
-	AudioManager::PlayClip(clip, uiAudioChannel.channel->ChannelId);
+	AudioManager::PlayClip(&clip, uiAudioChannel.channel->ChannelId);
 }
 
 void SoundSystem::RegenerateSoundQueue(const SoundSetDef& def) {
 	chatSoundQueue.clear();
-	for (const auto& audio : def.GetAudioClips())
+	for (AudioClip* audio : def.GetAudioClips())
 		chatSoundQueue.push_back(audio);
 
 	if (def.Randomize) {
 
 		for (int i = 0; i < chatSoundQueue.size() - 1; ++i) {
 			int j = rnd.Next(i, chatSoundQueue.size());
-			AudioClip swap = chatSoundQueue[i];
+			AudioClip* swap = chatSoundQueue[i];
 			chatSoundQueue[i] = chatSoundQueue[j];
 			chatSoundQueue[j] = swap;
 		}
@@ -273,7 +273,7 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 
 	if (newRequest && currentChat.sound) {
 
-		AudioClip play;
+		AudioClip* play = nullptr;
 
 		if (chatSoundQueue.size() == 0) {
 			RegenerateSoundQueue(*currentChat.sound);
@@ -283,7 +283,7 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 		chatSoundQueue.erase(chatSoundQueue.begin());
 
 		AudioManager::PlayClip(play, channel.channel->ChannelId);
-		channel.clipId = play.id;
+		channel.clipId = play->id;
 
 
 	}
@@ -294,8 +294,6 @@ void SoundSystem::UpdateChatRequest(EntityManager& em)
 		if (channel.channel->IsDone() && channel.clipId != 0xFFFF) {
 
 			++sameUnitClipFinished;
-
-			//currentChat = { currentChat.sound, currentChat.id };
 			channel.clipId = 0xFFFF;
 		}
 		else {

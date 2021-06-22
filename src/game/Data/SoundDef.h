@@ -7,14 +7,14 @@ struct AdvisorSounds {
 	const char* SoundPath;
 
 	std::vector<uint8_t> SoundIds;
-	std::array<AudioClip, 8> Clips;
+	std::array< AudioClip*, 8> Clips;
 
 	void LoadSoundClips();
 };
 
 struct AudioStreamDef {
 	const char* Path;
-	AudioStream* Stream;
+	AudioClip* Stream;
 
 	void Load();
 };

@@ -29,7 +29,7 @@ const Font* Game::SystemFont10;
 const Font* Game::SystemFont8;
 
 
-AudioClip Game::ButtonAudio;
+AudioClip* Game::ButtonAudio;
 
 float Game::DeltaTime = 0;
 

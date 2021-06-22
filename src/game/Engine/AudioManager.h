@@ -22,8 +22,7 @@ private:
 public:
 
 	static void Init();
-	static void PlayClip(const AudioClip&, int channel);
-	static void PlayStream(AudioStream* stream, int channel);
+	static void PlayClip(AudioClip* clip, int channel);
 	static void StopChannel(int channel);
 	static void SetChannelVolume(int channel, float volume);
 

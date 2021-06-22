@@ -48,7 +48,7 @@ struct AudioChannelState {
 	std::array< AudioChannelClip, QueueSize> clipQueue;
 	int queueSize = 0;
 
-	AudioStream* stream = nullptr;
+	AudioClip* stream = nullptr;
 
 	AudioChannelClip* CurrentClip() {
 		return queueSize > 0 ? &clipQueue[0] : nullptr;

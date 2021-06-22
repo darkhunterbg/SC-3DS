@@ -117,7 +117,7 @@ void UnitSelectionConsolePanel::UpdateSelection(GameViewContext& context)
 				context.selection.clear();
 				context.selection.AddEntity(entityId);
 
-				context.GetEntityManager().GetSoundSystem().PlayUISound(Game::ButtonAudio);
+				context.GetEntityManager().GetSoundSystem().PlayUISound(*Game::ButtonAudio);
 			}
 
 			break;

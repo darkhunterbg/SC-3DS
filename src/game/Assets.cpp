@@ -6,7 +6,7 @@
 #include "Platform.h"
 #include <stdio.h>
 
-bool AudioStream::FillNextBuffer() {
+bool AudioClip::FillNextBuffer() {
 
 	activeBufferIndex = (activeBufferIndex + 1) % BufferCount;
 	Span<uint8_t> buffer = buffers[activeBufferIndex];
@@ -17,7 +17,7 @@ bool AudioStream::FillNextBuffer() {
 		size = remaining;
 
 
-	int read = fread(buffer.Data(), sizeof(uint8_t), buffer.Size(), stream);
+	int read = fread(buffer.Data(), sizeof(uint8_t), size, stream);
 	if (read > 0) {
 		activeBufferSize = (unsigned)read;
 		streamPos += read;
@@ -29,7 +29,7 @@ bool AudioStream::FillNextBuffer() {
 	}
 }
 
-bool AudioStream::Restart() {
+bool AudioClip::Restart() {
 
 	bool success = fseek(stream, 0, SEEK_SET);
 
@@ -39,7 +39,7 @@ bool AudioStream::Restart() {
 	return success;
 }
 
-AudioStream::AudioStream(AudioInfo info, unsigned bufferSize, FILE* stream) {
+AudioClip::AudioClip(AudioInfo info, unsigned bufferSize, FILE* stream) {
 
 	this->info = info;
 	uint8_t* memory = new uint8_t[bufferSize * BufferCount];
@@ -50,12 +50,12 @@ AudioStream::AudioStream(AudioInfo info, unsigned bufferSize, FILE* stream) {
 	activeBufferSize = 0;
 }
 
-AudioStream::~AudioStream()
+AudioClip::~AudioClip()
 {
 	delete[] buffers[0].Data();
 }
 
-int AudioStream::GetRemaining() const {
+int AudioClip::GetRemaining() const {
 	return info.GetTotalSize() - streamPos;
 }
 

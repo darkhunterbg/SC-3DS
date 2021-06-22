@@ -128,25 +128,8 @@ struct AudioInfo {
 		return GetTotalSize() / (float)GetBytesPerSec();
 	}
 };
-struct AudioClip {
 
-	AudioInfo info;
-	uint8_t* data;
-	uint16_t id = 0;
-
-	Span< uint8_t> GetData() const {
-		return { data, (unsigned)info.GetTotalSize() };
-	}
-	unsigned GetSize() const {
-		return (unsigned)info.GetTotalSize();
-	}
-	float GetDuration() const {
-		return  info.GetDurationSeconds();
-	}
-
-
-};
-class AudioStream {
+class AudioClip {
 public:
 	Span<uint8_t> GetData() const {
 		return { buffers[activeBufferIndex].Data(), (unsigned)activeBufferSize };
@@ -165,8 +148,13 @@ public:
 	bool FillNextBuffer();
 	bool Restart();
 
-	AudioStream(AudioInfo info, unsigned bufferSize, FILE* stream);
-	~AudioStream();
+	AudioClip(const AudioClip&) = delete;
+	AudioClip& operator=(const AudioClip&) = delete;
+
+	AudioClip(AudioInfo info, unsigned bufferSize, FILE* stream);
+	~AudioClip();
+
+	uint16_t id = 0;
 private:
 	AudioInfo info;
 

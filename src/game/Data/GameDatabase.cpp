@@ -71,7 +71,7 @@ void GameDatabase::LoadAssetReferences()
 
 	audioClips.reserve(AudioClipDefs.size());
 	for (const AudioClipDef& clipDef : AudioClipDefs) {
-		AudioClip clip = AssetLoader::LoadAudioClip(clipDef.path);
+		AudioClip* clip = AssetLoader::LoadAudioClip(clipDef.path);
 		audioClips.push_back(clip);
 	}
 

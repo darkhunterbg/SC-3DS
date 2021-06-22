@@ -21,7 +21,7 @@ class SoundSystem {
 	};
 
 	struct EntityAudio {
-		AudioClip clip;
+		AudioClip* clip = nullptr;
 		float volume = 1.0f;
 		uint16_t priority = 0;
 	};
@@ -44,7 +44,7 @@ private:
 	EntityAudioChannel chatAudioChannel;
 	EntityAudioChannel uiAudioChannel;
 
-	std::vector<AudioClip> entityUniqueAudio;
+	std::vector<AudioClip*> entityUniqueAudio;
 	std::vector<EntityPriorityAudio> entityAudioPriority;
 
 	std::vector<EntityAudio> playWorldAudio;
@@ -53,7 +53,7 @@ private:
 	UnitChatRequest currentChat = { nullptr, Entity::None };
 
 
-	std::vector<AudioClip> chatSoundQueue;
+	std::vector<AudioClip*> chatSoundQueue;
 	int sameUnitClipFinished = 0;
 
 	Random rnd;
@@ -72,7 +72,7 @@ public:
 	void PlayUnitSelect(EntityId id, const UnitDef& unit);
 	void PlayUnitCommand(EntityId id, const UnitDef& unit);
 	void PlayAdviserErrorMessage(const RaceDef& race, AdvisorErrorMessageType message);
-	void PlayUISound(const AudioClip& clip);
+	void PlayUISound(AudioClip& clip);
 
 	void ClearAudio(EntityManager& em);
 };

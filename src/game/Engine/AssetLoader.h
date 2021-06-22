@@ -15,12 +15,11 @@ class AssetLoader {
 		Texture = 1,
 		Font = 2,
 		AudioClip = 3,
-		AudioStream = 4,
-		Database = 5
+		Database = 4
 	};
 
-	std::array< const char*, 6> AssetTypeName = {
-		   "Unknown", "Texture", "Font", "AudioClip", "AudioStream", "Database"
+	std::array< const char*, 5> AssetTypeName = {
+		   "Unknown", "Texture", "Font", "AudioClip", "Database"
 	};
 
 	struct AssetEntry {
@@ -59,6 +58,5 @@ public:
 
 	static const Texture* LoadTexture(const char* path);
 	static const Font* LoadFont(const char* path, int size);
-	static AudioClip LoadAudioClip(const char* path);
-	static AudioStream* LoadAudioStream(const char* path);
+	static AudioClip* LoadAudioClip(const char* path);
 };

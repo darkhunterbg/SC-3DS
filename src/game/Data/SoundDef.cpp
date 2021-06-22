@@ -17,5 +17,5 @@ void AdvisorSounds::LoadSoundClips()
 
 void AudioStreamDef::Load()
 {
-	Stream = AssetLoader::LoadAudioStream(Path);
+	Stream = AssetLoader::LoadAudioClip(Path);
 }

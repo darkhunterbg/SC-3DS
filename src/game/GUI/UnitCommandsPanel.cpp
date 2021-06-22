@@ -221,7 +221,7 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 
 void UnitCommandsPanel::OnCommandPressed(GameViewContext& context, const UnitCommand& cmd) {
 
-	context.GetEntityManager().GetSoundSystem().PlayUISound(Game::ButtonAudio);
+	context.GetEntityManager().GetSoundSystem().PlayUISound(*Game::ButtonAudio);
 
 	if (cmd.ability != nullptr) {
 

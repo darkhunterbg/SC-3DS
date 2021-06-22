@@ -45,8 +45,8 @@ void GameScene::Start() {
 	race.LoadResourses();
 
 
-	AudioStream* stream = race.GameMusic[std::rand() % race.GameMusic.size()].Stream;
-	AudioManager::PlayStream(stream, 0);
+	//AudioClip* stream = race.GameMusic[std::rand() % race.GameMusic.size()].Stream;
+	//AudioManager::PlayClip(stream, 0);
 
 	for (int p = 0; p < totalPlayers; ++p) {
 		entityManager->GetPlayerSystem().AddPlayer(race, color[p]);

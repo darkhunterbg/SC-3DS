@@ -17,13 +17,13 @@ void RaceDatabase::Init()
 		d.commandIconsPath = "unit\\cmdbtns\\tcmdbtns";
 		d.supplyIconPath = "game\\icons\\tsupply";
 		d.gasIconPath = "game\\icons\\tgas";
-		d.AdvisorErrorSounds.SoundPath = "sound/terran/advisor/taderr";
+		d.AdvisorErrorSounds.SoundPath = "sound\\terran\\advisor\\taderr";
 		d.AdvisorErrorSounds.SoundIds = { 0,1,2,3,4,6 };
-		d.AdvisorUpdateSounds.SoundPath = "sound/terran/advisor/tadupd";
+		d.AdvisorUpdateSounds.SoundPath = "sound\\terran\\advisor\\tadupd";
 		d.AdvisorUpdateSounds.SoundIds = { 0,1,2,3,4,5,6,7 };
-		d.GameMusic.push_back({ "music/terran1.wav" });
-		d.GameMusic.push_back({ "music/terran2.wav" });
-		d.GameMusic.push_back({ "music/terran3.wav" });
+		d.GameMusic.push_back({ "music\\terran1" });
+		d.GameMusic.push_back({ "music\\terran2" });
+		d.GameMusic.push_back({ "music\\terran3" });
 
 	}
 	// ============= Zerg =========================
@@ -37,13 +37,13 @@ void RaceDatabase::Init()
 		d.commandIconsPath = "unit\\cmdbtns\\zcmdbtns";
 		d.supplyIconPath = "game\\icons\\zsupply";
 		d.gasIconPath = "game\\icons\\zgas";
-		d.AdvisorErrorSounds.SoundPath = "sound/zerg/advisor/zaderr";
+		d.AdvisorErrorSounds.SoundPath = "sound\\zerg\\advisor\\zaderr";
 		d.AdvisorErrorSounds.SoundIds = { 0,1,2,6 };
-		d.AdvisorUpdateSounds.SoundPath = "sound/zerg/advisor/zadupd";
+		d.AdvisorUpdateSounds.SoundPath = "sound\\zerg\\advisor\\zadupd";
 		d.AdvisorUpdateSounds.SoundIds = { 0,1,2,4 };
-		d.GameMusic.push_back({ "music/zerg1.wav" });
-		d.GameMusic.push_back({ "music/zerg2.wav" });
-		d.GameMusic.push_back({ "music/zerg3.wav" });
+		d.GameMusic.push_back({ "music\\zerg1" });
+		d.GameMusic.push_back({ "music\\zerg2" });
+		d.GameMusic.push_back({ "music\\zerg3" });
 
 	}
 	// ============= Protoss ======================
@@ -57,13 +57,13 @@ void RaceDatabase::Init()
 		d.commandIconsPath = "unit\\cmdbtns\\pcmdbtns";
 		d.supplyIconPath = "game\\icons\\psupply";
 		d.gasIconPath = "game\\icons\\pgas";
-		d.AdvisorErrorSounds.SoundPath = "sound/protoss/advisor/paderr";
+		d.AdvisorErrorSounds.SoundPath = "sound\\protoss\\advisor\\paderr";
 		d.AdvisorErrorSounds.SoundIds = { 0,1,2,6 };
-		d.AdvisorUpdateSounds.SoundPath = "sound/protoss/advisor/padupd";
+		d.AdvisorUpdateSounds.SoundPath = "sound\\protoss\\advisor\\padupd";
 		d.AdvisorUpdateSounds.SoundIds = { 0,1,2,4 };
-		d.GameMusic.push_back({ "music/protoss1.wav" });
-		d.GameMusic.push_back({ "music/protoss2.wav" });
-		d.GameMusic.push_back({ "music/protoss3.wav" });
+		d.GameMusic.push_back({ "music\\protoss1" });
+		d.GameMusic.push_back({ "music\\protoss2" });
+		d.GameMusic.push_back({ "music\\protoss3" });
 	}
 }
 
