@@ -130,11 +130,12 @@ namespace DataManager.Widgets
 			Changed = false;
 
 			rowIndex = 0;
+			int i = 0;
 			foreach (var section in sections)
 			{
-				//ImGui.PushID(++i);
+				ImGui.PushID(++i);
 				DrawSection(section);
-				//ImGui.PopID();
+				ImGui.PopID();
 			}
 
 

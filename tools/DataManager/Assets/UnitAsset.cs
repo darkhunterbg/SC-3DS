@@ -20,6 +20,16 @@ namespace DataManager.Assets
 		[Binary(BinaryType.Vector2, 2)]
 		[Optional]
 		public Vector2 Range { get; set; }
+
+
+		[FrameTimeEditor]
+		[Binary(BinaryType.UInt, 1)]
+		[Optional]
+		public int Cooldown { get; set; } = 1;
+
+		[Binary(BinaryType.UInt, 1)]
+		[Optional]
+		public int _Padding { get; set; }
 	}
 
 	[BinaryData(DataItemType.Units)]

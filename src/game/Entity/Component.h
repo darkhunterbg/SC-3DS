@@ -355,7 +355,7 @@ struct UnitWeaponComponent {
 
 	inline void FromAttack(const UnitAttack& atk) {
 		maxRange = atk.Range.y;
-		//cooldown = def.Cooldown;
+		cooldown = atk.Cooldown;
 		//damage = def.Damage;
 	}
 

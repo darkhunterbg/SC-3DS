@@ -22,6 +22,8 @@ typedef uint32_t UnitId;
 struct UnitAttack {
 	int16_t WeaponId;
 	Vector2Int16 Range;
+	uint8_t Cooldown;
+	uint8_t Padding;
 
 	const WeaponDef* GetWeapon() const;
 	inline bool IsValid() const { return WeaponId >= 0; }

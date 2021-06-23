@@ -85,7 +85,7 @@ namespace DataManager.Widgets
 		{
 			int number = (int)prop.GetValue(item);
 
-			EditorFieldDrawer.FrameTime(string.Empty, number, out bool changed);
+			number = EditorFieldDrawer.FrameTime(string.Empty, number, out bool changed);
 			if (changed)
 			{
 				prop.SetValue(item, number);
@@ -97,7 +97,7 @@ namespace DataManager.Widgets
 		{
 			int number = (int)prop.GetValue(item);
 
-			EditorFieldDrawer.Supply(string.Empty, number, out bool changed);
+			number = EditorFieldDrawer.Supply(string.Empty, number, out bool changed);
 			if (changed)
 			{
 				prop.SetValue(item, number);

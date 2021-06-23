@@ -76,7 +76,6 @@ void GameScene::Start() {
 	int i = 0;
 	for (int y = 2; y > 0; --y) {
 		for (int x = 1; x > 0; --x) {
-			Color c = color[(i) % 12];
 			//auto& def = *UnitDatabase::Units[1];
 			UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
 				Vector2Int16(Vector2Int{ x * 32 + 48,y * 32 + 48 }));
@@ -85,6 +84,8 @@ void GameScene::Start() {
 
 		}
 	}
+
+	UnitEntityUtil::NewUnit(def, 2, Vector2Int16(256,128));
 
 	entityManager->FullUpdate();
 
