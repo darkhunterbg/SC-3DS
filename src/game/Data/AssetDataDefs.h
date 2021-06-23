@@ -29,6 +29,7 @@ enum class AnimationType : uint8_t
 	LiftOff,
 	Burrow,
 	UnBorrow,
+	Enabled
 };
 
 #pragma pack(push,1)

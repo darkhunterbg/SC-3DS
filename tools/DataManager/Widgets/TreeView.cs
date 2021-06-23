@@ -370,7 +370,7 @@ namespace DataManager.Widgets
 					focused = true;
 
 				if((ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left) ||
-					ImGui.IsMouseClicked(ImGuiMouseButton.Middle)) && ImGui.IsItemFocused())
+					ImGui.IsMouseClicked(ImGuiMouseButton.Middle)) && ImGui.IsItemHovered())
 				{
 					if (node.Item is IInteractableTreeViewItem inter)
 						inter.Activate();
@@ -385,7 +385,6 @@ namespace DataManager.Widgets
 					| ImGuiTreeNodeFlags.OpenOnDoubleClick;
 
 				ImGui.SetNextItemOpen(node.Expanded);
-
 
 				if (renameNode == node)
 				{

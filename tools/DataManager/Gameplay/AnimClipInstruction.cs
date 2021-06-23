@@ -168,16 +168,21 @@ namespace DataManager.Gameplay
 		public static readonly AnimClipInstruction TurnClockWise = new AnimClipInstruction("turncw", (state, p) =>
 		{
 			state.AddOrientation((byte)p[0]);
-			return true;
+			return false;
 		}, NewParam<byte>("rotation"));
 
 		public static readonly AnimClipInstruction TurnClocCounterkWise = new AnimClipInstruction("turnccw", (state, p) =>
 		{
 			state.AddOrientation(-(byte)p[0]);
-			return true;
+			return false;
 		}, NewParam<byte>("rotation"));
 
-
+		public static readonly AnimClipInstruction GoTo = new AnimClipInstruction("goto", (state, p) =>
+		{
+			state.InstructionId = (byte)p[0];
+			--state.InstructionId;
+			return false;
+		}, NewParam<byte>("instruction"));
 
 
 

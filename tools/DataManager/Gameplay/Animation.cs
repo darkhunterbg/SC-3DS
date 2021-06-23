@@ -78,13 +78,17 @@ namespace DataManager.Gameplay
 				OrientationOffset = Orientation;
 		}
 
+		public void RestartAnimation()
+		{
+			InstructionId = -1;
+		}
 
 		public bool ExecuteInstruction(SpriteAnimClipAsset clip)
 		{
 			++InstructionId;
 			if (InstructionId >= clip.Instructions.Count)
 			{
-				InstructionId = -1;
+				//InstructionId = -1;
 				return false;
 			}
 
@@ -112,7 +116,6 @@ namespace DataManager.Gameplay
 
 			return true;
 		}
-
 
 	}
 }

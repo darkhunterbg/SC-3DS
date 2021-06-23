@@ -65,6 +65,8 @@ namespace DataManager.Widgets
 
 		public bool ShowCollider = false;
 
+		public bool LoopAnimation = false;
+
 		public bool SelectionChanged { get; private set; } = false;
 		public bool ClipChanged { get; private set; } = false;
 		public SpriteAnimData AnimData { get; private set; } = new SpriteAnimData();
@@ -135,6 +137,7 @@ namespace DataManager.Widgets
 					AnimData.State.SetOrientation(orient);
 				}
 			}
+			EditorFieldDrawer.Bool("Loop Animation", ref LoopAnimation);
 
 			EditorFieldDrawer.Bool("Show Collider", ref ShowCollider);
 		}
@@ -157,6 +160,11 @@ namespace DataManager.Widgets
 							{
 								if (AnimData.State.InstructionId == AnimData.BreakpointAt)
 									break;
+							}
+
+							if(AnimData.State.InstructionId>= Clip.InstructionCount && LoopAnimation)
+							{
+								AnimData.State.RestartAnimation();
 							}
 
 							int frameDelay = AnimData.State.FrameDelay;

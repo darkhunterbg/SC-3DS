@@ -80,9 +80,7 @@ static bool TryAttackTarget(EntityId target, EntityId id, Vector2Int16 pos, Enti
 	Vector2Int16 distance = collider.Closest(pos);
 	distance -= pos;
 
-
 	int range = ((int)(weapon.maxRange + 1) << 5);
-
 
 	if (distance.LengthSquaredInt() < range * range) {
 

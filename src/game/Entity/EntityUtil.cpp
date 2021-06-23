@@ -130,7 +130,7 @@ void EntityUtil::PlayAnimation(EntityId id, const AnimClipDef& clip)
 	auto& state = em.AnimationArchetype.StateComponents.GetComponent(id);
 	state.animFrame = 0;
 	state.wait = 0;
-	state.instructionId = anim.instructionStart;
+	state.instructionCounter = anim.instructionStart;
 }
 
 

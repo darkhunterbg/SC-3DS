@@ -138,12 +138,12 @@ struct RenderShadowComponent {
 
 struct AnimationComponent {
 	const Image* baseImage;
-	uint8_t instructionStart;
-	uint8_t instructionEnd;
+	uint32_t instructionStart;
+	uint32_t instructionEnd;
 };
 
 struct AnimationStateComponent {
-	uint32_t instructionId;
+	int32_t instructionCounter = 0;
 	uint16_t animFrame = 0;
 	uint8_t wait;
 };
@@ -189,12 +189,9 @@ struct UnitAIStateDataComponent {
 
 struct UnitComponent {
 	const UnitDef* def;
-	EntityId movementGlowEntity = Entity::None;
-	EntityId cargo = Entity::None;;
-	EntityId fires[3] = { Entity::None, Entity::None, Entity::None };
+	EntityId cargo = Entity::None;
 	uint16_t kills = 0;
 
-	inline bool HasMovementGlow() const { return movementGlowEntity != Entity::None; }
 	inline bool HasCargo() const { return cargo != Entity::None; }
 };
 

@@ -57,26 +57,33 @@ static void TurnCCW(const InstructionParams& params, EntityId id, EntityManager&
 	EntityUtil::UpdateAnimationVisual(id);
 }
 
+static void GoTo(const InstructionParams& params, EntityId id, EntityManager& em) {
+	auto& state = em.AnimationArchetype.StateComponents.GetComponent(id);
+	const auto& anim = em.AnimationArchetype.AnimationComponents.GetComponent(id);
+	state.instructionCounter = anim.instructionStart + params.bytes[0];
+	--state.instructionCounter;
+}
+
+
 // ======================================================================================
 
 static InstructionAction instructionMap[] =
 {
-	Frame, Wait, WaitRandom, Face, TurnCW, TurnCCW
+	Frame, Wait, WaitRandom, Face, TurnCW, TurnCCW, GoTo
 };
 
 void AnimationPlayer::RunAnimation(EntityId id, const AnimationComponent& anim, AnimationStateComponent& state, EntityManager& em)
 {
-
 	while (state.wait == 0 &&
-		state.instructionId < anim.instructionEnd)
+		state.instructionCounter < anim.instructionEnd)
 	{
-		const auto& instr = instructionCache[state.instructionId];
+		const auto& instr = instructionCache[state.instructionCounter];
 		const auto& action = instructionMap[instr.id];
 		action(instr.params, id, em);
 
-		++state.instructionId;
+		++state.instructionCounter;
 	}
 
-	if (state.instructionId == anim.instructionEnd)
-		state.instructionId = anim.instructionStart;
+	//if (state.instructionId == anim.instructionEnd)
+	//	state.instructionId = anim.instructionStart;
 }

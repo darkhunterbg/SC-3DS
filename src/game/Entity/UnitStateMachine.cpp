@@ -73,16 +73,6 @@ void UnitTurningState::EnterState(
 			EntityUtil::PlayAnimation(id, *unit.def->Art.GetSprite().GetAnimation(AnimationType::Init));
 
 		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
-
-		flags.set(ComponentFlags::NavigationWork);
-		flags.set(ComponentFlags::AnimationEnabled);
-
-		if (unit.HasMovementGlow()) {
-			EntityId glow = unit.movementGlowEntity;
-
-			em.FlagComponents.GetComponent(glow).set(ComponentFlags::AnimationEnabled);
-			em.FlagComponents.GetComponent(glow).set(ComponentFlags::RenderEnabled);
-		}
 	}
 }
 void UnitTurningState::ExitState(
@@ -92,11 +82,6 @@ void UnitTurningState::ExitState(
 		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
 		flags.clear(ComponentFlags::NavigationWork);
-		if (unit.HasMovementGlow()) {
-			EntityId glow = unit.movementGlowEntity;
-			em.FlagComponents.GetComponent(glow).clear(ComponentFlags::AnimationEnabled);
-			em.FlagComponents.GetComponent(glow).clear(ComponentFlags::RenderEnabled);
-		}
 	}
 }
 
@@ -121,13 +106,6 @@ void UnitMovingState::EnterState(
 		flags.set(ComponentFlags::NavigationWork);
 		flags.set(ComponentFlags::AnimationEnabled);
 
-		if (unit.HasMovementGlow()) {
-			EntityId glow = unit.movementGlowEntity;
-			em.FlagComponents.GetComponent(glow).set(ComponentFlags::AnimationEnabled);
-			em.FlagComponents.GetComponent(glow).set(ComponentFlags::RenderEnabled);
-			em.FlagComponents.GetComponent(glow).set(ComponentFlags::OrientationChanged);
-		}
-
 		movement.velocity = Vector2Int8(movementTable32[orientation] * velocity);
 
 	}
@@ -141,11 +119,6 @@ void UnitMovingState::ExitState(
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
 		em.MovementArchetype.MovementComponents.GetComponent(id).velocity = { 0,0 };
 		flags.clear(ComponentFlags::NavigationWork);
-		if (unit.HasMovementGlow()) {
-			EntityId glow = unit.movementGlowEntity;
-			em.FlagComponents.GetComponent(glow).clear(ComponentFlags::AnimationEnabled);
-			em.FlagComponents.GetComponent(glow).clear(ComponentFlags::RenderEnabled);
-		}
 	}
 }
 
@@ -284,11 +257,6 @@ void UnitDeathState::EnterState(
 		// or just replace death animation with directional ones
 		flags.clear(ComponentFlags::OrientationChanged);
 
-		if (unit.HasMovementGlow()) {
-			em.DeleteEntity(unit.movementGlowEntity);
-			em.ParentArchetype.Archetype.RemoveEntity(id);
-		}
-
 		if (unit.def->Art.GetSprite().GetAnimation(AnimationType::Death))
 			EntityUtil::PlayAnimation(id, *unit.def->Art.GetSprite().GetAnimation(AnimationType::Death));
 
@@ -323,12 +291,6 @@ void UnitProducingState::EnterState(UnitStateMachineChangeData& data, EntityMana
 {
 	for (EntityId id : data.entities) {
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
-
-		if (unit.HasMovementGlow()) {
-			EntityId glow = unit.movementGlowEntity;
-			em.FlagComponents.GetComponent(glow).set(ComponentFlags::AnimationEnabled);
-			em.FlagComponents.GetComponent(glow).set(ComponentFlags::RenderEnabled);
-		}
 	}
 }
 
@@ -336,12 +298,6 @@ void UnitProducingState::ExitState(UnitStateMachineChangeData& data, EntityManag
 {
 	for (EntityId id : data.entities) {
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
-
-		if (unit.HasMovementGlow()) {
-			EntityId glow = unit.movementGlowEntity;
-			em.FlagComponents.GetComponent(glow).clear(ComponentFlags::AnimationEnabled);
-			em.FlagComponents.GetComponent(glow).clear(ComponentFlags::RenderEnabled);
-		}
 	}
 }
 
