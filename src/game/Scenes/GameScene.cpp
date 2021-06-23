@@ -19,7 +19,7 @@ GameScene::~GameScene() {}
 
 
 void GameScene::Start() {
-	Vector2Int16 size = { 64 * 32,64 * 32 };
+	Vector2Int16 size = { 64* 32,64 * 32 };
 
 	camera.Position = { 0,0 };
 	camera.Size = { 400,240 };

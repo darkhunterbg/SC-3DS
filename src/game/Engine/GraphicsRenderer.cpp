@@ -229,7 +229,7 @@ void GraphicsRenderer::NewFrame()
 void GraphicsRenderer::EndFrame()
 {
 	Submit();
-	instance.vbPos = 0;
+	
 }
 
 void GraphicsRenderer::Submit()
@@ -242,6 +242,7 @@ void GraphicsRenderer::Submit()
 	instance.texture = nullptr;
 	instance.cmdType = DrawCommandType::None;
 	instance.drawCommands.clear();
+	instance.vbPos = 0;
 }
 
 void GraphicsRenderer::DrawOnScreen(ScreenId screen)

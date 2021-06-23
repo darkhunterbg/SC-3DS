@@ -164,18 +164,18 @@ void MapSystem::InitFowVisibleEntitiesJob(int start, int end) {
 
 		em.PositionComponents.CopyComponent(from, id);
 
-/*		em.UnitArchetype.RenderArchetype.RenderComponents.CopyComponent(from, id);
-		em.UnitArchetype.RenderArchetype.BoundingBoxComponents.CopyComponent(from, id);
-		em.UnitArchetype.RenderArchetype.OffsetComponents.CopyComponent(from, id);
-		em.UnitArchetype.RenderArchetype.DestinationComponents.CopyComponent(from, id)*/;
+		/*		em.UnitArchetype.RenderArchetype.RenderComponents.CopyComponent(from, id);
+				em.UnitArchetype.RenderArchetype.BoundingBoxComponents.CopyComponent(from, id);
+				em.UnitArchetype.RenderArchetype.OffsetComponents.CopyComponent(from, id);
+				em.UnitArchetype.RenderArchetype.DestinationComponents.CopyComponent(from, id)*/;
 
-		em.UnitArchetype.OwnerComponents.CopyComponent(from, id);
+				em.UnitArchetype.OwnerComponents.CopyComponent(from, id);
 
-		em.MapObjectArchetype.BoundingBoxComponents.CopyComponent(from, id);
-		em.MapObjectArchetype.DestinationComponents.CopyComponent(from, id);
-		em.MapObjectArchetype.MinimapColorId.CopyComponent(from, id);
+				em.MapObjectArchetype.BoundingBoxComponents.CopyComponent(from, id);
+				em.MapObjectArchetype.DestinationComponents.CopyComponent(from, id);
+				em.MapObjectArchetype.MinimapColorId.CopyComponent(from, id);
 
-		em.FlagComponents.GetComponent(id).set(ComponentFlags::RenderEnabled);
+				em.FlagComponents.GetComponent(id).set(ComponentFlags::RenderEnabled);
 	}
 }
 
