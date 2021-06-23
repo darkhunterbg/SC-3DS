@@ -77,6 +77,7 @@ struct SpriteDef {
 	bool isRotating;
 	Rectangle16 collider;
 
+	const AnimClipDef* GetAnimation(AnimationType type) const;
 	const Span<AnimClipDef> GetClips() const;
 	const Image& GetImage() const;
 	inline bool HasCollider() const { return collider.size != Vector2Int16{ 0,0 }; }

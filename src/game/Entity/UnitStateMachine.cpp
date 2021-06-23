@@ -47,12 +47,9 @@ void UnitIdleState::EnterState(
 
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
 
-		//em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
-		//	.GetComponent(id).clips = unit.def->Graphics->IdleAnimations;
+		if(unit.def->Art.GetSprite().GetAnimation(AnimationType::Init))
+			EntityUtil::PlayAnimation(id, *unit.def->Art.GetSprite().GetAnimation(AnimationType::Init));
 
-		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
-
-		flags.set(ComponentFlags::AnimationEnabled);
 	}
 }
 void UnitIdleState::ExitState(
@@ -72,8 +69,8 @@ void UnitTurningState::EnterState(
 
 		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
 
-		//em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
-		//	.GetComponent(id).clips = unit.def->Graphics->IdleAnimations;
+		if (unit.def->Art.GetSprite().GetAnimation(AnimationType::Init))
+			EntityUtil::PlayAnimation(id, *unit.def->Art.GetSprite().GetAnimation(AnimationType::Init));
 
 		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
 
@@ -118,8 +115,8 @@ void UnitMovingState::EnterState(
 		const auto& orientation = em.OrientationComponents.GetComponent(id);
 		const auto& velocity = em.UnitArchetype.MovementComponents.GetComponent(id).movementSpeed;
 
-		//em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
-		//	.GetComponent(id).clips = unit.def->Graphics->MovementAnimations;
+		if (unit.def->Art.GetSprite().GetAnimation(AnimationType::Walking))
+			EntityUtil::PlayAnimation(id, *unit.def->Art.GetSprite().GetAnimation(AnimationType::Walking));
 
 		flags.set(ComponentFlags::NavigationWork);
 		flags.set(ComponentFlags::AnimationEnabled);
@@ -176,8 +173,8 @@ static void  UnitAttackingEnterStateJob(int start, int end) {
 		em.OrientationComponents.GetComponent(id) = orientation;
 
 
-		//em.UnitArchetype.AnimationArchetype.OrientationArchetype.AnimOrientationComponents
-		//	.GetComponent(id).clips = unit.def->Graphics->AttackAnimations;
+		if (unit.def->Art.GetSprite().GetAnimation(AnimationType::GroundAttackRepeat))
+			EntityUtil::PlayAnimation(id, *unit.def->Art.GetSprite().GetAnimation(AnimationType::GroundAttackRepeat));
 
 		flags.set(ComponentFlags::AnimationEnabled);
 		flags.set(ComponentFlags::OrientationChanged);
@@ -291,6 +288,9 @@ void UnitDeathState::EnterState(
 			em.DeleteEntity(unit.movementGlowEntity);
 			em.ParentArchetype.Archetype.RemoveEntity(id);
 		}
+
+		if (unit.def->Art.GetSprite().GetAnimation(AnimationType::Death))
+			EntityUtil::PlayAnimation(id, *unit.def->Art.GetSprite().GetAnimation(AnimationType::Death));
 
 		//if (unit.def->Graphics->HasDeathAnimation()) {
 		//	EntityUtil::PlayAnimation(id, unit.def->Graphics->DeathAnimation);

@@ -189,10 +189,10 @@ void GameView::ContextualGamepadInput() {
 					context.CancelBuildQueue(data.queueSize - 1);
 				}
 			}
-			else {
-				context.ActivateAbility(&AbilityDatabase::Stop);
+			else {*/
+				context.ActivateAbility(GameDatabase::instance->StopAbility);
 				commandTrigged = true;
-			}*/
+			//}
 		}
 
 		if (InputManager::Gamepad.IsButtonReleased(GamepadButton::X)) {

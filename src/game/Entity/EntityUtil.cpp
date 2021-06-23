@@ -175,8 +175,8 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 	s.offset = def.Art.ShadowOffset;
 
 
-	if (def.Art.GetSprite().animCount)
-		EntityUtil::PlayAnimation(e, def.Art.GetSprite().GetClips()[0]);
+	if (def.Art.GetSprite().GetAnimation(AnimationType::Init))
+		EntityUtil::PlayAnimation(e, *def.Art.GetSprite().GetAnimation(AnimationType::Init));
 
 
 

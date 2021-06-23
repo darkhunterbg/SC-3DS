@@ -78,6 +78,7 @@ const RaceDef* GameDatabase::GetRace(RaceType type) const
 void GameDatabase::LoadAssetReferences()
 {
 	std::vector<const Texture*> textures;
+	textures.reserve(AtlasDefs.size());
 
 	for (const AtlasDef& atlases : AtlasDefs) {
 		std::string name = atlases.GetAtlasName();
