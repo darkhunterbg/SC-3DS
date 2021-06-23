@@ -9,7 +9,10 @@
 #include "../Engine/GraphicsRenderer.h"
 #include "../Engine/InputManager.h"
 
-#include "../Data/AbilityDef.h"
+#include "../Data/GameDatabase.h"
+
+
+static std::vector<const AbilityDef*> unitAbilities;
 
 void UnitCommandsPanel::Draw(GameViewContext& context)
 {
@@ -122,8 +125,6 @@ void UnitCommandsPanel::DrawCommands(GameViewContext& context) {
 			if (cmd.active)
 				color = Colors::White;
 
-
-
 			GraphicsRenderer::Draw(commandIcon, d, color);
 		}
 	}
@@ -148,7 +149,7 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 	if (context.IsTargetSelectionMode) {
 		unitCommands[8].enabled = true;
 		unitCommands[8].pressed = unitCommands[8].active = InputManager::Gamepad.IsButtonDown(GamepadButton::B);
-		//unitCommands[8].commandIcon = &SpriteDatabase::Load_unit_cmdbtns_cmdicons()->GetFrame(236);
+		unitCommands[8].commandIcon = &GameDatabase::instance->GetIcon(236);
 		return;
 	}
 
@@ -162,41 +163,18 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 
 		UnitAIState state = em.UnitArchetype.AIStateComponents.GetComponent(entityId);
 
-
-		//if (unit.def->Weapon)
+		unitAbilities.clear();
+		if (unit.def->GetAttacks().Size()  > 0)
 		{
-	/*		unitCommands[2].ability = &AbilityDatabase::Attack;
-			unitCommands[2].enabled = true;*/
+			unitAbilities.push_back(GameDatabase::instance->AttackAbility);
 		}
 
-		//if (unit.def->MovementSpeed > 0)
+		if (unit.def->Movement.MaxVelocity > 0)
 		{
-		/*	unitCommands[0].ability = &AbilityDatabase::Move;
-			unitCommands[0].enabled = true;
-
-			unitCommands[1].ability = &AbilityDatabase::Stop;
-			unitCommands[1].enabled = true;*/
-
-			//if (unit.def->GathersResources) {
-
-			//	if (unit.HasCargo())
-			//	{
-			//		unitCommands[4].ability = &AbilityDatabase::ReturnCargo;
-			//		unitCommands[4].enabled = true;
-
-			//	}
-			//	else {
-			//		unitCommands[4].ability = &AbilityDatabase::Gather;
-			//		unitCommands[4].enabled = true;
-			//	}
-			//}
-			//else {
-				//unitCommands[3].ability = &AbilityDatabase::Patrol;
-				//unitCommands[3].enabled = true;
-
-				//unitCommands[4].ability = &AbilityDatabase::HoldPosition;
-				//unitCommands[4].enabled = true;
-			//}
+			unitAbilities.push_back(GameDatabase::instance->MoveAbility);
+			unitAbilities.push_back(GameDatabase::instance->HoldPositionAbility);
+			unitAbilities.push_back(GameDatabase::instance->PatrolAbility);
+	
 		}
 
 		/*if (unit.def->ProductionUnit != nullptr) {
@@ -209,12 +187,23 @@ void UnitCommandsPanel::UpdateCommands(GameViewContext& context)
 			}
 		}*/
 
+		if (unitAbilities.size() > 0)
+			unitAbilities.push_back(GameDatabase::instance->StopAbility);
+
+		for (const AbilityDef* ability : unitAbilities)
+		{
+			if (!ability)
+				continue;
+
+			unitCommands[ability->Art.GetButtonIndex()].ability = ability;
+			unitCommands[ability->Art.GetButtonIndex()].enabled = true;
+		}
 
 		for (auto& cmd : unitCommands) {
 			if (!cmd.IsUsable())
 				continue;
 
-			//cmd.active = cmd.ability->TargetingData.IsState(state);
+			cmd.active = cmd.ability->Data.IsState(state);
 		}
 	}
 }
@@ -230,8 +219,8 @@ void UnitCommandsPanel::OnCommandPressed(GameViewContext& context, const UnitCom
 			context.ActivateCurrentAbility(*cmd.abilityProduce);
 		}
 
-		//if (cmd.ability->TargetingData.EntitySelectedAction == UnitAIState::Nothing)
-		//	return;
+		if (cmd.ability->Data.EntitySelectedAction == UnitAIState::Nothing)
+			return;
 
 		context.SelectAbilityTarget(*cmd.ability);
 

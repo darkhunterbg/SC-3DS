@@ -123,16 +123,18 @@ namespace DataManager.Widgets
 			}
 		}
 
+
+		static int rowIndex = 0;
 		public void Draw(Vector2 size = new Vector2())
 		{
 			Changed = false;
 
-			int i = 0;
+			rowIndex = 0;
 			foreach (var section in sections)
 			{
-				ImGui.PushID(++i);
+				//ImGui.PushID(++i);
 				DrawSection(section);
-				ImGui.PopID();
+				//ImGui.PopID();
 			}
 
 
@@ -153,9 +155,10 @@ namespace DataManager.Widgets
 
 			for (int i = 0; i < section.editorProperties.Count; ++i)
 			{
+				++rowIndex;
 				ImGui.TableNextRow();
 
-				ImGui.PushID(i);
+				ImGui.PushID(rowIndex);
 
 				ImGui.TableNextColumn();
 

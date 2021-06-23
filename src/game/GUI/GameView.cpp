@@ -159,21 +159,21 @@ void GameView::ContextualGamepadInput() {
 
 		if (InputManager::Gamepad.IsButtonReleased(GamepadButton::A)) {
 
-			/*if (entity == Entity::None) {
-				context.ActivateAbility(&AbilityDatabase::Attack, position);
+			if (entity == Entity::None) {
+				context.ActivateAbility(GameDatabase::instance->AttackAbility, position);
 			}
 			else {
 				if (UnitEntityUtil::IsEnemy(context.player, entity))
-					context.ActivateAbility(&AbilityDatabase::Attack, entity);
+					context.ActivateAbility(GameDatabase::instance->AttackAbility, entity);
 				else {
-					if (context.GetEntityManager().UnitArchetype.DataComponents.GetComponent(entity).resources > 0)
+					/*if (context.GetEntityManager().UnitArchetype.DataComponents.GetComponent(entity).resources > 0)
 					{
 						context.ActivateAbility(&AbilityDatabase::Gather, entity);
 					}
-					else
-						context.ActivateAbility(&AbilityDatabase::Move, entity);
+					else*/
+						context.ActivateAbility(GameDatabase::instance->MoveAbility, entity);
 				}
-			}*/
+			}
 
 			commandTrigged = true;
 			commandHasTarget = true;
@@ -209,10 +209,10 @@ void GameView::ContextualGamepadInput() {
 			}
 			else {
 
-		/*		if (entity == Entity::None)
-					context.ActivateAbility(&AbilityDatabase::Move, position);
+				if (entity == Entity::None)
+					context.ActivateAbility(GameDatabase::instance->MoveAbility, position);
 				else
-					context.ActivateAbility(&AbilityDatabase::Move, entity);*/
+					context.ActivateAbility(GameDatabase::instance->MoveAbility, entity);
 
 				commandTrigged = true;
 				commandHasTarget = true;

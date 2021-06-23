@@ -1,7 +1,7 @@
 #include "AbilityDef.h"
 #include "GameDatabase.h"
 
-const ImageFrame& AbilityDef::Art::GetIcon() const
+const ImageFrame& AbilityDef::AbilityArt::GetIcon() const
 {
 	return GameDatabase::instance->GetIcon(IconId);
 }

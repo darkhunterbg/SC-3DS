@@ -135,6 +135,12 @@ void GameDatabase::LoadAssetReferences()
 	selections.push_back(&GetImage("unit\\thingy\\o122"));
 	selections.push_back(&GetImage("unit\\thingy\\o146"));
 	selections.push_back(&GetImage("unit\\thingy\\o224"));
+
+	MoveAbility = GetAbility("Generic\\Move");
+	AttackAbility = GetAbility("Generic\\Attack");
+	StopAbility = GetAbility("Generic\\Stop");
+	PatrolAbility = GetAbility("Generic\\Patrol");
+	HoldPositionAbility = GetAbility("Generic\\Hold Position");
 }
 
 void GameDatabase::CreateRaces()

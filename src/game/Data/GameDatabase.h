@@ -47,6 +47,12 @@ public:
 
 	std::vector<RaceDef> RaceDefs;
 
+	const AbilityDef* MoveAbility = nullptr;
+	const AbilityDef* AttackAbility = nullptr;
+	const AbilityDef* StopAbility = nullptr;
+	const AbilityDef* PatrolAbility = nullptr;
+	const AbilityDef* HoldPositionAbility = nullptr;
+
 	GameDatabase();
 	GameDatabase(const GameDatabase&) = delete;
 	GameDatabase& operator=(const GameDatabase&) = delete;

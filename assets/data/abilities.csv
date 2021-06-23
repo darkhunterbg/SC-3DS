@@ -1,2 +1,6 @@
-Path,AbilityId,Name,Icon
-Generic\Move,14561388,Move,228
+Path,AbilityId,Name,Icon,ButtonPosition,TargetSelection,EntityAIState,PositionAIState
+Generic\Attack,14998522,Attack,230,"2,0",True,AttackTarget,GoToAttack
+Generic\Hold Position,14998526,Hold Position,255,"1,1",False,HoldPosition,Nothing
+Generic\Move,14561388,Move,228,"0,0",True,Follow,GoToPosition
+Generic\Patrol,14998524,Patrol,254,"0,1",True,Patrol,Patrol
+Generic\Stop,14998520,Stop,229,"1,0",False,Idle,Nothing

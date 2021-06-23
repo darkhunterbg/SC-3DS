@@ -106,12 +106,11 @@ void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 
 		const auto& ability = *GameDatabase::instance->GetAbility(cmd.abilityId);
 
-		/*
-
+		
 		switch (cmd.targetType)
 		{
 		case  PlayerCommandTargetType::None: {
-			UnitAIState action = ability.TargetingData.EntitySelectedAction;
+			UnitAIState action = ability.Data.EntitySelectedAction;
 			if (action == UnitAIState::Nothing) {
 				EXCEPTION("Tried to active ability %s with Nothing action no target!", ability.Name.data());
 				return;
@@ -124,7 +123,7 @@ void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 			break;
 		}
 		case  PlayerCommandTargetType::Entity: {
-			UnitAIState action = ability.TargetingData.EntitySelectedAction;
+			UnitAIState action = ability.Data.EntitySelectedAction;
 			if (action == UnitAIState::Nothing) {
 				EXCEPTION("Tried to active ability %s with Nothing action for entity!", ability.Name.data());
 				return;
@@ -137,7 +136,7 @@ void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 			break;
 		}
 		case  PlayerCommandTargetType::Position: {
-			UnitAIState action = ability.TargetingData.PositionSelectedAction;
+			UnitAIState action = ability.Data.PositionSelectedAction;
 			if (action == UnitAIState::Nothing) {
 				EXCEPTION("Tried to active ability %s with Nothing action for position!", ability.Name.data());
 				return;
@@ -162,7 +161,6 @@ void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 		}
 		}
 
-		*/
 	}
 
 	lastExecuted = commands.size();

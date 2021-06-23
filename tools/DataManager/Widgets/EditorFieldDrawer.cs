@@ -55,8 +55,8 @@ namespace DataManager.Widgets
 			}
 			if (type.IsEnum)
 			{
-				int i = obj == null ? default : (int)obj;
-				return Enum(name, (Enum)(object)i, out changed);
+				Enum i = obj == null ? default : (Enum)obj;
+				return Enum(name, i, out changed);
 			}
 			if (type.IsSubclassOf(typeof(Asset)))
 			{
@@ -200,7 +200,7 @@ namespace DataManager.Widgets
 			int editNumber = (int)(object)(value);
 			if (ImGui.Combo(name, ref editNumber, values, values.Length))
 			{
-				value = (Enum)((object)editNumber);
+				value = (Enum)System.Enum.GetValues(value.GetType()).GetValue(editNumber);
 				return true;
 			}
 			return false;
