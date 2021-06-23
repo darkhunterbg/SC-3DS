@@ -378,7 +378,6 @@ static void AudioCallback(void* userdata, Uint8* stream, int len) {
 
 	unsigned size = clip != nullptr ? clip->Remaining() : 0;
 	if (size == 0) {
-		state->DequeueClip();
 		printf("Voice starvation at channel %i\n", state->handle);
 		return;
 	}

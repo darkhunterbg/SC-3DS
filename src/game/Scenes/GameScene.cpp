@@ -5,7 +5,6 @@
 #include "../Engine/AudioManager.h"
 #include "../Entity/EntityManager.h"
 #include "../Profiler.h"
-#include "../Data/RaceDatabase.h"
 #include "../Data//GameDatabase.h"
 #include "../Entity/EntityUtil.h"
 
@@ -41,12 +40,11 @@ void GameScene::Start() {
 
 	int totalPlayers = 8;
 
-	auto& race = RaceDatabase::Terran;
-	race.LoadResourses();
+	const auto& race = *GameDatabase::instance->GetRace(RaceType::Terran);
 
+	if (race.GetMusic())
+		entityManager->GetSoundSystem().PlayMusic(*race.GetMusic());
 
-	AudioClip* stream = race.GameMusic[std::rand() % race.GameMusic.size()].Stream;
-	AudioManager::PlayClip(stream, 0);
 
 	for (int p = 0; p < totalPlayers; ++p) {
 		entityManager->GetPlayerSystem().AddPlayer(race, color[p]);
@@ -68,10 +66,10 @@ void GameScene::Start() {
 
 
 
-	//entityManager->UnitArchetype.HealthComponents.GetComponent(e).current = 499;
+		//entityManager->UnitArchetype.HealthComponents.GetComponent(e).current = 499;
 
-	//EntityId e = UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 0,
-	//	Vector2Int16(48, 48));
+		//EntityId e = UnitEntityUtil::NewUnit(*UnitDatabase::Units[0], 0,
+		//	Vector2Int16(48, 48));
 
 	const auto& def = *GameDatabase::instance->GetUnit("Terran\\Units\\Marine");
 
@@ -80,7 +78,7 @@ void GameScene::Start() {
 		for (int x = 1; x > 0; --x) {
 			Color c = color[(i) % 12];
 			//auto& def = *UnitDatabase::Units[1];
-			 UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
+			UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
 				Vector2Int16(Vector2Int{ x * 32 + 48,y * 32 + 48 }));
 
 			i += 1;

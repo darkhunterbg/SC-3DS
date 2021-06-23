@@ -42,8 +42,7 @@ bool AudioClip::Restart() {
 		return true;
 	}
 
-
-	bool success = fseek(stream, 0, SEEK_SET);
+	bool success = fseek(stream, streamStartPos, SEEK_SET);
 
 	if (success)
 		streamPos = 0;
@@ -55,6 +54,9 @@ AudioClip::AudioClip(AudioInfo info, unsigned bufferSize, FILE* stream) {
 	this->info = info;
 	uint8_t* memory = new uint8_t[bufferSize * BufferCount];
 	this->stream = stream;
+
+	fgetpos(stream, &streamStartPos);
+
 	for (int i = 0; i < BufferCount; ++i) {
 		buffers[i] = { memory + bufferSize * i, bufferSize };
 	}

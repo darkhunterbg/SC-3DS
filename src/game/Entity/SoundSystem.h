@@ -43,6 +43,7 @@ private:
 	std::vector<EntityAudioChannel> worldAudioChannels;
 	EntityAudioChannel chatAudioChannel;
 	EntityAudioChannel uiAudioChannel;
+	const AudioChannelState* musicChannel = nullptr;
 
 	std::vector<AudioClip*> entityUniqueAudio;
 	std::vector<EntityPriorityAudio> entityAudioPriority;
@@ -75,4 +76,6 @@ public:
 	void PlayUISound(AudioClip& clip);
 
 	void ClearAudio(EntityManager& em);
+
+	void PlayMusic(const SoundSetDef& music);
 };

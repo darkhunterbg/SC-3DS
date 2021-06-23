@@ -58,6 +58,23 @@ const AbilityDef* GameDatabase::GetAbility(AbilityId id) const
 	return r->second;
 }
 
+const SoundSetDef* GameDatabase::GetSoundSet(const char* path) const {
+	for (const SoundSetDef& def : SoundSetDefs)
+		if (std::strncmp(def.Path, path, sizeof(def.Path)) == 0)
+			return  &def;
+
+	return nullptr;
+}
+
+const RaceDef* GameDatabase::GetRace(RaceType type) const
+{
+	for (const RaceDef& def : RaceDefs)
+		if (def.Type == type)
+			return &def;
+
+	return nullptr;
+}
+
 void GameDatabase::LoadAssetReferences()
 {
 	std::vector<const Texture*> textures;
@@ -75,15 +92,15 @@ void GameDatabase::LoadAssetReferences()
 		audioClips.push_back(clip);
 	}
 
-	images.reserve(ImageDefs.size());
+
 	frames.reserve(frames.size());
-
-
 	for (const ImageFrameDef& frameDef : FrameDefs) {
 		const Texture* tex = textures[frameDef.atlasId];
 		frames.push_back(ImageFrame(*tex, frameDef));
 	}
 
+	images.reserve(ImageDefs.size());
+	imageNamesMap.reserve(ImageDefs.size());
 	for (const ImageDef& imageDef : ImageDefs) {
 		
 		const ImageFrame* f = &frames[imageDef.frameStart];
@@ -92,13 +109,17 @@ void GameDatabase::LoadAssetReferences()
 		imageNamesMap[img.GetName()] = &img;
 	}
 
+	unitMap.reserve(UnitDefs.size());
 	for (const auto& def : UnitDefs) {
 		unitMap[def.Id] = &def;
 	}
 
+	abilityMap.reserve(AbilityDefs.size());
 	for (const auto& def : AbilityDefs) {
 		abilityMap[def.Id] = &def;
 	}
+
+	CreateRaces();
 
 	commandIcons = imageNamesMap["unit\\cmdbtns\\cmdicons"];
 
@@ -114,4 +135,55 @@ void GameDatabase::LoadAssetReferences()
 	selections.push_back(&GetImage("unit\\thingy\\o122"));
 	selections.push_back(&GetImage("unit\\thingy\\o146"));
 	selections.push_back(&GetImage("unit\\thingy\\o224"));
+}
+
+void GameDatabase::CreateRaces()
+{
+	RaceDefs.reserve(3);
+
+	// ============= Terran =======================
+	{
+		RaceDef d = RaceDef();
+		d.Name = "Terran";
+		d.SupplyNamePlural = "Supplies";
+		d.SupplyBuildingNamePlural = "Supply Depots";
+		d.Type = RaceType::Terran;
+		d.ConsoleLowerSprite = GetImage("game\\tconsole").GetFrame(0);
+		d.ConsoleUpperSprite = GetImage("game\\tconsoleup").GetFrame(0);
+		d.CommandIcons = &GetImage("unit\\cmdbtns\\tcmdbtns");
+		d.SupplyIcon = GetImage("game\\icons\\tsupply").GetFrame(0);
+		d.GasIcon = GetImage("game\\icons\\tgas").GetFrame(0);
+
+		RaceDefs.push_back(d);
+	}
+	// ============= Zerg =========================
+	{
+		RaceDef d = RaceDef();
+		d.Name = "Zerg";
+		d.SupplyNamePlural = "Controls";
+		d.SupplyBuildingNamePlural = "Overlords";
+		d.Type = RaceType::Zerg;
+		d.ConsoleLowerSprite = GetImage("game\\zconsole").GetFrame(0);
+		d.ConsoleUpperSprite = GetImage("game\\zconsoleup").GetFrame(0);
+		d.CommandIcons = &GetImage("unit\\cmdbtns\\zcmdbtns");
+		d.SupplyIcon = GetImage("game\\icons\\zsupply").GetFrame(0);
+		d.GasIcon = GetImage("game\\icons\\zgas").GetFrame(0);
+
+		RaceDefs.push_back(d);
+	}
+	// ============= Protoss ======================
+	{
+		RaceDef d = RaceDef();
+		d.Name = "Protoss";
+		d.SupplyNamePlural = "Psi";
+		d.SupplyBuildingNamePlural = "Pylons";
+		d.Type = RaceType::Protoss;
+		d.ConsoleLowerSprite = GetImage("game\\zconsole").GetFrame(0);
+		d.ConsoleUpperSprite = GetImage("game\\zconsoleup").GetFrame(0);
+		d.CommandIcons = &GetImage("unit\\cmdbtns\\zcmdbtns");
+		d.SupplyIcon = GetImage("game\\icons\\zsupply").GetFrame(0);
+		d.GasIcon = GetImage("game\\icons\\zgas").GetFrame(0);
+
+		RaceDefs.push_back(d);
+	}
 }

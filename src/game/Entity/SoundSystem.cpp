@@ -30,10 +30,11 @@ SoundSystem::SoundSystem()
 		}
 	}
 
+	musicChannel = &channels[0];
 	chatAudioChannel.channel = &channels[channels.Size() - 2];
 	uiAudioChannel.channel = &channels[channels.Size() - 1];
 
-	rnd = Random(std::rand());
+	rnd = Random();
 }
 
 bool SoundSystem::EntityAudioSort(const EntityPriorityAudio& a, EntityPriorityAudio& b) {
@@ -208,20 +209,24 @@ void SoundSystem::PlayUnitCommand(EntityId id, const UnitDef& unit) {
 }
 void SoundSystem::PlayAdviserErrorMessage(const RaceDef& race, AdvisorErrorMessageType message)
 {
-	auto clip = race.AdvisorErrorSounds.Clips[(int)message];
+	auto def = race.GetAdvisorError(message);
+	if (def == nullptr)
+		return;
 
-	if (clip->GetData().Size() == 0)
+	AudioClip& clip = def->GetAudioClip(0);
+
+	if (clip.GetData().Size() == 0)
 		return;
 
 
 	auto& channel = chatAudioChannel;
 
-	if (clip->id == channel.clipId)
+	if (clip.id == channel.clipId)
 		return;
 
-	channel.clipId = clip->id;
+	channel.clipId = clip.id;
 
-	AudioManager::PlayClip(clip, channel.channel->ChannelId);
+	AudioManager::PlayClip(&clip, channel.channel->ChannelId);
 }
 void SoundSystem::PlayUISound(AudioClip& clip)
 {
@@ -325,4 +330,19 @@ void SoundSystem::ClearAudio(EntityManager& em)
 
 		flags.clear(ComponentFlags::SoundTrigger);
 	}
+}
+
+void SoundSystem::PlayMusic(const SoundSetDef& music)
+{
+	if (musicChannel == nullptr)
+		return;
+
+	auto clips = music.GetAudioClips();
+	if (clips.Size() == 0)
+		return;
+
+	int i = rnd.Next(clips.Size());
+	AudioClip* clip = clips[i];
+
+	AudioManager::PlayClip(clip, musicChannel->ChannelId);
 }

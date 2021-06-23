@@ -1,5 +1,4 @@
 #include "PerformanceTestScene.h"
-#include "../Data/RaceDatabase.h"
 #include "../Profiler.h"
 
 #include "../Entity/Component.h"
@@ -19,7 +18,7 @@ void PerformanceTestScene::Start() {
 	camera.Scale = 2;
 
 	em.Init({ 128 * 32,128 * 32 });
-	em.GetPlayerSystem().AddPlayer(RaceDatabase::Terran, Colors::White);
+	em.GetPlayerSystem().AddPlayer(*GameDatabase::instance->GetRace(RaceType::Terran), Colors::White);
 	em.GetMapSystem().FogOfWarVisible = false;
 	//em.DrawBoundingBoxes = true;
 

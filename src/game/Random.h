@@ -12,8 +12,10 @@ public:
 	inline int Next()
 	{
 		// https://stackoverflow.com/questions/26237419/faster-than-rand
+		int i = seed;
 		seed = (214013 * seed + 2531011);
-		return (seed >> 16) & 0x7FFF;
+		seed = (seed >> 16) & 0x7FFF;
+		return i;
 	}
 	inline int Next(int max) {
 		return Next() % max;

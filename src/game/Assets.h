@@ -172,4 +172,5 @@ private:
 	FILE* stream;
 	int activeBufferIndex = 1;
 	int streamPos = 0;
+	fpos_t streamStartPos = 0;
 };

@@ -1,24 +1,31 @@
 #include "RaceDef.h"
 
-#include "../Engine/AssetLoader.h"
+#include "GameDatabase.h"
+#include "../StringLib.h"
 
+const SoundSetDef* RaceDef::GetAdvisorError(AdvisorErrorMessageType type) const
+{
+	char path[32];
 
-void RaceDef::LoadResourses() {
-	AdvisorErrorSounds.LoadSoundClips();
-	AdvisorUpdateSounds.LoadSoundClips();
+	stbsp_snprintf(path, 32, "Advisor\\%s\\Error0%i", Name.data(), (int)type);
 
-	CommandIcons = &AssetLoader::GetDatabase().GetImage(commandIconsPath);
-	ConsoleLowerSprite = AssetLoader::GetDatabase().GetImage(consolePath).GetFrame(0);
-	ConsoleUpperSprite = AssetLoader::GetDatabase().GetImage(consolePath + "up").GetFrame(0);
+	return GameDatabase::instance->GetSoundSet(path);
+}
 
+const SoundSetDef* RaceDef::GetAdvisorUpdate(AdvisorUpdateMessageType type) const
+{
+	char path[32];
 
-	SupplyIcon  = AssetLoader::GetDatabase().GetImage(supplyIconPath).GetFrame(0);
-	GasIcon = AssetLoader::GetDatabase().GetImage(gasIconPath).GetFrame(0);
-		//const SpriteAtlas* icons = AssetLoader::LoadAtlas("game_icons.t3x");
-		//SupplyIcon = icons->GetSprite(SupplyIconId);
+	stbsp_snprintf(path, 32, "Advisor\\%s\\Update0%i", Name.data(), (int)type);
 
-		//GasIcon = icons->GetSprite(GasIconId);
+	return GameDatabase::instance->GetSoundSet(path);
+}
 
-		for (auto& musicDef : GameMusic)
-			musicDef.Load();
+const SoundSetDef* RaceDef::GetMusic() const
+{
+	char path[32];
+
+	stbsp_snprintf(path, 32, "Music\\%s", Name.data());
+
+	return GameDatabase::instance->GetSoundSet(path);
 }

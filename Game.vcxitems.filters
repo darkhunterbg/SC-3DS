@@ -77,9 +77,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\EntityTree.h">
       <Filter>Entity</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\SoundDef.h">
-      <Filter>Data</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\TimingSystem.h">
       <Filter>Entity</Filter>
     </ClInclude>
@@ -87,9 +84,6 @@
       <Filter>Entity</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\RaceDef.h">
-      <Filter>Data</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\RaceDatabase.h">
       <Filter>Data</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\PlayerSystem.h">
@@ -230,9 +224,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\EntityTree.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\SoundDef.cpp">
-      <Filter>Data</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\TimingSystem.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
@@ -240,9 +231,6 @@
       <Filter>Entity</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\RaceDef.cpp">
-      <Filter>Data</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\RaceDatabase.cpp">
       <Filter>Data</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\PlayerSystem.cpp">

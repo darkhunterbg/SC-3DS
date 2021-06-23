@@ -15,6 +15,7 @@ namespace DataManager.Assets
 		public override string AssetName => Path;
 
 		[Index(0)]
+		[Binary(BinaryType.String,32)]
 		public string Path { get; set; }
 
 		[Ignore]

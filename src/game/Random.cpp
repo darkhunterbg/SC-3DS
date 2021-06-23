@@ -2,6 +2,7 @@
 
 #include <random>
 
+#include "Platform.h"
 
 Random::Random()
 {

@@ -7,6 +7,7 @@ struct AudioClip;
 
 #pragma pack(push, 2)
 struct SoundSetDef {
+	char Path[32];
 	uint16_t ClipStart;
 	uint8_t ClipCount;
 	bool Randomize;

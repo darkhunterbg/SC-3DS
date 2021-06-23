@@ -3,11 +3,9 @@
 #include "../Entity/EntityManager.h" 
 #include "../Entity/EntityUtil.h"
 #include "../Debug.h"
-#include "../Data/RaceDatabase.h"
-#include "../Data/SoundSetDef.h"
+#include "../Data/GameDatabase.h"
 
 #include <algorithm>
-
 
 void GameViewContext::ActivateAbility(const AbilityDef* ability)
 {
@@ -270,7 +268,7 @@ const RaceDef& GameViewContext::GetPlayerRaceDef() const
 {
 	auto& info = GetPlayerInfo();
 
-	return *RaceDatabase::GetRaceDef(info.race);
+	return *GameDatabase::instance->GetRace(info.race);
 }
 
 const PlayerInfo& GameViewContext::GetPlayerInfo() const

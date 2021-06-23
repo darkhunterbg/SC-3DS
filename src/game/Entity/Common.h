@@ -40,6 +40,10 @@ enum class TimerExpiredAction : uint8_t {
 static constexpr const int TimerExpiredActionTypeCount = 5;
 
 
+enum AdvisorUpdateMessageType {
+
+};
+
 enum AdvisorErrorMessageType {
 	NotEnoughMinerals = 0,
 	NotEnoughGas = 1,

@@ -5,7 +5,6 @@
 #include "Scenes/PerformanceTestScene.h"
 #include "StringLib.h"
 #include "Profiler.h"
-#include "Data/RaceDatabase.h"
 
 #include "Engine/GraphicsRenderer.h"
 #include "Engine/JobSystem.h"
@@ -71,9 +70,6 @@ void Game::Start() {
 	frameStartTime = Platform::ElaspedTime();
 	AudioManager::Init();
 	GraphicsRenderer::Init();
-
-
-	RaceDatabase::Init();
 }
 bool Game::Update() {
 

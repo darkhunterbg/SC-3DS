@@ -7,10 +7,12 @@
 #include "AbilityDef.h"
 #include "UpgradeDef.h"
 #include "SoundSetDef.h"
+#include "RaceDef.h"
 
 #include "../Assets.h"
 #include <algorithm>
 #include <unordered_map>
+
 
 class GameDatabase {
 private:
@@ -24,6 +26,8 @@ private:
 	std::unordered_map<std::string, const Image*> imageNamesMap;
 	std::unordered_map<UnitId, const UnitDef*> unitMap;
 	std::unordered_map<AbilityId, const AbilityDef*> abilityMap;
+
+	void CreateRaces();
 public:
 	static const GameDatabase* instance;
 
@@ -40,6 +44,8 @@ public:
 	std::vector<UpgradeDef> UpgradeDefs;
 	std::vector<WeaponDef> WeaponDefs;
 	std::vector<SoundSetDef> SoundSetDefs;
+
+	std::vector<RaceDef> RaceDefs;
 
 	GameDatabase();
 	GameDatabase(const GameDatabase&) = delete;
@@ -58,10 +64,15 @@ public:
 	const AbilityDef* GetAbility(const char* path) const;
 	const AbilityDef* GetAbility(AbilityId id) const;
 
+	const SoundSetDef* GetSoundSet(const char* path) const;
+	const RaceDef* GetRace(RaceType type) const;
+
 	inline AudioClip& GetAudioClip(unsigned id) const { return *audioClips[id]; }
 	inline Span<AudioClip*> GetAudioClips(unsigned id, unsigned count) const {
 		return { &audioClips[id], count };
 	}
 
+
 	void LoadAssetReferences();
+
 };

@@ -2,10 +2,12 @@
 
 #include <cstdint>
 #include <string>
-#include <vector>
-#include <functional>
 
-#include "SoundDef.h"
+#include "../Assets.h"
+
+#include "../Entity/Common.h"
+
+struct SoundSetDef;
 
 enum class RaceType :uint8_t {
 
@@ -19,31 +21,18 @@ struct RaceDef {
 	RaceType Type;
 	std::string Name;
 
-	std::string consolePath;
-	std::string commandIconsPath;
-
 	ImageFrame ConsoleLowerSprite;
 	ImageFrame ConsoleUpperSprite;
 	const Image* CommandIcons;
 
 	ImageFrame SupplyIcon;
-	std::string supplyIconPath;
+	ImageFrame GasIcon;
 
 	std::string SupplyNamePlural;
 	std::string SupplyBuildingNamePlural;
 
-	ImageFrame GasIcon;
-	std::string gasIconPath;
-
-	AdvisorSounds AdvisorErrorSounds;
-	AdvisorSounds AdvisorUpdateSounds;
-
-	std::vector<AudioStreamDef> GameMusic;
-
-	RaceDef() {  }
-	RaceDef(const RaceDef&) = delete;
-	RaceDef& operator=(const RaceDef&) = delete;
-
-	void LoadResourses();
+	const SoundSetDef* GetAdvisorError(AdvisorErrorMessageType type) const;
+	const SoundSetDef* GetAdvisorUpdate(AdvisorUpdateMessageType type) const;
+	const SoundSetDef* GetMusic() const;
 };
 
