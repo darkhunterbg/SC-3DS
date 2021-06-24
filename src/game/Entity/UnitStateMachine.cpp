@@ -134,8 +134,10 @@ void UnitAttackingState::EnterState(
 		uint8_t orientation = EntityUtil::GetOrientationToPosition(id, targetPos);
 		em.OrientationComponents.GetComponent(id) = orientation;
 
-		if (anim) 
+		if (anim) {
 			EntityUtil::PlayAnimation(id, *anim);
+			em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitAIWaitForAnimation);
+		}
 		else
 		{
 			em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::AttackLoop;
@@ -293,6 +295,7 @@ void UnitAttackLoopState::EnterState(UnitStateMachineChangeData& data, EntityMan
 		SetAnimationIfAvaiable(id, em, AnimationType::GroundAttackRepeat);
 
 		em.UnitArchetype.WeaponComponents.GetComponent(id).StartCooldown();
+		em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitAIWaitForAnimation);
 	}
 }
 void UnitAttackLoopState::ExitState(UnitStateMachineChangeData& data, EntityManager& em) {}

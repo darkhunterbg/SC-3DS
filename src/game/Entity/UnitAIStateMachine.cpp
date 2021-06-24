@@ -85,14 +85,11 @@ static bool TryAttackTarget(EntityId target, EntityId id, Vector2Int16 pos, Enti
 	if (distance.LengthSquaredInt() < range * range) {
 
 		if (em.UnitArchetype.StateComponents.GetComponent(id) == UnitState::Attacking) {
-			if (em.AnimationArchetype.StateComponents.GetComponent(id).done)
-			{
-				em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::AttackLoop;
-				em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
-			}
+			em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::AttackLoop;
+			em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
 		}
 		else if (weapon.IsReady())
-				UnitEntityUtil::AttackTarget(id, target);
+			UnitEntityUtil::AttackTarget(id, target);
 
 		return true;
 	}

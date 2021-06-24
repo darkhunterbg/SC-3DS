@@ -37,15 +37,22 @@ void UnitSystem::UnitAIUpdate(EntityManager& em) {
 
 		UnitAIState state = em.UnitArchetype.AIStateComponents.GetComponent(id);
 
+	
 		if (flags.test(ComponentFlags::UnitAIStateChanged)) {
 			aiEnterStateData[(int)state].entities.push_back(id);
 			flags.clear(ComponentFlags::UnitAIStateChanged);
 		}
 
+		if (flags.test(ComponentFlags::UnitAIWaitForAnimation)) {
+			if (!em.AnimationArchetype.StateComponents.GetComponent(id).done)
+				continue;
+			
+			flags.clear(ComponentFlags::UnitAIWaitForAnimation);
+		}
+
 		const auto& stateData = em.UnitArchetype.AIStateDataComponents.GetComponent(id);
 		const auto& position = em.PositionComponents.GetComponent(id);
 		PlayerId owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
-
 
 		auto& thinkData = aiThinkData[(int)state];
 

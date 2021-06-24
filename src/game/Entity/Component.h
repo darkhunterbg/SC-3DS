@@ -75,6 +75,7 @@ enum class ComponentFlags {
 	SoundMuted = 11,
 	UnitAIPaused = 12,
 	UnitAIStateChanged = 13,
+	UnitAIWaitForAnimation = 14,
 };
 
 struct FlagsComponent {
