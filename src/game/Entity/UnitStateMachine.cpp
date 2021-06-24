@@ -33,6 +33,7 @@ std::vector<IUnitState*> UnitStateMachine::States = {
 	new UnitDeathState(),
 	new UnitProducingState(),
 	new UnitMiningState(),
+	new UnitAttackLoopState(),
 };
 
 static inline void SetAnimationIfAvaiable(EntityId id, EntityManager& em, AnimationType animation) {
@@ -41,6 +42,9 @@ static inline void SetAnimationIfAvaiable(EntityId id, EntityManager& em, Animat
 	const AnimClipDef* anim = unit.def->Art.GetSprite().GetAnimation(animation);
 	if (anim) EntityUtil::PlayAnimation(id, *anim);
 }
+
+
+
 
 // ============================ Idle State ====================================
 
@@ -119,15 +123,30 @@ void UnitAttackingState::EnterState(
 	UnitStateMachineChangeData& data, EntityManager& em)
 {
 	for (EntityId id : data.entities) {
-		SetAnimationIfAvaiable(id, em, AnimationType::GroundAttackRepeat);
+		const UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
+		const AnimClipDef* anim = unit.def->Art.GetSprite().GetAnimation(AnimationType::GroundAttackInit);
 
-		em.UnitArchetype.WeaponComponents.GetComponent(id).StartCooldown();
+		const auto& stateData = em.UnitArchetype.StateDataComponents.GetComponent(id);
+		Vector2Int16 targetPos = em.PositionComponents.GetComponent(stateData.target.entityId);
+		Rectangle16 targetCollider = em.CollisionArchetype.ColliderComponents.GetComponent(stateData.target.entityId).collider;
+
+		targetCollider.position += targetPos;
+		uint8_t orientation = EntityUtil::GetOrientationToPosition(id, targetPos);
+		em.OrientationComponents.GetComponent(id) = orientation;
+
+		if (anim) 
+			EntityUtil::PlayAnimation(id, *anim);
+		else
+		{
+			em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::AttackLoop;
+			em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
+		}
 	}
 }
 void UnitAttackingState::ExitState(
 	UnitStateMachineChangeData& data, EntityManager& em)
 {
-	
+
 }
 
 
@@ -166,7 +185,7 @@ void UnitProducingState::EnterState(UnitStateMachineChangeData& data, EntityMana
 
 void UnitProducingState::ExitState(UnitStateMachineChangeData& data, EntityManager& em)
 {
-	
+
 }
 
 
@@ -266,3 +285,14 @@ void UnitMiningState::ExitState(UnitStateMachineChangeData& data, EntityManager&
 	em.DeleteEntities(scratch, false);
 
 }
+
+// ============================ Attack Loop State =====================================
+
+void UnitAttackLoopState::EnterState(UnitStateMachineChangeData& data, EntityManager& em) {
+	for (EntityId id : data.entities) {
+		SetAnimationIfAvaiable(id, em, AnimationType::GroundAttackRepeat);
+
+		em.UnitArchetype.WeaponComponents.GetComponent(id).StartCooldown();
+	}
+}
+void UnitAttackLoopState::ExitState(UnitStateMachineChangeData& data, EntityManager& em) {}

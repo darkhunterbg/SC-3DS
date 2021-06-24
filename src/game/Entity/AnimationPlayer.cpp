@@ -74,8 +74,10 @@ static InstructionAction instructionMap[] =
 
 void AnimationPlayer::RunAnimation(EntityId id, const AnimationComponent& anim, AnimationStateComponent& state, EntityManager& em)
 {
+	bool running = true;
+
 	while (state.wait == 0 &&
-		state.instructionCounter < anim.instructionEnd)
+		(running = state.instructionCounter < anim.instructionEnd))
 	{
 		const auto& instr = instructionCache[state.instructionCounter];
 		const auto& action = instructionMap[instr.id];
@@ -84,6 +86,7 @@ void AnimationPlayer::RunAnimation(EntityId id, const AnimationComponent& anim, 
 		++state.instructionCounter;
 	}
 
-	//if (state.instructionId == anim.instructionEnd)
-	//	state.instructionId = anim.instructionStart;
+	state.done = !running;
+		//if (state.instructionId == anim.instructionEnd)
+		//	state.instructionId = anim.instructionStart;
 }

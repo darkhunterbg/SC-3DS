@@ -12,6 +12,7 @@ enum class UnitState : uint8_t {
 	Death = 4,
 	Producing = 5,
 	Mining = 6,
+	AttackLoop = 7,
 };
 
 enum class UnitAIState :uint8_t {

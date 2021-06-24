@@ -146,6 +146,14 @@ struct AnimationStateComponent {
 	int32_t instructionCounter = 0;
 	uint16_t animFrame = 0;
 	uint8_t wait;
+	bool done = false;
+
+	inline void StartAnimation(uint32_t ic) {
+		instructionCounter = ic;
+		animFrame = 0;
+		wait = 0;
+		done = false;
+	}
 };
 
 struct AnimationShadowComponent {

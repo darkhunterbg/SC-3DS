@@ -84,8 +84,15 @@ static bool TryAttackTarget(EntityId target, EntityId id, Vector2Int16 pos, Enti
 
 	if (distance.LengthSquaredInt() < range * range) {
 
-		if (weapon.IsReady())
-			UnitEntityUtil::AttackTarget(id, target);
+		if (em.UnitArchetype.StateComponents.GetComponent(id) == UnitState::Attacking) {
+			if (em.AnimationArchetype.StateComponents.GetComponent(id).done)
+			{
+				em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::AttackLoop;
+				em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
+			}
+		}
+		else if (weapon.IsReady())
+				UnitEntityUtil::AttackTarget(id, target);
 
 		return true;
 	}
@@ -321,14 +328,14 @@ void UnitAIGatherResoureState::Think(UnitAIThinkData& data, EntityManager& em)
 					/*em.AnimationArchetype.OrientationArchetype.AnimOrientationComponents.GetComponent(e2)
 						.clips = GraphicsDatabase::MineralOre.Animations;*/
 
-					//em.ParentArchetype.Archetype.AddEntity(id);
+						//em.ParentArchetype.Archetype.AddEntity(id);
 					em.ParentArchetype.ChildComponents.GetComponent(id).AddChild(e2);
 
 					em.UnitArchetype.UnitComponents.GetComponent(id).cargo = e2;
-				/*	em.FlagComponents.GetComponent(e2).set(ComponentFlags::RenderEnabled);
-					em.FlagComponents.GetComponent(e2).set(ComponentFlags::RenderChanged);*/
+					/*	em.FlagComponents.GetComponent(e2).set(ComponentFlags::RenderEnabled);
+						em.FlagComponents.GetComponent(e2).set(ComponentFlags::RenderChanged);*/
 
-					//EntityUtil::SetRenderFromAnimationClip(e2, GraphicsDatabase::MineralOre.Animations[0], 0);
+						//EntityUtil::SetRenderFromAnimationClip(e2, GraphicsDatabase::MineralOre.Animations[0], 0);
 					UnitEntityUtil::SetAIState(id, UnitAIState::ReturnCargo);
 				}
 			}
@@ -348,7 +355,7 @@ void UnitAIReturnCargoState::Think(UnitAIThinkData& data, EntityManager& em)
 
 		scratch.clear();
 
-		em.GetKinematicSystem().CircleCast({ pos, {( 10 << 5 )} }, scratch);
+		em.GetKinematicSystem().CircleCast({ pos, {(10 << 5)} }, scratch);
 
 		for (EntityId t : scratch) {
 			if (em.UnitArchetype.OwnerComponents.GetComponent(t) != owner)

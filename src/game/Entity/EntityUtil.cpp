@@ -128,9 +128,7 @@ void EntityUtil::PlayAnimation(EntityId id, const AnimClipDef& clip)
 	anim.instructionEnd = clip.InstructionEnd();
 
 	auto& state = em.AnimationArchetype.StateComponents.GetComponent(id);
-	state.animFrame = 0;
-	state.wait = 0;
-	state.instructionCounter = anim.instructionStart;
+	state.StartAnimation(clip.instructionStart);
 }
 
 
@@ -245,7 +243,13 @@ void UnitEntityUtil::AttackTarget(EntityId id, EntityId e)
 	EntityManager& em = GetManager();
 
 	em.UnitArchetype.StateDataComponents.GetComponent(id).target.entityId = e;
-	em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Attacking;
+	auto& state = em.UnitArchetype.StateComponents.GetComponent(id);
+	if (state != UnitState::Attacking) {
+		if (state != UnitState::AttackLoop)
+			em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::Attacking;
+		else
+			em.UnitArchetype.StateComponents.GetComponent(id) = UnitState::AttackLoop;
+	}
 	em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
 	em.FlagComponents.GetComponent(id).clear(ComponentFlags::NavigationWork);
 }
