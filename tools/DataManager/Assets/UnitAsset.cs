@@ -30,6 +30,11 @@ namespace DataManager.Assets
 		[Binary(BinaryType.UInt, 1)]
 		[Optional]
 		public int _Padding { get; set; }
+
+		[DefaultEditor]
+		[Binary(BinaryType.UInt, 2)]
+		[Optional]
+		public int Damage { get; set; }
 	}
 
 	[BinaryData(DataItemType.Units)]
@@ -182,6 +187,11 @@ namespace DataManager.Assets
 		[Binary(BinaryType.AssetRef, 2)]
 		[Optional, TypeConverter(typeof(AssetConverter))]
 		public SoundSetAsset AnnoyedSound { get; set; }
+
+		[DefaultEditor]
+		[Binary(BinaryType.AssetRef, 2)]
+		[Optional, TypeConverter(typeof(AssetConverter))]
+		public SoundSetAsset DeathSound { get; set; }
 		#endregion
 
 		public UnitAsset() : base()

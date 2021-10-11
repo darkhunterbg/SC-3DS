@@ -5,6 +5,7 @@
 #include "../Profiler.h"
 #include "../Engine/JobSystem.h"
 #include "../Debug.h"
+#include "../Data/SoundSetDef.h"
 
 #include <algorithm>
 
@@ -163,9 +164,23 @@ void UnitDeathState::EnterState(
 	em.NavigationArchetype.Archetype.RemoveSortedEntities(data.entities);
 	em.MovementArchetype.Archetype.RemoveSortedEntities(data.entities);
 
+
 	for (EntityId id : data.entities) {
 		SetAnimationIfAvaiable(id, em, AnimationType::Death);
+		em.FlagComponents.GetComponent(id).clear(ComponentFlags::RenderShadows);
+		const UnitDef& def = *em.UnitArchetype.UnitComponents[id].def;
+		const auto sound = def.Sounds.GetDeathSound();
+		if (sound != nullptr)
+		{
+			int r = std::rand() % sound->GetAudioClips().Size();
+			em.SoundArchetype.SourceComponents.GetComponent(id).clip = &sound->GetAudioClip(r);
+			em.FlagComponents.GetComponent(id).set(ComponentFlags::SoundTrigger);
+		}
+
+		em.TimingArchetype.TimingComponents.GetComponent(id).NewTimer(TimeUtil::SecondsTime(0.5f));
+		em.TimingArchetype.ActionComponents.GetComponent(id).action = TimerExpiredAction::DeleteEntity;
 	}
+
 }
 
 void UnitDeathState::ExitState(

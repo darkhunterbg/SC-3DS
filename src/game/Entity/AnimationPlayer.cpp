@@ -64,12 +64,16 @@ static void GoTo(const InstructionParams& params, EntityId id, EntityManager& em
 	--state.instructionCounter;
 }
 
+static void Attack(const InstructionParams& params, EntityId id, EntityManager& em) {
+	em.GetUnitSystem().UnitAttackEvent(id);
+}
+
 
 // ======================================================================================
 
 static InstructionAction instructionMap[] =
 {
-	Frame, Wait, WaitRandom, Face, TurnCW, TurnCCW, GoTo
+	Frame, Wait, WaitRandom, Face, TurnCW, TurnCCW, GoTo, Attack
 };
 
 void AnimationPlayer::RunAnimation(EntityId id, const AnimationComponent& anim, AnimationStateComponent& state, EntityManager& em)

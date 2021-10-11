@@ -187,7 +187,7 @@ namespace DataManager.Gameplay
 
 
 
-
+		public static readonly AnimClipInstruction Attack = new AnimClipInstruction("attack", (state, p) => true);
 
 
 

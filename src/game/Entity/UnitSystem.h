@@ -6,6 +6,22 @@
 #include <vector>
 #include <array>
 
+template <class T>
+class Node {
+	T data;
+	Node* prev, * next;
+};
+
+template <class T>
+class List {
+	Node<T>* start, * end;
+};
+
+class Data {
+	Data* next, * prev;
+	/// 
+};
+
 class EntityManager;
 
 class UnitSystem {
@@ -26,6 +42,9 @@ private:
 
 	std::vector<BuildUpdateData> unitBuildUpdate;
 
+	std::vector<EntityId> attackUnits;
+
+	 void ResolveUnitEvents(EntityManager& em);
 public:
 	UnitSystem();
 
@@ -35,6 +54,8 @@ public:
 	void UpdateUnitStats(EntityManager& em);
 
 	void UpdateBuilding(EntityManager& em);
+
+	void UnitAttackEvent(EntityId id);
 
 	void DequeueItem(EntityId id, int itemId, EntityManager& em);
 

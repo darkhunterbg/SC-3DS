@@ -30,5 +30,11 @@ namespace DataManager.Assets
 		[Optional]
 		[Binary(BinaryType.String, 32)]
 		public string Name { get; set; } = string.Empty;
+
+		[Section("Sounds")]
+		[DefaultEditor]
+		[Binary(BinaryType.AssetRef, 2)]
+		[Optional, TypeConverter(typeof(AssetConverter))]
+		public SoundSetAsset SpawnSound { get; set; }
 	}
 }

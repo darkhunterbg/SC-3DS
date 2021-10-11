@@ -158,6 +158,8 @@ EntityId UnitEntityUtil::NewUnit(const UnitDef& def, PlayerId playerId, Vector2I
 	em.UnitArchetype.MovementComponents.NewComponent(e).FromDef(def);
 	em.UnitArchetype.DataComponents.NewComponent(e).FromDef(def);
 	em.UnitArchetype.OwnerComponents.NewComponent(e, player.id);
+	if (def.Attacks[0].IsValid())
+		em.UnitArchetype.WeaponComponents.NewComponent(e).FromAttack(def.Attacks[0]);
 	em.UnitArchetype.Archetype.AddEntity(e);
 
 	em.UnitArchetype.PrevStateComponents.NewComponent(e);

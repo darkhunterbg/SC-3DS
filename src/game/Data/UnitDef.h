@@ -24,9 +24,10 @@ struct UnitAttack {
 	Vector2Int16 Range;
 	uint8_t Cooldown;
 	uint8_t Padding;
+	uint16_t Damage;
 
 	const WeaponDef* GetWeapon() const;
-	inline bool IsValid() const { return WeaponId >= 0; }
+	inline bool IsValid() const { return WeaponId >= 0 && Damage > 0; }
 
 };
 
@@ -35,11 +36,13 @@ struct UnitSounds {
 	int16_t YesSoundId;
 	int16_t WhatSoundId;
 	int16_t AnnoyedSoundId;
+	int16_t DeathSoundId;
 
 	const SoundSetDef* GetReadySound() const;
 	const SoundSetDef* GetYesSound() const;
 	const SoundSetDef* GetWhatSound() const;
 	const SoundSetDef* GetAnnoyedSound() const;
+	const SoundSetDef* GetDeathSound() const;
 };
 
 

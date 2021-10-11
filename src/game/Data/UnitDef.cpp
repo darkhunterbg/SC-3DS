@@ -102,3 +102,12 @@ const SoundSetDef* UnitSounds::GetAnnoyedSound() const
 
 	return &GameDatabase::instance->SoundSetDefs[AnnoyedSoundId];
 }
+
+
+const SoundSetDef* UnitSounds::GetDeathSound() const
+{
+	if (DeathSoundId < 0)
+		return nullptr;
+
+	return &GameDatabase::instance->SoundSetDefs[DeathSoundId];
+}

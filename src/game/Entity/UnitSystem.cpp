@@ -37,7 +37,7 @@ void UnitSystem::UnitAIUpdate(EntityManager& em) {
 
 		UnitAIState state = em.UnitArchetype.AIStateComponents.GetComponent(id);
 
-	
+
 		if (flags.test(ComponentFlags::UnitAIStateChanged)) {
 			aiEnterStateData[(int)state].entities.push_back(id);
 			flags.clear(ComponentFlags::UnitAIStateChanged);
@@ -46,7 +46,7 @@ void UnitSystem::UnitAIUpdate(EntityManager& em) {
 		if (flags.test(ComponentFlags::UnitAIWaitForAnimation)) {
 			if (!em.AnimationArchetype.StateComponents.GetComponent(id).done)
 				continue;
-			
+
 			flags.clear(ComponentFlags::UnitAIWaitForAnimation);
 		}
 
@@ -76,6 +76,10 @@ void UnitSystem::UnitAIUpdate(EntityManager& em) {
 			state.Think(thinkData, em);
 	}
 
+}
+
+void UnitSystem::UnitAttackEvent(EntityId id) {
+	attackUnits.push_back(id);
 }
 
 void UnitSystem::UpdateUnitCooldowns(EntityManager& em)
@@ -122,6 +126,8 @@ void UnitSystem::ApplyUnitState(EntityManager& em) {
 		if (data.size())
 			state.EnterState(data, em);
 	}
+
+	ResolveUnitEvents(em);
 }
 
 void UnitSystem::UpdateUnitStats(EntityManager& em)
@@ -246,7 +252,7 @@ void UnitSystem::UpdateBuilding(EntityManager& em)
 		UnitDataComponent& data = em.UnitArchetype.DataComponents.GetComponent(id);
 		PlayerId owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
 
-	
+
 
 		if (!data.IsQueueEmpty()) {
 			const UnitDef* def = data.productionQueue[0];
@@ -324,7 +330,7 @@ void UnitSystem::UpdateBuilding(EntityManager& em)
 				}
 			}
 		}
-		
+
 	}
 	*/
 
@@ -358,14 +364,14 @@ void UnitSystem::DequeueItem(EntityId id, int itemId, EntityManager& em)
 		if (itemId == 0) {
 			def = data.productionQueue[0];
 
-	/*		if (em.GetPlayerSystem().HasEnoughFreeSupply(owner, def->UseSupplyDoubled)) {
-				data.build = true;
-				em.GetPlayerSystem().ReserveSupply(owner, def->UseSupplyDoubled);
-			}
-			else {
-				data.build = false;
-				em.GetPlayerSystem().NewEvent(owner, PlayerEventType::NotEnoughSupply, id);
-			}*/
+			/*		if (em.GetPlayerSystem().HasEnoughFreeSupply(owner, def->UseSupplyDoubled)) {
+						data.build = true;
+						em.GetPlayerSystem().ReserveSupply(owner, def->UseSupplyDoubled);
+					}
+					else {
+						data.build = false;
+						em.GetPlayerSystem().NewEvent(owner, PlayerEventType::NotEnoughSupply, id);
+					}*/
 		}
 	}
 	else {
@@ -373,4 +379,72 @@ void UnitSystem::DequeueItem(EntityId id, int itemId, EntityManager& em)
 		state = UnitState::Idle;
 		em.FlagComponents.GetComponent(id).set(ComponentFlags::UnitStateChanged);
 	}
+}
+
+void UnitSystem::ResolveUnitEvents(EntityManager& em) {
+	std::sort(attackUnits.begin(), attackUnits.end());
+
+
+	for (EntityId id : attackUnits) {
+		const auto& stateData = em.UnitArchetype.StateDataComponents.GetComponent(id);
+		Vector2Int16 targetPos = em.PositionComponents.GetComponent(stateData.target.entityId);
+		Rectangle16 targetCollider = em.CollisionArchetype.ColliderComponents.GetComponent(stateData.target.entityId).collider;
+
+		targetCollider.position += targetPos;
+
+
+		UnitComponent& unit = em.UnitArchetype.UnitComponents.GetComponent(id);
+		FlagsComponent& flags = em.FlagComponents.GetComponent(id);
+
+		uint8_t orientation = EntityUtil::GetOrientationToPosition(id, targetPos);
+		em.OrientationComponents.GetComponent(id) = orientation;
+
+
+
+		UnitWeaponComponent& weapon = em.UnitArchetype.WeaponComponents.GetComponent(id);
+		weapon.StartCooldown();
+
+		bool kill = em.UnitArchetype.HealthComponents.GetComponent(stateData.target.entityId)
+			.Reduce(weapon.damage);
+
+		if (kill) {
+			++unit.kills;
+		}
+
+
+		// Particle Effect
+
+		//targetCollider.Shrink(unit.def->Weapon->TargetEffect[0].GetFrameSize()>> 1);
+
+		Vector2Int16 spawnAt = targetCollider.Closest(em.PositionComponents.GetComponent(id));
+
+		EntityId e = em.NewEntity();
+
+		// HACK
+		em.TimingArchetype.TimingComponents.GetComponent(e).NewTimer(TimeUtil::SecondsTime(1.0f));
+		em.TimingArchetype.ActionComponents.GetComponent(e).action = TimerExpiredAction::DeleteEntity;
+		em.FlagComponents.NewComponent(e).set(ComponentFlags::UpdateTimers);
+		em.FlagComponents.GetComponent(e).set(ComponentFlags::PositionChanged);
+		em.RenderArchetype.RenderComponents.GetComponent(e).depth = 1;
+		em.PositionComponents.NewComponent(e, spawnAt);
+
+		//EntityUtil::PlayAnimation(e, unit.def->Weapon->TargetEffect[0]);
+		//EntityUtil::SetRenderFromAnimationClip(e, unit.def->Weapon->TargetEffect[0], 0);
+		//EntityUtil::SetMapObjectBoundingBoxFromRender(e);
+
+
+		if (unit.def->Attacks[0].IsValid()) {
+			auto weapon = unit.def->Attacks[0].GetWeapon();
+
+			auto sound = weapon->GetSpawnSound();
+			if (sound != nullptr) {
+				int i = std::rand() % sound->ClipCount;
+				em.SoundArchetype.Archetype.AddEntity(e);
+				em.SoundArchetype.SourceComponents.NewComponent(e).clip = &sound->GetAudioClip(i);
+				em.FlagComponents.GetComponent(e).set(ComponentFlags::SoundTrigger);
+			}
+		}
+	}
+
+	attackUnits.clear();
 }

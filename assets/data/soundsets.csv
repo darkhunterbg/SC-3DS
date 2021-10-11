@@ -38,3 +38,4 @@ Units\Terran\Marine\Death,True,"sound\terran\marine\tmadth00,sound\terran\marine
 Units\Terran\Marine\Ready,False,sound\terran\marine\tmardy00
 Units\Terran\Marine\What,True,"sound\terran\marine\tmawht00,sound\terran\marine\tmawht01,sound\terran\marine\tmawht02,sound\terran\marine\tmawht03"
 Units\Terran\Marine\Yes,True,"sound\terran\marine\tmayes00,sound\terran\marine\tmayes01,sound\terran\marine\tmayes02,sound\terran\marine\tmayes03"
+Weapons\GaussRifle,False,sound\bullet\tmafir00
