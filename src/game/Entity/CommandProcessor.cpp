@@ -112,7 +112,7 @@ void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 		case  PlayerCommandTargetType::None: {
 			UnitAIState action = ability.Data.EntitySelectedAction;
 			if (action == UnitAIState::Nothing) {
-				EXCEPTION("Tried to active ability %s with Nothing action no target!", ability.Name.data());
+				EXCEPTION("Tried to active ability %s with Nothing action no target!", ability.Path);
 				return;
 			}
 
@@ -125,7 +125,7 @@ void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 		case  PlayerCommandTargetType::Entity: {
 			UnitAIState action = ability.Data.EntitySelectedAction;
 			if (action == UnitAIState::Nothing) {
-				EXCEPTION("Tried to active ability %s with Nothing action for entity!", ability.Name.data());
+				EXCEPTION("Tried to active ability %s with Nothing action for entity!", ability.Path);
 				return;
 			}
 
@@ -138,7 +138,7 @@ void CommandProcessor::ExecuteQueuedCommands(EntityManager& em)
 		case  PlayerCommandTargetType::Position: {
 			UnitAIState action = ability.Data.PositionSelectedAction;
 			if (action == UnitAIState::Nothing) {
-				EXCEPTION("Tried to active ability %s with Nothing action for position!", ability.Name.data());
+				EXCEPTION("Tried to active ability %s with Nothing action for position!", ability.Path);
 				return;
 			}
 
