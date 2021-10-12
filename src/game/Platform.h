@@ -42,6 +42,7 @@ public:
 	static void ChangeBlendingMode(BlendMode mode);
 	static void ClearBuffer(Color color);
 
+	static void DrawTexture(const Texture& texture, const SubImageCoord& uv, const Rectangle16& dst, bool hFlip = false, Color32 color = Color32(Colors::White));
 	static void DrawTexture(const Texture& texture, const Rectangle16& src, const Rectangle16& dst, bool hFlip = false, Color32 color = Color32(Colors::White));
 	static void DrawRectangle(const Rectangle& rect, Color32 color = Color32(Colors::White));
 	static void DrawText(const Font& font, Vector2Int position, const char* text, Color color = Colors::White);

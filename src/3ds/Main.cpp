@@ -31,7 +31,6 @@ C2D_TextBuf textBuffer;
 u64 mainTimer;
 std::vector<NDSAudioChannel*> audioChannels;
 
-Span<Vertex> vertexBuffer;
 C3D_BufInfo vbInfo;
 
 DVLB_s* spriteBatchBlob;
@@ -44,12 +43,14 @@ void UpdateAudioChannel(NDSAudioChannel& channel);
 
 PrintConsole* console = NULL;
 
-void FatalError(const char* error, ...) {
+void FatalError(const char* error, ...)
+{
 	if (console == nullptr)
 		console = consoleInit(GFX_BOTTOM, nullptr);
 
 	int i = 0;
-	for (auto channel : audioChannels) {
+	for (auto channel : audioChannels)
+	{
 		ndspChnSetPaused(i++, true);
 	}
 
@@ -62,7 +63,8 @@ void FatalError(const char* error, ...) {
 	std::cout << CONSOLE_RED << buffer << CONSOLE_RESET << std::endl;
 	std::cout << "Press START to exit";
 
-	while (aptMainLoop()) {
+	while (aptMainLoop())
+	{
 		hidScanInput();
 		if (hidKeysDown() & KEY_START)
 			break;
@@ -82,7 +84,8 @@ struct Atlas {
 
 u32 __ctru_heap_size = (30 << 20);
 
-void TextureLoadTest() {
+void TextureLoadTest()
+{
 
 	romfsInit();
 	gfxInitDefault();
@@ -110,16 +113,18 @@ void TextureLoadTest() {
 
 	std::vector<std::string> textures;
 
-	for (auto a : altases) {
-		for (int i = 0; i < a.subatlases; ++i) {
-			std::string tex =  std::string(a.name) + "_" + std::to_string(i) + ".t3x";
+	for (auto a : altases)
+	{
+		for (int i = 0; i < a.subatlases; ++i)
+		{
+			std::string tex = std::string(a.name) + "_" + std::to_string(i) + ".t3x";
 			textures.push_back(tex);
 		}
 	}
 
 	console = consoleInit(GFX_BOTTOM, nullptr);
 
-	printf("free space %iMB / %iMB\n", envGetHeapSize() / (1024 * 1024),  linearSpaceFree() / (1024 * 1024));
+	printf("free space %iMB / %iMB\n", envGetHeapSize() / (1024 * 1024), linearSpaceFree() / (1024 * 1024));
 
 
 	int i = 0;
@@ -150,7 +155,7 @@ void TextureLoadTest() {
 		C3D_Tex tex;
 		auto loaded = Tex3DS_TextureImportStdio(f, &tex, nullptr, false);
 		if (loaded == nullptr)
-			FatalError("Failed to load texture! Used Memory %iMB", texMemoryUsed/(1024*1024));
+			FatalError("Failed to load texture! Used Memory %iMB", texMemoryUsed / (1024 * 1024));
 
 		texMemoryUsed += tex.size;
 
@@ -179,7 +184,8 @@ int main()
 			break;
 
 
-		for (auto channel : audioChannels) {
+		for (auto channel : audioChannels)
+		{
 			if (!channel->enabled)
 				continue;
 
@@ -213,14 +219,13 @@ int main()
 	return 0;
 }
 
-void LoadShader() {
+void LoadShader()
+{
 	spriteBatchBlob = DVLB_ParseFile((u32*)spritebatch_shbin, spritebatch_shbin_size);
 	if (!spriteBatchBlob)
 		FatalError("Failed to compile spritebatch shader");
 
 	static constexpr const int VBSize = 64 * 1024;
-
-	vertexBuffer = { (Vertex*)linearAlloc(sizeof(Vertex) * VBSize), VBSize };
 
 	shaderProgramInit(&spriteBatchProgram);
 	shaderProgramSetVsh(&spriteBatchProgram, &spriteBatchBlob->DVLE[0]);
@@ -230,11 +235,12 @@ void LoadShader() {
 	AttrInfo_AddLoader(&spriteBatchAttributeInfo, 1, GPU_FLOAT, 2); // v1=texcoord
 	AttrInfo_AddLoader(&spriteBatchAttributeInfo, 2, GPU_UNSIGNED_BYTE, 4); // v2=color
 
-	BufInfo_Init(&vbInfo);
-	BufInfo_Add(&vbInfo, vertexBuffer.Data(), sizeof(Vertex), 3, 0x210);
+	//BufInfo_Init(&vbInfo);
+	//BufInfo_Add(&vbInfo, vertexBuffer.Data(), sizeof(Vertex), 3, 0x210);
 }
 
-void Init() {
+void Init()
+{
 
 	romfsInit();
 	gfxInitDefault();
@@ -275,13 +281,15 @@ void Init() {
 	userDir = assetDir.substr(0, assetDir.length() - 6) + "User/";
 	struct stat s = { 0 };
 
-	if (stat(userDir.data(), &s) != 0 || !S_ISDIR(s.st_mode)) {
+	if (stat(userDir.data(), &s) != 0 || !S_ISDIR(s.st_mode))
+	{
 		mkdir(userDir.data(), 0444);
 	}
 
 	textBuffer = C2D_TextBufNew(4096);
 }
-void Uninit() {
+void Uninit()
+{
 
 	ndspExit();
 	C2D_Fini();
@@ -290,7 +298,8 @@ void Uninit() {
 	romfsExit();
 }
 
-void UpdateAudioChannel(NDSAudioChannel& channel) {
+void UpdateAudioChannel(NDSAudioChannel& channel)
+{
 
 	// TODO: on update check if clip has changed and if so, clear chain and start over 
 
@@ -305,7 +314,8 @@ void UpdateAudioChannel(NDSAudioChannel& channel) {
 
 	AudioChannelClip* clip = state->CurrentClip();
 	unsigned size = clip != nullptr ? clip->Remaining() : 0;
-	if (size == 0) {
+	if (size == 0)
+	{
 		//EngineLogWarning("Voice starvation at channel %i", state->handle);
 		return;
 	}
@@ -321,7 +331,8 @@ void UpdateAudioChannel(NDSAudioChannel& channel) {
 
 	memcpy(_audioBuffer, clip->PlayFrom(), len);
 
-	if (len < state->bufferSize) {
+	if (len < state->bufferSize)
+	{
 		unsigned silenceSize = state->bufferSize - len;
 		memset(_audioBuffer + len, 0, silenceSize);
 	}
@@ -332,7 +343,8 @@ void UpdateAudioChannel(NDSAudioChannel& channel) {
 
 	clip->playPos += len;
 
-	if (clip->Done()) {
+	if (clip->Done())
+	{
 		state->DequeueClip();
 	}
 

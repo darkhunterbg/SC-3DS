@@ -86,9 +86,7 @@ struct ImageFrame {
 	inline Rectangle16 GetRect16() const {
 		return { offset, size };
 	}
-	inline Rectangle16 GetSource() const {
-		return uv.GetSource(texture->GetSize());
-	}
+
 };
 
 class Image {

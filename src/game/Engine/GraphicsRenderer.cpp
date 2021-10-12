@@ -16,7 +16,8 @@ void GraphicsRenderer::BufferDraw(std::vector<BatchDrawCommand>& cmd)
 	if (cmd.size() == 0)
 		return;
 
-	for (const auto& c : cmd) {
+	for (const auto& c : cmd)
+	{
 
 		Rectangle16 dst = { c.position, c.sprite->size };
 		dst.size = Vector2Int16(Vector2(dst.size) * c.scale);
@@ -25,7 +26,7 @@ void GraphicsRenderer::BufferDraw(std::vector<BatchDrawCommand>& cmd)
 		if (hFlips)
 			dst.size.x *= -1;
 
-		Platform::DrawTexture(*c.sprite->texture, c.sprite->GetSource(), dst, hFlips, c.color.value);
+		Platform::DrawTexture(*c.sprite->texture, c.sprite->uv, dst, hFlips, c.color.value);
 	}
 }
 
@@ -43,7 +44,7 @@ void GraphicsRenderer::Draw(const ImageFrame& sprite, Vector2Int position, Color
 
 	Rectangle16 rect = { Vector2Int16(position), sprite.size };
 
-	Platform::DrawTexture(*sprite.texture, sprite.GetSource(), rect, false, color.value);
+	Platform::DrawTexture(*sprite.texture, sprite.uv, rect, false, color.value);
 }
 
 void GraphicsRenderer::Draw(const ImageFrame& sprite, const Rectangle& dst, Color32 color)
@@ -53,7 +54,7 @@ void GraphicsRenderer::Draw(const ImageFrame& sprite, const Rectangle& dst, Colo
 
 	Rectangle16 rect = { Vector2Int16(dst.position), Vector2Int16(dst.size) };
 
-	Platform::DrawTexture(*sprite.texture, sprite.GetSource(), rect, false, color.value);
+	Platform::DrawTexture(*sprite.texture, sprite.uv, rect, false, color.value);
 }
 
 void GraphicsRenderer::DrawText(const Font& font, Vector2Int position, const char* text, Color color)
@@ -78,7 +79,7 @@ void GraphicsRenderer::DrawLine(Vector2Int src, Vector2Int dst, Color32 color)
 	if (dst.y < rect.position.y)
 		rect.position.y = dst.y;
 
-	rect.size =  (dst - src);
+	rect.size = (dst - src);
 	rect.size.x = fabs(rect.size.x);
 	rect.size.y = fabs(rect.size.y);
 
@@ -97,7 +98,7 @@ void GraphicsRenderer::NewFrame()
 void GraphicsRenderer::EndFrame()
 {
 	Submit();
-	
+
 }
 
 void GraphicsRenderer::Submit()

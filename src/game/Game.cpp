@@ -35,13 +35,13 @@ float Game::DeltaTime = 0;
 
 static void ShowTitleScreen() {
 	GraphicsRenderer::DrawOnScreen(ScreenId::Top);
-	GraphicsRenderer::Draw(*title, { 0,0 }, { 400,240 });
+	GraphicsRenderer::Draw(*title, { 0,0 }, {400,240});
 }
 static void InitialScene() {
 	AssetLoader::LoadDatabase();
 
-	Game::SetCurrentScene(new GameScene());
-	//Game::SetCurrentScene(new PerformanceTestScene());
+	 Game::SetCurrentScene(new GameScene());
+	// Game::SetCurrentScene(new PerformanceTestScene());
 }
 
 void Game::FrameStart() {

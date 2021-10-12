@@ -37,14 +37,16 @@ static ScreenId currentRT;
 static GPU_Target* target = nullptr;
 
 
-constexpr Uint8 SDL_FloatToUint8(float x) {
+constexpr Uint8 SDL_FloatToUint8(float x)
+{
 	return (Uint8)(255.0f * ClampF(x, 0.0f, 1.0f) + 0.5f);
 }
 
 static 	void AudioCallback(void* userdata, Uint8* stream, int len);
 
 
-TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize) {
+TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize)
+{
 
 	std::filesystem::path p = assetDir;
 	p.append(path);
@@ -52,7 +54,8 @@ TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize) {
 
 	GPU_Image* tex = GPU_LoadImage(p.string().data());
 
-	if (tex == nullptr) {
+	if (tex == nullptr)
+	{
 		auto error = SDL_GetError();
 		EXCEPTION("Load texture %s failed with error %i.", path.data(), error);
 	}
@@ -63,7 +66,8 @@ TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize) {
 	return tex;
 
 }
-const Font* Platform::LoadFont(const char* path, int size) {
+const Font* Platform::LoadFont(const char* path, int size)
+{
 
 	std::filesystem::path fullPath = assetDir;
 	fullPath = fullPath.parent_path().append("gfx").append(path).replace_extension("ttf");
@@ -72,7 +76,8 @@ const Font* Platform::LoadFont(const char* path, int size) {
 	auto lf = FC_LoadFont(font, fullPath.generic_string().data(), size, FC_MakeColor(255, 255, 255, 255), TTF_STYLE_NORMAL);
 
 
-	if (lf == 0) {
+	if (lf == 0)
+	{
 		const char* error = SDL_GetError();
 		EXCEPTION("Load font %s failed with %s!", fullPath.generic_string().data(), error);
 		FC_ClearFont(font);
@@ -81,26 +86,30 @@ const Font* Platform::LoadFont(const char* path, int size) {
 
 	return new Font(font, 1);
 }
-Vector2Int Platform::MeasureString(const Font& font, const char* text) {
+Vector2Int Platform::MeasureString(const Font& font, const char* text)
+{
 	FC_Font* f = font.GetFontId<FC_Font>();
 	GPU_Rect rect = FC_GetBounds(f, 0, 0, FC_AlignEnum::FC_ALIGN_LEFT, FC_MakeScale(font.GetScale(), font.GetScale()), text);
 
 	return { (int)rect.w, (int)rect.h };
 }
 
-FILE* Platform::OpenAsset(const char* path) {
+FILE* Platform::OpenAsset(const char* path)
+{
 	std::filesystem::path f = assetDir;
 	f.append(path);
 
 	return fopen(f.generic_string().data(), "rb");
 }
 
-void Platform::DrawOnScreen(ScreenId screen) {
+void Platform::DrawOnScreen(ScreenId screen)
+{
 	currentRT = screen;
 	target = (screens[(int)currentRT])->target;
 
 }
-void Platform::DrawOnSurface(SurfaceId surface) {
+void Platform::DrawOnSurface(SurfaceId surface)
+{
 	auto t = (GPU_Target*)surface;
 
 	if (t == nullptr)
@@ -108,12 +117,14 @@ void Platform::DrawOnSurface(SurfaceId surface) {
 	else
 		target = t;
 }
-SurfaceId Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering, TextureId& outTexture) {
+SurfaceId Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering, TextureId& outTexture)
+{
 	GPU_Image* tex = nullptr;
 
 	tex = GPU_CreateImage(size.x, size.y, GPU_FORMAT_RGBA);
 
-	if (pixelFiltering) {
+	if (pixelFiltering)
+	{
 		GPU_SetImageFilter(tex, GPU_FILTER_NEAREST);
 	}
 	else
@@ -127,7 +138,8 @@ SurfaceId Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering, Textu
 
 	return surface;
 }
-SubImageCoord Platform::GenerateUV(TextureId texture, Rectangle16 src) {
+SubImageCoord Platform::GenerateUV(TextureId texture, Rectangle16 src)
+{
 	GPU_Image* img = (GPU_Image*)texture;
 	Vector2 start = Vector2(src.position) / Vector2(img->w, img->h);
 	Vector2 end = Vector2(src.GetMax()) / Vector2(img->w, img->h);
@@ -137,7 +149,8 @@ SubImageCoord Platform::GenerateUV(TextureId texture, Rectangle16 src) {
 	return uv;
 }
 
-void Platform::ChangeBlendingMode(BlendMode mode) {
+void Platform::ChangeBlendingMode(BlendMode mode)
+{
 	GPU_BlendPresetEnum b = GPU_BLEND_NORMAL;
 
 	switch (mode)
@@ -158,13 +171,15 @@ void Platform::ChangeBlendingMode(BlendMode mode) {
 	GPU_SetShapeBlendMode(b);
 }
 
-void Platform::ClearBuffer(Color color) {
+void Platform::ClearBuffer(Color color)
+{
 	Color32 c(color);
 
 	GPU_ClearRGBA(target, c.GetR(), c.GetG(), c.GetB(), c.GetA());
 }
 
-void Platform::DrawTexture(const Texture& texture, const Rectangle16& src, const Rectangle16& dst, bool hFlip, Color32 c) {
+void Platform::DrawTexture(const Texture& texture, const Rectangle16& src, const Rectangle16& dst, bool hFlip, Color32 c)
+{
 
 	GPU_Image* img = (GPU_Image*)texture.GetTextureId();
 	GPU_Rect srcRect = { (float)src.position.x, (float)src.position.y, (float)src.size.x, (float)src.size.y };
@@ -174,7 +189,19 @@ void Platform::DrawTexture(const Texture& texture, const Rectangle16& src, const
 	GPU_SetRGBA(img, c.GetR(), c.GetG(), c.GetB(), c.GetA());
 	GPU_BlitScale(img, &srcRect, target, (float)dst.GetCenter().x, (float)dst.GetCenter().y, scale.x, scale.y);
 }
-void Platform::DrawRectangle(const Rectangle& rect, Color32 c) {
+void Platform::DrawTexture(const Texture& texture, const SubImageCoord& uv, const Rectangle16& dst, bool hFlip, Color32 c)
+{
+	GPU_Image* img = (GPU_Image*)texture.GetTextureId();
+	Rectangle16 src = uv.GetSource(texture.GetSize());
+	GPU_Rect srcRect = { (float)src.position.x, (float)src.position.y, (float)src.size.x, (float)src.size.y };
+	Vector2 scale = Vector2(dst.size) / Vector2(src.size);
+	scale.x -= scale.x * 2.0f * hFlip;
+
+	GPU_SetRGBA(img, c.GetR(), c.GetG(), c.GetB(), c.GetA());
+	GPU_BlitScale(img, &srcRect, target, (float)dst.GetCenter().x, (float)dst.GetCenter().y, scale.x, scale.y);
+}
+void Platform::DrawRectangle(const Rectangle& rect, Color32 c)
+{
 	SDL_Color sdlColor;
 
 	sdlColor.r = c.GetR();
@@ -186,7 +213,8 @@ void Platform::DrawRectangle(const Rectangle& rect, Color32 c) {
 	GPU_RectangleFilled(target, rect.position.x, rect.position.y, rect.GetMax().x, rect.GetMax().y, sdlColor);
 }
 
-void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color) {
+void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color)
+{
 
 	auto c = FC_MakeColor(SDL_FloatToUint8(color.r), SDL_FloatToUint8(color.g), SDL_FloatToUint8(color.b), SDL_FloatToUint8(color.a));
 
@@ -195,7 +223,8 @@ void Platform::DrawText(const Font& font, Vector2Int position, const char* text,
 
 }
 
-double Platform::ElaspedTime() {
+double Platform::ElaspedTime()
+{
 	uint64_t elapsed = SDL_GetPerformanceCounter() - mainTimer;
 
 	double elapsedSeconds = (double)(elapsed) / (double)SDL_GetPerformanceFrequency();
@@ -203,14 +232,16 @@ double Platform::ElaspedTime() {
 	return elapsedSeconds;
 }
 
-void Platform::UpdateGamepadState(GamepadState& state) {
+void Platform::UpdateGamepadState(GamepadState& state)
+{
 	static SDL_Joystick* joystick = nullptr;
 	if (joystick == nullptr)
 		joystick = SDL_JoystickOpen(0);
 	if (!joystick)
 		return;
 
-	if (SDL_NumJoysticks() == 0) {
+	if (SDL_NumJoysticks() == 0)
+	{
 		SDL_JoystickClose(joystick);
 		joystick = nullptr;
 		return;
@@ -223,7 +254,8 @@ void Platform::UpdateGamepadState(GamepadState& state) {
 	static constexpr const Sint16 DEVICE_AXIS_DEADZONE = 8000;
 
 	float axis[4];
-	for (int i = 0; i < 4; ++i) {
+	for (int i = 0; i < 4; ++i)
+	{
 		int value = SDL_JoystickGetAxis(joystick, i);
 		int sign = value < 0 ? -1 : 1;
 		value = abs(value);
@@ -263,7 +295,8 @@ void Platform::UpdateGamepadState(GamepadState& state) {
 	state.CStick = Vector2(axis[2], axis[3]);
 
 }
-void Platform::UpdatePointerState(PointerState& state) {
+void Platform::UpdatePointerState(PointerState& state)
+{
 	if (touchScreenLocation.size.x == 0 || touchScreenLocation.size.y == 0)
 		return;
 
@@ -281,7 +314,8 @@ void Platform::UpdatePointerState(PointerState& state) {
 	state.Position = pos;
 }
 
-void Platform::CreateChannel(AudioChannelState& channel) {
+void Platform::CreateChannel(AudioChannelState& channel)
+{
 
 	SDL_AudioSpec wavSpec = {};
 	wavSpec.channels = channel.mono ? 1 : 2;
@@ -293,7 +327,8 @@ void Platform::CreateChannel(AudioChannelState& channel) {
 	wavSpec.userdata = &channel;
 
 	SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(nullptr, 0, &wavSpec, &got, 0);
-	if (deviceId == 0) {
+	if (deviceId == 0)
+	{
 		channel.handle = deviceId;
 		EXCEPTION("Failed to create audio channel!");
 	}
@@ -303,14 +338,16 @@ void Platform::CreateChannel(AudioChannelState& channel) {
 
 	SDL_PauseAudioDevice(deviceId, 1);
 }
-void Platform::EnableChannel(const AudioChannelState& channel, bool enabled) {
+void Platform::EnableChannel(const AudioChannelState& channel, bool enabled)
+{
 
 	if (!mute)
 		SDL_PauseAudioDevice(channel.handle, enabled ? 0 : 1);
 }
 
 static std::function<void(int)> threadWorkFunc;
-int Platform::StartThreads(std::function<void(int)> threadWork) {
+int Platform::StartThreads(std::function<void(int)> threadWork)
+{
 	if (noThreading)
 		return 0;
 
@@ -318,7 +355,8 @@ int Platform::StartThreads(std::function<void(int)> threadWork) {
 
 	int numberOfThreads = SDL_GetCPUCount();
 
-	for (int i = 1; i < numberOfThreads; ++i) {
+	for (int i = 1; i < numberOfThreads; ++i)
+	{
 		std::string name = "WorkerThread" + std::to_string(i);
 
 		SDL_CreateThread([](void* data) {
@@ -328,23 +366,28 @@ int Platform::StartThreads(std::function<void(int)> threadWork) {
 	}
 	return std::max(0, numberOfThreads - 1);
 }
-Semaphore Platform::CreateSemaphore() {
+Semaphore Platform::CreateSemaphore()
+{
 	return SDL_CreateSemaphore(0);
 }
-void Platform::WaitSemaphore(Semaphore s) {
+void Platform::WaitSemaphore(Semaphore s)
+{
 	SDL_SemWait((SDL_sem*)s);
 }
-void Platform::ReleaseSemaphore(Semaphore s, int v) {
+void Platform::ReleaseSemaphore(Semaphore s, int v)
+{
 	for (int i = 0; i < v; ++i)
 		SDL_SemPost((SDL_sem*)s);
 }
 
-std::string Platform::GetUserDirectory() {
+std::string Platform::GetUserDirectory()
+{
 
 	return userDir.u8string() + "/";
 }
 
-static void AudioCallback(void* userdata, Uint8* stream, int len) {
+static void AudioCallback(void* userdata, Uint8* stream, int len)
+{
 	AudioChannelState* state = (AudioChannelState*)userdata;
 
 	SDL_memset(stream, 0, len);
@@ -352,7 +395,8 @@ static void AudioCallback(void* userdata, Uint8* stream, int len) {
 	AudioChannelClip* clip = state->CurrentClip();
 
 	unsigned size = clip != nullptr ? clip->Remaining() : 0;
-	if (size == 0) {
+	if (size == 0)
+	{
 		printf("Voice starvation at channel %i\n", state->handle);
 		return;
 	}
@@ -366,7 +410,8 @@ static void AudioCallback(void* userdata, Uint8* stream, int len) {
 
 	clip->playPos += len;
 
-	if (clip->Done()) {
+	if (clip->Done())
+	{
 		state->DequeueClip();
 	}
 }

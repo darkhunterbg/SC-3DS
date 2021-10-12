@@ -31,7 +31,6 @@ static std::unordered_map<std::string, C2D_Font> loadedFonts;
 static bool c2d_Prepared = true;
 static std::unordered_map<const C3D_Tex*, const Tex3DS_SubTexture*> loadedTextures;
 
-extern Span<Vertex> vertexBuffer;
 extern C3D_BufInfo vbInfo;
 
 extern DVLB_s* spriteBatchBlob;
@@ -57,8 +56,8 @@ TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize) {
 	C3D_TexSetWrap(tex, GPU_TEXTURE_WRAP_PARAM::GPU_CLAMP_TO_EDGE, GPU_TEXTURE_WRAP_PARAM::GPU_CLAMP_TO_EDGE);
 	C3D_TexSetFilter(tex, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR);
 
-	outSize.x = tex->width;
-	outSize.y = tex->height;
+	outSize.x = loadedTextures[tex]->width;
+	outSize.y = loadedTextures[tex]->height;
 
 	return tex;
 }
@@ -263,10 +262,6 @@ SubImageCoord Platform::GenerateUV(TextureId texture, Rectangle16 src) {
 //	};
 //}
 
-Span<Vertex> Platform::GetVertexBuffer() {
-
-	return  vertexBuffer;
-}
 
 static void SetEnv(DrawCommandType type) {
 	C3D_TexEnv* env = C3D_GetTexEnv(0);
@@ -287,6 +282,7 @@ static void SetEnv(DrawCommandType type) {
 	}
 }
 
+/*
 void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
 
 	if (c2d_Prepared) {
@@ -340,9 +336,82 @@ void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
 			break;
 		}
 	}
+} */
 
+void Platform::DrawTexture(const Texture& texture, const Rectangle16& src, const Rectangle16& dst, bool hFlip, Color32 c)
+{
+	if (!c2d_Prepared)
+	{
+		C2D_Prepare();
+		c2d_Prepared = true;
+	}
 
+	Vector2 scale = Vector2(dst.size) / Vector2(src.size);
+	Vector2 s = scale;
+	scale.x -= scale.x * 2.0f * hFlip;
+
+	C2D_Image img;
+	img.tex = (C3D_Tex*)texture.GetTextureId();
+	auto subTex = loadedTextures[img.tex];
+
+	auto st2 = *subTex;
+	
+	auto uv = GenerateUV(texture.GetTextureId(), src);
+	st2.width = src.size.x;
+	st2.height = src.size.y;
+	st2.left = uv.corners.topLeft.y;
+	st2.top = uv.corners.topLeft.x;
+	st2.right =  uv.corners.bottomRight.y;
+	st2.bottom =  uv.corners.bottomRight.x;
+
+	img.subtex = &st2;
+
+	C2D_DrawImageAt(img, (float)dst.position.x, (float)dst.position.y, 0, nullptr, 1, 1);
 }
+void Platform::DrawTexture(const Texture& texture, const SubImageCoord& uv, const Rectangle16& dst, bool hFlip, Color32 c)
+{
+	if (!c2d_Prepared)
+	{
+		C2D_Prepare();
+		c2d_Prepared = true;
+	}
+
+	Vector2 uvSize = uv.corners.topRight - uv.corners.bottomLeft;
+
+	Vector2Int16 size = Vector2Int16(Vector2(texture.GetSize()) * uvSize);
+
+	Vector2 scale = Vector2(dst.size) / Vector2(size);
+	Vector2 s = scale;
+	scale.x -= scale.x * 2.0f * hFlip;
+
+	C2D_Image img;
+	img.tex = (C3D_Tex*)texture.GetTextureId();
+	auto subTex = loadedTextures[img.tex];
+
+	auto st2 = *subTex;
+
+	st2.width = size.x;
+	st2.height = size.y;
+	st2.left = uv.corners.topLeft.x;
+	st2.top = uv.corners.topLeft.y;
+	st2.right = uv.corners.bottomRight.x;
+	st2.bottom = uv.corners.bottomRight.y;
+
+	img.subtex = &st2;
+
+	C2D_DrawImageAt(img, (float)dst.position.x, (float)dst.position.y, 0, nullptr, scale.x, scale.y);
+}
+void Platform::DrawRectangle(const Rectangle& rect, Color32 c)
+{
+	if (!c2d_Prepared)
+	{
+		C2D_Prepare();
+		c2d_Prepared = true;
+	}
+
+	C2D_DrawRectSolid((float)rect.position.x, (float)rect.position.y, 0, (float)rect.size.x, (float)rect.size.y, c.value);
+}
+
 
 void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color) {
 
