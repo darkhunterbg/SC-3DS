@@ -1,4 +1,4 @@
-All of the source code (folders src and tools) belongs to me. Exceptions are citro2d and stb_sprintf and SDL_FontCache. Check each individual file for details.
+All of the source code (folders src and tools) belongs to me. Exceptions are citro2d, stb_sprintf, SDL_FontCache. Check each individual file for details.
 All assets/art/content used in the project are based on Blizzard's Starcraft, I don't own their origial work.
 You are free to use this project in any way that is not a commercial use, as long as a credit to this me and this repo is given.
 I am not liable for any kind of damage, nor guarantee everything works.
