@@ -376,4 +376,4 @@ bin/
 /assets/atlases/
 /assets/data/*.bin
 /cooked_assets/
-/romfs_citra/
+*.lnk
