@@ -76,8 +76,7 @@ namespace DataManager.Build
 		{
 			this.op = op;
 			totalJobs = atlases.Count;
-			foreach (var atlas in atlases)
-			{
+			foreach (var atlas in atlases) {
 				++currentJob;
 
 				DisplayItem(atlas.OutputName);
@@ -112,27 +111,33 @@ namespace DataManager.Build
 				return;
 
 			BuildData();
+
+			if (cancelled)
+				return;
+
+			BuildAudio();
+
+			if (cancelled)
+				return;
+
+			BuildOther();
 		}
 
 		private static List<AtlasBSPTree> SimplifyAtlasTrees(List<AtlasBSPTree> subAtlases)
 		{
 			List<AtlasBSPTree> scaledSubAtlases = new List<AtlasBSPTree>();
 
-			foreach (var subAtlas in subAtlases)
-			{
+			foreach (var subAtlas in subAtlases) {
 				var tree = subAtlas;
 
-				while (tree.TakenSpace < (tree.TotalSpace / 4) && tree.TotalSpace >= 128 * 128)
-				{
+				while (tree.TakenSpace < (tree.TotalSpace / 4) && tree.TotalSpace >= 128 * 128) {
 					bool success = true;
 
 					var test = new AtlasBSPTree(tree.Dimensions.X / 2, tree.Dimensions.Y / 2);
 					var frames = tree.GetFrames();
 
-					foreach (var f in frames)
-					{
-						if (!test.TryAdd(f.image))
-						{
+					foreach (var f in frames) {
+						if (!test.TryAdd(f.image)) {
 							success = false;
 							break;
 						}
@@ -161,15 +166,13 @@ namespace DataManager.Build
 
 			int i = 0;
 
-			foreach (var subAtlas in subAtlases)
-			{
+			foreach (var subAtlas in subAtlases) {
 				if (cancelled)
 					yield break;
 
 				var tree = subAtlas;
 
-				using (var texture = new RenderTarget2D(AppGame.Device, tree.Dimensions.X, tree.Dimensions.Y))
-				{
+				using (var texture = new RenderTarget2D(AppGame.Device, tree.Dimensions.X, tree.Dimensions.Y)) {
 
 					texture.GraphicsDevice.SetRenderTarget(texture);
 					texture.GraphicsDevice.Clear(Color.Transparent);
@@ -178,14 +181,11 @@ namespace DataManager.Build
 
 					spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
-					foreach (var f in frames)
-					{
+					foreach (var f in frames) {
 						spriteBatch.Draw(f.image.Image.Texture, f.rect.Location.ToVector2(), Color.White);
 					}
-					if (DrawAtlasOutiline)
-					{
-						foreach (var f in tree.GetNodes())
-						{
+					if (DrawAtlasOutiline) {
+						foreach (var f in tree.GetNodes()) {
 							spriteBatch.DrawRectangle(f.Region.Location.ToVector2().ToVec2(),
 				new Vector2(1, f.Region.Size.Y),
 				 Color.Magenta);
@@ -226,8 +226,7 @@ namespace DataManager.Build
 		{
 			packedTree = null;
 
-			foreach (var imageList in assets.Where(t => t.TakenSpace <= tree.FreeSpace))
-			{
+			foreach (var imageList in assets.Where(t => t.TakenSpace <= tree.FreeSpace)) {
 				if (cancelled)
 					return null;
 
@@ -235,17 +234,14 @@ namespace DataManager.Build
 				bool success = true;
 
 				foreach (var frame in imageList.Frames.OrderByDescending(t => t.rect.Size.Y)
-					.ThenBy(t => t.rect.Size.X))
-				{
-					if (!test.TryAdd(frame))
-					{
+					.ThenBy(t => t.rect.Size.X)) {
+					if (!test.TryAdd(frame)) {
 						success = false;
 						break;
 					}
 				}
 
-				if (success)
-				{
+				if (success) {
 					packedTree = test;
 					return imageList;
 				}
@@ -257,8 +253,7 @@ namespace DataManager.Build
 		private List<AtlasBSPTree> GenerateAtlasTree(SpriteAtlasEntry atlas)
 		{
 			var assets = atlas.GetImageListsForBuild();
-			foreach (var asset in assets)
-			{
+			foreach (var asset in assets) {
 				GeneratedImages.Add(new ImageListAtlasData(asset));
 			}
 
@@ -274,25 +269,20 @@ namespace DataManager.Build
 				goto TightPacking;
 
 
-			while (assets.Count > 0)
-			{
+			while (assets.Count > 0) {
 				var add = FindFittingImageList(assets, current, out var packed);
 				if (cancelled)
 					return null;
 
-				if (add != null)
-				{
+				if (add != null) {
 					assets.Remove(add);
 
 					current = packed;
 
 					++assetProgress;
 					Progress(assetProgress, assetTotal);
-				}
-				else
-				{
-					if (current.IsEmpty())
-					{
+				} else {
+					if (current.IsEmpty()) {
 						// Cant  find anything to fit in empty, remaining should be tighlty-apcked
 						break;
 					}
@@ -301,35 +291,29 @@ namespace DataManager.Build
 				}
 			}
 
-			if (!current.IsEmpty())
-			{
+			if (!current.IsEmpty()) {
 				subAtlases.Add(current);
 				current = new AtlasBSPTree();
 			}
 
 		TightPacking:
-			foreach (var imageList in assets)
-			{
+			foreach (var imageList in assets) {
 				if (cancelled)
 					return subAtlases;
 
 				foreach (var frame in imageList.Frames.OrderByDescending(t => t.rect.Size.Y)
-					.ThenBy(t => t.rect.Size.X))
-				{
+					.ThenBy(t => t.rect.Size.X)) {
 					bool success = false;
 
-					foreach (var sub in subAtlases.Where(t => t.FreeSpace >= frame.TakenSpace))
-					{
-						if (sub.TryAdd(frame))
-						{
+					foreach (var sub in subAtlases.Where(t => t.FreeSpace >= frame.TakenSpace)) {
+						if (sub.TryAdd(frame)) {
 							success = true;
 							break;
 						}
 					}
 
 
-					if (!success)
-					{
+					if (!success) {
 						var newAtlas = new AtlasBSPTree();
 						newAtlas.TryAdd(frame);
 						subAtlases.Add(newAtlas);
@@ -342,8 +326,7 @@ namespace DataManager.Build
 
 			}
 
-			if (!current.IsEmpty())
-			{
+			if (!current.IsEmpty()) {
 				subAtlases.Add(current);
 				current = new AtlasBSPTree();
 			}
@@ -361,34 +344,28 @@ namespace DataManager.Build
 			GeneratedSubAtlases = GeneratedAtlases.SelectMany(s => s.SubAtlases).OrderBy(a => a.AtlasName)
 		.ThenBy(a => a.AtlasIndex).ToList();
 
-			foreach (var img in GeneratedImages)
-			{
+			foreach (var img in GeneratedImages) {
 				img.FrameOffset = GeneratedFrames.FindIndex(i => i.Frame.ImageList == img.List);
 			}
 
 			int i = 0;
-			foreach (var subAtlases in GeneratedSubAtlases)
-			{
+			foreach (var subAtlases in GeneratedSubAtlases) {
 				foreach (var f in subAtlases.Images)
 					f.AtlasId = i;
 
 				++i;
 			}
 
-			if (GenerateCSVImageData)
-			{
-				using (var csv = new CsvWriter(new StreamWriter(AssetManager.ImagesDataPath), AssetManager.CsvConfig))
-				{
+			if (GenerateCSVImageData) {
+				using (var csv = new CsvWriter(new StreamWriter(AssetManager.ImagesDataPath), AssetManager.CsvConfig)) {
 					csv.WriteRecords(GeneratedImages);
 				}
 
-				using (var csv = new CsvWriter(new StreamWriter(AssetManager.FramesDataPath), AssetManager.CsvConfig))
-				{
+				using (var csv = new CsvWriter(new StreamWriter(AssetManager.FramesDataPath), AssetManager.CsvConfig)) {
 					csv.WriteRecords(GeneratedFrames);
 				}
 
-				using (var csv = new CsvWriter(new StreamWriter(AssetManager.SpriteAtlasDataPath), AssetManager.CsvConfig))
-				{
+				using (var csv = new CsvWriter(new StreamWriter(AssetManager.SpriteAtlasDataPath), AssetManager.CsvConfig)) {
 					csv.WriteRecords(GeneratedSubAtlases);
 				}
 			}
@@ -403,8 +380,7 @@ namespace DataManager.Build
 
 			Progress(currentJob, totalJobs);
 
-			foreach (var atlas in subAtlases)
-			{
+			foreach (var atlas in subAtlases) {
 				if (cancelled)
 					return;
 
@@ -440,13 +416,63 @@ namespace DataManager.Build
 			}
 		}
 
+		private void BuildAudio()
+		{
+			DisplayItem("Audio Clips");
+
+			var sounds = AppGame.AssetManager.GetAssets<SoundSetAsset>();
+
+			var items = sounds.SelectMany(s => s.Clips).Where(c => !c.IsEmpty).Select(s => s.Clip).ToList();
+			items.AddRange(AppGame.AssetManager.AudioClips.Where(c => c.RelativePath.Contains("sound\\misc")));
+			items = items.Distinct().ToList();
+			currentJob = 0;
+			totalJobs = items.Count;
+
+			Progress(currentJob, totalJobs);
+
+			foreach (var audio in items) {
+				DisplayItem(audio.RelativePath);
+				var dir = Path.GetDirectoryName(Path.Combine(AssetManager.CookedAssetsDir, audio.RelativePath));
+				Directory.CreateDirectory(dir);
+				var path = Path.Combine(dir, Path.GetFileName(audio.FilePath));
+				File.Copy(audio.FilePath, path, true);
+
+				++currentJob;
+				Progress(currentJob, totalJobs);
+			}
+		}
+
+		private void BuildOther()
+		{
+			List<string> files = new List<string>()
+			{
+				"glue\\title.png", "tileset\\tile.png"
+			};
+
+			currentJob = 0;
+			totalJobs = files.Count();
+
+			Progress(currentJob, totalJobs);
+
+			foreach (var f in files) {
+				DisplayItem(f);
+
+				var src = Path.Combine(AssetManager.AssetsDir, f);
+				var dst = Path.Combine(AssetManager.CookedAssetsDir, f);
+				Directory.CreateDirectory(Path.GetDirectoryName(dst));
+				File.Copy(src, dst, true);
+
+				++currentJob;
+				Progress(currentJob, totalJobs);
+			}
+		}
+
 		private void BuildData()
 		{
 			List<AnimClipInstructionData> instructionData = new List<AnimClipInstructionData>();
 
 			foreach (var clip in AppGame.AssetManager.GetAssets<SpriteAnimClipAsset>()
-				.OrderBy(s => s.Sprite.AssetName).ThenBy(s => s.Type))
-			{
+				.OrderBy(s => s.Sprite.AssetName).ThenBy(s => s.Type)) {
 				clip._InstructionStart = (uint)instructionData.Count;
 
 				instructionData.AddRange(clip.Instructions.Select(s => new AnimClipInstructionData(clip, s)));
@@ -454,11 +480,10 @@ namespace DataManager.Build
 
 			List<AudioClip> audioClipsData = new List<AudioClip>();
 
-			foreach (var asset in AppGame.AssetManager.GetAssets<SoundSetAsset>())
-			{
+			foreach (var asset in AppGame.AssetManager.GetAssets<SoundSetAsset>()) {
 				asset._ClipStart = audioClipsData.Count;
 				var items = asset.Clips.Where(s => !s.IsEmpty && s.Clip != null);
-				audioClipsData.AddRange(items.Select(s=>s.Clip));
+				audioClipsData.AddRange(items.Select(s => s.Clip));
 				asset._ClipCount = items.Count();
 			}
 
@@ -492,8 +517,7 @@ namespace DataManager.Build
 			});
 
 
-			foreach (var assetDb in AppGame.AssetManager.Assets.Values)
-			{
+			foreach (var assetDb in AppGame.AssetManager.Assets.Values) {
 				assetDb.PrepareForSerialization();
 				data.Add(new DataItem()
 				{
@@ -520,8 +544,7 @@ namespace DataManager.Build
 
 			List<MemoryStream> binData = new List<MemoryStream>();
 
-			foreach (var item in data)
-			{
+			foreach (var item in data) {
 				headers[currentJob].Offset = offset;
 
 				++currentJob;
@@ -540,8 +563,7 @@ namespace DataManager.Build
 			totalJobs = data.Count;
 
 
-			using (FileStream stream = new FileStream(AssetManager.BuildDataFile, FileMode.Create))
-			{
+			using (FileStream stream = new FileStream(AssetManager.BuildDataFile, FileMode.Create)) {
 				stream.Write(BitConverter.GetBytes((uint)headers.Length));
 
 				DisplayItem("Data Headers");
@@ -549,8 +571,7 @@ namespace DataManager.Build
 
 				DisplayItem("Data Sections");
 
-				foreach (var str in binData)
-				{
+				foreach (var str in binData) {
 					str.Position = 0;
 					++currentJob;
 					byte[] bin = new byte[str.Length];
@@ -560,6 +581,7 @@ namespace DataManager.Build
 				}
 			}
 		}
+
 
 		public void Dispose()
 		{
