@@ -8,6 +8,7 @@
 #include "SDL_FontCache.h"
 #include "Game.h"
 #include "MathLib.h"
+#include "Debug.h"
 
 GPU_Image* screens[2];
 GPU_Image* white;
@@ -49,8 +50,18 @@ int main(int argc, char** argv) {
 	GPU_Rect rect = { 0,0,1,1 };
 	GPU_UpdateImageBytes(white, &rect, data, sizeof(data));
 
-	assetDir = std::filesystem::current_path().parent_path();
-	assetDir = assetDir.append("cooked_assets").append("win32");
+	assetDir = std::filesystem::current_path().append("cooked_assets").append("win32");// .parent_path();
+
+	if (!std::filesystem::exists(assetDir))
+	{
+		assetDir = std::filesystem::current_path().parent_path().append("cooked_assets").append("win32");
+	}
+
+	if (!std::filesystem::exists(assetDir))
+	{
+		EXCEPTION("Asset directory not found!");
+	}
+
 	userDir = std::filesystem::current_path();
 	userDir = userDir.append("User");
 
