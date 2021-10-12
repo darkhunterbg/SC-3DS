@@ -35,7 +35,6 @@ extern GPU_Image* white;
 
 static ScreenId currentRT;
 static GPU_Target* target = nullptr;
-static Vertex* vertexBuffer = nullptr;
 
 
 constexpr Uint8 SDL_FloatToUint8(float x) {
@@ -165,50 +164,26 @@ void Platform::ClearBuffer(Color color) {
 	GPU_ClearRGBA(target, c.GetR(), c.GetG(), c.GetB(), c.GetA());
 }
 
+void Platform::DrawTexture(const Texture& texture, const Rectangle16& src, const Rectangle16& dst, bool hFlip, Color32 c) {
 
-Span<Vertex> Platform::GetVertexBuffer() {
-	if (vertexBuffer == nullptr) {
-		vertexBuffer = new Vertex[10 * 1024];
-	}
-	return { vertexBuffer, 10 * 1024 };
+	GPU_Image* img = (GPU_Image*)texture.GetTextureId();
+	GPU_Rect srcRect = { (float)src.position.x, (float)src.position.y, (float)src.size.x, (float)src.size.y };
+	Vector2 scale = Vector2(dst.size) / Vector2(src.size);
+	scale.x -= scale.x * 2.0f * hFlip;
+
+	GPU_SetRGBA(img, c.GetR(), c.GetG(), c.GetB(), c.GetA());
+	GPU_BlitScale(img, &srcRect, target, (float)dst.GetCenter().x, (float)dst.GetCenter().y, scale.x, scale.y);
 }
-void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
+void Platform::DrawRectangle(const Rectangle& rect, Color32 c) {
+	SDL_Color sdlColor;
 
-	for (const DrawCommand& cmd : commands)
-	{
-		switch (cmd.type)
-		{
-		case DrawCommandType::TexturedTriangle: {
+	sdlColor.r = c.GetR();
+	sdlColor.g = c.GetG();
+	sdlColor.b = c.GetB();
+	sdlColor.a = c.GetA();
 
-			GPU_Image* img = (GPU_Image*)cmd.texture->GetTextureId();
 
-			GPU_PrimitiveBatchV(img, target, GPU_TRIANGLES, cmd.count, vertexBuffer + cmd.start, 0, nullptr, GPU_BATCH_XY_ST_RGBA8);
-
-			break;
-		}
-		case DrawCommandType::Triangle: {
-			for (int i = cmd.start; i < cmd.start + cmd.count; i += 6) {
-
-				Vector2 start = vertexBuffer[i].position;
-				Color32 c = vertexBuffer[i].color.value;
-				SDL_Color color;
-
-				color.r = c.GetR();
-				color.g = c.GetG();
-				color.b = c.GetB();
-				color.a = c.GetA();
-
-				Vector2 end = vertexBuffer[i + 2].position;
-
-				GPU_RectangleFilled(target, start.x, start.y, end.x, end.y, color);
-			}
-			break;
-		}
-		default:
-			break;
-		}
-
-	}
+	GPU_RectangleFilled(target, rect.position.x, rect.position.y, rect.GetMax().x, rect.GetMax().y, sdlColor);
 }
 
 void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color) {

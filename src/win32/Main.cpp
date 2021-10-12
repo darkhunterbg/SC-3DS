@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
 		std::string a = argv[1];
 		if (a == "-mute")
 		{
-			//mute = true;
+			mute = true;
 		}
 	}
 

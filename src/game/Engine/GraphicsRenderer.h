@@ -10,20 +10,7 @@
 class GraphicsRenderer {
 
 private:
-
-	const Texture* texture = nullptr;
-	DrawCommandType cmdType = DrawCommandType::None;
-	unsigned vbPos = 0;
-	Vertex* vb = nullptr;
-	std::vector<DrawCommand> drawCommands;
-	Span<Vertex> vertexBuffer;
 	BlendMode blendMode = BlendMode::Alpha;
-
-	void AddVertex(const Vector2& pos, const Vector2& uv, const Color32& c);
-
-	DrawCommand& NewDrawCommand(const Texture* texture);
-	DrawCommand& GetDrawCommand(const Texture* texture);
-	DrawCommand& GetDrawCommand(DrawCommandType type);
 
 	GraphicsRenderer() {}
 

@@ -41,9 +41,10 @@ public:
 	static void DrawOnSurface(SurfaceId surface);
 	static void ChangeBlendingMode(BlendMode mode);
 	static void ClearBuffer(Color color);
-	static Span<Vertex> GetVertexBuffer();
-	static void ExecDrawCommands(const Span<DrawCommand> commands);
-	static void DrawText(const Font& font, Vector2Int position, const char* text, Color color= Colors::White);
+
+	static void DrawTexture(const Texture& texture, const Rectangle16& src, const Rectangle16& dst, bool hFlip = false, Color32 color = Color32(Colors::White));
+	static void DrawRectangle(const Rectangle& rect, Color32 color = Color32(Colors::White));
+	static void DrawText(const Font& font, Vector2Int position, const char* text, Color color = Colors::White);
 	static SurfaceId NewRenderSurface(Vector2Int size, bool pixelFiltering, TextureId& outTexture);
 
 	// ================ Input =======================

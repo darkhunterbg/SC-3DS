@@ -36,6 +36,7 @@ void GameHUD::DrawResource(const ImageFrame& icon, Vector2Int pos, Color color, 
 	stbsp_vsnprintf(textBuffer, sizeof(textBuffer), fmt, args);
 	va_end(args);
 
+	
 	GraphicsRenderer::Draw(icon, { pos,{ 14, 14} });
 	pos += {16, -2};
 	GraphicsRenderer::DrawText(*font, pos + Vector2Int{ 1,1 }, textBuffer, Colors::Black);

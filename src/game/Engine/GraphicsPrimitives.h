@@ -8,26 +8,11 @@ struct ImageFrameDef;
 
 typedef void* SurfaceId;
 
-
-struct Vertex {
-	Vector2 position;
-	Vector2 uv;
-	Color32 color;
-};
-
 enum class DrawCommandType : uint8_t {
 	None,
 	TexturedTriangle,
 	Triangle,
 };
-
-struct DrawCommand {
-	const Texture* texture;
-	uint16_t start;
-	uint16_t count;
-	DrawCommandType type;
-};
-
 
 struct BatchDrawCommand {
 	int order;

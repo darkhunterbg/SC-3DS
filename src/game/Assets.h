@@ -26,6 +26,11 @@ union SubImageCoord {
 	inline Vector2 GetSize() const {
 		return corners.bottomRight - corners.topLeft;
 	}
+	inline Rectangle16 GetSource(Vector2Int16 texSize) const {
+		Vector2Int16 pos = Vector2Int16(Vector2(texSize) * corners.topLeft);
+		Vector2Int16 size = Vector2Int16(Vector2(texSize) * GetSize());
+		return { pos,size };
+	}
 };
 
 class Texture {
@@ -80,6 +85,9 @@ struct ImageFrame {
 	}
 	inline Rectangle16 GetRect16() const {
 		return { offset, size };
+	}
+	inline Rectangle16 GetSource() const {
+		return uv.GetSource(texture->GetSize());
 	}
 };
 
