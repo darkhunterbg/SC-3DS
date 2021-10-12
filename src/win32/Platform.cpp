@@ -70,7 +70,7 @@ const Font* Platform::LoadFont(const char* path, int size)
 {
 
 	std::filesystem::path fullPath = assetDir;
-	fullPath = fullPath.parent_path().append("gfx").append(path).replace_extension("ttf");
+	fullPath = fullPath.append(path).replace_extension("ttf");
 
 	FC_Font* font = FC_CreateFont();
 	auto lf = FC_LoadFont(font, fullPath.generic_string().data(), size, FC_MakeColor(255, 255, 255, 255), TTF_STYLE_NORMAL);
@@ -178,17 +178,6 @@ void Platform::ClearBuffer(Color color)
 	GPU_ClearRGBA(target, c.GetR(), c.GetG(), c.GetB(), c.GetA());
 }
 
-void Platform::DrawTexture(const Texture& texture, const Rectangle16& src, const Rectangle16& dst, bool hFlip, Color32 c)
-{
-
-	GPU_Image* img = (GPU_Image*)texture.GetTextureId();
-	GPU_Rect srcRect = { (float)src.position.x, (float)src.position.y, (float)src.size.x, (float)src.size.y };
-	Vector2 scale = Vector2(dst.size) / Vector2(src.size);
-	scale.x -= scale.x * 2.0f * hFlip;
-
-	GPU_SetRGBA(img, c.GetR(), c.GetG(), c.GetB(), c.GetA());
-	GPU_BlitScale(img, &srcRect, target, (float)dst.GetCenter().x, (float)dst.GetCenter().y, scale.x, scale.y);
-}
 void Platform::DrawTexture(const Texture& texture, const SubImageCoord& uv, const Rectangle16& dst, bool hFlip, Color32 c)
 {
 	GPU_Image* img = (GPU_Image*)texture.GetTextureId();

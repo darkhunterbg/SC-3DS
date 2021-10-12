@@ -230,30 +230,6 @@ SubImageCoord Platform::GenerateUV(TextureId texture, Rectangle16 src)
 	return uv;
 }
 
-void Platform::DrawTexture(const Texture& texture, const Rectangle16& src, const Rectangle16& dst, bool hFlip, Color32 c)
-{
-	Vector2 scale = Vector2(dst.size) / Vector2(src.size);
-	Vector2 s = scale;
-	scale.x -= scale.x * 2.0f * hFlip;
-
-	C2D_Image img;
-	img.tex = (C3D_Tex*)texture.GetTextureId();
-	auto subTex = loadedTextures[img.tex];
-
-	auto st2 = *subTex;
-
-	auto uv = GenerateUV(texture.GetTextureId(), src);
-	st2.width = src.size.x;
-	st2.height = src.size.y;
-	st2.left = uv.corners.topLeft.y;
-	st2.top = uv.corners.topLeft.x;
-	st2.right = uv.corners.bottomRight.y;
-	st2.bottom = uv.corners.bottomRight.x;
-
-	img.subtex = &st2;
-
-	C2D_DrawImageAt(img, (float)dst.position.x, (float)dst.position.y, 0, nullptr, 1, 1);
-}
 void Platform::DrawTexture(const Texture& texture, const SubImageCoord& uv, const Rectangle16& dst, bool hFlip, Color32 c)
 {
 	Vector2 uvSize = uv.corners.topRight - uv.corners.bottomLeft;

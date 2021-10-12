@@ -40,4 +40,9 @@
   <ItemGroup>
     <Folder Include="MonoGame.ImGui\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="imgui.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

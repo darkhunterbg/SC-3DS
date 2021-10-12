@@ -75,6 +75,18 @@ namespace DataManager.Build
 		private void BuildAsync(AsyncOperation op)
 		{
 			this.op = op;
+
+			DisplayItem("Cleaning...");
+
+			totalJobs = 1;
+			currentJob = 0;
+
+			Directory.Delete(AssetManager.CookedAssetsPCDir, true);
+			if (Build3DS) {
+				Directory.Delete(AssetManager.Cooked3DSAssetsDir, true);
+			}
+
+			
 			totalJobs = atlases.Count;
 			foreach (var atlas in atlases) {
 				++currentJob;
@@ -375,6 +387,8 @@ namespace DataManager.Build
 		{
 			var subAtlases = GeneratedAtlases.SelectMany(s => s.SubAtlases).ToList();
 
+			Directory.CreateDirectory(AssetManager.SpriteAtlas3DSBuildDir);
+
 			currentJob = 0;
 			totalJobs = subAtlases.Count();
 
@@ -432,10 +446,17 @@ namespace DataManager.Build
 
 			foreach (var audio in items) {
 				DisplayItem(audio.RelativePath);
-				var dir = Path.GetDirectoryName(Path.Combine(AssetManager.CookedAssetsDir, audio.RelativePath));
+				var dir = Path.GetDirectoryName(Path.Combine(AssetManager.CookedAssetsPCDir, audio.RelativePath));
 				Directory.CreateDirectory(dir);
 				var path = Path.Combine(dir, Path.GetFileName(audio.FilePath));
 				File.Copy(audio.FilePath, path, true);
+
+				if (Build3DS) {
+					dir = Path.GetDirectoryName(Path.Combine(AssetManager.Cooked3DSAssetsDir, audio.RelativePath));
+					path = Path.Combine(dir, Path.GetFileName(audio.FilePath));
+					Directory.CreateDirectory(dir);
+					File.Copy(audio.FilePath, path, true);
+				}
 
 				++currentJob;
 				Progress(currentJob, totalJobs);
@@ -446,7 +467,7 @@ namespace DataManager.Build
 		{
 			List<string> files = new List<string>()
 			{
-				"glue\\title.png", "tileset\\tile.png"
+				"glue\\title.png", "tileset\\tile.png" , "font.ttf"
 			};
 
 			currentJob = 0;
@@ -458,9 +479,71 @@ namespace DataManager.Build
 				DisplayItem(f);
 
 				var src = Path.Combine(AssetManager.AssetsDir, f);
-				var dst = Path.Combine(AssetManager.CookedAssetsDir, f);
+				var dst = Path.Combine(AssetManager.CookedAssetsPCDir, f);
 				Directory.CreateDirectory(Path.GetDirectoryName(dst));
 				File.Copy(src, dst, true);
+
+				if (Build3DS) {
+
+					if (f.EndsWith(".png")) {
+
+						string inputTexture = src;
+						string outFile = Path.ChangeExtension(Path.GetFullPath(Path.Combine(AssetManager.Cooked3DSAssetsDir, f)), "t3x");
+
+						Directory.CreateDirectory(Path.GetDirectoryName(outFile));
+
+						string args = $" -f auto-etc1 -z auto -q high -o {outFile} {inputTexture}";
+						var process = new ProcessStartInfo(AssetManager.tex3dsPath, args);
+						process.UseShellExecute = false;
+						process.CreateNoWindow = true;
+						process.RedirectStandardOutput = true;
+						process.RedirectStandardError = true;
+						var p = new Process()
+						{
+							StartInfo = process
+						};
+
+
+						p.Start();
+
+						p.WaitForExit();
+
+						string error = p.StandardError.ReadToEnd();
+						if (!string.IsNullOrEmpty(error))
+							throw new Exception($"Failed to build atlas {f}: {error}");
+					} else if (f.EndsWith(".ttf")) {
+
+						string input = src;
+						string outFile = Path.ChangeExtension(Path.GetFullPath(Path.Combine(AssetManager.Cooked3DSAssetsDir, f)), "bcfnt");
+
+						Directory.CreateDirectory(Path.GetDirectoryName(outFile));
+
+						string args = $" -o {outFile} {input}";
+						var process = new ProcessStartInfo(AssetManager.mkbcfntPath, args);
+						process.UseShellExecute = false;
+						process.CreateNoWindow = true;
+						process.RedirectStandardOutput = true;
+						process.RedirectStandardError = true;
+						var p = new Process()
+						{
+							StartInfo = process
+						};
+
+
+						p.Start();
+
+						p.WaitForExit();
+
+						string error = p.StandardError.ReadToEnd();
+						if (!string.IsNullOrEmpty(error))
+							throw new Exception($"Failed to build font {f}: {error}");
+
+					} else {
+						string outFile = Path.Combine(AssetManager.Cooked3DSAssetsDir, f);
+						Directory.CreateDirectory(Path.GetDirectoryName(outFile));
+						File.Copy(src, outFile, true);
+					}
+				}
 
 				++currentJob;
 				Progress(currentJob, totalJobs);
@@ -562,8 +645,8 @@ namespace DataManager.Build
 			currentJob = 0;
 			totalJobs = data.Count;
 
-
-			using (FileStream stream = new FileStream(AssetManager.BuildDataFile, FileMode.Create)) {
+			string dst = Path.Combine(AssetManager.CookedAssetsPCDir, AssetManager.BuildDataFile);
+			using (FileStream stream = new FileStream(dst, FileMode.Create)) {
 				stream.Write(BitConverter.GetBytes((uint)headers.Length));
 
 				DisplayItem("Data Headers");
@@ -579,6 +662,12 @@ namespace DataManager.Build
 					stream.Write(bin);
 					Progress(currentJob, totalJobs);
 				}
+			}
+
+			if (Build3DS) {
+				string outFile = Path.Combine(AssetManager.Cooked3DSAssetsDir, AssetManager.BuildDataFile);
+				Directory.CreateDirectory(Path.GetDirectoryName(outFile));
+				File.Copy(dst, outFile, true);
 			}
 		}
 

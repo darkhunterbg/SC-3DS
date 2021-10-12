@@ -55,13 +55,11 @@ namespace DataManager.Panels
 
 			DrawImageListAssets();
 
-			if (selectItemsFor != null)
-			{
+			if (selectItemsFor != null) {
 				DrawSelectItemsModal();
 			}
 
-			if (changed)
-			{
+			if (changed) {
 				AppSettings.Save(SettingsFileName, entries);
 			}
 		}
@@ -74,8 +72,7 @@ namespace DataManager.Panels
 
 			ImGui.BeginChild("##sag.assets.list");
 
-			foreach (var asset in query)
-			{
+			foreach (var asset in query) {
 				bool enabled = entries.Any(e => e.Assets.Contains(asset));
 				DrawImageAssetListItem(asset, enabled);
 
@@ -92,13 +89,11 @@ namespace DataManager.Panels
 
 
 			ImGui.SameLine();
-			if (ImGui.Button("Build All##sag.entries.buildall"))
-			{
+			if (ImGui.Button("Build All##sag.entries.buildall")) {
 				AppGame.RunCoroutine(BuildCrt(true));
 			}
 			ImGui.SameLine();
-			if (ImGui.Button("Build PC##sag.entries.buildall"))
-			{
+			if (ImGui.Button("Build PC##sag.entries.buildall")) {
 				AppGame.RunCoroutine(BuildCrt(false));
 			}
 
@@ -106,8 +101,7 @@ namespace DataManager.Panels
 
 			string text = string.Empty;
 
-			for (int i = 0; i < entries.Count; ++i)
-			{
+			for (int i = 0; i < entries.Count; ++i) {
 				var entry = entries[i];
 				text = entry.OutputName;
 
@@ -117,8 +111,7 @@ namespace DataManager.Panels
 
 				ImGui.SameLine();
 				ImGui.SetNextItemWidth(300);
-				if (ImGui.InputText($"##sag.entries.path.{entry.Id}", ref text, 256))
-				{
+				if (ImGui.InputText($"##sag.entries.path.{entry.Id}", ref text, 256)) {
 					entry.OutputName = text;
 					changed = true;
 				}
@@ -127,8 +120,7 @@ namespace DataManager.Panels
 				int number = (int)entry.PackStrategy;
 				var enumValues = EnumCacheValues.GetValues(typeof(SpriteAtlasPackStrategy));
 				ImGui.SetNextItemWidth(200);
-				if (ImGui.Combo($"##sag.entries.packstrat.{entry.Id}", ref number, enumValues, enumValues.Length))
-				{
+				if (ImGui.Combo($"##sag.entries.packstrat.{entry.Id}", ref number, enumValues, enumValues.Length)) {
 					entry.PackStrategy = (SpriteAtlasPackStrategy)number;
 					changed = true;
 				}
@@ -137,8 +129,7 @@ namespace DataManager.Panels
 				number = (int)entry.FilterStrategy;
 				enumValues = EnumCacheValues.GetValues(typeof(SpriteAtlasFilterStrategy));
 				ImGui.SetNextItemWidth(200);
-				if (ImGui.Combo($"##sag.entries.filterStart.{entry.Id}", ref number, enumValues, enumValues.Length))
-				{
+				if (ImGui.Combo($"##sag.entries.filterStart.{entry.Id}", ref number, enumValues, enumValues.Length)) {
 					entry.FilterStrategy = (SpriteAtlasFilterStrategy)number;
 					changed = true;
 				}
@@ -150,16 +141,14 @@ namespace DataManager.Panels
 				ImGui.SameLine();
 
 				ImGui.SameLine();
-				if (ImGui.Button($"Delete##sag.entries.del.{entry.Id}"))
-				{
+				if (ImGui.Button($"Delete##sag.entries.del.{entry.Id}")) {
 					entries.RemoveAt(i--);
 					changed = true;
 					continue;
 				}
 
 
-				if (expand)
-				{
+				if (expand) {
 					DrawEntryExtendedItem(entry);
 
 					ImGui.TreePop();
@@ -169,8 +158,7 @@ namespace DataManager.Panels
 
 			ImGui.Separator();
 
-			if (ImGui.Button("New Entry##sag.entries.new"))
-			{
+			if (ImGui.Button("New Entry##sag.entries.new")) {
 				entries.Add(new SpriteAtlasEntry());
 
 				changed = true;
@@ -184,8 +172,7 @@ namespace DataManager.Panels
 		{
 			int i = 0;
 
-			for (int j = 0; j < entry.Directories.Count; ++j)
-			{
+			for (int j = 0; j < entry.Directories.Count; ++j) {
 				var path = entry.Directories[j];
 
 				ImGui.PushID(++i);
@@ -194,24 +181,21 @@ namespace DataManager.Panels
 				ImGui.SameLine();
 
 				ImGui.SameLine();
-				if (ImGui.Button($"Edit##sag.entries.edit.{entry.Id}"))
-				{
+				if (ImGui.Button($"Edit##sag.entries.edit.{entry.Id}")) {
 					selectEditDirIndex = j;
 					selectItemsFor = entry;
 					modalSearchText = selectItemsFor.Directories[selectEditDirIndex];
 				}
 
 				ImGui.SameLine();
-				if (ImGui.Button($"Delete##sag.entries.delete.{entry.Id}"))
-				{
+				if (ImGui.Button($"Delete##sag.entries.delete.{entry.Id}")) {
 					entry.Directories.Remove(path);
 				}
 
 				ImGui.PopID();
 			}
 
-			if (ImGui.Button($"New Entry##sag.entries.add.{entry.Id}"))
-			{
+			if (ImGui.Button($"New Entry##sag.entries.add.{entry.Id}")) {
 				selectEditDirIndex = -1;
 				selectItemsFor = entry;
 			}
@@ -259,25 +243,21 @@ namespace DataManager.Panels
 
 			ImGui.Text($"{query.Count()} entries.");
 
-			foreach (var asset in query)
-			{
+			foreach (var asset in query) {
 				DrawImageAssetListItem(asset);
 			}
 
 			ImGui.EndChild();
 
-			if (ImGui.Button("Cancel##sag.entries.edit.cancel"))
-			{
+			if (ImGui.Button("Cancel##sag.entries.edit.cancel")) {
 				selectItemsFor = null;
 				modalSearchText = string.Empty;
 			}
 
 			ImGui.SameLine();
 
-			if (!string.IsNullOrEmpty(modalSearchText))
-			{
-				if (ImGui.Button("Ok##sag.entries.edit.ok"))
-				{
+			if (!string.IsNullOrEmpty(modalSearchText)) {
+				if (ImGui.Button("Ok##sag.entries.edit.ok")) {
 
 					if (selectEditDirIndex != -1)
 						selectItemsFor.Directories.Remove(selectItemsFor.Directories[selectEditDirIndex]);
@@ -301,20 +281,18 @@ namespace DataManager.Panels
 
 			BuildGenerator build = new BuildGenerator() { Build3DS = build3DS };
 
-
-			foreach (var file in Directory.GetFiles(AssetManager.SpriteAtlas3DSBuildDir))
-				File.Delete(file);
+			if (Directory.Exists(AssetManager.SpriteAtlas3DSBuildDir))
+				foreach (var file in Directory.GetFiles(AssetManager.SpriteAtlas3DSBuildDir))
+					File.Delete(file);
 
 
 			var op = build.BuildAtlases(entries);
 
 
-			while (!op.Completed)
-			{
+			while (!op.Completed) {
 				var elapsed = TimeSpan.FromSeconds((int)timer.Elapsed.TotalSeconds);
 
-				if (!AppGui.ProgressDialog($"Building: {op.ItemName} ({elapsed.ToString("c")}) ", op.Progress, true))
-				{
+				if (!AppGui.ProgressDialog($"Building: {op.ItemName} ({elapsed.ToString("c")}) ", op.Progress, true)) {
 					op.Cancel();
 					break;
 

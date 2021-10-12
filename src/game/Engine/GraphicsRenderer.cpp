@@ -34,8 +34,9 @@ void GraphicsRenderer::Draw(const Texture& texture, Vector2Int position, Vector2
 {
 	Rectangle16 dst = { Vector2Int16(position), Vector2Int16(size) };
 	Rectangle16 src = { Vector2Int16(0,0), texture.GetSize() };
+	SubImageCoord uv = Platform::GenerateUV(texture.GetTextureId(), src);
 
-	Platform::DrawTexture(texture, src, dst, false, color.value);
+	Platform::DrawTexture(texture, uv, dst, false, color.value);
 }
 
 void GraphicsRenderer::Draw(const ImageFrame& sprite, Vector2Int position, Color32 color)

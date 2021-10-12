@@ -49,6 +49,8 @@ namespace DataManager
 	{
 		public static void SaveAsPng(this Texture2D texture, string fileName)
 		{
+			Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+
 			using (FileStream s = new FileStream(fileName, FileMode.OpenOrCreate))
 			{
 				texture.SaveAsPng(s, texture.Width, texture.Height);

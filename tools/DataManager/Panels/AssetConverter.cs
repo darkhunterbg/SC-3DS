@@ -217,8 +217,8 @@ namespace DataManager.Panels
 
 			if (ImGui.Button("Convert all##AssetConverter.ConvertSettings.ConvertAll"))
 			{
-				if (Directory.Exists(AssetManager.AssetsDir))
-					Directory.Delete(AssetManager.AssetsDir, true);
+				if (Directory.Exists(AssetManager.ExtractedAssetsDir))
+					Directory.Delete(AssetManager.ExtractedAssetsDir, true);
 				AppGui.RunGuiCoroutine(ConvertCrt(convertEntries));
 			}
 			ImGui.SameLine();
