@@ -8,12 +8,6 @@ struct ImageFrameDef;
 
 typedef void* SurfaceId;
 
-enum class DrawCommandType : uint8_t {
-	None,
-	TexturedTriangle,
-	Triangle,
-};
-
 struct BatchDrawCommand {
 	int order;
 	const ImageFrame* sprite;

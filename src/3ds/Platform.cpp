@@ -28,17 +28,11 @@ static RenderTarget currentRT;
 static std::vector<RenderTarget> createdRenderTargets;
 static int currentScreen = 0;
 static std::unordered_map<std::string, C2D_Font> loadedFonts;
-static bool c2d_Prepared = true;
+
 static std::unordered_map<const C3D_Tex*, const Tex3DS_SubTexture*> loadedTextures;
 
-extern C3D_BufInfo vbInfo;
-
-extern DVLB_s* spriteBatchBlob;
-extern shaderProgram_s spriteBatchProgram;
-extern C3D_AttrInfo spriteBatchAttributeInfo;
-
-
-TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize) {
+TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize)
+{
 	std::string assetPath = assetDir + path + ".t3x";
 	std::replace(assetPath.begin(), assetPath.end(), '\\', '/');
 	FILE* f = fopen(assetPath.data(), "rb");
@@ -62,11 +56,13 @@ TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize) {
 	return tex;
 }
 
-const Font* Platform::LoadFont(const char* path, int size) {
+const Font* Platform::LoadFont(const char* path, int size)
+{
 
 	std::string fontPath = assetDir + path;
 
-	if (loadedFonts.find(fontPath) == loadedFonts.end()) {
+	if (loadedFonts.find(fontPath) == loadedFonts.end())
+	{
 
 		C2D_Font font = C2D_FontLoad(fontPath.data());
 		if (font == nullptr)
@@ -77,7 +73,8 @@ const Font* Platform::LoadFont(const char* path, int size) {
 	float scale = (float)size / 30.0f;
 	return new Font(loadedFonts[fontPath], scale);
 }
-Vector2Int Platform::MeasureString(const Font& font, const char* text) {
+Vector2Int Platform::MeasureString(const Font& font, const char* text)
+{
 	C2D_Font f = (C2D_Font)font.GetFontIdRaw();
 
 	C2D_TextBufClear(textBuffer);
@@ -94,7 +91,8 @@ Vector2Int Platform::MeasureString(const Font& font, const char* text) {
 
 	return size;
 }
-void Platform::ChangeBlendingMode(BlendMode mode) {
+void Platform::ChangeBlendingMode(BlendMode mode)
+{
 
 	C2D_Flush();
 
@@ -123,9 +121,11 @@ void Platform::ChangeBlendingMode(BlendMode mode) {
 	}
 }
 
-void Platform::DrawOnSurface(SurfaceId surface) {
+void Platform::DrawOnSurface(SurfaceId surface)
+{
 
-	if (surface == nullptr) {
+	if (surface == nullptr)
+	{
 		currentRT = screens[currentScreen];
 		C2D_SceneBegin(currentRT.rt);
 		return;
@@ -133,8 +133,10 @@ void Platform::DrawOnSurface(SurfaceId surface) {
 	C3D_RenderTarget* rt = (C3D_RenderTarget*)surface;
 	C2D_SceneBegin(rt);
 
-	for (auto& crt : createdRenderTargets) {
-		if (crt.rt == rt) {
+	for (auto& crt : createdRenderTargets)
+	{
+		if (crt.rt == rt)
+		{
 			currentRT = crt;
 			return;
 		}
@@ -143,8 +145,8 @@ void Platform::DrawOnSurface(SurfaceId surface) {
 	EXCEPTION("RenderTarget not found!");
 }
 
-
-SurfaceId Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering, TextureId& outTexture) {
+SurfaceId Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering, TextureId& outTexture)
+{
 	C3D_Tex* tex = new C3D_Tex();
 	if (!C3D_TexInitVRAM(tex, size.x, size.y, GPU_TEXCOLOR::GPU_RGBA8))
 		EXCEPTION("Failed to create texture with size %ix%i!", size.x, size.y);
@@ -153,7 +155,8 @@ SurfaceId Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering, Textu
 
 	outTexture = tex;
 
-	if (rt == nullptr) {
+	if (rt == nullptr)
+	{
 		EXCEPTION("Failed to create render target for texture with size %ix%i!", size.x, size.y);
 	}
 
@@ -182,18 +185,21 @@ SurfaceId Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering, Textu
 	return rt;
 }
 
-void Platform::DrawOnScreen(ScreenId screen) {
+void Platform::DrawOnScreen(ScreenId screen)
+{
 
 	currentScreen = (int)screen;
 	currentRT = screens[currentScreen];
 	C2D_SceneBegin(currentRT.rt);
 }
 
-void Platform::ClearBuffer(Color color) {
+void Platform::ClearBuffer(Color color)
+{
 	C2D_TargetClear(currentRT.rt, Color32(color).value);
 }
 
-SubImageCoord Platform::GenerateUV(TextureId texture, Rectangle16 src) {
+SubImageCoord Platform::GenerateUV(TextureId texture, Rectangle16 src)
+{
 	C3D_Tex* tex = (C3D_Tex*)texture;
 
 	if (loadedTextures.find(tex) == loadedTextures.end())
@@ -221,131 +227,11 @@ SubImageCoord Platform::GenerateUV(TextureId texture, Rectangle16 src) {
 	Tex3DS_SubTextureBottomLeft(&st2, &uv.coords[2].x, &uv.coords[2].y);
 	Tex3DS_SubTextureBottomRight(&st2, &uv.coords[3].x, &uv.coords[3].y);
 
-	//uv.corners.topLeft += min;
-	//uv.corners.topRight.y += min.y;
-	////uv.corners.topRight.x = uv.corners.topLeft.x + uv.GetSize().y * (max - min).x;
-	//uv.corners.bottomLeft.x += min.x;
-
 	return uv;
-
-	/*Vector2 min = {
-	(float)src.position.x / (float)size.x ,
-	1.0f - (float)src.position.y / (float)size.y };
-
-	Vector2 max = {
-		(float)(src.position.x + src.size.x) / (float)size.x,
-		1 - (float)(src.position.y + src.size.y) / (float)size.y
-	};*/
-
-	//return { Vector2{0,0},Vector2{0,1}, Vector2{1,0}, Vector2{1,1} };
-
-	//return { min, {min.x, max.y}, {max.x, min.y}, max };
 }
-//
-//Sprite Platform::NewSprite(Texture texture, Rectangle16 src) {
-//	C3D_Tex* tex = (C3D_Tex*)texture;
-//
-//	Vector2Int size = { tex->width, tex->height };
-//
-//	Vector2 min = { 
-//		(float)src.position.x / (float)size.x ,
-//		1.0f - (float)src.position.y / (float)size.y };
-//	Vector2 max = { 
-//		(float)(src.position.x + src.size.x) / (float)size.x,
-//		1 - (float)(src.position.y + src.size.y) / (float)size.y 
-//	};
-//
-//	return Sprite{
-//		src, 
-//		{ min, {max.x, min.y}, {min.x, max.y}, max },
-//		tex 
-//	};
-//}
-
-
-static void SetEnv(DrawCommandType type) {
-	C3D_TexEnv* env = C3D_GetTexEnv(0);
-	C3D_TexEnvInit(env);
-	switch (type)
-	{
-	case DrawCommandType::TexturedTriangle:
-		C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
-		C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
-
-		break;
-	case DrawCommandType::Triangle:
-		C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
-		C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
-		break;
-	default:
-		break;
-	}
-}
-
-/*
-void Platform::ExecDrawCommands(const Span<DrawCommand> commands) {
-
-	if (c2d_Prepared) {
-		C2D_Flush();
-
-		C3D_TexEnv* env = C3D_GetTexEnv(1);
-		C3D_TexEnvInit(env);
-
-		C3D_BindProgram(&spriteBatchProgram);
-		C3D_SetAttrInfo(&spriteBatchAttributeInfo);
-		C3D_SetBufInfo(&vbInfo);
-
-		C3D_DepthTest(true, GPU_GEQUAL, GPU_WRITE_ALL);
-		C3D_CullFace(GPU_CULL_NONE);
-
-		c2d_Prepared = false;
-
-		C3D_Mtx mdlvMtx;
-		Mtx_Identity(&mdlvMtx);
-		auto uLoc_mdlvMtx = shaderInstanceGetUniformLocation(spriteBatchProgram.vertexShader, "mdlvMtx");
-		C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, uLoc_mdlvMtx, &mdlvMtx);
-	}
-
-
-	auto uLoc_projMtx = shaderInstanceGetUniformLocation(spriteBatchProgram.vertexShader, "projMtx");
-
-	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, uLoc_projMtx, &currentRT.projMtx);
-
-	SetEnv(commands[0].type);
-	DrawCommandType type = commands[0].type;
-
-	for (const DrawCommand& cmd : commands)
-	{
-		if (cmd.type != type) {
-			type = cmd.type;
-			SetEnv(cmd.type);
-		}
-
-		switch (cmd.type)
-		{
-		case DrawCommandType::TexturedTriangle: {
-			C3D_TexBind(0, (C3D_Tex*)cmd.texture->GetTextureId());
-			C3D_DrawArrays(GPU_TRIANGLES, cmd.start, cmd.count);
-			break;
-		}
-		case DrawCommandType::Triangle: {
-			C3D_DrawArrays(GPU_TRIANGLES, cmd.start, cmd.count);
-			break;
-		}
-		default:
-			break;
-		}
-	}
-} */
 
 void Platform::DrawTexture(const Texture& texture, const Rectangle16& src, const Rectangle16& dst, bool hFlip, Color32 c)
 {
-	if (!c2d_Prepared)
-	{
-		C2D_Prepare();
-		c2d_Prepared = true;
-	}
-
 	Vector2 scale = Vector2(dst.size) / Vector2(src.size);
 	Vector2 s = scale;
 	scale.x -= scale.x * 2.0f * hFlip;
@@ -355,14 +241,14 @@ void Platform::DrawTexture(const Texture& texture, const Rectangle16& src, const
 	auto subTex = loadedTextures[img.tex];
 
 	auto st2 = *subTex;
-	
+
 	auto uv = GenerateUV(texture.GetTextureId(), src);
 	st2.width = src.size.x;
 	st2.height = src.size.y;
 	st2.left = uv.corners.topLeft.y;
 	st2.top = uv.corners.topLeft.x;
-	st2.right =  uv.corners.bottomRight.y;
-	st2.bottom =  uv.corners.bottomRight.x;
+	st2.right = uv.corners.bottomRight.y;
+	st2.bottom = uv.corners.bottomRight.x;
 
 	img.subtex = &st2;
 
@@ -370,12 +256,6 @@ void Platform::DrawTexture(const Texture& texture, const Rectangle16& src, const
 }
 void Platform::DrawTexture(const Texture& texture, const SubImageCoord& uv, const Rectangle16& dst, bool hFlip, Color32 c)
 {
-	if (!c2d_Prepared)
-	{
-		C2D_Prepare();
-		c2d_Prepared = true;
-	}
-
 	Vector2 uvSize = uv.corners.topRight - uv.corners.bottomLeft;
 
 	Vector2Int16 size = Vector2Int16(Vector2(texture.GetSize()) * uvSize);
@@ -392,6 +272,7 @@ void Platform::DrawTexture(const Texture& texture, const SubImageCoord& uv, cons
 
 	st2.width = size.x;
 	st2.height = size.y;
+
 	st2.left = uv.corners.topLeft.x;
 	st2.top = uv.corners.topLeft.y;
 	st2.right = uv.corners.bottomRight.x;
@@ -399,28 +280,20 @@ void Platform::DrawTexture(const Texture& texture, const SubImageCoord& uv, cons
 
 	img.subtex = &st2;
 
-	C2D_DrawImageAt(img, (float)dst.position.x, (float)dst.position.y, 0, nullptr, scale.x, scale.y);
+	C2D_ImageTint tint;
+
+	C2D_PlainImageTint(&tint, c.value, 1);
+
+	C2D_DrawImageAt(img, (float)dst.position.x, (float)dst.position.y, 0, &tint, scale.x, scale.y);
 }
 void Platform::DrawRectangle(const Rectangle& rect, Color32 c)
 {
-	if (!c2d_Prepared)
-	{
-		C2D_Prepare();
-		c2d_Prepared = true;
-	}
-
 	C2D_DrawRectSolid((float)rect.position.x, (float)rect.position.y, 0, (float)rect.size.x, (float)rect.size.y, c.value);
 }
 
 
-void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color) {
-
-	if (!c2d_Prepared) {
-		C2D_Prepare();
-		c2d_Prepared = true;
-	}
-
-
+void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color)
+{
 	C2D_Font f = (C2D_Font)font.GetFontIdRaw();
 
 	C2D_Text t;
@@ -434,7 +307,8 @@ void Platform::DrawText(const Font& font, Vector2Int position, const char* text,
 }
 
 
-double Platform::ElaspedTime() {
+double Platform::ElaspedTime()
+{
 
 	u64 now = svcGetSystemTick();
 
@@ -444,7 +318,8 @@ double Platform::ElaspedTime() {
 	return elapsed / 1000;
 }
 
-void Platform::UpdateGamepadState(GamepadState& state) {
+void Platform::UpdateGamepadState(GamepadState& state)
+{
 	u32 kDown = hidKeysHeld();
 	state.X = kDown & KEY_X;
 	state.Y = kDown & KEY_Y;
@@ -469,7 +344,8 @@ void Platform::UpdateGamepadState(GamepadState& state) {
 
 	state.CStick = Vector2(cstickPos.dx, -cstickPos.dy) / 154.0f;
 }
-void Platform::UpdatePointerState(PointerState& state) {
+void Platform::UpdatePointerState(PointerState& state)
+{
 	touchPosition touchPos;
 	hidTouchRead(&touchPos);
 
@@ -478,14 +354,16 @@ void Platform::UpdatePointerState(PointerState& state) {
 	state.Position = { touchPos.px, touchPos.py };
 }
 
-FILE* Platform::OpenAsset(const char* path) {
+FILE* Platform::OpenAsset(const char* path)
+{
 	std::string f = assetDir + path;
 	std::replace(f.begin(), f.end(), '\\', '/');
 
 	return fopen(f.data(), "rb");
 }
 
-void Platform::CreateChannel(AudioChannelState& channel) {
+void Platform::CreateChannel(AudioChannelState& channel)
+{
 	if (audioChannels.size() == 24)
 		EXCEPTION("Reached max number of channels!");
 
@@ -506,7 +384,8 @@ void Platform::CreateChannel(AudioChannelState& channel) {
 
 	memset(&platformChannel->waveBuff[0], 0, sizeof(platformChannel->waveBuff));
 
-	for (int i = 0; i < 2; ++i) {
+	for (int i = 0; i < 2; ++i)
+	{
 		platformChannel->waveBuff[i].data_vaddr = linearAlloc(channel.bufferSize);
 		platformChannel->waveBuff[i].nsamples = channel.bufferSize / (2 * (channel.mono ? 1 : 2));
 	}
@@ -515,7 +394,8 @@ void Platform::CreateChannel(AudioChannelState& channel) {
 
 	channel.handle = channelId;
 }
-void Platform::EnableChannel(const AudioChannelState& channel, bool enabled) {
+void Platform::EnableChannel(const AudioChannelState& channel, bool enabled)
+{
 
 	audioChannels[channel.handle]->enabled = enabled;
 	ndspChnSetPaused(channel.handle, !enabled);
@@ -529,11 +409,13 @@ static  int threadIds[] = { 1,2,3 };
 
 static std::function<void(int)> f;
 
-static void ThreadWork(void* arg) {
+static void ThreadWork(void* arg)
+{
 	f(*(int*)arg);
 }
 
-int Platform::StartThreads(std::function<void(int)> threadWork) {
+int Platform::StartThreads(std::function<void(int)> threadWork)
+{
 
 	f = threadWork;
 
@@ -547,8 +429,10 @@ int Platform::StartThreads(std::function<void(int)> threadWork) {
 
 	std::vector<int> cores;
 
-	for (int i = 0; i < 3; ++i) {
-		if (threadCreate(ThreadWork, &threadIds[threads], 4096, prio - 1, threadIds[i], true)) {
+	for (int i = 0; i < 3; ++i)
+	{
+		if (threadCreate(ThreadWork, &threadIds[threads], 4096, prio - 1, threadIds[i], true))
+		{
 			cores.push_back(threadIds[i]);
 			++threads;
 		}
@@ -562,7 +446,8 @@ int Platform::StartThreads(std::function<void(int)> threadWork) {
 
 	return threads;
 }
-Semaphore Platform::CreateSemaphore() {
+Semaphore Platform::CreateSemaphore()
+{
 	Handle* h = new Handle(0);
 	Result r = svcCreateSemaphore(h, 0, 100000);
 	if (r)
@@ -570,12 +455,14 @@ Semaphore Platform::CreateSemaphore() {
 
 	return h;
 }
-void Platform::WaitSemaphore(Semaphore s) {
+void Platform::WaitSemaphore(Semaphore s)
+{
 	Result r = svcWaitSynchronization(*(Handle*)s, -1);
 	if (r)
 		EXCEPTION("svcWaitSynchronization failed with %s", R_SUMMARY(r));
 }
-void Platform::ReleaseSemaphore(Semaphore s, int v) {
+void Platform::ReleaseSemaphore(Semaphore s, int v)
+{
 	s32 o;
 	Result r = svcReleaseSemaphore(&o, *(Handle*)s, v);
 	if (r)

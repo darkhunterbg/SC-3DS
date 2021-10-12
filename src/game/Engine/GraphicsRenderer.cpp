@@ -34,6 +34,7 @@ void GraphicsRenderer::Draw(const Texture& texture, Vector2Int position, Vector2
 {
 	Rectangle16 dst = { Vector2Int16(position), Vector2Int16(size) };
 	Rectangle16 src = { Vector2Int16(0,0), texture.GetSize() };
+
 	Platform::DrawTexture(texture, src, dst, false, color.value);
 }
 

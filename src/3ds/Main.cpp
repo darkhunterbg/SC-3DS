@@ -31,12 +31,6 @@ C2D_TextBuf textBuffer;
 u64 mainTimer;
 std::vector<NDSAudioChannel*> audioChannels;
 
-C3D_BufInfo vbInfo;
-
-DVLB_s* spriteBatchBlob;
-shaderProgram_s spriteBatchProgram;
-C3D_AttrInfo spriteBatchAttributeInfo;
-
 void Init();
 void Uninit();
 void UpdateAudioChannel(NDSAudioChannel& channel);
@@ -219,25 +213,6 @@ int main()
 	return 0;
 }
 
-void LoadShader()
-{
-	spriteBatchBlob = DVLB_ParseFile((u32*)spritebatch_shbin, spritebatch_shbin_size);
-	if (!spriteBatchBlob)
-		FatalError("Failed to compile spritebatch shader");
-
-	static constexpr const int VBSize = 64 * 1024;
-
-	shaderProgramInit(&spriteBatchProgram);
-	shaderProgramSetVsh(&spriteBatchProgram, &spriteBatchBlob->DVLE[0]);
-
-	AttrInfo_Init(&spriteBatchAttributeInfo);
-	AttrInfo_AddLoader(&spriteBatchAttributeInfo, 0, GPU_FLOAT, 2); // v0=position
-	AttrInfo_AddLoader(&spriteBatchAttributeInfo, 1, GPU_FLOAT, 2); // v1=texcoord
-	AttrInfo_AddLoader(&spriteBatchAttributeInfo, 2, GPU_UNSIGNED_BYTE, 4); // v2=color
-
-	//BufInfo_Init(&vbInfo);
-	//BufInfo_Add(&vbInfo, vertexBuffer.Data(), sizeof(Vertex), 3, 0x210);
-}
 
 void Init()
 {
@@ -254,9 +229,7 @@ void Init()
 	//	FatalError("svcReleaseSemaphore failed with %s", R_SUMMARY(r));
 
 
-	LoadShader();
-
-	C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
+	C2D_Init(4096 * 8);
 	C2D_Prepare();
 	top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
 	bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
