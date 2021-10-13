@@ -34,8 +34,11 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\InputDevices.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\InputManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\JobSystem.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationPlayer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\Entity.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\EntityManager.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\EntityUtil.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\ObjectDrawSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Game.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.h" />
@@ -74,8 +77,11 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\InputDevices.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\InputManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\JobSystem.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationPlayer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\Entity.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\EntityManager.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\EntityUtil.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\ObjectDrawSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Game.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.cpp" />

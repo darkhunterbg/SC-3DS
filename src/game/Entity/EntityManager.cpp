@@ -3,12 +3,13 @@
 #include "../Profiler.h"
 #include "../Util.h"
 #include "../Debug.h"
+#include "EntityUtil.h"
 
 #include <algorithm>
 
-
 EntityManager::EntityManager() {
-
+	memset(_orientations.data(), 0, _orientations.size());
+	EntityUtil::emInstance = this;
 }
 EntityManager::~EntityManager() {
 }
@@ -81,6 +82,8 @@ void EntityManager::Update1() {
 }
 // Update 24 per second (60 fps) 
 void EntityManager::Update2() {
+	AnimationSystem.RunAnimations(*this);
+
 	UpdateChildren();
 
 	CollectEntityChanges();

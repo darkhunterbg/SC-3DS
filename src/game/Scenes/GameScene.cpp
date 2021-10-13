@@ -9,6 +9,7 @@
 
 #include "../Engine/GraphicsRenderer.h"
 #include "../Engine/InputManager.h"
+#include "../Entity/EntityUtil.h"
 
 #include <algorithm>
 
@@ -82,9 +83,11 @@ void GameScene::Start()
 
 			entityManager->DrawSystem.NewComponent(id);
 			entityManager->DrawSystem.InitFromImage(id, def.Art.GetSprite().GetImage());
-			entityManager->DrawSystem.SetSpriteWithColorShadow(id, def.Art.GetSprite().GetImage(), *def.Art.GetShadowImage(), 0, false);
 			entityManager->GetPosition(id) = Vector2Int16(Vector2Int{ x * 32 ,y * 32 });
-			entityManager->DrawSystem.SetColor(id, Colors::SCBlue);
+			entityManager->DrawSystem.GetComponent(id).color = Color32(Colors::SCBlue);
+
+			entityManager->AnimationSystem.NewComponent(id);
+			EntityUtil::PlayAnimation(id, *def.Art.GetSprite().GetAnimation(AnimationType::Init), def.Art.GetShadowImage());
 		}
 	}
 

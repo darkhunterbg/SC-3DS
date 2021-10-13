@@ -12,6 +12,7 @@
 #include "../Camera.h"
 
 #include "ObjectDrawSystem.h"
+#include "AnimationSystem.h"
 
 struct EntityChangedData {
 	std::vector<EntityId> entity;
@@ -51,6 +52,7 @@ private:
 	uint32_t logicalFrame = 0;
 
 	std::array<Vector2Int16, Entity::MaxEntities> _positions;
+	std::array<uint8_t, Entity::MaxEntities> _orientations;
 public:
 	bool DrawColliders = false;
 	bool DrawGrid = false;
@@ -58,6 +60,7 @@ public:
 	bool Muted = false;
 
 	ObjectDrawSystem DrawSystem;
+	AnimationSystem AnimationSystem;
 
 	EntityManager();
 	~EntityManager();
@@ -68,6 +71,7 @@ public:
 		return entities.GetEntities();
 	}
 	inline Vector2Int16& GetPosition(EntityId id) { return _positions[Entity::ToIndex(id)]; }
+	inline uint8_t& GetOrientation(EntityId id) { return _orientations[Entity::ToIndex(id)]; }
 
 	void DeleteEntity(EntityId id);
 	void DeleteEntities(const std::vector<EntityId>& entities, bool sorted = false);

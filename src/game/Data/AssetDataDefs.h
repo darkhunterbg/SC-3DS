@@ -61,6 +61,8 @@ struct AudioClipDef {
 	char path[32];
 };
 
+struct SpriteDef;
+
 struct AnimClipDef {
 	uint16_t spriteId;
 	uint32_t instructionStart;
@@ -68,6 +70,7 @@ struct AnimClipDef {
 	AnimationType type;
 
 	inline uint32_t InstructionEnd() const { return instructionStart + instructionCount; }
+	const SpriteDef& GetSprite() const;
 };
 
 struct SpriteDef {

@@ -25,3 +25,7 @@ const Image& UnitWireframeDef::Wireframe::GetImage() const
 	return GameDatabase::instance->GetImage(imageId);
 }
 
+const SpriteDef& AnimClipDef::GetSprite() const
+{
+	return GameDatabase::instance->SpriteDefs[spriteId];
+}

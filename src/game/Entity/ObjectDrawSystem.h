@@ -31,7 +31,6 @@ class ObjectDrawSystem {
 	std::array<short, Entity::MaxEntities> _entityToIndexMap;
 	EntityId _maxEntity = Entity::None;
 
-	DrawComponent& GetComponent(EntityId id);
 	DrawComponent* TryGetComponent(EntityId id);
 public:
 	ObjectDrawSystem();
@@ -75,12 +74,5 @@ public:
 		draw.shadowOffset = shadowImg.GetImageFrameOffset(frame, flipped);
 	}
 
-	inline void SetVisible(EntityId id, bool visible)
-	{
-		GetComponent(id).visible = visible;
-	}
-	inline void SetColor(EntityId id, const Color& color)
-	{
-		GetComponent(id).color = Color32(color);
-	}
+	DrawComponent& GetComponent(EntityId id);
 };
