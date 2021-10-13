@@ -4,7 +4,6 @@
 
 #include "../MathLib.h"
 #include "../Color.h"
-#include "GameViewContext.h"
 
 #include <vector>
 
@@ -16,18 +15,18 @@ struct UnitHealthComponent;
 class UnitSelectionConsolePanel {
 
 public:
-	void UpdateSelection(GameViewContext& context);
+	void UpdateSelection();
 
-	void Draw(GameViewContext& context);
+	void Draw();
 	Rectangle PanelDst;
 private:
 
-	void DrawMultiSelection(Rectangle dst, GameViewContext& context);
+	void DrawMultiSelection(Rectangle dst);
 	
-	void DrawUnitName(Rectangle space, EntityId id, const UnitComponent& unit, GameViewContext& context);
-	void DrawSupplyInfo(Rectangle space, EntityId id, const UnitComponent& unit, GameViewContext& context);
-	void DrawProductionDetails(Rectangle space, EntityId id, const UnitDataComponent& data, GameViewContext& context);
-	void DrawUnitDetail(Rectangle space, EntityId id, const UnitComponent& unit, GameViewContext& context);
+	void DrawUnitName(Rectangle space, EntityId id, const UnitComponent& unit);
+	void DrawSupplyInfo(Rectangle space, EntityId id, const UnitComponent& unit);
+	void DrawProductionDetails(Rectangle space, EntityId id, const UnitDataComponent& data);
+	void DrawUnitDetail(Rectangle space, EntityId id, const UnitComponent& unit);
 
 	void DrawUnitInfo(Rectangle space, EntityId id, const UnitComponent& unit, const UnitHealthComponent& health);
 

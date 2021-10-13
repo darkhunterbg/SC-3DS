@@ -4,8 +4,6 @@
 #include "../Camera.h"
 #include "../Entity/EntityManager.h"
 #include "../Util.h"
-#include "../Entity/EntityUtil.h"
-#include "GameViewContext.h"
 #include <algorithm>
 
 #include "Game.h"
@@ -87,19 +85,19 @@ void Cursor::Update(Camera& camera, GameViewContext& context) {
 	}
 
 	worldPos = camera.ScreenToWorld(Position);
-	hover = context.GetUnitAtPosition(worldPos);
+	//hover = context.GetUnitAtPosition(worldPos);
 
 
 	dragging = (worldPos - holdStart).LengthSquared() != 0;
 
 	//newClip = currentClip;
 
-	if (context.IsTargetSelectionMode) {
-		UpdateTargetSelectionState(camera, context);
-	}
-	else {
-		UpdateDefaultState(camera, context);
-	}
+	//if (context.IsTargetSelectionMode) {
+	//	UpdateTargetSelectionState(camera, context);
+	//}
+	//else {
+	//	UpdateDefaultState(camera, context);
+	//}
 
 	if (corner.LengthSquared() != 0) {
 		int index = (corner.x + 1) + (corner.y + 1) * 3;
@@ -116,7 +114,7 @@ void Cursor::Update(Camera& camera, GameViewContext& context) {
 
 void Cursor::UpdateDefaultState(Camera& camera, GameViewContext& context)
 {
-	EntityManager& em = context.GetEntityManager();
+	//EntityManager& em = context.GetEntityManager();
 
 	if (holding && dragging) {
 		Vector2Int16 start = camera.WorldToScreen(holdStart);
@@ -144,14 +142,14 @@ void Cursor::UpdateDefaultState(Camera& camera, GameViewContext& context)
 			rect.position.x = std::min(start.x, end.x);
 			rect.position.y = std::min(start.y, end.y);
 
-			context.SelectUnitsInRegion(rect);
+			//context.SelectUnitsInRegion(rect);
 
 			holdStart = { 0,0 };
 			regionRect = { {0,0},{0,0} };
 
 		}
 		else {
-			context.SelectUnitAtPosition(worldPos);
+			//context.SelectUnitAtPosition(worldPos);
 		}
 	}
 
@@ -163,7 +161,7 @@ void Cursor::UpdateDefaultState(Camera& camera, GameViewContext& context)
 				newClip = "cursor\\arrow";
 			}
 			else {
-				if (UnitEntityUtil::IsAlly(context.player, hover)) {
+				/*if (UnitEntityUtil::IsAlly(context.player, hover)) {
 					newClip = "cursor\\magg";
 				}
 				else if (UnitEntityUtil::IsEnemy(context.player, hover)) {
@@ -171,7 +169,7 @@ void Cursor::UpdateDefaultState(Camera& camera, GameViewContext& context)
 				}
 				else {
 					newClip = "cursor\\magy";
-				}
+				}*/
 
 			}
 		}
@@ -188,7 +186,7 @@ void Cursor::UpdateTargetSelectionState(Camera& camera, GameViewContext& context
 		newClip = "cursor\\targn";
 	}
 	else {
-		if (UnitEntityUtil::IsAlly(context.player, hover)) {
+		/*if (UnitEntityUtil::IsAlly(context.player, hover)) {
 			newClip = "cursor\\targg";
 		}
 		else if (UnitEntityUtil::IsEnemy(context.player, hover)) {
@@ -196,7 +194,7 @@ void Cursor::UpdateTargetSelectionState(Camera& camera, GameViewContext& context
 		}
 		else {
 			newClip = "cursor\\targy";
-		}
+		}*/
 
 	}
 }

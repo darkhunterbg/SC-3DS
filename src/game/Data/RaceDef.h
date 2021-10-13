@@ -5,9 +5,22 @@
 
 #include "../Assets.h"
 
-#include "../Entity/Common.h"
-
 struct SoundSetDef;
+
+enum AdvisorErrorMessageType {
+	NotEnoughMinerals = 0,
+	NotEnoughGas = 1,
+	NotEnoughSupply = 2,
+	LandingInterrupted = 3,
+	InvalidLandingZone = 4,
+	NotEnoughEnergy = 6,
+};
+
+
+enum AdvisorUpdateMessageType {
+
+};
+
 
 enum class RaceType :uint8_t {
 

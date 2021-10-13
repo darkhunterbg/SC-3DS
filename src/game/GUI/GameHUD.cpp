@@ -3,8 +3,6 @@
 #include "../StringLib.h"
 #include "../Camera.h"
 #include "../MathLib.h"
-#include "../Entity/PlayerSystem.h"
-#include "../Entity/MapSystem.h"
 #include "../Util.h"
 #include "../Entity/EntityManager.h"
 #include "../Engine/GraphicsRenderer.h"
@@ -43,13 +41,13 @@ void GameHUD::DrawResource(const ImageFrame& icon, Vector2Int pos, Color color, 
 	GraphicsRenderer::DrawText(*font, pos, textBuffer, color);
 }
 
-void GameHUD::UpdateInfo(GameViewContext& context) {
-	const PlayerInfo& info = context.GetEntityManager().GetPlayerSystem().GetPlayerInfo(context.player);
+void GameHUD::UpdateInfo( ) {
+	//const PlayerInfo& info = context.GetEntityManager().GetPlayerSystem().GetPlayerInfo(context.player);
 
-	minerals.target = info.minerals;
-	gas.target = info.gas;
-	supply.current = info.GetUsedSupply();
-	supply.max = info.GetProvidedSupply();
+	//minerals.target = info.minerals;
+	//gas.target = info.gas;
+	//supply.current = info.GetUsedSupply();
+	//supply.max = info.GetProvidedSupply();
 }
 
 static const  int GetResourceUpdate(int change) {
@@ -69,9 +67,9 @@ void GameHUD::UpdateResourceDiff(GameHUD::Resource& r) {
 	r.shown += mod;
 }
 
-void GameHUD::UpperScreenGUI(const Camera& camera, GameViewContext& context) {
+void GameHUD::UpperScreenGUI(const Camera& camera) {
 
-	UpdateInfo(context);
+	UpdateInfo();
 
 	UpdateResourceDiff(minerals);
 	UpdateResourceDiff(gas);
@@ -81,11 +79,11 @@ void GameHUD::UpperScreenGUI(const Camera& camera, GameViewContext& context) {
 	// Minerals
 	DrawResource(mineralIcon, { 160, 2 }, color, "%i", minerals.shown);
 	// Gas
-	DrawResource(context.race->GasIcon, { 240, 2 }, color, "%i", gas.shown);
+	//DrawResource(context.race->GasIcon, { 240, 2 }, color, "%i", gas.shown);
 	// Supply
 	if (supply.current > supply.max)
 		color = Colors::UIRed;
-	DrawResource(context.race->SupplyIcon, { 320,2 }, color, "%i", supply.current);
+	//DrawResource(context.race->SupplyIcon, { 320,2 }, color, "%i", supply.current);
 
 
 	Vector2Int pos = { 320 + 16 , 0 };
@@ -96,65 +94,65 @@ void GameHUD::UpperScreenGUI(const Camera& camera, GameViewContext& context) {
 	GraphicsRenderer::DrawText(*font, pos, textBuffer, Colors::UIGreen);
 
 
-	const auto& sprite = context.race->ConsoleUpperSprite;
-	GraphicsRenderer::Draw(sprite, { 0, 240 - sprite.size.y });
+	//const auto& sprite = context.race->ConsoleUpperSprite;
+	//GraphicsRenderer::Draw(sprite, { 0, 240 - sprite.size.y });
 
 
-	if (context.IsTargetSelectionMode) {
-		pos = { 0, 240 - sprite.size.y };
-		pos.y -= 16;
-		pos.x += 160;
-		GraphicsRenderer::DrawText(*font, pos + Vector2Int{ 1, 1 }, "Select Target", Colors::Black);
-		GraphicsRenderer::DrawText(*font, pos, "Select Target", Colors::UILightGray);
+	//if (context.IsTargetSelectionMode) {
+	//	pos = { 0, 240 - sprite.size.y };
+	//	pos.y -= 16;
+	//	pos.x += 160;
+	//	GraphicsRenderer::DrawText(*font, pos + Vector2Int{ 1, 1 }, "Select Target", Colors::Black);
+	//	GraphicsRenderer::DrawText(*font, pos, "Select Target", Colors::UILightGray);
 
-	}
+	//}
 }
 
-void GameHUD::LowerScreenGUI(const Camera& camera, GameViewContext& context) {
+void GameHUD::LowerScreenGUI(const Camera& camera) {
 
-	GraphicsRenderer::ClearCurrentSurface({ 0x080808ff });
+	//GraphicsRenderer::ClearCurrentSurface({ 0x080808ff });
 
-	EntityId selected = context.GetPriorityUnitSelected();
-	if (selected != Entity::None) {
-		auto& def = *context.GetEntityManager().UnitArchetype.UnitComponents.GetComponent(selected).def;
-		auto portrait = def.Art.GetPortraitImage();
-		if (portrait != nullptr)
-			GraphicsRenderer::Draw(portrait->GetFrame(0), portraitPanelDst);
-	}
+	//EntityId selected = context.GetPriorityUnitSelected();
+	//if (selected != Entity::None) {
+	//	auto& def = *context.GetEntityManager().UnitArchetype.UnitComponents.GetComponent(selected).def;
+	//	auto portrait = def.Art.GetPortraitImage();
+	//	if (portrait != nullptr)
+	//		GraphicsRenderer::Draw(portrait->GetFrame(0), portraitPanelDst);
+	//}
 
-	GraphicsRenderer::Draw(context.race->ConsoleLowerSprite, { 0,0 });
+	//GraphicsRenderer::Draw(context.race->ConsoleLowerSprite, { 0,0 });
 
-	DrawMinimap(camera, context);
+	//DrawMinimap(camera);
 
-	consolePanel.Draw(context);
+	//consolePanel.Draw();
 
-	commandsPanel.Draw(context);
+	//commandsPanel.Draw(context);
 
 }
 
-void GameHUD::Update(Camera& camera, GameViewContext& context) {
-	if (InputManager::Pointer.IsDown()) {
-		if (minimapDst.Contains(InputManager::Pointer.Position())) {
-			Vector2Int pos = InputManager::Pointer.Position() - Vector2Int(minimapDst.position);
-			camera.Position = Vector2Int16(Vector2(pos) * minimapUpscale);
-		}
+void GameHUD::Update(Camera& camera) {
+	//if (InputManager::Pointer.IsDown()) {
+	//	if (minimapDst.Contains(InputManager::Pointer.Position())) {
+	//		Vector2Int pos = InputManager::Pointer.Position() - Vector2Int(minimapDst.position);
+	//		camera.Position = Vector2Int16(Vector2(pos) * minimapUpscale);
+	//	}
 
-		if (portraitPanelDst.Contains(InputManager::Pointer.Position())) {
-			EntityId selected = context.GetPriorityUnitSelected();
-			if (selected != Entity::None) {
-				Vector2Int16 pos = context.GetEntityManager().PositionComponents.GetComponent(selected);
-				camera.Position = pos;
-			}
-		}
-	}
+	//	if (portraitPanelDst.Contains(InputManager::Pointer.Position())) {
+	//		EntityId selected = context.GetPriorityUnitSelected();
+	//		if (selected != Entity::None) {
+	//			Vector2Int16 pos = context.GetEntityManager().PositionComponents.GetComponent(selected);
+	//			camera.Position = pos;
+	//		}
+	//	}
+	//}
 
-	consolePanel.UpdateSelection(context);
-	commandsPanel.UpdateInput(context);
+	//consolePanel.UpdateSelection(context);
+	//commandsPanel.UpdateInput(context);
 }
 
-void GameHUD::DrawMinimap(const Camera& camera, GameViewContext& context) {
+void GameHUD::DrawMinimap(const Camera& camera) {
 
-	context.GetEntityManager().GetMapSystem().DrawMinimap(minimapDst);
+	//context.GetEntityManager().GetMapSystem().DrawMinimap(minimapDst);
 
 	Rectangle camRect = camera.GetRectangle();
 	Vector2 min = Vector2(camRect.GetMin());

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../MathLib.h"
-#include "../Entity/Common.h"
 #include "../Assets.h"
 
 #include <string> 
@@ -25,15 +24,15 @@ struct AbilityDef {
 	} Art;
 
 	struct AbilityData {
-		UnitAIState EntitySelectedAction;
-		UnitAIState PositionSelectedAction;
-		inline bool HasTargetSelection() const {
-			return PositionSelectedAction != UnitAIState::Nothing;
-		}
+		//UnitAIState EntitySelectedAction;
+		//UnitAIState PositionSelectedAction;
+		//inline bool HasTargetSelection() const {
+		//	return PositionSelectedAction != UnitAIState::Nothing;
+		//}
 
-			inline bool IsState(UnitAIState s) const {
-			return EntitySelectedAction == s || PositionSelectedAction == s;
-		}
+		//	inline bool IsState(UnitAIState s) const {
+		//	return EntitySelectedAction == s || PositionSelectedAction == s;
+		//}
 	} Data;
 
 

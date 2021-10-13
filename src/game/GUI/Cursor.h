@@ -3,7 +3,6 @@
 #include "../Assets.h"
 #include <vector>
 #include "../Entity/Entity.h"
-#include "../Entity/Common.h"
 #include "GUIAnimator.h"
 
 class Camera;

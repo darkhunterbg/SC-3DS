@@ -20,7 +20,7 @@ public:
 	virtual void Draw() override;
 
 private:
-	GameView* view;
+	//GameView* view;
 	Camera camera;
 	EntityManager* entityManager;
 };

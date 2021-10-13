@@ -11,17 +11,15 @@
 
 class Camera;
 class EntityManager;
-class GameViewContext;
-
 
 class GameHUD {
 public:
-	GameHUD( Vector2Int16 mapSize);
+	GameHUD(Vector2Int16 mapSize);
 
-	void UpperScreenGUI(const Camera& camera, GameViewContext& context);
-	void LowerScreenGUI(const Camera& camera, GameViewContext& context);
-	
-	void Update( Camera& camera, GameViewContext& context);
+	void UpperScreenGUI(const Camera& camera);
+	void LowerScreenGUI(const Camera& camera);
+
+	void Update(Camera& camera);
 private:
 	UnitSelectionConsolePanel consolePanel;
 	UnitCommandsPanel commandsPanel;
@@ -48,8 +46,8 @@ private:
 	Supply supply = { 0,0 };
 
 	void DrawResource(const ImageFrame& icon, Vector2Int pos, Color color, const char* text, ...);
-	void DrawMinimap(const Camera& camera, GameViewContext& context);
+	void DrawMinimap(const Camera& camera);
 
-	void UpdateInfo(GameViewContext& context);
+	void UpdateInfo();
 	static void UpdateResourceDiff(Resource& r);
 };

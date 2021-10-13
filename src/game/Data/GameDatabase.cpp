@@ -1,7 +1,6 @@
 #include "GameDatabase.h"
 #include "../Engine/AssetLoader.h"
 #include "../Debug.h"
-#include "../Entity/AnimationPlayer.h"
 
 const GameDatabase* GameDatabase::instance = nullptr;
 
@@ -124,7 +123,7 @@ void GameDatabase::LoadAssetReferences()
 
 	commandIcons = imageNamesMap["unit\\cmdbtns\\cmdicons"];
 
-	AnimationPlayer::BuildInstructionCache({ AnimInstructionDefs.data(), AnimInstructionDefs.size() });
+	//AnimationPlayer::BuildInstructionCache({ AnimInstructionDefs.data(), AnimInstructionDefs.size() });
 
 	selections.push_back(&GetImage("unit\\thingy\\o022"));
 	selections.push_back(&GetImage("unit\\thingy\\o032"));

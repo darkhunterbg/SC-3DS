@@ -6,7 +6,6 @@
 #include "../Entity/EntityManager.h"
 #include "../Profiler.h"
 #include "../Data//GameDatabase.h"
-#include "../Entity/EntityUtil.h"
 
 #include "../Engine/GraphicsRenderer.h"
 #include "../Engine/InputManager.h"
@@ -18,8 +17,9 @@ GameScene::GameScene() {}
 GameScene::~GameScene() {}
 
 
-void GameScene::Start() {
-	Vector2Int16 size = { 64* 32,64 * 32 };
+void GameScene::Start()
+{
+	Vector2Int16 size = { 64 * 32,64 * 32 };
 
 	camera.Position = { 0,0 };
 	camera.Size = { 400,240 };
@@ -32,7 +32,7 @@ void GameScene::Start() {
 
 	entityManager->Init(size);
 
-	view = new GameView(*entityManager, size);
+	//view = new GameView(*entityManager, size);
 
 	Color color[] = { Colors::SCRed, Colors::SCBlue, Colors::SCLightGreen, Colors::SCPurle,
 	 Colors::SCOrange, Colors::SCGreen, Colors::SCBrown, Colors::SCLightYellow, Colors::SCWhite,
@@ -42,15 +42,15 @@ void GameScene::Start() {
 
 	const auto& race = *GameDatabase::instance->GetRace(RaceType::Terran);
 
-	if (race.GetMusic())
-		entityManager->GetSoundSystem().PlayMusic(*race.GetMusic());
+	//if (race.GetMusic())
+	//	entityManager->GetSoundSystem().PlayMusic(*race.GetMusic());
 
 
-	for (int p = 0; p < totalPlayers; ++p) {
-		entityManager->GetPlayerSystem().AddPlayer(race, color[p]);
-	}
+	//for (int p = 0; p < totalPlayers; ++p) {
+	//	entityManager->GetPlayerSystem().AddPlayer(race, color[p]);
+	//}
 
-	view->SetPlayer(1, race);
+	//view->SetPlayer(1, race);
 
 
 	/*UnitEntityUtil::NewUnit(UnitDatabase::MineralField1, 0,
@@ -74,18 +74,19 @@ void GameScene::Start() {
 	const auto& def = *GameDatabase::instance->GetUnit("Terran\\Units\\Marine");
 
 	int i = 0;
-	for (int y = 2; y > 0; --y) {
-		for (int x = 1; x > 0; --x) {
-			//auto& def = *UnitDatabase::Units[1];
-			UnitEntityUtil::NewUnit(def, 1 + i / 200,// 1 + i % totalPlayers,
-				Vector2Int16(Vector2Int{ x * 32 + 48,y * 32 + 48 }));
+	for (int y = 0; y < 100; ++y)
+	{
+		for (int x = 0; x < 100; ++x)
+		{
+			EntityId id = entityManager->NewEntity();
 
-			i += 1;
-
+			entityManager->DrawSystem.NewComponent(id);
+			entityManager->DrawSystem.InitFromImage(id, def.Art.GetSprite().GetImage());
+			entityManager->DrawSystem.SetSpriteWithColorShadow(id, def.Art.GetSprite().GetImage(), *def.Art.GetShadowImage(), 0, false);
+			entityManager->GetPosition(id) = Vector2Int16(Vector2Int{ x * 32 ,y * 32 });
+			entityManager->DrawSystem.SetColor(id, Colors::SCBlue);
 		}
 	}
-
-	UnitEntityUtil::NewUnit(def, 2, Vector2Int16(256,128));
 
 	entityManager->FullUpdate();
 
@@ -96,7 +97,8 @@ void GameScene::Start() {
 
 int t = 0;
 
-void GameScene::Update() {
+void GameScene::Update()
+{
 
 	entityManager->FrameUpdate(camera);
 
@@ -107,26 +109,27 @@ void GameScene::Update() {
 	//	entityManager->GetPlayerSystem().AddGas(1, 8);
 	//}
 
-	view->Update(camera);
+	//view->Update(camera);
 
 	camera.Update();
 
 
-	if (InputManager::Gamepad.IsButtonReleased(GamepadButton::Select)) {
-		entityManager->GetMapSystem().FogOfWarVisible = !entityManager->GetMapSystem().FogOfWarVisible;
-	}
+	//if (InputManager::Gamepad.IsButtonReleased(GamepadButton::Select)) {
+	//	entityManager->GetMapSystem().FogOfWarVisible = !entityManager->GetMapSystem().FogOfWarVisible;
+	//}
 }
 
-void GameScene::Draw() {
-	const PlayerInfo& playerInfo = entityManager->GetPlayerSystem().GetPlayerInfo(1);
+void GameScene::Draw()
+{
+	//const PlayerInfo& playerInfo = entityManager->GetPlayerSystem().GetPlayerInfo(1);
 
 	GraphicsRenderer::DrawOnScreen(ScreenId::Top);
 
 	entityManager->Draw(camera);
 
-	view->DrawUpperScreen(camera);
+	//view->DrawUpperScreen(camera);
 
 	GraphicsRenderer::DrawOnScreen(ScreenId::Bottom);
 
-	view->DrawLowerScreen(camera);
+	//view->DrawLowerScreen(camera);
 }

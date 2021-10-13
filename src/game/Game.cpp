@@ -2,7 +2,6 @@
 
 #include "Scenes/Scene.h"
 #include "Scenes/GameScene.h"
-#include "Scenes/PerformanceTestScene.h"
 #include "StringLib.h"
 #include "Profiler.h"
 

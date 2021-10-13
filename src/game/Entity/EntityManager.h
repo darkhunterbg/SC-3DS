@@ -4,23 +4,14 @@
 #include <array>
 
 #include "Entity.h"
-#include "Archetype.h"
 #include "../Span.h"
 
-#include "RenderSystem.h"
-#include "KinematicSystem.h"
-#include "NavigationSystem.h"
-#include "TimingSystem.h"
-#include "PlayerSystem.h"
-#include "MapSystem.h"
-#include "UnitSystem.h"
-#include "SoundSystem.h"
-#include "AnimationSystem.h"
-#include "CommandProcessor.h"
 #include "../Random.h"
 
 #include "../Data/UnitDef.h"
 #include "../Camera.h"
+
+#include "ObjectDrawSystem.h"
 
 struct EntityChangedData {
 	std::vector<EntityId> entity;
@@ -35,120 +26,14 @@ class EntityManager {
 private:
 	EntityManagerCollection entities;
 
-	RenderSystem renderSystem;
-	KinematicSystem kinematicSystem;
-	NavigationSystem navigationSystem;
-	TimingSystem timingSystem;
-	PlayerSystem playerSystem;
-	MapSystem mapSystem;
-	UnitSystem unitSystem;
-	SoundSystem soundSystem;
-	AnimationSystem animationSystem;
-	CommandProcessor commandProcessor;
-
 	bool ready = false;
 
 	EntityChangedData changedData;
 
-	std::vector<EntityArchetype*> archetypes;
 	std::vector<EntityId> scratch;
 	std::vector<EntityId> toDelete;
 public:
-
-	ComponentCollection<Vector2Int16> OldPositionComponents;
-	ComponentCollection<Vector2Int16> PositionComponents;
-	ComponentCollection<FlagsComponent> FlagComponents;
-	ComponentCollection<uint8_t> OrientationComponents;
-
 	Random rand;
-
-	struct {
-		EntityArchetype Archetype = EntityArchetype("Parent");
-		ComponentCollection<ChildComponent> ChildComponents;
-	} ParentArchetype;
-
-	struct {
-		EntityArchetype Archetype = EntityArchetype("Render");
-		ComponentCollection<RenderComponent> RenderComponents;
-		ComponentCollection<RenderShadowComponent> ShadowComponents;
-		ComponentCollection<RenderOffsetComponent> OffsetComponents;
-		ComponentCollection<RenderDestinationComponent> DestinationComponents;
-		ComponentCollection<Rectangle16> BoundingBoxComponents;
-	} RenderArchetype;
-
-	struct  {
-		EntityArchetype Archetype = EntityArchetype("Hidden");
-	} HiddenArchetype;
-
-	struct {
-		EntityArchetype Archetype = EntityArchetype("Animation");
-		ComponentCollection<AnimationComponent> AnimationComponents;
-		ComponentCollection<AnimationStateComponent> StateComponents;
-		ComponentCollection<AnimationShadowComponent> ShadowComponents;
-	} AnimationArchetype;
-
-	struct {
-		EntityArchetype Archetype = EntityArchetype("Navigation");
-		ComponentCollection<NavigationComponent> NavigationComponents;
-	} NavigationArchetype;
-
-	struct {
-		EntityArchetype Archetype = EntityArchetype("Collision");
-		ComponentCollection<ColliderComponent> ColliderComponents;
-	} CollisionArchetype;
-
-	struct {
-		EntityArchetype Archetype = EntityArchetype("Movement");
-		ComponentCollection<MovementComponent> MovementComponents;
-	} MovementArchetype;
-
-	struct {
-		EntityArchetype Archetype = EntityArchetype("Unit");
-
-		struct {
-			EntityArchetype Archetype = EntityArchetype("Unit.Hidden");
-		} HiddenArchetype;
-
-		struct {
-			EntityArchetype Archetype = EntityArchetype("Unit.FowVisible");
-		} FowVisibleArchetype;
-
-
-		ComponentCollection<UnitMovementComponent> MovementComponents;
-		ComponentCollection<UnitComponent> UnitComponents;
-		ComponentCollection<UnitDataComponent> DataComponents;
-		ComponentCollection<PlayerId> OwnerComponents;
-
-		ComponentCollection<UnitState> PrevStateComponents;
-		ComponentCollection<UnitState> StateComponents;
-		ComponentCollection<UnitStateDataComponent> StateDataComponents;
-
-		ComponentCollection< UnitWeaponComponent> WeaponComponents;
-
-		ComponentCollection<UnitAIState> AIStateComponents;
-		ComponentCollection<UnitAIStateDataComponent> AIStateDataComponents;
-		ComponentCollection<UnitHealthComponent> HealthComponents;
-	} UnitArchetype;
-
-
-	struct {
-		EntityArchetype Archetype = EntityArchetype("Timing");
-		ComponentCollection<TimingComponent> TimingComponents;
-		ComponentCollection<TimingActionComponent> ActionComponents;
-	} TimingArchetype;
-
-	struct {
-		EntityArchetype Archetype = EntityArchetype("MapObject");
-		ComponentCollection<Rectangle16> BoundingBoxComponents;
-		ComponentCollection<Rectangle16> DestinationComponents;
-		ComponentCollection<uint8_t> MinimapColorId;
-	} MapObjectArchetype;
-	
-	struct {
-		EntityArchetype Archetype = EntityArchetype("Sound");
-		ComponentCollection<SoundSourceComponent> SourceComponents;
-	} SoundArchetype;
-
 private:
 	void CollectEntityChanges();
 	void ApplyEntityChanges();
@@ -165,42 +50,25 @@ private:
 	int8_t updateId = 0;
 	uint32_t logicalFrame = 0;
 
-	
+	std::array<Vector2Int16, Entity::MaxEntities> _positions;
 public:
 	bool DrawColliders = false;
 	bool DrawGrid = false;
 	bool DrawBoundingBoxes = false;
 	bool Muted = false;
 
+	ObjectDrawSystem DrawSystem;
+
 	EntityManager();
 	~EntityManager();
 
 	void Init(Vector2Int16 mapSize);
 
-	inline UnitSystem& GetUnitSystem() {
-		return unitSystem;
-	}
-	inline PlayerSystem& GetPlayerSystem() {
-		return playerSystem;
-	}
-	inline MapSystem& GetMapSystem() {
-		return mapSystem;
-	}
-	inline SoundSystem& GetSoundSystem() {
-		return soundSystem;
-	}
-	inline KinematicSystem& GetKinematicSystem() {
-		return kinematicSystem;
-	}
-	inline RenderSystem& GetRenderSystem() {
-		return renderSystem;
-	}
-	inline CommandProcessor& GetCommandProcessor() {
-		return commandProcessor;
-	}
 	inline const Span<EntityId> GetEntities() const {
 		return entities.GetEntities();
 	}
+	inline Vector2Int16& GetPosition(EntityId id) { return _positions[Entity::ToIndex(id)]; }
+
 	void DeleteEntity(EntityId id);
 	void DeleteEntities(const std::vector<EntityId>& entities, bool sorted = false);
 	// NOTE: this will reuse given vector as scratch for performance reasons
@@ -216,15 +84,4 @@ public:
 	void Draw(const Camera& camera);
 
 	void FullUpdate();
-
-	inline bool CollidesWithAny(const Rectangle16& collider, EntityId skip) {
-
-		return kinematicSystem.CollidesWithAny(collider, skip);
-	}
-	inline void RectCast(const Rectangle16& collider, std::vector<EntityId>& result) {
-		return kinematicSystem.RectCast(collider, result);
-	}
-	inline EntityId PointCast(Vector2Int16 point) {
-		return kinematicSystem.PointCast(point);
-	}
 };
