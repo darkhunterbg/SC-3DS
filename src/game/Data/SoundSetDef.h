@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <Span.h>
 
-struct AudioClip;
+class AudioClip;
 
 #pragma pack(push, 2)
 struct SoundSetDef {

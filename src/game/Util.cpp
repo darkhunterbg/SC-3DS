@@ -3,7 +3,11 @@
 #include "Profiler.h"
 
 
-void Util::DrawTransparentRectangle(const Rectangle& rect, Color c) {
+std::vector<short> Util::_delIndexesScratch;
+
+
+void Util::DrawTransparentRectangle(const Rectangle& rect, Color c)
+{
 	Vector2Int src = rect.position;
 	Vector2Int dst = src + Vector2Int(rect.size.x - 1, 0);
 	GraphicsRenderer::DrawLine(src, dst, c);
@@ -21,7 +25,8 @@ void Util::DrawTransparentRectangle(const Rectangle& rect, Color c) {
 	GraphicsRenderer::DrawLine(src, dst, c);
 }
 
-void Util::DrawTransparentRectangle(const Rectangle& rect, int thickness, Color c) {
+void Util::DrawTransparentRectangle(const Rectangle& rect, int thickness, Color c)
+{
 
 	Color32 color = Color32(c);
 
@@ -48,7 +53,8 @@ void Util::DrawTransparentRectangle(const Rectangle16& rect, Color c)
 }
 
 
-void Util::DrawTransparentRectangle(const Rectangle16& rect, int thickness, Color c) {
+void Util::DrawTransparentRectangle(const Rectangle16& rect, int thickness, Color c)
+{
 	Rectangle dst = { Vector2Int(rect.position), Vector2Int(rect.size) };
 	DrawTransparentRectangle(dst, thickness, c);
 }

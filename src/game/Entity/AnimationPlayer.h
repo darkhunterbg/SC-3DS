@@ -1,9 +1,10 @@
 #pragma once
 #include "../Span.h"
+#include "Entity.h"
 
 struct AnimInstructionDef;
 class EntityManager;
-class AnimationComponent;
+struct AnimationComponent;
 
 class AnimationPlayer {
 private:
@@ -11,5 +12,5 @@ private:
 	~AnimationPlayer() = delete;
 public:
 	static void BuildInstructionCache(const Span<AnimInstructionDef> instructions);	
-	static void RunAnimation( AnimationComponent& anim, EntityManager& em);
+	static void RunAnimation( AnimationComponent& anim, EntityId id, EntityManager& em);
 };

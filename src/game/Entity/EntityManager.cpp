@@ -7,22 +7,29 @@
 
 #include <algorithm>
 
-EntityManager::EntityManager() {
+EntityManager::EntityManager()
+{
 	memset(_orientations.data(), 0, _orientations.size());
 	EntityUtil::emInstance = this;
+
+	_systems.push_back(&DrawSystem);
+	_systems.push_back(&AnimationSystem);
 }
-EntityManager::~EntityManager() {
+EntityManager::~EntityManager()
+{
 }
 
 void EntityManager::Init(Vector2Int16 mapSize)
 {
 }
 
-void EntityManager::DeleteEntity(EntityId id) {
+void EntityManager::DeleteEntity(EntityId id)
+{
 	toDelete.push_back(id);
 }
 
-void EntityManager::DeleteEntitiesSorted(std::vector<EntityId>& e) {
+void EntityManager::DeleteEntitiesSorted(std::vector<EntityId>& e)
+{
 	int max = e.size();
 
 	if (e.size() != max)
@@ -30,8 +37,8 @@ void EntityManager::DeleteEntitiesSorted(std::vector<EntityId>& e) {
 
 	toDelete.insert(toDelete.end(), e.begin(), e.end());
 }
-void EntityManager::DeleteEntities(const std::vector<EntityId>& e, bool sorted) {
-
+void EntityManager::DeleteEntities(const std::vector<EntityId>& e, bool sorted)
+{
 	scratch.clear();
 	scratch.insert(scratch.begin(), e.begin(), e.end());
 
@@ -39,54 +46,52 @@ void EntityManager::DeleteEntities(const std::vector<EntityId>& e, bool sorted) 
 		std::sort(scratch.begin(), scratch.end());
 
 	DeleteEntitiesSorted(scratch);
-
 }
 
 void EntityManager::ClearEntities()
 {
+	toDelete.clear();
+	toDelete.insert(toDelete.end(), entities.GetEntities().begin(), entities.GetEntities().end());
+
+	for (auto& system : _systems)
+		system->DeleteEntities(toDelete);
+
+	toDelete.clear();
 	entities.ClearEntities();
+
 }
 
-
-void EntityManager::CollectEntityChanges() {
-	changedData.clear();
-	for (EntityId id : entities) {
-		int i = Entity::ToIndex(id);
-	}
-}
-void EntityManager::ApplyEntityChanges() {
-	for (EntityId id : changedData.entity) {
-		int i = Entity::ToIndex(id);
-	}
-
+void EntityManager::ApplyEntityChanges()
+{
 	if (toDelete.size() > 0)
 	{
 		std::sort(toDelete.begin(), toDelete.end());
+
+		for (auto& system : _systems)
+			system->DeleteEntities(toDelete);
+
 		entities.DeleteSortedEntities(toDelete);
 		toDelete.clear();
 	}
 }
-void EntityManager::UpdateChildren() {
-}
 
 // Updates 12 per second (60 fps) 
-void EntityManager::Update0() {
+void EntityManager::Update0()
+{
 
 
 	//soundSystem.UpdateEntityAudio(camera, *this);
 }
 // Updates 24 per second (60 fps) 
-void EntityManager::Update1() {
+void EntityManager::Update1()
+{
 
 
 }
 // Update 24 per second (60 fps) 
-void EntityManager::Update2() {
+void EntityManager::Update2()
+{
 	AnimationSystem.RunAnimations(*this);
-
-	UpdateChildren();
-
-	CollectEntityChanges();
 
 	ApplyEntityChanges();
 
@@ -94,16 +99,19 @@ void EntityManager::Update2() {
 }
 
 // Draws 12 per second (60 fps) 
-void EntityManager::Draw0(const Camera& camera) {
+void EntityManager::Draw0(const Camera& camera)
+{
 }
 // Draws 24 per second (60 fps) 
-void EntityManager::Draw1(const Camera& camera) {
+void EntityManager::Draw1(const Camera& camera)
+{
 
 }
 // Draws 24 per second (60 fps) 
 void EntityManager::Draw2(const Camera& camera) {}
 
-void EntityManager::FrameUpdate(const Camera& camera) {
+void EntityManager::FrameUpdate(const Camera& camera)
+{
 
 	ready = true;
 
@@ -132,14 +140,27 @@ void EntityManager::FrameUpdate(const Camera& camera) {
 	//Util::RealTimeStat("Entities", entities.size());
 }
 
-void EntityManager::FullUpdate() {
-
+void EntityManager::FullUpdate()
+{
 	Update0();
 	Update1();
 	Update2();
 }
 
-void EntityManager::Draw(const Camera& camera) {
+size_t EntityManager::GetMemoryUsage()
+{
+	size_t size = +entities.GetMemoryUsage();
+	for (auto system : _systems)
+		size += system->ReportMemoryUsage();
+
+	size += scratch.capacity() * sizeof(EntityId);
+	size += toDelete.capacity() * sizeof(EntityId);
+
+	return size;
+}
+
+void EntityManager::Draw(const Camera& camera)
+{
 
 	SectionProfiler p("Draw");
 

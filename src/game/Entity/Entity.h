@@ -51,8 +51,12 @@ public:
 	{
 		return sortedEntities.cend();
 	}
-};
 
+	size_t GetMemoryUsage()
+	{
+		return sortedEntities.capacity() * sizeof(EntityId);
+	}
+};
 
 
 class EntityManagerCollection
@@ -67,7 +71,10 @@ public:
 
 	EntityManagerCollection();
 
-	inline const Span<EntityId> GetEntities() const { return { sortedEntities.GetEntities().data(), sortedEntities.GetEntities().size() }; }
+	inline const std::vector<EntityId>& GetEntities() const
+	{
+		return sortedEntities.GetEntities();
+	}
 	inline EntityId GetEntity(int index) const { return sortedEntities[index]; }
 
 	void NewEntities(unsigned size, std::vector<EntityId>& outIds);
@@ -84,12 +91,20 @@ public:
 	inline EntityId at(int i)const { return GetEntity(i); };
 	inline size_t size() const { return sortedEntities.size(); }
 	inline EntityId operator[](int i)  const { return GetEntity(i); }
-	inline Span<EntityId>::ConstIterator begin() const
+	inline auto begin() const
 	{
 		return GetEntities().begin();
 	}
-	inline Span<EntityId>::ConstIterator end() const
+	inline auto end() const
 	{
 		return  GetEntities().end();
+	}
+
+	size_t GetMemoryUsage()
+	{
+		size_t size = sizeof(usedEntities);
+		size += freeEntities.capacity() * sizeof(EntityId);
+		size += sortedEntities.GetMemoryUsage();
+		return size;
 	}
 };

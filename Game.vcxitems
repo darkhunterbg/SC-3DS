@@ -37,8 +37,10 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationPlayer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\AnimationSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\Entity.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\EntityComponentMap.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\EntityManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\EntityUtil.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\IEntitySystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\ObjectDrawSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Game.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.h" />

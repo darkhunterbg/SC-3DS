@@ -21,5 +21,5 @@ public:
 	static void SetOrientation(EntityId e, int orientation);
 	static void SetAnimationFrame(EntityId id, unsigned frame);
 	static void UpdateAnimationVisual(EntityId id);
-	static void PlayAnimation(EntityId id, const AnimClipDef& clip, const Image* shadow  = nullptr);
+	static void PlayAnimation(EntityId id, const AnimClipDef& clip, const Image* shadow = nullptr);
 };

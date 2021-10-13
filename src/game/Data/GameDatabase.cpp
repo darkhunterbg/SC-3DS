@@ -8,6 +8,7 @@ const GameDatabase* GameDatabase::instance = nullptr;
 GameDatabase::GameDatabase()
 {
 	instance = this;
+
 }
 
 const Image& GameDatabase::GetImage(const std::string& path) const

@@ -9,14 +9,20 @@ void AnimationSystem::RunAnimations(EntityManager& em)
 {
 	SectionProfiler p("RunAnimations");
 
-	for (AnimationComponent& anim : _animComponents)
+	auto& components = _animComponents.GetComponents();
+	auto& entities = _animComponents.GetEntities();
+
+	for (int i = 0; i < components.size(); ++i)
 	{
+		AnimationComponent& anim = components[i];
 		if (anim.wait > 0) --anim.wait;
 		if (anim.wait == 0)
 		{
-			AnimationPlayer::RunAnimation(anim, em);
+			EntityId id = entities[i];
+			AnimationPlayer::RunAnimation(anim, id, em);
 		}
 	}
+
 }
 
 void AnimationSystem::StartAnimation(EntityId id, const AnimClipDef& clip)
@@ -30,7 +36,6 @@ void AnimationSystem::StartAnimation(EntityId id, const AnimClipDef& clip)
 	anim.animFrame = 0;
 	anim.wait = 0;
 	anim.done = false;
-	anim.entityId = id;
 }
 
 void AnimationSystem::StartAnimationWithShadow(EntityId id, const AnimClipDef& clip, const Image& shadow)
@@ -44,6 +49,15 @@ void AnimationSystem::StartAnimationWithShadow(EntityId id, const AnimClipDef& c
 	anim.animFrame = 0;
 	anim.wait = 0;
 	anim.done = false;
-	anim.entityId = id;
+}
+
+void AnimationSystem::DeleteEntities(std::vector<EntityId>& entities)
+{
+	_animComponents.DeleteComponents(entities);
+}
+
+size_t AnimationSystem::ReportMemoryUsage()
+{
+	return _animComponents.GetMemoryUsage();
 }
 

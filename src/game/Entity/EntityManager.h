@@ -13,15 +13,8 @@
 
 #include "ObjectDrawSystem.h"
 #include "AnimationSystem.h"
+#include "IEntitySystem.h"
 
-struct EntityChangedData {
-	std::vector<EntityId> entity;
-	std::vector<Vector2Int16> position;
-	std::vector<Vector2Int16> oldPosition;
-
-	size_t size() const { return entity.size(); }
-	void clear() { entity.clear(); position.clear(); oldPosition.clear(); }
-};
 
 class EntityManager {
 private:
@@ -29,16 +22,14 @@ private:
 
 	bool ready = false;
 
-	EntityChangedData changedData;
-
 	std::vector<EntityId> scratch;
 	std::vector<EntityId> toDelete;
+
+	std::vector<IEntitySystem*> _systems;
 public:
 	Random rand;
 private:
-	void CollectEntityChanges();
 	void ApplyEntityChanges();
-	void UpdateChildren();
 
 	void Update0();
 	void Update1();
@@ -67,7 +58,7 @@ public:
 
 	void Init(Vector2Int16 mapSize);
 
-	inline const Span<EntityId> GetEntities() const {
+	inline const auto GetEntities() const {
 		return entities.GetEntities();
 	}
 	inline Vector2Int16& GetPosition(EntityId id) { return _positions[Entity::ToIndex(id)]; }
@@ -88,4 +79,6 @@ public:
 	void Draw(const Camera& camera);
 
 	void FullUpdate();
+
+	size_t GetMemoryUsage();
 };

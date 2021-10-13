@@ -230,3 +230,5 @@ void EntityManagerCollection::ClearEntities()
 		freeEntities.push_back(--id);
 	}
 }
+
+

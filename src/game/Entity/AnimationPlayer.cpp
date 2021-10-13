@@ -78,7 +78,7 @@ static InstructionAction instructionMap[] =
 	Frame, Wait, WaitRandom, Face, TurnCW, TurnCCW, GoTo, Attack
 };
 
-void AnimationPlayer::RunAnimation(AnimationComponent& anim, EntityManager& em)
+void AnimationPlayer::RunAnimation(AnimationComponent& anim, EntityId id, EntityManager& em)
 {
 	bool running = true;
 
@@ -87,7 +87,7 @@ void AnimationPlayer::RunAnimation(AnimationComponent& anim, EntityManager& em)
 	{
 		const auto& instr = instructionCache[anim.instructionCounter];
 		const auto& action = instructionMap[instr.id];
-		action(instr.params, anim.entityId, em);
+		action(instr.params, id, em);
 
 		++anim.instructionCounter;
 	}

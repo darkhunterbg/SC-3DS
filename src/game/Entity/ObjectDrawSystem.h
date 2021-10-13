@@ -1,11 +1,12 @@
 #pragma once
 
-#include "Entity.h"
+#include "EntityComponentMap.h"
 #include "../Assets.h"
 #include "../Color.h"
 #include "../Engine/GraphicsPrimitives.h"
+#include "IEntitySystem.h"
+
 #include <vector>
-#include <array>
 
 class Camera;
 class EntityManager;
@@ -25,22 +26,25 @@ struct DrawComponent
 	bool visible = true;
 };
 
-class ObjectDrawSystem {
-	std::vector<DrawComponent> _drawComponents;
+class ObjectDrawSystem : public IEntitySystem {
+	EntityComponentMap<DrawComponent> _drawComponents;
 	std::vector<BatchDrawCommand> _drawCmd;
-	std::array<short, Entity::MaxEntities> _entityToIndexMap;
-	EntityId _maxEntity = Entity::None;
 
-	DrawComponent* TryGetComponent(EntityId id);
 public:
 	ObjectDrawSystem();
 
 	void Draw(EntityManager& em, const Camera& camera);
 
-	void NewComponent(EntityId id);
-	inline bool HasComponent(EntityId id) const { return _entityToIndexMap[id] != -1; }
-
-	void RemoveComponent(EntityId id);
+	inline void NewComponent(EntityId id) { _drawComponents.NewComponent(id); }
+	inline bool HasComponent(EntityId id) const
+	{
+		return _drawComponents.HasComponent(id);
+	}
+	inline void RemoveComponent(EntityId id)
+	{
+		_drawComponents.DeleteComponent(id);
+	}
+	DrawComponent& GetComponent(EntityId id) { return _drawComponents.GetComponent(id); }
 
 	inline void InitFromImage(EntityId id, const Image& image)
 	{
@@ -74,5 +78,7 @@ public:
 		draw.shadowOffset = shadowImg.GetImageFrameOffset(frame, flipped);
 	}
 
-	DrawComponent& GetComponent(EntityId id);
+	// Inherited via IEntitySystem
+	virtual void DeleteEntities(std::vector<EntityId>& entities) override;
+	virtual size_t ReportMemoryUsage() override;
 };

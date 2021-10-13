@@ -3,6 +3,7 @@
 
 #include "Color.h"
 #include "MathLib.h"
+#include <vector>
 
 class Util {
 private:
@@ -15,4 +16,6 @@ public:
 	static void DrawTransparentRectangle(const Rectangle16& rect, int thickness, Color c);
 
 	static void RealTimeStat(const char* stat, int value);
+
+	static std::vector<short> _delIndexesScratch;
 };
