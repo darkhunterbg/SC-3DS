@@ -62,9 +62,11 @@ EntityId EntityUtil::SpawnUnit(const UnitDef& def, PlayerId owner, Vector2Int16 
 
 	em.DrawSystem.NewComponent(id);
 	em.DrawSystem.InitFromImage(id, def.Art.GetSprite().GetImage());
+	em.DrawSystem.GetComponent(id).color = em.PlayerSystem.GetPlayerInfo(owner).color;
+
 	em.SetPosition(id, position);
 	em.SetOrientation(id, orientation);
-	em.DrawSystem.GetComponent(id).color = em.PlayerSystem.GetPlayerInfo(owner).color;
+	em.UnitSystem.NewUnit(id, def, owner);
 
 	em.AnimationSystem.NewComponent(id);
 	EntityUtil::PlayAnimation(id, *def.Art.GetSprite().GetAnimation(AnimationType::Init), def.Art.GetShadowImage());

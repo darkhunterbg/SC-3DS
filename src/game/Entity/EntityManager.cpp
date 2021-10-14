@@ -16,6 +16,7 @@ EntityManager::EntityManager()
 	_systems.push_back(&AnimationSystem);
 	_systems.push_back(&PlayerSystem);
 	_systems.push_back(&MapSystem);
+	_systems.push_back(&UnitSystem);
 }
 EntityManager::~EntityManager()
 {
@@ -111,6 +112,7 @@ void EntityManager::Update2()
 // Draws 12 per second (60 fps) 
 void EntityManager::Draw0(const Camera& camera)
 {
+	MapSystem.DrawOffscreenData(*this);
 }
 // Draws 24 per second (60 fps) 
 void EntityManager::Draw1(const Camera& camera)

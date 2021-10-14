@@ -44,6 +44,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\MapSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\ObjectDrawSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\PlayerSystem.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Game.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUD.h" />
@@ -89,6 +90,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\MapSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\ObjectDrawSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\PlayerSystem.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Game.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUD.cpp" />

@@ -158,27 +158,17 @@ void PlayerSystem::UpdatePlayers(const EntityManager& em) {
 		players[owner].usedSupplyDoubled -= data.supplyUsage;
 		players[owner].providedSupplyDoubled -= data.supplyProvides;
 	}
+	*/
 
-	for (EntityId id : em.UnitArchetype.Archetype.GetEntities()) {
-
-		PlayerId owner = em.UnitArchetype.OwnerComponents.GetComponent(id);
-		const auto& data = em.UnitArchetype.DataComponents.GetComponent(id);
-		Vector2Int16 position = em.PositionComponents.GetComponent(id);
-		position.x = position.x >> (5);
-		position.y = position.y >> (5);
-
-		playerVision[owner]->ranges.push_back({ position, data.vision });
-	}*/
-
-	for (EntityId id : em.GetEntities())
+	for (EntityId id : em.UnitSystem.GetEntities())
 	{
 		Vector2Int16 position = em.GetPosition(id);
 		position.x = position.x >> (5);
 		position.y = position.y >> (5);
-		playerVision[1]->ranges.push_back({ position,8 });
+		auto& unit = em.UnitSystem.GetComponent(id);
+
+		playerVision[unit.owner.i]->ranges.push_back({ position,unit.vision });
 	}
-
-
 	
 }
 

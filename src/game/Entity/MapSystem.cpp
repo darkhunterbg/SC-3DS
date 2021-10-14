@@ -38,7 +38,6 @@ void MapSystem::RedrawMinimapFogOfWar(const PlayerVision& vision)
 	{
 		for (short x = 0; x < mapSizeTiles; ++x)
 		{
-
 			uint8_t state = vision.GetState({ x,y });
 			if (state)
 			{
@@ -49,6 +48,8 @@ void MapSystem::RedrawMinimapFogOfWar(const PlayerVision& vision)
 	}
 
 	GraphicsRenderer::ChangeBlendingMode(BlendMode::Alpha);
+
+	GraphicsRenderer::DrawOnCurrentScreen();
 }
 
 void MapSystem::SetSize(Vector2Int16 size)
@@ -58,6 +59,16 @@ void MapSystem::SetSize(Vector2Int16 size)
 	_minimapTextureSize = size.x / 32;
 
 	_tile = GraphicsRenderer::NewSprite(*AssetLoader::LoadTexture("tileset\\tile"), { {0,0},{192,192} });
+}
+
+void MapSystem::DrawOffscreenData(EntityManager& em)
+{
+	if (!em.PlayerSystem.HasPlayer(ActivePlayer))
+		return;
+
+	const PlayerVision& vision = em.PlayerSystem.GetPlayerVision(ActivePlayer);
+
+	RedrawMinimapFogOfWar(vision);
 }
 
 void MapSystem::DrawMap(const Camera& camera)
@@ -84,13 +95,6 @@ void MapSystem::DrawMap(const Camera& camera)
 }
 void MapSystem::DrawFogOfWar(EntityManager& em, const Camera& camera)
 {
-	if (!em.PlayerSystem.HasPlayer(ActivePlayer))
-		return;
-
-	const PlayerVision& vision = em.PlayerSystem.GetPlayerVision(ActivePlayer);
-
-	RedrawMinimapFogOfWar(vision);
-
 	if (!FogOfWarVisible || _minimapFowTexture.surfaceId == nullptr)
 		return;
 

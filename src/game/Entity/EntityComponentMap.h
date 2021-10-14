@@ -34,7 +34,13 @@ public:
 		for (EntityId id : ids) outIndexes.push_back(GetIndex(id));
 	}
 	inline TComponent& GetComponent(EntityId id) { return  _components[_entityToIndexMap[Entity::ToIndex(id)]]; }
+	inline const TComponent& GetComponent(EntityId id) const { return  _components[_entityToIndexMap[Entity::ToIndex(id)]]; }
 	inline TComponent* TryGetComponent(EntityId id)
+	{
+		short index = _entityToIndexMap[Entity::ToIndex(id)];
+		return index < 0 ? nullptr : _components[index];
+	}
+	inline const TComponent* TryGetComponent(EntityId id) const
 	{
 		short index = _entityToIndexMap[Entity::ToIndex(id)];
 		return index < 0 ? nullptr : _components[index];
@@ -53,6 +59,7 @@ public:
 	}
 	inline const std::vector<EntityId>& GetEntities() const { return _entities; }
 	inline std::vector<TComponent>& GetComponents() { return _components; }
+	inline const std::vector<TComponent>& GetComponents() const { return _components; }
 
 	void NewComponent(EntityId id)
 	{

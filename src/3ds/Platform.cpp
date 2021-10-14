@@ -267,7 +267,6 @@ void Platform::DrawRectangle(const Rectangle& rect, Color32 c)
 	C2D_DrawRectSolid((float)rect.position.x, (float)rect.position.y, 0, (float)rect.size.x, (float)rect.size.y, c.value);
 }
 
-
 void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color)
 {
 	C2D_Font f = (C2D_Font)font.GetFontIdRaw();

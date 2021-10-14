@@ -34,6 +34,8 @@ public:
 
 	void SetSize(Vector2Int16 size);
 
+	void DrawOffscreenData(EntityManager& em);
+
 	void DrawMap(const Camera& camera);
 	void DrawFogOfWar(EntityManager& em, const Camera& camera);
 };

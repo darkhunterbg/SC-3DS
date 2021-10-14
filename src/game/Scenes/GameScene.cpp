@@ -75,13 +75,16 @@ void GameScene::Start()
 	const auto& def = *GameDatabase::instance->GetUnit("Terran\\Units\\Marine");
 
 	int i = 0;
-	for (int y = 0; y < 10; ++y)
+	for (int y = 1; y < 3; ++y)
 	{
-		for (int x = 0; x < 10; ++x)
+		for (int x = 1; x < 3; ++x)
 		{
 			EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ x * 32 ,y * 32 }));
 		}
 	}
+	entityManager->PlayerSystem.SetMapKnown(PlayerId{ 1 });
+
+	EntityUtil::SpawnUnit(def, PlayerId{ 2 }, Vector2Int16(Vector2Int{ 256 , 64 }));
 
 	entityManager->FullUpdate();
 

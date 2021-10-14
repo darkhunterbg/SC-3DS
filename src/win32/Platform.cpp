@@ -36,6 +36,7 @@ extern GPU_Image* white;
 static ScreenId currentRT;
 static GPU_Target* target = nullptr;
 
+GPU_BlendPresetEnum blendMode;
 
 constexpr Uint8 SDL_FloatToUint8(float x)
 {
@@ -168,6 +169,8 @@ void Platform::ChangeBlendingMode(BlendMode mode)
 		break;
 	}
 
+	blendMode = b;
+
 	GPU_SetShapeBlendMode(b);
 }
 
@@ -187,6 +190,7 @@ void Platform::DrawTexture(const Texture& texture, const SubImageCoord& uv, cons
 	scale.x -= scale.x * 2.0f * hFlip;
 
 	GPU_SetRGBA(img, c.GetR(), c.GetG(), c.GetB(), c.GetA());
+	//GPU_SetBlendMode(img, blendMode);
 	GPU_BlitScale(img, &srcRect, target, (float)dst.GetCenter().x, (float)dst.GetCenter().y, scale.x, scale.y);
 }
 void Platform::DrawRectangle(const Rectangle& rect, Color32 c)
@@ -204,12 +208,9 @@ void Platform::DrawRectangle(const Rectangle& rect, Color32 c)
 
 void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color)
 {
-
 	auto c = FC_MakeColor(SDL_FloatToUint8(color.r), SDL_FloatToUint8(color.g), SDL_FloatToUint8(color.b), SDL_FloatToUint8(color.a));
 
-
 	FC_DrawScaleColor(font.GetFontId<FC_Font>(), target, position.x, position.y, FC_MakeScale(1, 1), c, text);
-
 }
 
 double Platform::ElaspedTime()

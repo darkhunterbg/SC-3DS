@@ -15,6 +15,7 @@
 #include "AnimationSystem.h"
 #include "PlayerSystem.h"
 #include "MapSystem.h"
+#include "UnitSystem.h"
 
 #include "IEntitySystem.h"
 
@@ -57,6 +58,7 @@ public:
 	AnimationSystem AnimationSystem;
 	PlayerSystem PlayerSystem;
 	MapSystem MapSystem;
+	UnitSystem UnitSystem;
 
 	EntityManager();
 	~EntityManager();
