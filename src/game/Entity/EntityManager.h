@@ -13,6 +13,9 @@
 
 #include "ObjectDrawSystem.h"
 #include "AnimationSystem.h"
+#include "PlayerSystem.h"
+#include "MapSystem.h"
+
 #include "IEntitySystem.h"
 
 
@@ -52,24 +55,30 @@ public:
 
 	ObjectDrawSystem DrawSystem;
 	AnimationSystem AnimationSystem;
+	PlayerSystem PlayerSystem;
+	MapSystem MapSystem;
 
 	EntityManager();
 	~EntityManager();
 
 	void Init(Vector2Int16 mapSize);
 
-	inline const auto GetEntities() const {
+	inline const auto GetEntities() const
+	{
 		return entities.GetEntities();
 	}
-	inline Vector2Int16& GetPosition(EntityId id) { return _positions[Entity::ToIndex(id)]; }
-	inline uint8_t& GetOrientation(EntityId id) { return _orientations[Entity::ToIndex(id)]; }
+	void SetPosition(EntityId id, Vector2Int16 pos) { _positions[Entity::ToIndex(id)] = pos; }
+	void SetOrientation(EntityId id, uint8_t orien) { _orientations[Entity::ToIndex(id)] = orien; }
+	inline Vector2Int16 GetPosition(EntityId id) const { return _positions[Entity::ToIndex(id)]; }
+	inline uint8_t GetOrientation(EntityId id) const { return _orientations[Entity::ToIndex(id)]; }
 
 	void DeleteEntity(EntityId id);
 	void DeleteEntities(const std::vector<EntityId>& entities, bool sorted = false);
 	// NOTE: this will reuse given vector as scratch for performance reasons
 	void DeleteEntitiesSorted(std::vector<EntityId>& entities);
 	EntityId NewEntity() { return entities.NewEntity(); }
-	void NewEntities(unsigned size, std::vector<EntityId>& outIds) {
+	void NewEntities(unsigned size, std::vector<EntityId>& outIds)
+	{
 		entities.NewEntities(size, outIds);
 	}
 	void ClearEntities();

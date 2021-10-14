@@ -14,6 +14,8 @@ EntityManager::EntityManager()
 
 	_systems.push_back(&DrawSystem);
 	_systems.push_back(&AnimationSystem);
+	_systems.push_back(&PlayerSystem);
+	_systems.push_back(&MapSystem);
 }
 EntityManager::~EntityManager()
 {
@@ -21,6 +23,8 @@ EntityManager::~EntityManager()
 
 void EntityManager::Init(Vector2Int16 mapSize)
 {
+	PlayerSystem.SetSize(mapSize);
+	MapSystem.SetSize(mapSize);
 }
 
 void EntityManager::DeleteEntity(EntityId id)
@@ -78,20 +82,26 @@ void EntityManager::ApplyEntityChanges()
 // Updates 12 per second (60 fps) 
 void EntityManager::Update0()
 {
+	PlayerSystem.ResetNewEvents();
 
-
-	//soundSystem.UpdateEntityAudio(camera, *this);
+	PlayerSystem.UpdateNextPlayerVision();
 }
 // Updates 24 per second (60 fps) 
 void EntityManager::Update1()
 {
+	PlayerSystem.ResetNewEvents();
 
+	PlayerSystem.UpdateNextPlayerVision();
 
 }
 // Update 24 per second (60 fps) 
 void EntityManager::Update2()
 {
+	PlayerSystem.FinishCollectingEvents();
+
 	AnimationSystem.RunAnimations(*this);
+
+	PlayerSystem.UpdatePlayers(*this);
 
 	ApplyEntityChanges();
 
@@ -155,6 +165,8 @@ size_t EntityManager::GetMemoryUsage()
 
 	size += scratch.capacity() * sizeof(EntityId);
 	size += toDelete.capacity() * sizeof(EntityId);
+	size += sizeof(_positions);
+	size + sizeof(_orientations);
 
 	return size;
 }
@@ -178,9 +190,11 @@ void EntityManager::Draw(const Camera& camera)
 			EXCEPTION("Invalid UpdateId %i", updateId);
 		}
 
+		MapSystem.DrawMap(camera);
 
 		DrawSystem.Draw(*this, camera);
 
+		MapSystem.DrawFogOfWar(*this, camera);
 		//if (DrawBoundingBoxes)
 
 		//if (DrawColliders)

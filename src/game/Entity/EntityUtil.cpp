@@ -13,7 +13,7 @@ void EntityUtil::SetOrientation(EntityId id, int orientation)
 	else
 		orientation %= 32;
 
-	em.GetOrientation(id) = orientation;
+	em.SetOrientation(id, orientation);
 
 	UpdateAnimationVisual(id);
 }
@@ -52,4 +52,22 @@ void EntityUtil::PlayAnimation(EntityId id, const AnimClipDef& clip, const Image
 	else
 		em.AnimationSystem.StartAnimationWithShadow(id, clip, *shadow);
 	UpdateAnimationVisual(id);
+}
+
+EntityId EntityUtil::SpawnUnit(const UnitDef& def, PlayerId owner, Vector2Int16 position, int orientation)
+{
+	auto& em = GetManager();
+
+	EntityId id = em.NewEntity();
+
+	em.DrawSystem.NewComponent(id);
+	em.DrawSystem.InitFromImage(id, def.Art.GetSprite().GetImage());
+	em.SetPosition(id, position);
+	em.SetOrientation(id, orientation);
+	em.DrawSystem.GetComponent(id).color = em.PlayerSystem.GetPlayerInfo(owner).color;
+
+	em.AnimationSystem.NewComponent(id);
+	EntityUtil::PlayAnimation(id, *def.Art.GetSprite().GetAnimation(AnimationType::Init), def.Art.GetShadowImage());
+
+	return id;
 }

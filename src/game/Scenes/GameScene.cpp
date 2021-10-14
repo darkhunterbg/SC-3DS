@@ -47,9 +47,9 @@ void GameScene::Start()
 	//	entityManager->GetSoundSystem().PlayMusic(*race.GetMusic());
 
 
-	//for (int p = 0; p < totalPlayers; ++p) {
-	//	entityManager->GetPlayerSystem().AddPlayer(race, color[p]);
-	//}
+	for (int p = 0; p < totalPlayers; ++p) {
+		entityManager->PlayerSystem.AddPlayer(race, color[p]);
+	}
 
 	//view->SetPlayer(1, race);
 
@@ -75,19 +75,11 @@ void GameScene::Start()
 	const auto& def = *GameDatabase::instance->GetUnit("Terran\\Units\\Marine");
 
 	int i = 0;
-	for (int y = 0; y < 100; ++y)
+	for (int y = 0; y < 10; ++y)
 	{
-		for (int x = 0; x < 100; ++x)
+		for (int x = 0; x < 10; ++x)
 		{
-			EntityId id = entityManager->NewEntity();
-
-			entityManager->DrawSystem.NewComponent(id);
-			entityManager->DrawSystem.InitFromImage(id, def.Art.GetSprite().GetImage());
-			entityManager->GetPosition(id) = Vector2Int16(Vector2Int{ x * 32 ,y * 32 });
-			entityManager->DrawSystem.GetComponent(id).color = Color32(Colors::SCBlue);
-
-			entityManager->AnimationSystem.NewComponent(id);
-			EntityUtil::PlayAnimation(id, *def.Art.GetSprite().GetAnimation(AnimationType::Init), def.Art.GetShadowImage());
+			EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ x * 32 ,y * 32 }));
 		}
 	}
 
@@ -117,9 +109,9 @@ void GameScene::Update()
 	camera.Update();
 
 
-	//if (InputManager::Gamepad.IsButtonReleased(GamepadButton::Select)) {
-	//	entityManager->GetMapSystem().FogOfWarVisible = !entityManager->GetMapSystem().FogOfWarVisible;
-	//}
+	if (InputManager::Gamepad.IsButtonReleased(GamepadButton::Select)) {
+		entityManager->MapSystem.FogOfWarVisible = !entityManager->MapSystem.FogOfWarVisible;
+	}
 }
 
 void GameScene::Draw()

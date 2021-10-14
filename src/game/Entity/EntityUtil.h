@@ -2,6 +2,7 @@
 
 #include "Entity.h"
 #include "../Data/AssetDataDefs.h"
+#include "PlayerSystem.h"
 
 class EntityManager;
 
@@ -22,4 +23,7 @@ public:
 	static void SetAnimationFrame(EntityId id, unsigned frame);
 	static void UpdateAnimationVisual(EntityId id);
 	static void PlayAnimation(EntityId id, const AnimClipDef& clip, const Image* shadow = nullptr);
+
+	static EntityId SpawnUnit(const UnitDef& def, PlayerId owner, Vector2Int16 position, int orientation = 0);
 };
+
