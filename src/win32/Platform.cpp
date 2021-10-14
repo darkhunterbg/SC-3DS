@@ -190,7 +190,7 @@ void Platform::DrawTexture(const Texture& texture, const SubImageCoord& uv, cons
 	scale.x -= scale.x * 2.0f * hFlip;
 
 	GPU_SetRGBA(img, c.GetR(), c.GetG(), c.GetB(), c.GetA());
-	//GPU_SetBlendMode(img, blendMode);
+	GPU_SetBlendMode(img, blendMode);
 	GPU_BlitScale(img, &srcRect, target, (float)dst.GetCenter().x, (float)dst.GetCenter().y, scale.x, scale.y);
 }
 void Platform::DrawRectangle(const Rectangle& rect, Color32 c)

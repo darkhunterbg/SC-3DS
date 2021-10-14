@@ -15,6 +15,8 @@ class EntityManager;
 
 struct PlayerId {
 	short i;
+	bool operator == (const PlayerId& o) const { return i == o.i; }
+	bool operator != (const PlayerId& o) const { return i != o.i; }
 };
 
 enum class PlayerEventType :uint8_t {

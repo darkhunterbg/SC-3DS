@@ -36,6 +36,8 @@ public:
 
 	void DrawOffscreenData(EntityManager& em);
 
+	void UpdateVisibleObjects(EntityManager& em);
+
 	void DrawMap(const Camera& camera);
 	void DrawFogOfWar(EntityManager& em, const Camera& camera);
 };

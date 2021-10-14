@@ -17,11 +17,9 @@ static bool DrawSort(const BatchDrawCommand& a, const BatchDrawCommand& b)
 	return a.order < b.order;
 }
 
-void ObjectDrawSystem::Draw(EntityManager& em, const Camera& camera)
+void ObjectDrawSystem::UpdatePositions(EntityManager& em)
 {
-	SectionProfiler p("ObjectDraw");
-
-	for(EntityId id : _drawComponents.GetEntities())
+	for (EntityId id : _drawComponents.GetEntities())
 	{
 		auto& draw = _drawComponents.GetComponent(id);
 		if (draw.visible)
@@ -30,6 +28,11 @@ void ObjectDrawSystem::Draw(EntityManager& em, const Camera& camera)
 			draw.boundingBox.SetCenter(draw.position);
 		}
 	}
+}
+
+void ObjectDrawSystem::Draw( const Camera& camera)
+{
+	SectionProfiler p("ObjectDraw");
 
 	_drawCmd.clear();
 

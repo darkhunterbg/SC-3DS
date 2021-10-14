@@ -106,6 +106,10 @@ void EntityManager::Update2()
 
 	ApplyEntityChanges();
 
+	DrawSystem.UpdatePositions(*this);
+
+	MapSystem.UpdateVisibleObjects(*this);
+
 	++logicalFrame;
 }
 
@@ -194,7 +198,7 @@ void EntityManager::Draw(const Camera& camera)
 
 		MapSystem.DrawMap(camera);
 
-		DrawSystem.Draw(*this, camera);
+		DrawSystem.Draw(camera);
 
 		MapSystem.DrawFogOfWar(*this, camera);
 		//if (DrawBoundingBoxes)

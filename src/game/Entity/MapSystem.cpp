@@ -71,6 +71,24 @@ void MapSystem::DrawOffscreenData(EntityManager& em)
 	RedrawMinimapFogOfWar(vision);
 }
 
+void MapSystem::UpdateVisibleObjects(EntityManager& em)
+{
+	if (!em.PlayerSystem.HasPlayer(ActivePlayer))
+		return;
+
+	const PlayerVision& vision = em.PlayerSystem.GetPlayerVision(ActivePlayer);
+
+	for (EntityId id : em.UnitSystem.GetEntities())
+	{
+		DrawComponent& draw = em.DrawSystem.GetComponent(id);
+		auto bb = draw.boundingBox;
+		bb.Restrict({ 0,0 }, _mapSize);
+		bb.position = bb.position >> 5;
+		bb.size = bb.size >> 5;
+		draw.visible = !FogOfWarVisible || vision.IsVisible(bb);
+	}
+}
+
 void MapSystem::DrawMap(const Camera& camera)
 {
 	Rectangle16 camRect = camera.GetRectangle16();
@@ -126,9 +144,10 @@ void MapSystem::DrawFogOfWar(EntityManager& em, const Camera& camera)
 	// upscale downscaled minimap fow
 	GraphicsRenderer::Draw(_fowDownscaleTexture, _fogOfWarTexture.GetRect());
 
-
 	GraphicsRenderer::DrawOnCurrentScreen();
+
 	GraphicsRenderer::ChangeBlendingMode(BlendMode::Alpha);
+
 	static constexpr const int CamDownscale = 32 / Upscale;
 	Rectangle16 src = { (camRect.position / CamDownscale), (camRect.size / CamDownscale) };
 
@@ -137,4 +156,6 @@ void MapSystem::DrawFogOfWar(EntityManager& em, const Camera& camera)
 	GraphicsRenderer::Draw(sprite, { {0,0}, Vector2Int(camera.Size) });
 
 	GraphicsRenderer::Submit();
+
+	
 }

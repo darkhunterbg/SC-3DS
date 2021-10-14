@@ -33,7 +33,8 @@ class ObjectDrawSystem : public IEntitySystem {
 public:
 	ObjectDrawSystem();
 
-	void Draw(EntityManager& em, const Camera& camera);
+	void UpdatePositions(EntityManager& em);
+	void Draw( const Camera& camera);
 
 	inline void NewComponent(EntityId id) { _drawComponents.NewComponent(id); }
 	inline bool HasComponent(EntityId id) const
