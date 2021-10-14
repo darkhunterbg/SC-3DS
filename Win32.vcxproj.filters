@@ -4,8 +4,10 @@
     <ClCompile Include="src\win32\Main.cpp" />
     <ClCompile Include="src\win32\Platform.cpp" />
     <ClCompile Include="src\win32\SDL_FontCache.c" />
+    <ClCompile Include="src\win32\AbstractPlatform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\win32\SDL_FontCache.h" />
+    <ClInclude Include="src\win32\AbstractPlatform.h" />
   </ItemGroup>
 </Project>

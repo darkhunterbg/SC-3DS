@@ -26,11 +26,11 @@ const Font* Game::SystemFont12;
 const Font* Game::SystemFont10;
 const Font* Game::SystemFont8;
 
-
 AudioClip* Game::ButtonAudio;
 
 float Game::DeltaTime = 0;
 
+static PlatformInfo _platformInfo;
 
 static void ShowTitleScreen() {
 	GraphicsRenderer::DrawOnScreen(ScreenId::Top);
@@ -57,8 +57,9 @@ void Game::FrameEnd() {
 
 void Game::Start() {
 
-	JobSystem::Init();
+	_platformInfo = Platform::GetPlatformInfo();
 
+	JobSystem::Init();
 
 	SystemFont12 = AssetLoader::LoadFont("font.bcfnt",12);
 	SystemFont10 = AssetLoader::LoadFont("font.bcfnt", 10);
@@ -128,4 +129,14 @@ void Game::SetCurrentScene(Scene* scene)
 
 	currentScene = scene;
 	currentScene->Start();
+}
+
+const PlatformInfo& Game::GetPlatformInfo()
+{
+	return _platformInfo;
+}
+
+void Game::PlatformUpdated()
+{
+	_platformInfo = Platform::GetPlatformInfo();
 }

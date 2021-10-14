@@ -1,12 +1,10 @@
 #pragma once
 
 #include "Scene.h"
-#include "../Camera.h"
+#include "../GUI/GameView.h"
 
 #include "../Entity/Entity.h"
 
-class Cursor;
-class GameView;
 class EntityManager;
 
 class GameScene : public Scene {
@@ -20,7 +18,6 @@ public:
 	virtual void Draw() override;
 
 private:
-	//GameView* view;
-	Camera camera;
+	GameView view;
 	EntityManager* entityManager;
 };

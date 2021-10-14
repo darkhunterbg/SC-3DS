@@ -13,6 +13,10 @@
 
 typedef void* Semaphore;
 
+struct PlatformInfo {
+public:
+	std::vector<Vector2Int16> Screens;
+};
 
 class Platform {
 
@@ -23,6 +27,8 @@ private:
 public:
 
 	// ================ General Purpose =================
+
+	static PlatformInfo GetPlatformInfo();
 
 	static Vector2Int MeasureString(const Font& font, const char* text);
 	static double ElaspedTime();

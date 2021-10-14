@@ -15,10 +15,9 @@ private:
 
 	friend class EntityManager;
 
-	static inline  EntityManager& GetManager() { return *emInstance; }
-
-
 public:
+	static inline EntityManager& GetManager() { return *emInstance; }
+
 	static void SetOrientation(EntityId e, int orientation);
 	static void SetAnimationFrame(EntityId id, unsigned frame);
 	static void UpdateAnimationVisual(EntityId id);

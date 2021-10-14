@@ -14,7 +14,7 @@
 class EntityManager;
 
 struct PlayerId {
-	short i;
+	short i = 0;
 	bool operator == (const PlayerId& o) const { return i == o.i; }
 	bool operator != (const PlayerId& o) const { return i != o.i; }
 };

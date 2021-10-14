@@ -31,6 +31,10 @@ class MapSystem : public IEntitySystem {
 public:
 	PlayerId ActivePlayer = { 1 };
 	bool FogOfWarVisible = true;
+	inline Vector2Int16 GetSize() const
+	{
+		return _mapSize;
+	}
 
 	void SetSize(Vector2Int16 size);
 

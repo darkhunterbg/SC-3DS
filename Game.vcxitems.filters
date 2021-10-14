@@ -36,9 +36,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\MathLib.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Platform.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Span.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUD.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.h">
       <Filter>GUI</Filter>
     </ClInclude>
@@ -63,17 +60,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\WeaponDef.h">
       <Filter>Data</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitSelectionConsolePanel.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitCommandsPanel.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\AbilityDef.h">
       <Filter>Data</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GameView.h">
-      <Filter>GUI</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\GraphicsRenderer.h">
       <Filter>Engine</Filter>
@@ -145,6 +133,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitSystem.h">
       <Filter>Entity</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\ViewContext.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GameView.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -157,9 +151,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Camera.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Assets.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Game.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUD.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
@@ -177,15 +168,6 @@
       <Filter>Data</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Util.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitSelectionConsolePanel.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitCommandsPanel.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GameView.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\GraphicsRenderer.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
@@ -252,6 +234,12 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitSystem.cpp">
       <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\ViewContext.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GameView.cpp">
+      <Filter>GUI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

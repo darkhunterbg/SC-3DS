@@ -22,9 +22,6 @@ void GameScene::Start()
 {
 	Vector2Int16 size = { 64 * 32,64 * 32 };
 
-	camera.Position = { 0,0 };
-	camera.Size = { 400,240 };
-	camera.Limits = { {0,0,}, size };
 
 	entityManager = new EntityManager();
 	//entityManager->DrawBoundingBoxes = true;
@@ -32,6 +29,7 @@ void GameScene::Start()
 	//entityManager->DrawColliders = true;
 
 	entityManager->Init(size);
+
 
 	//view = new GameView(*entityManager, size);
 
@@ -47,9 +45,14 @@ void GameScene::Start()
 	//	entityManager->GetSoundSystem().PlayMusic(*race.GetMusic());
 
 
-	for (int p = 0; p < totalPlayers; ++p) {
+	for (int p = 0; p < totalPlayers; ++p)
+	{
 		entityManager->PlayerSystem.AddPlayer(race, color[p]);
 	}
+
+	view.Init();
+
+	view.SetPlayer(PlayerId{ 1 });
 
 	//view->SetPlayer(1, race);
 
@@ -98,36 +101,27 @@ int t = 0;
 void GameScene::Update()
 {
 
-	entityManager->FrameUpdate(camera);
-
-	t++;
-
-	//if (t % 60 == 0) {
-	//	entityManager->GetPlayerSystem().AddMinerals(1, 8);
-	//	entityManager->GetPlayerSystem().AddGas(1, 8);
-	//}
-
-	//view->Update(camera);
-
-	camera.Update();
+	entityManager->FrameUpdate(view.GetCamera());
 
 
-	if (InputManager::Gamepad.IsButtonReleased(GamepadButton::Select)) {
+	view.GetCamera().Update();
+
+
+	if (InputManager::Gamepad.IsButtonReleased(GamepadButton::Select))
+	{
 		entityManager->MapSystem.FogOfWarVisible = !entityManager->MapSystem.FogOfWarVisible;
 	}
 }
 
 void GameScene::Draw()
 {
-	//const PlayerInfo& playerInfo = entityManager->GetPlayerSystem().GetPlayerInfo(1);
-
 	GraphicsRenderer::DrawOnScreen(ScreenId::Top);
 
-	entityManager->Draw(camera);
+	entityManager->Draw(view.GetCamera());
 
-	//view->DrawUpperScreen(camera);
+	view.DrawMainScreen();
 
 	GraphicsRenderer::DrawOnScreen(ScreenId::Bottom);
 
-	//view->DrawLowerScreen(camera);
+	view.DrawSecondaryScreen();
 }

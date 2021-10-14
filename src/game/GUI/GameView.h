@@ -1,35 +1,26 @@
 #pragma once
 
-class GameHUD;
-class Cursor;
-class Camera;
+#include "ViewContext.h"
+#include "../Camera.h"
 
 class GameView {
-
 private:
-	
-	GameHUD* hud;
-	Cursor* cursor;
+	GameView(const GameView&) = delete;
+	GameView& operator=(const GameView&) = delete;
 
-	int messageTimer = 0;
-	char message[128];
 
-	void DrawMarkers(const Camera& camera);
-	void UpdateMarkers();
-	void DrawUnitBars(const Camera& camera);
-
-	void ContextualGamepadInput();
+	ViewContext _context;
+	Camera _camera;
 public:
-	GameView(EntityManager& em, Vector2Int16 mapSizePixels);
+	GameView();
 
-	//void SetPlayer(PlayerId player, const RaceDef& race);
+	void Init();
 
-	void Update(Camera& camera);
+	void SetPlayer(PlayerId player);
 
-	void ProcessEvents();
+	const inline ViewContext& GetContext() { return _context; }
+	inline Camera& GetCamera() { return _camera; }
 
-	void DrawUpperScreen(const Camera& camera);
-	void DrawLowerScreen(const Camera& camera);
-
-
+	void DrawMainScreen();
+	void DrawSecondaryScreen();
 };

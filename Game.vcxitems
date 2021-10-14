@@ -47,11 +47,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Game.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUD.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GameView.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIAnimator.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitCommandsPanel.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitSelectionConsolePanel.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\ViewContext.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\BinaryData.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\Wave.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\MathLib.h" />
@@ -93,11 +91,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Game.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GameHUD.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GameView.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIAnimator.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitCommandsPanel.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\UnitSelectionConsolePanel.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\ViewContext.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\BinaryData.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\Wave.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Profiler.cpp" />

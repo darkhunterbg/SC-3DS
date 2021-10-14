@@ -1,6 +1,6 @@
 
 #include "Platform.h"
-
+#include "AbstractPlatform.h"
 
 #include <SDL.h>
 #include <SDL_gpu.h>
@@ -25,7 +25,8 @@
 extern std::filesystem::path assetDir;
 extern std::filesystem::path userDir;
 extern GPU_Target* screen;
-extern GPU_Image* screens[2];
+extern AbstractPlatform abstractPlatform;
+
 extern uint64_t mainTimer;
 extern Rectangle touchScreenLocation;
 extern bool mute;
@@ -45,6 +46,14 @@ constexpr Uint8 SDL_FloatToUint8(float x)
 
 static 	void AudioCallback(void* userdata, Uint8* stream, int len);
 
+
+PlatformInfo Platform::GetPlatformInfo()
+{
+	PlatformInfo info;
+	for (auto& s : abstractPlatform.Screens)
+		info.Screens.push_back(s.Resolution);
+	return info;
+}
 
 TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize)
 {
@@ -105,8 +114,13 @@ FILE* Platform::OpenAsset(const char* path)
 
 void Platform::DrawOnScreen(ScreenId screen)
 {
+	int id = (int)screen;
+
+	if (id >= abstractPlatform.Screens.size())
+		return;
+
 	currentRT = screen;
-	target = (screens[(int)currentRT])->target;
+	target = abstractPlatform.Screens[id].Image->target;
 
 }
 void Platform::DrawOnSurface(SurfaceId surface)
@@ -114,7 +128,7 @@ void Platform::DrawOnSurface(SurfaceId surface)
 	auto t = (GPU_Target*)surface;
 
 	if (t == nullptr)
-		target = (screens[(int)currentRT])->target;
+		target = (abstractPlatform.Screens[(int)currentRT]).Image->target;
 	else
 		target = t;
 }

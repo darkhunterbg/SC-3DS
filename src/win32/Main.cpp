@@ -5,12 +5,14 @@
 #include <thread>
 
 #include "Color.h"
-#include "SDL_FontCache.h"
 #include "Game.h"
 #include "MathLib.h"
 #include "Debug.h"
+#include "AbstractPlatform.h"
 
-GPU_Image* screens[2];
+#include <vector>
+
+
 GPU_Image* white;
 GPU_Target* screen;
 SDL_Window* window;
@@ -18,18 +20,19 @@ std::filesystem::path assetDir;
 std::filesystem::path userDir;
 uint64_t mainTimer;
 
+AbstractPlatform abstractPlatform;
+
 Rectangle touchScreenLocation;
 bool mute = false;
 bool noThreading = true;
 
-void Draw();
 
 int main(int argc, char** argv) {
 
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_AUDIO);
 
 	GPU_SetRequiredFeatures(GPU_FEATURE_BASIC_SHADERS);
-	screen = GPU_Init(400, 480, GPU_DEFAULT_INIT_FLAGS);
+	screen = GPU_Init(640, 480, GPU_DEFAULT_INIT_FLAGS);
 
 	window = SDL_GetWindowFromID(screen->context->windowID);
 
@@ -37,13 +40,10 @@ int main(int argc, char** argv) {
 	SDL_SetWindowTitle(window, "StarCraft");
 	SDL_MaximizeWindow(window);
 
+	abstractPlatform = AbstractPlatform::PC(screen);
 
-	screens[0] = GPU_CreateImage(400, 240, GPU_FORMAT_RGBA);
-	screens[1] = GPU_CreateImage(320, 240, GPU_FORMAT_RGBA);
-	GPU_LoadTarget(screens[0]);
-	GPU_LoadTarget(screens[1]);
-	GPU_SetImageFilter(screens[0], GPU_FILTER_LINEAR);
-	GPU_SetImageFilter(screens[1], GPU_FILTER_LINEAR);
+	abstractPlatform.ApplyPlatform();
+
 	GPU_SetShapeBlendMode(GPU_BLEND_NORMAL);
 	white = GPU_CreateImage(1, 1, GPU_FORMAT_RGBA);
 	uint8_t data[4] = { 255,255,255,255 };
@@ -95,7 +95,11 @@ int main(int argc, char** argv) {
 				if (event.window.event == SDL_WINDOWEVENT_CLOSE)
 					done = true;
 				if (event.window.event == SDL_WINDOWEVENT_RESIZED)
+				{
 					GPU_SetWindowResolution(event.window.data1, event.window.data2);
+					abstractPlatform.ApplyPlatform();
+					Game::PlatformUpdated();
+				}
 				break;
 			}
 		}
@@ -111,7 +115,7 @@ int main(int argc, char** argv) {
 
 		Game::Draw();
 
-		Draw();
+		abstractPlatform.Draw(screen);
 
 		Game::FrameEnd();
 		GPU_Flip(screen);
@@ -126,47 +130,3 @@ int main(int argc, char** argv) {
 	return 0;
 }
 
-void Draw() {
-
-	GPU_DeactivateShaderProgram();
-
-
-	int w = screen->base_w;
-	int h = screen->base_h;
-
-	GPU_Clear(screen);
-
-	const int n3dsUpW = 400;
-	const int n3dsUpH = 240;
-	const int n3dsDnW = 320;
-	const int n3dsDnH = 240;
-
-	SDL_Rect clip = { 0 };
-
-	// Top
-
-	clip.h = h / 2;
-	clip.w = (clip.h * n3dsUpW) / n3dsUpH;
-	clip.x = (w - clip.w) / 2;
-
-	GPU_Rect r = { (float)clip.x, (float)clip.y, (float)clip.w, (float)clip.h };
-	GPU_BlitRect(screens[0], nullptr, screen, &r);
-
-	clip.y = clip.h;
-	clip.w = (clip.h * n3dsDnW) / n3dsDnH;
-	clip.x = (w - clip.w) / 2;
-
-	touchScreenLocation.position = { clip.x, clip.y };
-	touchScreenLocation.size = { clip.w,clip.h };
-
-	r = { (float)clip.x, (float)clip.y, (float)clip.w, (float)clip.h };
-	GPU_BlitRect(screens[1], nullptr, screen, &r);
-
-	const Color& c = Colors::CornflowerBlue;
-
-	for (auto s : screens) {
-
-		GPU_ClearRGBA(s->target, (Uint8)(c.r * 255), (Uint8)(c.g * 255), (Uint8)(c.b * 255), 255);
-
-	}
-}

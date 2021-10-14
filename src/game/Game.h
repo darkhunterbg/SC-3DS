@@ -3,6 +3,7 @@
 #include "Assets.h"
 
 class Scene;
+struct PlatformInfo;
 
 class Game {
 
@@ -26,4 +27,8 @@ public:
 	static void End();
 
 	static void SetCurrentScene(Scene* scene);
+
+	static const PlatformInfo& GetPlatformInfo();
+
+	static void PlatformUpdated();	
 };

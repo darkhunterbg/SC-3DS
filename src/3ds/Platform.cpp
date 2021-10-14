@@ -31,6 +31,16 @@ static std::unordered_map<std::string, C2D_Font> loadedFonts;
 
 static std::unordered_map<const C3D_Tex*, const Tex3DS_SubTexture*> loadedTextures;
 
+
+PlatformInfo Platform::GetPlatformInfo()
+{
+	PlatformInfo info;
+	info.Screens.push_back(Vector2Int16(screens[0].size));
+	info.Screens.push_back(Vector2Int16(screens[1].size));
+	return info;
+}
+
+
 TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize)
 {
 	std::string assetPath = assetDir + path + ".t3x";
