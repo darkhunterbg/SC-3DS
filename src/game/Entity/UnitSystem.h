@@ -12,7 +12,8 @@ struct UnitComponent {
 	PlayerId owner;
 	const UnitDef* def;
 	uint8_t vision = 2;
-
+	int16_t usedSupply = 0;
+	int16_t providedSupply = 0;
 };
 
 class UnitSystem : public IEntitySystem {

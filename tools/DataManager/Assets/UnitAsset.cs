@@ -143,7 +143,22 @@ namespace DataManager.Assets
 		[Binary(BinaryType.UInt, 2)]
 		[Optional]
 		public int Health { get; set; } = 100;
-		#endregion 
+
+		[DefaultEditor]
+		[Binary(BinaryType.UInt, 2)]
+		[Optional]
+		public int Vision { get; set; } = 7;
+
+		[SupplyEditor]
+		[Binary(BinaryType.UInt, 2)]
+		[Optional]
+		public int UseSupply { get; set; } = 0;
+
+		[SupplyEditor]
+		[Binary(BinaryType.UInt, 2)]
+		[Optional]
+		public int ProvideSupply { get; set; } = 0;
+		#endregion
 
 		#region Movement
 		[Section("Movement")]
