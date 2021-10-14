@@ -18,7 +18,7 @@ UnitComponent& UnitSystem::NewUnit(EntityId id, const UnitDef& def, PlayerId own
 
 	unit.owner = owner;
 	unit.def = &def;
-	unit.vision = def.Stats.Vision;
+	unit.vision = def.Stats.Vision + 1;
 	unit.providedSupply = def.Stats.ProvideSupply;
 	unit.usedSupply = def.Stats.UseSupply;
 
