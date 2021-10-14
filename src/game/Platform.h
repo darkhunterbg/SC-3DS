@@ -16,6 +16,7 @@ typedef void* Semaphore;
 struct PlatformInfo {
 public:
 	std::vector<Vector2Int16> Screens;
+	bool PointerIsCursor = false;
 };
 
 class Platform {

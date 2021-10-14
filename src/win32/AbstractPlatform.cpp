@@ -1,5 +1,6 @@
 #include "AbstractPlatform.h"
 #include "Color.h"
+#include <algorithm>
 
 #include <SDL.h>
 #include <SDL_gpu.h>
@@ -26,19 +27,17 @@ void AbstractPlatform::ApplyPlatform()
 		GPU_SetImageFilter(screen.Image, GPU_FILTER_LINEAR);
 
 	}
+
+	SDL_ShowCursor(!Pointer.SameAsCursor);
 }
 
-void AbstractPlatform::Draw(GPU_Target* screen)
+void AbstractPlatform::UpdateScreens(GPU_Target* screen)
 {
-	GPU_DeactivateShaderProgram();
+	SDL_Rect clip = { 0 };
 
 
 	int w = screen->base_w;
 	int h = screen->base_h;
-
-	GPU_Clear(screen);
-
-	SDL_Rect clip = { 0 };
 
 	clip.h = h / Screens.size();
 
@@ -50,21 +49,55 @@ void AbstractPlatform::Draw(GPU_Target* screen)
 		clip.w = (clip.h * screenW) / sreeenH;
 		clip.x = (w - clip.w) / 2;
 
-		GPU_Rect r = { (float)clip.x, (float)clip.y, (float)clip.w, (float)clip.h };
-		GPU_BlitRect(aScreen.Image, nullptr, screen, &r);
+		aScreen.NativePosition = { clip.x, clip.y };
+		aScreen.NativeResolution = { clip.w, clip.h };
 
 		clip.y += clip.h;
 	}
 
+}
+
+void AbstractPlatform::UpdateInput()
+{
+	Vector2Int pos;
+	Uint32  buttonState = SDL_GetMouseState(&pos.x, &pos.y);
+
+	auto& screen = Screens[Pointer.ScreenReference];
+	pos -= screen.NativePosition;
 
 
-	//touchScreenLocation.position = { clip.x, clip.y };
-	//touchScreenLocation.size = { clip.w,clip.h };
+	//state.Touch = buttonState & SDL_BUTTON(SDL_BUTTON_LEFT);
+	Vector2Int nativeSize = screen.NativeResolution;
+
+	pos.x = std::min(std::max(pos.x, 0), nativeSize.x);
+	pos.y = std::min(std::max(pos.y, 0), nativeSize.y);
+	pos.x = (pos.x * screen.Resolution.x) / nativeSize.x;
+	pos.y = (pos.y * screen.Resolution.y) / nativeSize.y;
+
+	Pointer.Position = pos;
+}
+
+void AbstractPlatform::Draw(GPU_Target* screen)
+{
+	GPU_DeactivateShaderProgram();
+
+	UpdateScreens(screen);
+
+	GPU_Clear(screen);
+
+	SDL_Rect clip = { 0 };
 
 	const Color& c = Colors::CornflowerBlue;
 
 	for (AbstractScreen& aScreen : Screens)
 	{
+		clip.x = aScreen.NativePosition.x;
+		clip.y = aScreen.NativePosition.y;
+		clip.w = aScreen.NativeResolution.x;
+		clip.h = aScreen.NativeResolution.y;
+
+		GPU_Rect r = { (float)clip.x, (float)clip.y, (float)clip.w, (float)clip.h };
+		GPU_BlitRect(aScreen.Image, nullptr, screen, &r);
 		GPU_ClearRGBA(aScreen.Image->target, (Uint8)(c.r * 255), (Uint8)(c.g * 255), (Uint8)(c.b * 255), 255);
 	}
 }

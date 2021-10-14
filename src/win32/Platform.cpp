@@ -52,6 +52,9 @@ PlatformInfo Platform::GetPlatformInfo()
 	PlatformInfo info;
 	for (auto& s : abstractPlatform.Screens)
 		info.Screens.push_back(s.Resolution);
+
+	info.PointerIsCursor = abstractPlatform.Pointer.SameAsCursor;
+
 	return info;
 }
 
@@ -301,6 +304,8 @@ void Platform::UpdateGamepadState(GamepadState& state)
 }
 void Platform::UpdatePointerState(PointerState& state)
 {
+	state.Position = abstractPlatform.Pointer.Position;
+
 	if (touchScreenLocation.size.x == 0 || touchScreenLocation.size.y == 0)
 		return;
 

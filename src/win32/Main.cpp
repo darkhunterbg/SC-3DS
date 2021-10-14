@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
 	SDL_SetWindowTitle(window, "StarCraft");
 	SDL_MaximizeWindow(window);
 
-	abstractPlatform = AbstractPlatform::PC(screen);
+	abstractPlatform = AbstractPlatform::N3DS(screen);
 
 	abstractPlatform.ApplyPlatform();
 
@@ -83,6 +83,10 @@ int main(int argc, char** argv) {
 	}
 
 	while (!done) {
+
+		abstractPlatform.UpdateScreens(screen);
+		abstractPlatform.UpdateInput();
+
 		Game::FrameStart();
 
 		SDL_Event event;

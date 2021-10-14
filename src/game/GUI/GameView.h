@@ -2,6 +2,8 @@
 
 #include "ViewContext.h"
 #include "../Camera.h"
+#include "Cursor.h"
+
 
 class GameView {
 private:
@@ -11,6 +13,7 @@ private:
 
 	ViewContext _context;
 	Camera _camera;
+	Cursor _cursor;
 public:
 	GameView();
 
