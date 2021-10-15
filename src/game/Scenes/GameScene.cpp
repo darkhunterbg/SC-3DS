@@ -41,7 +41,11 @@ void GameScene::Start()
 
 	const auto& race = *GameDatabase::instance->GetRace(RaceType::Terran);
 
-	//if (race.GetMusic())
+	if (race.GetMusic())
+	{
+
+		AudioManager::PlayClip(&race.GetMusic()->GetAudioClip(2), 0);
+	}
 	//	entityManager->GetSoundSystem().PlayMusic(*race.GetMusic());
 
 

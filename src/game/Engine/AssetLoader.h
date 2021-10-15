@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <array>
 #include "../Data/GameDatabase.h"
+#include "../Coroutine.h"
 
 class AssetLoader {
 	typedef std::size_t AssetId;
@@ -55,6 +56,7 @@ public:
 	}
 
 	static void LoadDatabase();
+	static Coroutine* LoadDatabaseAsync();
 
 	static const Texture* LoadTexture(const char* path);
 	static const Font* LoadFont(const char* path, int size);

@@ -13,10 +13,16 @@
 
 typedef void* Semaphore;
 
+enum class PlatformType {
+	Generic = 0,
+	Nintendo3DS = 1,
+};
+
 struct PlatformInfo {
 public:
 	std::vector<Vector2Int16> Screens;
 	bool PointerIsCursor = false;
+	PlatformType Type = PlatformType::Generic;
 };
 
 class Platform {

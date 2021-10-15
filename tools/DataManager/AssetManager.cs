@@ -205,7 +205,7 @@ namespace DataManager
 					continue;
 				
 
-				ImageLists.Add(ImageList.FromPng(file));
+				ImageLists.Add(ImageList.FromPng(file, isExtracted: true));
 			}
 
 			foreach (var file in Directory.GetFiles(AssetsDir, "*.png", SearchOption.AllDirectories))

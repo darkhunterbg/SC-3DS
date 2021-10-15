@@ -75,7 +75,7 @@ namespace DataManager.Assets
 
         private ImageList() { }
 
-        public static ImageList FromPng(string pngFile)
+        public static ImageList FromPng(string pngFile, bool isExtracted = false)
         {
             var i = new ImageList();
             i.AssetDir = Path.GetDirectoryName(pngFile);
@@ -83,6 +83,9 @@ namespace DataManager.Assets
             i.RelativePath = i.RelativePath.Substring(0, i.RelativePath.Length - 4);
 
 
+            if(isExtracted ) {
+                i.RelativePath = i.RelativePath.Substring("extracted\\".Length);
+			}
             using (var image = SixLabors.ImageSharp.Image.Load(pngFile))
             {
                 i.FrameSize = new Vector2(image.Width, image.Height);

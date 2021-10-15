@@ -12,6 +12,7 @@ private:
 	~Game() = delete;
 
 public:
+	static const Font* SystemFont16;
 	static const Font* SystemFont12;
 	static const Font* SystemFont10;
 	static const Font* SystemFont8;

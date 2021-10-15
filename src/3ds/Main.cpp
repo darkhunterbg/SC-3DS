@@ -78,84 +78,6 @@ struct Atlas {
 
 u32 __ctru_heap_size = (30 << 20);
 
-void TextureLoadTest()
-{
-
-	romfsInit();
-	gfxInitDefault();
-	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
-
-	char dir[64];
-	getcwd(&dir[0], 64);
-
-	if (strcmp(dir, "/") == 0)
-		assetDir = "3ds/StarCraft/romfs/";
-	else
-		assetDir = "StarCraft/romfs/";
-
-	Atlas altases[] = {
-		{"bullet_flingy",1},
-		{"gui",1},
-		{"wirefram" ,2} ,
-		{"neutral",5},
-		{"terran",7},
-		{"protoss",12},
-		{"thingy",16},
-		{"zerg",24}
-
-	};
-
-	std::vector<std::string> textures;
-
-	for (auto a : altases)
-	{
-		for (int i = 0; i < a.subatlases; ++i)
-		{
-			std::string tex = std::string(a.name) + "_" + std::to_string(i) + ".t3x";
-			textures.push_back(tex);
-		}
-	}
-
-	console = consoleInit(GFX_BOTTOM, nullptr);
-
-	printf("free space %iMB / %iMB\n", envGetHeapSize() / (1024 * 1024), linearSpaceFree() / (1024 * 1024));
-
-
-	int i = 0;
-
-	size_t texMemoryUsed = 0;
-
-	while (aptMainLoop())
-	{
-		svcSleepThread(1);
-		hidScanInput();
-
-		u32 kDown = hidKeysDown();
-		if (kDown & KEY_START)
-			break;
-
-		if (i >= textures.size())
-			FatalError("Done loading %i textures", textures.size());
-
-		std::string file = assetDir + "atlases/" + textures[i];
-
-		FILE* f = fopen(file.data(), "rb");
-
-		if (f == nullptr)
-			FatalError("Failed to open %s", textures[i].data());
-
-		printf("Loading %s (%i/%i)\n", textures[i].data(), ++i, textures.size());
-
-		C3D_Tex tex;
-		auto loaded = Tex3DS_TextureImportStdio(f, &tex, nullptr, false);
-		if (loaded == nullptr)
-			FatalError("Failed to load texture! Used Memory %iMB", texMemoryUsed / (1024 * 1024));
-
-		texMemoryUsed += tex.size;
-
-		fclose(f);
-	}
-}
 
 int main()
 {
@@ -246,9 +168,9 @@ void Init()
 	getcwd(&dir[0], 64);
 
 	if (strcmp(dir, "/") == 0)
-		assetDir = "3ds/StarCraft/romfs/";
+		assetDir = "3ds/StarCraft/romfs_debug/";
 	else
-		assetDir = "StarCraft/romfs/";
+		assetDir = "StarCraft/romfs_debug/";
 
 
 	userDir = assetDir.substr(0, assetDir.length() - 6) + "User/";

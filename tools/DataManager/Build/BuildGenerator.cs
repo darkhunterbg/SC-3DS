@@ -137,6 +137,16 @@ namespace DataManager.Build
 
 		private static List<AtlasBSPTree> SimplifyAtlasTrees(List<AtlasBSPTree> subAtlases)
 		{
+			if (subAtlases.Count == 1) {
+				var f = subAtlases[0].GetFrames();
+				if(f.Count== 1) {
+					var r = new AtlasBSPTree(f[0].rect.Width, f[0].rect.Height);
+					r.TryAdd(f[0].image);
+
+					return new List<AtlasBSPTree>() { r };
+				}
+			}
+
 			List<AtlasBSPTree> scaledSubAtlases = new List<AtlasBSPTree>();
 
 			foreach (var subAtlas in subAtlases) {

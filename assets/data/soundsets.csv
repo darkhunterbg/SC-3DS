@@ -32,6 +32,7 @@ Advisor\Zerg\Update02,False,sound\zerg\advisor\zadupd02
 Advisor\Zerg\Update04,False,sound\zerg\advisor\zadupd04
 Music\Protoss,True,"music\protoss1,music\protoss2,music\protoss3"
 Music\Terran,True,"music\terran1,music\terran2,music\terran3"
+Music\Title,False,music\title
 Music\Zerg,True,"music\zerg1,music\zerg2,music\zerg3"
 Units\Terran\Marine\Annoyed,False,"sound\terran\marine\tmapss00,sound\terran\marine\tmapss01,sound\terran\marine\tmapss02,sound\terran\marine\tmapss03,sound\terran\marine\tmapss04,sound\terran\marine\tmapss05,sound\terran\marine\tmapss06"
 Units\Terran\Marine\Death,True,"sound\terran\marine\tmadth00,sound\terran\marine\tmadth01"

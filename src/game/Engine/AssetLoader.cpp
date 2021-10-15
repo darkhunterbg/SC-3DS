@@ -19,14 +19,16 @@ const Texture* AssetLoader::LoadTexture(const char* path)
 	AssetId id = instance.hasher(p);
 	AssetEntry& e = instance.loadedAssets[id];
 
-	if (e.id == 0) {
+	if (e.id == 0)
+	{
 		Vector2Int16 size;
 		TextureId texId = Platform::LoadTexture(p.data(), size);
 		e.data = new Texture(p, size, texId);
 		e.type = AssetType::Texture;
 		e.id = id;
 	}
-	else {
+	else
+	{
 		if (e.type != AssetType::Texture)
 			EXCEPTION("Tried to load '%s' as %i but it was %i!",
 				p.data(), GetAssetTypeName(AssetType::Texture), GetAssetTypeName(e.type));
@@ -42,12 +44,14 @@ const Font* AssetLoader::LoadFont(const char* path, int size)
 	id = (id * 513269) ^ intHasher(size);
 	AssetEntry& e = instance.loadedAssets[id];
 
-	if (e.id == 0) {
+	if (e.id == 0)
+	{
 		e.data = Platform::LoadFont(p.data(), size);
 		e.type = AssetType::Font;
 		e.id = id;
 	}
-	else {
+	else
+	{
 		if (e.type != AssetType::Font)
 			EXCEPTION("Tried to load '%s' as %i but it was %i!",
 				p.data(), GetAssetTypeName(AssetType::Font), GetAssetTypeName(e.type));
@@ -62,12 +66,14 @@ AudioClip* AssetLoader::LoadAudioClip(const char* path)
 	AssetId id = instance.hasher(p);
 	AssetEntry& e = instance.loadedAssets[id];
 
-	if (e.id == 0) {
+	if (e.id == 0)
+	{
 		e.data = LoadAudioClipFromFile(p.data());
 		e.type = AssetType::AudioClip;
 		e.id = id;
 	}
-	else {
+	else
+	{
 		if (e.type != AssetType::AudioClip)
 			EXCEPTION("Tried to load '%s' as %i but it was %i!",
 				p.data(), GetAssetTypeName(AssetType::AudioClip), GetAssetTypeName(e.type));
@@ -80,7 +86,8 @@ AudioClip* AssetLoader::LoadAudioClip(const char* path)
 static uint16_t audioClipId = 0;
 
 
-static AudioClip* LoadAudioClipFromFile(const char* path) {
+static AudioClip* LoadAudioClipFromFile(const char* path)
+{
 	std::string p = path;
 	p += ".wav";
 
@@ -96,13 +103,15 @@ static AudioClip* LoadAudioClipFromFile(const char* path) {
 
 	AudioClip* stream = nullptr;
 
-	if (info.GetTotalSize() < 1024 * 200) {
+	if (info.GetTotalSize() < 1024 * 200)
+	{
 		stream = new AudioClip(info, f);
 
 		fclose(f);
 
 	}
-	else {
+	else
+	{
 		stream = new AudioClip(info, AudioStreamBufferSize, f);
 	}
 
@@ -131,4 +140,39 @@ void AssetLoader::LoadDatabase()
 	instance.db->LoadAssetReferences();
 
 	fclose(f);
+}
+
+Coroutine* AssetLoader::LoadDatabaseAsync()
+{
+	Coroutine* crt = new Coroutine();
+
+
+	FILE* f = Platform::OpenAsset(DataFile);
+
+	crt->AddNext([f]() {
+		if (!f)
+			EXCEPTION("Failed to load file %s", DataFile);
+
+		instance.db = BinaryDataLoader::LoadDatabase(f);
+
+		return true;
+		}).AddNext([f]() {
+			std::string p = DataFile;
+
+			AssetId id = instance.hasher(p);
+			AssetEntry& e = instance.loadedAssets[id];
+
+			e.id = id;
+			e.type = AssetType::Database;
+			e.data = instance.db;
+
+			instance.db->LoadAssetReferences();
+
+			fclose(f);
+
+			return true;
+	});
+
+		return crt;
+
 }

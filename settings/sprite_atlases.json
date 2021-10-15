@@ -85,7 +85,7 @@
   {
     "OutputName": "title",
     "ImageList": [
-      "*\\glue\\title\\title"
+      "glue\\title\\title"
     ],
     "PackStrategy": 0,
     "FilterStrategy": 1

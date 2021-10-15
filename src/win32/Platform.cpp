@@ -54,6 +54,7 @@ PlatformInfo Platform::GetPlatformInfo()
 		info.Screens.push_back(s.Resolution);
 
 	info.PointerIsCursor = abstractPlatform.Pointer.SameAsCursor;
+	info.Type = abstractPlatform.Type;
 
 	return info;
 }

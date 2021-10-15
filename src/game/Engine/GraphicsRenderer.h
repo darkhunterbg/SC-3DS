@@ -79,4 +79,6 @@ public:
 	static void ClearCurrentSurface(Color color);
 
 	static ImageFrame NewSprite(const Texture& texture, const Rectangle16& rect);
+
+	static Vector2Int16 GetScreenSize(ScreenId screen);
 };

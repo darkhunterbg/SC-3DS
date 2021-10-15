@@ -22,6 +22,7 @@ static Scene* currentScene;
 static std::string error;
 static double frameStartTime = 0;
 
+const Font* Game::SystemFont16;
 const Font* Game::SystemFont12;
 const Font* Game::SystemFont10;
 const Font* Game::SystemFont8;
@@ -35,7 +36,7 @@ static PlatformInfo _platformInfo;
 
 static void InitialScene()
 {
-	AssetLoader::LoadDatabase();
+	
 
 	Game::SetCurrentScene(new BootScene());
 }
@@ -60,6 +61,7 @@ void Game::Start()
 
 	JobSystem::Init();
 
+	SystemFont16 = AssetLoader::LoadFont("font.bcfnt", 16);
 	SystemFont12 = AssetLoader::LoadFont("font.bcfnt", 12);
 	SystemFont10 = AssetLoader::LoadFont("font.bcfnt", 10);
 	SystemFont8 = AssetLoader::LoadFont("font.bcfnt", 8);

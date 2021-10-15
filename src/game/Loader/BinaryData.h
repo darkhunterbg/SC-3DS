@@ -4,6 +4,7 @@
 #include <vector>
 #include <cstdio>
 
+class Coroutine;
 
 class GameDatabase;
 

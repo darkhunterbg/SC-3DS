@@ -35,6 +35,7 @@ static std::unordered_map<const C3D_Tex*, const Tex3DS_SubTexture*> loadedTextur
 PlatformInfo Platform::GetPlatformInfo()
 {
 	PlatformInfo info;
+	info.Type = PlatformType::Nintendo3DS;
 	info.Screens.push_back(Vector2Int16(screens[0].size));
 	info.Screens.push_back(Vector2Int16(screens[1].size));
 	return info;

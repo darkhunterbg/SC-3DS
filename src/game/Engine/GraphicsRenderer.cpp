@@ -2,6 +2,7 @@
 
 #include "../Platform.h"
 #include "../Debug.h"
+#include "../Game.h"
 
 
 GraphicsRenderer GraphicsRenderer::instance;
@@ -165,4 +166,11 @@ ImageFrame GraphicsRenderer::NewSprite(const Texture& texture, const Rectangle16
 	f.uv = Platform::GenerateUV(texture.GetTextureId(), rect);
 
 	return f;
+}
+
+Vector2Int16 GraphicsRenderer::GetScreenSize(ScreenId screen)
+{
+	auto& platformInfo = Game::GetPlatformInfo();
+	if (platformInfo.Screens.size() <= (int)screen) return Vector2Int16();
+	return platformInfo.Screens[(int)screen];
 }
