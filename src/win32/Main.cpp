@@ -27,8 +27,8 @@ uint64_t mainTimer;
 AbstractPlatform abstractPlatform;
 
 Rectangle touchScreenLocation;
-bool mute = false;
-bool noThreading = true;
+bool mute = true;
+bool noThreading = false;
 
 
 void Toolbar();

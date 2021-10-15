@@ -2,6 +2,8 @@
 #include "../Engine/AssetLoader.h"
 #include "../Engine/AudioManager.h"
 #include "../Engine/GraphicsRenderer.h"
+#include "../Engine/InputManager.h"
+#include "../Engine/JobSystem.h"
 #include "../Data/GameDatabase.h"
 #include "../Game.h"
 #include "../Scenes/GameScene.h"
@@ -18,35 +20,28 @@ void BootScene::Start()
 {
 	auto clip = AssetLoader::LoadAudioClip("music\\title");
 	AudioManager::PlayClip(clip, 0);
+
+	JobSystem::RunJobAsync(1, 1, [](int, int) {
+		AssetLoader::LoadDatabase();
+		});
+
 }
 
 void BootScene::Stop()
 {
-	if (_loadingCrt != nullptr)
-		delete _loadingCrt;
 
-	delete this;
 }
 
 void BootScene::Update()
 {
-	if (_loadingCrt == nullptr)
+
+
+	if (!_ready && !JobSystem::IsWorking())
 	{
-		_loadingCrt = AssetLoader::LoadDatabaseAsync();
-	}
-	else
-	{
-		if (!_loadingCrt->MoveNext())
-		{
-			//delete _loadingCrt;
-			Game::SetCurrentScene(new GameScene());
-		}
+		_ready = true;
 	}
 
-	//if (_frameCounter == 1)
-	//{
-	//	AssetLoader::LoadDatabase();
-	//}
+
 }
 
 void BootScene::Draw()
@@ -63,11 +58,17 @@ void BootScene::Draw()
 		GraphicsRenderer::Draw(*_title, { -430,-358 }, { 640,480 });
 		GraphicsRenderer::DrawRectangle({ {0,0},{120,200} }, Colors::Black);
 
-		GraphicsRenderer::Draw(*_title, { -40,-240 }, { 400,300 });
+		GraphicsRenderer::Draw(*_title, { -36,-240 }, { 400,300 });
 		GraphicsRenderer::DrawRectangle({ {300,25},{20,100} }, Colors::Black);
-	
 
-		GraphicsRenderer::DrawText(*Game::SystemFont12, { 145,140 }, "Loading", Colors::SCWhite);
+		if (_ready)
+		{
+			if ((_frameCounter / 30) % 3)
+
+				GraphicsRenderer::DrawText(*Game::SystemFont12, { 110,140 }, "Press A to continue", Colors::SCWhite);
+		}
+		else
+			GraphicsRenderer::DrawText(*Game::SystemFont12, { 145,140 }, "Loading", Colors::SCWhite);
 	}
 	else
 	{
@@ -80,10 +81,21 @@ void BootScene::Draw()
 		pos.y -= 90;
 		pos.x -= 22;
 
-		GraphicsRenderer::DrawText(*Game::SystemFont16, pos, "Loading", Colors::SCWhite);
+		if (_ready)
+		{
+			if ((_frameCounter / 30) % 3)
+
+				GraphicsRenderer::DrawText(*Game::SystemFont16, pos - Vector2Int{ 40, 0 }, "Press A to continue", Colors::SCWhite);
+		}
+		else
+			GraphicsRenderer::DrawText(*Game::SystemFont16, pos, "Loading", Colors::SCWhite);
 	}
 
 
+	if (_ready && InputManager::Gamepad.IsButtonDown(GamepadButton::A))
+	{
+		Game::SetCurrentScene(new GameScene());
+	}
 
 	_frameCounter++;
 }

@@ -8,8 +8,7 @@ class BootScene : public Scene
 {
 private: 
 	int _frameCounter = 0;
-
-	Coroutine* _loadingCrt = nullptr;
+	bool _ready = false;
 public:
 	BootScene();
 	virtual void Start() override;

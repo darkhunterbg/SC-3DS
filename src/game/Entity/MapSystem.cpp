@@ -4,6 +4,7 @@
 #include "../Engine/AssetLoader.h"
 #include "../Camera.h"
 #include "EntityManager.h"
+#include "../Profiler.h"
 
 static ImageFrame _tile;
 
@@ -18,6 +19,8 @@ size_t MapSystem::ReportMemoryUsage()
 
 void MapSystem::RedrawMinimapFogOfWar(const PlayerVision& vision)
 {
+		if (!FogOfWarVisible) return;
+
 	if (_minimapFowTexture.surfaceId == nullptr)
 	{
 		_minimapFowTexture = GraphicsRenderer::NewRenderSurface({ _minimapTextureSize,_minimapTextureSize });
@@ -28,7 +31,6 @@ void MapSystem::RedrawMinimapFogOfWar(const PlayerVision& vision)
 
 	GraphicsRenderer::DrawOnSurface(_minimapFowTexture);
 	GraphicsRenderer::ClearCurrentSurface(Colors::Black);
-
 
 	Color colors[2] = { (Color(0,0,0,0.5)), Color(0,0,0,0.0f) };
 

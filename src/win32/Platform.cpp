@@ -220,6 +220,7 @@ void Platform::DrawRectangle(const Rectangle& rect, Color32 c)
 	sdlColor.b = c.GetB();
 	sdlColor.a = c.GetA();
 
+	GPU_SetRGBA(white, c.GetR(), c.GetG(), c.GetB(), c.GetA());
 
 	GPU_RectangleFilled(target, rect.position.x, rect.position.y, rect.GetMax().x, rect.GetMax().y, sdlColor);
 }

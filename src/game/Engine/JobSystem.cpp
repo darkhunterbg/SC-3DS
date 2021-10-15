@@ -94,6 +94,29 @@ void JobSystem::ExecJob(int elements, int batchSize)
 	}
 }
 
+void JobSystem::ExecJobAsync(int elements, int batchSize)
+{
+	jobs.clear();
+
+	for (int i = 0; i < elements; i += batchSize)
+	{
+		int count = std::min(batchSize, elements - i);
+		jobs.push_back({ i, i + count });
+	}
+
+	workingThreads = std::min(threads, (int)jobs.size());
+	takenJobs = 0;
+
+	if (workingThreads > 0)
+	{
+		Platform::ReleaseSemaphore(semaphore, workingThreads );
+	}
+	else
+	{
+		EXCEPTION("Cannot start async job without any worker threads!");
+	}
+}
+
 void JobSystem::Init()
 {
 	CurrentThreadId = 0;

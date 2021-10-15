@@ -18,6 +18,7 @@ struct Job {
 template <class T>
 class ThreadLocal;
 
+
 class JobSystem {
 private:
 	JobSystem() = delete;
@@ -33,6 +34,7 @@ private:
 	static void ThreadWorkOnJob(int threadId);
 	static void ThreadWork(int threadId);
 	static void ExecJob(int elements, int batchSize);
+	static void ExecJobAsync(int elements, int batchSize);
 
 	template <class T>
 	friend class ThreadLocal;
@@ -46,6 +48,18 @@ public:
 		action = a;
 		ExecJob(elements, batchSize);
 	}
+
+	static inline void RunJobAsync(int elements, int batchSize,
+		const std::function<void(int, int)>& a)
+	{
+
+		if (!elements)
+			return;
+		action = a;
+		ExecJobAsync(elements, batchSize);
+	}
+
+	static inline bool IsWorking() { return workingThreads > 0; }
 
 	static constexpr const int DefaultJobSize = 128;
 	static constexpr const int SingleThreadJobSize = 0x7FFFFFFF;
