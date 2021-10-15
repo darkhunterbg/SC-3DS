@@ -2,6 +2,7 @@
 
 #include "Scenes/Scene.h"
 #include "Scenes/GameScene.h"
+#include "Scenes/BootScene.h"
 #include "StringLib.h"
 #include "Profiler.h"
 
@@ -11,14 +12,13 @@
 #include "Engine/AssetLoader.h"
 #include "Engine/InputManager.h"
 
+
 #include "Platform.h"
 
 
 
 static Scene* currentScene;
 
-static const Texture* title;
-static bool startup;
 static std::string error;
 static double frameStartTime = 0;
 
@@ -32,18 +32,16 @@ float Game::DeltaTime = 0;
 
 static PlatformInfo _platformInfo;
 
-static void ShowTitleScreen() {
-	GraphicsRenderer::DrawOnScreen(ScreenId::Top);
-	GraphicsRenderer::Draw(*title, { 0,0 }, {400,240});
-}
-static void InitialScene() {
+
+static void InitialScene()
+{
 	AssetLoader::LoadDatabase();
 
-	 Game::SetCurrentScene(new GameScene());
-	// Game::SetCurrentScene(new PerformanceTestScene());
+	Game::SetCurrentScene(new BootScene());
 }
 
-void Game::FrameStart() {
+void Game::FrameStart()
+{
 	auto now = Platform::ElaspedTime();
 	DeltaTime = now - frameStartTime;
 	frameStartTime = now;
@@ -51,62 +49,52 @@ void Game::FrameStart() {
 	Profiler::FrameStart();
 
 }
-void Game::FrameEnd() {
+void Game::FrameEnd()
+{
 	Profiler::FrameEnd();
 }
 
-void Game::Start() {
-
+void Game::Start()
+{
 	_platformInfo = Platform::GetPlatformInfo();
 
 	JobSystem::Init();
 
-	SystemFont12 = AssetLoader::LoadFont("font.bcfnt",12);
+	SystemFont12 = AssetLoader::LoadFont("font.bcfnt", 12);
 	SystemFont10 = AssetLoader::LoadFont("font.bcfnt", 10);
 	SystemFont8 = AssetLoader::LoadFont("font.bcfnt", 8);
 	ButtonAudio = AssetLoader::LoadAudioClip("sound\\misc\\button");
-	title = AssetLoader::LoadTexture("glue\\title");
-	startup = true;
 	frameStartTime = Platform::ElaspedTime();
 	AudioManager::Init();
 	GraphicsRenderer::Init();
-}
-bool Game::Update() {
 
+	InitialScene();
+}
+bool Game::Update()
+{
 	//SectionProfiler p("Update");
 
-	
 	InputManager::Update();
 
 	AudioManager::UpdateAudio();
 
-	if (startup) {
-
-	}
-	else {
-		if (currentScene)
-			currentScene->Update();
-		else
-			InitialScene();
-	}
+	if (currentScene)
+		currentScene->Update();
 
 	//p.Submit();
 
 	return true;
 }
 
-void Game::Draw() {
+void Game::Draw()
+{
 	//SectionProfiler p("Draw");
 	GraphicsRenderer::NewFrame();
 
-	if (startup) {
-		ShowTitleScreen();
-		startup = false;
-	}
-	else {
-		if (currentScene)
-			currentScene->Draw();
-	}
+
+	if (currentScene)
+		currentScene->Draw();
+
 	//p.Submit();
 
 	Profiler::ShowPerformance();
@@ -114,7 +102,8 @@ void Game::Draw() {
 	GraphicsRenderer::EndFrame();
 }
 
-void Game::End() {
+void Game::End()
+{
 
 	if (currentScene != nullptr)
 		currentScene->Stop();

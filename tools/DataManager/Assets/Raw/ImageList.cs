@@ -43,6 +43,7 @@ namespace DataManager.Assets
 
         [Ignore]
         public ImageList List { get; private set; }
+
         public ImageListAtlasData(ImageList list)
         {
             List = list;

@@ -197,6 +197,17 @@ namespace DataManager
 				ImageLists.Add(ImageList.FromInfoFile(file));
 			}
 
+			List<string> ignore = ImageLists.SelectMany(s => s.Frames).Select(s => s.FrameFilePath).ToList();
+
+			foreach (var file in Directory.GetFiles(ExtractedAssetsDir, "*.png", SearchOption.AllDirectories)) {
+
+				if (ignore.Contains(file))
+					continue;
+				
+
+				ImageLists.Add(ImageList.FromPng(file));
+			}
+
 			foreach (var file in Directory.GetFiles(AssetsDir, "*.png", SearchOption.AllDirectories))
 			{
 				if (file.StartsWith(SpriteAtlasOutDir))
@@ -281,7 +292,18 @@ namespace DataManager
 			Palettes.Add("White", new Palette(Microsoft.Xna.Framework.Color.White) { Name = "White" });
 		}
 
-		public void ConvertGRP(GRPEntry asset, GRPConvertMode convertMode)
+		public void ConvertPCX(RawAssetEntry asset)
+		{
+			PCXImage img = asset.LoadAsImage() as PCXImage;
+			if (img == null) return;
+
+
+			string f = asset.DisplayName;
+			string dst = Path.Combine(ExtractedAssetsDir, Path.GetDirectoryName(f), Path.GetFileNameWithoutExtension(f)) + ".png";
+
+			img.ToTexture().SaveAsPng(dst);
+		}
+		public void ConvertGRP(RawAssetEntry asset, GRPConvertMode convertMode)
 		{
 			switch (convertMode)
 			{
@@ -299,7 +321,7 @@ namespace DataManager
 					}
 			}
 		}
-		private void HandleGRPConvert(GRPEntry asset, Palette pal)
+		private void HandleGRPConvert(RawAssetEntry asset, Palette pal)
 		{
 			string f = asset.DisplayName;
 
@@ -347,7 +369,7 @@ namespace DataManager
 
 			File.WriteAllLines(Path.Combine(dst, $"info.txt"), info);
 		}
-		private void HandleWireframeGRPConvert(GRPEntry asset)
+		private void HandleWireframeGRPConvert(RawAssetEntry asset)
 		{
 			string f = asset.DisplayName;
 			GRPImage img = new GRPImage(asset.Path);

@@ -1,11 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ImGuiNET;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Numerics;
+using Color = Microsoft.Xna.Framework.Color;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace DataManager.Assets
 {
@@ -14,7 +14,7 @@ namespace DataManager.Assets
 		public int x, y, color;
 	}
 
-	public class GRPFrame
+	public class GRPFrame 
 	{
 		public int XOffset;
 		public int YOffset;
@@ -166,7 +166,7 @@ namespace DataManager.Assets
 		}
 	}
 
-	public class GRPImage : IDisposable
+	public class GRPImage : IRawImage
 	{
 		public int NumberOfFrames;
 		public int MaxWidth, MaxHeight;
@@ -175,7 +175,7 @@ namespace DataManager.Assets
 
 		public GRPFrame Preview => Frames[0];
 
-		public readonly string Path;
+		public  string Path { get; }
 
 		// https://sourceforge.net/p/stratlas/wiki/GRP/
 
@@ -307,6 +307,26 @@ namespace DataManager.Assets
 		public void Dispose()
 		{
 			
+		}
+
+		public void GUIPreview(GuiTexture src)
+		{
+			LoadPreview(src.Texture);
+
+			ImGui.Text($"Dimensions: {MaxWidth}x{MaxHeight}");
+			ImGui.Text($"Frames: {NumberOfFrames}");
+
+			Vector2 uv = new Vector2(Preview.Width, Preview.Height);
+			Vector2 size = new Vector2(MaxWidth, MaxHeight);
+			int multiplier = 1;
+			if (size.X <= 128 && size.Y <= 128)
+				multiplier = 2;
+			if (size.X <= 64 && size.Y <= 64)
+				multiplier = 4;
+			//if (size.X <= 32 && size.Y <= 32)
+			//	multiplier = 8;
+
+			ImGui.Image(src.GuiImage, uv * multiplier, Vector2.Zero, uv / src.Texture.Width);
 		}
 	}
 }

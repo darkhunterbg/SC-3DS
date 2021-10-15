@@ -41,8 +41,8 @@ SOURCES		+= src/3ds/citro2d src/3ds/citro2d/c2d
 
 #DATA		:=	data
 INCLUDES	:=	$(SOURCES)
-GRAPHICS	:=	gfx
-GFXBUILD	:=	gfxbuild
+#GRAPHICS	:=	gfx
+#GFXBUILD	:=	gfxbuild
 ROMFS		:=	romfs
 #GFXBUILD	:=	$(ROMFS)
 APP_TITLE	:=	StarCraft

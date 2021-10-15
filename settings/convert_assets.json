@@ -1,66 +1,92 @@
 [
   {
     "Mode": 1,
+    "IgnorePCXPalette": true,
     "Path": "cursor/*"
   },
   {
     "Mode": 1,
+    "IgnorePCXPalette": true,
     "Path": "unit/cmdbtns/*"
   },
   {
     "Mode": 2,
+    "IgnorePCXPalette": true,
     "Path": "unit/cmdbtns/cmdicons.grp"
   },
   {
     "Mode": 0,
+    "IgnorePCXPalette": true,
     "Path": "unit/wirefram/*"
   },
   {
     "Mode": 0,
+    "IgnorePCXPalette": true,
     "Path": "unit/bullet/**"
   },
   {
     "Mode": 0,
+    "IgnorePCXPalette": true,
     "Path": "unit/terran/**"
   },
   {
     "Mode": 0,
+    "IgnorePCXPalette": true,
     "Path": "unit/protoss/**"
   },
   {
     "Mode": 0,
+    "IgnorePCXPalette": true,
     "Path": "unit/zerg/**"
   },
   {
     "Mode": 0,
+    "IgnorePCXPalette": true,
     "Path": "unit/neutral/**"
   },
   {
     "Mode": 4,
+    "IgnorePCXPalette": true,
     "Path": "unit/thingy/**"
   },
   {
     "Mode": 5,
+    "IgnorePCXPalette": true,
     "Path": "unit/thingy/o[0123456789d]*"
   },
   {
     "Mode": 4,
+    "IgnorePCXPalette": true,
     "Path": "unit/thingy/tbang*"
   },
   {
     "Mode": 3,
+    "IgnorePCXPalette": true,
     "Path": "unit/wirefram/*"
   },
   {
     "Mode": 0,
+    "IgnorePCXPalette": true,
     "Path": "unit/flingy/**"
   },
   {
     "Mode": 5,
+    "IgnorePCXPalette": true,
     "Path": "game/blink*"
   },
   {
     "Mode": 6,
+    "IgnorePCXPalette": true,
     "Path": "*sha*"
+  },
+  {
+    "Mode": 0,
+    "IgnorePCXPalette": true,
+    "Path": "game/*.pcx"
+  },
+  {
+    "Mode": 0,
+    "IgnorePCXPalette": true,
+    "Path": "glue/**/*.pcx"
   }
 ]

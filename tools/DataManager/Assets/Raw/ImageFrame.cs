@@ -86,6 +86,8 @@ namespace DataManager.Assets
 
 		public int YOffset => (int)Position.Y;
 
+		public string FrameFilePath => ImageList.GetFrameFilePath(FrameIndex);
+
 		public Vector2 GetOffset(bool hFlip = false)
 		{
 			Vector2 offset = Position - ImageList.FrameSize / 2;

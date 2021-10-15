@@ -81,5 +81,13 @@
     ],
     "PackStrategy": 0,
     "FilterStrategy": 1
+  },
+  {
+    "OutputName": "title",
+    "ImageList": [
+      "*\\glue\\title\\title"
+    ],
+    "PackStrategy": 0,
+    "FilterStrategy": 1
   }
 ]

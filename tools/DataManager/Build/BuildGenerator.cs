@@ -467,7 +467,7 @@ namespace DataManager.Build
 		{
 			List<string> files = new List<string>()
 			{
-				"glue\\title.png", "tileset\\tile.png" , "font.ttf"
+				 "tileset\\tile.png" , "font.ttf"
 			};
 
 			currentJob = 0;
@@ -670,7 +670,6 @@ namespace DataManager.Build
 				File.Copy(dst, outFile, true);
 			}
 		}
-
 
 		public void Dispose()
 		{

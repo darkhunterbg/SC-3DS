@@ -31,33 +31,38 @@ namespace DataManager.Assets
 			RemappedIndexes.Add(c);
 		}
 
-		public Palette(string path)
+		public Palette(byte[] data)
 		{
-			Name = Path.GetFileNameWithoutExtension(path);
+			LoadFromData(data);
+		}
 
-			byte[] data = File.ReadAllBytes(path);
+		private void LoadFromData(byte[] data)
+		{
 			if (data.Length != 768 && data.Length != 1024)
 				throw new Exception("Invalid palette file!");
 
 			Colors.Clear();
 
 
-			if (data.Length == 768)
-			{
-				for (int i = 0; i < data.Length / 3; ++i)
-				{
+			if (data.Length == 768) {
+				for (int i = 0; i < data.Length / 3; ++i) {
 					Color c = new Color(data[i * 3], data[i * 3 + 1], data[i * 3 + 2], (byte)255);
 					Colors.Add(c);
 				}
-			}
-			else
-			{
-				for (int i = 0; i < data.Length / 4; ++i)
-				{
+			} else {
+				for (int i = 0; i < data.Length / 4; ++i) {
 					Color c = new Color(data[i * 4], data[i * 4 + 1], data[i * 4 + 2], data[i * 4 + 3]);
 					Colors.Add(c);
 				}
 			}
+		}
+
+		public Palette(string path)
+		{
+			Name = Path.GetFileNameWithoutExtension(path);
+
+			byte[] data = File.ReadAllBytes(path);
+			LoadFromData(data);
 		}
 
 		private Palette() { }

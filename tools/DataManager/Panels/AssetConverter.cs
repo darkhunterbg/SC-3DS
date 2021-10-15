@@ -15,7 +15,7 @@ namespace DataManager.Panels
 {
 	public class AssetConverter : IGuiPanel
 	{
-		class GRPConverEntry
+		class AssetConverEntry
 		{
 			[JsonProperty]
 			public string Path { get; private set; } = string.Empty;
@@ -23,28 +23,28 @@ namespace DataManager.Panels
 			private Glob glob = new Glob(string.Empty);
 			[JsonProperty]
 			public GRPConvertMode Mode;
+			[JsonProperty]
+			public bool IgnorePCXPalette = true;
+
 
 			public void SetPath(string path)
 			{
 				Path = path;
-				try
-				{
+				try {
 					glob = new Glob(path, GlobOptions.Compiled);
-				}
-				catch
-				{
+				} catch {
 					glob = new Glob(string.Empty);
 				}
 			}
 
-			public IEnumerable<GRPEntry> GetMatches(IEnumerable<GRPEntry> assets)
+			public IEnumerable<RawAssetEntry> GetMatches(IEnumerable<RawAssetEntry> assets)
 			{
+				var result = assets.Where(a => glob.IsMatch(a.DisplayName));
 
-				return assets.Where(a => glob.IsMatch(a.DisplayName));
-
+				return result;
 			}
 
-			public bool IsMatch(GRPEntry asset)
+			public bool IsMatch(RawAssetEntry asset)
 			{
 				return glob.IsMatch(asset.DisplayName);
 			}
@@ -58,10 +58,10 @@ namespace DataManager.Panels
 
 		public string WindowName => "Asset Converter";
 
-		private List<GRPEntry> rawAssets;
-		private List<GRPConverEntry> convertEntries = new List<GRPConverEntry>();
-		private GRPImage loaded;
-		private GRPEntry hovered;
+		private List<RawAssetEntry> rawAssets;
+		private List<AssetConverEntry> convertEntries = new List<AssetConverEntry>();
+		private IRawImage loaded;
+		private RawAssetEntry hovered;
 		private GuiTexture previewTexture;
 		private string assetFilter = string.Empty;
 
@@ -74,7 +74,12 @@ namespace DataManager.Panels
 		public AssetConverter()
 		{
 			rawAssets = Directory.GetFiles(AssetManager.StarcraftAssetDir, "*.grp", SearchOption.AllDirectories)
-				.Select(s => new GRPEntry(s)).ToList();
+				.Select(s => new RawAssetEntry(s)).ToList();
+
+			rawAssets.AddRange(Directory.GetFiles(AssetManager.StarcraftAssetDir, "*.pcx", SearchOption.AllDirectories)
+				.Select(s => new RawAssetEntry(s)));
+
+			rawAssets = rawAssets.OrderByDescending(r => r.Path).ToList();
 
 			Texture2D tex = new Texture2D(AppGame.Device, 1024, 1024, false, SurfaceFormat.Color);
 
@@ -83,9 +88,9 @@ namespace DataManager.Panels
 			modes = Enum.GetValues<GRPConvertMode>();
 			modeNames = Enum.GetNames<GRPConvertMode>();
 
-			convertEntries = AppSettings.Load<List<GRPConverEntry>>(SettingsFileName);
+			convertEntries = AppSettings.Load<List<AssetConverEntry>>(SettingsFileName);
 			if (convertEntries == null)
-				convertEntries = new List<GRPConverEntry>();
+				convertEntries = new List<AssetConverEntry>();
 
 			foreach (var e in convertEntries)
 				e.Init();
@@ -93,33 +98,26 @@ namespace DataManager.Panels
 
 		private void Update()
 		{
-			if (hovered == null)
-			{
-				if (loaded != null)
-				{
+			if (hovered == null) {
+				if (loaded != null) {
 					loaded.Dispose();
 					loaded = null;
 
 				}
 
 				failed = false;
-			}
-			else
-			{
+			} else {
 				if ((loaded == null || loaded.Path == hovered.Path) && failed)
 					return;
 
-				if (loaded == null || loaded.Path != hovered.Path)
-				{
+				if (loaded == null || loaded.Path != hovered.Path) {
 					loaded?.Dispose();
-					try
-					{
-						loaded = new GRPImage(hovered.Path);
-						loaded.LoadPreview(previewTexture.Texture);
-						failed = false;
-					}
-					catch
-					{
+					try {
+						loaded = hovered.LoadAsImage();
+						if (loaded == null) {
+							failed = true;
+						}
+					} catch (Exception ex) {
 						loaded = null;
 						failed = true;
 					}
@@ -151,17 +149,13 @@ namespace DataManager.Panels
 
 			hovered = null;
 
-			IEnumerable<GRPEntry> query = Util.TextFilter(rawAssets, assetFilter, a => a.DisplayName);
+			IEnumerable<RawAssetEntry> query = Util.TextFilter(rawAssets, assetFilter, a => a.DisplayName);
 
 			ImGui.BeginChild("##AssetConverter.RawAssetsTable");
-			foreach (var asset in query)
-			{
-				if (convertEntries.Any(t => t.IsMatch(asset)))
-				{
+			foreach (var asset in query) {
+				if (convertEntries.Any(t => t.IsMatch(asset))) {
 					ImGui.Text(asset.DisplayName);
-				}
-				else
-				{
+				} else {
 					ImGui.TextDisabled(asset.DisplayName);
 				}
 
@@ -182,25 +176,9 @@ namespace DataManager.Panels
 		{
 			ImGui.BeginTooltip();
 
-			if (loaded != null)
-			{
-				ImGui.Text($"Dimensions: {loaded.MaxWidth}x{loaded.MaxHeight}");
-				ImGui.Text($"Frames: {loaded.NumberOfFrames}");
-
-				Vector2 uv = new Vector2(loaded.Preview.Width, loaded.Preview.Height);
-				Vector2 size = new Vector2(loaded.MaxWidth, loaded.MaxHeight);
-				int multiplier = 1;
-				if (size.X <= 128 && size.Y <= 128)
-					multiplier = 2;
-				if (size.X <= 64 && size.Y <= 64)
-					multiplier = 4;
-				//if (size.X <= 32 && size.Y <= 32)
-				//	multiplier = 8;
-
-				ImGui.Image(previewTexture.GuiImage, uv * multiplier, Vector2.Zero, uv / previewTexture.Texture.Width);
-			}
-			else
-			{
+			if (loaded != null) {
+				loaded.GUIPreview(previewTexture);
+			} else {
 				ImGui.TextColored(Microsoft.Xna.Framework.Color.Red.ToVec4(), "Failed to load image data.");
 			}
 
@@ -215,8 +193,7 @@ namespace DataManager.Panels
 
 			int total = convertEntries.SelectMany(entry => entry.GetMatches(rawAssets)).Distinct().Count();
 
-			if (ImGui.Button("Convert all##AssetConverter.ConvertSettings.ConvertAll"))
-			{
+			if (ImGui.Button("Convert all##AssetConverter.ConvertSettings.ConvertAll")) {
 				if (Directory.Exists(AssetManager.ExtractedAssetsDir))
 					Directory.Delete(AssetManager.ExtractedAssetsDir, true);
 				AppGui.RunGuiCoroutine(ConvertCrt(convertEntries));
@@ -225,19 +202,17 @@ namespace DataManager.Panels
 			ImGui.Text($"{total}/{rawAssets.Count}");
 
 			ImGui.Separator();
-			GRPConverEntry hover = null;
+			AssetConverEntry hover = null;
 			string text = string.Empty;
 
 			bool changed = false;
 
-			for (int i = 0; i < convertEntries.Count; ++i)
-			{
+			for (int i = 0; i < convertEntries.Count; ++i) {
 				var entry = convertEntries[i];
 				text = entry.Path;
 
 				ImGui.SetNextItemWidth(400);
-				if (ImGui.InputText($"##AssetConverter.ConvertSettings.path.{i}", ref text, 256))
-				{
+				if (ImGui.InputText($"##AssetConverter.ConvertSettings.path.{i}", ref text, 256)) {
 					entry.SetPath(text);
 					changed = true;
 				}
@@ -245,11 +220,16 @@ namespace DataManager.Panels
 				ImGui.SameLine();
 				int mode = (int)entry.Mode;
 				ImGui.SetNextItemWidth(200);
-				if (ImGui.Combo($"##AssetConverter.ConvertSettings.mode.{i}", ref mode, modeNames, modeNames.Length))
-				{
+				if (ImGui.Combo($"##AssetConverter.ConvertSettings.mode.{i}", ref mode, modeNames, modeNames.Length)) {
 					entry.Mode = modes[mode];
 					changed = true;
 				}
+
+				ImGui.SameLine();
+				if (ImGui.Checkbox($"Ignore PCX Palette##AssetConverter.ConvertSettings.ignorepal.{i}", ref entry.IgnorePCXPalette)) {
+					changed = true;
+				}
+
 
 				ImGui.SameLine();
 				ImGui.Text($"[{entry.GetMatches(rawAssets).Count()}]");
@@ -258,34 +238,28 @@ namespace DataManager.Panels
 
 
 				ImGui.SameLine();
-				if (ImGui.Button($"Convert##AssetConverter.ConvertSettings.convert.{i}"))
-				{
-					AppGui.RunGuiCoroutine(ConvertCrt(new List<GRPConverEntry>() { entry }));
+				if (ImGui.Button($"Convert##AssetConverter.ConvertSettings.convert.{i}")) {
+					AppGui.RunGuiCoroutine(ConvertCrt(new List<AssetConverEntry>() { entry }));
 				}
 
 				ImGui.SameLine();
-				if (ImGui.Button($"Delete##AssetConverter.ConvertSettings.del.{i}"))
-				{
+				if (ImGui.Button($"Delete##AssetConverter.ConvertSettings.del.{i}")) {
 					convertEntries.RemoveAt(i);
 					--i;
 					changed = true;
 				}
 
-				if (i > 0)
-				{
+				if (i > 0) {
 					ImGui.SameLine();
-					if (ImGui.ArrowButton($"##AssetConverter.ConvertSettings.up.{i}", ImGuiDir.Up))
-					{
+					if (ImGui.ArrowButton($"##AssetConverter.ConvertSettings.up.{i}", ImGuiDir.Up)) {
 						convertEntries.RemoveAt(i);
 						convertEntries.Insert(i - 1, entry);
 						changed = true;
 					}
 				}
-				if (i < convertEntries.Count - 1)
-				{
+				if (i < convertEntries.Count - 1) {
 					ImGui.SameLine();
-					if (ImGui.ArrowButton($"##AssetConverter.ConvertSettings.down.{i}", ImGuiDir.Down))
-					{
+					if (ImGui.ArrowButton($"##AssetConverter.ConvertSettings.down.{i}", ImGuiDir.Down)) {
 						convertEntries.RemoveAt(i);
 						convertEntries.Insert(i + 1, entry);
 						changed = true;
@@ -293,25 +267,22 @@ namespace DataManager.Panels
 				}
 			}
 
-			if (ImGui.Button("New Entry##AssetConverter.ConvertSettings.NewEntry"))
-			{
-				convertEntries.Add(new GRPConverEntry());
+			if (ImGui.Button("New Entry##AssetConverter.ConvertSettings.NewEntry")) {
+				convertEntries.Add(new AssetConverEntry());
 			}
 
-			if (hover != null)
-			{
+			if (hover != null) {
 				ShowConvertEntryHover(hover);
 			}
 
-			if (changed)
-			{
+			if (changed) {
 				AppSettings.Save(SettingsFileName, convertEntries);
 			}
 
 			ImGui.EndChild();
 		}
 
-		private void ShowConvertEntryHover(GRPConverEntry entry)
+		private void ShowConvertEntryHover(AssetConverEntry entry)
 		{
 			var matches = entry.GetMatches(rawAssets).ToList();
 
@@ -320,8 +291,7 @@ namespace DataManager.Panels
 
 			ImGui.BeginTooltip();
 
-			foreach (var m in matches)
-			{
+			foreach (var m in matches) {
 				ImGui.Text(m.DisplayName);
 			}
 
@@ -329,20 +299,32 @@ namespace DataManager.Panels
 			ImGui.EndTooltip();
 		}
 
-		private IEnumerator ConvertCrt(List<GRPConverEntry> entries)
+		private IEnumerator ConvertCrt(List<AssetConverEntry> entries)
 		{
-			HashSet<Tuple<GRPEntry,GRPConvertMode>> convert = new HashSet<Tuple<GRPEntry, GRPConvertMode>>();
+			HashSet<Tuple<RawAssetEntry, GRPConvertMode>> convert = new HashSet<Tuple<RawAssetEntry, GRPConvertMode>>();
 
-			foreach (var entry in entries)
-			{
+			foreach (var entry in entries) {
 				var matches = entry.GetMatches(rawAssets);
 
-				foreach (var match in matches)
-				{
-					var item = new Tuple<GRPEntry, GRPConvertMode> (match, entry.Mode);
+				foreach (var match in matches) {
 
-					if (!convert.Contains(item))
-					{
+					if (entry.IgnorePCXPalette) {
+						if (match.IsPCX)
+							try {
+
+								var img = match.LoadAsImage() as PCXImage;
+
+								if (img.IsPaletteFormat)
+									continue;
+
+							} catch (Exception ex) { }
+					}
+
+
+
+					var item = new Tuple<RawAssetEntry, GRPConvertMode>(match, entry.Mode);
+
+					if (!convert.Contains(item)) {
 						convert.Add(item);
 					}
 				}
@@ -350,9 +332,14 @@ namespace DataManager.Panels
 
 			int i = 0;
 
-			foreach (var item in convert)
-			{
-				AppGame.AssetManager.ConvertGRP(item.Item1, item.Item2);
+			foreach (var item in convert) {
+				if (item.Item1.IsGRP)
+					AppGame.AssetManager.ConvertGRP(item.Item1, item.Item2);
+				else
+					if (item.Item1.IsPCX)
+					AppGame.AssetManager.ConvertPCX(item.Item1);
+
+
 
 				if (!AppGui.ProgressDialog($"Converting {i++}/{convert.Count}", i, convert.Count, true))
 					break;
