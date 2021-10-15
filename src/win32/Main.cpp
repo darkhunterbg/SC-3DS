@@ -4,6 +4,10 @@
 #include <filesystem>
 #include <thread>
 
+#include "ImGui/imgui.h"
+#include "ImGui/imgui_impl_sdl.h"
+#include "ImGui/imgui_sdl.h"
+
 #include "Color.h"
 #include "Game.h"
 #include "MathLib.h"
@@ -27,12 +31,15 @@ bool mute = false;
 bool noThreading = true;
 
 
-int main(int argc, char** argv) {
+void Toolbar();
+
+int main(int argc, char** argv)
+{
 
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_AUDIO);
 
 	GPU_SetRequiredFeatures(GPU_FEATURE_BASIC_SHADERS);
-	screen = GPU_Init(640, 480, GPU_DEFAULT_INIT_FLAGS);
+	screen = GPU_Init(1280, 720, GPU_DEFAULT_INIT_FLAGS);
 
 	window = SDL_GetWindowFromID(screen->context->windowID);
 
@@ -40,7 +47,17 @@ int main(int argc, char** argv) {
 	SDL_SetWindowTitle(window, "StarCraft");
 	SDL_MaximizeWindow(window);
 
-	abstractPlatform = AbstractPlatform::N3DS(screen);
+	AbstractPlatform::InitPlatforms(screen);
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiSDL::Initialize(screen);
+	ImGui_ImplSDL2_InitForOpenGL(window, screen->context->context);
+	ImGui::StyleColorsDark();
+
+	ImGui::GetIO().FontGlobalScale = 2;
+
+	abstractPlatform = AbstractPlatform::PC(screen);
 
 	abstractPlatform.ApplyPlatform();
 
@@ -74,7 +91,8 @@ int main(int argc, char** argv) {
 
 	Game::Start();
 
-	if (argc > 1) {
+	if (argc > 1)
+	{
 		std::string a = argv[1];
 		if (a == "-mute")
 		{
@@ -82,7 +100,10 @@ int main(int argc, char** argv) {
 		}
 	}
 
-	while (!done) {
+	while (!done)
+	{
+
+		ImGui::NewFrame();
 
 		abstractPlatform.UpdateScreens(screen);
 		abstractPlatform.UpdateInput();
@@ -90,7 +111,8 @@ int main(int argc, char** argv) {
 		Game::FrameStart();
 
 		SDL_Event event;
-		while (SDL_PollEvent(&event)) {
+		while (SDL_PollEvent(&event))
+		{
 			switch (event.type)
 			{
 			case SDL_QUIT: done = true; break;
@@ -112,6 +134,8 @@ int main(int argc, char** argv) {
 			break;
 
 
+
+
 		done = !Game::Update();
 
 		if (done)
@@ -122,6 +146,13 @@ int main(int argc, char** argv) {
 		abstractPlatform.Draw(screen);
 
 		Game::FrameEnd();
+
+		ImGui_ImplSDL2_NewFrame();
+
+		Toolbar();
+		ImGui::Render();
+		ImGuiSDL::Render(ImGui::GetDrawData());
+
 		GPU_Flip(screen);
 	}
 
@@ -132,5 +163,36 @@ int main(int argc, char** argv) {
 	SDL_Quit();
 
 	return 0;
+}
+
+
+
+void Toolbar()
+{
+	ImGui::Begin("Settings");
+
+	int index = -1;
+
+
+	int i = 0;
+	for (auto& p : AbstractPlatform::Platforms)
+	{
+		if (p.Name == abstractPlatform.Name)
+		{
+			index = i; break;
+		}
+		++i;
+	}
+
+
+	ImGui::SetNextItemWidth(250);
+	if(ImGui::Combo("Platform", &index, AbstractPlatform::PlatformsString.data(), AbstractPlatform::Platforms.size()))
+	{
+		abstractPlatform = AbstractPlatform::Platforms[index];
+		abstractPlatform.ApplyPlatform();
+		Game::PlatformUpdated();
+	}
+
+	ImGui::End();
 }
 

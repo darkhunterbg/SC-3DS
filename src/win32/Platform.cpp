@@ -312,15 +312,6 @@ void Platform::UpdatePointerState(PointerState& state)
 	Vector2Int pos;
 	Uint32  buttonState = SDL_GetMouseState(&pos.x, &pos.y);
 	state.Touch = buttonState & SDL_BUTTON(SDL_BUTTON_LEFT);
-
-
-	pos -= Vector2Int(touchScreenLocation.position);
-	pos.x = std::min(std::max(pos.x, 0), (int)touchScreenLocation.size.x);
-	pos.y = std::min(std::max(pos.y, 0), (int)touchScreenLocation.size.x);
-	pos.x = (pos.x * 320) / touchScreenLocation.size.x;
-	pos.y = (pos.y * 240) / touchScreenLocation.size.y;
-
-	state.Position = pos;
 }
 
 void Platform::CreateChannel(AudioChannelState& channel)

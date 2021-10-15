@@ -5,6 +5,9 @@
 #include <SDL.h>
 #include <SDL_gpu.h>
 
+std::vector<AbstractPlatform> AbstractPlatform::Platforms;
+std::vector<const char*> AbstractPlatform::PlatformsString;
+
 void AbstractPlatform::ApplyPlatform()
 {
 	for (AbstractScreen& screen : Screens)
@@ -99,5 +102,16 @@ void AbstractPlatform::Draw(GPU_Target* screen)
 		GPU_Rect r = { (float)clip.x, (float)clip.y, (float)clip.w, (float)clip.h };
 		GPU_BlitRect(aScreen.Image, nullptr, screen, &r);
 		GPU_ClearRGBA(aScreen.Image->target, (Uint8)(c.r * 255), (Uint8)(c.g * 255), (Uint8)(c.b * 255), 255);
+	}
+}
+
+void AbstractPlatform::InitPlatforms(GPU_Target* screen)
+{
+	Platforms.push_back(PC(screen));
+	Platforms.push_back(N3DS(screen));
+
+	for (const auto& p : Platforms)
+	{
+		PlatformsString.push_back(p.Name.data());
 	}
 }

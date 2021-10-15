@@ -5,6 +5,7 @@
 #include <vector>
 #include <SDL.h>
 #include <SDL_gpu.h>
+#include <string>
 
 struct AbstractScreen {
 	Vector2Int16 Resolution;
@@ -15,9 +16,6 @@ struct AbstractScreen {
 	bool IsScreenReference = false;
 	GPU_Image* Image = nullptr;
 	GPU_Target* ScreenRef = nullptr;
-
-
-
 };
 
 struct AbstractPointer {
@@ -31,6 +29,7 @@ class AbstractPlatform {
 public:
 	std::vector<AbstractScreen> Screens;
 	AbstractPointer Pointer;
+	std::string Name;
 
 	void ApplyPlatform();
 
@@ -38,9 +37,15 @@ public:
 	void UpdateInput();
 	void Draw(GPU_Target* screen);
 
+	static std::vector<AbstractPlatform> Platforms;
+	static std::vector<const char*> PlatformsString;
+	
+	static void InitPlatforms(GPU_Target* screen);
+
 	static AbstractPlatform N3DS(GPU_Target* screen)
 	{
 		AbstractPlatform p;
+		p.Name = "Nintendo 3DS";
 		p.Pointer.ScreenReference = 1;
 		p.Screens.push_back({ {400,240} });
 		p.Screens.push_back({ {320,240} });
@@ -51,6 +56,7 @@ public:
 	static AbstractPlatform PC(GPU_Target* screen)
 	{
 		AbstractPlatform p;
+		p.Name = "Desktop";
 		p.Pointer.SameAsCursor = true;
 		p.Screens.push_back({ {640,480} });
 
