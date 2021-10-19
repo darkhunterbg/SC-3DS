@@ -14,8 +14,12 @@
 #include <unordered_map>
 
 
+class Coroutine;
+
 class GameDatabase {
 private:
+	friend class GameDatabaseLoadAsetReferencesCrt;
+
 	std::vector<ImageFrame> frames;
 	std::vector<Image> images;
 	std::vector<AudioClip*> audioClips;
@@ -78,7 +82,5 @@ public:
 		return { &audioClips[id], count };
 	}
 
-
-	void LoadAssetReferences();
-
+	Coroutine* LoadAssetReferencesAsync();
 };

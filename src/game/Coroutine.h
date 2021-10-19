@@ -5,7 +5,7 @@
 
 #define NAMEOF(CLASS) #CLASS
 
-#define CRT_START(NAME)  virtual bool MoveNext() override { Name= NAME; switch(__iter) { case 0:  
+#define CRT_START()  virtual bool MoveNext() override { switch(__iter) { case 0:  
 
 #define CRT_END() return true; }}
 
@@ -24,7 +24,6 @@ protected:
 	virtual bool MoveNext() = 0;
 
 public:
-	std::string Name;
 
 	Coroutine() {}
 	Coroutine(const Coroutine&) = delete;
@@ -45,5 +44,10 @@ public:
 			}
 			return false;
 		}
+	}
+
+	inline void RunAll()
+	{
+		while (!MoveNext());
 	}
 };

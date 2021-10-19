@@ -3,11 +3,11 @@
 #include "../Engine/AudioManager.h"
 #include "../Engine/GraphicsRenderer.h"
 #include "../Engine/InputManager.h"
-#include "../Engine/JobSystem.h"
 #include "../Data/GameDatabase.h"
 #include "../Game.h"
 #include "../Scenes/GameScene.h"
 #include "../Platform.h"
+#include "../TimeSlice.h"
 
 static const Texture* _title;
 static bool _autoStart = false;
@@ -24,10 +24,6 @@ void BootScene::Start()
 
 	_loadCrt = AssetLoader::LoadDatabaseAsync();
 
-	//JobSystem::RunJobAsync(1, 1, [](int, int) {
-		//AssetLoader::LoadDatabase();
-		//});
-
 }
 
 void BootScene::Stop()
@@ -37,17 +33,26 @@ void BootScene::Stop()
 
 void BootScene::Update()
 {
-	if (!_ready && _loadCrt->Next())
+	if (_ready) return;
+
+	TimeSlice budget = TimeSlice(0.010);
+
+	while (!budget.IsTimeElapsed())
 	{
-		_ready = true;
+		if (_loadCrt->Next())
+		{
+			_ready = true;
+			break;
+		}
 	}
 }
 
 void BootScene::Draw()
 {
-
 	if (Game::GetPlatformInfo().Type == PlatformType::Nintendo3DS)
 	{
+		GraphicsRenderer::DrawOnScreen(ScreenId::Top);
+
 		GraphicsRenderer::Draw(*_title, { 0,0 }, { 400,300 });
 
 		GraphicsRenderer::DrawOnScreen(ScreenId::Bottom);

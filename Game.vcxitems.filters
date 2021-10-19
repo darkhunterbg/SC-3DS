@@ -143,6 +143,7 @@
       <Filter>Scenes</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Coroutine.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\TimeSlice.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -248,5 +249,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\BootScene.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\TimeSlice.cpp" />
   </ItemGroup>
 </Project>

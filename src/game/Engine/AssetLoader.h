@@ -58,7 +58,6 @@ public:
 		return *instance.db;
 	}
 
-	static void LoadDatabase();
 	static Coroutine* LoadDatabaseAsync();
 
 	static const Texture* LoadTexture(const char* path);

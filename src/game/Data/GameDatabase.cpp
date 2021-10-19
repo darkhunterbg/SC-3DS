@@ -2,6 +2,7 @@
 #include "../Engine/AssetLoader.h"
 #include "../Entity/AnimationPlayer.h"
 #include "../Debug.h"
+#include "../Coroutine.h"
 
 const GameDatabase* GameDatabase::instance = nullptr;
 
@@ -59,7 +60,8 @@ const AbilityDef* GameDatabase::GetAbility(AbilityId id) const
 	return r->second;
 }
 
-const SoundSetDef* GameDatabase::GetSoundSet(const char* path) const {
+const SoundSetDef* GameDatabase::GetSoundSet(const char* path) const
+{
 	for (const SoundSetDef& def : SoundSetDefs)
 		if (std::strncmp(def.Path, path, sizeof(def.Path)) == 0)
 			return  &def;
@@ -76,73 +78,118 @@ const RaceDef* GameDatabase::GetRace(RaceType type) const
 	return nullptr;
 }
 
-void GameDatabase::LoadAssetReferences()
-{
+class GameDatabaseLoadAsetReferencesCrt : public Coroutine {
+
+	GameDatabase* db;
 	std::vector<const Texture*> textures;
-	textures.reserve(AtlasDefs.size());
+	std::string name;
+	const  Texture* tex;
+	AudioClip* clip;
+	const ImageFrame* f;
+	const Image* img;
+	int i = 0;
 
-	for (const AtlasDef& atlases : AtlasDefs) {
-		std::string name = atlases.GetAtlasName();
-		name = "atlases\\" + name;
-		auto tex = AssetLoader::LoadTexture(name.data());
-		textures.push_back(tex);
-	}
+public: GameDatabaseLoadAsetReferencesCrt(GameDatabase* db) : db(db) {}
+	  
+	  CRT_START()
+	  {
+		  textures.reserve(db->AtlasDefs.size());
 
-	audioClips.reserve(AudioClipDefs.size());
-	for (const AudioClipDef& clipDef : AudioClipDefs) {
-		AudioClip* clip = AssetLoader::LoadAudioClip(clipDef.path);
-		audioClips.push_back(clip);
-	}
+		  for (i = 0; i < db->AtlasDefs.size(); ++i)
+		  {
+			  name = db->AtlasDefs[i].GetAtlasName();
+			  name = "atlases\\" + name;
+			  tex = AssetLoader::LoadTexture(name.data());
+			  textures.push_back(tex);
+
+			  CRT_YIELD();
+		  }
+
+		  db->audioClips.reserve(db->AudioClipDefs.size());
+
+		  for (i = 0; i < db->AudioClipDefs.size(); ++i)
+		  {
+			  clip = AssetLoader::LoadAudioClip(db->AudioClipDefs[i].path);
+			  db->audioClips.push_back(clip);
+
+			  CRT_YIELD();
+		  }
 
 
-	frames.reserve(frames.size());
-	for (const ImageFrameDef& frameDef : FrameDefs) {
-		const Texture* tex = textures[frameDef.atlasId];
-		frames.push_back(ImageFrame(*tex, frameDef));
-	}
+		  db->frames.reserve(db->frames.size());
+		  for (const ImageFrameDef& frameDef : db->FrameDefs)
+		  {
+			  tex = textures[frameDef.atlasId];
+			  db->frames.push_back(ImageFrame(*tex, frameDef));
+		  }
 
-	images.reserve(ImageDefs.size());
-	imageNamesMap.reserve(ImageDefs.size());
-	for (const ImageDef& imageDef : ImageDefs) {
-		
-		const ImageFrame* f = &frames[imageDef.frameStart];
-		images.push_back(Image(f, imageDef));
-		const auto& img = images.back();
-		imageNamesMap[img.GetName()] = &img;
-	}
+		  CRT_YIELD();
 
-	unitMap.reserve(UnitDefs.size());
-	for (const auto& def : UnitDefs) {
-		unitMap[def.Id] = &def;
-	}
+		  db->images.reserve(db->ImageDefs.size());
+		  db->imageNamesMap.reserve(db->ImageDefs.size());
+		  for (const ImageDef& imageDef : db->ImageDefs)
+		  {
 
-	abilityMap.reserve(AbilityDefs.size());
-	for (const auto& def : AbilityDefs) {
-		abilityMap[def.Id] = &def;
-	}
+			  f = &db->frames[imageDef.frameStart];
+			  db->images.push_back(Image(f, imageDef));
+			  img = &db->images.back();
+			  db->imageNamesMap[img->GetName()] = img;
+		  }
 
-	CreateRaces();
+		  CRT_YIELD();
 
-	commandIcons = imageNamesMap["unit\\cmdbtns\\cmdicons"];
+		  db->unitMap.reserve(db->UnitDefs.size());
+		  for (const auto& def : db->UnitDefs)
+		  {
+			  db->unitMap[def.Id] = &def;
+		  }
 
-	AnimationPlayer::BuildInstructionCache({ AnimInstructionDefs.data(), AnimInstructionDefs.size() });
+		  CRT_YIELD();
 
-	selections.push_back(&GetImage("unit\\thingy\\o022"));
-	selections.push_back(&GetImage("unit\\thingy\\o032"));
-	selections.push_back(&GetImage("unit\\thingy\\o048"));
-	selections.push_back(&GetImage("unit\\thingy\\o062"));
-	selections.push_back(&GetImage("unit\\thingy\\o072"));
-	selections.push_back(&GetImage("unit\\thingy\\o094"));
-	selections.push_back(&GetImage("unit\\thingy\\o110"));
-	selections.push_back(&GetImage("unit\\thingy\\o122"));
-	selections.push_back(&GetImage("unit\\thingy\\o146"));
-	selections.push_back(&GetImage("unit\\thingy\\o224"));
+		  db->abilityMap.reserve(db->AbilityDefs.size());
+		  for (const auto& def : db->AbilityDefs)
+		  {
+			  db->abilityMap[def.Id] = &def;
+		  }
 
-	MoveAbility = GetAbility("Generic\\Move");
-	AttackAbility = GetAbility("Generic\\Attack");
-	StopAbility = GetAbility("Generic\\Stop");
-	PatrolAbility = GetAbility("Generic\\Patrol");
-	HoldPositionAbility = GetAbility("Generic\\Hold Position");
+		  CRT_YIELD();
+
+		  db->CreateRaces();
+
+		  db->commandIcons = db->imageNamesMap["unit\\cmdbtns\\cmdicons"];
+
+		  CRT_YIELD();
+
+		  AnimationPlayer::BuildInstructionCache({ db->AnimInstructionDefs.data(),db->AnimInstructionDefs.size() });
+
+		  CRT_YIELD();
+
+		  db->selections.push_back(&db->GetImage("unit\\thingy\\o022"));
+		  db->selections.push_back(&db->GetImage("unit\\thingy\\o032"));
+		  db->selections.push_back(&db->GetImage("unit\\thingy\\o048"));
+		  db->selections.push_back(&db->GetImage("unit\\thingy\\o062"));
+		  db->selections.push_back(&db->GetImage("unit\\thingy\\o072"));
+		  db->selections.push_back(&db->GetImage("unit\\thingy\\o094"));
+		  db->selections.push_back(&db->GetImage("unit\\thingy\\o110"));
+		  db->selections.push_back(&db->GetImage("unit\\thingy\\o122"));
+		  db->selections.push_back(&db->GetImage("unit\\thingy\\o146"));
+		  db->selections.push_back(&db->GetImage("unit\\thingy\\o224"));
+
+		  db->MoveAbility = db->GetAbility("Generic\\Move");
+		  db->AttackAbility = db->GetAbility("Generic\\Attack");
+		  db->StopAbility = db->GetAbility("Generic\\Stop");
+		  db->PatrolAbility = db->GetAbility("Generic\\Patrol");
+		  db->HoldPositionAbility = db->GetAbility("Generic\\Hold Position");
+
+	  }
+	  CRT_END();
+};
+
+Coroutine* GameDatabase::LoadAssetReferencesAsync()
+{
+	GameDatabaseLoadAsetReferencesCrt* crt = new GameDatabaseLoadAsetReferencesCrt(this);
+
+	return crt;
 }
 
 void GameDatabase::CreateRaces()

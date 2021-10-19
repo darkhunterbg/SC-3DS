@@ -12,64 +12,6 @@ static void LoadData(uint32_t size, FILE* f, std::vector<TDataType>& outData)
 	fread(outData.data(), sizeof(TDataType), size, f);
 }
 
-GameDatabase* BinaryDataLoader::LoadDatabase(FILE* f)
-{
-	GameDatabase* db = new GameDatabase();
-
-	uint32_t headerCount = 0;
-	fread(&headerCount, sizeof(headerCount), 1, f);
-
-	DataSectionHeader* headers = new DataSectionHeader[headerCount];
-	fread(headers, headerCount, sizeof(DataSectionHeader), f);
-
-	for (int i = 0; i < headerCount; ++i)
-	{
-		const DataSectionHeader& header = headers[i];
-
-		fseek(f, header.offset, SEEK_SET);
-
-		switch (header.type)
-		{
-		case DataSectionType::Atlases:
-			LoadData(header.size, f, db->AtlasDefs); break;
-		case DataSectionType::Images:
-			LoadData(header.size, f, db->ImageDefs); break;
-		case DataSectionType::Frames:
-			LoadData(header.size, f, db->FrameDefs); break;
-		case DataSectionType::Sprites:
-			LoadData(header.size, f, db->SpriteDefs); break;
-		case DataSectionType::AnimClips:
-			LoadData(header.size, f, db->AnimClipDefs); break;
-		case DataSectionType::AnimInstructions:
-			LoadData(header.size, f, db->AnimInstructionDefs); break;
-		case DataSectionType::Units:
-			LoadData(header.size, f, db->UnitDefs); break;
-		case DataSectionType::Abilities:
-			LoadData(header.size, f, db->AbilityDefs); break;
-		case DataSectionType::Upgrades:
-			LoadData(header.size, f, db->UpgradeDefs); break;
-		case DataSectionType::Effects:
-			break;
-		case DataSectionType::Wireframe:
-			LoadData(header.size, f, db->WireframeDefs); break;
-		case DataSectionType::Weapons:
-			LoadData(header.size, f, db->WeaponDefs); break;
-		case DataSectionType::SoundSets:
-			LoadData(header.size, f, db->SoundSetDefs); break;
-			break;
-		case DataSectionType::AudioClips:
-			LoadData(header.size, f, db->AudioClipDefs); break;
-		default:
-			EXCEPTION("Unknown data section type %i at position %i", header.type, i);
-			break;
-		}
-	}
-
-	delete[] headers;
-
-	return db;
-}
-
 
 class BinaryDataLoadDatabaseCrt : public Coroutine {
 
@@ -84,7 +26,7 @@ private:
 	DataSectionHeader* headers = nullptr;
 	int i = 0;
 
-	CRT_START(NAMEOF(BinaryDataLoadDatabaseCrt))
+	CRT_START()
 	{
 		*store = new GameDatabase();
 		db = *store;
@@ -97,11 +39,13 @@ private:
 
 		CRT_YIELD();
 
-		for (; i < headerCount; ++i)
+		for (i = 0; i < headerCount; ++i)
 		{
 			//const DataSectionHeader& header = headers[i];
 
 			fseek(f, headers[i].offset, SEEK_SET);
+
+			CRT_YIELD();
 
 			switch (headers[i].type)
 			{
@@ -151,7 +95,7 @@ private:
 
 Coroutine* BinaryDataLoader::LoadDatabaseAsync(FILE* f, GameDatabase** out)
 {
-	BinaryDataLoadDatabaseCrt* crt =  new BinaryDataLoadDatabaseCrt(f);
+	BinaryDataLoadDatabaseCrt* crt = new BinaryDataLoadDatabaseCrt(f);
 
 	crt->store = out;
 

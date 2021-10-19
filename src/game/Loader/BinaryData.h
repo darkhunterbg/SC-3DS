@@ -39,6 +39,5 @@ private:
 	BinaryDataLoader() = delete;
 	~BinaryDataLoader() = delete;
 public:
-	static GameDatabase* LoadDatabase(FILE* f);
 	static Coroutine* LoadDatabaseAsync(FILE* f, GameDatabase** out);
 };

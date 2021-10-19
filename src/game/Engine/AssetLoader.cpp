@@ -120,64 +120,37 @@ static AudioClip* LoadAudioClipFromFile(const char* path)
 	return stream;
 }
 
-void AssetLoader::LoadDatabase()
-{
-	FILE* f = Platform::OpenAsset(DataFile);
-
-	if (!f)
-		EXCEPTION("Failed to load file %s", DataFile);
-
-	std::string p = DataFile;
-	AssetId id = instance.hasher(p);
-	AssetEntry& e = instance.loadedAssets[id];
-
-	instance.db = BinaryDataLoader::LoadDatabase(f);
-
-	e.id = id;
-	e.type = AssetType::Database;
-	e.data = instance.db;
-
-	instance.db->LoadAssetReferences();
-
-	fclose(f);
-}
 
 class AssetLoaderLoadDatabaseCrt : public Coroutine {
 
 	FILE* f;
-	Coroutine* crt;
+	AssetLoader::AssetId id;
+	AssetLoader::AssetEntry* e;
 
-	CRT_START(NAMEOF(AssetLoaderLoadDatabaseCrt))
+	CRT_START()
 	{
 		f = Platform::OpenAsset(DataFile);
 		if (!f)
 			EXCEPTION("Failed to load file %s", DataFile);
 
-		crt = BinaryDataLoader::LoadDatabaseAsync(f, &AssetLoader::instance.db);
-		CRT_WAIT_FOR(crt);
+		CRT_WAIT_FOR(BinaryDataLoader::LoadDatabaseAsync(f, &AssetLoader::instance.db));
 
-		std::string p = DataFile;
+		id = AssetLoader::instance.hasher(DataFile);
+		e = &AssetLoader::instance.loadedAssets[id];
 
-		AssetLoader::AssetId id = AssetLoader::instance.hasher(p);
-		AssetLoader::AssetEntry& e = AssetLoader::instance.loadedAssets[id];
+		e->id = id;
+		e->type = AssetLoader::AssetType::Database;
+		e->data = AssetLoader::instance.db;
 
-		e.id = id;
-		e.type = AssetLoader::AssetType::Database;
-		e.data = AssetLoader::instance.db;
-
-		AssetLoader::instance.db->LoadAssetReferences();
+		CRT_WAIT_FOR(AssetLoader::instance.db->LoadAssetReferencesAsync());
 
 		fclose(f);
 
 	}
 	CRT_END();
-
-
 };
 
 Coroutine* AssetLoader::LoadDatabaseAsync()
 {
-
 	return new AssetLoaderLoadDatabaseCrt();
-
 }
