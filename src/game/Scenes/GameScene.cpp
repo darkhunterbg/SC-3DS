@@ -20,7 +20,7 @@ GameScene::~GameScene() {}
 
 void GameScene::Start()
 {
-	Vector2Int16 size = { 64 * 32,64 * 32 };
+	Vector2Int16 size = { 128 * 32,128 * 32 };
 
 
 	entityManager = new EntityManager();

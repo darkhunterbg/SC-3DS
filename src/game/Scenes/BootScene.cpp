@@ -9,7 +9,8 @@
 #include "../Scenes/GameScene.h"
 #include "../Platform.h"
 
-const Texture* _title;
+static const Texture* _title;
+static bool _autoStart = true;
 
 BootScene::BootScene()
 {
@@ -21,9 +22,9 @@ void BootScene::Start()
 	auto clip = AssetLoader::LoadAudioClip("music\\title");
 	AudioManager::PlayClip(clip, 0);
 
-	JobSystem::RunJobAsync(1, 1, [](int, int) {
+	//JobSystem::RunJobAsync(1, 1, [](int, int) {
 		AssetLoader::LoadDatabase();
-		});
+		//});
 
 }
 
@@ -34,14 +35,10 @@ void BootScene::Stop()
 
 void BootScene::Update()
 {
-
-
 	if (!_ready && !JobSystem::IsWorking())
 	{
 		_ready = true;
 	}
-
-
 }
 
 void BootScene::Draw()
@@ -58,7 +55,7 @@ void BootScene::Draw()
 		GraphicsRenderer::Draw(*_title, { -430,-358 }, { 640,480 });
 		GraphicsRenderer::DrawRectangle({ {0,0},{120,200} }, Colors::Black);
 
-		GraphicsRenderer::Draw(*_title, { -36,-240 }, { 400,300 });
+		GraphicsRenderer::Draw(*_title, { -40,-240 }, { 400,300 });
 		GraphicsRenderer::DrawRectangle({ {300,25},{20,100} }, Colors::Black);
 
 		if (_ready)
@@ -92,7 +89,7 @@ void BootScene::Draw()
 	}
 
 
-	if (_ready && InputManager::Gamepad.IsButtonDown(GamepadButton::A))
+	if (_ready && (_autoStart || InputManager::Gamepad.IsButtonDown(GamepadButton::A)))
 	{
 		Game::SetCurrentScene(new GameScene());
 	}

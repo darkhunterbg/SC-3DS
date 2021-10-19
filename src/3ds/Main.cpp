@@ -71,11 +71,6 @@ void FatalError(const char* error, ...)
 	exit(1);
 }
 
-struct Atlas {
-	const char* name;
-	int subatlases = 0;
-};
-
 u32 __ctru_heap_size = (30 << 20);
 
 
@@ -151,7 +146,7 @@ void Init()
 	//	FatalError("svcReleaseSemaphore failed with %s", R_SUMMARY(r));
 
 
-	C2D_Init(4096 * 8);
+	C2D_Init(4096 *8 + 256*256);
 	C2D_Prepare();
 	top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
 	bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);

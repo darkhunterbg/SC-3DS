@@ -7,6 +7,8 @@
 #include "../Engine/GraphicsPrimitives.h"
 #include "PlayerSystem.h"
 
+#include <vector>
+
 class EntityManager;
 class Camera;
 class PlayerVision;
@@ -26,6 +28,9 @@ class MapSystem : public IEntitySystem {
 
 	RenderSurface _fogOfWarTexture = { 0 };
 	RenderSurface _fowDownscaleTexture = { 0 };
+
+	std::vector<Rectangle16> _halfLitTiles;
+	std::vector<Rectangle16> _fullLitTiles;
 
 	void RedrawMinimapFogOfWar(const PlayerVision& vision);
 public:

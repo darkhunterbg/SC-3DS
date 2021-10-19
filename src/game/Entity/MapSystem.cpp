@@ -19,7 +19,7 @@ size_t MapSystem::ReportMemoryUsage()
 
 void MapSystem::RedrawMinimapFogOfWar(const PlayerVision& vision)
 {
-		if (!FogOfWarVisible) return;
+	if (!FogOfWarVisible) return;
 
 	if (_minimapFowTexture.surfaceId == nullptr)
 	{
@@ -32,21 +32,51 @@ void MapSystem::RedrawMinimapFogOfWar(const PlayerVision& vision)
 	GraphicsRenderer::DrawOnSurface(_minimapFowTexture);
 	GraphicsRenderer::ClearCurrentSurface(Colors::Black);
 
+	_halfLitTiles.clear();
+	_fullLitTiles.clear();
+
 	Color colors[2] = { (Color(0,0,0,0.5)), Color(0,0,0,0.0f) };
+
+	std::vector<Rectangle16>* renderTiles[] = { &_halfLitTiles, &_fullLitTiles };
 
 	GraphicsRenderer::ChangeBlendingMode(BlendMode::AllSet);
 
 	for (short y = 0; y < mapSizeTiles; ++y)
 	{
-		for (short x = 0; x < mapSizeTiles; ++x)
+		Rectangle16 start = { {0,y} ,{1,1} };
+		uint8_t currentState = vision.GetState(start.position);
+
+		for (short x = 1; x < mapSizeTiles; ++x)
 		{
 			uint8_t state = vision.GetState({ x,y });
-			if (state)
+			if (state != currentState)
 			{
-				const Color& c = colors[state - 1];
-				GraphicsRenderer::DrawRectangle({ { x * multiplier, y * multiplier }, { multiplier, multiplier} }, c);
+				Rectangle16 add = start;
+				add.size.x = x - add.position.x + 1;
+				renderTiles[currentState - 1]->push_back(add);
+
+				currentState = state ;
+				start = { {x,y }, { 1,1 } };
+
 			}
 		}
+
+		Rectangle16 add = start;
+		uint8_t state = vision.GetState({ (short)(mapSizeTiles - 1),y });
+		add.size.x = mapSizeTiles - 1 - add.position.x + 1;
+		renderTiles[state - 1]->push_back(add);
+	}
+
+	for (auto& rect : _halfLitTiles)
+	{
+		const Color& c = colors[0];
+		GraphicsRenderer::DrawRectangle({ Vector2Int(rect.position * multiplier), Vector2Int(rect.size * multiplier) }, c);
+	}
+
+	for (auto& rect : _fullLitTiles)
+	{
+		const Color& c = colors[1];
+		GraphicsRenderer::DrawRectangle({ Vector2Int(rect.position * multiplier), Vector2Int(rect.size * multiplier) }, c);
 	}
 
 	GraphicsRenderer::ChangeBlendingMode(BlendMode::Alpha);
@@ -123,11 +153,16 @@ void MapSystem::DrawFogOfWar(EntityManager& em, const Camera& camera)
 	Vector2Int16 FogOfWarTextureSize = Vector2Int16(_minimapTextureSize, _minimapTextureSize);
 	FogOfWarTextureSize *= Upscale;
 
-
 	GraphicsRenderer::ChangeBlendingMode(BlendMode::AllSet);
 
 	if (_fogOfWarTexture.surfaceId == nullptr)
 	{
+#ifdef _3DS
+		if (FogOfWarTextureSize.x == 1024)
+			FogOfWarTextureSize /= 2;
+#endif
+
+
 		_fogOfWarTexture = GraphicsRenderer::NewRenderSurface(Vector2Int(FogOfWarTextureSize));
 		_fowDownscaleTexture = GraphicsRenderer::NewRenderSurface(Vector2Int(_minimapTextureSize / 2));
 	}
@@ -159,5 +194,5 @@ void MapSystem::DrawFogOfWar(EntityManager& em, const Camera& camera)
 
 	GraphicsRenderer::Submit();
 
-	
+
 }
