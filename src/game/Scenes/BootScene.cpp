@@ -10,7 +10,7 @@
 #include "../Platform.h"
 
 static const Texture* _title;
-static bool _autoStart = true;
+static bool _autoStart = false;
 
 BootScene::BootScene()
 {
@@ -22,20 +22,22 @@ void BootScene::Start()
 	auto clip = AssetLoader::LoadAudioClip("music\\title");
 	AudioManager::PlayClip(clip, 0);
 
+	_loadCrt = AssetLoader::LoadDatabaseAsync();
+
 	//JobSystem::RunJobAsync(1, 1, [](int, int) {
-		AssetLoader::LoadDatabase();
+		//AssetLoader::LoadDatabase();
 		//});
 
 }
 
 void BootScene::Stop()
 {
-
+	delete _loadCrt;
 }
 
 void BootScene::Update()
 {
-	if (!_ready && !JobSystem::IsWorking())
+	if (!_ready && _loadCrt->Next())
 	{
 		_ready = true;
 	}

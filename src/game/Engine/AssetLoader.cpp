@@ -142,37 +142,42 @@ void AssetLoader::LoadDatabase()
 	fclose(f);
 }
 
-Coroutine* AssetLoader::LoadDatabaseAsync()
-{
-	Coroutine* crt = new Coroutine();
+class AssetLoaderLoadDatabaseCrt : public Coroutine {
 
+	FILE* f;
+	Coroutine* crt;
 
-	FILE* f = Platform::OpenAsset(DataFile);
-
-	crt->AddNext([f]() {
+	CRT_START(NAMEOF(AssetLoaderLoadDatabaseCrt))
+	{
+		f = Platform::OpenAsset(DataFile);
 		if (!f)
 			EXCEPTION("Failed to load file %s", DataFile);
 
-		instance.db = BinaryDataLoader::LoadDatabase(f);
+		crt = BinaryDataLoader::LoadDatabaseAsync(f, &AssetLoader::instance.db);
+		CRT_WAIT_FOR(crt);
 
-		return true;
-		}).AddNext([f]() {
-			std::string p = DataFile;
+		std::string p = DataFile;
 
-			AssetId id = instance.hasher(p);
-			AssetEntry& e = instance.loadedAssets[id];
+		AssetLoader::AssetId id = AssetLoader::instance.hasher(p);
+		AssetLoader::AssetEntry& e = AssetLoader::instance.loadedAssets[id];
 
-			e.id = id;
-			e.type = AssetType::Database;
-			e.data = instance.db;
+		e.id = id;
+		e.type = AssetLoader::AssetType::Database;
+		e.data = AssetLoader::instance.db;
 
-			instance.db->LoadAssetReferences();
+		AssetLoader::instance.db->LoadAssetReferences();
 
-			fclose(f);
+		fclose(f);
 
-			return true;
-	});
+	}
+	CRT_END();
 
-		return crt;
+
+};
+
+Coroutine* AssetLoader::LoadDatabaseAsync()
+{
+
+	return new AssetLoaderLoadDatabaseCrt();
 
 }

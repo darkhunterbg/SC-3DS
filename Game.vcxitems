@@ -68,7 +68,6 @@
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Assets.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Camera.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Coroutine.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\AbilityDef.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\AssetDataDefs.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\GameDatabase.cpp" />

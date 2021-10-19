@@ -3,18 +3,47 @@
 #include <functional>
 #include <vector>
 
-class Coroutine {
-private:
-	std::vector<std::function<bool()>> _iterations;
-	bool _done = false;
-	int iter = 0;
-public:
-	Coroutine& AddNext(std::function<bool()> i);
+#define NAMEOF(CLASS) #CLASS
 
+#define CRT_START(NAME)  virtual bool MoveNext() override { Name= NAME; switch(__iter) { case 0:  
+
+#define CRT_END() return true; }}
+
+#define CRT_YIELD()  __iter = __LINE__ ; return  false;  case __LINE__: {}
+
+#define CRT_WAIT_FOR(CRT) __waitFor = CRT; CRT_YIELD()
+
+#define CRT_BREAK() return true;  }
+
+class Coroutine {
+protected:
+	int __iter = 0;
+
+	Coroutine* __waitFor = nullptr;
+
+	virtual bool MoveNext() = 0;
+
+public:
+	std::string Name;
+
+	Coroutine() {}
 	Coroutine(const Coroutine&) = delete;
 	Coroutine& operator=(const Coroutine&) = delete;
 
-	Coroutine();
-
-	bool MoveNext();
+	// Returns TRUE when coroutine is done.
+	bool Next()
+	{
+		if (__waitFor == nullptr)
+			return MoveNext();
+		else
+		{
+			bool done = __waitFor->Next();
+			if (done)
+			{
+				delete __waitFor;
+				__waitFor = nullptr;
+			}
+			return false;
+		}
+	}
 };

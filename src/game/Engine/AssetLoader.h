@@ -9,6 +9,8 @@
 #include "../Coroutine.h"
 
 class AssetLoader {
+	friend class AssetLoaderLoadDatabaseCrt;
+
 	typedef std::size_t AssetId;
 
 	enum class AssetType : uint8_t {
@@ -49,6 +51,7 @@ private:
 		}
 		return instance.AssetTypeName[(unsigned)type];
 	}
+
 
 public:
 	inline static GameDatabase& GetDatabase() {

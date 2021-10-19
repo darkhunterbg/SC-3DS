@@ -248,6 +248,5 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\BootScene.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Coroutine.cpp" />
   </ItemGroup>
 </Project>
