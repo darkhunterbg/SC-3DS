@@ -29,6 +29,7 @@
     <ClCompile Include="src\win32\ImGui\imgui_impl_sdl.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="src\win32\lodepng.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\win32\SDL_FontCache.h" />
@@ -63,6 +64,7 @@
     <ClInclude Include="src\win32\ImGui\imgui_impl_sdl.h">
       <Filter>ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="src\win32\lodepng.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ImGui">

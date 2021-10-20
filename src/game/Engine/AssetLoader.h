@@ -18,14 +18,6 @@ class AssetLoader {
 
 	typedef std::size_t AssetId;
 
-	enum class AssetType : uint8_t {
-		Unknown = 0,
-		Texture = 1,
-		Font = 2,
-		AudioClip = 3,
-		Database = 4
-	};
-
 	std::array< const char*, 5> AssetTypeName = {
 		   "Unknown", "Texture", "Font", "AudioClip", "Database"
 	};

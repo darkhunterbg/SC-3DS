@@ -31,6 +31,7 @@ public:
 	int HardwareThreadsCount = 1;
 };
 
+
 class Platform {
 
 private:
@@ -48,9 +49,9 @@ public:
 
 	// ================ File System ======================
 
-	static TextureId LoadTexture(const char* path, Vector2Int16& outSize);
+	static TextureId CreateTextureFromFile(const char* path, Span<uint8_t> data, Vector2Int16& outSize);
 	static const Font* LoadFont(const char* path, int size);
-	static FILE* OpenAsset(const char* path);
+	static FILE* OpenAsset(const char* path, AssetType type);
 	static std::string GetUserDirectory();
 
 	// =============== Graphics =========================

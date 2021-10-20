@@ -1,6 +1,7 @@
 
 #include "Platform.h"
 #include "AbstractPlatform.h"
+#include "lodepng.h"
 
 #include <SDL.h>
 #include <SDL_gpu.h>
@@ -63,14 +64,18 @@ PlatformInfo Platform::GetPlatformInfo()
 	return info;
 }
 
-TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize)
+
+TextureId Platform::CreateTextureFromFile(const char* path, Span<uint8_t> data, Vector2Int16& outSize)
 {
+	uint8_t* decoded = nullptr;
+	unsigned w, h;
+	int error = lodepng_decode32(&decoded, &w, &h, data.Data(), data.Size());
+	if(error !=0) EXCEPTION("Decode texture data %s failed with error %i.", path.data(), error);
 
-	std::filesystem::path p = assetDir;
-	p.append(path);
-	p.concat(".png");
+	outSize.x = w;
+	outSize.y = h;
 
-	GPU_Image* tex = GPU_LoadImage(p.string().data());
+	GPU_Image* tex = GPU_CreateImage(outSize.x, outSize.y, GPU_FORMAT_RGBA);
 
 	if (tex == nullptr)
 	{
@@ -78,21 +83,22 @@ TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize)
 		EXCEPTION("Load texture %s failed with error %i.", path.data(), error);
 	}
 
-	outSize.x = (short)tex->w;
-	outSize.y = (short)tex->h;
+	GPU_Rect rect = { 0.0f,0.0f, (float)w, (float)h };
+
+	GPU_UpdateImageBytes(tex, &rect, decoded, w * 4);
+
+	delete[] decoded;
 
 	return tex;
-
 }
+
 const Font* Platform::LoadFont(const char* path, int size)
 {
-
 	std::filesystem::path fullPath = assetDir;
 	fullPath = fullPath.append(path).replace_extension("ttf");
 
 	FC_Font* font = FC_CreateFont();
 	auto lf = FC_LoadFont(font, fullPath.generic_string().data(), size, FC_MakeColor(255, 255, 255, 255), TTF_STYLE_NORMAL);
-
 
 	if (lf == 0)
 	{
@@ -112,10 +118,27 @@ Vector2Int Platform::MeasureString(const Font& font, const char* text)
 	return { (int)rect.w, (int)rect.h };
 }
 
-FILE* Platform::OpenAsset(const char* path)
+FILE* Platform::OpenAsset(const char* path, AssetType type)
 {
 	std::filesystem::path f = assetDir;
 	f.append(path);
+
+	switch (type)
+	{
+	case AssetType::Unknown:
+		break;
+	case AssetType::Texture:
+		f.replace_extension("png"); break;
+	case AssetType::Font:
+		f.replace_extension("ttf"); break;
+	case AssetType::AudioClip:
+		f.replace_extension("wav"); break;
+	case AssetType::Database:
+		f.replace_extension("bin"); break;
+		break;
+	default:
+		break;
+	}
 
 	return fopen(f.generic_string().data(), "rb");
 }

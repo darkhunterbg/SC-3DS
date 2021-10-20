@@ -7,6 +7,16 @@
 #include <string>
 #include <array>
 
+
+enum class AssetType : uint8_t {
+	Unknown = 0,
+	Texture = 1,
+	Font = 2,
+	AudioClip = 3,
+	Database = 4
+};
+
+
 typedef void* TextureId;
 
 struct ImageDef;

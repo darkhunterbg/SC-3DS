@@ -45,19 +45,15 @@ PlatformInfo Platform::GetPlatformInfo()
 	return info;
 }
 
-TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize)
+TextureId Platform::CreateTextureFromFile(const char* path, Span<uint8_t> data, Vector2Int16& outSize)
 {
-	std::string assetPath = assetDir + path + ".t3x";
+	std::string assetPath = assetDir + path;
 	std::replace(assetPath.begin(), assetPath.end(), '\\', '/');
-	FILE* f = fopen(assetPath.data(), "rb");
-	if (f == nullptr)
-		EXCEPTION("Failed to open file '%s'", assetPath.data());
 
-	setvbuf(f, NULL, _IOFBF, 64 * 1024);
 
 	C3D_Tex* tex = new	C3D_Tex();
 
-	auto t3x = Tex3DS_TextureImportStdio(f, tex, nullptr, false);
+	auto t3x = Tex3DS_TextureImport(data.Data(), data.Size(), tex, nullptr, false);
 
 	loadedTextures[tex] = Tex3DS_GetSubTexture(t3x, 0);
 
@@ -69,6 +65,31 @@ TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize)
 
 	return tex;
 }
+
+//TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize)
+//{
+//	std::string assetPath = assetDir + path + ".t3x";
+//	std::replace(assetPath.begin(), assetPath.end(), '\\', '/');
+//	FILE* f = fopen(assetPath.data(), "rb");
+//	if (f == nullptr)
+//		EXCEPTION("Failed to open file '%s'", assetPath.data());
+//
+//	setvbuf(f, NULL, _IOFBF, 64 * 1024);
+//
+//	C3D_Tex* tex = new	C3D_Tex();
+//
+//	auto t3x = Tex3DS_TextureImportStdio(f, tex, nullptr, false);
+//
+//	loadedTextures[tex] = Tex3DS_GetSubTexture(t3x, 0);
+//
+//	C3D_TexSetWrap(tex, GPU_TEXTURE_WRAP_PARAM::GPU_CLAMP_TO_EDGE, GPU_TEXTURE_WRAP_PARAM::GPU_CLAMP_TO_EDGE);
+//	C3D_TexSetFilter(tex, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR);
+//
+//	outSize.x = loadedTextures[tex]->width;
+//	outSize.y = loadedTextures[tex]->height;
+//
+//	return tex;
+//}
 
 const Font* Platform::LoadFont(const char* path, int size)
 {
@@ -343,10 +364,27 @@ void Platform::UpdatePointerState(PointerState& state)
 	state.Position = { touchPos.px, touchPos.py };
 }
 
-FILE* Platform::OpenAsset(const char* path)
+FILE* Platform::OpenAsset(const char* path, AssetType type)
 {
 	std::string f = assetDir + path;
 	std::replace(f.begin(), f.end(), '\\', '/');
+
+	switch (type)
+	{
+	case AssetType::Unknown:
+		break;
+	case AssetType::Texture:
+		f += ".t3x"; break;
+	case AssetType::Font:
+		f += ".bcfnt"; break;
+	case AssetType::AudioClip:
+		f += ".wav"; break;
+	case AssetType::Database:
+		f += ".bin"; break;
+		break;
+	default:
+		break;
+	}
 
 	return fopen(f.data(), "rb");
 }

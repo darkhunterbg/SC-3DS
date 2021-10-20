@@ -6,8 +6,9 @@
 
 static constexpr const int AudioStreamBufferSize = 4096;
 static AudioClip* LoadAudioClipFromFile(const char* path);
+static  Texture* LoadTextureFromFile(const char* path);
 
-static constexpr const char* DataFile = "data.bin";
+static constexpr const char* DataFile = "data";
 
 static std::hash<int> intHasher;
 
@@ -44,8 +45,7 @@ const Texture* AssetLoader::LoadTexture(const char* path)
 	if (e.id == 0)
 	{
 		Vector2Int16 size;
-		TextureId texId = Platform::LoadTexture(p.data(), size);
-		e.data = new Texture(p, size, texId);
+		e.data = LoadTextureFromFile(path);
 		e.type = AssetType::Texture;
 		e.id = id;
 	}
@@ -110,12 +110,11 @@ static uint16_t audioClipId = 0;
 static AudioClip* LoadAudioClipFromFile(const char* path)
 {
 	std::string p = path;
-	p += ".wav";
 
-	FILE* f = Platform::OpenAsset(p.data());
+	FILE* f = Platform::OpenAsset(p.data(), AssetType::AudioClip);
 
 	if (f == nullptr)
-		EXCEPTION("Failed to open asset '%s': errno %i!", p.data());
+		EXCEPTION("Failed to open asset '%s'!", p.data());
 
 	AudioInfo info;
 
@@ -140,7 +139,35 @@ static AudioClip* LoadAudioClipFromFile(const char* path)
 
 	return stream;
 }
+static Texture* LoadTextureFromFile(const char* path)
+{
+	std::string p = path;
 
+	FILE* f = Platform::OpenAsset(p.data(), AssetType::Texture);
+
+	setvbuf(f, NULL, _IOFBF, 64 * 1024);
+
+	if (f == nullptr)
+		EXCEPTION("Failed to open asset '%s'!", p.data());
+
+	fseek(f, 0, SEEK_END);
+	unsigned size = ftell(f);
+	fseek(f, 0, SEEK_SET);
+
+	uint8_t* data = new uint8_t[size];
+
+	auto read = fread(data, sizeof(uint8_t), size, f);
+	if (read != size) EXCEPTION("Failed to read data from asset '%s'", p.data());
+
+	fclose(f);
+
+	Vector2Int16 texSize;
+	TextureId texId = Platform::CreateTextureFromFile(p.data(), { data, size }, texSize);
+
+	delete[] data;
+
+	return new Texture(p, texSize, texId);
+}
 class AssetLoaderLoadDatabaseCrt : public CoroutineImpl {
 
 	FILE* f;
@@ -149,7 +176,7 @@ class AssetLoaderLoadDatabaseCrt : public CoroutineImpl {
 
 	CRT_START()
 	{
-		f = Platform::OpenAsset(DataFile);
+		f = Platform::OpenAsset(DataFile, AssetType::Database);
 		if (!f)
 			EXCEPTION("Failed to load file %s", DataFile);
 
@@ -159,7 +186,7 @@ class AssetLoaderLoadDatabaseCrt : public CoroutineImpl {
 		e = &AssetLoader::instance.loadedAssets[id];
 
 		e->id = id;
-		e->type = AssetLoader::AssetType::Database;
+		e->type = AssetType::Database;
 		e->data = AssetLoader::instance.db;
 
 		CRT_WAIT_FOR(AssetLoader::instance.db->LoadAssetReferencesAsync());
