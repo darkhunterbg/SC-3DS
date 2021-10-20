@@ -16,9 +16,7 @@ static void FinishBufferingAndPlay(AudioChannelState& channel)
 
 	channel.stream->SwapBuffers();
 	channel.QueueClip({ channel.stream->GetData(),0 });
-
-	delete channel.streamingCrt;
-	channel.streamingCrt = nullptr;
+	channel.StopStreaming();
 
 	Platform::EnableChannel(channel, true);
 }
@@ -62,16 +60,10 @@ void AudioManager::PlayClip(AudioClip* clip, int c)
 
 	clip->Restart();
 
-	if (channel.IsStreaming())
-	{
-		delete channel.streamingCrt;
-		channel.streamingCrt = nullptr;
-	}
+	channel.StopStreaming();
 
 	channel.stream = clip;
 	channel.ClearQueue();
-
-	
 
 	StartLoadingNextBuffer(channel);
 }

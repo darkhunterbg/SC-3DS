@@ -141,7 +141,7 @@ static AudioClip* LoadAudioClipFromFile(const char* path)
 	return stream;
 }
 
-class AssetLoaderLoadDatabaseCrt : public Coroutine {
+class AssetLoaderLoadDatabaseCrt : public CoroutineImpl {
 
 	FILE* f;
 	AssetLoader::AssetId id;
@@ -170,13 +170,13 @@ class AssetLoaderLoadDatabaseCrt : public Coroutine {
 	CRT_END();
 };
 
-Coroutine* AssetLoader::LoadDatabaseAsync()
+Coroutine AssetLoader::LoadDatabaseAsync()
 {
-	return new AssetLoaderLoadDatabaseCrt();
+	return  Coroutine(new AssetLoaderLoadDatabaseCrt());
 }
 
 
-class AssetLoaderIOCrt : public Coroutine {
+class AssetLoaderIOCrt : public CoroutineImpl {
 private:
 	AssetLoader::IORequest _request;
 
@@ -213,7 +213,7 @@ public:
 };
 
 
-Coroutine* AssetLoader::RunIOAsync(std::function<void()> func)
+Coroutine AssetLoader::RunIOAsync(std::function<void()> func)
 {
-	return new AssetLoaderIOCrt(func);
+	return Coroutine(new AssetLoaderIOCrt(func));
 }

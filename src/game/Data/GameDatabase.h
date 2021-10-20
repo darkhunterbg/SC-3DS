@@ -8,13 +8,11 @@
 #include "UpgradeDef.h"
 #include "SoundSetDef.h"
 #include "RaceDef.h"
+#include "../Coroutine.h"
 
 #include "../Assets.h"
 #include <algorithm>
 #include <unordered_map>
-
-
-class Coroutine;
 
 class GameDatabase {
 private:
@@ -64,7 +62,6 @@ public:
 	inline const Image& GetImage(unsigned id) const { return images[id]; }
 	inline const Image& GetSelectionImage(unsigned id) const { return *selections[id]; }
 
-
 	const Image& GetImage(const std::string& path) const;
 	const ImageFrame& GetIcon(unsigned id) const;
 
@@ -82,5 +79,5 @@ public:
 		return { &audioClips[id], count };
 	}
 
-	Coroutine* LoadAssetReferencesAsync();
+	Coroutine LoadAssetReferencesAsync();
 };

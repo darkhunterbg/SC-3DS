@@ -78,7 +78,7 @@ const RaceDef* GameDatabase::GetRace(RaceType type) const
 	return nullptr;
 }
 
-class GameDatabaseLoadAsetReferencesCrt : public Coroutine {
+class GameDatabaseLoadAsetReferencesCrt : public CoroutineImpl {
 
 	GameDatabase* db;
 	std::vector<const Texture*> textures;
@@ -185,11 +185,9 @@ public: GameDatabaseLoadAsetReferencesCrt(GameDatabase* db) : db(db) {}
 	  CRT_END();
 };
 
-Coroutine* GameDatabase::LoadAssetReferencesAsync()
+Coroutine GameDatabase::LoadAssetReferencesAsync()
 {
-	GameDatabaseLoadAsetReferencesCrt* crt = new GameDatabaseLoadAsetReferencesCrt(this);
-
-	return crt;
+	return Coroutine(new GameDatabaseLoadAsetReferencesCrt(this));
 }
 
 void GameDatabase::CreateRaces()

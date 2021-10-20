@@ -3,8 +3,7 @@
 #include <cstdint>
 #include <vector>
 #include <cstdio>
-
-class Coroutine;
+#include "../Coroutine.h"
 
 class GameDatabase;
 
@@ -39,5 +38,5 @@ private:
 	BinaryDataLoader() = delete;
 	~BinaryDataLoader() = delete;
 public:
-	static Coroutine* LoadDatabaseAsync(FILE* f, GameDatabase** out);
+	static Coroutine LoadDatabaseAsync(FILE* f, GameDatabase** out);
 };

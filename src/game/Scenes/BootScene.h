@@ -2,14 +2,14 @@
 
 
 #include "Scene.h"
-class Coroutine;
+#include "../Coroutine.h"
 
 class BootScene : public Scene
 {
 private: 
 	int _frameCounter = 0;
 	bool _ready = false;
-	Coroutine* _loadCrt = nullptr;
+	Coroutine _loadCrt;
 public:
 	BootScene();
 	virtual void Start() override;

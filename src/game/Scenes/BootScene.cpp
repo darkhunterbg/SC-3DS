@@ -28,7 +28,7 @@ void BootScene::Start()
 
 void BootScene::Stop()
 {
-	delete _loadCrt;
+
 }
 
 void BootScene::Update()

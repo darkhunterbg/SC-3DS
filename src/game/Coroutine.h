@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <vector>
+#include <memory>
 
 #define NAMEOF(CLASS) #CLASS
 
@@ -15,19 +16,23 @@
 
 #define CRT_BREAK() return true; 
 
-class Coroutine {
+class CoroutineImpl;
+
+typedef std::shared_ptr<CoroutineImpl> Coroutine;
+
+class CoroutineImpl {
 protected:
 	int __iter = 0;
 
-	Coroutine* __waitFor = nullptr;
+	Coroutine __waitFor = nullptr;
 
 	virtual bool MoveNext() = 0;
 
 public:
 
-	Coroutine() {}
-	Coroutine(const Coroutine&) = delete;
-	Coroutine& operator=(const Coroutine&) = delete;
+	CoroutineImpl() {}
+	CoroutineImpl(const CoroutineImpl&) = delete;
+	CoroutineImpl& operator=(const CoroutineImpl&) = delete;
 
 	// Returns TRUE when coroutine is done.
 	bool Next()
@@ -39,7 +44,6 @@ public:
 			bool done = __waitFor->Next();
 			if (done)
 			{
-				delete __waitFor;
 				__waitFor = nullptr;
 			}
 			return false;

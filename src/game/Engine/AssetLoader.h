@@ -78,11 +78,11 @@ public:
 
 	static void Init();
 
-	static Coroutine* LoadDatabaseAsync();
+	static Coroutine LoadDatabaseAsync();
 
 	static const Texture* LoadTexture(const char* path);
 	static const Font* LoadFont(const char* path, int size);
 	static AudioClip* LoadAudioClip(const char* path);
 
-	static Coroutine* RunIOAsync(std::function<void()> func);
+	static Coroutine RunIOAsync(std::function<void()> func);
 };
