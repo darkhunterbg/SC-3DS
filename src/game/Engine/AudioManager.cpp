@@ -29,6 +29,8 @@ static void StartLoadingNextBuffer(AudioChannelState& channel)
 	channel.streamingCrt = AssetLoader::RunIOAsync([channel]() {
 		channel.stream->FillNextBuffer();
 		});
+
+	channel.streamingCrt->Next();
 }
 
 void AudioManager::Init()
@@ -56,6 +58,8 @@ void AudioManager::Init()
 
 void AudioManager::PlayClip(AudioClip* clip, int c)
 {
+	GAME_ASSERT(clip, "Tried to play null clip on channel %i", c);
+
 	auto& channel = instance.channels[c];
 
 	clip->Restart();
