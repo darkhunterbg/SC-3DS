@@ -5,7 +5,10 @@
 
 #include "../Assets.h"
 
+#include "../Coroutine.h"
+
 typedef int AudioChannelHandle;
+
 
 struct AudioChannelClip {
 	Span<uint8_t> data = {};
@@ -49,6 +52,7 @@ struct AudioChannelState {
 	int queueSize = 0;
 
 	AudioClip* stream = nullptr;
+	Coroutine* streamingCrt = nullptr;
 
 	AudioChannelClip* CurrentClip() {
 		return queueSize > 0 ? &clipQueue[0] : nullptr;
@@ -57,6 +61,11 @@ struct AudioChannelState {
 	void ClearQueue() {
 		queueSize = 0;
 		playbackCompleted = true;
+	}
+
+	bool IsStreaming() const
+	{
+		return streamingCrt != nullptr;
 	}
 
 	bool IsDone() const { return queueSize == 0 && playbackCompleted; }

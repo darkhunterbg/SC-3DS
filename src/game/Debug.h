@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdarg>
 
 #if defined (_3DS)
 extern void FatalError(const char* error, ...);
@@ -12,3 +13,5 @@ extern void FatalError(const char* error, ...);
 #define EXCEPTION(TEXT, ...) 
 #endif
 #endif
+
+#define GAME_ASSERT(COND, MESSAGE, ...) if(!(COND)) EXCEPTION(MESSAGE, ## __VA_ARGS__); 

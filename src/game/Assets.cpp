@@ -7,15 +7,11 @@
 #include <stdio.h>
 
 bool AudioClip::FillNextBuffer() {
-	if (stream == nullptr) {
-		activeBufferIndex = 0;
-		activeBufferSize = buffers[activeBufferIndex].Size();
-		streamPos = activeBufferSize;
-		return true;
-	}
 
-	activeBufferIndex = (activeBufferIndex + 1) % BufferCount;
-	Span<uint8_t> buffer = buffers[activeBufferIndex];
+	if (stream == nullptr) return false;
+
+	int nextBufferIndex = (_activeBufferIndex + 1) % BufferCount;
+	Span<uint8_t> buffer = buffers[nextBufferIndex];
 	unsigned size = buffer.Size();
 	unsigned remaining = GetRemaining();
 
@@ -25,27 +21,42 @@ bool AudioClip::FillNextBuffer() {
 
 	int read = fread(buffer.Data(), sizeof(uint8_t), size, stream);
 	if (read > 0) {
-		activeBufferSize = (unsigned)read;
-		streamPos += read;
+		_nextBufferSize = (unsigned)read;
 		return true;
 	}
 	else {
-		activeBufferSize = 0;
+		_nextBufferSize = 0;
 		return false;
+	}
+}
+void AudioClip::SwapBuffers()
+{
+	if (stream == nullptr)
+	{
+		_activeBufferIndex = 0;
+		_activeBufferSize = buffers[_activeBufferIndex].Size();
+		_streamPos = _activeBufferSize;
+
+	}
+	else
+	{
+		_activeBufferIndex = (_activeBufferIndex + 1) % BufferCount;
+		_activeBufferSize = _nextBufferSize;
+		_streamPos += _nextBufferSize;
 	}
 }
 
 bool AudioClip::Restart() {
 
 	if (stream == nullptr) {
-		streamPos = 0;
+		_streamPos = 0;
 		return true;
 	}
 
-	bool success = fseek(stream, streamStartPos, SEEK_SET);
+	bool success = fseek(stream, _streamStartPos, SEEK_SET);
 
 	if (success)
-		streamPos = 0;
+		_streamPos = 0;
 
 	return success;
 }
@@ -55,12 +66,12 @@ AudioClip::AudioClip(AudioInfo info, unsigned bufferSize, FILE* stream) {
 	uint8_t* memory = new uint8_t[bufferSize * BufferCount];
 	this->stream = stream;
 
-	fgetpos(stream, &streamStartPos);
+	fgetpos(stream, &_streamStartPos);
 
 	for (int i = 0; i < BufferCount; ++i) {
 		buffers[i] = { memory + bufferSize * i, bufferSize };
 	}
-	activeBufferSize = 0;
+	_activeBufferSize = 0;
 }
 AudioClip::AudioClip(AudioInfo info, FILE* stream) {
 	this->info = info;
@@ -69,8 +80,8 @@ AudioClip::AudioClip(AudioInfo info, FILE* stream) {
 	fread(memory, sizeof(uint8_t), info.GetTotalSize(), stream);
 	buffers[0] = { memory, (unsigned)info.GetTotalSize() };
 	buffers[1] = { memory, 0 };
-	activeBufferIndex = 0;
-	activeBufferSize = buffers[0].Size();
+	_activeBufferIndex = 0;
+	_activeBufferSize = buffers[0].Size();
 }
 
 AudioClip::~AudioClip()
@@ -82,7 +93,7 @@ AudioClip::~AudioClip()
 }
 
 int AudioClip::GetRemaining() const {
-	return info.GetTotalSize() - streamPos;
+	return info.GetTotalSize() - _streamPos;
 }
 
 

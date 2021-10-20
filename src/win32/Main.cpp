@@ -27,7 +27,7 @@ uint64_t mainTimer;
 AbstractPlatform abstractPlatform;
 
 Rectangle touchScreenLocation;
-bool mute = true;
+bool mute = false;
 bool noThreading = false;
 
 
@@ -96,7 +96,7 @@ int main(int argc, char** argv)
 		std::string a = argv[1];
 		if (a == "-mute")
 		{
-			mute = true;
+			//mute = true;
 		}
 	}
 

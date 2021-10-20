@@ -36,8 +36,6 @@ static PlatformInfo _platformInfo;
 
 static void InitialScene()
 {
-	
-
 	Game::SetCurrentScene(new BootScene());
 }
 
@@ -60,6 +58,8 @@ void Game::Start()
 	_platformInfo = Platform::GetPlatformInfo();
 
 	JobSystem::Init();
+
+	AssetLoader::Init();
 
 	SystemFont16 = AssetLoader::LoadFont("font.bcfnt", 16);
 	SystemFont12 = AssetLoader::LoadFont("font.bcfnt", 12);

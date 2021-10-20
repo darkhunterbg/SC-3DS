@@ -55,6 +55,10 @@ PlatformInfo Platform::GetPlatformInfo()
 
 	info.PointerIsCursor = abstractPlatform.Pointer.SameAsCursor;
 	info.Type = abstractPlatform.Type;
+	info.HardwareThreadsCount = 1;
+
+	if (!noThreading)
+		info.HardwareThreadsCount = SDL_GetCPUCount();
 
 	return info;
 }
@@ -342,31 +346,38 @@ void Platform::CreateChannel(AudioChannelState& channel)
 }
 void Platform::EnableChannel(const AudioChannelState& channel, bool enabled)
 {
-
 	if (!mute)
 		SDL_PauseAudioDevice(channel.handle, enabled ? 0 : 1);
 }
 
-static std::function<void(int)> threadWorkFunc;
-int Platform::StartThreads(std::function<void(int)> threadWork)
+static std::vector< std::function<void(int)>> threadWorkFunc;
+
+int Platform::TryStartThreads(ThreadUsageType type, int requestCount, std::function<void(int)> threadWork)
 {
-	if (noThreading)
-		return 0;
+	if (noThreading) return 0;
 
-	threadWorkFunc = threadWork;
-
-	int numberOfThreads = SDL_GetCPUCount();
-
-	for (int i = 1; i < numberOfThreads; ++i)
+	for (int i = 0; i < requestCount; ++i)
 	{
-		std::string name = "WorkerThread" + std::to_string(i);
+		threadWorkFunc.push_back(threadWork);
+		int id = threadWorkFunc.size();
+		std::string name;
+
+		switch (type)
+		{
+		case ThreadUsageType::IO: name = "IOThread"; break;
+		case ThreadUsageType::JobSystem: name = "WorkerThread"; break;
+		default: name = "GenericThread"; break;
+		}
+
+		name += "_" + std::to_string(i);
 
 		SDL_CreateThread([](void* data) {
-			threadWorkFunc(*(int*)data);
+			int i = *(int*)data;
+			threadWorkFunc[i - 1](i);
 			return 0;
-			}, name.data(), new int(i));
+			}, name.data(), new int(id));
 	}
-	return std::max(0, numberOfThreads - 1);
+	return requestCount;
 }
 Semaphore Platform::CreateSemaphore()
 {

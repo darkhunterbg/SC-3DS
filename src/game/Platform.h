@@ -18,11 +18,17 @@ enum class PlatformType {
 	Nintendo3DS = 1,
 };
 
+enum class ThreadUsageType {
+	JobSystem = 0,
+	IO = 1,
+};
+
 struct PlatformInfo {
 public:
 	std::vector<Vector2Int16> Screens;
 	bool PointerIsCursor = false;
 	PlatformType Type = PlatformType::Generic;
+	int HardwareThreadsCount = 1;
 };
 
 class Platform {
@@ -41,7 +47,7 @@ public:
 	static double ElaspedTime();
 
 	// ================ File System ======================
-	
+
 	static TextureId LoadTexture(const char* path, Vector2Int16& outSize);
 	static const Font* LoadFont(const char* path, int size);
 	static FILE* OpenAsset(const char* path);
@@ -72,7 +78,7 @@ public:
 
 	// ================= Threading ==================
 
-	static int StartThreads(std::function<void(int)> threadWork);
+	static int TryStartThreads(ThreadUsageType type, int requestCount, std::function<void(int)> threadWork);
 	static Semaphore CreateSemaphore();
 	static void WaitSemaphore(Semaphore);
 	static void ReleaseSemaphore(Semaphore, int);

@@ -13,6 +13,28 @@ static std::hash<int> intHasher;
 
 AssetLoader AssetLoader::instance;
 
+void AssetLoader::ProcessIORequests(int threadId)
+{
+	while (true)
+	{
+		IORequest* request = nullptr;
+
+		Platform::WaitSemaphore(instance._semaphore);
+
+		if (instance._ioQueue.TryDequeue(&request))
+		{
+			request->action();
+			request->completed = true;
+		}
+	}
+}
+
+void AssetLoader::Init()
+{
+	instance._semaphore = Platform::CreateSemaphore();
+	instance._usesIOThread = Platform::TryStartThreads(ThreadUsageType::IO, 1, ProcessIORequests) > 0;
+}
+
 const Texture* AssetLoader::LoadTexture(const char* path)
 {
 	std::string p = path;
@@ -85,7 +107,6 @@ AudioClip* AssetLoader::LoadAudioClip(const char* path)
 
 static uint16_t audioClipId = 0;
 
-
 static AudioClip* LoadAudioClipFromFile(const char* path)
 {
 	std::string p = path;
@@ -120,7 +141,6 @@ static AudioClip* LoadAudioClipFromFile(const char* path)
 	return stream;
 }
 
-
 class AssetLoaderLoadDatabaseCrt : public Coroutine {
 
 	FILE* f;
@@ -153,4 +173,47 @@ class AssetLoaderLoadDatabaseCrt : public Coroutine {
 Coroutine* AssetLoader::LoadDatabaseAsync()
 {
 	return new AssetLoaderLoadDatabaseCrt();
+}
+
+
+class AssetLoaderIOCrt : public Coroutine {
+private:
+	AssetLoader::IORequest _request;
+
+public:
+	AssetLoaderIOCrt(std::function<void()> func)
+	{
+		_request.completed = false;
+		_request.action = func;
+
+		if (AssetLoader::instance._usesIOThread)
+		{
+			AssetLoader::instance._ioQueue.Enqueue(&_request);
+			Platform::ReleaseSemaphore(AssetLoader::instance._semaphore, 1);
+		}
+	}
+
+
+	CRT_START()
+	{
+		if (!AssetLoader::instance._usesIOThread)
+		{
+			_request.action();
+			_request.completed = true;
+
+			CRT_BREAK();
+		}
+
+		while (!_request.completed)
+		{
+			CRT_YIELD();
+		}
+	}
+	CRT_END();
+};
+
+
+Coroutine* AssetLoader::RunIOAsync(std::function<void()> func)
+{
+	return new AssetLoaderIOCrt(func);
 }

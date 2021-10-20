@@ -7,9 +7,14 @@
 #include <array>
 #include "../Data/GameDatabase.h"
 #include "../Coroutine.h"
+#include "../RingBuffer.h"
+
+typedef void* Semaphore;
+
 
 class AssetLoader {
 	friend class AssetLoaderLoadDatabaseCrt;
+	friend class AssetLoaderIOCrt;
 
 	typedef std::size_t AssetId;
 
@@ -31,11 +36,19 @@ class AssetLoader {
 		AssetType type;
 	};
 
+	struct IORequest {
+		std::function<void(void)> action;
+		volatile bool completed = false;
+	};
+
+
 private:
 
 	std::hash<std::string> hasher;
-
 	GameDatabase* db = nullptr;
+	RingBuffer<IORequest*, 1024> _ioQueue;
+	Semaphore _semaphore = 0;
+	bool _usesIOThread = false;
 
 	AssetLoader(const AssetLoader&) = delete;
 	AssetLoader& operator=(const AssetLoader&) = delete;
@@ -45,8 +58,12 @@ private:
 
 	static AssetLoader instance;
 
-	static inline constexpr const char* GetAssetTypeName(AssetType type)  {
-		if ((unsigned)type > instance.AssetTypeName.size()) {
+	static void ProcessIORequests(int threadId);
+
+	static inline constexpr const char* GetAssetTypeName(AssetType type)
+	{
+		if ((unsigned)type > instance.AssetTypeName.size())
+		{
 			return "Invalid";
 		}
 		return instance.AssetTypeName[(unsigned)type];
@@ -54,13 +71,18 @@ private:
 
 
 public:
-	inline static GameDatabase& GetDatabase() {
+	inline static GameDatabase& GetDatabase()
+	{
 		return *instance.db;
 	}
+
+	static void Init();
 
 	static Coroutine* LoadDatabaseAsync();
 
 	static const Texture* LoadTexture(const char* path);
 	static const Font* LoadFont(const char* path, int size);
 	static AudioClip* LoadAudioClip(const char* path);
+
+	static Coroutine* RunIOAsync(std::function<void()> func);
 };

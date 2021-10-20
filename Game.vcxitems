@@ -57,6 +57,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Platform.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Profiler.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Random.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\RingBuffer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\BootScene.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\GameScene.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.h" />

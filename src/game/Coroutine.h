@@ -13,7 +13,7 @@
 
 #define CRT_WAIT_FOR(CRT) __waitFor = CRT; CRT_YIELD()
 
-#define CRT_BREAK() return true;  }
+#define CRT_BREAK() return true; 
 
 class Coroutine {
 protected:

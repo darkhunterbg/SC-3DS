@@ -38,9 +38,12 @@ PlatformInfo Platform::GetPlatformInfo()
 	info.Type = PlatformType::Nintendo3DS;
 	info.Screens.push_back(Vector2Int16(screens[0].size));
 	info.Screens.push_back(Vector2Int16(screens[1].size));
+	bool isNew3DS = false;
+	APT_CheckNew3DS(&isNew3DS);
+	if (isNew3DS)
+		info.HardwareThreadsCount = 3;
 	return info;
 }
-
 
 TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize)
 {
@@ -391,7 +394,7 @@ void Platform::EnableChannel(const AudioChannelState& channel, bool enabled)
 	}
 }
 
-static  int threadIds[] = { 1,2,3 };
+static int threadIds[] = { 1,2,3 };
 
 static std::function<void(int)> f;
 
@@ -400,12 +403,12 @@ static void ThreadWork(void* arg)
 	f(*(int*)arg);
 }
 
-int Platform::StartThreads(std::function<void(int)> threadWork)
+int Platform::TryStartThreads(ThreadUsageType type, int requestCount, std::function<void(int)> threadWork)
 {
-
 	f = threadWork;
 
 	int threads = 0;
+	std::vector<int> cores;
 
 	s32 prio = 0;
 
@@ -413,14 +416,27 @@ int Platform::StartThreads(std::function<void(int)> threadWork)
 	if (r)
 		EXCEPTION("svcGetThreadPriority failed with %s", R_SUMMARY(r));
 
-	std::vector<int> cores;
-
-	for (int i = 0; i < 3; ++i)
+	if (type == ThreadUsageType::JobSystem)
 	{
-		if (threadCreate(ThreadWork, &threadIds[threads], 4096, prio - 1, threadIds[i], true))
+		for (int i = 0; i < requestCount; ++i)
 		{
-			cores.push_back(threadIds[i]);
+			if (threadCreate(ThreadWork, &threadIds[threads], 4096, prio - 1, threadIds[i], true))
+			{
+				cores.push_back(threadIds[i]);
+				++threads;
+			}
+		}
+	}
+	else if (type == ThreadUsageType::IO)
+	{
+		if (threadCreate(ThreadWork, new int(100), 4096, prio - 2, -2, true))
+		{
+			cores.push_back(0);
 			++threads;
+		}
+		else
+		{
+			EXCEPTION("Failed to create IO thread!");
 		}
 	}
 
@@ -430,25 +446,33 @@ int Platform::StartThreads(std::function<void(int)> threadWork)
 
 	//EXCEPTION("Created threads on cores %s, %i threads", coreIds.data(), cores.size());
 
+
 	return threads;
 }
+static int semaphoreCount;
+
 Semaphore Platform::CreateSemaphore()
 {
-	Handle* h = new Handle(0);
+	Handle* h = new Handle();
 	Result r = svcCreateSemaphore(h, 0, 100000);
 	if (r)
-		EXCEPTION("svcCreateSemaphore failed with %s", R_SUMMARY(r));
+		EXCEPTION("svcCreateSemaphore failed with %i: %s", r, R_SUMMARY(r));
+
 
 	return h;
 }
 void Platform::WaitSemaphore(Semaphore s)
 {
+	GAME_ASSERT((Handle*)s, "Tried to wait for null semaphore!");
+
 	Result r = svcWaitSynchronization(*(Handle*)s, -1);
 	if (r)
-		EXCEPTION("svcWaitSynchronization failed with %s", R_SUMMARY(r));
+		EXCEPTION("svcWaitSynchronization failed with %i: %s", r, R_SUMMARY(r));
 }
 void Platform::ReleaseSemaphore(Semaphore s, int v)
 {
+	GAME_ASSERT((Handle*)s, "Tried to release null semaphore!");
+
 	s32 o;
 	Result r = svcReleaseSemaphore(&o, *(Handle*)s, v);
 	if (r)

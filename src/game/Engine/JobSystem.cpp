@@ -28,7 +28,8 @@ void JobSystem::ThreadWork(int threadId)
 {
 	CurrentThreadId = threadId;
 
-	while (true) {
+	while (true)
+	{
 		Platform::WaitSemaphore(semaphore);
 
 		ThreadWorkOnJob(threadId);
@@ -43,7 +44,8 @@ void JobSystem::ThreadWorkOnJob(int threadId)
 
 	int nextJob = takenJobs.fetch_add(1, std::memory_order_seq_cst);
 
-	while (nextJob < totalJobs) {
+	while (nextJob < totalJobs)
+	{
 		Job job = jobs[nextJob];
 		a(job.start, job.end);
 
@@ -64,14 +66,16 @@ void JobSystem::ThreadWorkOnJob(int threadId)
 
 void JobSystem::ExecJob(int elements, int batchSize)
 {
-	if (!threads || elements <= batchSize) {
+	if (!threads || elements <= batchSize)
+	{
 		action(0, elements);
 		return;
 	}
 
 	jobs.clear();
 
-	for (int i = 0; i < elements; i += batchSize) {
+	for (int i = 0; i < elements; i += batchSize)
+	{
 		int count = std::min(batchSize, elements - i);
 		jobs.push_back({ i, i + count });
 	}
@@ -79,14 +83,16 @@ void JobSystem::ExecJob(int elements, int batchSize)
 	workingThreads = std::min(threads, (int)jobs.size()) + 1;
 	takenJobs = 0;
 
-	if (workingThreads > 1) {
+	if (workingThreads > 1)
+	{
 		Platform::ReleaseSemaphore(semaphore, workingThreads - 1);
 	}
 
 	ThreadWorkOnJob(0);
 
 	auto time = Platform::ElaspedTime();
-	while (workingThreads) {
+	while (workingThreads)
+	{
 		auto delta = Platform::ElaspedTime() - time;
 		if (delta > 3)
 			EXCEPTION("Main thread locked! Taken jobs %i/%i, working threads %i",
@@ -109,7 +115,7 @@ void JobSystem::ExecJobAsync(int elements, int batchSize)
 
 	if (workingThreads > 0)
 	{
-		Platform::ReleaseSemaphore(semaphore, workingThreads );
+		Platform::ReleaseSemaphore(semaphore, workingThreads);
 	}
 	else
 	{
@@ -121,7 +127,15 @@ void JobSystem::Init()
 {
 	CurrentThreadId = 0;
 
-	semaphore = Platform::CreateSemaphore();
-	threads = Platform::StartThreads(ThreadWork);
+
+	int workerThreads = Platform::GetPlatformInfo().HardwareThreadsCount - 1;
+
+	if (workerThreads > 0)
+	{
+		semaphore = Platform::CreateSemaphore();
+		threads = Platform::TryStartThreads(ThreadUsageType::JobSystem, workerThreads, ThreadWork);
+	}
+	else
+		threads = 0;
 
 }

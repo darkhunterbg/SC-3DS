@@ -144,6 +144,7 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Coroutine.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\TimeSlice.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\RingBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">

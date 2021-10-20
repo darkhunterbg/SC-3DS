@@ -1,15 +1,40 @@
 #include "AudioManager.h"
 #include "../Platform.h"
 #include "../Profiler.h"
+#include "AssetLoader.h"
+#include "../Coroutine.h"
 
 static constexpr const int AudioChannelBufferSize = 4096;
 static constexpr const int MonoChannels = 6;
 
 AudioManager AudioManager::instance;
 
+static void FinishBufferingAndPlay(AudioChannelState& channel)
+{
+	GAME_ASSERT(channel.IsStreaming(), "Channel %i is not streaming!");
+	channel.streamingCrt->RunAll();
+
+	channel.stream->SwapBuffers();
+	channel.QueueClip({ channel.stream->GetData(),0 });
+
+	delete channel.streamingCrt;
+	channel.streamingCrt = nullptr;
+
+	Platform::EnableChannel(channel, true);
+}
+
+static void StartLoadingNextBuffer(AudioChannelState& channel)
+{
+	GAME_ASSERT(channel.stream != nullptr, "Channel %i does not have audo stream to buffer from!", channel.ChannelId);
+	GAME_ASSERT(!channel.IsStreaming(), "Channel %i is already buffering!");
+
+	channel.streamingCrt = AssetLoader::RunIOAsync([channel]() {
+		channel.stream->FillNextBuffer();
+		});
+}
+
 void AudioManager::Init()
 {
-
 	AudioChannelState channel;
 	channel.mono = false;
 
@@ -36,14 +61,19 @@ void AudioManager::PlayClip(AudioClip* clip, int c)
 	auto& channel = instance.channels[c];
 
 	clip->Restart();
-	clip->FillNextBuffer();
+
+	if (channel.IsStreaming())
+	{
+		delete channel.streamingCrt;
+		channel.streamingCrt = nullptr;
+	}
 
 	channel.stream = clip;
 	channel.ClearQueue();
 
-	channel.QueueClip({ clip->GetData(),0 });
+	
 
-	Platform::EnableChannel(channel, true);
+	StartLoadingNextBuffer(channel);
 }
 
 void AudioManager::StopChannel(int c)
@@ -61,25 +91,38 @@ void AudioManager::UpdateAudio()
 {
 	for (auto& channel : instance.channels)
 	{
-		if (channel.IsValid())
+		if (!channel.IsValid())
+			continue;
+
+
+		bool isStreamDone = !channel.IsStreaming() && (channel.stream == nullptr || channel.stream->IsAtEnd());
+		bool isPlayingDone = channel.CurrentClip() == nullptr || channel.CurrentClip()->Done();
+
+		if (isPlayingDone && isStreamDone)
 		{
-			auto* currentClip = channel.CurrentClip();
+			Platform::EnableChannel(channel, false);
+			continue;
+		}
 
-			if (channel.stream && !channel.stream->IsAtEnd())
+
+		if (channel.stream == nullptr)
+			continue;
+
+
+		if (!channel.stream->IsAtEnd())
+		{
+			AudioClip& track = *channel.stream;
+
+			if (!channel.IsQueueFull())
 			{
-				AudioClip& track = *channel.stream;
-
-				if (!channel.IsQueueFull())
-				{
-					track.FillNextBuffer();
-					channel.QueueClip({ track.GetData(),0 });
-				}
+				if (!channel.IsStreaming())
+					StartLoadingNextBuffer(channel);
 			}
-			else
-				if (currentClip == nullptr || currentClip->Done())
-				{
-					Platform::EnableChannel(channel, false);
-				}
+
+			if (channel.IsDone() && channel.IsStreaming())
+			{
+				FinishBufferingAndPlay(channel);
+			}
 		}
 	}
 }

@@ -138,7 +138,7 @@ struct AudioInfo {
 class AudioClip {
 public:
 	Span<uint8_t> GetData() const {
-		return { buffers[activeBufferIndex].Data(), (unsigned)activeBufferSize };
+		return { buffers[_activeBufferIndex].Data(), (unsigned)_activeBufferSize };
 	}
 	int GetSize() const {
 		return info.GetTotalSize();
@@ -152,6 +152,7 @@ public:
 
 	int GetRemaining() const;
 	bool FillNextBuffer();
+	void SwapBuffers();
 	bool Restart();
 
 	AudioClip(const AudioClip&) = delete;
@@ -174,9 +175,10 @@ private:
 	static constexpr const int BufferCount = 2;
 
 	std::array< Span<uint8_t>, BufferCount> buffers;
-	int activeBufferSize = 0;
+	int _activeBufferSize = 0;
+	int _nextBufferSize = 0;
 	FILE* stream;
-	int activeBufferIndex = 1;
-	int streamPos = 0;
-	fpos_t streamStartPos = 0;
+	int _activeBufferIndex = 1;
+	int _streamPos = 0;
+	fpos_t _streamStartPos = 0;
 };
