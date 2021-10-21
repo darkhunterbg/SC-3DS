@@ -11,6 +11,7 @@ class GraphicsRenderer {
 
 private:
 	BlendMode blendMode = BlendMode::Alpha;
+	ScreenId _currentScreen = ScreenId::Top;
 
 	GraphicsRenderer() {}
 
@@ -81,4 +82,6 @@ public:
 	static ImageFrame NewSprite(const Texture& texture, const Rectangle16& rect);
 
 	static Vector2Int16 GetScreenSize(ScreenId screen);
+
+	static Vector2Int16 GetCurrentScreenSize();
 };

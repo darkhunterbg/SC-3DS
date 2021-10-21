@@ -2,10 +2,10 @@
 #include "../Scenes/BootScene.h"
 #include "../Assets.h"
 #include "../Engine/AssetLoader.h"
-#include "../Engine/GraphicsRenderer.h"
 #include "../Engine/InputManager.h"
 #include "../Game.h"
 #include "../Platform.h"
+#include "../GUI/GUI.h"
 
 static const Texture* _title;
 
@@ -18,52 +18,69 @@ void BootSceneView::Draw()
 {
 	if (Game::GetPlatformInfo().Type == PlatformType::Nintendo3DS)
 	{
-		GraphicsRenderer::DrawOnScreen(ScreenId::Top);
+		GUI::UseScreen(ScreenId::Top);
 
-		GraphicsRenderer::Draw(*_title, { 0,0 }, { 400,300 });
+		GUIImage::DrawTexture(*_title, { {0,0},{400,300} });
 
-		GraphicsRenderer::DrawOnScreen(ScreenId::Bottom);
+		GUI::UseScreen(ScreenId::Bottom);
 
-		GraphicsRenderer::DrawRectangle({ {0,0},{320,240} }, Colors::Black);
+		GUIImage::DrawColor(Colors::Black);
 
-		GraphicsRenderer::Draw(*_title, { -430,-358 }, { 640,480 });
-		GraphicsRenderer::DrawRectangle({ {0,0},{120,200} }, Colors::Black);
+		GUIImage::DrawTexture(*_title, { { -440, -358} ,{640,480} });
 
-		GraphicsRenderer::Draw(*_title, { -40,-240 }, { 400,300 });
-		GraphicsRenderer::DrawRectangle({ {300,25},{20,100} }, Colors::Black);
+		GUIImage::DrawColor({ {0,0},{120,200} }, Colors::Black);
+
+		GUIImage::DrawTexture(*_title, { { -40,-240 }, { 400,300 } });
+		GUIImage::DrawColor({ {300,25},{20,100} }, Colors::Black);
+
+		const char* text = nullptr;
 
 		if (_scene->IsLoadCompleted())
 		{
 			if ((_frameCounter / 30) % 3)
-
-				GraphicsRenderer::DrawText(*Game::SystemFont12, { 110,140 }, "Press A to continue", Colors::SCWhite);
+				text = "Press A to continue";
 		}
 		else
-			GraphicsRenderer::DrawText(*Game::SystemFont12, { 145,140 }, "Loading", Colors::SCWhite);
+		{
+			text = "Loading";
+		}
+
+		if (text != nullptr)
+		{
+			GUILabel::DrawText(*Game::SystemFont12, text, Vector2Int(0, 20), GUIHorizontalAlignment::Center, GUIVerticalAlignment::Center, Colors::SCWhite);
+		}
 	}
 	else
 	{
-		GraphicsRenderer::DrawOnScreen(ScreenId::Top);
+		GUI::UseScreen(ScreenId::Top);
 
-		GraphicsRenderer::Draw(*_title, { 0,0 }, Vector2Int(_title->GetSize()));
+		GUIImage::DrawTexture(*_title);
 
 		Vector2Int pos = Vector2Int(_title->GetSize());
 		pos.x /= 2;
 		pos.y -= 90;
 		pos.x -= 22;
 
+		const char* text = nullptr;
+
 		if (_scene->IsLoadCompleted())
 		{
 			if ((_frameCounter / 30) % 3)
+				text = "Press A to continue";
 
-				GraphicsRenderer::DrawText(*Game::SystemFont16, pos - Vector2Int{ 40, 0 }, "Press A to continue", Colors::SCWhite);
 		}
 		else
-			GraphicsRenderer::DrawText(*Game::SystemFont16, pos, "Loading", Colors::SCWhite);
+		{
+			text = "Loading";
+		}
+
+		if (text != nullptr)
+		{
+			GUILabel::DrawText(*Game::SystemFont16, text, Vector2Int(0, 160), GUIHorizontalAlignment::Center, GUIVerticalAlignment::Center, Colors::SCWhite);
+		}
 	}
 
-
-	if (_scene->IsLoadCompleted() && ( InputManager::Gamepad.IsButtonDown(GamepadButton::A)))
+	if (_scene->IsLoadCompleted() && (InputManager::Gamepad.IsButtonDown(GamepadButton::A)))
 	{
 		_scene->StartGame();
 	}

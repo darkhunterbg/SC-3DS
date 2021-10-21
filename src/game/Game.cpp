@@ -12,6 +12,7 @@
 #include "Engine/AssetLoader.h"
 #include "Engine/InputManager.h"
 
+#include "GUI/GUI.h"
 
 #include "Platform.h"
 
@@ -94,6 +95,7 @@ void Game::Start()
 	frameStartTime = Platform::ElaspedTime();
 	AudioManager::Init();
 	GraphicsRenderer::Init();
+	GUI::SetState(*(new GUIState()));
 
 	InitialScene();
 }

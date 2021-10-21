@@ -112,6 +112,7 @@ void GraphicsRenderer::DrawOnScreen(ScreenId screen)
 {
 	Submit();
 	Platform::DrawOnScreen(screen);
+	instance._currentScreen = screen;
 }
 
 void GraphicsRenderer::DrawOnSurface(RenderSurface surface)
@@ -173,4 +174,9 @@ Vector2Int16 GraphicsRenderer::GetScreenSize(ScreenId screen)
 	auto& platformInfo = Game::GetPlatformInfo();
 	if (platformInfo.Screens.size() <= (int)screen) return Vector2Int16();
 	return platformInfo.Screens[(int)screen];
+}
+
+Vector2Int16 GraphicsRenderer::GetCurrentScreenSize()
+{
+	return GetScreenSize(instance._currentScreen);
 }
