@@ -13,12 +13,11 @@ static void LoadData(uint32_t size, FILE* f, std::vector<TDataType>& outData)
 }
 
 
-class BinaryDataLoadDatabaseCrt : public CoroutineImpl {
+class BinaryDataLoadDatabaseCrt : public CoroutineRImpl<GameDatabase*> {
 
 public:
 	FILE* f = nullptr;
 	GameDatabase* db = nullptr;
-	GameDatabase** store = nullptr;
 	BinaryDataLoadDatabaseCrt(FILE* f) : f(f) {}
 private:
 
@@ -28,8 +27,7 @@ private:
 
 	CRT_START()
 	{
-		*store = new GameDatabase();
-		db = *store;
+		db = new GameDatabase();
 
 		headerCount = 0;
 		fread(&headerCount, sizeof(headerCount), 1, f);
@@ -88,17 +86,16 @@ private:
 
 		delete[] headers;
 
-
+		CRT_RETURN(db);
 	}
 	CRT_END();
 };
 
-Coroutine BinaryDataLoader::LoadDatabaseAsync(FILE* f, GameDatabase** out)
+CoroutineR<GameDatabase*> BinaryDataLoader::LoadDatabaseAsync(FILE* f)
 {
 	auto c = new BinaryDataLoadDatabaseCrt(f);
-	c->store = out;
 
-	Coroutine crt = Coroutine(c);
+	CoroutineR<GameDatabase*> crt = CoroutineR<GameDatabase*>(c);
 
 	return crt;
 }

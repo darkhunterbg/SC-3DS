@@ -4,6 +4,8 @@
 #include <vector>
 #include <memory>
 
+#include <cstdio>
+
 #define NAMEOF(CLASS) #CLASS
 
 #define CRT_START()  virtual bool MoveNext() override { switch(__iter) { case 0:  
@@ -14,11 +16,15 @@
 
 #define CRT_WAIT_FOR(CRT) __waitFor = CRT; CRT_YIELD()
 
-#define CRT_BREAK() return true; 
+#define CRT_BREAK() return true;
+
+#define CRT_RETURN(RESULT) __result = RESULT; CRT_BREAK()
 
 class CoroutineImpl;
+class CorroutineRImpl;
 
-typedef std::shared_ptr<CoroutineImpl> Coroutine;
+using Coroutine = std::shared_ptr<CoroutineImpl>;
+
 
 class CoroutineImpl {
 protected:
@@ -28,6 +34,7 @@ protected:
 
 	virtual bool MoveNext() = 0;
 
+	friend class CorroutineRImpl;
 public:
 
 	CoroutineImpl() {}
@@ -37,7 +44,7 @@ public:
 	// Returns TRUE when coroutine is done.
 	bool Next()
 	{
-		if (__waitFor == nullptr)
+		if (!__waitFor)
 			return MoveNext();
 		else
 		{
@@ -55,3 +62,19 @@ public:
 		while (!MoveNext());
 	}
 };
+
+template<class TResult>
+class CoroutineRImpl :  public virtual CoroutineImpl {
+protected:
+	TResult __result = {};
+public:
+	CoroutineRImpl() : CoroutineImpl() {}
+	CoroutineRImpl(const CoroutineRImpl&) = delete;
+	CoroutineRImpl& operator=(const CoroutineRImpl&) = delete;
+
+	TResult GetResult() const { printf("GetResult: 0x%p", (void*)__result); return __result; }
+};
+
+
+template <typename TResult>
+using CoroutineR = std::shared_ptr<CoroutineRImpl<TResult>>;

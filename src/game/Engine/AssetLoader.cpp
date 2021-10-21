@@ -173,14 +173,16 @@ class AssetLoaderLoadDatabaseCrt : public CoroutineImpl {
 	FILE* f;
 	AssetLoader::AssetId id;
 	AssetLoader::AssetEntry* e;
-
+	CoroutineR<GameDatabase*> loadDBCrt;
 	CRT_START()
 	{
 		f = Platform::OpenAsset(DataFile, AssetType::Database);
 		if (!f)
 			EXCEPTION("Failed to load file %s", DataFile);
 
-		CRT_WAIT_FOR(BinaryDataLoader::LoadDatabaseAsync(f, &AssetLoader::instance.db));
+		loadDBCrt = BinaryDataLoader::LoadDatabaseAsync(f);
+		CRT_WAIT_FOR(loadDBCrt);
+		AssetLoader::instance.db = loadDBCrt->GetResult();
 
 		id = AssetLoader::instance.hasher(DataFile);
 		e = &AssetLoader::instance.loadedAssets[id];
