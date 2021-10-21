@@ -1,22 +1,29 @@
 #include "BootScene.h"
 #include "../Engine/AssetLoader.h"
 #include "../Engine/AudioManager.h"
-#include "../Engine/GraphicsRenderer.h"
-#include "../Engine/InputManager.h"
 #include "../Data/GameDatabase.h"
 #include "../Game.h"
 #include "../Scenes/GameScene.h"
-#include "../Platform.h"
 #include "../TimeSlice.h"
+#include "../SceneView/BootSceneView.h"
 
-static const Texture* _title;
 static bool _autoStart = false;
 
 BootScene::BootScene()
 {
-	_title = AssetLoader::LoadTexture("atlases\\title_0");
-
+	_view = new BootSceneView(this);
 }
+
+BootScene::~BootScene()
+{
+	delete _view;
+}
+
+void BootScene::StartGame()
+{
+	Game::SetCurrentScene(new GameScene());
+}
+
 void BootScene::Start()
 {
 	auto clip = AssetLoader::LoadAudioClip("music\\title");
@@ -28,85 +35,33 @@ void BootScene::Start()
 
 void BootScene::Stop()
 {
-
 }
 
 void BootScene::Update()
 {
-	if (_ready) return;
-
-	TimeSlice budget = TimeSlice(0.010);
-
-	while (!budget.IsTimeElapsed())
+	if (!_ready)
 	{
-		if (_loadCrt->Next())
+		TimeSlice budget = TimeSlice(0.010);
+
+		while (!budget.IsTimeElapsed())
 		{
-			_ready = true;
-			break;
+			if (_loadCrt->Next())
+			{
+				_ready = true;
+
+				break;
+			}
 		}
+	}
+
+
+	if (_ready && _autoStart)
+	{
+		StartGame();
 	}
 }
 
 void BootScene::Draw()
 {
-	if (Game::GetPlatformInfo().Type == PlatformType::Nintendo3DS)
-	{
-		GraphicsRenderer::DrawOnScreen(ScreenId::Top);
-
-		GraphicsRenderer::Draw(*_title, { 0,0 }, { 400,300 });
-
-		GraphicsRenderer::DrawOnScreen(ScreenId::Bottom);
-
-		GraphicsRenderer::DrawRectangle({ {0,0},{320,240} }, Colors::Black);
-
-		GraphicsRenderer::Draw(*_title, { -430,-358 }, { 640,480 });
-		GraphicsRenderer::DrawRectangle({ {0,0},{120,200} }, Colors::Black);
-
-		GraphicsRenderer::Draw(*_title, { -40,-240 }, { 400,300 });
-		GraphicsRenderer::DrawRectangle({ {300,25},{20,100} }, Colors::Black);
-
-		if (_ready)
-		{
-			if ((_frameCounter / 30) % 3)
-
-				GraphicsRenderer::DrawText(*Game::SystemFont12, { 110,140 }, "Press A to continue", Colors::SCWhite);
-		}
-		else
-			GraphicsRenderer::DrawText(*Game::SystemFont12, { 145,140 }, "Loading", Colors::SCWhite);
-	}
-	else
-	{
-		GraphicsRenderer::DrawOnScreen(ScreenId::Top);
-
-		GraphicsRenderer::Draw(*_title, { 0,0 }, Vector2Int(_title->GetSize()));
-
-		Vector2Int pos = Vector2Int(_title->GetSize());
-		pos.x /= 2;
-		pos.y -= 90;
-		pos.x -= 22;
-
-		if (_ready)
-		{
-			if ((_frameCounter / 30) % 3)
-
-				GraphicsRenderer::DrawText(*Game::SystemFont16, pos - Vector2Int{ 40, 0 }, "Press A to continue", Colors::SCWhite);
-		}
-		else
-			GraphicsRenderer::DrawText(*Game::SystemFont16, pos, "Loading", Colors::SCWhite);
-	}
-
-
-	if (_ready && (_autoStart || InputManager::Gamepad.IsButtonDown(GamepadButton::A)))
-	{
-		Game::SetCurrentScene(new GameScene());
-	}
-
-	_frameCounter++;
-}
-
-
-
-BootScene::~BootScene()
-{
-
+	_view->Draw();
 }

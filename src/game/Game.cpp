@@ -15,7 +15,7 @@
 
 #include "Platform.h"
 
-
+#include <queue>
 
 static Scene* currentScene;
 
@@ -33,10 +33,35 @@ float Game::DeltaTime = 0;
 
 static PlatformInfo _platformInfo;
 
+static std::queue<Scene*> _nextScene;
+
+static bool SwithScenes()
+{
+	bool switched = false;
+
+	while (_nextScene.size() > 0)
+	{
+		if (currentScene != nullptr)
+		{
+			currentScene->Stop();
+			delete currentScene;
+		}
+
+		currentScene = _nextScene.back();
+		_nextScene.pop();
+		currentScene->Start();
+
+		switched = true;
+	}
+
+	return switched;
+}
+
 
 static void InitialScene()
 {
 	Game::SetCurrentScene(new BootScene());
+	SwithScenes();
 }
 
 void Game::FrameStart()
@@ -76,12 +101,21 @@ bool Game::Update()
 {
 	//SectionProfiler p("Update");
 
+	SwithScenes();
+
 	InputManager::Update();
 
 	AudioManager::UpdateAudio();
 
 	if (currentScene)
 		currentScene->Update();
+
+	if (SwithScenes())
+	{
+		// Run another update for the new scene
+		if (currentScene)
+			currentScene->Update();
+	}
 
 	//p.Submit();
 
@@ -92,7 +126,6 @@ void Game::Draw()
 {
 	//SectionProfiler p("Draw");
 	GraphicsRenderer::NewFrame();
-
 
 	if (currentScene)
 		currentScene->Draw();
@@ -106,20 +139,17 @@ void Game::Draw()
 
 void Game::End()
 {
-
 	if (currentScene != nullptr)
 		currentScene->Stop();
+
 
 	currentScene = nullptr;
 }
 
 void Game::SetCurrentScene(Scene* scene)
 {
-	if (currentScene != nullptr)
-		currentScene->Stop();
+	_nextScene.emplace(scene);
 
-	currentScene = scene;
-	currentScene->Start();
 }
 
 const PlatformInfo& Game::GetPlatformInfo()
@@ -131,3 +161,4 @@ void Game::PlatformUpdated()
 {
 	_platformInfo = Platform::GetPlatformInfo();
 }
+

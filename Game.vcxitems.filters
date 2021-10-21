@@ -19,6 +19,9 @@
     <Filter Include="Engine">
       <UniqueIdentifier>{898c26bb-8331-471d-9b99-4afb31e09d10}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SceneView">
+      <UniqueIdentifier>{c23002b4-d6e6-4602-81be-85e68edc381e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.h">
@@ -145,6 +148,15 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Coroutine.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\TimeSlice.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\RingBuffer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\BootSceneView.h">
+      <Filter>SceneView</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIImage.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIBase.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -251,5 +263,11 @@
       <Filter>Scenes</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\TimeSlice.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\BootSceneView.cpp">
+      <Filter>SceneView</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIImage.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
