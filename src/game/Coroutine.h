@@ -64,7 +64,7 @@ public:
 };
 
 template<class TResult>
-class CoroutineRImpl :  public virtual CoroutineImpl {
+class CoroutineRImpl : public virtual CoroutineImpl {
 protected:
 	TResult __result = {};
 public:
@@ -72,7 +72,7 @@ public:
 	CoroutineRImpl(const CoroutineRImpl&) = delete;
 	CoroutineRImpl& operator=(const CoroutineRImpl&) = delete;
 
-	TResult GetResult() const { printf("GetResult: 0x%p", (void*)__result); return __result; }
+	TResult GetResult() const { return __result; }
 };
 
 
