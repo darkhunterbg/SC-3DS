@@ -32,4 +32,5 @@ public:
 	static const PlatformInfo& GetPlatformInfo();
 
 	static void PlatformUpdated();	
+
 };

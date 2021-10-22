@@ -28,7 +28,7 @@ using Coroutine = std::shared_ptr<CoroutineImpl>;
 
 class CoroutineImpl {
 private:
-	bool _done = false;
+	volatile bool _done = false;
 protected:
 	int __iter = 0;
 
@@ -42,6 +42,8 @@ public:
 	CoroutineImpl() {}
 	CoroutineImpl(const CoroutineImpl&) = delete;
 	CoroutineImpl& operator=(const CoroutineImpl&) = delete;
+
+	virtual ~CoroutineImpl() {}
 
 	// Returns TRUE when coroutine is done.
 	bool Next()
@@ -80,6 +82,8 @@ public:
 	CoroutineRImpl& operator=(const CoroutineRImpl&) = delete;
 
 	TResult GetResult() const { return __result; }
+
+	virtual ~CoroutineRImpl() {}
 };
 
 

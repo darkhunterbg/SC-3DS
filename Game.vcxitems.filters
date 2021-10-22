@@ -317,5 +317,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\IAudioSource.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\PlatformAlloc.cpp" />
   </ItemGroup>
 </Project>

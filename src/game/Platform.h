@@ -84,6 +84,10 @@ public:
 	static void WaitSemaphore(Semaphore);
 	static void ReleaseSemaphore(Semaphore, int);
 
+	// ================ Other ========================
+
+	static void* PlatformAlloc(unsigned size);
+	static void PlatformFree(void* ptr);
 };
 
 

@@ -176,7 +176,7 @@ public:
 	void SetSize(Vector2Int16 size);
 
 	PlayerId AddPlayer(const RaceDef& race, Color color);
-	inline bool HasPlayer(PlayerId id) { return id.i >= 0 &&  id.i < players.size(); }
+	inline bool HasPlayer(PlayerId id) { return id.i >= 0 &&  id.i < (short)players.size(); }
 	void SetMapKnown(PlayerId player);
 
 	const PlayerInfo& GetNeutralPlayer() const;

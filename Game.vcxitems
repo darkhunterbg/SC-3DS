@@ -118,6 +118,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\LibSmacker\smk_hufftree.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\BinaryData.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\Wave.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\PlatformAlloc.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Profiler.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Random.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\BootScene.cpp" />
