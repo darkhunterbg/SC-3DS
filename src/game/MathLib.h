@@ -411,7 +411,7 @@ struct Rectangle16
 
 		Vector2Int16 dist = c.position - test;
 		int radius = (int)c.size * (int)c.size;
-		return dist.LengthSquaredInt() <= radius;
+		return (int)dist.LengthSquaredInt() <= radius;
 	}
 
 	inline bool Contains(const Vector2Int16& v) const {

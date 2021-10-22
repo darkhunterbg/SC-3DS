@@ -3,6 +3,7 @@
 #include "../Span.h"
 #include "../Coroutine.h"
 
+#include <vector>
 #include <inttypes.h>
 
 struct AudioChannelClip {
@@ -43,4 +44,21 @@ public:
 	virtual bool Restart() = 0;
 	virtual bool IsAtEnd() const = 0;
 	virtual ~IAudioSource() {}
+};
+
+class BufferedAudioSource : public IAudioSource {
+	struct Buffer {
+		uint8_t* data;
+		unsigned size;
+	};
+private:
+	std::vector<Buffer> _buffers;
+	int _nextBuffer = 0;
+public:
+	void AddCopyBuffer(const uint8_t* _buffer, unsigned size);
+	void AddAndOwnBuffer(uint8_t* _buffer, unsigned size);
+	virtual CoroutineR<AudioChannelClip> GetNextAudioChannelClipAsync() override;
+	virtual bool Restart() override;
+	virtual bool IsAtEnd() const override;
+	virtual ~BufferedAudioSource() override;
 };

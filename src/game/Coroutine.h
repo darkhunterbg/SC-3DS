@@ -10,7 +10,7 @@
 
 #define CRT_START()  virtual bool MoveNext() override { switch(__iter) { case 0:  
 
-#define CRT_END() return true; }}
+#define CRT_END() return true; } return true;}
 
 #define CRT_YIELD()  __iter = __LINE__ ; return  false;  case __LINE__: {}
 
@@ -46,6 +46,8 @@ public:
 	// Returns TRUE when coroutine is done.
 	bool Next()
 	{
+		if (IsCompleted()) return true;
+		
 		if (!__waitFor)
 			return _done = MoveNext();
 		else
@@ -67,8 +69,9 @@ public:
 	}
 };
 
+
 template<class TResult>
-class CoroutineRImpl : public virtual CoroutineImpl {
+class CoroutineRImpl : public  CoroutineImpl {
 protected:
 	TResult __result = {};
 public:
@@ -82,3 +85,44 @@ public:
 
 template <typename TResult>
 using CoroutineR = std::shared_ptr<CoroutineRImpl<TResult>>;
+
+
+namespace hidden
+{
+	class GenericCrt : public CoroutineImpl {
+		std::function<void()> _func;
+	public:
+		GenericCrt(std::function<void()> func) : _func(func) {}
+
+		CRT_START()
+		{
+			_func();
+		}
+		CRT_END();
+	};
+
+	template<class TResult>
+	class GenericRCrt : public CoroutineRImpl<TResult> {
+		std::function<TResult()> _func;
+	public:
+		GenericRCrt(std::function<TResult()> func) : _func(func) {}
+
+		virtual bool MoveNext() override
+		{
+			CoroutineRImpl<TResult>::__result = _func();
+			return true;
+		}
+	};
+}
+
+
+static Coroutine CoroutineFromFunction(std::function<void()> func)
+{
+	return Coroutine(new hidden::GenericCrt(func));
+}
+
+template<class TResult>
+static CoroutineR<TResult> CoroutineFromFunctionResult(std::function<TResult()> func)
+{
+	return CoroutineR<TResult>(new hidden::GenericRCrt<TResult>(func));
+}

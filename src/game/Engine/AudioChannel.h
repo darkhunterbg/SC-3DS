@@ -8,7 +8,7 @@ typedef int AudioChannelHandle;
 
 struct AudioChannelState {
 
-	static constexpr const int QueueSize = 2;
+	static constexpr const int MaxQueueItems = 2;
 
 	bool mono = false;
 	bool playbackCompleted = true;
@@ -19,7 +19,7 @@ struct AudioChannelState {
 	AudioChannelHandle handle = -1;
 	unsigned bufferSize = 0;
 
-	std::array< AudioChannelClip, QueueSize> clipQueue;
+	std::array< AudioChannelClip, MaxQueueItems> clipQueue;
 	int queueSize = 0;
 
 	IAudioSource* stream = nullptr;
@@ -50,11 +50,11 @@ struct AudioChannelState {
 
 	bool IsDone() const { return queueSize == 0 && playbackCompleted; }
 
-	bool IsQueueFull() const { return queueSize == QueueSize; }
+	bool IsQueueFull() const { return queueSize == MaxQueueItems; }
 
 	bool QueueClip(AudioChannelClip clip)
 	{
-		if (queueSize == QueueSize)
+		if (queueSize == MaxQueueItems)
 			return false;
 
 		clipQueue[queueSize++] = clip;

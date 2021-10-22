@@ -171,22 +171,9 @@ void Platform::UpdateSurface(SurfaceId surface, Rectangle part, Span<uint8_t> by
 			int width = tex->width;
 			int height = tex->height;
 
-			void* gpusrc = linearAlloc(bytes.Size());
+			void* gpusrc = bytes.Data();
 
-			memcpy(gpusrc, bytes.Data(), bytes.Size());
-
-			GSPGPU_FlushDataCache(gpusrc, bytes.Size());
-
-
-			void* data = (void*)linearAlloc(tex->width * tex->height * 4);
-
-
-			C3D_SyncDisplayTransfer((u32*)gpusrc, GX_BUFFER_DIM(part.size.x, part.size.y), (u32*)data, GX_BUFFER_DIM(width, height), TEXTURE_TRANSFER_FLAGS);
-			C3D_TexUpload(tex, data);
-
-			linearFree(data);
-
-			linearFree(gpusrc);
+			C3D_SyncDisplayTransfer((u32*)gpusrc, GX_BUFFER_DIM(part.size.x, part.size.y), (u32*)tex->data, GX_BUFFER_DIM(width, height), TEXTURE_TRANSFER_FLAGS);
 
 			return;
 		}

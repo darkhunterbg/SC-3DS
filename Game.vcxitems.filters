@@ -314,5 +314,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\VideoPlaybackScene.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\IAudioSource.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

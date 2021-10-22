@@ -90,7 +90,7 @@
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <AdditionalOptions>-Wno-unused-variable</AdditionalOptions>
+      <AdditionalOptions>-Wno-unused-variable -Wno-unused-function</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

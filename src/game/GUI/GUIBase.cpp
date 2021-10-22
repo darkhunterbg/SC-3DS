@@ -57,6 +57,8 @@ Vector2Int GUI::GetRelativePosition(Vector2Int pos, GUIHorizontalAlignment hAlig
 
 	position += scale * space.size / 2;
 	position += pos;
+
+	return position;
 }
 
 Vector2Int GUI::GetRelativePosition(Rectangle rect, GUIHorizontalAlignment hAlign, GUIVerticalAlignment vAlign)

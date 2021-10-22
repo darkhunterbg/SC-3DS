@@ -9,15 +9,16 @@ static constexpr const int MonoChannels = 6;
 
 AudioManager AudioManager::instance;
 
+
 static void FinishBufferingAndPlay(AudioChannelState& channel)
 {
 	GAME_ASSERT(channel.IsStreaming(), "Channel %i is not streaming!");
 	channel.streamingCrt->RunAll();
 
 	auto clip = channel.streamingCrt->GetResult();
-	if(!clip.IsEmpty())
-		channel.QueueClip(channel.streamingCrt->GetResult());
-	
+	if (!clip.IsEmpty())
+		channel.QueueClip(clip);
+
 	channel.StopStreaming();
 
 	Platform::EnableChannel(channel, !clip.IsEmpty());
@@ -54,24 +55,11 @@ void AudioManager::Init()
 	}
 }
 
-void AudioManager::PlayBuffer(Span<uint8_t> buffer, int c)
-{
-	auto& channel = instance.channels[c];
-
-	channel.StopStreaming();
-
-	channel.stream = nullptr;
-	channel.ClearQueue();
-	
-
-	channel.QueueClip(AudioChannelClip{ buffer, 0 });
-	Platform::EnableChannel(channel, true);
-}
 
 
 void AudioManager::Play(IAudioSource& src, int c)
 {
-	GAME_ASSERT(c< instance.channels.size(), "Tried to play clip on  invalid channel %i", c);
+	GAME_ASSERT(c < instance.channels.size(), "Tried to play clip on  invalid channel %i", c);
 
 	auto& channel = instance.channels[c];
 
@@ -118,18 +106,17 @@ void AudioManager::UpdateAudio()
 			continue;
 
 
-		if (!channel.stream->IsAtEnd())
-		{
-			if (!channel.IsQueueFull())
-			{
-				if (!channel.IsStreaming())
-					StartLoadingNextBuffer(channel);
-			}
 
-			if (channel.IsDone() && channel.IsStreaming())
-			{
-				FinishBufferingAndPlay(channel);
-			}
+		if (!channel.IsQueueFull())
+		{
+			if (!channel.IsStreaming())
+				StartLoadingNextBuffer(channel);
 		}
+
+		if (channel.IsDone() && channel.IsStreaming())
+		{
+			FinishBufferingAndPlay(channel);
+		}
+
 	}
 }
