@@ -28,7 +28,7 @@ AbstractPlatform abstractPlatform;
 
 Rectangle touchScreenLocation;
 bool mute = false;
-bool noThreading = false;
+bool noThreading = true;
 
 
 void Toolbar();

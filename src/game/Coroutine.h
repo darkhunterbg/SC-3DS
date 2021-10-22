@@ -27,6 +27,8 @@ using Coroutine = std::shared_ptr<CoroutineImpl>;
 
 
 class CoroutineImpl {
+private:
+	bool _done = false;
 protected:
 	int __iter = 0;
 
@@ -45,7 +47,7 @@ public:
 	bool Next()
 	{
 		if (!__waitFor)
-			return MoveNext();
+			return _done = MoveNext();
 		else
 		{
 			bool done = __waitFor->Next();
@@ -57,9 +59,11 @@ public:
 		}
 	}
 
+	inline bool IsCompleted() const { return  _done; }
+
 	inline void RunAll()
 	{
-		while (!MoveNext());
+		while (!Next());
 	}
 };
 

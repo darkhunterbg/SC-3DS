@@ -7,6 +7,8 @@
 #include <string>
 #include <array>
 
+#include "Engine/IAudioSource.h"
+
 
 enum class AssetType : uint8_t {
 	Unknown = 0,
@@ -145,7 +147,7 @@ struct AudioInfo {
 	}
 };
 
-class AudioClip {
+class AudioClip : public IAudioSource {
 public:
 	Span<uint8_t> GetData() const {
 		return { buffers[_activeBufferIndex].Data(), (unsigned)_activeBufferSize };
@@ -156,14 +158,17 @@ public:
 	float GetDuration() const {
 		return info.GetDurationSeconds();
 	}
-	bool IsAtEnd() const {
+	virtual bool IsAtEnd() const override
+	{
 		return GetRemaining() == 0;
 	}
 
 	int GetRemaining() const;
 	bool FillNextBuffer();
 	void SwapBuffers();
-	bool Restart();
+	virtual bool Restart() override;
+
+	CoroutineR<AudioChannelClip> GetNextAudioChannelClipAsync() override;
 
 	AudioClip(const AudioClip&) = delete;
 	AudioClip& operator=(const AudioClip&) = delete;
@@ -176,7 +181,7 @@ public:
 	/// Create buffered clip (data will be streamed between 2 buffers)
 	/// </summary>
 	AudioClip(AudioInfo info, unsigned bufferSize, FILE* stream);
-	~AudioClip();
+	virtual ~AudioClip() override;
 
 	uint16_t id = 0;
 private:

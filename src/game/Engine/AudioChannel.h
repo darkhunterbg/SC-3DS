@@ -1,37 +1,10 @@
 #pragma once
 
 #include <array>
-#include "../Span.h"
-#include "../Assets.h"
-#include "../Coroutine.h"
+
+#include "IAudioSource.h"
 
 typedef int AudioChannelHandle;
-
-
-struct AudioChannelClip {
-	Span<uint8_t> data = {};
-	unsigned playPos = 0;
-
-	unsigned Remaining() {
-		return data.Size() - playPos;
-	}
-
-	bool Done() const {
-		return playPos >= data.Size();
-	}
-
-	const uint8_t* PlayFrom() const {
-		return data.Data() + playPos;
-	}
-
-	const float PlayedPercentage() const {
-		unsigned size = data.Size();
-		if (size == 0)
-			return 1;
-
-		return playPos / (float)size;
-	}
-};
 
 struct AudioChannelState {
 
@@ -49,14 +22,18 @@ struct AudioChannelState {
 	std::array< AudioChannelClip, QueueSize> clipQueue;
 	int queueSize = 0;
 
-	AudioClip* stream = nullptr;
-	Coroutine streamingCrt = nullptr;
+	IAudioSource* stream = nullptr;
+	CoroutineR<AudioChannelClip> streamingCrt = nullptr;
 
-	AudioChannelClip* CurrentClip() {
+
+
+	AudioChannelClip* CurrentClip()
+	{
 		return queueSize > 0 ? &clipQueue[0] : nullptr;
 	}
 
-	void ClearQueue() {
+	void ClearQueue()
+	{
 		queueSize = 0;
 		playbackCompleted = true;
 	}
@@ -66,7 +43,7 @@ struct AudioChannelState {
 		return streamingCrt != nullptr;
 	}
 
-	void StopStreaming() 
+	void StopStreaming()
 	{
 		streamingCrt = nullptr;
 	}
@@ -75,14 +52,16 @@ struct AudioChannelState {
 
 	bool IsQueueFull() const { return queueSize == QueueSize; }
 
-	bool QueueClip(AudioChannelClip clip) {
+	bool QueueClip(AudioChannelClip clip)
+	{
 		if (queueSize == QueueSize)
 			return false;
 
 		clipQueue[queueSize++] = clip;
 		return true;
 	}
-	void DequeueClip() {
+	void DequeueClip()
+	{
 		playbackCompleted = true;
 		if (queueSize == 0)
 			return;

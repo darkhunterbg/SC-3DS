@@ -14,11 +14,13 @@ static void FinishBufferingAndPlay(AudioChannelState& channel)
 	GAME_ASSERT(channel.IsStreaming(), "Channel %i is not streaming!");
 	channel.streamingCrt->RunAll();
 
-	channel.stream->SwapBuffers();
-	channel.QueueClip({ channel.stream->GetData(),0 });
+	auto clip = channel.streamingCrt->GetResult();
+	if(!clip.IsEmpty())
+		channel.QueueClip(channel.streamingCrt->GetResult());
+	
 	channel.StopStreaming();
 
-	Platform::EnableChannel(channel, true);
+	Platform::EnableChannel(channel, !clip.IsEmpty());
 }
 
 static void StartLoadingNextBuffer(AudioChannelState& channel)
@@ -26,10 +28,7 @@ static void StartLoadingNextBuffer(AudioChannelState& channel)
 	GAME_ASSERT(channel.stream != nullptr, "Channel %i does not have audo stream to buffer from!", channel.ChannelId);
 	GAME_ASSERT(!channel.IsStreaming(), "Channel %i is already buffering!");
 
-	channel.streamingCrt = AssetLoader::RunIOAsync([channel]() {
-		channel.stream->FillNextBuffer();
-		});
-
+	channel.streamingCrt = channel.stream->GetNextAudioChannelClipAsync();
 	channel.streamingCrt->Next();
 }
 
@@ -70,17 +69,17 @@ void AudioManager::PlayBuffer(Span<uint8_t> buffer, int c)
 }
 
 
-void AudioManager::PlayClip(AudioClip* clip, int c)
+void AudioManager::Play(IAudioSource& src, int c)
 {
-	GAME_ASSERT(clip, "Tried to play null clip on channel %i", c);
+	GAME_ASSERT(c< instance.channels.size(), "Tried to play clip on  invalid channel %i", c);
 
 	auto& channel = instance.channels[c];
 
-	clip->Restart();
+	src.Restart();
 
 	channel.StopStreaming();
 
-	channel.stream = clip;
+	channel.stream = &src;
 	channel.ClearQueue();
 
 	StartLoadingNextBuffer(channel);
@@ -121,8 +120,6 @@ void AudioManager::UpdateAudio()
 
 		if (!channel.stream->IsAtEnd())
 		{
-			AudioClip& track = *channel.stream;
-
 			if (!channel.IsQueueFull())
 			{
 				if (!channel.IsStreaming())

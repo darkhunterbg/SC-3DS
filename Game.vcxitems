@@ -32,6 +32,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\AudioManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\GraphicsPrimitives.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\GraphicsRenderer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\IAudioSource.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\InputDevices.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\InputManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\JobSystem.h" />

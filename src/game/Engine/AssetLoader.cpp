@@ -24,6 +24,8 @@ void AssetLoader::ProcessIORequests(int threadId)
 
 		if (instance._ioQueue.TryDequeue(&request))
 		{
+			GAME_ASSERT(!request->completed, "FATAL ERROR: ProcessIORequests got request->completed = true!");
+
 			request->action();
 			request->completed = true;
 		}

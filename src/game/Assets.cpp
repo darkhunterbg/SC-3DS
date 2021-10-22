@@ -1,13 +1,13 @@
 #include "Assets.h"
 #include "Data/AssetDataDefs.h"
 #include "Debug.h"
-#include "Data/AssetDataDefs.h"
+#include "Engine/AssetLoader.h"
 
 #include "Platform.h"
 #include <stdio.h>
 
-bool AudioClip::FillNextBuffer() {
-
+bool AudioClip::FillNextBuffer()
+{
 	if (stream == nullptr) return false;
 
 	int nextBufferIndex = (_activeBufferIndex + 1) % BufferCount;
@@ -20,11 +20,13 @@ bool AudioClip::FillNextBuffer() {
 
 
 	int read = fread(buffer.Data(), sizeof(uint8_t), size, stream);
-	if (read > 0) {
+	if (read > 0)
+	{
 		_nextBufferSize = (unsigned)read;
 		return true;
 	}
-	else {
+	else
+	{
 		_nextBufferSize = 0;
 		return false;
 	}
@@ -46,9 +48,10 @@ void AudioClip::SwapBuffers()
 	}
 }
 
-bool AudioClip::Restart() {
-
-	if (stream == nullptr) {
+bool AudioClip::Restart()
+{
+	if (stream == nullptr)
+	{
 		_streamPos = 0;
 		return true;
 	}
@@ -61,19 +64,52 @@ bool AudioClip::Restart() {
 	return success;
 }
 
-AudioClip::AudioClip(AudioInfo info, unsigned bufferSize, FILE* stream) {
+class AudioClipStreamAudioCrt : public CoroutineRImpl<AudioChannelClip> {
+
+	AudioClip* _clip;
+	Coroutine _fillCrt = nullptr;
+public: AudioClipStreamAudioCrt(AudioClip& clip) : _clip(&clip) {}
+	  CRT_START()
+	  {
+		  if (_clip->IsAtEnd())
+		  {
+			  CRT_RETURN({});
+		  }
+
+
+		  _fillCrt = AssetLoader::RunIOAsync([this]() { _clip->FillNextBuffer(); });
+
+		  CRT_WAIT_FOR(_fillCrt);
+
+		  _clip->SwapBuffers();
+
+		
+		  CRT_RETURN(AudioChannelClip{ _clip->GetData() });
+	  }
+	  CRT_END();
+};
+
+CoroutineR<AudioChannelClip> AudioClip::GetNextAudioChannelClipAsync()
+{
+	return CoroutineR<AudioChannelClip>(new AudioClipStreamAudioCrt(*this));
+}
+
+AudioClip::AudioClip(AudioInfo info, unsigned bufferSize, FILE* stream)
+{
 	this->info = info;
 	uint8_t* memory = new uint8_t[bufferSize * BufferCount];
 	this->stream = stream;
 
 	fgetpos(stream, &_streamStartPos);
 
-	for (int i = 0; i < BufferCount; ++i) {
+	for (int i = 0; i < BufferCount; ++i)
+	{
 		buffers[i] = { memory + bufferSize * i, bufferSize };
 	}
 	_activeBufferSize = 0;
 }
-AudioClip::AudioClip(AudioInfo info, FILE* stream) {
+AudioClip::AudioClip(AudioInfo info, FILE* stream)
+{
 	this->info = info;
 	uint8_t* memory = new uint8_t[info.GetTotalSize()];
 	this->stream = nullptr;
@@ -92,7 +128,8 @@ AudioClip::~AudioClip()
 	delete[] buffers[0].Data();
 }
 
-int AudioClip::GetRemaining() const {
+int AudioClip::GetRemaining() const
+{
 	return info.GetTotalSize() - _streamPos;
 }
 
@@ -135,7 +172,8 @@ const ImageFrame* Image::GetColorMaskFrame(unsigned index) const
 	return frameStart + index + colorMaskOffset;
 }
 
-Vector2Int16 Image::GetImageFrameOffset(unsigned frameId, bool hFlip) const {
+Vector2Int16 Image::GetImageFrameOffset(unsigned frameId, bool hFlip) const
+{
 	const auto& frame = GetFrame(frameId);
 
 	Vector2Int16 offset = frame.offset - (size >> 1);
@@ -144,7 +182,8 @@ Vector2Int16 Image::GetImageFrameOffset(unsigned frameId, bool hFlip) const {
 
 	return offset;
 }
-Vector2Int16 Image::GetImageFrameOffset(const ImageFrame& frame, bool hFlip) const {
+Vector2Int16 Image::GetImageFrameOffset(const ImageFrame& frame, bool hFlip) const
+{
 
 	Vector2Int16 offset = frame.offset - (size >> 1);
 	if (hFlip)

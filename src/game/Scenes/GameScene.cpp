@@ -44,7 +44,7 @@ void GameScene::Start()
 	if (race.GetMusic())
 	{
 
-		AudioManager::PlayClip(&race.GetMusic()->GetAudioClip(2), 0);
+		AudioManager::Play(race.GetMusic()->GetAudioClip(2), 0);
 	}
 	//	entityManager->GetSoundSystem().PlayMusic(*race.GetMusic());
 
