@@ -86,7 +86,7 @@ void AbstractPlatform::Draw(GPU_Target* screen)
 
 	UpdateScreens(screen);
 
-	GPU_Clear(screen);
+	GPU_ClearColor(screen, { 30,30,30,255 });
 
 	SDL_Rect clip = { 0 };
 

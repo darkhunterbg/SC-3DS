@@ -184,6 +184,14 @@ SurfaceId Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering, Textu
 
 	return surface;
 }
+void Platform::UpdateSurface(SurfaceId surface, Rectangle part, Span<uint8_t> bytes)
+{
+	auto t = (GPU_Target*)surface;
+
+	GPU_Rect rect = { (float)part.position.x, (float)part.position.y, (float)part.size.x, (float)part.size.y };
+
+	GPU_UpdateImageBytes(t->image, &rect, bytes.Data(), part.size.x * 4);
+}
 SubImageCoord Platform::GenerateUV(TextureId texture, Rectangle16 src)
 {
 	GPU_Image* img = (GPU_Image*)texture;

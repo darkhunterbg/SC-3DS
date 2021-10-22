@@ -1,5 +1,6 @@
 #include "GUIImage.h"
 #include "../Engine/GraphicsRenderer.h"
+#include "../Platform.h"
 
 void GUIImage::DrawTexture(const Texture& texture, Rectangle rect, Color color)
 {
@@ -9,7 +10,18 @@ void GUIImage::DrawTexture(const Texture& texture, Rectangle rect, Color color)
 void GUIImage::DrawTexture(const Texture& texture, Color color)
 {
 	Rectangle rect = GUI::GetLayoutSpace();
-	GraphicsRenderer::Draw(texture, rect.position, rect.size,  Color32(color));
+	GraphicsRenderer::Draw(texture, rect.position, rect.size, Color32(color));
+}
+void GUIImage::DrawSubTexture(const Texture& texture, Rectangle subImage, Color color)
+{
+	Rectangle rect = GUI::GetLayoutSpace();
+	ImageFrame imgFrame;
+	imgFrame.texture = &texture;
+	imgFrame.offset = Vector2Int16(subImage.position);
+	imgFrame.size = Vector2Int16(subImage.size);
+	imgFrame.uv = Platform::GenerateUV(texture.GetTextureId(), Rectangle_ToRectangle16(subImage));
+
+	GraphicsRenderer::Draw(imgFrame, rect, color);
 }
 
 void GUIImage::DrawColor(Color color)

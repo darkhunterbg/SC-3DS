@@ -3,6 +3,7 @@
 #include "Scenes/Scene.h"
 #include "Scenes/GameScene.h"
 #include "Scenes/BootScene.h"
+#include "Scenes/VideoPlaybackScene.h"
 #include "StringLib.h"
 #include "Profiler.h"
 
@@ -61,7 +62,7 @@ static bool SwithScenes()
 
 static void InitialScene()
 {
-	Game::SetCurrentScene(new BootScene());
+	Game::SetCurrentScene(new VideoPlaybackScene());
 	SwithScenes();
 }
 

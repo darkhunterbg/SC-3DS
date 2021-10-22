@@ -55,6 +55,10 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIImage.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUILabel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\ViewContext.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\LibSmacker\smacker.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\LibSmacker\smk_bitstream.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\LibSmacker\smk_hufftree.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\LibSmacker\smk_malloc.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\BinaryData.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\Wave.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\MathLib.h" />
@@ -65,6 +69,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\BootScene.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\GameScene.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\VideoPlaybackScene.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\BootSceneView.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Span.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\stb_sprintf.h" />
@@ -106,6 +111,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIImage.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUILabel.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\ViewContext.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\LibSmacker\smacker.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\LibSmacker\smk_bitstream.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\LibSmacker\smk_hufftree.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\BinaryData.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\Wave.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Profiler.cpp" />
@@ -113,6 +121,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\BootScene.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\GameScene.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\VideoPlaybackScene.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\BootSceneView.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\StringLib.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\TimeSlice.cpp" />

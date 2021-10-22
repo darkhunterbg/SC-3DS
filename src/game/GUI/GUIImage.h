@@ -10,6 +10,8 @@ public:
 	static void DrawTexture(const Texture& texture, Rectangle rect, Color color = Colors::White);
 	static void DrawTexture(const Texture& texture, Color color = Colors::White);
 
+	static void DrawSubTexture(const Texture& texture, Rectangle subImage, Color color = Colors::White);
+
 	static void DrawColor(Color color);
 	static void DrawColor(Rectangle rect, Color color);
 };

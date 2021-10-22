@@ -66,31 +66,6 @@ TextureId Platform::CreateTextureFromFile(const char* path, Span<uint8_t> data, 
 	return tex;
 }
 
-//TextureId Platform::LoadTexture(const char* path, Vector2Int16& outSize)
-//{
-//	std::string assetPath = assetDir + path + ".t3x";
-//	std::replace(assetPath.begin(), assetPath.end(), '\\', '/');
-//	FILE* f = fopen(assetPath.data(), "rb");
-//	if (f == nullptr)
-//		EXCEPTION("Failed to open file '%s'", assetPath.data());
-//
-//	setvbuf(f, NULL, _IOFBF, 64 * 1024);
-//
-//	C3D_Tex* tex = new	C3D_Tex();
-//
-//	auto t3x = Tex3DS_TextureImportStdio(f, tex, nullptr, false);
-//
-//	loadedTextures[tex] = Tex3DS_GetSubTexture(t3x, 0);
-//
-//	C3D_TexSetWrap(tex, GPU_TEXTURE_WRAP_PARAM::GPU_CLAMP_TO_EDGE, GPU_TEXTURE_WRAP_PARAM::GPU_CLAMP_TO_EDGE);
-//	C3D_TexSetFilter(tex, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR);
-//
-//	outSize.x = loadedTextures[tex]->width;
-//	outSize.y = loadedTextures[tex]->height;
-//
-//	return tex;
-//}
-
 const Font* Platform::LoadFont(const char* path, int size)
 {
 
@@ -158,7 +133,6 @@ void Platform::ChangeBlendingMode(BlendMode mode)
 
 void Platform::DrawOnSurface(SurfaceId surface)
 {
-
 	if (surface == nullptr)
 	{
 		currentRT = screens[currentScreen];
@@ -173,6 +147,47 @@ void Platform::DrawOnSurface(SurfaceId surface)
 		if (crt.rt == rt)
 		{
 			currentRT = crt;
+			return;
+		}
+	}
+
+	EXCEPTION("RenderTarget not found!");
+}
+void Platform::UpdateSurface(SurfaceId surface, Rectangle part, Span<uint8_t> bytes)
+{
+	C3D_RenderTarget* rt = (C3D_RenderTarget*)surface;
+
+#define TEXTURE_TRANSFER_FLAGS \
+	(GX_TRANSFER_FLIP_VERT(0) | GX_TRANSFER_OUT_TILED(1) | GX_TRANSFER_RAW_COPY(0) | \
+	GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) | GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGBA8) | \
+	GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO) )
+
+	for (auto& crt : createdRenderTargets)
+	{
+		if (crt.rt == rt)
+		{
+			C3D_Tex* tex = crt.tex;
+
+			int width = tex->width;
+			int height = tex->height;
+
+			void* gpusrc = linearAlloc(bytes.Size());
+
+			memcpy(gpusrc, bytes.Data(), bytes.Size());
+
+			GSPGPU_FlushDataCache(gpusrc, bytes.Size());
+
+
+			void* data = (void*)linearAlloc(tex->width * tex->height * 4);
+
+
+			C3D_SyncDisplayTransfer((u32*)gpusrc, GX_BUFFER_DIM(part.size.x, part.size.y), (u32*)data, GX_BUFFER_DIM(width, height), TEXTURE_TRANSFER_FLAGS);
+			C3D_TexUpload(tex, data);
+
+			linearFree(data);
+
+			linearFree(gpusrc);
+
 			return;
 		}
 	}
