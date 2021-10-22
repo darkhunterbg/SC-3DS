@@ -11,6 +11,8 @@
 #include "../Debug.h"
 
 #include "../Engine/AssetLoader.h"
+#include "../Engine/AudioManager.h"
+#include "../Engine/InputManager.h"
 
 #include <cstring>
 
@@ -29,6 +31,8 @@ static 	std::vector<uint8_t> pixelData;
 
 Coroutine crt;
 
+static unsigned char   a_trackmask, a_channels[7], a_depth[7];
+static unsigned long   a_rate[7];
 
 
 static void ReadAndDecode()
@@ -37,7 +41,6 @@ static void ReadAndDecode()
 
 	const uint8_t* pal_data = smk_get_palette(video);
 	const uint8_t* image = smk_get_video(video);
-
 	int a = 0;
 	for (int y = 0; y < h; ++y)
 	{
@@ -54,7 +57,10 @@ static void ReadAndDecode()
 			pixelData[i * 4] = 255;
 		}
 	}
+
 }
+
+static std::vector< uint8_t> audioStream;
 
 void VideoPlaybackScene::Start()
 {
@@ -62,17 +68,36 @@ void VideoPlaybackScene::Start()
 	video = smk_open_filepointer(f, SMK_MODE_DISK);
 
 
-
+	smk_info_audio(video, &a_trackmask, a_channels, a_depth, a_rate);
 	smk_info_video(video, &w, &h, &yScaling);
 	smk_info_all(video, &frame, &frames, &frameTime);
 
 	frameTime /= 1000;
 
-	smk_enable_video(video, true);
+	smk_enable_audio(video, 0, true);
 
 	smk_first(video);
 
+	auto size = smk_get_audio_size(video, 0);
 
+
+	for (int i = 0; i < frames; ++i)
+	{
+		const uint8_t* audio = smk_get_audio(video, 0);
+		size = smk_get_audio_size(video, 0);
+		int offset = audioStream.size();
+		audioStream.resize(offset + size);
+
+
+		memcpy(audioStream.data() + offset, audio, size);
+		smk_next(video);
+	}
+
+	smk_enable_video(video, true);
+	smk_enable_audio(video, 0, false);
+
+
+	smk_first(video);
 
 	surface = GraphicsRenderer::NewRenderSurface({ (int)512,(int)512 });
 	pixelData.resize(512 * 512 * 4);
@@ -89,6 +114,8 @@ void VideoPlaybackScene::Start()
 	countdown += frameTime;
 
 	crt = AssetLoader::RunIOAsync(ReadAndDecode);
+
+	AudioManager::PlayBuffer({ audioStream.data() ,audioStream.size() }, 0);
 }
 void VideoPlaybackScene::Stop()
 {
@@ -120,6 +147,13 @@ void VideoPlaybackScene::Draw()
 			Platform::UpdateSurface(surface.surfaceId, { {0,0}, {512,512} }, { pixelData.data(), pixelData.size() });
 		}
 
+		//const uint8_t* audio = smk_get_audio(video, 0);
+		//auto size = smk_get_audio_size(video, 0);
+
+
+
+		//AudioManager::UpdateAudio();
+
 		crt = nullptr;
 	}
 
@@ -130,5 +164,11 @@ void VideoPlaybackScene::Draw()
 	}
 
 	GUIImage::DrawSubTexture(*surface.sprite.texture, { {0,0},{(int)w,(int)h} });
+
+	if (InputManager::Gamepad.IsButtonDown(GamepadButton::A))
+	{
+		Game::SetCurrentScene(new BootScene());
+
+	}
 }
 

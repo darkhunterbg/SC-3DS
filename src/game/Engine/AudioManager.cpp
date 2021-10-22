@@ -55,6 +55,20 @@ void AudioManager::Init()
 	}
 }
 
+void AudioManager::PlayBuffer(Span<uint8_t> buffer, int c)
+{
+	auto& channel = instance.channels[c];
+
+	channel.StopStreaming();
+
+	channel.stream = nullptr;
+	channel.ClearQueue();
+	
+
+	channel.QueueClip(AudioChannelClip{ buffer, 0 });
+	Platform::EnableChannel(channel, true);
+}
+
 
 void AudioManager::PlayClip(AudioClip* clip, int c)
 {

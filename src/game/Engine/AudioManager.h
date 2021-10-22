@@ -6,6 +6,8 @@
 #include "Span.h"
 
 
+#include "../MathLib.h"
+
 class AudioManager {
 
 private:
@@ -22,6 +24,7 @@ private:
 public:
 
 	static void Init();
+	static void PlayBuffer(Span<uint8_t> buffer, int channel);
 	static void PlayClip(AudioClip* clip, int channel);
 	static void StopChannel(int channel);
 	static void SetChannelVolume(int channel, float volume);
