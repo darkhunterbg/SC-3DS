@@ -33,6 +33,11 @@ static void StartLoadingNextBuffer(AudioChannelState& channel)
 	channel.streamingCrt->Next();
 }
 
+void AudioManager::SetMute(bool mute)
+{
+	instance._mute = mute;
+}
+
 void AudioManager::Init()
 {
 	AudioChannelState channel;
@@ -97,6 +102,10 @@ void AudioManager::StopAll()
 
 void AudioManager::UpdateAudio()
 {
+	if (instance._mute)
+		return;
+
+
 	for (auto& channel : instance.channels)
 	{
 		if (!channel.IsValid())

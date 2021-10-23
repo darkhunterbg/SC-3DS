@@ -12,6 +12,7 @@ class AudioManager {
 
 private:
 	std::vector<AudioChannelState> channels;
+	bool _mute = false;
 
 	AudioManager() {}
 
@@ -22,6 +23,11 @@ private:
 	static AudioManager instance;
 
 public:
+	static bool IsMute()
+	{
+		return instance._mute;
+	}
+	static void SetMute(bool mute);
 
 	static void Init();
 	static void Play(IAudioSource& source, int channel);
@@ -30,7 +36,7 @@ public:
 	static void StopAll();
 	static void UpdateAudio();
 
-	inline  static const Span<AudioChannelState> GetAudioChannes() {
+	inline  static const Span<AudioChannelState> GetAudioChannels() {
 		return { instance.channels.data(), instance.channels.size() };
 	}
 };

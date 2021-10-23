@@ -70,8 +70,9 @@ public:
 
 	static Coroutine LoadDatabaseAsync();
 
-	static const Texture* LoadTexture(const char* path);
-	static const Font* LoadFont(const char* path, int size);
+	static Texture* LoadTexture(const char* path);
+	static void  UnloadTexture(Texture* texture);
+	static Font* LoadFont(const char* path, int size);
 	static AudioClip* LoadAudioClip(const char* path);
 	static VideoClip* LoadVideoClip(const char* path);
 	static void UnloadVideoClip(VideoClip* clip);

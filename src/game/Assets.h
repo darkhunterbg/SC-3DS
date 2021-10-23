@@ -53,6 +53,8 @@ private:
 	Vector2Int16 size;
 	std::string name;
 public:
+	 AssetId Id;
+
 	Texture(const Texture&) = delete;
 	~Texture();
 
@@ -219,7 +221,7 @@ public:
 	Coroutine LoadNextFrameAsync(volatile bool* doneCallbackFlag);
 	void DecodeCurrentFrame(uint8_t* outPixelData, int texLineSize);
 
-	int AllocatePixelDataBuffer(uint8_t** pixelData) const;
+	
 	inline Vector2Int GetTextureSize() const { return _textureSize; }
 
 	bool IsAtEnd() const;

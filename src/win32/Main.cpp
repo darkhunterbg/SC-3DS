@@ -14,6 +14,8 @@
 #include "Debug.h"
 #include "AbstractPlatform.h"
 
+#include "Engine/AudioManager.h"
+
 #include <vector>
 
 
@@ -89,20 +91,25 @@ int main(int argc, char** argv)
 
 	mainTimer = SDL_GetPerformanceCounter();
 
-	Game::Start();
+
+
+	GameStartSettings settings = {};
+	settings.skipIntro = true;
 
 	if (argc > 1)
 	{
 		std::string a = argv[1];
 		if (a == "-mute")
 		{
-			//mute = true;
+			mute = settings.mute = true;
 		}
 	}
 
+	Game::Start(settings);
+
+
 	while (!done)
 	{
-
 		ImGui::NewFrame();
 
 		abstractPlatform.UpdateScreens(screen);
@@ -132,8 +139,6 @@ int main(int argc, char** argv)
 
 		if (done)
 			break;
-
-
 
 
 		done = !Game::Update();
@@ -186,11 +191,20 @@ void Toolbar()
 
 
 	ImGui::SetNextItemWidth(250);
-	if(ImGui::Combo("Platform", &index, AbstractPlatform::PlatformsString.data(), AbstractPlatform::Platforms.size()))
+	if (ImGui::Combo("Platform", &index, AbstractPlatform::PlatformsString.data(), AbstractPlatform::Platforms.size()))
 	{
 		abstractPlatform = AbstractPlatform::Platforms[index];
 		abstractPlatform.ApplyPlatform();
 		Game::PlatformUpdated();
+	}
+
+	bool audioEnabled = !AudioManager::IsMute();
+
+	ImGui::SetNextItemWidth(250);
+	if (ImGui::Checkbox("Audio Enabled", &audioEnabled))
+	{
+		mute = !audioEnabled;
+		AudioManager::SetMute(!audioEnabled);
 	}
 
 	ImGui::End();

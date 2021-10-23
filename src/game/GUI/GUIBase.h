@@ -8,13 +8,13 @@
 #include <unordered_map>
 #include <memory>
 
-enum class GUIHorizontalAlignment {
+enum class GUIHAlign {
 	Left = 0,
 	Center = 1,
 	Right = 2,
 };
 
-enum class GUIVerticalAlignment {
+enum class GUIVAlign {
 	Top = 0,
 	Center = 1,
 	Bottom = 2,
@@ -47,21 +47,28 @@ public:
 
 	static void UseScreen(ScreenId screen);
 
+	static void BeginAbsoluteLayout(Vector2Int position, Vector2Int size) { BeginAbsoluteLayout({ position,size }); }
 	static void BeginAbsoluteLayout(Rectangle layout);
+	static void BeginRelativeLayout(Vector2Int position, Vector2Int size,
+		GUIHAlign hAlign = GUIHAlign::Center,
+		GUIVAlign vAlign = GUIVAlign::Center)
+	{
+		BeginRelativeLayout({ position,size }, hAlign, vAlign);
+	}
 	static void BeginRelativeLayout(Rectangle layout,
-		GUIHorizontalAlignment hAlign = GUIHorizontalAlignment::Center,
-		GUIVerticalAlignment vAlign = GUIVerticalAlignment::Center);
+		GUIHAlign hAlign = GUIHAlign::Center,
+		GUIVAlign vAlign = GUIVAlign::Center);
 
 	static void EndLayout();
 
 	static Vector2Int GetPosition(Vector2Int pos);
 	static Vector2Int GetRelativePosition(Vector2Int pos,
-		GUIHorizontalAlignment hAlign = GUIHorizontalAlignment::Center,
-		GUIVerticalAlignment vAlign = GUIVerticalAlignment::Center);
+		GUIHAlign hAlign = GUIHAlign::Center,
+		GUIVAlign vAlign = GUIVAlign::Center);
 
 	static Vector2Int GetRelativePosition(Rectangle rect,
-		GUIHorizontalAlignment hAlign = GUIHorizontalAlignment::Center,
-		GUIVerticalAlignment vAlign = GUIVerticalAlignment::Center);
+		GUIHAlign hAlign = GUIHAlign::Center,
+		GUIVAlign vAlign = GUIVAlign::Center);
 
 	static Rectangle GetLayoutSpace();
 

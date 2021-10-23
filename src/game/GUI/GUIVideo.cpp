@@ -46,15 +46,18 @@ static void Decode(VideoClip& clip, VideoFrameRenderData* data)
 	data->decoded = true;
 }
 
-bool GUIVideo::DrawVideo(VideoClip& clip, Color color)
+bool GUIVideo::DrawVideo(const char* id, VideoClip& clip, bool loop, Color color)
 {
 	Vector2Int textureSize = clip.GetTextureSize();
+	
+	std::string key = id;
+	key += ".Data";
 
-	VideoFrameRenderData* data = GUI::GetResourceById<VideoFrameRenderData>("VideoData");
+	VideoFrameRenderData* data = GUI::GetResourceById<VideoFrameRenderData>(key);
 	if (data == nullptr)
 	{
 		data = new	VideoFrameRenderData(textureSize);
-		GUI::RegisterResource("VideoData", data, [](void* p) {delete (VideoFrameRenderData*)p;  });
+		GUI::RegisterResource(key, data, [](void* p) {delete (VideoFrameRenderData*)p;  });
 		data->countdown = -0.01;
 
 		data->audioSrc = clip.PrepareAudio();
@@ -74,7 +77,9 @@ bool GUIVideo::DrawVideo(VideoClip& clip, Color color)
 	if (data->countdown <= 0)
 	{
 		if (clip.IsAtEnd())
-			return true;
+		{
+			if (!loop) return true;
+		}
 
 		frameChanged = true;
 		data->countdown += clip.GetFrameTime();
@@ -87,15 +92,26 @@ bool GUIVideo::DrawVideo(VideoClip& clip, Color color)
 
 	if (frameChanged)
 	{
-		data->currentFrame = clip.GetCurrentFrame();
-
 		if (data->readCrt != nullptr)
 			data->readCrt->RunAll();
 
+		data->currentFrame = clip.GetCurrentFrame();
 		data->loaded = false;
-		data->readCrt = clip.LoadNextFrameAsync(&data->loaded);
 
-		if(!data->decoded)
+		if (clip.IsAtEnd() ) {
+			if (loop)
+			{
+				data->loaded = false;
+				data->readCrt = clip.LoadFirstFrameAsync(&data->loaded);
+			}
+		}
+		else
+		{
+			data->loaded = false;
+			data->readCrt = clip.LoadNextFrameAsync(&data->loaded);
+		}
+
+		if (!data->decoded)
 			Decode(clip, data);
 
 		if (data->texture == nullptr)
@@ -112,13 +128,13 @@ bool GUIVideo::DrawVideo(VideoClip& clip, Color color)
 	return false;
 }
 
-bool GUIVideo::DrawVideoScaled(VideoClip& clip, Vector2 scale, Color color)
+bool GUIVideo::DrawVideoScaled(const char* id, VideoClip& clip, Vector2 scale, bool loop, Color color)
 {
 	Vector2 size = Vector2(clip.GetFrameSize()) * scale;
 
 	GUI::BeginRelativeLayout({ {0,0},Vector2Int(size) });
 
-	bool done = DrawVideo(clip, color);
+	bool done = DrawVideo(id, clip, loop, color);
 
 	GUI::EndLayout();
 

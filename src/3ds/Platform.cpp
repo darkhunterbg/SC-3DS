@@ -68,15 +68,13 @@ TextureId Platform::CreateTextureFromFile(const char* path, Span<uint8_t> data, 
 
 const Font* Platform::LoadFont(const char* path, int size)
 {
-
-	std::string fontPath = assetDir + path;
+	std::string fontPath = assetDir + path + ".bcfnt";
 
 	if (loadedFonts.find(fontPath) == loadedFonts.end())
 	{
-
 		C2D_Font font = C2D_FontLoad(fontPath.data());
 		if (font == nullptr)
-			EXCEPTION("Load font %s failed!", path);
+			EXCEPTION("Load font %s failed!", fontPath.data());
 
 		loadedFonts[fontPath] = font;
 	}

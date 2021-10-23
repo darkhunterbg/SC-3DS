@@ -35,6 +35,7 @@ float Game::DeltaTime = 0;
 
 static PlatformInfo _platformInfo;
 
+
 static std::queue<Scene*> _nextScene;
 
 static bool SwithScenes()
@@ -62,9 +63,19 @@ static bool SwithScenes()
 }
 
 
-static void InitialScene()
+static void InitialScene(GameStartSettings settings)
 {
-	Game::SetCurrentScene(new VideoPlaybackScene());
+	if (settings.skipIntro)
+	{
+		Game::SetCurrentScene(new BootScene());
+	}
+	else
+	{
+		Game::SetCurrentScene(new VideoPlaybackScene("Smk\\Blizzard", []() {
+			Game::SetCurrentScene(new BootScene());
+			}));
+	}
+
 	SwithScenes();
 }
 
@@ -82,7 +93,7 @@ void Game::FrameEnd()
 	Profiler::FrameEnd();
 }
 
-void Game::Start()
+void Game::Start(GameStartSettings settings)
 {
 	_platformInfo = Platform::GetPlatformInfo();
 
@@ -90,17 +101,18 @@ void Game::Start()
 
 	AssetLoader::Init();
 
-	SystemFont16 = AssetLoader::LoadFont("font.bcfnt", 16);
-	SystemFont12 = AssetLoader::LoadFont("font.bcfnt", 12);
+	SystemFont16 = AssetLoader::LoadFont("font", 16);
+	SystemFont12 = AssetLoader::LoadFont("font", 12);
 	//SystemFont10 = AssetLoader::LoadFont("font.bcfnt", 10);
 	//SystemFont8 = AssetLoader::LoadFont("font.bcfnt", 8);
 	//ButtonAudio = AssetLoader::LoadAudioClip("sound\\misc\\button");
 	frameStartTime = Platform::ElaspedTime();
 	AudioManager::Init();
+	AudioManager::SetMute(settings.mute);
 	GraphicsRenderer::Init();
 	GUI::SetState(*(new GUIState()));
 
-	InitialScene();
+	InitialScene(settings);
 }
 bool Game::Update()
 {

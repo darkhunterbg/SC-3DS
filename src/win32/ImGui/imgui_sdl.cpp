@@ -221,7 +221,7 @@ namespace
 			GPU_FreeImage(Source);
 		}
 
-	/*	Color Sample(float u, float v) const
+		Color Sample(float u, float v) const
 		{
 			const int x = static_cast<int>(std::round(u * (Surface->w - 1) + 0.5f));
 			const int y = static_cast<int>(std::round(v * (Surface->h - 1) + 0.5f));
@@ -229,8 +229,8 @@ namespace
 			const int location = y * Surface->w + x;
 			assert(location < Surface->w* Surface->h);
 
-			return Color(static_cast<uint32_t*>(Surface->pixels)[location]);
-		}*/
+			return Color(static_cast<uint32_t*>(Surface->data)[location]);
+		}
 	};
 
 	template <typename T> class InterpolatedFactorEquation
@@ -424,14 +424,14 @@ namespace
 		const InterpolatedFactorEquation<Color> shadeColor(Color(v1.col), Color(v2.col), Color(v3.col), v1.pos, v2.pos, v3.pos);
 
 		auto cached = std::make_unique<Device::TriangleCacheItem>();
-	/*	DrawTriangleWithColorFunction(renderInfo, [&](float x, float y) {
+		DrawTriangleWithColorFunction(renderInfo, [&](float x, float y) {
 			const float u = textureU.Evaluate(x, y);
 			const float v = textureV.Evaluate(x, y);
 			const Color sampled = texture->Sample(u, v);
 			const Color shade = shadeColor.Evaluate(x, y);
 
 			return sampled * shade;
-			}, cached.get());*/
+			}, cached.get());
 
 		if (!cached->Texture) return;
 

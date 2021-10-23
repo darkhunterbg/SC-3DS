@@ -40,7 +40,7 @@ void AssetLoader::Init()
 	instance._usesIOThread = Platform::TryStartThreads(ThreadUsageType::IO, 1, ProcessIORequests) > 0;
 }
 
-const Texture* AssetLoader::LoadTexture(const char* path)
+Texture* AssetLoader::LoadTexture(const char* path)
 {
 	std::string p = path;
 	AssetId id = instance.hasher(p);
@@ -52,6 +52,7 @@ const Texture* AssetLoader::LoadTexture(const char* path)
 		e.data = LoadTextureFromFile(path);
 		e.type = AssetType::Texture;
 		e.id = id;
+		((Texture*)e.data)->Id = id;
 	}
 	else
 	{
@@ -60,10 +61,23 @@ const Texture* AssetLoader::LoadTexture(const char* path)
 				p.data(), GetAssetTypeName(AssetType::Texture), GetAssetTypeName(e.type));
 	}
 
-	return (const Texture*)e.data;
+	return ( Texture*)e.data;
 }
 
-const Font* AssetLoader::LoadFont(const char* path, int size)
+void AssetLoader::UnloadTexture(Texture* texture)
+{
+	if (!texture) return;
+
+	AssetEntry& e = instance.loadedAssets[texture->Id];
+
+	GAME_ASSERT(e.id != 0, "Failed to find textured with id %i to delete", texture->Id);
+
+	instance.loadedAssets.erase(e.id);
+
+	delete texture;
+}
+
+Font* AssetLoader::LoadFont(const char* path, int size)
 {
 	std::string p = path;
 	AssetId id = instance.hasher(p);
@@ -83,7 +97,7 @@ const Font* AssetLoader::LoadFont(const char* path, int size)
 				p.data(), GetAssetTypeName(AssetType::Font), GetAssetTypeName(e.type));
 	}
 
-	return (const Font*)e.data;
+	return ( Font*)e.data;
 }
 
 AudioClip* AssetLoader::LoadAudioClip(const char* path)
@@ -133,6 +147,8 @@ VideoClip* AssetLoader::LoadVideoClip(const char* path)
 void AssetLoader::UnloadVideoClip(VideoClip* clip)
 {
 	GAME_ASSERT(clip, "Tried to unload nullptr clip!");
+
+	if (!clip) return;
 
 	AssetEntry& e = instance.loadedAssets[clip->Id];
 

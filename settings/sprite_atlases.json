@@ -89,5 +89,14 @@
     ],
     "PackStrategy": 0,
     "FilterStrategy": 1
+  },
+  {
+    "OutputName": "mainmenu",
+    "ImageList": [
+      "glue\\mainmenu\\*",
+      "glue\\palmm\\*"
+    ],
+    "PackStrategy": 0,
+    "FilterStrategy": 1
   }
 ]

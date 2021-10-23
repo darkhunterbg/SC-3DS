@@ -6,26 +6,29 @@
 #include "../Scenes/GameScene.h"
 #include "../TimeSlice.h"
 #include "../SceneView/BootSceneView.h"
+#include "../Scenes/MainMenuScene.h"
 
-static bool _autoStart = false;
+static bool _autoStart = true;
 
 BootScene::BootScene()
 {
-	_view = new BootSceneView(this);
+	
 }
 
 BootScene::~BootScene()
 {
-	delete _view;
+
 }
 
 void BootScene::StartGame()
 {
-	Game::SetCurrentScene(new GameScene());
+	Game::SetCurrentScene(new MainMenuScene());
 }
 
 void BootScene::Start()
 {
+	_view = new BootSceneView(this);
+
 	auto clip = AssetLoader::LoadAudioClip("music\\title");
 	AudioManager::Play(*clip, 0);
 
@@ -35,6 +38,7 @@ void BootScene::Start()
 
 void BootScene::Stop()
 {
+	delete _view;
 }
 
 void BootScene::Update()

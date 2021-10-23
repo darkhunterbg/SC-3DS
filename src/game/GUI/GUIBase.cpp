@@ -25,7 +25,7 @@ void GUI::BeginAbsoluteLayout(Rectangle layout)
 	GetState().SpaceStack.push_back(layout);
 }
 
-void GUI::BeginRelativeLayout(Rectangle layout, GUIHorizontalAlignment hAlign, GUIVerticalAlignment vAlign)
+void GUI::BeginRelativeLayout(Rectangle layout, GUIHAlign hAlign, GUIVAlign vAlign)
 {
 	Rectangle space = GetState().GetSpace();
 
@@ -47,7 +47,7 @@ Vector2Int GUI::GetPosition(Vector2Int pos)
 	return space.position + pos;
 }
 
-Vector2Int GUI::GetRelativePosition(Vector2Int pos, GUIHorizontalAlignment hAlign, GUIVerticalAlignment vAlign)
+Vector2Int GUI::GetRelativePosition(Vector2Int pos, GUIHAlign hAlign, GUIVAlign vAlign)
 {
 	Rectangle space = GetState().GetSpace();
 
@@ -61,7 +61,7 @@ Vector2Int GUI::GetRelativePosition(Vector2Int pos, GUIHorizontalAlignment hAlig
 	return position;
 }
 
-Vector2Int GUI::GetRelativePosition(Rectangle rect, GUIHorizontalAlignment hAlign, GUIVerticalAlignment vAlign)
+Vector2Int GUI::GetRelativePosition(Rectangle rect, GUIHAlign hAlign, GUIVAlign vAlign)
 {
 	Rectangle space = GetState().GetSpace();
 

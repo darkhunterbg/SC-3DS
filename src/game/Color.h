@@ -111,6 +111,9 @@ namespace Colors {
 	constexpr Color UILightGray = { 0xacacd9ff };
 	constexpr Color IconYellow = { 0xfcfc38ff };
 	constexpr Color IconGray = { 0.6f,0.6f,0.6f,1 };
+	constexpr Color UIMenuGreen = { 0x54bc2cff };
+	constexpr Color UIMenuGreenLit = { 0xacf46cff };
+
 
 	constexpr Color SCRed = { 0xf40404ff };
 	constexpr Color SCBlue = { 0x0c48ccff };
@@ -128,6 +131,8 @@ namespace Colors {
 
 	constexpr Color MapFriendly = { 0x0dff16ff };
 	constexpr Color MapResource = { 0x00e4fcff };
+
+
 
 
 }

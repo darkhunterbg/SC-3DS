@@ -5,12 +5,16 @@
 class Scene;
 struct PlatformInfo;
 
+struct GameStartSettings {
+	bool skipIntro = false;
+	bool mute = false;
+};
+
 class Game {
 
 private:
 	Game() = delete;
 	~Game() = delete;
-
 public:
 	static const Font* SystemFont16;
 	static const Font* SystemFont12;
@@ -20,7 +24,7 @@ public:
 
 	static float DeltaTime;
 
-	static void Start();
+	static void Start(GameStartSettings settings = {});
 	static void FrameStart();
 	static void FrameEnd();
 	static bool Update();

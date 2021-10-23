@@ -9,6 +9,7 @@ private:
 	int _frameCounter = 0;
 public: 
 	BootSceneView(BootScene* scene);
+	~BootSceneView();
 
 	void Draw();
 };

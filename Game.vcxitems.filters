@@ -184,6 +184,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\smk_bitstream.h">
       <Filter>Loader</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\MainMenuScene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\MainMenuSceneView.h">
+      <Filter>SceneView</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -320,6 +326,12 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\smk_bitstream.c">
       <Filter>Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\MainMenuScene.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\MainMenuSceneView.cpp">
+      <Filter>SceneView</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

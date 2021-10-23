@@ -24,6 +24,18 @@ void GUIImage::DrawSubTexture(const Texture& texture, Rectangle subImage, Color 
 	GraphicsRenderer::Draw(imgFrame, rect, color);
 }
 
+void GUIImage::DrawImage(const Image& image, unsigned subImage, Color color)
+{
+	const ImageFrame& frame = image.GetFrame(subImage);
+	DrawImageFrame(frame, color);
+}
+
+void GUIImage::DrawImageFrame(const ImageFrame& frame, Color color )
+{
+	Rectangle rect = GUI::GetLayoutSpace();
+	GraphicsRenderer::Draw(frame, rect, color);
+}
+
 void GUIImage::DrawColor(Color color)
 {
 	Rectangle rect = GUI::GetLayoutSpace();

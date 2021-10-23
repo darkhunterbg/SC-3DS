@@ -7,11 +7,16 @@
 #include "../Platform.h"
 #include "../GUI/GUI.h"
 
-static const Texture* _title;
+static Texture* _title;
 
 BootSceneView::BootSceneView(BootScene* scene) : _scene(scene)
 {
 	_title = AssetLoader::LoadTexture("atlases\\title_0");
+}
+
+BootSceneView::~BootSceneView()
+{
+	AssetLoader::UnloadTexture(_title);
 }
 
 void BootSceneView::Draw()
@@ -47,7 +52,7 @@ void BootSceneView::Draw()
 
 		if (text != nullptr)
 		{
-			GUILabel::DrawText(*Game::SystemFont12, text, Vector2Int(0, 20), GUIHorizontalAlignment::Center, GUIVerticalAlignment::Center, Colors::SCWhite);
+			GUILabel::DrawText(*Game::SystemFont12, text, Vector2Int(0, 20), GUIHAlign::Center, GUIVAlign::Center, Colors::SCWhite);
 		}
 	}
 	else
@@ -76,7 +81,7 @@ void BootSceneView::Draw()
 
 		if (text != nullptr)
 		{
-			GUILabel::DrawText(*Game::SystemFont16, text, Vector2Int(0, 160), GUIHorizontalAlignment::Center, GUIVerticalAlignment::Center, Colors::SCWhite);
+			GUILabel::DrawText(*Game::SystemFont16, text, Vector2Int(0, 160), GUIHAlign::Center, GUIVAlign::Center, Colors::SCWhite);
 		}
 	}
 

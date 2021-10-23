@@ -315,11 +315,20 @@ void VideoClip::DecodeCurrentFrame(uint8_t* pixelData, int texLineSize)
 			int index = image[++a];
 			index *= 3;
 
+			if (index == 0)
+			{
+				pixelData[i++] = 0;
+				pixelData[i++] = 0;
+				pixelData[i++] = 0;
+				pixelData[i++] = 0;
+				continue;
+			}
+
 #ifdef _3DS
 			pixelData[i++] = 255;
 			pixelData[i++] = (pal_data[index + 2]);
-			pixelData[i++] = (pal_data[index]);
 			pixelData[i++] = (pal_data[index + 1]);
+			pixelData[i++] = (pal_data[index]);
 #else
 			pixelData[i++] = (pal_data[index]);
 			pixelData[i++] = (pal_data[index + 1]);

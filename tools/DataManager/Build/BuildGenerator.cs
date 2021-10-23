@@ -23,7 +23,10 @@ namespace DataManager.Build
 	{
 		List<string> additionalBuildFiles = new List<string>()
 			{
-				 "tileset\\tile.png" , "font.ttf" ,"Smk\\Blizzard.smk"
+				 "tileset\\tile.png" , "font.ttf", "mm-font.ttf" ,"Smk\\Blizzard.smk",
+				 "glue\\mainmenu\\exit.smk",  "glue\\mainmenu\\exiton.smk",
+				  "glue\\mainmenu\\single.smk",  "glue\\mainmenu\\singleon.smk",
+				   "glue\\mainmenu\\multi.smk",  "glue\\mainmenu\\multion.smk",
 			};
 
 		public static BuildGenerator Instance { get; private set; }
