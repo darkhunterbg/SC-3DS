@@ -70,7 +70,7 @@ bool GUIVideo::DrawVideo(const char* id, VideoClip& clip, bool loop, Color color
 	}
 	else
 	{
-		data->countdown -= 16.6;
+		data->countdown -= GUI::GetState().VideoPlaybackCooldown;
 	}
 
 	bool frameChanged = false;

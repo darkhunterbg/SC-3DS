@@ -1,6 +1,7 @@
 #include "GUIBase.h"
 
 #include "../Engine/GraphicsRenderer.h"
+#include "../Engine/InputManager.h"
 
 GUIState* GUI::_state = nullptr;
 
@@ -44,7 +45,8 @@ void GUI::EndLayout()
 Vector2Int GUI::GetPosition(Vector2Int pos)
 {
 	Rectangle space = GetState().GetSpace();
-	return space.position + pos;
+	space.position += pos;
+	return space.position;
 }
 
 Vector2Int GUI::GetRelativePosition(Vector2Int pos, GUIHAlign hAlign, GUIVAlign vAlign)
@@ -101,4 +103,13 @@ void GUI::CleanResources()
 	}
 
 	state.Resources.clear();
+}
+
+bool GUI::IsLayoutHover()
+{
+	Rectangle layout = GetLayoutSpace();
+
+	Vector2Int pos = InputManager::Pointer.Position();
+
+	return layout.Contains(pos);
 }

@@ -29,6 +29,7 @@ public:
 
 	std::vector<Rectangle> SpaceStack;
 	std::unordered_map<std::string, Resource> Resources;
+	double VideoPlaybackCooldown = 16.6;
 
 	Rectangle GetSpace()const { return SpaceStack.back(); }
 };
@@ -83,5 +84,12 @@ public:
 	static void RegisterResource(const std::string& key, void* resource, void (*freeFunc)(void*));
 
 	static void CleanResources();
+
+	static bool IsLayoutHover();
+
+	static void SetVideoPlaybackSpeed(double speed)
+	{
+		GetState().VideoPlaybackCooldown = 16.6 * speed;
+	}
 };
 

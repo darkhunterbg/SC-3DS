@@ -10,5 +10,5 @@ private:
 public:
 	// Reutrn TRUE when playback is done
 	static bool DrawVideo(const char* id, VideoClip& clip, bool loop = false, Color color = Colors::White);
-	static bool DrawVideoScaled(const char* id, VideoClip& clip, Vector2 scale, bool loop = false, Color color = Colors::White);
+	static bool DrawVideoScaled(const char* id, VideoClip& clip, Vector2 scale,  bool loop = false, Color color = Colors::White);
 };
