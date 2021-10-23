@@ -141,6 +141,14 @@ RenderSurface GraphicsRenderer::NewRenderSurface(Vector2Int size, bool pixelFilt
 	return rs;
 }
 
+Texture* GraphicsRenderer::NewTexture(Vector2Int size, bool pixelFiltering)
+{
+	TextureId t = Platform::NewTexture(size, pixelFiltering);
+	Texture* texture = new Texture("RuntimeTexture", Vector2Int16(size), t);
+
+	return texture;
+}
+
 void GraphicsRenderer::ChangeBlendingMode(BlendMode mode)
 {
 	if (mode == instance.blendMode)

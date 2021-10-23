@@ -27,7 +27,7 @@ public:
 	static void Play(IAudioSource& source, int channel);
 	static void StopChannel(int channel);
 	static void SetChannelVolume(int channel, float volume);
-
+	static void StopAll();
 	static void UpdateAudio();
 
 	inline  static const Span<AudioChannelState> GetAudioChannes() {

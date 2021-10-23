@@ -74,6 +74,7 @@ public:
 	static void DrawOnCurrentScreen();
 
 	static RenderSurface NewRenderSurface(Vector2Int size, bool pixelFiltering = false);
+	static Texture* NewTexture(Vector2Int size, bool pixelFiltering = false);
 
 	static void ChangeBlendingMode(BlendMode mode);
 

@@ -84,3 +84,21 @@ Rectangle GUI::GetLayoutSpace()
 {
 	return GetState().GetSpace();
 }
+
+void GUI::RegisterResource(const std::string& key, void* resource, void (*freeFunc)(void*)){
+	GetState().Resources.insert({ key, { resource, freeFunc } });
+}
+
+void GUI::CleanResources()
+{
+	auto& state = GetState();
+
+	for (auto& r : state.Resources)
+	{
+		if (r.second.freeFunc != nullptr)
+			r.second.freeFunc(r.second.memory);
+
+	}
+
+	state.Resources.clear();
+}

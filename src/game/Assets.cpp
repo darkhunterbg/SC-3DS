@@ -9,6 +9,12 @@
 
 #include <stdio.h>
 
+Texture::~Texture()
+{
+	Platform::DestroyTexture(id);
+}
+
+
 bool AudioClip::FillNextBuffer()
 {
 	if (stream == nullptr) return false;
@@ -50,7 +56,6 @@ void AudioClip::SwapBuffers()
 		_streamPos += _nextBufferSize;
 	}
 }
-
 bool AudioClip::Restart()
 {
 	if (stream == nullptr)
@@ -96,7 +101,6 @@ CoroutineR<AudioChannelClip> AudioClip::GetNextAudioChannelClipAsync()
 {
 	return CoroutineR<AudioChannelClip>(new AudioClipStreamAudioCrt(*this));
 }
-
 AudioClip::AudioClip(AudioInfo info, unsigned bufferSize, FILE* stream)
 {
 	this->info = info;
@@ -122,7 +126,6 @@ AudioClip::AudioClip(AudioInfo info, FILE* stream)
 	_activeBufferIndex = 0;
 	_activeBufferSize = buffers[0].Size();
 }
-
 AudioClip::~AudioClip()
 {
 	if (stream != nullptr)
@@ -130,12 +133,10 @@ AudioClip::~AudioClip()
 
 	delete[] buffers[0].Data();
 }
-
 int AudioClip::GetRemaining() const
 {
 	return info.GetTotalSize() - _streamPos;
 }
-
 
 Vector2Int Font::MeasureString(const char* text) const
 {
@@ -158,7 +159,6 @@ Image::Image(const ImageFrame* frameStart, const ImageDef& def)
 {
 
 }
-
 const ImageFrame& Image::GetFrame(unsigned index) const
 {
 	if (index >= frameCount)
@@ -166,7 +166,6 @@ const ImageFrame& Image::GetFrame(unsigned index) const
 
 	return frameStart[index];
 }
-
 const ImageFrame* Image::GetColorMaskFrame(unsigned index) const
 {
 	if (colorMaskOffset && index + colorMaskOffset >= frameCount)
@@ -174,7 +173,6 @@ const ImageFrame* Image::GetColorMaskFrame(unsigned index) const
 
 	return frameStart + index + colorMaskOffset;
 }
-
 Vector2Int16 Image::GetImageFrameOffset(unsigned frameId, bool hFlip) const
 {
 	const auto& frame = GetFrame(frameId);
@@ -194,7 +192,6 @@ Vector2Int16 Image::GetImageFrameOffset(const ImageFrame& frame, bool hFlip) con
 
 	return offset;
 }
-
 
 
 VideoClip::VideoClip(void* smkHandle) : _handle(smkHandle)
@@ -230,13 +227,10 @@ VideoClip::~VideoClip()
 {
 	smk_close((smk)_handle);
 }
-
-
 bool VideoClip::IsAtEnd() const
 {
 	return GetCurrentFrame() == _totalFrames - 1;
 }
-
 long VideoClip::GetCurrentFrame() const
 {
 	smk video = (smk)_handle;
@@ -244,7 +238,6 @@ long VideoClip::GetCurrentFrame() const
 	smk_info_all(video, &frame, nullptr, nullptr);
 	return (long)frame;
 }
-
 IAudioSource* VideoClip::PrepareAudio()
 {
 	if (!_hasAudio) return nullptr;
@@ -272,11 +265,14 @@ IAudioSource* VideoClip::PrepareAudio()
 		_audioData.shrink_to_fit();
 
 		_audioSrc.AddBuffer(_audioData.data(), _audioData.size());
+
+		smk_enable_audio(video, 0, false);
+
+		smk_first(video);
 	}
 
 	return &_audioSrc;
 }
-
 Coroutine VideoClip::LoadFirstFrameAsync(volatile bool* doneCallbackFlag)
 {
 	smk video = (smk)_handle;
@@ -290,7 +286,6 @@ Coroutine VideoClip::LoadFirstFrameAsync(volatile bool* doneCallbackFlag)
 			*doneCallbackFlag = true;
 		});;
 }
-
 Coroutine VideoClip::LoadNextFrameAsync(volatile bool* doneCallbackFlag)
 {
 	return AssetLoader::RunIOAsync([this, doneCallbackFlag] {
@@ -300,8 +295,6 @@ Coroutine VideoClip::LoadNextFrameAsync(volatile bool* doneCallbackFlag)
 			*doneCallbackFlag = true;
 		});;
 }
-
-
 void VideoClip::DecodeCurrentFrame(uint8_t* pixelData, int texLineSize)
 {
 	smk video = (smk)_handle;

@@ -9,7 +9,6 @@
 
 #include "Engine/IAudioSource.h"
 
-
 enum class AssetType : uint8_t {
 	Unknown = 0,
 	Texture = 1,
@@ -19,6 +18,8 @@ enum class AssetType : uint8_t {
 	Database = 5,
 };
 
+
+typedef std::size_t AssetId;
 
 typedef void* TextureId;
 
@@ -53,7 +54,7 @@ private:
 	std::string name;
 public:
 	Texture(const Texture&) = delete;
-
+	~Texture();
 
 	Texture(const std::string& name, Vector2Int16 size, TextureId id) :
 		id(id), size(size), name(name) {}
@@ -203,6 +204,8 @@ private:
 
 class VideoClip {
 public:
+	AssetId Id;
+
 	VideoClip(const VideoClip&) = delete;
 	VideoClip& operator=(const VideoClip&) = delete;
 
@@ -230,6 +233,7 @@ public:
 		return _frameTimeMs;
 	}
 	long GetCurrentFrame() const;
+	inline bool HasAudio() const { return _hasAudio; }
 private:
 	void* _handle;
 	long _totalFrames;

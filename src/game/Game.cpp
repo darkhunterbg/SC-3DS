@@ -47,6 +47,8 @@ static bool SwithScenes()
 		{
 			currentScene->Stop();
 			delete currentScene;
+
+			GUI::CleanResources();
 		}
 
 		currentScene = _nextScene.back();
@@ -145,8 +147,11 @@ void Game::End()
 	if (currentScene != nullptr)
 		currentScene->Stop();
 
-
 	currentScene = nullptr;
+
+
+	GUI::CleanResources();
+
 }
 
 void Game::SetCurrentScene(Scene* scene)

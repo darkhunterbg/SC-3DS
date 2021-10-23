@@ -5,6 +5,8 @@
 #include "../MathLib.h"
 #include "../Engine/GraphicsPrimitives.h"
 #include <vector>
+#include <unordered_map>
+#include <memory>
 
 enum class GUIHorizontalAlignment {
 	Left = 0,
@@ -20,7 +22,13 @@ enum class GUIVerticalAlignment {
 
 class GUIState {
 public:
+	struct Resource {
+		void* memory;
+		void (*freeFunc)(void*);
+	};
+
 	std::vector<Rectangle> SpaceStack;
+	std::unordered_map<std::string, Resource> Resources;
 
 	Rectangle GetSpace()const { return SpaceStack.back(); }
 };
@@ -56,5 +64,17 @@ public:
 		GUIVerticalAlignment vAlign = GUIVerticalAlignment::Center);
 
 	static Rectangle GetLayoutSpace();
+
+	template <class TResource>
+	static TResource* GetResourceById(const std::string& key)
+	{
+		auto state = GetState();
+		auto result = state.Resources.find(key);
+		if (result == state.Resources.end()) return nullptr;
+		return static_cast<TResource*>(result->second.memory);
+	}
+	static void RegisterResource(const std::string& key, void* resource, void (*freeFunc)(void*));
+
+	static void CleanResources();
 };
 

@@ -16,8 +16,6 @@ class AssetLoader {
 	friend class AssetLoaderLoadDatabaseCrt;
 	friend class AssetLoaderIOCrt;
 
-	typedef std::size_t AssetId;
-
 	std::array< const char*, 6> AssetTypeName = {
 		   "Unknown", "Texture", "Font", "AudioClip", "VideoClip", "Database"
 	};
@@ -76,6 +74,7 @@ public:
 	static const Font* LoadFont(const char* path, int size);
 	static AudioClip* LoadAudioClip(const char* path);
 	static VideoClip* LoadVideoClip(const char* path);
+	static void UnloadVideoClip(VideoClip* clip);
 
 	static Coroutine RunIOAsync(std::function<void()> func);
 };

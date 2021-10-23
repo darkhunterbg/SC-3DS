@@ -43,7 +43,6 @@ public:
 	// ================ General Purpose =================
 
 	static PlatformInfo GetPlatformInfo();
-
 	static Vector2Int MeasureString(const Font& font, const char* text);
 	static double ElaspedTime();
 
@@ -66,7 +65,9 @@ public:
 	static void DrawRectangle(const Rectangle& rect, Color32 color = Color32(Colors::White));
 	static void DrawText(const Font& font, Vector2Int position, const char* text, Color color = Colors::White);
 	static SurfaceId NewRenderSurface(Vector2Int size, bool pixelFiltering, TextureId& outTexture);
-	static void UpdateSurface(SurfaceId surface, Rectangle part, Span<uint8_t> bytes);
+	static TextureId NewTexture(Vector2Int size, bool pixelFiltering);
+	static void UpdateTexture(TextureId texture, Rectangle part, Span<uint8_t> bytes);
+	static void DestroyTexture(TextureId texture);
 	// ================ Input =======================
 
 	static void UpdateGamepadState(GamepadState& state);

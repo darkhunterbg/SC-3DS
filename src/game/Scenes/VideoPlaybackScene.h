@@ -4,8 +4,10 @@
 
 #include "Scene.h"
 
-class VideoPlaybackScene : public Scene {
+class VideoClip;
 
+class VideoPlaybackScene : public Scene {
+	VideoClip* _clip;
 public:
 	void Start() override;
 	void Draw() override;

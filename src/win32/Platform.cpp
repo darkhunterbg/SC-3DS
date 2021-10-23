@@ -70,22 +70,17 @@ TextureId Platform::CreateTextureFromFile(const char* path, Span<uint8_t> data, 
 	uint8_t* decoded = nullptr;
 	unsigned w, h;
 	int error = lodepng_decode32(&decoded, &w, &h, data.Data(), data.Size());
-	if(error !=0) EXCEPTION("Decode texture data %s failed with error %i.", path.data(), error);
+	if (error != 0) EXCEPTION("Decode texture data %s failed with error %i.", path.data(), error);
 
 	outSize.x = w;
 	outSize.y = h;
 
-	GPU_Image* tex = GPU_CreateImage(outSize.x, outSize.y, GPU_FORMAT_RGBA);
+	GPU_Image* tex = (GPU_Image*)NewTexture(Vector2Int(outSize), false);
 
-	if (tex == nullptr)
-	{
-		auto error = SDL_GetError();
-		EXCEPTION("Load texture %s failed with error %i.", path.data(), error);
-	}
-
+	
 	GPU_Rect rect = { 0.0f,0.0f, (float)w, (float)h };
 
-	GPU_UpdateImageBytes(tex, &rect, decoded, w * 4);
+	UpdateTexture(tex, { {0,0},{(int)w,(int)h} }, { decoded, w * h * 4 });
 
 	delete[] decoded;
 
@@ -169,7 +164,24 @@ SurfaceId Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering, Textu
 {
 	GPU_Image* tex = nullptr;
 
-	tex = GPU_CreateImage(size.x, size.y, GPU_FORMAT_RGBA);
+	tex = (GPU_Image*)NewTexture(size, pixelFiltering);
+
+
+	GPU_Target* surface = GPU_LoadTarget(tex);
+	GPU_SetWrapMode(tex, GPU_WRAP_NONE, GPU_WRAP_NONE);
+	outTexture = tex;
+
+	return surface;
+}
+TextureId Platform::NewTexture(Vector2Int size, bool pixelFiltering)
+{
+	GPU_Image* tex = GPU_CreateImage(size.x, size.y, GPU_FORMAT_RGBA);
+
+	if (tex == nullptr)
+	{
+		auto error = SDL_GetError();
+		EXCEPTION("Load texture %s failed with error %i.", path.data(), error);
+	}
 
 	if (pixelFiltering)
 	{
@@ -180,19 +192,19 @@ SurfaceId Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering, Textu
 		GPU_SetImageFilter(tex, GPU_FILTER_LINEAR);
 	}
 
-	GPU_Target* surface = GPU_LoadTarget(tex);
-	GPU_SetWrapMode(tex, GPU_WRAP_NONE, GPU_WRAP_NONE);
-	outTexture = tex;
-
-	return surface;
+	return tex;
 }
-void Platform::UpdateSurface(SurfaceId surface, Rectangle part, Span<uint8_t> bytes)
+void Platform::DestroyTexture(TextureId texture)
 {
-	auto t = (GPU_Target*)surface;
+	GPU_FreeImage((GPU_Image*)texture);
+}
+void Platform::UpdateTexture(TextureId texture, Rectangle part, Span<uint8_t> bytes)
+{
+	auto t = (GPU_Image*)texture;
 
 	GPU_Rect rect = { (float)part.position.x, (float)part.position.y, (float)part.size.x, (float)part.size.y };
 
-	GPU_UpdateImageBytes(t->image, &rect, bytes.Data(), part.size.x * 4);
+	GPU_UpdateImageBytes(t, &rect, bytes.Data(), part.size.x * 4);
 }
 SubImageCoord Platform::GenerateUV(TextureId texture, Rectangle16 src)
 {

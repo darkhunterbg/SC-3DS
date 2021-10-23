@@ -153,33 +153,24 @@ void Platform::DrawOnSurface(SurfaceId surface)
 
 	EXCEPTION("RenderTarget not found!");
 }
-void Platform::UpdateSurface(SurfaceId surface, Rectangle part, Span<uint8_t> bytes)
+void Platform::UpdateTexture(TextureId texture, Rectangle part, Span<uint8_t> bytes)
 {
-	C3D_RenderTarget* rt = (C3D_RenderTarget*)surface;
 
 #define TEXTURE_TRANSFER_FLAGS \
 	(GX_TRANSFER_FLIP_VERT(0) | GX_TRANSFER_OUT_TILED(1) | GX_TRANSFER_RAW_COPY(0) | \
 	GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) | GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGBA8) | \
 	GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO) )
 
-	for (auto& crt : createdRenderTargets)
-	{
-		if (crt.rt == rt)
-		{
-			C3D_Tex* tex = crt.tex;
 
-			int width = tex->width;
-			int height = tex->height;
+	C3D_Tex* tex = (C3D_Tex*)texture;
 
-			void* gpusrc = bytes.Data();
+	int width = tex->width;
+	int height = tex->height;
 
-			C3D_SyncDisplayTransfer((u32*)gpusrc, GX_BUFFER_DIM(part.size.x, part.size.y), (u32*)tex->data, GX_BUFFER_DIM(width, height), TEXTURE_TRANSFER_FLAGS);
+	void* gpusrc = bytes.Data();
 
-			return;
-		}
-	}
+	C3D_SyncDisplayTransfer((u32*)gpusrc, GX_BUFFER_DIM(part.size.x, part.size.y), (u32*)tex->data, GX_BUFFER_DIM(width, height), TEXTURE_TRANSFER_FLAGS);
 
-	EXCEPTION("RenderTarget not found!");
 }
 
 SurfaceId Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering, TextureId& outTexture)
@@ -220,6 +211,37 @@ SurfaceId Platform::NewRenderSurface(Vector2Int size, bool pixelFiltering, Textu
 		C3D_TexSetFilter(tex, GPU_TEXTURE_FILTER_PARAM::GPU_NEAREST, GPU_TEXTURE_FILTER_PARAM::GPU_NEAREST);
 
 	return rt;
+}
+TextureId Platform::NewTexture(Vector2Int size, bool pixelFiltering)
+{
+	C3D_Tex* tex = new C3D_Tex();
+	if (!C3D_TexInit(tex, size.x, size.y, GPU_TEXCOLOR::GPU_RGBA8))
+		EXCEPTION("Failed to create texture with size %ix%i!", size.x, size.y);
+
+	if (!pixelFiltering)
+		C3D_TexSetFilter(tex, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR, GPU_TEXTURE_FILTER_PARAM::GPU_LINEAR);
+	else
+		C3D_TexSetFilter(tex, GPU_TEXTURE_FILTER_PARAM::GPU_NEAREST, GPU_TEXTURE_FILTER_PARAM::GPU_NEAREST);
+
+
+	Tex3DS_SubTexture* sub = new Tex3DS_SubTexture();
+	sub->width = tex->width;
+	sub->height = tex->height;
+	sub->top = 1;
+	sub->left = 0;
+	sub->bottom = 0;
+	sub->right = 1;
+
+	loadedTextures[tex] = sub;
+
+	return tex;
+}
+void Platform::DestroyTexture(TextureId texture)
+{
+	C3D_Tex* tex = (C3D_Tex*)texture;
+
+	C3D_TexDelete(tex);
+	delete tex;
 }
 
 void Platform::DrawOnScreen(ScreenId screen)

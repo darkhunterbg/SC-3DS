@@ -119,6 +119,7 @@ VideoClip* AssetLoader::LoadVideoClip(const char* path)
 		e.data = LoadVideoClipFromFile(p.data());
 		e.type = AssetType::VideoClip;
 		e.id = id;
+		((VideoClip*)e.data)->Id = id;
 	}
 	else
 	{
@@ -128,8 +129,19 @@ VideoClip* AssetLoader::LoadVideoClip(const char* path)
 	}
 
 	return   (VideoClip*)e.data;
-}
+} 
+void AssetLoader::UnloadVideoClip(VideoClip* clip)
+{
+	GAME_ASSERT(clip, "Tried to unload nullptr clip!");
 
+	AssetEntry& e = instance.loadedAssets[clip->Id];
+
+	GAME_ASSERT(e.id != 0, "Failed to find video with id %i to delete", clip->Id);
+
+	instance.loadedAssets.erase(e.id);
+
+	delete clip;
+}
 static VideoClip* LoadVideoClipFromFile(const char* path)
 {
 	std::string p = path;
@@ -211,7 +223,7 @@ static Texture* LoadTextureFromFile(const char* path)
 class AssetLoaderLoadDatabaseCrt : public CoroutineImpl {
 
 	FILE* f;
-	AssetLoader::AssetId id;
+	AssetId id;
 	AssetLoader::AssetEntry* e;
 	CoroutineR<GameDatabase*> loadDBCrt;
 	CRT_START()

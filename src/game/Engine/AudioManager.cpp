@@ -84,6 +84,17 @@ void AudioManager::SetChannelVolume(int c, float volume)
 	instance.channels[c].volume = std::min(1.0f, std::max(0.0f, volume));
 }
 
+void AudioManager::StopAll()
+{
+	for (auto& channel : instance.channels)
+	{
+		if (!channel.IsValid())
+			continue;
+
+		Platform::EnableChannel(channel, false);
+	}
+}
+
 void AudioManager::UpdateAudio()
 {
 	for (auto& channel : instance.channels)

@@ -41,4 +41,5 @@ struct RenderSurface {
 		return sprite.GetRect();
 	}
 
+	inline bool IsValid() { return surfaceId != nullptr; }
 };

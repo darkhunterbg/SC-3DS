@@ -21,6 +21,11 @@ namespace DataManager.Build
 {
 	public class BuildGenerator : IDisposable
 	{
+		List<string> additionalBuildFiles = new List<string>()
+			{
+				 "tileset\\tile.png" , "font.ttf" ,"Smk\\Blizzard.smk"
+			};
+
 		public static BuildGenerator Instance { get; private set; }
 
 		private List<SpriteAtlasEntry> atlases = null;
@@ -475,20 +480,20 @@ namespace DataManager.Build
 
 		private void BuildOther()
 		{
-			List<string> files = new List<string>()
-			{
-				 "tileset\\tile.png" , "font.ttf"
-			};
-
 			currentJob = 0;
-			totalJobs = files.Count();
+			totalJobs = additionalBuildFiles.Count();
 
 			Progress(currentJob, totalJobs);
 
-			foreach (var f in files) {
+			foreach (var f in additionalBuildFiles) {
 				DisplayItem(f);
 
 				var src = Path.Combine(AssetManager.AssetsDir, f);
+				if (!File.Exists(src)) {
+					src = Path.Combine(AssetManager.StarcraftAssetDir, f);
+				}
+				
+					
 				var dst = Path.Combine(AssetManager.CookedAssetsPCDir, f);
 				Directory.CreateDirectory(Path.GetDirectoryName(dst));
 				File.Copy(src, dst, true);
