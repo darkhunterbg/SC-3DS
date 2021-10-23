@@ -18,8 +18,8 @@ class AssetLoader {
 
 	typedef std::size_t AssetId;
 
-	std::array< const char*, 5> AssetTypeName = {
-		   "Unknown", "Texture", "Font", "AudioClip", "Database"
+	std::array< const char*, 6> AssetTypeName = {
+		   "Unknown", "Texture", "Font", "AudioClip", "VideoClip", "Database"
 	};
 
 	struct AssetEntry {
@@ -75,6 +75,7 @@ public:
 	static const Texture* LoadTexture(const char* path);
 	static const Font* LoadFont(const char* path, int size);
 	static AudioClip* LoadAudioClip(const char* path);
+	static VideoClip* LoadVideoClip(const char* path);
 
 	static Coroutine RunIOAsync(std::function<void()> func);
 };

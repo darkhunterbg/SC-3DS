@@ -50,6 +50,7 @@ class BufferedAudioSource : public IAudioSource {
 	struct Buffer {
 		uint8_t* data;
 		unsigned size;
+		bool owned = false;
 	};
 private:
 	std::vector<Buffer> _buffers;
@@ -57,6 +58,7 @@ private:
 public:
 	void AddCopyBuffer(const uint8_t* _buffer, unsigned size);
 	void AddAndOwnBuffer(uint8_t* _buffer, unsigned size);
+	void AddBuffer(uint8_t* _buffer, unsigned size);
 	virtual CoroutineR<AudioChannelClip> GetNextAudioChannelClipAsync() override;
 	virtual bool Restart() override;
 	virtual bool IsAtEnd() const override;

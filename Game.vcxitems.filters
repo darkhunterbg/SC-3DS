@@ -22,9 +22,6 @@
     <Filter Include="SceneView">
       <UniqueIdentifier>{c23002b4-d6e6-4602-81be-85e68edc381e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LibSmacker">
-      <UniqueIdentifier>{7f028bec-af83-4aff-b59b-305ee5954a39}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.h">
@@ -166,23 +163,26 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUILabel.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\LibSmacker\smacker.h">
-      <Filter>LibSmacker</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\LibSmacker\smk_bitstream.h">
-      <Filter>LibSmacker</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\LibSmacker\smk_hufftree.h">
-      <Filter>LibSmacker</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\LibSmacker\smk_malloc.h">
-      <Filter>LibSmacker</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\VideoPlaybackScene.h">
       <Filter>Scenes</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Engine\IAudioSource.h">
       <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIVideo.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\smk_hufftree.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\smk_malloc.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\smacker.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\smk_bitstream.h">
+      <Filter>Loader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -302,15 +302,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUILabel.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\LibSmacker\smacker.c">
-      <Filter>LibSmacker</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\LibSmacker\smk_bitstream.c">
-      <Filter>LibSmacker</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\LibSmacker\smk_hufftree.c">
-      <Filter>LibSmacker</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\VideoPlaybackScene.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
@@ -318,5 +309,17 @@
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\PlatformAlloc.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIVideo.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\smk_hufftree.c">
+      <Filter>Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\smacker.c">
+      <Filter>Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\smk_bitstream.c">
+      <Filter>Loader</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

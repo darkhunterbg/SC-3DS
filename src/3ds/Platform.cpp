@@ -381,9 +381,12 @@ FILE* Platform::OpenAsset(const char* path, AssetType type)
 		f += ".bcfnt"; break;
 	case AssetType::AudioClip:
 		f += ".wav"; break;
+	case AssetType::VideoClip:
+		f += ".smk"; break;
 	case AssetType::Database:
 		f += ".bin"; break;
 		break;
+
 	default:
 		break;
 	}

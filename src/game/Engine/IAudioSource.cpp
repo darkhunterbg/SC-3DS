@@ -11,9 +11,12 @@ void BufferedAudioSource::AddCopyBuffer(const uint8_t* _buffer, unsigned size)
 
 void BufferedAudioSource::AddAndOwnBuffer(uint8_t* _buffer, unsigned size)
 {
-	_buffers.push_back({ _buffer, size });
+	_buffers.push_back({ _buffer, size , true });
 }
-
+void BufferedAudioSource::AddBuffer(uint8_t* _buffer, unsigned size)
+{
+	_buffers.push_back({ _buffer, size , false });
+}
 
 CoroutineR<AudioChannelClip> BufferedAudioSource::GetNextAudioChannelClipAsync()
 {
@@ -39,6 +42,7 @@ BufferedAudioSource::~BufferedAudioSource()
 {
 	for (const auto& b : _buffers)
 	{
-		//delete[] b.data;
+		if (b.owned)
+			delete[] b.data;
 	}
 }

@@ -133,6 +133,8 @@ FILE* Platform::OpenAsset(const char* path, AssetType type)
 		f.replace_extension("ttf"); break;
 	case AssetType::AudioClip:
 		f.replace_extension("wav"); break;
+	case AssetType::VideoClip:
+		f.replace_extension("smk"); break;
 	case AssetType::Database:
 		f.replace_extension("bin"); break;
 		break;

@@ -15,7 +15,8 @@ enum class AssetType : uint8_t {
 	Texture = 1,
 	Font = 2,
 	AudioClip = 3,
-	Database = 4
+	VideoClip = 4,
+	Database = 5,
 };
 
 
@@ -196,4 +197,46 @@ private:
 	int _activeBufferIndex = 1;
 	int _streamPos = 0;
 	fpos_t _streamStartPos = 0;
+};
+
+
+
+class VideoClip {
+public:
+	VideoClip(const VideoClip&) = delete;
+	VideoClip& operator=(const VideoClip&) = delete;
+
+	VideoClip(void* smkHandle);
+	~VideoClip();
+
+	IAudioSource* PrepareAudio();
+
+	Coroutine LoadFirstFrameAsync(volatile bool* doneCallbackFlag);
+
+	Coroutine LoadNextFrameAsync(volatile bool* doneCallbackFlag);
+	void DecodeCurrentFrame(uint8_t* outPixelData, int texLineSize);
+
+	int AllocatePixelDataBuffer(uint8_t** pixelData) const;
+	inline Vector2Int GetTextureSize() const { return _textureSize; }
+
+	bool IsAtEnd() const;
+
+	inline Vector2Int GetFrameSize() const
+	{
+		return _frameSize;
+	}
+	inline double GetFrameTime() const
+	{
+		return _frameTimeMs;
+	}
+	long GetCurrentFrame() const;
+private:
+	void* _handle;
+	long _totalFrames;
+	bool _hasAudio;
+	double _frameTimeMs;
+	Vector2Int _frameSize;
+	Vector2Int _textureSize;
+	BufferedAudioSource _audioSrc;
+	std::vector< uint8_t> _audioData;
 };

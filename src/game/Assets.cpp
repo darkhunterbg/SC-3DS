@@ -4,6 +4,9 @@
 #include "Engine/AssetLoader.h"
 
 #include "Platform.h"
+
+#include "Loader/smacker.h"
+
 #include <stdio.h>
 
 bool AudioClip::FillNextBuffer()
@@ -83,7 +86,7 @@ public: AudioClipStreamAudioCrt(AudioClip& clip) : _clip(&clip) {}
 
 		  _clip->SwapBuffers();
 
-		
+
 		  CRT_RETURN(AudioChannelClip{ _clip->GetData() });
 	  }
 	  CRT_END();
@@ -190,4 +193,146 @@ Vector2Int16 Image::GetImageFrameOffset(const ImageFrame& frame, bool hFlip) con
 		offset.x = (size.x >> 1) - frame.offset.x - frame.size.x;
 
 	return offset;
+}
+
+
+
+VideoClip::VideoClip(void* smkHandle) : _handle(smkHandle)
+{
+	smk video = (smk)_handle;
+
+	unsigned char   a_trackmask, a_channels[7], a_depth[7];
+	unsigned long   a_rate[7];
+	static unsigned long w, h, frames;
+
+	smk_info_audio(video, &a_trackmask, a_channels, a_depth, a_rate);
+	smk_info_video(video, &w, &h, nullptr);
+	smk_info_all(video, nullptr, &frames, &_frameTimeMs);
+
+	_frameTimeMs /= 1000;
+	_totalFrames = (long)frames;
+	_frameSize = Vector2Int((int)w, (int)h);
+
+	_hasAudio = a_trackmask == 1;
+
+	_textureSize = { 1,1 };
+
+	while (_textureSize.x < _frameSize.x)
+	{
+		_textureSize.x = _textureSize.x << 1;
+	}
+	while (_textureSize.y < _frameSize.y)
+	{
+		_textureSize.y = _textureSize.y << 1;
+	}
+}
+VideoClip::~VideoClip()
+{
+	smk_close((smk)_handle);
+}
+
+
+bool VideoClip::IsAtEnd() const
+{
+	return GetCurrentFrame() == _totalFrames - 1;
+}
+
+long VideoClip::GetCurrentFrame() const
+{
+	smk video = (smk)_handle;
+	unsigned long frame;
+	smk_info_all(video, &frame, nullptr, nullptr);
+	return (long)frame;
+}
+
+IAudioSource* VideoClip::PrepareAudio()
+{
+	if (!_hasAudio) return nullptr;
+
+	if (_audioData.size() == 0)
+	{
+		smk video = (smk)_handle;
+		smk_enable_audio(video, 0, true);
+		smk_enable_video(video, false);
+
+		smk_first(video);
+
+		for (long i = 0; i < _totalFrames; ++i)
+		{
+			const uint8_t* audio = smk_get_audio(video, 0);
+			unsigned size = smk_get_audio_size(video, 0);
+			int offset = _audioData.size();
+			_audioData.resize(offset + size);
+
+
+			memcpy(_audioData.data() + offset, audio, size);
+			smk_next(video);
+		}
+
+		_audioData.shrink_to_fit();
+
+		_audioSrc.AddBuffer(_audioData.data(), _audioData.size());
+	}
+
+	return &_audioSrc;
+}
+
+Coroutine VideoClip::LoadFirstFrameAsync(volatile bool* doneCallbackFlag)
+{
+	smk video = (smk)_handle;
+	smk_enable_audio(video, 0, false);
+	smk_enable_video(video, true);
+
+	return AssetLoader::RunIOAsync([this, doneCallbackFlag] {
+		smk video = (smk)_handle;
+		smk_first(video);
+		if (doneCallbackFlag != nullptr)
+			*doneCallbackFlag = true;
+		});;
+}
+
+Coroutine VideoClip::LoadNextFrameAsync(volatile bool* doneCallbackFlag)
+{
+	return AssetLoader::RunIOAsync([this, doneCallbackFlag] {
+		smk video = (smk)_handle;
+		smk_next(video);
+		if (doneCallbackFlag != nullptr)
+			*doneCallbackFlag = true;
+		});;
+}
+
+
+void VideoClip::DecodeCurrentFrame(uint8_t* pixelData, int texLineSize)
+{
+	smk video = (smk)_handle;
+	const uint8_t* pal_data = smk_get_palette(video);
+	const uint8_t* image = smk_get_video(video);
+	int a = 0;
+
+	int w = GetFrameSize().x;
+	int h = GetFrameSize().y;
+
+
+	for (int y = 0; y < h; ++y)
+	{
+		for (int x = 0; x < w; ++x)
+		{
+			int i = (x + y * texLineSize) << 2;
+
+			int index = image[++a];
+			index *= 3;
+
+#ifdef _3DS
+			pixelData[i++] = 255;
+			pixelData[i++] = (pal_data[index + 2]);
+			pixelData[i++] = (pal_data[index]);
+			pixelData[i++] = (pal_data[index + 1]);
+#else
+			pixelData[i++] = (pal_data[index]);
+			pixelData[i++] = (pal_data[index + 1]);
+			pixelData[i++] = (pal_data[index + 2]);
+			pixelData[i++] = 255;
+#endif
+		}
+	}
 }

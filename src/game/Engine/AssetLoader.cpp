@@ -3,10 +3,12 @@
 #include "Debug.h"
 #include "../Loader/Wave.h"
 #include "../Loader/BinaryData.h"
+#include "../Loader/smacker.h"
 
 static constexpr const int AudioStreamBufferSize = 4096;
 static AudioClip* LoadAudioClipFromFile(const char* path);
-static  Texture* LoadTextureFromFile(const char* path);
+static Texture* LoadTextureFromFile(const char* path);
+static VideoClip* LoadVideoClipFromFile(const char* path);
 
 static constexpr const char* DataFile = "data";
 
@@ -103,12 +105,48 @@ AudioClip* AssetLoader::LoadAudioClip(const char* path)
 				p.data(), GetAssetTypeName(AssetType::AudioClip), GetAssetTypeName(e.type));
 	}
 
-	return   (AudioClip*)e.data;
+	return (AudioClip*)e.data;
 }
 
+VideoClip* AssetLoader::LoadVideoClip(const char* path)
+{
+	std::string p = path;
+	AssetId id = instance.hasher(p);
+	AssetEntry& e = instance.loadedAssets[id];
 
+	if (e.id == 0)
+	{
+		e.data = LoadVideoClipFromFile(p.data());
+		e.type = AssetType::VideoClip;
+		e.id = id;
+	}
+	else
+	{
+		if (e.type != AssetType::VideoClip)
+			EXCEPTION("Tried to load '%s' as %i but it was %i!",
+				p.data(), GetAssetTypeName(AssetType::VideoClip), GetAssetTypeName(e.type));
+	}
+
+	return   (VideoClip*)e.data;
+}
+
+static VideoClip* LoadVideoClipFromFile(const char* path)
+{
+	std::string p = path;
+
+	FILE* f = Platform::OpenAsset(p.data(), AssetType::VideoClip);
+
+	if (f == nullptr)
+		EXCEPTION("Failed to open asset '%s'!", p.data());
+
+	smk handle = smk_open_filepointer(f, SMK_MODE_DISK);
+	if(handle == nullptr)
+		EXCEPTION("Failed to load SMK video '%s'!", p.data());
+
+	return new VideoClip(handle);
+
+}
 static uint16_t audioClipId = 0;
-
 static AudioClip* LoadAudioClipFromFile(const char* path)
 {
 	std::string p = path;
