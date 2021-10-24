@@ -204,6 +204,8 @@ namespace
 				Renderer = Main;
 			else
 			{
+				if (texture->target == nullptr)
+					GPU_GetTarget(texture);
 				Renderer = texture->target;
 				GPU_Clear(Renderer);
 			}
@@ -539,6 +541,7 @@ namespace ImGuiSDL
 		GPU_Image* image = GPU_CreateImage(width, height, GPU_FORMAT_RGBA);
 		GPU_Rect rect = { 0,0, (float)width, (float)height };
 		GPU_UpdateImageBytes(image, &rect, pixels, width * 4);
+		GPU_SetImageFilter(image, GPU_FILTER_LINEAR_MIPMAP);
 
 		Texture* texture = new Texture();
 		texture->Surface = GPU_GetTarget(image);

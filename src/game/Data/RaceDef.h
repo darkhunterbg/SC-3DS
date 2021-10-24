@@ -34,6 +34,7 @@ struct RaceDef {
 	RaceType Type;
 	std::string Name;
 
+	ImageFrame ConsoleSprite;
 	ImageFrame ConsoleLowerSprite;
 	ImageFrame ConsoleUpperSprite;
 	const Image* CommandIcons;

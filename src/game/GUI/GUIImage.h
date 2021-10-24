@@ -16,4 +16,6 @@ public:
 
 	static void DrawColor(Color color);
 	static void DrawColor(Rectangle rect, Color color);
+
+	static void DrawAnimatedImage(const char* id, const Image& image,int* frameState, Color color = Colors::White);
 };

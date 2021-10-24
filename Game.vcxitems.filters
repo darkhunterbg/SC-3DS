@@ -39,9 +39,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\MathLib.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Platform.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Span.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\Wave.h">
       <Filter>Loader</Filter>
     </ClInclude>
@@ -100,9 +97,6 @@
       <Filter>Data</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Random.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIAnimator.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\UpgradeDef.h">
       <Filter>Data</Filter>
     </ClInclude>
@@ -135,12 +129,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitSystem.h">
       <Filter>Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\ViewContext.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GameView.h">
-      <Filter>GUI</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\BootScene.h">
       <Filter>Scenes</Filter>
@@ -190,6 +178,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\MainMenuSceneView.h">
       <Filter>SceneView</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\Cursor.h">
+      <Filter>SceneView</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\GameSceneView.h">
+      <Filter>SceneView</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -202,9 +196,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Camera.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Assets.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Game.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\Cursor.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\Wave.cpp">
       <Filter>Loader</Filter>
     </ClCompile>
@@ -253,9 +244,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\AbilityDef.cpp">
       <Filter>Data</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIAnimator.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\UpgradeDef.cpp">
       <Filter>Data</Filter>
     </ClCompile>
@@ -285,12 +273,6 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitSystem.cpp">
       <Filter>Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\ViewContext.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GameView.cpp">
-      <Filter>GUI</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\BootScene.cpp">
       <Filter>Scenes</Filter>
@@ -331,6 +313,12 @@
       <Filter>Scenes</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\MainMenuSceneView.cpp">
+      <Filter>SceneView</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\Cursor.cpp">
+      <Filter>SceneView</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\GameSceneView.cpp">
       <Filter>SceneView</Filter>
     </ClCompile>
   </ItemGroup>

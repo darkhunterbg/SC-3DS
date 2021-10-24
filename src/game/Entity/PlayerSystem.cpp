@@ -23,12 +23,13 @@ bool PlayerInfo::HasEnoughSupply(int supplyDoubled) const
 {
 	int available = std::min(GetMaxSupply(), (int)providedSupplyDoubled);
 	available -= usedSupplyDoubled + reserverdSupplyDoubled;
-	return available  >= supplyDoubled;
+	return available >= supplyDoubled;
 }
 
 // ================== Player Vision ==================
 
-void PlayerVision::SetGridSize(Vector2Int16 size) {
+void PlayerVision::SetGridSize(Vector2Int16 size)
+{
 	gridSize = size;
 	int s = (size.x >> 5) * (size.y);
 	knoweldge.clear();
@@ -37,7 +38,8 @@ void PlayerVision::SetGridSize(Vector2Int16 size) {
 	visibility.reserve(s);
 	visibilityCountdown.clear();
 	visibilityCountdown.reserve(s * 32);
-	for (int i = 0; i < s; ++i) {
+	for (int i = 0; i < s; ++i)
+	{
 		knoweldge.push_back({ 0 });
 		visibility.push_back({ 0 });
 
@@ -48,7 +50,8 @@ void PlayerVision::SetGridSize(Vector2Int16 size) {
 
 // ================== Player System ==================
 
-PlayerSystem::PlayerSystem() {
+PlayerSystem::PlayerSystem()
+{
 
 }
 
@@ -64,7 +67,8 @@ void PlayerSystem::SetSize(Vector2Int16 size)
 
 	PlayerId id = { 0 };
 
-	players.push_back(PlayerInfo(Color32(Colors::SCNeutral), RaceType::Neutral, id));
+
+	players.push_back(PlayerInfo(Color32(Colors::SCNeutral), RaceType::Neutral, id, "Neutral"));
 	playerVision.push_back(new PlayerVision());
 	playerVision[id.i]->SetGridSize(gridSize);
 }
@@ -73,14 +77,15 @@ PlayerId PlayerSystem::AddPlayer(const RaceDef& race, Color color)
 {
 	PlayerId id = { (short)players.size() };
 
-	players.push_back(PlayerInfo(Color32(color), race.Type, id));
+	players.push_back(PlayerInfo(Color32(color), race.Type, id, "Player " + std::to_string(id.i )));
 	playerVision.push_back(new PlayerVision());
 	playerVision[id.i]->SetGridSize(gridSize);
 	playerEvents.push_back(PlayerEventCollection());
 
 	return id;
 }
-void PlayerSystem::SetMapKnown(PlayerId player) {
+void PlayerSystem::SetMapKnown(PlayerId player)
+{
 	PlayerVision& vision = *playerVision[player.i];
 	memset(vision.knoweldge.data(), 0xFF, sizeof(PlayerVision::VisionCell) * vision.knoweldge.size());
 }
@@ -97,7 +102,7 @@ const PlayerInfo& PlayerSystem::GetPlayerInfo(PlayerId id) const
 
 const PlayerVision& PlayerSystem::GetPlayerVision(PlayerId id) const
 {
-	if (playerVision.size() <=  id.i)
+	if (playerVision.size() <= id.i)
 		EXCEPTION("Player with id %i/%i not found", id.i, playerVision.size());
 
 	return *playerVision[id.i];
@@ -139,8 +144,10 @@ bool PlayerSystem::HasEnoughGas(PlayerId player, int gas) const
 }
 
 
-void PlayerSystem::UpdatePlayers(const EntityManager& em) {
-	for (PlayerVision* vision : playerVision) {
+void PlayerSystem::UpdatePlayers(const EntityManager& em)
+{
+	for (PlayerVision* vision : playerVision)
+	{
 		vision->ranges.clear();
 	}
 
@@ -162,20 +169,23 @@ void PlayerSystem::UpdatePlayers(const EntityManager& em) {
 		players[unit.owner.i].usedSupplyDoubled += unit.usedSupply;
 		players[unit.owner.i].providedSupplyDoubled += unit.providedSupply;
 	}
-	
+
 }
 
 static PlayerSystem* s;
 
-void PlayerSystem::UpdateNextPlayerVisionJob(int start, int end) {
-	for (int i = start; i < end; ++i) {
+void PlayerSystem::UpdateNextPlayerVisionJob(int start, int end)
+{
+	for (int i = start; i < end; ++i)
+	{
 		PlayerVision& vision = *s->playerVision[i];
 		s->UpdatePlayerVision(vision);
 		s->UpdatePlayerVisionTimers(vision);
 	}
 }
 
-bool PlayerSystem::UpdateNextPlayerVision(int players) {
+bool PlayerSystem::UpdateNextPlayerVision(int players)
+{
 	s = this;
 
 	int max = std::min((int)playerVision.size(), playerUpdate + players);
@@ -183,21 +193,24 @@ bool PlayerSystem::UpdateNextPlayerVision(int players) {
 	JobSystem::RunJob(max - playerUpdate, 1, UpdateNextPlayerVisionJob);
 
 	playerUpdate += players;
-	if (playerUpdate >= playerVision.size()) {
+	if (playerUpdate >= playerVision.size())
+	{
 		playerUpdate = 0;
 	}
 
 	return playerUpdate == 0;
 }
 
-void PlayerSystem::UpdatePlayerVisionTimers(PlayerVision& vision) {
+void PlayerSystem::UpdatePlayerVisionTimers(PlayerVision& vision)
+{
 	const int bitshift = std::log2(vision.gridSize.x);
 	const Vector2Int16 gridSize = vision.gridSize;
 	const int gridSizeBuckets = gridSize.x >> 5;
 
 	int bucketMax = (gridSize.x >> 5) * (gridSize.y >> 5);
 
-	for (int b = 0; b < bucketMax; ++b) {
+	for (int b = 0; b < bucketMax; ++b)
+	{
 		if (!vision.timerBuckets.test(b))
 			continue;
 
@@ -207,13 +220,16 @@ void PlayerSystem::UpdatePlayerVisionTimers(PlayerVision& vision) {
 		min.x = (b % gridSizeBuckets) << 5;
 		min.y = (b / gridSizeBuckets) << 5;
 
-		for (int y = min.y; y < min.y + 32; ++y) {
-			for (int x = min.x; x < min.x + 32; ++x) {
+		for (int y = min.y; y < min.y + 32; ++y)
+		{
+			for (int x = min.x; x < min.x + 32; ++x)
+			{
 				int t = x + y * gridSize.y;
 
 				uint8_t& countdown = vision.visibilityCountdown[t];
 
-				if (countdown > 0) {
+				if (countdown > 0)
+				{
 					--countdown;
 					Vector2Int16 p = Vector2Int16(t % gridSize.x, t >> bitshift);
 					vision.SetExplored(p);
@@ -226,7 +242,8 @@ void PlayerSystem::UpdatePlayerVisionTimers(PlayerVision& vision) {
 	}
 }
 
-void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
+void PlayerSystem::UpdatePlayerVision(PlayerVision& vision)
+{
 	// WARN: bitshift will not work when map is not power of 2 (192, for example)
 
 	vision.ClearVisibility();
@@ -238,7 +255,8 @@ void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
 
 	int end = vision.ranges.size();
 
-	for (int i = 0; i < end; ++i) {
+	for (int i = 0; i < end; ++i)
+	{
 		const Circle16& circle = vision.ranges[i];
 
 		Vector2Int16 min = circle.position - Vector2Int16(circle.size);
@@ -264,12 +282,15 @@ void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
 		if (min != circle.position - Vector2Int16(circle.size) ||
 			max != circle.position + Vector2Int16(circle.size))
 		{
-			for (short y = min.y; y <= max.y; ++y) {
-				for (short x = min.x; x <= max.x; ++x) {
+			for (short y = min.y; y <= max.y; ++y)
+			{
+				for (short x = min.x; x <= max.x; ++x)
+				{
 
 					Vector2Int16 p = Vector2Int16(x, y);
 					Vector2Int16 r = circle.position - p;
-					if (r.LengthSquaredInt() < size) {
+					if (r.LengthSquaredInt() < size)
+					{
 
 						vision.visibilityCountdown[p.x + (p.y << bitshift)]
 							= TileVisibilityTimer;
@@ -277,13 +298,17 @@ void PlayerSystem::UpdatePlayerVision(PlayerVision& vision) {
 				}
 			}
 		}
-		else {
-			for (short y = min.y; y <= circle.position.y; ++y) {
-				for (short x = min.x; x <= circle.position.x; ++x) {
+		else
+		{
+			for (short y = min.y; y <= circle.position.y; ++y)
+			{
+				for (short x = min.x; x <= circle.position.x; ++x)
+				{
 
 					Vector2Int16 p = Vector2Int16(x, y);
 					Vector2Int16 r = circle.position - p;
-					if (r.LengthSquaredInt() < size) {
+					if (r.LengthSquaredInt() < size)
+					{
 						vision.visibilityCountdown[p.x + (p.y << bitshift)]
 							= TileVisibilityTimer;
 
@@ -313,8 +338,10 @@ void PlayerSystem::NewEvent(PlayerId player, PlayerEventType type, EntityId sour
 
 void PlayerSystem::GetPlayerEvents(PlayerId player, PlayerEventType type, std::vector<PlayerEvent>& outEvents)
 {
-	for (const auto& ev : playerEvents[player.i]) {
-		if ((uint8_t)ev.type & (uint8_t)type) {
+	for (const auto& ev : playerEvents[player.i])
+	{
+		if ((uint8_t)ev.type & (uint8_t)type)
+		{
 			outEvents.push_back(ev);
 		}
 	}
@@ -339,7 +366,8 @@ void PlayerSystem::ResetNewEvents()
 {
 	newEventsReady = false;
 
-	for (PlayerEventCollection& collection : playerEvents) {
+	for (PlayerEventCollection& collection : playerEvents)
+	{
 		collection.clear();
 	}
 }

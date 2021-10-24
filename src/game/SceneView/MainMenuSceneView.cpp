@@ -99,6 +99,9 @@ void MainMenuSceneView::Draw()
 	GUILabel::DrawText(*_mmFont, "Show Credits", { 0,-32 }, GUIHAlign::Center, GUIVAlign::Bottom, buttonColor);
 	GUI::EndLayout();
 
+
+	_cursor.Draw();
+
 	if (Game::GetPlatformInfo().Type == PlatformType::Nintendo3DS)
 	{
 		GUI::UseScreen(ScreenId::Bottom);

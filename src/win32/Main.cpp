@@ -15,6 +15,9 @@
 #include "AbstractPlatform.h"
 
 #include "Engine/AudioManager.h"
+#include "Scenes/GameScene.h"
+#include "SceneView/GameSceneView.h"
+#include "Entity/EntityManager.h"
 
 #include <vector>
 
@@ -57,7 +60,7 @@ int main(int argc, char** argv)
 	ImGui_ImplSDL2_InitForOpenGL(window, screen->context->context);
 	ImGui::StyleColorsDark();
 
-	ImGui::GetIO().FontGlobalScale = 2;
+	ImGui::GetIO().FontGlobalScale = 1.5f;
 
 	abstractPlatform = AbstractPlatform::PC(screen);
 
@@ -95,6 +98,7 @@ int main(int argc, char** argv)
 
 	GameStartSettings settings = {};
 	settings.skipIntro = true;
+	settings.loadTestScene = true;
 
 	if (argc > 1)
 	{
@@ -174,7 +178,12 @@ int main(int argc, char** argv)
 
 void Toolbar()
 {
-	ImGui::Begin("Settings");
+	static bool toolbarOpen = true;
+
+	if (!ImGui::Begin("Settings", &toolbarOpen))
+	{
+		ImGui::End(); return;
+	}
 
 	int index = -1;
 
@@ -205,6 +214,34 @@ void Toolbar()
 	{
 		mute = !audioEnabled;
 		AudioManager::SetMute(!audioEnabled);
+	}
+
+	ImGui::Separator();
+
+	if (Game::GetCurrentScene()->GetId() == NAMEOF(GameScene))
+	{
+		GameScene* scene = static_cast<GameScene*>(Game::GetCurrentScene());
+
+		int player = 0;
+
+		std::vector<const char*> playersString;
+		playersString.clear();
+
+		auto& players = scene->GetEntityManager().PlayerSystem.GetPlayers();
+
+		for (auto& p : players)
+		{
+			playersString.push_back(p.name.data());
+			if (p.id == scene->GetView().GetPlayer())
+				player = p.id.i;
+		}
+		
+
+		ImGui::SetNextItemWidth(250);
+		if (ImGui::Combo("Player", &player, playersString.data(), players.size(),500))
+		{
+			scene->GetView().SetPlayer(players[player].id);
+		}
 	}
 
 	ImGui::End();

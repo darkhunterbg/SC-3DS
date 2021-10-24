@@ -1,13 +1,14 @@
 #pragma once
 
 #include "Assets.h"
+#include "Scenes/Scene.h"
 
-class Scene;
 struct PlatformInfo;
 
 struct GameStartSettings {
 	bool skipIntro = false;
 	bool mute = false;
+	bool loadTestScene = false;
 };
 
 class Game {
@@ -33,8 +34,9 @@ public:
 
 	static void SetCurrentScene(Scene* scene);
 
+	static Scene* GetCurrentScene();
+
 	static const PlatformInfo& GetPlatformInfo();
 
 	static void PlatformUpdated();	
-
 };

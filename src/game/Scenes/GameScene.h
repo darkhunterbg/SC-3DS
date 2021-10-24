@@ -1,10 +1,9 @@
 #pragma once
 
 #include "Scene.h"
-#include "../GUI/GameView.h"
 
-#include "../Entity/Entity.h"
 
+class GameSceneView;
 class EntityManager;
 
 class GameScene : public Scene {
@@ -14,10 +13,13 @@ public:
 	virtual ~GameScene() override;
 
 	virtual void Start() override;
+	virtual void Stop() override;
 	virtual void Update() override;
 	virtual void Draw() override;
 
+	EntityManager& GetEntityManager() { return *_entityManager; }
+	GameSceneView& GetView() { return *_view; }
 private:
-	GameView view;
-	EntityManager* entityManager;
+	GameSceneView* _view;
+	EntityManager* _entityManager;
 };

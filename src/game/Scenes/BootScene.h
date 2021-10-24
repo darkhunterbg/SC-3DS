@@ -12,9 +12,10 @@ private:
 	int _frameCounter = 0;
 	bool _ready = false;
 	Coroutine _loadCrt;
-	BootSceneView* _view;
+	BootSceneView* _view = nullptr;
+	Scene* _nextScene = nullptr;
 public:
-	BootScene();
+	BootScene(Scene* next = nullptr);
 	virtual void Start() override;
 	virtual void Stop() override;
 	virtual void Update() override;

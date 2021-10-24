@@ -3,6 +3,15 @@
 #include "../Engine/AssetLoader.h"
 #include "../Engine/AudioManager.h"
 
+MainMenuScene::MainMenuScene()
+{
+	_id = NAMEOF(MainMenuScene);
+}
+
+MainMenuScene::~MainMenuScene()
+{
+}
+
 void MainMenuScene::Start()
 {
 	_view = new MainMenuSceneView(this);

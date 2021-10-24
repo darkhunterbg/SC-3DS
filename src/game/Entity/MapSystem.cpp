@@ -51,20 +51,28 @@ void MapSystem::RedrawMinimapFogOfWar(const PlayerVision& vision)
 			uint8_t state = vision.GetState({ x,y });
 			if (state != currentState)
 			{
-				Rectangle16 add = start;
-				add.size.x = x - add.position.x + 1;
-				renderTiles[currentState - 1]->push_back(add);
+				if (currentState)
+				{
+					Rectangle16 add = start;
+					add.size.x = x - add.position.x + 1;
+					renderTiles[currentState - 1]->push_back(add);
+				}
 
-				currentState = state ;
+				currentState = state;
 				start = { {x,y }, { 1,1 } };
 
 			}
 		}
 
+
 		Rectangle16 add = start;
 		uint8_t state = vision.GetState({ (short)(mapSizeTiles - 1),y });
-		add.size.x = mapSizeTiles - 1 - add.position.x + 1;
-		renderTiles[state - 1]->push_back(add);
+		if (state)
+		{
+			add.size.x = mapSizeTiles - 1 - add.position.x + 1;
+			renderTiles[state - 1]->push_back(add);
+		}
+
 	}
 
 	for (auto& rect : _halfLitTiles)

@@ -65,15 +65,18 @@ static bool SwithScenes()
 
 static void InitialScene(GameStartSettings settings)
 {
+	Scene* afterBootScene = settings.loadTestScene ? new GameScene() : nullptr;
+
 	if (settings.skipIntro)
 	{
-		Game::SetCurrentScene(new BootScene());
+		Game::SetCurrentScene(new BootScene(afterBootScene));
 	}
 	else
 	{
-		Game::SetCurrentScene(new VideoPlaybackScene("Smk\\Blizzard", []() {
-			Game::SetCurrentScene(new BootScene());
+		Game::SetCurrentScene(new VideoPlaybackScene("Smk\\Blizzard", [afterBootScene]() {
+			Game::SetCurrentScene(new BootScene(afterBootScene));
 			}));
+
 	}
 
 	SwithScenes();
@@ -170,6 +173,11 @@ void Game::SetCurrentScene(Scene* scene)
 {
 	_nextScene.emplace(scene);
 
+}
+
+Scene* Game::GetCurrentScene()
+{
+	return currentScene;
 }
 
 const PlatformInfo& Game::GetPlatformInfo()

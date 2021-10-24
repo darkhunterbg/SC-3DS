@@ -131,6 +131,8 @@ struct PlayerInfo {
 	RaceType race;
 	PlayerId id;
 
+	std::string name;
+
 	bool newEvents = false;
 
 	inline int GetUsedSupply() const
@@ -145,9 +147,10 @@ struct PlayerInfo {
 
 	bool HasEnoughSupply(const UnitDef& unit) const;
 	bool HasEnoughSupply(int supplyDoubled) const;
-	PlayerInfo(Color32 color, RaceType race, PlayerId id) :
-		color(color), race(race), id(id)
+	PlayerInfo(Color32 color, RaceType race, PlayerId id, const std::string& name) :
+		color(color), race(race), id(id), name(name)
 	{
+		
 	}
 };
 

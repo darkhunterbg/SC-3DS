@@ -201,7 +201,8 @@ void GameDatabase::CreateRaces()
 		d.SupplyNamePlural = "Supplies";
 		d.SupplyBuildingNamePlural = "Supply Depots";
 		d.Type = RaceType::Terran;
-		d.ConsoleLowerSprite = GetImage("game\\tconsole").GetFrame(0);
+		d.ConsoleSprite = GetImage("game\\tconsole").GetFrame(0);
+		d.ConsoleLowerSprite = GetImage("game\\tconsoledn").GetFrame(0);
 		d.ConsoleUpperSprite = GetImage("game\\tconsoleup").GetFrame(0);
 		d.CommandIcons = &GetImage("unit\\cmdbtns\\tcmdbtns");
 		d.SupplyIcon = GetImage("game\\icons\\tsupply").GetFrame(0);
@@ -216,7 +217,8 @@ void GameDatabase::CreateRaces()
 		d.SupplyNamePlural = "Controls";
 		d.SupplyBuildingNamePlural = "Overlords";
 		d.Type = RaceType::Zerg;
-		d.ConsoleLowerSprite = GetImage("game\\zconsole").GetFrame(0);
+		d.ConsoleSprite = GetImage("game\\zconsole").GetFrame(0);
+		d.ConsoleLowerSprite = GetImage("game\\zconsoledn").GetFrame(0);
 		d.ConsoleUpperSprite = GetImage("game\\zconsoleup").GetFrame(0);
 		d.CommandIcons = &GetImage("unit\\cmdbtns\\zcmdbtns");
 		d.SupplyIcon = GetImage("game\\icons\\zsupply").GetFrame(0);
@@ -231,11 +233,12 @@ void GameDatabase::CreateRaces()
 		d.SupplyNamePlural = "Psi";
 		d.SupplyBuildingNamePlural = "Pylons";
 		d.Type = RaceType::Protoss;
-		d.ConsoleLowerSprite = GetImage("game\\zconsole").GetFrame(0);
-		d.ConsoleUpperSprite = GetImage("game\\zconsoleup").GetFrame(0);
-		d.CommandIcons = &GetImage("unit\\cmdbtns\\zcmdbtns");
-		d.SupplyIcon = GetImage("game\\icons\\zsupply").GetFrame(0);
-		d.GasIcon = GetImage("game\\icons\\zgas").GetFrame(0);
+		d.ConsoleSprite = GetImage("game\\pconsole").GetFrame(0);
+		d.ConsoleLowerSprite = GetImage("game\\pconsoledn").GetFrame(0);
+		d.ConsoleUpperSprite = GetImage("game\\pconsoleup").GetFrame(0);
+		d.CommandIcons = &GetImage("unit\\cmdbtns\\pcmdbtns");
+		d.SupplyIcon = GetImage("game\\icons\\psupply").GetFrame(0);
+		d.GasIcon = GetImage("game\\icons\\pgas").GetFrame(0);
 
 		RaceDefs.push_back(d);
 	}

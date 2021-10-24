@@ -1,7 +1,7 @@
 #include "GameScene.h"
 
 #include "../Game.h"
-#include "../GUI/GameView.h"
+#include "../SceneView/GameSceneView.h"
 #include "../Engine/AudioManager.h"
 #include "../Entity/EntityManager.h"
 #include "../Profiler.h"
@@ -13,7 +13,7 @@
 
 #include <algorithm>
 
-GameScene::GameScene() {}
+GameScene::GameScene() { _id = NAMEOF(GameScene); }
 
 GameScene::~GameScene() {}
 
@@ -23,12 +23,12 @@ void GameScene::Start()
 	Vector2Int16 size = { 128 * 32,128 * 32 };
 
 
-	entityManager = new EntityManager();
+	_entityManager = new EntityManager();
 	//entityManager->DrawBoundingBoxes = true;
 	//entityManager->DrawGrid = true;
 	//entityManager->DrawColliders = true;
 
-	entityManager->Init(size);
+	_entityManager->Init(size);
 
 
 	//view = new GameView(*entityManager, size);
@@ -39,11 +39,10 @@ void GameScene::Start()
 
 	int totalPlayers = 8;
 
-	const auto& race = *GameDatabase::instance->GetRace(RaceType::Terran);
 
+	const auto& race = *GameDatabase::instance->GetRace(RaceType::Terran);
 	if (race.GetMusic())
 	{
-
 		AudioManager::Play(race.GetMusic()->GetAudioClip(2), 0);
 	}
 	//	entityManager->GetSoundSystem().PlayMusic(*race.GetMusic());
@@ -51,12 +50,13 @@ void GameScene::Start()
 
 	for (int p = 0; p < totalPlayers; ++p)
 	{
-		entityManager->PlayerSystem.AddPlayer(race, color[p]);
+
+		auto& r = *GameDatabase::instance->GetRace((RaceType)(p % 3 + 1) );
+		_entityManager->PlayerSystem.AddPlayer(r, color[p]);
 	}
 
-	view.Init();
-
-	view.SetPlayer(PlayerId{ 1 });
+	_view = new GameSceneView(this);
+	_view->SetPlayer(PlayerId{ 1 });
 
 	//view->SetPlayer(1, race);
 
@@ -89,43 +89,47 @@ void GameScene::Start()
 			EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ x * 32 ,y * 32 }));
 		}
 	}
-	entityManager->PlayerSystem.SetMapKnown(PlayerId{ 1 });
+	//_entityManager->PlayerSystem.SetMapKnown(PlayerId{ 1 });
 
 	EntityUtil::SpawnUnit(def, PlayerId{ 2 }, Vector2Int16(Vector2Int{ 256 , 64 }));
 
-	entityManager->FullUpdate();
+	_entityManager->FullUpdate();
 
 	/*if (loadFromFile) {
 		entityManager->GetCommandProcessor().ReplayFromFile("record.cmd", *entityManager);
 	}*/
 }
 
+void GameScene::Stop()
+{
+	delete _view;
+	_view = nullptr;
+}
 int t = 0;
 
 void GameScene::Update()
 {
+	_view->GetCamera().Update();
 
-	entityManager->FrameUpdate(view.GetCamera());
-
-
-	view.GetCamera().Update();
-
+	_entityManager->FrameUpdate(_view->GetCamera());
 
 	if (InputManager::Gamepad.IsButtonReleased(GamepadButton::Select))
 	{
-		entityManager->MapSystem.FogOfWarVisible = !entityManager->MapSystem.FogOfWarVisible;
+		_entityManager->MapSystem.FogOfWarVisible = !_entityManager->MapSystem.FogOfWarVisible;
 	}
+
+	_view->Update();
 }
 
 void GameScene::Draw()
 {
 	GraphicsRenderer::DrawOnScreen(ScreenId::Top);
 
-	entityManager->Draw(view.GetCamera());
+	_entityManager->Draw(_view->GetCamera());
 
-	view.DrawMainScreen();
+	_view->DrawMainScreen();
 
 	GraphicsRenderer::DrawOnScreen(ScreenId::Bottom);
 
-	view.DrawSecondaryScreen();
+	_view->DrawSecondaryScreen();
 }

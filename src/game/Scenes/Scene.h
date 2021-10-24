@@ -1,6 +1,10 @@
 #pragma once
 
+#include <string>
+
 class Scene {
+protected:
+	 std::string _id;
 public :
 	virtual ~Scene() = 0;
 
@@ -9,4 +13,10 @@ public :
 
 	virtual void Update() {}
 	virtual void Draw() {}
+
+	const  std::string& GetId() const
+	{
+		return _id;
+	}
+
 };

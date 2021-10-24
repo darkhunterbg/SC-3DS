@@ -51,7 +51,7 @@ bool GUIVideo::DrawVideo(const char* id, VideoClip& clip, bool loop, Color color
 	Vector2Int textureSize = clip.GetTextureSize();
 	
 	std::string key = id;
-	key += ".Data";
+	key += ".VideoData";
 
 	VideoFrameRenderData* data = GUI::GetResourceById<VideoFrameRenderData>(key);
 	if (data == nullptr)

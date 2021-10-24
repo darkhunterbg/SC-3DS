@@ -2,6 +2,12 @@
 #include "../Engine/GraphicsRenderer.h"
 #include "../Platform.h"
 
+struct AnimationData {
+	const Image* image = nullptr;
+	int currentFrame = 0;
+	int timer = 0;
+};
+
 void GUIImage::DrawTexture(const Texture& texture, Rectangle rect, Color color)
 {
 	GraphicsRenderer::Draw(texture, GUI::GetPosition(rect.position), rect.size, Color32(color));
@@ -30,7 +36,7 @@ void GUIImage::DrawImage(const Image& image, unsigned subImage, Color color)
 	DrawImageFrame(frame, color);
 }
 
-void GUIImage::DrawImageFrame(const ImageFrame& frame, Color color )
+void GUIImage::DrawImageFrame(const ImageFrame& frame, Color color)
 {
 	Rectangle rect = GUI::GetLayoutSpace();
 	GraphicsRenderer::Draw(frame, rect, color);
@@ -45,4 +51,46 @@ void GUIImage::DrawColor(Color color)
 void GUIImage::DrawColor(Rectangle rect, Color color)
 {
 	GraphicsRenderer::DrawRectangle({ GUI::GetPosition(rect.position), rect.size }, color);
+}
+
+void GUIImage::DrawAnimatedImage(const char* id, const Image& image, int* frameState, Color color)
+{
+	std::string key = id;
+	key += ".AnimData";
+
+	AnimationData* data = GUI::GetResourceById<AnimationData>(key);
+	if (data == nullptr)
+	{
+		data = new	AnimationData();
+		GUI::RegisterResource(key, data, [](void* p) {delete (AnimationData*)p;  });
+	}
+
+	if (data->image != &image)
+	{
+		data->image = &image;
+		data->currentFrame = 0;
+		data->timer = GUI::GetState().ImageAnimationTimer + 1;
+	}
+
+	if (frameState)
+	{
+		if (data->currentFrame != *frameState)
+		{
+			data->currentFrame = *frameState;
+			data->timer = GUI::GetState().ImageAnimationTimer + 1;
+		}
+	}
+
+	data->timer--;
+	if (data->timer <= 0)
+	{
+		data->timer = GUI::GetState().ImageAnimationTimer;
+		data->currentFrame = (++data->currentFrame) % data->image->GetFrames().Size();
+		if (frameState)
+			*frameState = data->currentFrame;
+	}
+
+
+	auto& frame = data->image->GetFrame(data->currentFrame);
+	DrawImageFrame(frame, color);
 }

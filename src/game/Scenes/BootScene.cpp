@@ -6,13 +6,19 @@
 #include "../Scenes/GameScene.h"
 #include "../TimeSlice.h"
 #include "../SceneView/BootSceneView.h"
-#include "../Scenes/MainMenuScene.h"
+#include "MainMenuScene.h"
 
 static bool _autoStart = true;
 
-BootScene::BootScene()
+BootScene::BootScene(Scene* next)
 {
-	
+	_id = NAMEOF(BootScene);
+
+	_nextScene = next;
+	if (_nextScene == nullptr)
+	{
+		_nextScene = new MainMenuScene();
+	}
 }
 
 BootScene::~BootScene()
@@ -22,7 +28,7 @@ BootScene::~BootScene()
 
 void BootScene::StartGame()
 {
-	Game::SetCurrentScene(new MainMenuScene());
+	Game::SetCurrentScene(_nextScene);
 }
 
 void BootScene::Start()

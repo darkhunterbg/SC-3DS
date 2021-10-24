@@ -30,6 +30,7 @@ public:
 	std::vector<Rectangle> SpaceStack;
 	std::unordered_map<std::string, Resource> Resources;
 	double VideoPlaybackCooldown = 16.6;
+	int ImageAnimationTimer = 6;
 
 	Rectangle GetSpace()const { return SpaceStack.back(); }
 };

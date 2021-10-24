@@ -16,6 +16,8 @@ VideoPlaybackScene::VideoPlaybackScene(const char* video, std::function<void()> 
 {
 	_videoPath = video;
 	_onDoneCallback = doneCallback;
+
+	_id = NAMEOF(VideoPlaybackScene);
 }
 
 void VideoPlaybackScene::Start()
