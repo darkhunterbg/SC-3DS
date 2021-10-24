@@ -65,6 +65,7 @@
       <Filter>ImGui</Filter>
     </ClInclude>
     <ClInclude Include="src\win32\lodepng.h" />
+    <ClInclude Include="src\win32\SettingsPanel.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ImGui">

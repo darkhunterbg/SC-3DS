@@ -185,6 +185,7 @@ xcopy /y /d "$(SolutionDir)Libs\glew\lib\*.dll" "$(OutDir)"</Command>
     <ClInclude Include="src\win32\ImGui\imstb_truetype.h" />
     <ClInclude Include="src\win32\lodepng.h" />
     <ClInclude Include="src\win32\SDL_FontCache.h" />
+    <ClInclude Include="src\win32\SettingsPanel.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

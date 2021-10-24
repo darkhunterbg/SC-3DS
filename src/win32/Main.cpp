@@ -14,10 +14,7 @@
 #include "Debug.h"
 #include "AbstractPlatform.h"
 
-#include "Engine/AudioManager.h"
-#include "Scenes/GameScene.h"
-#include "SceneView/GameSceneView.h"
-#include "Entity/EntityManager.h"
+#include "SettingsPanel.h"
 
 #include <vector>
 
@@ -36,11 +33,8 @@ bool mute = false;
 bool noThreading = false;
 
 
-void Toolbar();
-
 int main(int argc, char** argv)
 {
-
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_AUDIO);
 
 	GPU_SetRequiredFeatures(GPU_FEATURE_BASIC_SHADERS);
@@ -158,7 +152,7 @@ int main(int argc, char** argv)
 
 		ImGui_ImplSDL2_NewFrame();
 
-		Toolbar();
+		DrawSettings();
 		ImGui::Render();
 		ImGuiSDL::Render(ImGui::GetDrawData());
 
@@ -176,101 +170,4 @@ int main(int argc, char** argv)
 
 
 
-void Toolbar()
-{
-
-	if (!ImGui::Begin("Settings"))
-	{
-		ImGui::End(); return;
-	}
-
-	int index = -1;
-
-
-	int i = 0;
-	for (auto& p : AbstractPlatform::Platforms)
-	{
-		if (p.Name == abstractPlatform.Name)
-		{
-			index = i; break;
-		}
-		++i;
-	}
-
-
-	ImGui::SetNextItemWidth(250);
-	if (ImGui::Combo("Platform", &index, AbstractPlatform::PlatformsString.data(), AbstractPlatform::Platforms.size()))
-	{
-		abstractPlatform = AbstractPlatform::Platforms[index];
-		abstractPlatform.ApplyPlatform();
-		Game::PlatformUpdated();
-	}
-
-	bool audioEnabled = !AudioManager::IsMute();
-
-	ImGui::SetNextItemWidth(250);
-	if (ImGui::Checkbox("Audio Enabled", &audioEnabled))
-	{
-		mute = !audioEnabled;
-		AudioManager::SetMute(!audioEnabled);
-	}
-
-	ImGui::SetNextItemWidth(250);
-	ImGui::Checkbox("Show Performance", &Game::ShowPerformanceStats);
-
-	ImGui::Separator();
-
-	if (Game::GetCurrentScene()->GetId() == NAMEOF(GameScene))
-	{
-		GameScene* scene = static_cast<GameScene*>(Game::GetCurrentScene());
-
-		int player = 0;
-
-		std::vector<const char*> playersString;
-		playersString.clear();
-
-		auto& players = scene->GetEntityManager().PlayerSystem.GetPlayers();
-
-		for (auto& p : players)
-		{
-			playersString.push_back(p.name.data());
-			if (p.id == scene->GetView().GetPlayer())
-				player = p.id.i;
-		}
-		
-
-		ImGui::SetNextItemWidth(250);
-		if (ImGui::Combo("Player", &player, playersString.data(), players.size(),500))
-		{
-			scene->GetView().SetPlayer(players[player].id);
-		}
-
-		PlayerId p = players[player].id;
-
-		if (ImGui::Button("Give Resources"))
-		{
-			scene->GetEntityManager().PlayerSystem.AddMinerals(p, 10000);
-			scene->GetEntityManager().PlayerSystem.AddGas(p, 10000);
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Take Resources"))
-		{
-			scene->GetEntityManager().PlayerSystem.AddMinerals(p, -10000);
-			scene->GetEntityManager().PlayerSystem.AddGas(p, -10000);
-		}
-
-
-		ImGui::Checkbox("Fog of War", &scene->GetEntityManager().MapSystem.FogOfWarVisible);
-
-		ImGui::SameLine();
-		if (ImGui::Button("Explore Map"))
-		{
-			scene->GetEntityManager().PlayerSystem.SetMapKnown(p);
-		}
-	
-		
-	}
-
-	ImGui::End();
-}
 
