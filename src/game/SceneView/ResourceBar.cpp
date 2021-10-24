@@ -84,9 +84,12 @@ void ResourceBar::UpdatePlayerInfo(const PlayerInfo& info, bool instant)
 
 	int id = (int)info.race - 1;
 
-	_supply[id].current = info.GetUsedSupply();
-	_supply[id].max = info.GetProvidedSupply();
-	_supply[id].enabled = true;
+	if (id >= 0)
+	{
+		_supply[id].current = info.GetUsedSupply();
+		_supply[id].max = info.GetProvidedSupply();
+		_supply[id].enabled = true;
+	}
 
 	if (instant)
 	{
