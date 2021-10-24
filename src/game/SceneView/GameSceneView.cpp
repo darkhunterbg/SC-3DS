@@ -7,12 +7,7 @@
 #include "../GUI/GUI.h"
 #include "../StringLib.h"
 #include "../Engine/AssetLoader.h"
-
-
-static const  int GetResourceUpdate(int change)
-{
-	return std::max(1, (int)std::ceil(std::sqrt(change)) / 2);
-}
+#include "../Profiler.h"
 
 GameSceneView::GameSceneView(GameScene* scene) : _scene(scene)
 {
@@ -29,29 +24,12 @@ void GameSceneView::SetPlayer(PlayerId player)
 	EntityUtil::GetManager().MapSystem.ActivePlayer = player;
 	const PlayerInfo& info = EntityUtil::GetManager().PlayerSystem.GetPlayerInfo(_player);
 
-	minerals.target = minerals.shown = info.minerals;
-	gas.target = gas.shown = info.gas;
-	supply.current = info.GetUsedSupply();
-	supply.max = info.GetProvidedSupply();
+	_resourceBar.UpdatePlayerInfo(info, true);
 }
 
 const PlayerInfo& GameSceneView::GetPlayerInfo() const
 {
 	return EntityUtil::GetManager().PlayerSystem.GetPlayerInfo(_player);
-}
-
-void GameSceneView::UpdateResourceDiff(GameSceneView::Resource& r)
-{
-	int diff = r.target - r.shown;
-	if (diff == 0)
-		return;
-
-	int update = GetResourceUpdate(diff);
-
-	int mod = diff < 0 ? -update : update;
-	if (std::abs(diff - mod) < update)
-		mod = diff;
-	r.shown += mod;
 }
 
 
@@ -68,34 +46,22 @@ void GameSceneView::Update()
 
 	const PlayerInfo& info = EntityUtil::GetManager().PlayerSystem.GetPlayerInfo(_player);
 
-	minerals.target = info.minerals;
-	gas.target = info.gas;
-	supply.current = info.GetUsedSupply();
-	supply.max = info.GetProvidedSupply();
+	_resourceBar.UpdatePlayerInfo(info, false);
 
-	UpdateResourceDiff(minerals);
-	UpdateResourceDiff(gas);
 }
 
-void GameSceneView::DrawResource(const ImageFrame& icon, Vector2Int pos, Color color, const char* fmt, ...)
+void GameSceneView::Draw()
 {
-	va_list args;
-	va_start(args, fmt);
-	stbsp_vsnprintf(textBuffer, sizeof(textBuffer), fmt, args);
-	va_end(args);
+	SectionProfiler p("GUI");
 
+	DrawMainScreen();
 
-	GUI::BeginAbsoluteLayout({ pos, {14,14} });
-	GUIImage::DrawImageFrame(icon);
-	GUI::EndLayout();
+	if (Platform::GetPlatformInfo().Type != PlatformType::Nintendo3DS)
+		return;
 
-	pos += {16, -2};
-
-	auto font = Game::SystemFont12;
-
-	GUILabel::DrawText(*font, textBuffer, pos + Vector2Int{ 1,1 }, Colors::Black);
-	GUILabel::DrawText(*font, textBuffer, pos, color);
+	DrawSecondaryScreen();
 }
+
 
 void GameSceneView::DrawMainScreen()
 {
@@ -107,7 +73,6 @@ void GameSceneView::DrawMainScreen()
 
 	if (raceDef == nullptr) raceDef = GameDatabase::instance->GetRace(RaceType::Terran);
 
-
 	if (Platform::GetPlatformInfo().Type != PlatformType::Nintendo3DS)
 	{
 		GUIImage::DrawImageFrame(raceDef->ConsoleSprite);
@@ -118,36 +83,18 @@ void GameSceneView::DrawMainScreen()
 	}
 	else
 	{
+	
 		GUI::BeginRelativeLayout({ 0,0 }, Vector2Int(raceDef->ConsoleUpperSprite.size), GUIHAlign::Center, GUIVAlign::Bottom);
 		GUIImage::DrawImageFrame(raceDef->ConsoleUpperSprite);
 		GUI::EndLayout();
 	}
 
-	auto  mineralIcon = AssetLoader::GetDatabase().GetImage("game\\icons\\min").GetFrame(0);
 
-	Color color = Colors::UIGreen;
-
-	Vector2Int pos = GUI::GetRelativePosition({ -240,2 }, GUIHAlign::Right, GUIVAlign::Top);
-
-	// Minerals
-	DrawResource(mineralIcon, pos, color, "%i", minerals.shown);
-	pos.x += 80;
-	// Gas
-	DrawResource(raceDef->GasIcon, pos, color, "%i", gas.shown);
-	pos.x += 80;
-	// Supply
-	if (supply.current > supply.max)
-		color = Colors::UIRed;
-	DrawResource(raceDef->SupplyIcon, pos, color, "%i", supply.current);
-	pos += {16, -2};
-
-	auto font = Game::SystemFont12;
-
-	pos.x += font->MeasureString(textBuffer).x;
-	stbsp_snprintf(textBuffer, sizeof(textBuffer), "/%i", supply.max);
-	GUILabel::DrawText(*font, textBuffer, pos + Vector2Int{ 1,1 }, Colors::Black);
-	GUILabel::DrawText(*font, textBuffer, pos, color);
-
+	Vector2Int barSize = GUI::GetScreenSize();
+	barSize.y = 14;
+	GUI::BeginRelativeLayout({ 0,2 }, barSize, GUIHAlign::Center, GUIVAlign::Top);
+	_resourceBar.Draw(info);
+	GUI::EndLayout();
 
 	_cursor.Draw();
 
@@ -155,9 +102,6 @@ void GameSceneView::DrawMainScreen()
 
 void GameSceneView::DrawSecondaryScreen()
 {
-	if (Platform::GetPlatformInfo().Type != PlatformType::Nintendo3DS)
-		return;
-
 	GUI::UseScreen(ScreenId::Bottom);
 
 	GUIImage::DrawColor(Colors::Black);

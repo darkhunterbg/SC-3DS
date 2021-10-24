@@ -127,9 +127,5 @@ void GameScene::Draw()
 
 	_entityManager->Draw(_view->GetCamera());
 
-	_view->DrawMainScreen();
-
-	GraphicsRenderer::DrawOnScreen(ScreenId::Bottom);
-
-	_view->DrawSecondaryScreen();
+	_view->Draw();
 }

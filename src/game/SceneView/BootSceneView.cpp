@@ -25,18 +25,18 @@ void BootSceneView::Draw()
 	{
 		GUI::UseScreen(ScreenId::Top);
 
-		GUIImage::DrawTexture(*_title, { {0,0},{400,300} });
+		GUIImage::DrawTextureAbsolute(*_title, { {0,0},{400,300} });
 
 		GUI::UseScreen(ScreenId::Bottom);
 
 		GUIImage::DrawColor(Colors::Black);
 
-		GUIImage::DrawTexture(*_title, { { -440, -358} ,{640,480} });
+		GUIImage::DrawTextureAbsolute(*_title, { { -440, -358} ,{640,480} });
 
-		GUIImage::DrawColor({ {0,0},{120,200} }, Colors::Black);
+		GUIImage::DrawColorAbsolute({ {0,0},{120,200} }, Colors::Black);
 
-		GUIImage::DrawTexture(*_title, { { -40,-240 }, { 400,300 } });
-		GUIImage::DrawColor({ {300,25},{20,100} }, Colors::Black);
+		GUIImage::DrawTextureAbsolute(*_title, { { -40,-240 }, { 400,300 } });
+		GUIImage::DrawColorAbsolute({ {300,25},{20,100} }, Colors::Black);
 
 		const char* text = nullptr;
 

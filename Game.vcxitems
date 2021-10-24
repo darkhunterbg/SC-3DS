@@ -73,6 +73,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\Cursor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\GameSceneView.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\MainMenuSceneView.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\ResourceBar.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Span.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\stb_sprintf.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\StringLib.h" />
@@ -128,6 +129,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\Cursor.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\GameSceneView.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\MainMenuSceneView.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\ResourceBar.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\StringLib.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\TimeSlice.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Util.cpp" />

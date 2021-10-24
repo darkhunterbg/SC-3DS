@@ -82,7 +82,11 @@ int main()
 
 	mainTimer = svcGetSystemTick();
 
-	Game::Start();
+	GameStartSettings settings;
+	settings.loadTestScene = true;
+	settings.skipIntro = true;
+
+	Game::Start(settings);
 
 	while (aptMainLoop())
 	{

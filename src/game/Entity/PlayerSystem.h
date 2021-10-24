@@ -122,8 +122,8 @@ public:
 struct PlayerInfo {
 	Color32 color;
 
-	int16_t minerals = 0;
-	int16_t gas = 0;
+	int minerals = 0;
+	int gas = 0;
 	int16_t usedSupplyDoubled = 0;
 	int16_t providedSupplyDoubled = 0;
 	int16_t reserverdSupplyDoubled = 0;

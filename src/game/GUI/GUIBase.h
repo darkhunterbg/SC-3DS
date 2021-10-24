@@ -7,6 +7,7 @@
 #include <vector>
 #include <unordered_map>
 #include <memory>
+#include <bitset>
 
 enum class GUIHAlign {
 	Left = 0,
@@ -20,6 +21,13 @@ enum class GUIVAlign {
 	Bottom = 2,
 };
 
+enum  GUITextEffects : uint8_t {
+	GUITextEffects_None = 0,
+	GUITextEffects_Shadow = 1,
+};
+
+
+
 class GUIState {
 public:
 	struct Resource {
@@ -32,7 +40,13 @@ public:
 	double VideoPlaybackCooldown = 16.6;
 	int ImageAnimationTimer = 6;
 
+	Vector2Int ElementOffset = { 0,0 };
+
 	Rectangle GetSpace()const { return SpaceStack.back(); }
+
+	Vector2Int PopOffset() { Vector2Int o = ElementOffset; ElementOffset = { 0,0 }; return o; }
+
+	std::bitset<32> TextEffects = { 0 };
 };
 
 class GUI {
@@ -63,14 +77,13 @@ public:
 
 	static void EndLayout();
 
-	static Vector2Int GetPosition(Vector2Int pos);
-	static Vector2Int GetRelativePosition(Vector2Int pos,
-		GUIHAlign hAlign = GUIHAlign::Center,
-		GUIVAlign vAlign = GUIVAlign::Center);
+	static Vector2Int GetPosition(Vector2Int pos,
+		GUIHAlign hAlign = GUIHAlign::Left,
+		GUIVAlign vAlign = GUIVAlign::Top);
 
-	static Vector2Int GetRelativePosition(Rectangle rect,
-		GUIHAlign hAlign = GUIHAlign::Center,
-		GUIVAlign vAlign = GUIVAlign::Center);
+	static Vector2Int GetPosition(Rectangle rect,
+		GUIHAlign hAlign = GUIHAlign::Left,
+		GUIVAlign vAlign = GUIVAlign::Top);
 
 	static Rectangle GetLayoutSpace();
 
@@ -91,6 +104,11 @@ public:
 	static void SetVideoPlaybackSpeed(double speed)
 	{
 		GetState().VideoPlaybackCooldown = 16.6 * speed;
+	}
+
+	static void AddNextElementOffset(Vector2Int offset)
+	{
+		GetState().ElementOffset += offset;
 	}
 };
 

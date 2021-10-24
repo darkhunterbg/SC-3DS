@@ -178,9 +178,8 @@ int main(int argc, char** argv)
 
 void Toolbar()
 {
-	static bool toolbarOpen = true;
 
-	if (!ImGui::Begin("Settings", &toolbarOpen))
+	if (!ImGui::Begin("Settings"))
 	{
 		ImGui::End(); return;
 	}
@@ -218,6 +217,7 @@ void Toolbar()
 
 	ImGui::SetNextItemWidth(250);
 	ImGui::Checkbox("Show Performance", &Game::ShowPerformanceStats);
+
 	ImGui::Separator();
 
 	if (Game::GetCurrentScene()->GetId() == NAMEOF(GameScene))
@@ -244,6 +244,31 @@ void Toolbar()
 		{
 			scene->GetView().SetPlayer(players[player].id);
 		}
+
+		PlayerId p = players[player].id;
+
+		if (ImGui::Button("Give Resources"))
+		{
+			scene->GetEntityManager().PlayerSystem.AddMinerals(p, 10000);
+			scene->GetEntityManager().PlayerSystem.AddGas(p, 10000);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Take Resources"))
+		{
+			scene->GetEntityManager().PlayerSystem.AddMinerals(p, -10000);
+			scene->GetEntityManager().PlayerSystem.AddGas(p, -10000);
+		}
+
+
+		ImGui::Checkbox("Fog of War", &scene->GetEntityManager().MapSystem.FogOfWarVisible);
+
+		ImGui::SameLine();
+		if (ImGui::Button("Explore Map"))
+		{
+			scene->GetEntityManager().PlayerSystem.SetMapKnown(p);
+		}
+	
+		
 	}
 
 	ImGui::End();

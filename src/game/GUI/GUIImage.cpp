@@ -8,7 +8,7 @@ struct AnimationData {
 	int timer = 0;
 };
 
-void GUIImage::DrawTexture(const Texture& texture, Rectangle rect, Color color)
+void GUIImage::DrawTextureAbsolute(const Texture& texture, Rectangle rect, Color color)
 {
 	GraphicsRenderer::Draw(texture, GUI::GetPosition(rect.position), rect.size, Color32(color));
 }
@@ -45,10 +45,10 @@ void GUIImage::DrawImageFrame(const ImageFrame& frame, Color color)
 void GUIImage::DrawColor(Color color)
 {
 	Rectangle rect = GUI::GetLayoutSpace();
-	GraphicsRenderer::DrawRectangle({ GUI::GetPosition(rect.position), rect.size }, color);
+	GraphicsRenderer::DrawRectangle({ rect.position, rect.size }, color);
 }
 
-void GUIImage::DrawColor(Rectangle rect, Color color)
+void GUIImage::DrawColorAbsolute(Rectangle rect, Color color)
 {
 	GraphicsRenderer::DrawRectangle({ GUI::GetPosition(rect.position), rect.size }, color);
 }
