@@ -28,6 +28,7 @@ const Font* Game::SystemFont16;
 const Font* Game::SystemFont12;
 const Font* Game::SystemFont10;
 const Font* Game::SystemFont8;
+GameInputSchema* Game::_input;
 
 AudioClip* Game::ButtonAudio;
 
@@ -116,6 +117,9 @@ void Game::Start(GameStartSettings settings)
 	GraphicsRenderer::Init();
 	GUI::SetState(*(new GUIState()));
 
+	_input = new GameInputSchema();
+	_input->InitDefault();
+
 	InitialScene(settings);
 }
 bool Game::Update()
@@ -190,5 +194,10 @@ const PlatformInfo& Game::GetPlatformInfo()
 void Game::PlatformUpdated()
 {
 	_platformInfo = Platform::GetPlatformInfo();
+}
+
+GameInputSchema& Game::GetInput()
+{
+	return *_input;
 }
 

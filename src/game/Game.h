@@ -2,6 +2,7 @@
 
 #include "Assets.h"
 #include "Scenes/Scene.h"
+#include "GameInputSchema.h"
 
 struct PlatformInfo;
 
@@ -16,6 +17,9 @@ class Game {
 private:
 	Game() = delete;
 	~Game() = delete;
+
+	static GameInputSchema* _input;
+
 public:
 	static const Font* SystemFont16;
 	static const Font* SystemFont12;
@@ -41,4 +45,6 @@ public:
 	static const PlatformInfo& GetPlatformInfo();
 
 	static void PlatformUpdated();	
+
+	static GameInputSchema& GetInput();
 };

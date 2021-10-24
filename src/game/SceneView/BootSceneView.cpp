@@ -2,7 +2,6 @@
 #include "../Scenes/BootScene.h"
 #include "../Assets.h"
 #include "../Engine/AssetLoader.h"
-#include "../Engine/InputManager.h"
 #include "../Game.h"
 #include "../Platform.h"
 #include "../GUI/GUI.h"
@@ -85,7 +84,7 @@ void BootSceneView::Draw()
 		}
 	}
 
-	if (_scene->IsLoadCompleted() && (InputManager::Gamepad.IsButtonDown(GamepadButton::A)))
+	if (_scene->IsLoadCompleted() && Game::GetInput().Common.Comfirm.IsActivated())
 	{
 		_scene->StartGame();
 	}

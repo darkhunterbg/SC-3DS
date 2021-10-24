@@ -9,7 +9,7 @@
 
 #include "../Engine/AssetLoader.h"
 #include "../Engine/AudioManager.h"
-#include "../Engine/InputManager.h"
+
 #include <cstring>
 
 VideoPlaybackScene::VideoPlaybackScene(const char* video, std::function<void()> doneCallback)
@@ -51,7 +51,7 @@ void VideoPlaybackScene::Draw()
 
 	GUI::EndLayout();
 
-	if (done || InputManager::Gamepad.IsButtonDown(GamepadButton::A))
+	if (done || Game::GetInput().Common.Comfirm.IsActivated())
 	{
 		_onDoneCallback();
 	}

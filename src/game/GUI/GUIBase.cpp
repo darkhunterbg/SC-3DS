@@ -2,6 +2,7 @@
 
 #include "../Engine/GraphicsRenderer.h"
 #include "../Engine/InputManager.h"
+#include "../Game.h"
 
 GUIState* GUI::_state = nullptr;
 
@@ -104,7 +105,14 @@ bool GUI::IsLayoutHover()
 {
 	Rectangle layout = GetLayoutSpace();
 
-	Vector2Int pos = InputManager::Pointer.Position();
+	Vector2Int pos = GetMousePosition();
 
 	return layout.Contains(pos);
+}
+
+Vector2Int GUI::GetMousePosition()
+{
+	if (!Game::GetInput().IsUsingMouse()) return Vector2Int{ -1000,-1000 };
+
+	return InputManager::Pointer.Position();
 }

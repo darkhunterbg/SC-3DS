@@ -2,6 +2,7 @@
 
 #include "InputDevices.h"
 
+
 class InputManager {
 
 private:
@@ -17,3 +18,4 @@ public:
 
 	static void Update();
 };
+

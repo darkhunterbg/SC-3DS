@@ -187,6 +187,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\ResourceBar.h">
       <Filter>SceneView</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GameInputSchema.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -327,5 +328,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\ResourceBar.cpp">
       <Filter>SceneView</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GameInputSchema.cpp" />
   </ItemGroup>
 </Project>

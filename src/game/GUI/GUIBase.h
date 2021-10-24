@@ -110,5 +110,7 @@ public:
 	{
 		GetState().ElementOffset += offset;
 	}
+
+	static Vector2Int GetMousePosition();
 };
 

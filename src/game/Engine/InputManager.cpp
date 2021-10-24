@@ -1,4 +1,5 @@
 #include "InputManager.h"
+#include "../Debug.h"
 
 Gamepad InputManager::Gamepad;
 Pointer InputManager::Pointer;

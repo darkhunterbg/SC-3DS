@@ -8,7 +8,6 @@
 #include "../Data//GameDatabase.h"
 
 #include "../Engine/GraphicsRenderer.h"
-#include "../Engine/InputManager.h"
 #include "../Entity/EntityUtil.h"
 
 #include <algorithm>
@@ -113,7 +112,7 @@ void GameScene::Update()
 {
 	_entityManager->FrameUpdate(_view->GetCamera());
 
-	if (InputManager::Gamepad.IsButtonReleased(GamepadButton::Select))
+	if (Game::GetInput().Cheats.ToggleFoW.IsActivated())
 	{
 		_entityManager->MapSystem.FogOfWarVisible = !_entityManager->MapSystem.FogOfWarVisible;
 	}

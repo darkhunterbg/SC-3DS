@@ -36,6 +36,10 @@ public:
 	inline bool IsButtonDown(GamepadButton button) const {
 		return currentState.Buttons[(int)button];
 	}
+	inline bool IsButtonUp(GamepadButton button) const
+	{
+		return !currentState.Buttons[(int)button];
+	}
 	inline bool IsButtonPressed(GamepadButton button) const {
 		return !prevState.Buttons[(int)button] && currentState.Buttons[(int)button];
 	}

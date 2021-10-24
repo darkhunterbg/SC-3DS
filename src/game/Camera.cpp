@@ -1,25 +1,18 @@
 #include "Camera.h"
 
-#include "Engine/InputManager.h"
+#include "Game.h"
 
 
 void Camera::Update() {
 
-	if (InputManager::Gamepad.IsButtonPressed(GamepadButton::R)) {
+	if (Game::GetInput().Camera.Zoom.IsActivated()) {
 		if (Scale == 1)
 			Scale = 2;
 		else
 			Scale = 1;
 	}
 
-	if (InputManager::Gamepad.IsButtonDown(GamepadButton::L))
-	{
-		Vector2 move = InputManager::Gamepad.CPad();
-		move *= (int)(GetCameraSpeed());
-		Position += Vector2Int16(move);
-	}
-
-	Vector2 move = InputManager::Gamepad.CStick();
+	Vector2 move = Game::GetInput().Camera.Move.VectorValue();
 	move *= (int)(GetCameraSpeed());
 	Position += Vector2Int16(move);
 
