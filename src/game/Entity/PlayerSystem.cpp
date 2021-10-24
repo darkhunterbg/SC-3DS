@@ -77,7 +77,7 @@ PlayerId PlayerSystem::AddPlayer(const RaceDef& race, Color color)
 {
 	PlayerId id = { (short)players.size() };
 
-	players.push_back(PlayerInfo(Color32(color), race.Type, id, "Player " + std::to_string(id.i )));
+	players.push_back(PlayerInfo(Color32(color), race.Type, id, "Player " + std::to_string(id.i)));
 	playerVision.push_back(new PlayerVision());
 	playerVision[id.i]->SetGridSize(gridSize);
 	playerEvents.push_back(PlayerEventCollection());
@@ -165,7 +165,7 @@ void PlayerSystem::UpdatePlayers(const EntityManager& em)
 		position.y = position.y >> (5);
 		auto& unit = em.UnitSystem.GetComponent(id);
 
-		playerVision[unit.owner.i]->ranges.push_back({ position,unit.vision });
+		playerVision[unit.owner.i]->ranges.push_back({ position,(uint8_t)(unit.vision )});
 		players[unit.owner.i].usedSupplyDoubled += unit.usedSupply;
 		players[unit.owner.i].providedSupplyDoubled += unit.providedSupply;
 	}
@@ -286,12 +286,10 @@ void PlayerSystem::UpdatePlayerVision(PlayerVision& vision)
 			{
 				for (short x = min.x; x <= max.x; ++x)
 				{
-
 					Vector2Int16 p = Vector2Int16(x, y);
 					Vector2Int16 r = circle.position - p;
 					if (r.LengthSquaredInt() < size)
 					{
-
 						vision.visibilityCountdown[p.x + (p.y << bitshift)]
 							= TileVisibilityTimer;
 					}

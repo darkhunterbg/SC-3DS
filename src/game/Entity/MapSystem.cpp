@@ -91,6 +91,29 @@ void MapSystem::RedrawMinimapFogOfWar(const PlayerVision& vision)
 
 	GraphicsRenderer::DrawOnCurrentScreen();
 }
+void MapSystem::GenerateMinimapTerrainTexture()
+{
+	Rectangle mapBounds = { {0,0}, Vector2Int(_mapSize) };
+
+	_minimapTerrainTexture = GraphicsRenderer::NewRenderSurface({ _minimapTextureSize,_minimapTextureSize });
+	GraphicsRenderer::DrawOnSurface(_minimapTerrainTexture);
+
+	Vector2 upscale = Vector2(mapBounds.size) / Vector2(_minimapTextureSize, _minimapTextureSize);
+
+	Vector2Int tileSize = { 32 * 6  , 32 * 6 };
+
+	for (int y = 0; y < _mapSize.y; y += tileSize.y)
+	{
+		for (int x = 0; x < _mapSize.x; x += tileSize.x)
+		{
+			Rectangle dst = { {x,y},{_mapSize.x, _mapSize.y} };
+			dst.position = Vector2Int(Vector2(x, y) / upscale);
+			dst.size = Vector2Int(Vector2(tileSize.x, tileSize.y) / upscale);
+			GraphicsRenderer::Draw(_tile, dst);
+		}
+	}
+
+}
 
 void MapSystem::SetSize(Vector2Int16 size)
 {
@@ -109,6 +132,44 @@ void MapSystem::DrawOffscreenData(EntityManager& em)
 	const PlayerVision& vision = em.PlayerSystem.GetPlayerVision(ActivePlayer);
 
 	RedrawMinimapFogOfWar(vision);
+
+	if (!_minimapTexture.IsValid())
+	{
+		_minimapTexture = GraphicsRenderer::NewRenderSurface({ _minimapTextureSize,_minimapTextureSize }, true);
+		GenerateMinimapTerrainTexture();
+	}
+
+	GraphicsRenderer::DrawOnSurface(_minimapTexture);
+	GraphicsRenderer::Draw(_minimapTerrainTexture, { 0,0 });
+
+	if (FogOfWarVisible)
+	{
+		GraphicsRenderer::Draw(_minimapFowTexture, { 0,0 });
+	}
+
+
+	for (EntityId id : em.UnitSystem.GetEntities())
+	{
+		DrawComponent& draw = em.DrawSystem.GetComponent(id);
+		if (!draw.visible) continue;
+
+		auto bb = draw.boundingBox;
+		bb.Restrict({ 0,0 }, _mapSize);
+		bb.position = bb.position >> 5;
+		bb.size = bb.size >> 5;
+
+		Rectangle dst = { Vector2Int(bb.position), Vector2Int(bb.size) };
+
+		PlayerId owner = em.UnitSystem.GetComponent(id).owner;
+
+		Color32 color = Color32(Colors::MapFriendly);
+		if (owner != ActivePlayer)
+			color = em.PlayerSystem.GetPlayerInfo(owner).color;
+
+		GraphicsRenderer::DrawRectangle(dst, color);
+	}
+
+	GraphicsRenderer::DrawOnCurrentScreen();
 }
 
 void MapSystem::UpdateVisibleObjects(EntityManager& em)
@@ -203,4 +264,9 @@ void MapSystem::DrawFogOfWar(EntityManager& em, const Camera& camera)
 	GraphicsRenderer::Submit();
 
 
+}
+void MapSystem::DrawMinimap(Rectangle dst)
+{
+	if (!_minimapTexture.IsValid()) return;
+	GraphicsRenderer::Draw(_minimapTexture, dst);
 }

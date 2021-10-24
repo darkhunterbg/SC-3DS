@@ -216,6 +216,8 @@ void Toolbar()
 		AudioManager::SetMute(!audioEnabled);
 	}
 
+	ImGui::SetNextItemWidth(250);
+	ImGui::Checkbox("Show Performance", &Game::ShowPerformanceStats);
 	ImGui::Separator();
 
 	if (Game::GetCurrentScene()->GetId() == NAMEOF(GameScene))

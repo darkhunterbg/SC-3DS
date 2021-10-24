@@ -32,6 +32,7 @@ const Font* Game::SystemFont8;
 AudioClip* Game::ButtonAudio;
 
 float Game::DeltaTime = 0;
+bool Game::ShowPerformanceStats = true;
 
 static PlatformInfo _platformInfo;
 
@@ -152,7 +153,8 @@ void Game::Draw()
 
 	//p.Submit();
 
-	Profiler::ShowPerformance();
+	if (ShowPerformanceStats)
+		Profiler::ShowPerformance();
 
 	GraphicsRenderer::EndFrame();
 }

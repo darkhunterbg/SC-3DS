@@ -20,7 +20,7 @@ GameScene::~GameScene() {}
 
 void GameScene::Start()
 {
-	Vector2Int16 size = { 128 * 32,128 * 32 };
+	Vector2Int16 size = { 64 * 32,64 * 32 };
 
 
 	_entityManager = new EntityManager();
@@ -89,9 +89,11 @@ void GameScene::Start()
 			EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ x * 32 ,y * 32 }));
 		}
 	}
-	//_entityManager->PlayerSystem.SetMapKnown(PlayerId{ 1 });
+	_entityManager->PlayerSystem.SetMapKnown(PlayerId{ 1 });
 
 	EntityUtil::SpawnUnit(def, PlayerId{ 2 }, Vector2Int16(Vector2Int{ 256 , 64 }));
+
+	EntityUtil::SpawnUnit(def, PlayerId{ 3 }, Vector2Int16(Vector2Int{ 300 , 300 }));
 
 	_entityManager->FullUpdate();
 
@@ -109,8 +111,6 @@ int t = 0;
 
 void GameScene::Update()
 {
-	_view->GetCamera().Update();
-
 	_entityManager->FrameUpdate(_view->GetCamera());
 
 	if (InputManager::Gamepad.IsButtonReleased(GamepadButton::Select))

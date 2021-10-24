@@ -33,6 +33,7 @@ class MapSystem : public IEntitySystem {
 	std::vector<Rectangle16> _fullLitTiles;
 
 	void RedrawMinimapFogOfWar(const PlayerVision& vision);
+	void GenerateMinimapTerrainTexture();
 public:
 	PlayerId ActivePlayer = { 1 };
 	bool FogOfWarVisible = true;
@@ -49,4 +50,5 @@ public:
 
 	void DrawMap(const Camera& camera);
 	void DrawFogOfWar(EntityManager& em, const Camera& camera);
+	void DrawMinimap(Rectangle dst);
 };

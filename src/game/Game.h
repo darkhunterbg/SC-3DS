@@ -25,6 +25,8 @@ public:
 
 	static float DeltaTime;
 
+	static bool ShowPerformanceStats;
+
 	static void Start(GameStartSettings settings = {});
 	static void FrameStart();
 	static void FrameEnd();
