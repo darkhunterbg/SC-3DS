@@ -16,6 +16,7 @@
 #include "PlayerSystem.h"
 #include "MapSystem.h"
 #include "UnitSystem.h"
+#include "KinematicSystem.h"
 
 #include "IEntitySystem.h"
 
@@ -49,7 +50,7 @@ private:
 	std::array<Vector2Int16, Entity::MaxEntities> _positions;
 	std::array<uint8_t, Entity::MaxEntities> _orientations;
 public:
-	bool DrawColliders = false;
+
 	bool DrawGrid = false;
 	bool DrawBoundingBoxes = false;
 	bool Muted = false;
@@ -59,6 +60,7 @@ public:
 	PlayerSystem PlayerSystem;
 	MapSystem MapSystem;
 	UnitSystem UnitSystem;
+	KinematicSystem KinematicSystem;
 
 	EntityManager();
 	~EntityManager();

@@ -17,6 +17,7 @@ EntityManager::EntityManager()
 	_systems.push_back(&PlayerSystem);
 	_systems.push_back(&MapSystem);
 	_systems.push_back(&UnitSystem);
+	_systems.push_back(&KinematicSystem);
 }
 EntityManager::~EntityManager()
 {
@@ -104,6 +105,8 @@ void EntityManager::Update2()
 
 	PlayerSystem.UpdatePlayers(*this);
 
+	KinematicSystem.UpdateColliders(*this);
+
 	ApplyEntityChanges();
 
 	DrawSystem.UpdatePositions(*this);
@@ -124,7 +127,8 @@ void EntityManager::Draw1(const Camera& camera)
 
 }
 // Draws 24 per second (60 fps) 
-void EntityManager::Draw2(const Camera& camera) {
+void EntityManager::Draw2(const Camera& camera)
+{
 
 }
 
@@ -205,7 +209,8 @@ void EntityManager::Draw(const Camera& camera)
 		MapSystem.DrawFogOfWar(*this, camera);
 		//if (DrawBoundingBoxes)
 
-		//if (DrawColliders)
+
+		KinematicSystem.DrawColliders(camera);
 
 		//if (DrawGrid)
 

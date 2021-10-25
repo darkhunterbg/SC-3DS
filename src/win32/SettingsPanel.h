@@ -103,6 +103,10 @@ void DrawSettings()
 	{
 		GameScene* scene = static_cast<GameScene*>(Game::GetCurrentScene());
 
+		ImGui::Checkbox("Show Colliders", &scene->GetEntityManager().KinematicSystem.ShowColliders);
+
+		ImGui::Separator();
+
 		int player = 0;
 
 		std::vector<const char*> playersString;
