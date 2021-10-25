@@ -7,7 +7,7 @@
 
 void AnimationSystem::RunAnimations(EntityManager& em)
 {
-	SectionProfiler p("RunAnimations");
+	//SectionProfiler p("RunAnimations");
 
 	auto& components = _animComponents.GetComponents();
 	auto& entities = _animComponents.GetEntities();

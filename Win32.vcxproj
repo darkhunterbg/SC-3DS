@@ -170,6 +170,7 @@ xcopy /y /d "$(SolutionDir)Libs\glew\lib\*.dll" "$(OutDir)"</Command>
     <ClCompile Include="src\win32\Main.cpp" />
     <ClCompile Include="src\win32\Platform.cpp" />
     <ClCompile Include="src\win32\SDL_FontCache.c" />
+    <ClCompile Include="src\win32\WindowsStuff.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\win32\AbstractPlatform.h" />

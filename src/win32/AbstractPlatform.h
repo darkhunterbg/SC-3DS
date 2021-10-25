@@ -37,7 +37,7 @@ public:
 	void ApplyPlatform();
 
 	void UpdateScreens(GPU_Target* screen);
-	void UpdateInput();
+	void UpdateInput(SDL_Window* window);
 	void Draw(GPU_Target* screen);
 
 	static std::vector<AbstractPlatform> Platforms;

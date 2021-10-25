@@ -28,10 +28,8 @@ uint64_t mainTimer;
 
 AbstractPlatform abstractPlatform;
 
-Rectangle touchScreenLocation;
 bool mute = false;
 bool noThreading = false;
-
 
 int main(int argc, char** argv)
 {
@@ -111,7 +109,7 @@ int main(int argc, char** argv)
 		ImGui::NewFrame();
 
 		abstractPlatform.UpdateScreens(screen);
-		abstractPlatform.UpdateInput();
+		abstractPlatform.UpdateInput(window);
 
 		Game::FrameStart();
 

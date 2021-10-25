@@ -100,6 +100,7 @@ public:
 	static void CleanResources();
 
 	static bool IsLayoutHover();
+	static bool IsLayoutActivated();
 
 	static void SetVideoPlaybackSpeed(double speed)
 	{
@@ -112,5 +113,6 @@ public:
 	}
 
 	static Vector2Int GetMousePosition();
+	static Vector2Int GetPointerPosition();
 };
 

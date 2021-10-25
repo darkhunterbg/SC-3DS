@@ -14,6 +14,8 @@ public :
 	virtual void Update() {}
 	virtual void Draw() {}
 
+	virtual void OnPlatformChanged() {}
+
 	const  std::string& GetId() const
 	{
 		return _id;

@@ -5,6 +5,12 @@
 #include <SDL.h>
 #include <SDL_gpu.h>
 
+
+#ifdef _WIN32
+extern bool Win32GetCursorPosition(int& x, int& y);
+#endif
+
+
 std::vector<AbstractPlatform> AbstractPlatform::Platforms;
 std::vector<const char*> AbstractPlatform::PlatformsString;
 
@@ -32,6 +38,7 @@ void AbstractPlatform::ApplyPlatform()
 	}
 
 	SDL_ShowCursor(!Pointer.SameAsCursor);
+	SDL_CaptureMouse((SDL_bool)Pointer.SameAsCursor);
 }
 
 void AbstractPlatform::UpdateScreens(GPU_Target* screen)
@@ -60,10 +67,20 @@ void AbstractPlatform::UpdateScreens(GPU_Target* screen)
 
 }
 
-void AbstractPlatform::UpdateInput()
+void AbstractPlatform::UpdateInput(SDL_Window* window)
 {
 	Vector2Int pos;
 	Uint32  buttonState = SDL_GetMouseState(&pos.x, &pos.y);
+
+#if _WIN32
+	if (Win32GetCursorPosition(pos.x, pos.y))
+	{
+		Vector2Int winPos;
+		SDL_GetWindowPosition(window, &winPos.x, &winPos.y);
+		pos -= winPos;
+	}
+
+#endif
 
 	auto& screen = Screens[Pointer.ScreenReference];
 	pos -= screen.NativePosition;
@@ -76,6 +93,7 @@ void AbstractPlatform::UpdateInput()
 	pos.y = std::min(std::max(pos.y, 0), nativeSize.y);
 	pos.x = (pos.x * screen.Resolution.x) / nativeSize.x;
 	pos.y = (pos.y * screen.Resolution.y) / nativeSize.y;
+
 
 	Pointer.Position = pos;
 }

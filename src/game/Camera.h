@@ -2,6 +2,8 @@
 
 #include "MathLib.h"
 
+class Cursor;
+
 class Camera {
 	static constexpr const int CameraSpeed = 10;
 public:
@@ -10,7 +12,7 @@ public:
 	Rectangle16 Limits;
 	int Scale = 1;
 
-	inline int GetCameraSpeed() const { return CameraSpeed * Scale; }
+	int GetCameraSpeed() const;
 
 	inline Rectangle16 GetRectangle16() const {
 		return Rectangle16((Position - (Size * Scale) / 2), Size * Scale);
@@ -27,5 +29,7 @@ public:
 		return (p - Position + (Size * Scale) / 2) / Scale;
 	}
 
-	void Update();
+	void SetPositionRestricted(Vector2Int16 pos);
+
+	void Update(Cursor* cursor = nullptr);
 };

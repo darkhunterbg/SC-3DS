@@ -15,6 +15,8 @@ GameSceneView::GameSceneView(GameScene* scene) : _scene(scene)
 	_camera.Position = { 0,0 };
 	_camera.Limits = { {0,0,}, size };
 
+	_cursor.GameMode = true;
+
 	SetPlayer(EntityUtil::GetManager().MapSystem.ActivePlayer);
 }
 
@@ -42,7 +44,7 @@ void GameSceneView::Update()
 		_camera.Size.y -= 96;
 	}
 
-	_camera.Update();
+	_camera.Update(&_cursor);
 
 	const PlayerInfo& info = EntityUtil::GetManager().PlayerSystem.GetPlayerInfo(_player);
 
@@ -52,7 +54,7 @@ void GameSceneView::Update()
 
 void GameSceneView::Draw()
 {
-	SectionProfiler p("GUI");
+	//SectionProfiler p("GUI");
 
 	DrawMainScreen();
 
@@ -60,6 +62,13 @@ void GameSceneView::Draw()
 		return;
 
 	DrawSecondaryScreen();
+}
+
+void GameSceneView::OnPlatformChanged()
+{
+	GUI::UseScreen(ScreenId::Top);
+
+	_cursor.Position = GUI::GetScreenSize() / 2;
 }
 
 
@@ -83,7 +92,7 @@ void GameSceneView::DrawMainScreen()
 	}
 	else
 	{
-	
+
 		GUI::BeginRelativeLayout({ 0,0 }, Vector2Int(raceDef->ConsoleUpperSprite.size), GUIHAlign::Center, GUIVAlign::Bottom);
 		GUIImage::DrawImageFrame(raceDef->ConsoleUpperSprite);
 		GUI::EndLayout();
@@ -137,4 +146,11 @@ void GameSceneView::DrawMinimap()
 	rect.size = Vector2Int(s) + 2;
 
 	Util::DrawTransparentRectangle(rect, 1, Colors::White);
+
+	if (GUI::IsLayoutActivated())
+	{
+		Vector2Int pos = GUI::GetPointerPosition() - dst.position;
+		_camera.SetPositionRestricted(Vector2Int16(Vector2(pos) * minimapUpscale));
+
+	}
 }

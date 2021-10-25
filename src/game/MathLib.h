@@ -336,6 +336,14 @@ struct Rectangle
 		return v.x <= position.x + size.x && v.x >= position.x &&
 			v.y <= position.y + size.y && v.y >= position.y;
 	}
+
+	void Restrict(Vector2Int min, Vector2Int max)
+	{
+		position = position.Floor(min.x, min.y);
+		Vector2Int end = position + size;
+		end = end.Ceil(max.x, max.y);
+		size = end - position;
+	}
 };
 
 struct Circle16 {

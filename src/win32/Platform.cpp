@@ -29,7 +29,6 @@ extern GPU_Target* screen;
 extern AbstractPlatform abstractPlatform;
 
 extern uint64_t mainTimer;
-extern Rectangle touchScreenLocation;
 extern bool mute;
 extern bool noThreading;
 extern int numberOfThreads;
@@ -47,7 +46,6 @@ constexpr Uint8 SDL_FloatToUint8(float x)
 
 static 	void AudioCallback(void* userdata, Uint8* stream, int len);
 
-
 PlatformInfo Platform::GetPlatformInfo()
 {
 	PlatformInfo info;
@@ -63,7 +61,6 @@ PlatformInfo Platform::GetPlatformInfo()
 
 	return info;
 }
-
 
 TextureId Platform::CreateTextureFromFile(const char* path, Span<uint8_t> data, Vector2Int16& outSize)
 {
@@ -216,7 +213,6 @@ SubImageCoord Platform::GenerateUV(TextureId texture, Rectangle16 src)
 
 	return uv;
 }
-
 void Platform::ChangeBlendingMode(BlendMode mode)
 {
 	GPU_BlendPresetEnum b = GPU_BLEND_NORMAL;
@@ -240,14 +236,12 @@ void Platform::ChangeBlendingMode(BlendMode mode)
 
 	GPU_SetShapeBlendMode(b);
 }
-
 void Platform::ClearBuffer(Color color)
 {
 	Color32 c(color);
 
 	GPU_ClearRGBA(target, c.GetR(), c.GetG(), c.GetB(), c.GetA());
 }
-
 void Platform::DrawTexture(const Texture& texture, const SubImageCoord& uv, const Rectangle16& dst, bool hFlip, Color32 c)
 {
 	GPU_Image* img = (GPU_Image*)texture.GetTextureId();
@@ -273,7 +267,6 @@ void Platform::DrawRectangle(const Rectangle& rect, Color32 c)
 
 	GPU_RectangleFilled(target, rect.position.x, rect.position.y, rect.GetMax().x, rect.GetMax().y, sdlColor);
 }
-
 void Platform::DrawText(const Font& font, Vector2Int position, const char* text, Color color)
 {
 	auto c = FC_MakeColor(SDL_FloatToUint8(color.r), SDL_FloatToUint8(color.g), SDL_FloatToUint8(color.b), SDL_FloatToUint8(color.a));
@@ -356,9 +349,6 @@ void Platform::UpdateGamepadState(GamepadState& state)
 void Platform::UpdatePointerState(PointerState& state)
 {
 	state.Position = abstractPlatform.Pointer.Position;
-
-	if (touchScreenLocation.size.x == 0 || touchScreenLocation.size.y == 0)
-		return;
 
 	Vector2Int pos;
 	Uint32  buttonState = SDL_GetMouseState(&pos.x, &pos.y);

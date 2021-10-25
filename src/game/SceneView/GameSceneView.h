@@ -10,8 +10,6 @@ class GameScene;
 
 class GameSceneView {
 private:
-	
-
 	GameScene* _scene = nullptr;
 
 	Camera _camera;
@@ -20,9 +18,9 @@ private:
 
 	PlayerId _player;
 
-
 	void DrawMinimap();
-
+	void DrawMainScreen();
+	void DrawSecondaryScreen();
 public:
 	GameSceneView(GameScene* scene);
 
@@ -33,6 +31,7 @@ public:
 
 	void Update();
 	void Draw();
-	void DrawMainScreen();
-	void DrawSecondaryScreen();
+
+
+	void OnPlatformChanged();
 };

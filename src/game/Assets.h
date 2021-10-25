@@ -216,9 +216,9 @@ public:
 
 	IAudioSource* PrepareAudio();
 
-	Coroutine LoadFirstFrameAsync(volatile bool* doneCallbackFlag);
+	Coroutine LoadFirstFrameAsync();
 
-	Coroutine LoadNextFrameAsync(volatile bool* doneCallbackFlag);
+	Coroutine LoadNextFrameAsync();
 	void DecodeCurrentFrame(uint8_t* outPixelData, int texLineSize);
 
 	

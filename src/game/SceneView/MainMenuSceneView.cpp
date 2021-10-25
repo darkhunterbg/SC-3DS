@@ -8,8 +8,8 @@
 #include "../Platform.h"
 #include "../Engine/AssetLoader.h"
 
-MainMenuSceneView::MainMenuSceneView(MainMenuScene* scene):
-	_scene (scene)
+MainMenuSceneView::MainMenuSceneView(MainMenuScene* scene) :
+	_scene(scene)
 {
 	_single = AssetLoader::LoadVideoClip("glue\\mainmenu\\single");
 	_singleon = AssetLoader::LoadVideoClip("glue\\mainmenu\\singleon");
@@ -21,7 +21,6 @@ MainMenuSceneView::MainMenuSceneView(MainMenuScene* scene):
 	_exiton = AssetLoader::LoadVideoClip("glue\\mainmenu\\exiton");
 
 	_mmFont = AssetLoader::LoadFont("mm-font", 16);
-
 
 	GUI::SetVideoPlaybackSpeed(0.75);
 }
@@ -65,11 +64,11 @@ void MainMenuSceneView::Draw()
 		GUI::EndLayout();
 		buttonColor = Colors::UIMenuGreenLit;
 	}
-	
+
 	GUILabel::DrawText(*_mmFont, "Multiplayer", { 0,0 }, GUIHAlign::Left, GUIVAlign::Top, buttonColor);
 	GUI::EndLayout();
 
-	
+
 	const Image& etail = GameDatabase::instance->GetImage("glue\\mainmenu\\etail");
 
 	GUI::BeginAbsoluteLayout({ 224,348 }, Vector2Int(etail.GetSize()));
@@ -83,12 +82,12 @@ void MainMenuSceneView::Draw()
 	GUIVideo::DrawVideo("exit", *_exit, true);
 	if (GUI::IsLayoutHover())
 	{
-		GUI::BeginAbsoluteLayout({ 424,328 },Vector2Int{ Vector2(_exiton->GetFrameSize())  });
+		GUI::BeginAbsoluteLayout({ 424,328 }, Vector2Int{ Vector2(_exiton->GetFrameSize()) });
 		GUIVideo::DrawVideo("exiton", *_exiton, true);
 		GUI::EndLayout();
 		buttonColor = Colors::UIMenuGreenLit;
 	}
-		
+
 	GUILabel::DrawText(*_mmFont, "Exit", { -50,-8 }, GUIHAlign::Right, GUIVAlign::Top, buttonColor);
 	GUI::EndLayout();
 
@@ -100,11 +99,13 @@ void MainMenuSceneView::Draw()
 	GUI::EndLayout();
 
 
-	_cursor.Draw();
+	if (Game::GetInput().IsUsingMouse())
+		_cursor.Draw();
 
 	if (Game::GetPlatformInfo().Type == PlatformType::Nintendo3DS)
 	{
 		GUI::UseScreen(ScreenId::Bottom);
 		GUIImage::DrawColor(Colors::Black);
 	}
+
 }

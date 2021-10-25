@@ -16,6 +16,7 @@ public:
 	virtual void Stop() override;
 	virtual void Update() override;
 	virtual void Draw() override;
+	virtual void OnPlatformChanged() override;
 
 	EntityManager& GetEntityManager() { return *_entityManager; }
 	GameSceneView& GetView() { return *_view; }

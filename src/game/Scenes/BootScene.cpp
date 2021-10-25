@@ -8,7 +8,6 @@
 #include "../SceneView/BootSceneView.h"
 #include "MainMenuScene.h"
 
-static bool _autoStart = true;
 
 BootScene::BootScene(Scene* next)
 {
@@ -19,6 +18,10 @@ BootScene::BootScene(Scene* next)
 	{
 		_nextScene = new MainMenuScene();
 	}
+
+#if(_DEBUG)
+	_nextSceneDelay = 0;
+#endif
 }
 
 BootScene::~BootScene()
@@ -51,15 +54,21 @@ void BootScene::Update()
 {
 	if (!_ready)
 	{
-		TimeSlice budget = TimeSlice(0.010);
-
-		while (!budget.IsTimeElapsed())
+		if (_loadCrt->IsCompleted())
 		{
-			if (_loadCrt->Next())
-			{
+			if (_nextSceneDelay > 0)
+				--_nextSceneDelay;
+			else
 				_ready = true;
+		}
+		else
+		{
+			TimeSlice budget = TimeSlice(0.010);
 
-				break;
+			while (!budget.IsTimeElapsed())
+			{
+				if (_loadCrt->Next()) break;
+				
 			}
 		}
 	}

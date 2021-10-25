@@ -194,6 +194,9 @@ const PlatformInfo& Game::GetPlatformInfo()
 void Game::PlatformUpdated()
 {
 	_platformInfo = Platform::GetPlatformInfo();
+
+	if (currentScene)
+		currentScene->OnPlatformChanged();
 }
 
 GameInputSchema& Game::GetInput()

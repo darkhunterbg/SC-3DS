@@ -273,27 +273,40 @@ IAudioSource* VideoClip::PrepareAudio()
 
 	return &_audioSrc;
 }
-Coroutine VideoClip::LoadFirstFrameAsync(volatile bool* doneCallbackFlag)
-{
-	smk video = (smk)_handle;
-	smk_enable_audio(video, 0, false);
-	smk_enable_video(video, true);
 
-	return AssetLoader::RunIOAsync([this, doneCallbackFlag] {
-		smk video = (smk)_handle;
-		smk_first(video);
-		if (doneCallbackFlag != nullptr)
-			*doneCallbackFlag = true;
-		});;
-}
-Coroutine VideoClip::LoadNextFrameAsync(volatile bool* doneCallbackFlag)
+
+class VideoClipLoadLoadFrameCrt : public CoroutineImpl {
+private:
+	smk video;
+	bool firstFrame;
+public:
+	VideoClipLoadLoadFrameCrt(smk video, bool first) : video(video), firstFrame(first) {}
+
+	CRT_START()
+	{
+		if (firstFrame)
+		{
+			smk_enable_audio(video, 0, false);
+			smk_enable_video(video, true);
+			CRT_WAIT_FOR(AssetLoader::RunIOAsync([this]() {smk_first(video); }));
+		}
+		else
+		{
+			CRT_WAIT_FOR(AssetLoader::RunIOAsync([this]() {smk_next(video); }));
+		}
+	}
+	CRT_END();
+};
+
+Coroutine VideoClip::LoadFirstFrameAsync()
 {
-	return AssetLoader::RunIOAsync([this, doneCallbackFlag] {
-		smk video = (smk)_handle;
-		smk_next(video);
-		if (doneCallbackFlag != nullptr)
-			*doneCallbackFlag = true;
-		});;
+	auto crt = new VideoClipLoadLoadFrameCrt((smk)_handle, true);
+	return Coroutine(crt);
+}
+Coroutine VideoClip::LoadNextFrameAsync()
+{
+	auto crt = new VideoClipLoadLoadFrameCrt((smk)_handle, false);
+	return Coroutine(crt);
 }
 void VideoClip::DecodeCurrentFrame(uint8_t* pixelData, int texLineSize)
 {

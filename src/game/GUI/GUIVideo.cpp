@@ -18,7 +18,11 @@ public:
 	double countdown = 0;
 	Coroutine readCrt;
 	IAudioSource* audioSrc = nullptr;
-	bool loaded = false;
+
+	bool IsCoroutineCompleted() const
+	{
+		return readCrt == nullptr || readCrt->IsCompleted();
+	}
 
 	VideoFrameRenderData(Vector2Int size)
 	{
@@ -39,17 +43,14 @@ public:
 
 static void Decode(VideoClip& clip, VideoFrameRenderData* data)
 {
-	auto p = SectionProfiler("Decode");
-
 	clip.DecodeCurrentFrame(data->pixelData, clip.GetTextureSize().x);
-
 	data->decoded = true;
 }
 
 bool GUIVideo::DrawVideo(const char* id, VideoClip& clip, bool loop, Color color)
 {
 	Vector2Int textureSize = clip.GetTextureSize();
-	
+
 	std::string key = id;
 	key += ".VideoData";
 
@@ -61,7 +62,7 @@ bool GUIVideo::DrawVideo(const char* id, VideoClip& clip, bool loop, Color color
 		data->countdown = -0.01;
 
 		data->audioSrc = clip.PrepareAudio();
-		data->readCrt = clip.LoadFirstFrameAsync(&data->loaded);
+		data->readCrt = clip.LoadFirstFrameAsync();
 
 		if (data->audioSrc != nullptr)
 		{
@@ -85,10 +86,13 @@ bool GUIVideo::DrawVideo(const char* id, VideoClip& clip, bool loop, Color color
 		data->countdown += clip.GetFrameTime();
 	}
 
-	if (data->loaded && !data->decoded)
+	if (data->IsCoroutineCompleted() && !data->decoded)
 	{
 		Decode(clip, data);
 	}
+
+	if (data->readCrt != nullptr)
+		data->readCrt->Next();
 
 	if (frameChanged)
 	{
@@ -96,19 +100,17 @@ bool GUIVideo::DrawVideo(const char* id, VideoClip& clip, bool loop, Color color
 			data->readCrt->RunAll();
 
 		data->currentFrame = clip.GetCurrentFrame();
-		data->loaded = false;
 
-		if (clip.IsAtEnd() ) {
+		if (clip.IsAtEnd())
+		{
 			if (loop)
 			{
-				data->loaded = false;
-				data->readCrt = clip.LoadFirstFrameAsync(&data->loaded);
+				data->readCrt = clip.LoadFirstFrameAsync();
 			}
 		}
 		else
 		{
-			data->loaded = false;
-			data->readCrt = clip.LoadNextFrameAsync(&data->loaded);
+			data->readCrt = clip.LoadNextFrameAsync();
 		}
 
 		if (!data->decoded)

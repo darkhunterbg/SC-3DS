@@ -110,9 +110,23 @@ bool GUI::IsLayoutHover()
 	return layout.Contains(pos);
 }
 
+bool GUI::IsLayoutActivated()
+{
+	if (!InputManager::Pointer.IsDown()) return false;
+
+	Rectangle layout = GetLayoutSpace();
+
+	return layout.Contains(InputManager::Pointer.Position());
+}
+
 Vector2Int GUI::GetMousePosition()
 {
 	if (!Game::GetInput().IsUsingMouse()) return Vector2Int{ -1000,-1000 };
 
+	return InputManager::Pointer.Position();
+}
+
+Vector2Int GUI::GetPointerPosition()
+{
 	return InputManager::Pointer.Position();
 }

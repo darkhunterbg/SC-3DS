@@ -13,7 +13,6 @@
   <ItemGroup>
     <None Include="Makefile" />
     <None Include="src\3ds\citro2d\render2d.v.pica" />
-    <None Include="src\3ds\spritebatch.v.pica" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\3ds\citro2d\c2d\base.c" />

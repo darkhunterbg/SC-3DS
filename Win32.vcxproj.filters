@@ -30,6 +30,7 @@
       <Filter>ImGui</Filter>
     </ClCompile>
     <ClCompile Include="src\win32\lodepng.cpp" />
+    <ClCompile Include="src\win32\WindowsStuff.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\win32\SDL_FontCache.h" />

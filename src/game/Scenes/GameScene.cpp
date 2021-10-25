@@ -128,3 +128,9 @@ void GameScene::Draw()
 
 	_view->Draw();
 }
+
+void GameScene::OnPlatformChanged()
+{
+	if (_view)
+		_view->OnPlatformChanged();
+}

@@ -5,7 +5,6 @@
     <None Include="src\3ds\citro2d\render2d.v.pica">
       <Filter>citro2d</Filter>
     </None>
-    <None Include="src\3ds\spritebatch.v.pica" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\3ds\Main.cpp" />

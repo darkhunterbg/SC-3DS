@@ -6,8 +6,6 @@
 #include "../Platform.h"
 #include "../GUI/GUI.h"
 
-static Texture* _title;
-
 BootSceneView::BootSceneView(BootScene* scene) : _scene(scene)
 {
 	_title = AssetLoader::LoadTexture("atlases\\title_0");
@@ -59,11 +57,6 @@ void BootSceneView::Draw()
 		GUI::UseScreen(ScreenId::Top);
 
 		GUIImage::DrawTexture(*_title);
-
-		Vector2Int pos = Vector2Int(_title->GetSize());
-		pos.x /= 2;
-		pos.y -= 90;
-		pos.x -= 22;
 
 		const char* text = nullptr;
 
