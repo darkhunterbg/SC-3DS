@@ -3,6 +3,7 @@
 #include "../Game.h"
 #include "../Data/GameDatabase.h"
 #include "../MathLib.h"
+#include "../Engine/GraphicsRenderer.h"
 
 static std::string _scrollAnim[] = {
 	"cursor\\scrollul", "cursor\\scrollu","cursor\\scrollur",
@@ -13,6 +14,23 @@ static std::string _scrollAnim[] = {
 Cursor::Cursor()
 {
 	ChangeClip("cursor\\arrow");
+}
+
+void Cursor::GameUpdate()
+{
+	Update();
+
+	if (_corner.LengthSquared() != 0)
+	{
+		int index = (_corner.x + 1) + (_corner.y + 1) * 3;
+		ChangeClip(_scrollAnim[index]);
+		return;
+	}
+
+	if (!_hover)
+		ChangeClip("cursor\\arrow");
+
+	_hover = false;
 }
 
 void Cursor::ChangeClip(const std::string& clipName)
@@ -26,6 +44,8 @@ void Cursor::ChangeClip(const std::string& clipName)
 
 void Cursor::Update()
 {
+	_screenSelection = { {0,0},{0,0} };
+
 	Vector2Int screenSize = GUI::GetScreenSize();
 
 	if (Game::GetInput().IsUsingMouse())
@@ -46,29 +66,45 @@ void Cursor::Update()
 	if (Position.y <= 1)_corner.y = -1;
 	if (Position.y >= screenSize.y - 1)_corner.y = 1;
 
-	if (GameMode)
-	{
-		if (_corner.LengthSquared() != 0)
-		{
-			int index = (_corner.x + 1) + (_corner.y + 1) * 3;
-			ChangeClip(_scrollAnim[index]);
-		}
-		else
-		{
-			ChangeClip("cursor\\arrow");
-		}
-	}
-
 }
 
 void Cursor::Draw()
 {
 	Update();
 
-	auto& frame = _animation->GetFrame(_animationFrameId);
-	Rectangle dst = { Position + Vector2Int(_animation->GetImageFrameOffset(frame,false)), Vector2Int(frame.size) };
+	//auto& frame = _animation->GetFrame(_animationFrameId);
+	Rectangle dst = { Position - Vector2Int(_animation->GetSize()/2), Vector2Int(_animation->GetSize()) };
 
 	GUI::BeginAbsoluteLayout(dst);
 	GUIImage::DrawAnimatedImage("cursor", *_animation, &_animationFrameId);
 	GUI::EndLayout();
+}
+
+void Cursor::SetUnitHover(CursorHoverState state)
+{
+	if (_corner != Vector2Int{ 0, 0 }) return;
+
+	_hover = true;
+
+	switch (state)
+	{
+	case Green:
+		ChangeClip("cursor\\magg"); break;
+	case Yellow:
+		ChangeClip("cursor\\magy"); break;
+	case Red:
+		ChangeClip("cursor\\magr"); break;
+	default:
+		break;
+	}
+}
+
+bool Cursor::GetScreenSelection(Rectangle& outRect)
+{
+	if (_screenSelection.size.LengthSquared() > 0)
+	{
+		outRect = _screenSelection;
+		return true;
+	}
+	return false;
 }

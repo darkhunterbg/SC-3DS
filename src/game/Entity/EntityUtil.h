@@ -24,5 +24,8 @@ public:
 	static void PlayAnimation(EntityId id, const AnimClipDef& clip, const Image* shadow = nullptr);
 
 	static EntityId SpawnUnit(const UnitDef& def, PlayerId owner, Vector2Int16 position, int orientation = 0);
+
+	static bool IsAlly(PlayerId player, EntityId id);
+	static bool IsEnemy(PlayerId player, EntityId id);
 };
 

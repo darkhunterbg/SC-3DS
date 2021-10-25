@@ -67,11 +67,14 @@ void GameInputSchema::InitDefault()
 		if (InputManager::Gamepad.IsButtonUp(GamepadButton::L))
 			r = InputManager::Gamepad.CPad();
 		});
+	Cursor.Select.AddCommand([](Vector2& r) {
+		r = Vector2(InputManager::Gamepad.IsButtonPressed(GamepadButton::Y));
+		});
 
 	Camera.Move.AddCommand([](Vector2& r) {
 		r = InputManager::Gamepad.CStick();
 		});
- 	Camera.Move.AddCommand([](Vector2& r) {
+	Camera.Move.AddCommand([](Vector2& r) {
 		if (InputManager::Gamepad.IsButtonDown(GamepadButton::L))
 			r = InputManager::Gamepad.CPad();
 		});

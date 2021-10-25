@@ -8,30 +8,31 @@
 #include "../StringLib.h"
 #include "../Engine/AssetLoader.h"
 #include "../Profiler.h"
+#include "../Scenes/GameScene.h"
 
 GameSceneView::GameSceneView(GameScene* scene) : _scene(scene)
 {
-	Vector2Int16 size = EntityUtil::GetManager().MapSystem.GetSize();
+	Vector2Int16 size = _scene->GetEntityManager().MapSystem.GetSize();
 	_camera.Position = { 0,0 };
 	_camera.Limits = { {0,0,}, size };
 
 	_cursor.GameMode = true;
 
-	SetPlayer(EntityUtil::GetManager().MapSystem.ActivePlayer);
+	SetPlayer(_scene->GetEntityManager().MapSystem.ActivePlayer);
 }
 
 void GameSceneView::SetPlayer(PlayerId player)
 {
 	_player = player;
-	EntityUtil::GetManager().MapSystem.ActivePlayer = player;
-	const PlayerInfo& info = EntityUtil::GetManager().PlayerSystem.GetPlayerInfo(_player);
+	_scene->GetEntityManager().MapSystem.ActivePlayer = player;
+	const PlayerInfo& info = _scene->GetEntityManager().PlayerSystem.GetPlayerInfo(_player);
 
 	_resourceBar.UpdatePlayerInfo(info, true);
 }
 
 const PlayerInfo& GameSceneView::GetPlayerInfo() const
 {
-	return EntityUtil::GetManager().PlayerSystem.GetPlayerInfo(_player);
+	return _scene->GetEntityManager().PlayerSystem.GetPlayerInfo(_player);
 }
 
 
@@ -46,10 +47,25 @@ void GameSceneView::Update()
 
 	_camera.Update(&_cursor);
 
-	const PlayerInfo& info = EntityUtil::GetManager().PlayerSystem.GetPlayerInfo(_player);
+	_cursor.GameUpdate();
+
+	Vector2Int16 worldPos = _camera.ScreenToWorld(Vector2Int16(_cursor.Position));
+
+	EntityId hover = _scene->GetEntityManager().KinematicSystem.PointCast(worldPos);
+	if (hover != Entity::None)
+	{
+		if (EntityUtil::IsAlly(_player, hover))
+			_cursor.SetUnitHover(CursorHoverState::Green);
+		else if (EntityUtil::IsEnemy(_player, hover))
+			_cursor.SetUnitHover(CursorHoverState::Red);
+		else
+			_cursor.SetUnitHover(CursorHoverState::Yellow);
+	}
+
+
+	const PlayerInfo& info = _scene->GetEntityManager().PlayerSystem.GetPlayerInfo(_player);
 
 	_resourceBar.UpdatePlayerInfo(info, false);
-
 }
 
 void GameSceneView::Draw()

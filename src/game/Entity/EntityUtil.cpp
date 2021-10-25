@@ -76,3 +76,17 @@ EntityId EntityUtil::SpawnUnit(const UnitDef& def, PlayerId owner, Vector2Int16 
 
 	return id;
 }
+
+
+bool EntityUtil::IsAlly(PlayerId player, EntityId id)
+{
+	EntityManager& em = GetManager();
+	return em.UnitSystem.GetComponent(id).owner == player;
+}
+
+bool EntityUtil::IsEnemy(PlayerId player, EntityId id)
+{
+	EntityManager& em = GetManager();
+	auto owner = em.UnitSystem.GetComponent(id).owner;
+	return owner.i != 0 && owner != player;
+}

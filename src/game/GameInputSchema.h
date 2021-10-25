@@ -44,6 +44,7 @@ public:
 
 	struct CursorCmd {
 		InputCommand Move = InputCommand("Cursor.Move");
+		InputCommand Select = InputCommand("Cursor.Select");
 	} Cursor;
 
 	struct CameraCmd {

@@ -33,7 +33,8 @@ void GUIImage::DrawSubTexture(const Texture& texture, Rectangle subImage, Color 
 void GUIImage::DrawImage(const Image& image, unsigned subImage, Color color)
 {
 	const ImageFrame& frame = image.GetFrame(subImage);
-	DrawImageFrame(frame, color);
+	Rectangle rect = GUI::GetLayoutSpace();
+	GraphicsRenderer::Draw(frame, rect, color);
 }
 
 void GUIImage::DrawImageFrame(const ImageFrame& frame, Color color)
@@ -90,7 +91,15 @@ void GUIImage::DrawAnimatedImage(const char* id, const Image& image, int* frameS
 			*frameState = data->currentFrame;
 	}
 
+	const ImageFrame& frame = data->image->GetFrame(data->currentFrame);
 
-	auto& frame = data->image->GetFrame(data->currentFrame);
+	Rectangle rect = GUI::GetLayoutSpace();
+	Vector2Int offset = rect.size / 2;
+	rect.position += Vector2Int(data->image->GetImageFrameOffset(data->currentFrame, false));
+	rect.position += rect.size / 2;
+	rect.size = (Vector2Int(frame.size) * rect.size) / Vector2Int(data->image->GetSize());
+
+	GUI::BeginAbsoluteLayout(rect);
 	DrawImageFrame(frame, color);
+	GUI::EndLayout();
 }
