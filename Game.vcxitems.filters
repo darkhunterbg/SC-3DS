@@ -22,6 +22,9 @@
     <Filter Include="SceneView">
       <UniqueIdentifier>{c23002b4-d6e6-4602-81be-85e68edc381e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Widgets">
+      <UniqueIdentifier>{a9d0f8b4-d146-426d-9471-4c841de25968}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.h">
@@ -178,16 +181,19 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\MainMenuSceneView.h">
       <Filter>SceneView</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\Cursor.h">
-      <Filter>SceneView</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\GameSceneView.h">
       <Filter>SceneView</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\ResourceBar.h">
-      <Filter>SceneView</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GameInputSchema.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Widgets\MinimapPanel.h">
+      <Filter>Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Widgets\ResourceBar.h">
+      <Filter>Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Widgets\Cursor.h">
+      <Filter>Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -319,15 +325,18 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\MainMenuSceneView.cpp">
       <Filter>SceneView</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\Cursor.cpp">
-      <Filter>SceneView</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\GameSceneView.cpp">
       <Filter>SceneView</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\ResourceBar.cpp">
-      <Filter>SceneView</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GameInputSchema.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Widgets\MinimapPanel.cpp">
+      <Filter>Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Widgets\ResourceBar.cpp">
+      <Filter>Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Widgets\Cursor.cpp">
+      <Filter>Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

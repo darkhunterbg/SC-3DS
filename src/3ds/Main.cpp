@@ -20,7 +20,6 @@
 #include "Engine/AudioChannel.h"
 #include "RenderTarget.h"
 
-#include <spritebatch_shbin.h>
 
 C3D_RenderTarget* top;
 C3D_RenderTarget* bottom;

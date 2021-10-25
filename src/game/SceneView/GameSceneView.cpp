@@ -87,7 +87,7 @@ void GameSceneView::DrawMainScreen()
 		GUIImage::DrawImageFrame(raceDef->ConsoleSprite);
 
 		GUI::BeginRelativeLayout({ 6,-4 }, { 128,128 }, GUIHAlign::Left, GUIVAlign::Bottom);
-		DrawMinimap();
+		_minimap.DrawMinimap(_camera);
 		GUI::EndLayout();
 	}
 	else
@@ -124,33 +124,7 @@ void GameSceneView::DrawSecondaryScreen()
 	GUIImage::DrawImageFrame(raceDef->ConsoleLowerSprite);
 
 	GUI::BeginRelativeLayout({ 7,-3 }, { 113,113 }, GUIHAlign::Left, GUIVAlign::Bottom);
-	DrawMinimap();
+	_minimap.DrawMinimap(_camera);
 	GUI::EndLayout();
 }
 
-void GameSceneView::DrawMinimap()
-{
-	Rectangle dst = GUI::GetLayoutSpace();
-	EntityUtil::GetManager().MapSystem.DrawMinimap(dst);
-
-	Rectangle camRect = _camera.GetRectangle();
-	Vector2 min = Vector2(camRect.GetMin());
-
-	Vector2 minimapUpscale = Vector2(EntityUtil::GetManager().MapSystem.GetSize()) / Vector2(dst.size);
-	min /= minimapUpscale;
-	min += Vector2(dst.position);
-	Vector2 s = Vector2(camRect.size) / minimapUpscale;
-
-	Rectangle rect;
-	rect.position = Vector2Int(min) - 1;
-	rect.size = Vector2Int(s) + 2;
-
-	Util::DrawTransparentRectangle(rect, 1, Colors::White);
-
-	if (GUI::IsLayoutActivated())
-	{
-		Vector2Int pos = GUI::GetPointerPosition() - dst.position;
-		_camera.SetPositionRestricted(Vector2Int16(Vector2(pos) * minimapUpscale));
-
-	}
-}

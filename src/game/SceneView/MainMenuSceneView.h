@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Assets.h"
-#include "Cursor.h"
+#include "../Widgets/Cursor.h"
 
 class MainMenuScene;
 

@@ -71,15 +71,16 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\VideoPlaybackScene.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\BootSceneView.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\Cursor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\GameSceneView.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\MainMenuSceneView.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\ResourceBar.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Span.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\stb_sprintf.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\StringLib.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\TimeSlice.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Util.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Widgets\Cursor.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Widgets\MinimapPanel.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Widgets\ResourceBar.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Assets.cpp" />
@@ -128,12 +129,13 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\VideoPlaybackScene.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\BootSceneView.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\Cursor.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\GameSceneView.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\MainMenuSceneView.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\ResourceBar.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\StringLib.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\TimeSlice.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Util.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Widgets\Cursor.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Widgets\MinimapPanel.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Widgets\ResourceBar.cpp" />
   </ItemGroup>
 </Project>

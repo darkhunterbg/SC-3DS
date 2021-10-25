@@ -1,7 +1,7 @@
 #include "Camera.h"
 
 #include "Game.h"
-#include "SceneView/Cursor.h"
+#include "Widgets/Cursor.h"
 
 int Camera::GetCameraSpeed() const
 {
@@ -31,7 +31,6 @@ void Camera::SetPositionRestricted(Vector2Int16 pos)
 
 void Camera::Update(Cursor* cursor)
 {
-
 	if (Game::GetInput().Camera.Zoom.IsActivated())
 	{
 		if (Scale == 1)

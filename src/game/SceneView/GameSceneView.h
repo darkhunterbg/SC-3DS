@@ -3,8 +3,9 @@
 #include "../Entity/PlayerSystem.h"
 
 #include "../Camera.h"
-#include "Cursor.h"
-#include "ResourceBar.h"
+#include "../Widgets/Cursor.h"
+#include "../Widgets/ResourceBar.h"
+#include "../Widgets/MinimapPanel.h"
 
 class GameScene;
 
@@ -15,10 +16,10 @@ private:
 	Camera _camera;
 	Cursor _cursor;
 	ResourceBar _resourceBar;
+	MinimapPanel _minimap;
 
 	PlayerId _player;
 
-	void DrawMinimap();
 	void DrawMainScreen();
 	void DrawSecondaryScreen();
 public:
@@ -31,7 +32,6 @@ public:
 
 	void Update();
 	void Draw();
-
 
 	void OnPlatformChanged();
 };
