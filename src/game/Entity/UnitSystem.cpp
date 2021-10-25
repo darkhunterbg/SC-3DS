@@ -21,6 +21,6 @@ UnitComponent& UnitSystem::NewUnit(EntityId id, const UnitDef& def, PlayerId own
 	unit.vision = def.Stats.Vision + 1;
 	unit.providedSupply = def.Stats.ProvideSupply;
 	unit.usedSupply = def.Stats.UseSupply;
-
+	unit.health = unit.maxHealth = def.Stats.Health;
 	return unit;
 }

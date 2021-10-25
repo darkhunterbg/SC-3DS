@@ -197,6 +197,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\KinematicSystem.h">
       <Filter>Entity</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Widgets\SelectionInfoPanel.h">
+      <Filter>Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -343,6 +346,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\KinematicSystem.cpp">
       <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Widgets\SelectionInfoPanel.cpp">
+      <Filter>Widgets</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

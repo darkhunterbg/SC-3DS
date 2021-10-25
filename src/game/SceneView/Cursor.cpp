@@ -68,17 +68,14 @@ void Cursor::Update()
 
 	if (Game::GetInput().Cursor.Select.IsActivated())
 	{
-		_screenSelection.position = Position;
-		_screenSelection.size = { 1,1 };
+		_screenSelection = { Position, {1,1} };
 	}
 
 }
 
 void Cursor::Draw()
 {
-	Update();
-
-	Rectangle dst = { Position - Vector2Int(_animation->GetSize()/2), Vector2Int(_animation->GetSize()) };
+	Rectangle dst = { Position - Vector2Int(_animation->GetSize() / 2), Vector2Int(_animation->GetSize()) };
 
 	GUI::BeginAbsoluteLayout(dst);
 	GUIImage::DrawAnimatedImage("cursor", *_animation, &_animationFrameId);

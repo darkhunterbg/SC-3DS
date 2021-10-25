@@ -70,6 +70,10 @@ void GameInputSchema::InitDefault()
 	Cursor.Select.AddCommand([](Vector2& r) {
 		r = Vector2(InputManager::Gamepad.IsButtonPressed(GamepadButton::Y));
 		});
+	Cursor.Select.AddCommand([](Vector2& r) {
+		if (Game::GetPlatformInfo().PointerIsCursor)
+			r = Vector2(InputManager::Pointer.IsReleased());
+		});
 
 	Camera.Move.AddCommand([](Vector2& r) {
 		r = InputManager::Gamepad.CStick();

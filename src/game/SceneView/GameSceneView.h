@@ -6,6 +6,8 @@
 #include "../Widgets/Cursor.h"
 #include "../Widgets/ResourceBar.h"
 #include "../Widgets/MinimapPanel.h"
+#include "../Widgets/SelectionInfoPanel.h"
+#include "../Entity/Entity.h"
 
 class GameScene;
 
@@ -17,11 +19,15 @@ private:
 	Cursor _cursor;
 	ResourceBar _resourceBar;
 	MinimapPanel _minimap;
+	SelectionInfoPanel _selectionPanel;
 
 	PlayerId _player;
 
 	void DrawMainScreen();
 	void DrawSecondaryScreen();
+
+	std::vector<EntityId> _temp;
+	std::vector<EntityId> _unitSelection;
 public:
 	GameSceneView(GameScene* scene);
 

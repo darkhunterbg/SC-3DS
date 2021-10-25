@@ -3,6 +3,7 @@
 #include "../Engine/GraphicsRenderer.h"
 #include "../Engine/InputManager.h"
 #include "../Game.h"
+#include "../Util.h"
 
 GUIState* GUI::_state = nullptr;
 
@@ -78,7 +79,7 @@ Rectangle GUI::GetLayoutSpace()
 {
 	Rectangle space = GetState().GetSpace();
 	space.position += GetState().PopOffset();
-
+	GetState().OverrideSize(space.size);
 	return space;
 }
 
@@ -129,4 +130,12 @@ Vector2Int GUI::GetMousePosition()
 Vector2Int GUI::GetPointerPosition()
 {
 	return InputManager::Pointer.Position();
+}
+
+void GUI::DrawLayoutDebug()
+{
+	Rectangle rect = GetLayoutSpace();
+
+	GraphicsRenderer::DrawRectangle(rect, Color{ 1,1,1,0.3f });
+	Util::DrawTransparentRectangle(rect, Colors::White);
 }

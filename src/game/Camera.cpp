@@ -1,6 +1,7 @@
 #include "Camera.h"
 
 #include "Game.h"
+
 #include "Widgets/Cursor.h"
 
 int Camera::GetCameraSpeed() const

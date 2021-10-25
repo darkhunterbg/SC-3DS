@@ -41,10 +41,19 @@ public:
 	int ImageAnimationTimer = 6;
 
 	Vector2Int ElementOffset = { 0,0 };
+	Vector2Int ElementSize = { 0, 0 };
 
 	Rectangle GetSpace()const { return SpaceStack.back(); }
 
 	Vector2Int PopOffset() { Vector2Int o = ElementOffset; ElementOffset = { 0,0 }; return o; }
+	void OverrideSize(Vector2Int& size)
+	{
+		if (ElementSize.LengthSquared() > 0)
+		{
+			size = ElementSize;
+			ElementSize = { 0,0 };
+		}
+	}
 
 	std::bitset<32> TextEffects = { 0 };
 };
@@ -111,8 +120,14 @@ public:
 	{
 		GetState().ElementOffset += offset;
 	}
+	static void SetNextElementSize(Vector2Int size)
+	{
+		GetState().ElementSize = size;
+	}
 
 	static Vector2Int GetMousePosition();
 	static Vector2Int GetPointerPosition();
+
+	static void DrawLayoutDebug();
 };
 

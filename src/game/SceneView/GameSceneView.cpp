@@ -62,6 +62,22 @@ void GameSceneView::Update()
 			_cursor.SetUnitHover(CursorHoverState::Yellow);
 	}
 
+	Rectangle selection;
+	if (_cursor.GetScreenSelection(selection))
+	{
+		_temp.clear();
+		auto r = Rectangle_ToRectangle16(selection);
+		// TODO: unit masking
+		_scene->GetEntityManager().KinematicSystem.RectCast(r, _temp);
+
+		if (_temp.size() > 0)
+		{
+			_unitSelection.clear();
+			_unitSelection.insert(_unitSelection.end(), _temp.begin(), _temp.end());
+
+		}
+	}
+
 
 	const PlayerInfo& info = _scene->GetEntityManager().PlayerSystem.GetPlayerInfo(_player);
 
@@ -105,6 +121,10 @@ void GameSceneView::DrawMainScreen()
 		GUI::BeginRelativeLayout({ 6,-4 }, { 128,128 }, GUIHAlign::Left, GUIVAlign::Bottom);
 		_minimap.DrawMinimap(_camera);
 		GUI::EndLayout();
+
+		GUI::BeginRelativeLayout({ 150,-3 }, { 252,90 }, GUIHAlign::Left, GUIVAlign::Bottom);
+		_selectionPanel.Draw(_unitSelection, *raceDef);
+		GUI::EndLayout();
 	}
 	else
 	{
@@ -114,12 +134,13 @@ void GameSceneView::DrawMainScreen()
 		GUI::EndLayout();
 	}
 
-
 	Vector2Int barSize = GUI::GetScreenSize();
 	barSize.y = 14;
 	GUI::BeginRelativeLayout({ 0,2 }, barSize, GUIHAlign::Center, GUIVAlign::Top);
 	_resourceBar.Draw(info);
 	GUI::EndLayout();
+
+
 
 	_cursor.Draw();
 
@@ -141,6 +162,10 @@ void GameSceneView::DrawSecondaryScreen()
 
 	GUI::BeginRelativeLayout({ 7,-3 }, { 113,113 }, GUIHAlign::Left, GUIVAlign::Bottom);
 	_minimap.DrawMinimap(_camera);
+	GUI::EndLayout();
+
+	GUI::BeginRelativeLayout({ 0,2 }, { 234,86 }, GUIHAlign::Left, GUIVAlign::Top);
+	_selectionPanel.Draw(_unitSelection, *raceDef);
 	GUI::EndLayout();
 }
 
