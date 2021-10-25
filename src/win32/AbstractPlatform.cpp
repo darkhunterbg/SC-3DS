@@ -70,7 +70,7 @@ void AbstractPlatform::UpdateScreens(GPU_Target* screen)
 void AbstractPlatform::UpdateInput(SDL_Window* window)
 {
 	Vector2Int pos;
-	Uint32  buttonState = SDL_GetMouseState(&pos.x, &pos.y);
+	Uint32 buttonState = SDL_GetMouseState(&pos.x, &pos.y);
 
 #if _WIN32
 	if (Win32GetCursorPosition(pos.x, pos.y))
@@ -85,9 +85,11 @@ void AbstractPlatform::UpdateInput(SDL_Window* window)
 	auto& screen = Screens[Pointer.ScreenReference];
 	pos -= screen.NativePosition;
 
+	Pointer.InsideScreen = Rectangle(screen.NativePosition, screen.NativeResolution).Contains(pos);
 
 	//state.Touch = buttonState & SDL_BUTTON(SDL_BUTTON_LEFT);
 	Vector2Int nativeSize = screen.NativeResolution;
+
 
 	pos.x = std::min(std::max(pos.x, 0), nativeSize.x);
 	pos.y = std::min(std::max(pos.y, 0), nativeSize.y);

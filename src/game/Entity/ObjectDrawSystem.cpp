@@ -32,7 +32,7 @@ void ObjectDrawSystem::UpdatePositions(EntityManager& em)
 
 void ObjectDrawSystem::Draw( const Camera& camera)
 {
-	SectionProfiler p("ObjectDraw");
+	//SectionProfiler p("ObjectDraw");
 
 	_drawCmd.clear();
 

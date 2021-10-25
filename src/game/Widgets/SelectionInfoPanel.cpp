@@ -138,7 +138,7 @@ void SelectionInfoPanel::DrawUnitDetails(EntityId id)
 
 		stbsp_snprintf(_buffer, sizeof(_buffer), "%i", info[i].counter);
 		GUI::BeginRelativeLayout({ -4,-2 }, { 12,10 }, GUIHAlign::Right, GUIVAlign::Bottom);
-		GUILabel::DrawText(font2, _buffer, GUIHAlign::Center, GUIVAlign::Center, Colors::UILightGray);
+		GUILabel::DrawText(font2, _buffer, GUIHAlign::Center, GUIVAlign::Top, Colors::UILightGray);
 		GUI::EndLayout();
 
 		GUI::EndLayout();

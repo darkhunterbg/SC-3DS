@@ -24,6 +24,7 @@ struct AbstractPointer {
 	bool SameAsCursor = false;
 	Vector2Int Position;
 	int ScreenReference = 0;
+	bool InsideScreen = false;
 };
 
 class AbstractPlatform {

@@ -66,7 +66,9 @@ void GameSceneView::Update()
 	if (_cursor.GetScreenSelection(selection))
 	{
 		_temp.clear();
-		auto r = Rectangle_ToRectangle16(selection);
+		Rectangle16 r;
+		r.position = _camera.ScreenToWorld(Vector2Int16(selection.position));
+		r.SetMax(_camera.ScreenToWorld(Vector2Int16(selection.GetMax())));
 		// TODO: unit masking
 		_scene->GetEntityManager().KinematicSystem.RectCast(r, _temp);
 
@@ -77,7 +79,6 @@ void GameSceneView::Update()
 
 		}
 	}
-
 
 	const PlayerInfo& info = _scene->GetEntityManager().PlayerSystem.GetPlayerInfo(_player);
 

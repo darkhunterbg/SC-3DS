@@ -350,8 +350,11 @@ void Platform::UpdatePointerState(PointerState& state)
 {
 	state.Position = abstractPlatform.Pointer.Position;
 
+	if (!abstractPlatform.Pointer.InsideScreen) return;
+
 	Vector2Int pos;
 	Uint32  buttonState = SDL_GetMouseState(&pos.x, &pos.y);
+
 	state.Touch = buttonState & SDL_BUTTON(SDL_BUTTON_LEFT);
 }
 
