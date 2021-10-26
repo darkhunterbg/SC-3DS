@@ -25,16 +25,22 @@ private:
 	Rectangle _screenSelection = { {0,0}, {0,0} };
 	Vector2Int _holdStart = { 0,0 };
 
-	Rectangle GetHoldRect();
+	
 public:
+	Rectangle Limits;
+
 	Vector2Int Position;
 
+	bool UsingLimits = false;
 	bool MultiSelectionEnabled = false;
+	bool DrawMultiSelection = false;
 
-	int CursorSpeed = 8;
+	int CursorSpeed = 10;
 
 	inline Vector2Int GetCornerState() const { return _corner; }
+	inline bool IsHolding() const { return _hold; }
 	bool GetScreenSelection(Rectangle& outRect);
+	Rectangle GetHoldRect();
 
 	Cursor();
 	

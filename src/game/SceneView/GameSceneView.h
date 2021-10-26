@@ -28,6 +28,10 @@ private:
 
 	std::vector<EntityId> _temp;
 	std::vector<EntityId> _unitSelection;
+
+	bool _cursorOverUI = false;
+
+	void CursorSelection();
 public:
 	GameSceneView(GameScene* scene);
 

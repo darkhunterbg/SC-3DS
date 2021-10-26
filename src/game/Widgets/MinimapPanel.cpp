@@ -26,7 +26,7 @@ void MinimapPanel::DrawMinimap(Camera& camera)
 
 	Util::DrawTransparentRectangle(rect, 1, Colors::White);
 
-	if (GUI::IsLayoutActivated())
+	if (PointerInputEnabled && GUI::IsLayoutActivated())
 	{
 		Vector2Int pos = GUI::GetPointerPosition() - dst.position;
 		camera.SetPositionRestricted(Vector2Int16(Vector2(pos) * minimapUpscale));

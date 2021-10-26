@@ -49,23 +49,32 @@ void Cursor::Update()
 
 	Vector2Int screenSize = GUI::GetScreenSize();
 
+	Rectangle l = { {0,0},screenSize };
+	if (UsingLimits)
+		l = Limits;
+	
+
 	if (Game::GetInput().IsUsingMouse())
 		Position = GUI::GetMousePosition();
 	else
 	{
 		Position += Vector2Int(Game::GetInput().Cursor.Move.VectorValue() * CursorSpeed);
-
-		Position.x = std::min(std::max(0, Position.x), screenSize.x);
-		Position.y = std::min(std::max(0, Position.y), screenSize.y);
 	}
+
+	Position.x = std::min(std::max(l.GetMin().x, Position.x), l.GetMax().x);
+	Position.y = std::min(std::max(l.GetMin().y, Position.y), l.GetMax().y);
+
 
 	_corner = { 0,0 };
 
-	if (Position.x <= 1)_corner.x = -1;
-	if (Position.x >= screenSize.x - 1)_corner.x = 1;
+	if (!_hold)
+	{
+		if (Position.x <= 1)_corner.x = -1;
+		if (Position.x >= screenSize.x - 1)_corner.x = 1;
 
-	if (Position.y <= 1)_corner.y = -1;
-	if (Position.y >= screenSize.y - 1)_corner.y = 1;
+		if (Position.y <= 1)_corner.y = -1;
+		if (Position.y >= screenSize.y - 1)_corner.y = 1;
+	}
 
 	bool holdCompleted = false;
 
@@ -111,7 +120,8 @@ bool Cursor::HandleMultiselection()
 		}
 	}
 
-	if(_hold) {
+	if (_hold)
+	{
 		ChangeClip("cursor\\drag");
 
 		if (!Game::GetInput().Cursor.Hold.IsActivated())
@@ -122,15 +132,14 @@ bool Cursor::HandleMultiselection()
 	}
 
 	return false;
-
 }
 
 void Cursor::Draw()
 {
-	if (_hold)
+	if (_hold &&  DrawMultiSelection )
 	{
 		Rectangle rect = GetHoldRect();
-		Util::DrawTransparentRectangle(rect, 2, Colors::UIGreen);
+		Util::DrawTransparentRectangle(rect, 1, Colors::UIGreen);
 	}
 
 	Rectangle dst = { Position - Vector2Int(_animation->GetSize() / 2), Vector2Int(_animation->GetSize()) };
