@@ -27,14 +27,19 @@ struct DrawComponent
 };
 
 class ObjectDrawSystem : public IEntitySystem {
+	struct ObjectSelection {
+		EntityId entity;
+		Color32 color = 0xFFFFFFFF;
+	};
+
 	EntityComponentMap<DrawComponent> _drawComponents;
 	std::vector<BatchDrawCommand> _drawCmd;
-
+	std::vector<ObjectSelection> _selection;
 public:
 	ObjectDrawSystem();
 
 	void UpdatePositions(EntityManager& em);
-	void Draw( const Camera& camera);
+	void Draw(EntityManager& em, const Camera& camera);
 
 	inline void NewComponent(EntityId id) { _drawComponents.NewComponent(id); }
 	inline bool HasComponent(EntityId id) const
@@ -46,6 +51,8 @@ public:
 		_drawComponents.DeleteComponent(id);
 	}
 	DrawComponent& GetComponent(EntityId id) { return _drawComponents.GetComponent(id); }
+
+	void UpdateSelection(const std::vector<EntityId> selection, Color color);
 
 	inline void InitFromImage(EntityId id, const Image& image)
 	{

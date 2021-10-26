@@ -30,7 +30,7 @@ void ObjectDrawSystem::UpdatePositions(EntityManager& em)
 	}
 }
 
-void ObjectDrawSystem::Draw( const Camera& camera)
+void ObjectDrawSystem::Draw(EntityManager& em, const Camera& camera)
 {
 	//SectionProfiler p("ObjectDraw");
 
@@ -56,7 +56,7 @@ void ObjectDrawSystem::Draw( const Camera& camera)
 
 		if (draw.shadow != nullptr)
 		{
-			cmd.order = depth + 1;
+			cmd.order = depth ;
 			cmd.sprite = draw.shadow;
 			cmd.position = draw.position + draw.shadowOffset;
 			cmd.position -= camBB.position;
@@ -84,9 +84,46 @@ void ObjectDrawSystem::Draw( const Camera& camera)
 		}
 	}
 
+	for (const auto& sel : _selection)
+	{
+		const DrawComponent& draw = _drawComponents.GetComponent(sel.entity);
+		if (!draw.visible) continue;
+
+		if (!camBB.Intersects(draw.boundingBox)) continue;
+
+		if (!em.UnitSystem.IsUnit(sel.entity)) continue;
+		
+		UnitComponent& unit = em.UnitSystem.GetComponent(sel.entity);
+
+		int depth = draw.depth * 10'000'000 + draw.position.y * 1000 + draw.position.x * 4;
+
+		const auto& selectionImage = unit.def->Art.GetSelectionImage();
+
+		BatchDrawCommand cmd;
+		cmd.order = depth + 1;
+		cmd.sprite = &selectionImage.GetFrame(0);
+		cmd.position = draw.position + selectionImage.GetImageFrameOffset(0, false) + Vector2Int16(0, unit.def->Art.SelectionOffset);
+		cmd.position -= camBB.position;
+		cmd.position /= camera.Scale;
+		cmd.scale = { 1,1 };
+		cmd.color = sel.color;
+
+
+		_drawCmd.push_back(cmd);
+	}
+
 	std::sort(_drawCmd.begin(), _drawCmd.end(), DrawSort);
 
 	GraphicsRenderer::BufferDraw(_drawCmd);
+}
+
+void ObjectDrawSystem::UpdateSelection(const std::vector<EntityId> selection, Color color)
+{
+	_selection.clear();
+	for (EntityId id : selection)
+	{
+		_selection.push_back({ id, Color32(color) });
+	}
 }
 
 void ObjectDrawSystem::DeleteEntities(std::vector<EntityId>& entities)
@@ -98,6 +135,7 @@ size_t ObjectDrawSystem::ReportMemoryUsage()
 {
 	size_t size = _drawCmd.capacity() * sizeof(BatchDrawCommand);
 	size += _drawComponents.GetMemoryUsage();
+	size += _selection.capacity() * sizeof(ObjectSelection);
 
 	return size;
 }

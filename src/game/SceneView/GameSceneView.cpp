@@ -39,7 +39,17 @@ const PlayerInfo& GameSceneView::GetPlayerInfo() const
 	return _scene->GetEntityManager().PlayerSystem.GetPlayerInfo(_player);
 }
 
-void GameSceneView::CursorSelection()
+Color GameSceneView::GetAlliedUnitColor(EntityId id)
+{
+	if (EntityUtil::IsAlly(_player, id))
+		return Colors::UIDarkGreen;
+
+	if (EntityUtil::IsEnemy(_player, id))
+		return Colors::UIDarkRed;
+
+	return Colors::UIDarkYellow;
+}
+void GameSceneView::UpdateSelection()
 {
 	Rectangle selection;
 	if (_cursor.GetScreenSelection(selection))
@@ -51,6 +61,8 @@ void GameSceneView::CursorSelection()
 		// TODO: unit masking
 		_scene->GetEntityManager().KinematicSystem.RectCast(r, _temp);
 
+		bool multiSelect = false;
+
 		for (int i = 0; i < _temp.size(); ++i)
 		{
 			EntityId id = _temp[i];
@@ -60,26 +72,47 @@ void GameSceneView::CursorSelection()
 			if (!_scene->GetEntityManager().UnitSystem.IsUnit(id)) remove = true;
 			if (!_scene->GetEntityManager().DrawSystem.GetComponent(id).visible)  remove = true;
 
-			if (!EntityUtil::IsAlly(_player, id))
-			{
-				_temp.clear();
-				_temp.push_back(id);
-				break;
-			}
 
 			if (remove)
 			{
 				_temp.erase(_temp.begin() + i);
 				--i;
 			}
+
+			if (!multiSelect && EntityUtil::IsAlly(_player, id))
+				multiSelect = true;
 		}
 
 		if (_temp.size() > 0)
 		{
 			_unitSelection.clear();
-			_unitSelection.insert(_unitSelection.end(), _temp.begin(), _temp.end());
+
+			if (multiSelect && _temp.size() > 1)
+			{
+				for (EntityId id : _temp)
+				{
+					if (EntityUtil::IsAlly(_player, id))
+					{
+						_unitSelection.push_back(id);
+					}
+				}
+			}
+			else
+			{
+				_unitSelection.push_back(_temp[0]);
+			}
 		}
 	}
+
+	Color selectionColor = Colors::White;
+
+	if (_unitSelection.size())
+	{
+		selectionColor = GetAlliedUnitColor(_unitSelection[0]);
+	}
+	// TODO: detect deleted entities & hidden entities
+
+	_scene->GetEntityManager().DrawSystem.UpdateSelection(_unitSelection, selectionColor);
 }
 
 void GameSceneView::Update()
@@ -115,7 +148,7 @@ void GameSceneView::Update()
 				_cursor.SetUnitHover(CursorHoverState::Yellow);
 		}
 
-		CursorSelection();
+		UpdateSelection();
 	}
 
 	const PlayerInfo& info = _scene->GetEntityManager().PlayerSystem.GetPlayerInfo(_player);

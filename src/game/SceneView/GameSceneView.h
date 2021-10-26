@@ -31,7 +31,8 @@ private:
 
 	bool _cursorOverUI = false;
 
-	void CursorSelection();
+	Color GetAlliedUnitColor(EntityId id);
+	void UpdateSelection();
 public:
 	GameSceneView(GameScene* scene);
 

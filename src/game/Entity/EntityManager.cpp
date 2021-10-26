@@ -204,7 +204,7 @@ void EntityManager::Draw(const Camera& camera)
 
 		MapSystem.DrawMap(camera);
 
-		DrawSystem.Draw(camera);
+		DrawSystem.Draw(*this, camera);
 
 		MapSystem.DrawFogOfWar(*this, camera);
 		//if (DrawBoundingBoxes)
