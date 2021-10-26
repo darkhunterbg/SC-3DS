@@ -68,11 +68,18 @@ void GameInputSchema::InitDefault()
 			r = InputManager::Gamepad.CPad();
 		});
 	Cursor.Select.AddCommand([](Vector2& r) {
-		r = Vector2(InputManager::Gamepad.IsButtonPressed(GamepadButton::Y));
+		r = Vector2(InputManager::Gamepad.IsButtonReleased(GamepadButton::Y));
 		});
 	Cursor.Select.AddCommand([](Vector2& r) {
 		if (Game::GetPlatformInfo().PointerIsCursor)
 			r = Vector2(InputManager::Pointer.IsReleased());
+		});
+	Cursor.Hold.AddCommand([](Vector2& r) {
+		r = Vector2(InputManager::Gamepad.IsButtonDown(GamepadButton::Y));
+		});
+	Cursor.Hold.AddCommand([](Vector2& r) {
+		if (Game::GetPlatformInfo().PointerIsCursor)
+			r = Vector2(InputManager::Pointer.IsDown());
 		});
 
 	Camera.Move.AddCommand([](Vector2& r) {

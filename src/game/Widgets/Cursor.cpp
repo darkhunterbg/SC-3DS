@@ -4,6 +4,7 @@
 #include "../Data/GameDatabase.h"
 #include "../MathLib.h"
 #include "../Engine/GraphicsRenderer.h"
+#include "../Util.h"
 
 static std::string _scrollAnim[] = {
 	"cursor\\scrollul", "cursor\\scrollu","cursor\\scrollur",
@@ -27,7 +28,7 @@ void Cursor::GameUpdate()
 		return;
 	}
 
-	if (!_hover)
+	if (!_hover && !_hold)
 		ChangeClip("cursor\\arrow");
 
 	_hover = false;
@@ -66,19 +67,73 @@ void Cursor::Update()
 	if (Position.y <= 1)_corner.y = -1;
 	if (Position.y >= screenSize.y - 1)_corner.y = 1;
 
+	bool holdCompleted = false;
+
+	if (MultiSelectionEnabled)
+		holdCompleted = HandleMultiselection();
+	else
+		_hold = false;
+
+
 	if (Game::GetInput().Cursor.Select.IsActivated())
 	{
-		_screenSelection.position = Position;
-		_screenSelection.size = { 1,1 };
+		if (holdCompleted)
+		{
+			_screenSelection = GetHoldRect();
+		}
+		else
+		{
+			_screenSelection.position = Position;
+			_screenSelection.size = { 1,1 };
+		}
 	}
+}
+
+Rectangle Cursor::GetHoldRect()
+{
+	Vector2Int size = (Position - _holdStart).Abs();
+	Vector2Int center = (Position + _holdStart) / 2;
+
+	Rectangle rect = { {0,0}, size };
+	rect.SetCenter(center);
+
+	return rect;
+}
+
+bool Cursor::HandleMultiselection()
+{
+	if (!_hold)
+	{
+		if (Game::GetInput().Cursor.Hold.IsActivated())
+		{
+			_hold = true;
+			_holdStart = Position;
+		}
+	}
+
+	if(_hold) {
+		ChangeClip("cursor\\drag");
+
+		if (!Game::GetInput().Cursor.Hold.IsActivated())
+		{
+			_hold = false;
+			return true;
+		}
+	}
+
+	return false;
 
 }
 
 void Cursor::Draw()
 {
-	Update();
+	if (_hold)
+	{
+		Rectangle rect = GetHoldRect();
+		Util::DrawTransparentRectangle(rect, 2, Colors::UIGreen);
+	}
 
-	Rectangle dst = { Position - Vector2Int(_animation->GetSize()/2), Vector2Int(_animation->GetSize()) };
+	Rectangle dst = { Position - Vector2Int(_animation->GetSize() / 2), Vector2Int(_animation->GetSize()) };
 
 	GUI::BeginAbsoluteLayout(dst);
 	GUIImage::DrawAnimatedImage("cursor", *_animation, &_animationFrameId);
@@ -87,17 +142,17 @@ void Cursor::Draw()
 
 void Cursor::SetUnitHover(CursorHoverState state)
 {
-	if (_corner != Vector2Int{ 0, 0 }) return;
+	if (_corner != Vector2Int{ 0, 0 } || _hold) return;
 
 	_hover = true;
 
 	switch (state)
 	{
-	case Green:
+	case CursorHoverState::Green:
 		ChangeClip("cursor\\magg"); break;
-	case Yellow:
+	case CursorHoverState::Yellow:
 		ChangeClip("cursor\\magy"); break;
-	case Red:
+	case CursorHoverState::Red:
 		ChangeClip("cursor\\magr"); break;
 	default:
 		break;

@@ -16,7 +16,7 @@ GameSceneView::GameSceneView(GameScene* scene) : _scene(scene)
 	_camera.Position = { 0,0 };
 	_camera.Limits = { {0,0,}, size };
 
-	_cursor.GameMode = true;
+	_cursor.MultiSelectionEnabled = true;
 
 	SetPlayer(_scene->GetEntityManager().MapSystem.ActivePlayer);
 }
@@ -104,7 +104,6 @@ void GameSceneView::OnPlatformChanged()
 	_cursor.Position = GUI::GetScreenSize() / 2;
 }
 
-
 void GameSceneView::DrawMainScreen()
 {
 	GUI::UseScreen(ScreenId::Top);
@@ -129,7 +128,6 @@ void GameSceneView::DrawMainScreen()
 	}
 	else
 	{
-
 		GUI::BeginRelativeLayout({ 0,0 }, Vector2Int(raceDef->ConsoleUpperSprite.size), GUIHAlign::Center, GUIVAlign::Bottom);
 		GUIImage::DrawImageFrame(raceDef->ConsoleUpperSprite);
 		GUI::EndLayout();
@@ -142,9 +140,7 @@ void GameSceneView::DrawMainScreen()
 	GUI::EndLayout();
 
 
-
 	_cursor.Draw();
-
 }
 
 void GameSceneView::DrawSecondaryScreen()

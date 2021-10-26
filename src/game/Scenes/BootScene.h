@@ -9,7 +9,6 @@ class BootSceneView;
 class BootScene : public Scene
 {
 private: 
-	int _frameCounter = 0;
 	bool _ready = false;
 	Coroutine _loadCrt;
 	BootSceneView* _view = nullptr;

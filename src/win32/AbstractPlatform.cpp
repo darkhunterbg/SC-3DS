@@ -83,9 +83,9 @@ void AbstractPlatform::UpdateInput(SDL_Window* window)
 #endif
 
 	auto& screen = Screens[Pointer.ScreenReference];
-	pos -= screen.NativePosition;
-
 	Pointer.InsideScreen = Rectangle(screen.NativePosition, screen.NativeResolution).Contains(pos);
+
+	pos -= screen.NativePosition;
 
 	//state.Touch = buttonState & SDL_BUTTON(SDL_BUTTON_LEFT);
 	Vector2Int nativeSize = screen.NativeResolution;

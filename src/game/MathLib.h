@@ -93,6 +93,10 @@ struct Vector2T
 	Vector2T Floor(T mx, T my) const {
 		return Vector2T(std::max(x, mx), std::max(y, my));
 	}
+	Vector2T Abs() const
+	{
+		return Vector2T(std::abs(x), std::abs(y));
+	}
 
 	static Vector2T Normalize(const Vector2T& a)
 	{

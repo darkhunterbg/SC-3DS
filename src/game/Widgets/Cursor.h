@@ -3,7 +3,7 @@
 #include <string>
 #include "../Assets.h"
 
-enum CursorHoverState {
+enum class CursorHoverState {
 	Green,
 	Yellow,
 	Red
@@ -17,14 +17,19 @@ private:
 	
 	Vector2Int _corner;
 	bool _hover = false;
+	bool _hold = false;
 
+	bool HandleMultiselection();
 	void ChangeClip(const std::string& clipName);
 
 	Rectangle _screenSelection = { {0,0}, {0,0} };
+	Vector2Int _holdStart = { 0,0 };
+
+	Rectangle GetHoldRect();
 public:
 	Vector2Int Position;
 
-	bool GameMode = false;
+	bool MultiSelectionEnabled = false;
 
 	int CursorSpeed = 8;
 

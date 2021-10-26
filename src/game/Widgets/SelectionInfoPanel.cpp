@@ -65,11 +65,22 @@ void static GetUnitWireframeColors(EntityId id, const UnitComponent& unit, Color
 	}
 }
 
-void SelectionInfoPanel::Draw(const std::vector<EntityId>& selection, const RaceDef& skin)
+void SelectionInfoPanel::Draw( std::vector<EntityId>& selection, const RaceDef& skin)
 {
 	if (selection.size() == 0) return;
 
 	_raceDef = &skin;
+
+	if (selection.size() > 1)
+	{
+		Vector2Int size = GUI::GetLayoutSpace().size;
+
+		size -= {34, 18};
+
+		GUI::BeginRelativeLayout({ 0,0 }, size, GUIHAlign::Center, GUIVAlign::Center);
+		DrawMultiselection(selection);
+		GUI::EndLayout(); return;
+	}
 
 	EntityId entityId = selection[0];
 
@@ -89,6 +100,54 @@ void SelectionInfoPanel::Draw(const std::vector<EntityId>& selection, const Race
 	GUI::BeginRelativeLayout({ 0,0 }, size, GUIHAlign::Right, GUIVAlign::Bottom);
 	DrawUnitDetails(entityId);
 	GUI::EndLayout();
+}
+
+void SelectionInfoPanel::DrawMultiselection(std::vector<EntityId>& selection)
+{
+	static constexpr const int Columns = 6;
+	static constexpr const int Rows = 2;
+	
+	_temp.clear();
+	_temp.insert(_temp.end(), selection.begin(), selection.end());
+
+	const ImageFrame& f = _raceDef->CommandIcons->GetFrame(14);
+	int max = std::min((int)_temp.size(), Columns* Rows);
+
+	Vector2 space = Vector2(GUI::GetLayoutSpace().size);
+	space.x -= f.size.x * Columns;
+	space.x /= (Columns - 1);
+	space.y -= f.size.y * Rows;
+	space.y /= (Rows - 1);
+
+	for (int i = 0; i < max; ++i)
+	{
+		Vector2Int offset = Vector2Int(Vector2(i / Rows, i % Rows) * (Vector2(f.size) + (space)));
+		EntityId id = _temp[i];
+		UnitComponent& unit = EntityUtil::GetManager().UnitSystem.GetComponent(id);
+
+		GUI::BeginRelativeLayout(offset, Vector2Int(f.size), GUIHAlign::Left, GUIVAlign::Top);
+		GUIImage::DrawImageFrame(f);
+	
+		Color wfColor[4];
+		GetUnitWireframeColors(id, unit, wfColor);
+
+		for (int i = 0; i < 4; ++i)
+		{
+			const auto& wfPart = unit.def->Art.GetWireframe()->group.GetImage().GetFrame(i + 1);
+			GUI::BeginRelativeLayout(Vector2Int(wfPart.offset) + Vector2Int{ -6, 1 }, Vector2Int(wfPart.size), GUIHAlign::Center, GUIVAlign::Top);
+			GUIImage::DrawImageFrame(wfPart, wfColor[i]);
+
+			GUI::EndLayout();
+		}
+
+		if (GUI::IsLayoutActivated())
+		{
+			selection.clear();
+			selection.push_back(id);
+		}
+
+		GUI::EndLayout();
+	}
 }
 
 void SelectionInfoPanel::DrawUnitDetails(EntityId id)
