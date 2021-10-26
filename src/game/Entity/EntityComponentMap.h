@@ -124,10 +124,11 @@ public:
 				continue;
 			Util::_delIndexesScratch.push_back(index);
 			_entityToIndexMap[index] = -1;
-
 		}
 
 		if (Util::_delIndexesScratch.size() == 0) return;
+
+
 
 		std::sort(Util::_delIndexesScratch.begin(), Util::_delIndexesScratch.end(), std::greater<short>());
 
@@ -137,10 +138,33 @@ public:
 			_entities.erase(_entities.begin() + index);
 		}
 
+
+		EntityId minEntity = Entity::None;
 		if (_entities.size() > 0)
+		{
 			_maxEntity = *std::max_element(_entities.begin(), _entities.end());
+			minEntity = *std::min_element(_entities.begin(), _entities.end());
+		}
 		else
 			_maxEntity = Entity::None;
+
+		//std::sort(Util::_delIndexesScratch.begin(), Util::_delIndexesScratch.end(), std::less<short>());
+		
+		if (_entities.size() == 0) return;
+
+		int start = Entity::ToIndex(minEntity);
+		int end = Entity::ToIndex(_maxEntity);
+
+		int iter = 0;
+		for (short index : Util::_delIndexesScratch)
+		{
+			index -= iter++;
+			for (int i = start; i <= end; ++i)
+			{
+				if (_entityToIndexMap[i] > index)
+					--_entityToIndexMap[i];
+			}
+		}
 	}
 
 	size_t GetMemoryUsage() const

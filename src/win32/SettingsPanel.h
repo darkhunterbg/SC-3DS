@@ -105,6 +105,11 @@ void DrawSettings()
 
 		ImGui::Checkbox("Show Colliders", &scene->GetEntityManager().KinematicSystem.ShowColliders);
 
+		if (ImGui::Button("Kill Seleced Units"))
+		{
+			scene->GetEntityManager().DeleteEntities(scene->GetView().GetSelection(), false);
+		}
+
 		ImGui::Separator();
 
 		int player = 0;
@@ -120,7 +125,6 @@ void DrawSettings()
 			if (p.id == scene->GetView().GetPlayer())
 				player = p.id.i;
 		}
-
 
 		ImGui::SetNextItemWidth(250);
 		if (ImGui::Combo("Player", &player, playersString.data(), players.size(), 500))

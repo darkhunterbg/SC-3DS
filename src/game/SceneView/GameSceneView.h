@@ -33,6 +33,8 @@ private:
 
 	Color GetAlliedUnitColor(EntityId id);
 	void UpdateSelection();
+
+	void OnEntitiesDeleted(const std::vector<EntityId>& entities);
 public:
 	GameSceneView(GameScene* scene);
 
@@ -40,6 +42,11 @@ public:
 	inline PlayerId GetPlayer() const { return _player; }
 	inline Camera& GetCamera() { return _camera; }
 	const PlayerInfo& GetPlayerInfo() const;
+
+	inline const std::vector<EntityId>& GetSelection() const
+	{
+		return _unitSelection;
+	}
 
 	void Update();
 	void Draw();

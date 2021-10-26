@@ -61,10 +61,12 @@ void EntityManager::ClearEntities()
 
 	for (auto& system : _systems)
 		system->DeleteEntities(toDelete);
+	
+	if (OnEntitiesDeleted != nullptr)
+		OnEntitiesDeleted(toDelete);
 
 	toDelete.clear();
 	entities.ClearEntities();
-
 }
 
 void EntityManager::ApplyEntityChanges()
@@ -75,6 +77,9 @@ void EntityManager::ApplyEntityChanges()
 
 		for (auto& system : _systems)
 			system->DeleteEntities(toDelete);
+
+		if (OnEntitiesDeleted != nullptr)
+			OnEntitiesDeleted(toDelete);
 
 		entities.DeleteSortedEntities(toDelete);
 		toDelete.clear();

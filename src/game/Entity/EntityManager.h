@@ -50,6 +50,7 @@ private:
 	std::array<Vector2Int16, Entity::MaxEntities> _positions;
 	std::array<uint8_t, Entity::MaxEntities> _orientations;
 public:
+	std::function<void(const std::vector<EntityId>&)> OnEntitiesDeleted;
 
 	bool DrawGrid = false;
 	bool DrawBoundingBoxes = false;

@@ -29,6 +29,7 @@ const Font* Game::SystemFont12;
 const Font* Game::SystemFont10;
 const Font* Game::SystemFont8;
 GameInputSchema* Game::_input;
+bool Game::_exit = false;
 
 AudioClip* Game::ButtonAudio;
 
@@ -100,6 +101,7 @@ void Game::FrameEnd()
 
 void Game::Start(GameStartSettings settings)
 {
+	_exit = false;
 	_platformInfo = Platform::GetPlatformInfo();
 
 	JobSystem::Init();
@@ -124,6 +126,7 @@ void Game::Start(GameStartSettings settings)
 }
 bool Game::Update()
 {
+	if (_exit) return false;
 	//SectionProfiler p("Update");
 
 	SwithScenes();
@@ -135,6 +138,8 @@ bool Game::Update()
 	if (currentScene)
 		currentScene->Update();
 
+	if (_exit) return false;
+
 	if (SwithScenes())
 	{
 		// Run another update for the new scene
@@ -142,20 +147,18 @@ bool Game::Update()
 			currentScene->Update();
 	}
 
-	//p.Submit();
-
-	return true;
+	return !_exit;
 }
 
 void Game::Draw()
 {
+	if (_exit) return;
+
 	//SectionProfiler p("Draw");
 	GraphicsRenderer::NewFrame();
 
 	if (currentScene)
 		currentScene->Draw();
-
-	//p.Submit();
 
 	if (ShowPerformanceStats)
 		Profiler::ShowPerformance();
@@ -163,6 +166,8 @@ void Game::Draw()
 	GUI::FrameEnd();
 
 	GraphicsRenderer::EndFrame();
+
+	if (_exit) return;
 }
 
 void Game::End()
@@ -172,9 +177,7 @@ void Game::End()
 
 	currentScene = nullptr;
 
-
 	GUI::CleanResources();
-
 }
 
 void Game::SetCurrentScene(Scene* scene)
@@ -204,5 +207,10 @@ void Game::PlatformUpdated()
 GameInputSchema& Game::GetInput()
 {
 	return *_input;
+}
+
+void Game::Exit()
+{
+	_exit = true;
 }
 

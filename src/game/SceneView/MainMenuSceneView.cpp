@@ -8,6 +8,8 @@
 #include "../Platform.h"
 #include "../Engine/AssetLoader.h"
 
+#include "../Scenes/GameScene.h"
+
 MainMenuSceneView::MainMenuSceneView(MainMenuScene* scene) :
 	_scene(scene)
 {
@@ -51,6 +53,10 @@ void MainMenuSceneView::Draw()
 	GUIVideo::DrawVideo("single", *_single, true);
 
 	GUILabel::DrawText(*_mmFont, "Single Player", { -26,16 }, GUIHAlign::Right, GUIVAlign::Bottom, buttonColor);
+
+	if (GUI::IsLayoutActivated())
+		Game::SetCurrentScene(new GameScene());
+
 	GUI::EndLayout();
 
 	buttonColor = Colors::UIMenuGreen;
@@ -66,6 +72,10 @@ void MainMenuSceneView::Draw()
 	}
 
 	GUILabel::DrawText(*_mmFont, "Multiplayer", { 0,0 }, GUIHAlign::Left, GUIVAlign::Top, buttonColor);
+
+	if (GUI::IsLayoutActivated())
+		Game::SetCurrentScene(new GameScene());
+
 	GUI::EndLayout();
 
 
@@ -89,6 +99,12 @@ void MainMenuSceneView::Draw()
 	}
 
 	GUILabel::DrawText(*_mmFont, "Exit", { -50,-8 }, GUIHAlign::Right, GUIVAlign::Top, buttonColor);
+
+	if (GUI::IsLayoutActivated())
+	{
+		Game::Exit();
+	}
+
 	GUI::EndLayout();
 
 	buttonColor = Colors::UIMenuGreen;
@@ -100,7 +116,10 @@ void MainMenuSceneView::Draw()
 
 
 	if (Game::GetInput().IsUsingMouse())
+	{
+		_cursor.Update();
 		_cursor.Draw();
+	}
 
 	if (Game::GetPlatformInfo().Type == PlatformType::Nintendo3DS)
 	{

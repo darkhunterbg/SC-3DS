@@ -23,6 +23,7 @@ struct AbstractScreen {
 struct AbstractPointer {
 	bool SameAsCursor = false;
 	Vector2Int Position;
+	Vector2Int NativePosition;
 	int ScreenReference = 0;
 	bool InsideScreen = false;
 };

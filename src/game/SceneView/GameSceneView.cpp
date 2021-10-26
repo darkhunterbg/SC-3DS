@@ -11,7 +11,6 @@
 #include "../Scenes/GameScene.h"
 
 
-
 GameSceneView::GameSceneView(GameScene* scene) : _scene(scene)
 {
 	Vector2Int16 size = _scene->GetEntityManager().MapSystem.GetSize();
@@ -21,6 +20,8 @@ GameSceneView::GameSceneView(GameScene* scene) : _scene(scene)
 	_cursor.MultiSelectionEnabled = true;
 	_cursor.UsingLimits = true;
 	_cursor.DrawMultiSelection = false;
+
+	_scene->GetEntityManager().OnEntitiesDeleted = [this](auto& a) { OnEntitiesDeleted(a); };
 
 	SetPlayer(_scene->GetEntityManager().MapSystem.ActivePlayer);
 }
@@ -48,6 +49,23 @@ Color GameSceneView::GetAlliedUnitColor(EntityId id)
 		return Colors::UIDarkRed;
 
 	return Colors::UIDarkYellow;
+}
+void GameSceneView::OnEntitiesDeleted(const std::vector<EntityId>& entities)
+{
+	if (_unitSelection.size() == 0) return;
+
+	for (EntityId id : entities)
+	{
+		for (int i = 0; i < _unitSelection.size(); ++i)
+		{
+			EntityId unit = _unitSelection[i];
+			if (unit == id)
+			{
+				_unitSelection.erase(_unitSelection.begin() + i);
+				--i;
+			}
+		}
+	}
 }
 void GameSceneView::UpdateSelection()
 {
@@ -101,6 +119,17 @@ void GameSceneView::UpdateSelection()
 			{
 				_unitSelection.push_back(_temp[0]);
 			}
+		}
+	}
+
+	// Dynamic selection update;
+	for (int i = 0; i < _unitSelection.size(); ++i)
+	{
+		EntityId id = _unitSelection[i];
+		if (!_scene->GetEntityManager().DrawSystem.GetComponent(id).visible)
+		{
+			_unitSelection.erase(_unitSelection.begin() + i);
+			--i;
 		}
 	}
 

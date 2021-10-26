@@ -5,6 +5,7 @@
 #include <SDL.h>
 #include <SDL_gpu.h>
 
+#include "ImGui/imgui.h"
 
 #ifdef _WIN32
 extern bool Win32GetCursorPosition(int& x, int& y);
@@ -82,9 +83,11 @@ void AbstractPlatform::UpdateInput(SDL_Window* window)
 
 #endif
 
+
 	auto& screen = Screens[Pointer.ScreenReference];
 	Pointer.InsideScreen = Rectangle(screen.NativePosition, screen.NativeResolution).Contains(pos);
-
+	Pointer.NativePosition = pos;
+	
 	pos -= screen.NativePosition;
 
 	//state.Touch = buttonState & SDL_BUTTON(SDL_BUTTON_LEFT);
@@ -98,6 +101,16 @@ void AbstractPlatform::UpdateInput(SDL_Window* window)
 
 
 	Pointer.Position = pos;
+
+	if (Pointer.SameAsCursor)
+	{
+		for (auto& s : Screens)
+		{
+			Rectangle r = { s.NativePosition, s.NativeResolution };
+			if (r.Contains(Pointer.NativePosition))
+				ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+		}
+	}
 }
 
 void AbstractPlatform::Draw(GPU_Target* screen)

@@ -210,11 +210,7 @@ void ObjectDrawSystem::UpdateSelection(const std::vector<EntityId> selection, Co
 	{
 		_selection.push_back({ id, Color32(color) });
 	}
-
-	// Also draw HP bars based on selection
 }
-
-
 
 void ObjectDrawSystem::DeleteEntities(std::vector<EntityId>& entities)
 {

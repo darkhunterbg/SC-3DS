@@ -108,8 +108,10 @@ int main(int argc, char** argv)
 	{
 		ImGui::NewFrame();
 
+	
 		abstractPlatform.UpdateScreens(screen);
 		abstractPlatform.UpdateInput(window);
+
 
 		Game::FrameStart();
 
