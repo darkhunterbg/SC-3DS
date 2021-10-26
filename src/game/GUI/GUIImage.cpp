@@ -1,6 +1,7 @@
 #include "GUIImage.h"
 #include "../Engine/GraphicsRenderer.h"
 #include "../Platform.h"
+#include "../Util.h"
 
 struct AnimationData {
 	const Image* image = nullptr;
@@ -102,4 +103,10 @@ void GUIImage::DrawAnimatedImage(const char* id, const Image& image, int* frameS
 	GUI::BeginAbsoluteLayout(rect);
 	DrawImageFrame(frame, color);
 	GUI::EndLayout();
+}
+
+void GUIImage::DrawBorder(int bordeThickness, Color color)
+{
+	Rectangle rect = GUI::GetLayoutSpace();
+	Util::DrawTransparentRectangle(rect, bordeThickness, color);
 }

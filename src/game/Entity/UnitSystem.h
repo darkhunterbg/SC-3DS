@@ -12,11 +12,13 @@ struct UnitComponent {
 	PlayerId owner;
 	const UnitDef* def;
 	uint8_t vision = 2;
+	uint8_t armor = 0;
 	int16_t usedSupply = 0;
 	int16_t providedSupply = 0;
 	int16_t health;
 	int16_t maxHealth;
 	int16_t kills = 0;
+	uint16_t damage[2] = { 0,0 };
 };
 
 class UnitSystem : public IEntitySystem {

@@ -160,6 +160,8 @@ void Game::Draw()
 	if (ShowPerformanceStats)
 		Profiler::ShowPerformance();
 
+	GUI::FrameEnd();
+
 	GraphicsRenderer::EndFrame();
 }
 

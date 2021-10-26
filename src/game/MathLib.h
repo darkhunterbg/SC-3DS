@@ -340,6 +340,13 @@ struct Rectangle
 		return v.x <= position.x + size.x && v.x >= position.x &&
 			v.y <= position.y + size.y && v.y >= position.y;
 	}
+	inline void Shrink(const Vector2Int& size)
+	{
+		Vector2Int move = size << 1;
+		move = move.Ceil(this->size.x, this->size.y);
+		this->size -= move;
+		this->position += move >> 1;
+	}
 
 	void Restrict(Vector2Int min, Vector2Int max)
 	{

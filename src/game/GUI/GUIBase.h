@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <memory>
 #include <bitset>
+#include <functional>>
 
 enum class GUIHAlign {
 	Left = 0,
@@ -37,6 +38,8 @@ public:
 
 	std::vector<Rectangle> SpaceStack;
 	std::unordered_map<std::string, Resource> Resources;
+	std::vector < std::function<void()>> ExecAtEndOfFrame;
+
 	double VideoPlaybackCooldown = 16.6;
 	int ImageAnimationTimer = 6;
 
@@ -107,6 +110,7 @@ public:
 	static void RegisterResource(const std::string& key, void* resource, void (*freeFunc)(void*));
 
 	static void CleanResources();
+	static void FrameEnd();
 
 	static bool IsLayoutHover();
 	static bool IsLayoutActivated();
@@ -129,5 +133,11 @@ public:
 	static Vector2Int GetPointerPosition();
 
 	static void DrawLayoutDebug();
+
+	static void DrawAtEndOfFrame(std::function<void()> func)
+	{
+		_state->ExecAtEndOfFrame.push_back(func);
+	}
+
 };
 

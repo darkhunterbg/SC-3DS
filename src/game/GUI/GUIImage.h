@@ -18,4 +18,6 @@ public:
 	static void DrawColorAbsolute(Rectangle rect, Color color);
 
 	static void DrawAnimatedImage(const char* id, const Image& image,int* frameState, Color color = Colors::White);
+
+	static void DrawBorder(int bordeThickness, Color color);
 };

@@ -9,6 +9,9 @@
 struct UnitItemInfo {
 	const ImageFrame* sprite;
 	uint8_t counter;
+	const char* name = nullptr;
+	const char* statName = nullptr;
+	int stat = 0;
 };
 
 void static GetUnitWireframeColors(EntityId id, const UnitComponent& unit, Color outColors[4])
@@ -65,7 +68,7 @@ void static GetUnitWireframeColors(EntityId id, const UnitComponent& unit, Color
 	}
 }
 
-void SelectionInfoPanel::Draw( std::vector<EntityId>& selection, const RaceDef& skin)
+void SelectionInfoPanel::Draw(std::vector<EntityId>& selection, const RaceDef& skin)
 {
 	if (selection.size() == 0) return;
 
@@ -106,12 +109,12 @@ void SelectionInfoPanel::DrawMultiselection(std::vector<EntityId>& selection)
 {
 	static constexpr const int Columns = 6;
 	static constexpr const int Rows = 2;
-	
+
 	_temp.clear();
 	_temp.insert(_temp.end(), selection.begin(), selection.end());
 
 	const ImageFrame& f = _raceDef->CommandIcons->GetFrame(14);
-	int max = std::min((int)_temp.size(), Columns* Rows);
+	int max = std::min((int)_temp.size(), Columns * Rows);
 
 	Vector2 space = Vector2(GUI::GetLayoutSpace().size);
 	space.x -= f.size.x * Columns;
@@ -127,7 +130,7 @@ void SelectionInfoPanel::DrawMultiselection(std::vector<EntityId>& selection)
 
 		GUI::BeginRelativeLayout(offset, Vector2Int(f.size), GUIHAlign::Left, GUIVAlign::Top);
 		GUIImage::DrawImageFrame(f);
-	
+
 		Color wfColor[4];
 		GetUnitWireframeColors(id, unit, wfColor);
 
@@ -171,13 +174,20 @@ void SelectionInfoPanel::DrawUnitDetails(EntityId id)
 	{
 		info[infoCount].sprite = &unit.def->TechTree.GetArmorUpgrade()->GetIcon();
 		info[infoCount].counter = 0;
+		info[infoCount].name = unit.def->TechTree.GetArmorUpgrade()->Name;
+		info[infoCount].statName = "Armor";
+		info[infoCount].stat = unit.armor;
 		++infoCount;
 	}
 
+	int i = 0;
 	for (const UnitAttack& atk : unit.def->GetAttacks())
 	{
 		info[infoCount].sprite = &atk.GetWeapon()->GetIcon();
 		info[infoCount].counter = 0;
+		info[infoCount].name = atk.GetWeapon()->Name;
+		info[infoCount].statName = "Damage";
+		info[infoCount].stat = unit.damage[i++];
 		++infoCount;
 	}
 
@@ -199,6 +209,15 @@ void SelectionInfoPanel::DrawUnitDetails(EntityId id)
 		GUI::BeginRelativeLayout({ -4,-2 }, { 12,10 }, GUIHAlign::Right, GUIVAlign::Bottom);
 		GUILabel::DrawText(font2, _buffer, GUIHAlign::Center, GUIVAlign::Top, Colors::UILightGray);
 		GUI::EndLayout();
+
+		if (GUI::IsLayoutHover())
+		{
+			if (info[i].statName != nullptr)
+				stbsp_snprintf(_buffer, sizeof(_buffer), "%s\n%s: %i", info[i].name, info[i].statName, info[i].stat);
+			else
+				stbsp_snprintf(_buffer, sizeof(_buffer), "%s", info[i].name);
+			GUITooltip::DrawTextTooltip("Tooltip", font2, _buffer);
+		}
 
 		GUI::EndLayout();
 

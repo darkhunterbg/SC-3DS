@@ -54,6 +54,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIBase.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIImage.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUILabel.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUITooltip.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIVideo.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\BinaryData.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\smacker.h" />
@@ -117,6 +118,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIBase.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIImage.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUILabel.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUITooltip.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIVideo.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\BinaryData.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\smacker.c" />

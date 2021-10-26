@@ -52,7 +52,6 @@ void Cursor::Update()
 	Rectangle l = { {0,0},screenSize };
 	if (UsingLimits)
 		l = Limits;
-	
 
 	if (Game::GetInput().IsUsingMouse())
 		Position = GUI::GetMousePosition();
@@ -63,7 +62,6 @@ void Cursor::Update()
 
 	Position.x = std::min(std::max(l.GetMin().x, Position.x), l.GetMax().x);
 	Position.y = std::min(std::max(l.GetMin().y, Position.y), l.GetMax().y);
-
 
 	_corner = { 0,0 };
 
@@ -102,9 +100,13 @@ Rectangle Cursor::GetHoldRect()
 {
 	Vector2Int size = (Position - _holdStart).Abs();
 	Vector2Int center = (Position + _holdStart) / 2;
+	size.x = std::max(1, size.x);
+	size.y = std::max(1, size.y);
 
 	Rectangle rect = { {0,0}, size };
 	rect.SetCenter(center);
+
+	
 
 	return rect;
 }

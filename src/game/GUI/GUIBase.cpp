@@ -102,6 +102,16 @@ void GUI::CleanResources()
 	state.Resources.clear();
 }
 
+void GUI::FrameEnd()
+{
+	for (auto& func : GetState().ExecAtEndOfFrame)
+	{
+		func();
+	}
+
+	GetState().ExecAtEndOfFrame.clear();
+}
+
 bool GUI::IsLayoutHover()
 {
 	Rectangle layout = GetLayoutSpace();
