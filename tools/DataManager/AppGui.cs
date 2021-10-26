@@ -20,6 +20,15 @@ namespace DataManager
 		public IEnumerator crt;
 		public volatile bool done = false;
 
+		// Danger, can cause deadlock if used on GUI thread
+		public void Wait()
+		{
+			if (!System.Threading.Thread.CurrentThread.IsBackground)
+				throw new Exception("Tried to wait GuiCoroutine on main thread!");
+
+			while (!done) System.Threading.Thread.Sleep(1);
+		}
+
 	}
 
 	public class AppGuiWindow
@@ -49,8 +58,7 @@ namespace DataManager
 
 		public static GuiCoroutine RunGuiCoroutine(IEnumerator crt)
 		{
-			lock (AppGame.Gui.coroutines)
-			{
+			lock (AppGame.Gui.coroutines) {
 				GuiCoroutine c = new GuiCoroutine()
 				{
 					crt = crt
@@ -60,6 +68,19 @@ namespace DataManager
 			}
 		}
 
+		static IEnumerator RunOnUICrt(Action action)
+		{
+			yield return null;
+			action();
+		}
+
+		public static GuiCoroutine RunGuiCoroutine(Action action)
+		{
+			return RunGuiCoroutine(RunOnUICrt(action));
+		}
+
+		private bool _ready = false;
+
 		public AppGui(AppGame game)
 		{
 			Game = game;
@@ -67,28 +88,15 @@ namespace DataManager
 			BackBuffer = new RenderTarget2D(game.GraphicsDevice, 1, 1);
 			guiRenderTarget = AppGame.GuiRenderer.BindTexture(BackBuffer);
 
-			var types = GetType().Assembly.GetTypes().Where(t => !t.IsAbstract && !t.IsInterface && t.IsAssignableTo(typeof(IGuiPanel)))
-				.ToList();
 
-			foreach (var t in types)
-			{
-				var p = Activator.CreateInstance(t) as IGuiPanel;
-				var window = new AppGuiWindow()
-				{
-					Name = p.WindowName,
-					Panel = p,
-				};
-
-				windows.Add(window);
-			}
 		}
+
+
 
 		private void ResizeRenderTarget(Vector2 size)
 		{
-			if (BackBuffer.Width != size.X || BackBuffer.Height != size.Y)
-			{
-				if (size.X > 1 && size.Y > 1)
-				{
+			if (BackBuffer.Width != size.X || BackBuffer.Height != size.Y) {
+				if (size.X > 1 && size.Y > 1) {
 
 					AppGame.GuiRenderer.UnbindTexture(guiRenderTarget);
 					BackBuffer.Dispose();
@@ -124,25 +132,55 @@ namespace DataManager
 			UpdateInput();
 
 			EditorFieldDrawer.ResetIds();
-			
+
 			EditorModalSelect.DrawSelectItemModal();
 
-			foreach (var win in windows)
-			{
-				ImGui.SetNextWindowSize(new Vector2(800, 600), ImGuiCond.FirstUseEver);
+			if (Ready()) {
 
-				if (ImGui.Begin(win.Name))
-				{
-					win.Panel.Draw(clientSize);
-					ImGui.End();
+				foreach (var win in windows) {
+					ImGui.SetNextWindowSize(new Vector2(800, 600), ImGuiCond.FirstUseEver);
+
+					if (ImGui.Begin(win.Name)) {
+						win.Panel.Draw(clientSize);
+						ImGui.End();
+					}
 				}
 			}
-
 			TooltipForObject(HoverObject);
 
 			UpdateCoroutines();
 
 			AppGame.Device.SetRenderTarget(null);
+		}
+
+		private bool Ready()
+		{
+			if (_ready)
+				return true;
+
+			if (Game.StartupOperation != null && !Game.StartupOperation.Completed) {
+				ProgressDialog(Game.StartupOperation);
+			} else {
+
+				if (!_ready) {
+					var types = GetType().Assembly.GetTypes().Where(t => !t.IsAbstract && !t.IsInterface && t.IsAssignableTo(typeof(IGuiPanel)))
+	.ToList();
+
+					foreach (var t in types) {
+						var p = Activator.CreateInstance(t) as IGuiPanel;
+						var window = new AppGuiWindow()
+						{
+							Name = p.WindowName,
+							Panel = p,
+						};
+
+						windows.Add(window);
+					}
+					_ready = true;
+				}
+			}
+
+			return _ready;
 		}
 
 		private void UpdateInput()
@@ -160,11 +198,9 @@ namespace DataManager
 
 		public bool UpdateCoroutines()
 		{
-			for (int i = 0; i < coroutines.Count; ++i)
-			{
+			for (int i = 0; i < coroutines.Count; ++i) {
 				var crt = coroutines[i];
-				if (!crt.crt.MoveNext())
-				{
+				if (!crt.crt.MoveNext()) {
 					crt.done = true;
 					coroutines.RemoveAt(i--);
 				}
@@ -184,14 +220,10 @@ namespace DataManager
 		public static SpriteBatch SpriteBatchBegin(Vector2 size, SamplerState? samplerState =
 			null, float aspectRatio = 0)
 		{
-			if (aspectRatio != 0)
-			{
-				if (size.X > size.Y)
-				{
+			if (aspectRatio != 0) {
+				if (size.X > size.Y) {
 					size.X = size.Y * aspectRatio;
-				}
-				else if (size.Y > size.X)
-				{
+				} else if (size.Y > size.X) {
 					size.Y = size.X * aspectRatio;
 				}
 			}
@@ -231,8 +263,7 @@ namespace DataManager
 				return;
 
 
-			if (obj is ImageList imgList)
-			{
+			if (obj is ImageList imgList) {
 				ImGui.BeginTooltip();
 
 				DrawImageListInfo(imgList);
@@ -241,10 +272,8 @@ namespace DataManager
 				return;
 			}
 
-			if (obj is ImageListRef imgRef)
-			{
-				if (imgRef.Image != null)
-				{
+			if (obj is ImageListRef imgRef) {
+				if (imgRef.Image != null) {
 					ImGui.BeginTooltip();
 
 					DrawImageListInfo(imgRef.Image);
@@ -254,8 +283,7 @@ namespace DataManager
 				return;
 			}
 
-			if (obj is ImageFrame frame)
-			{
+			if (obj is ImageFrame frame) {
 				ImGui.BeginTooltip();
 				DrawImageFrameInfo(frame);
 				ImGui.EndTooltip();
@@ -263,10 +291,8 @@ namespace DataManager
 			}
 
 
-			if (obj is ImageFrameRef imgFrameRef)
-			{
-				if (imgFrameRef.Frame != null)
-				{
+			if (obj is ImageFrameRef imgFrameRef) {
+				if (imgFrameRef.Frame != null) {
 					ImGui.BeginTooltip();
 
 					DrawImageFrameInfo(imgFrameRef.Frame);
@@ -283,8 +309,7 @@ namespace DataManager
 			ImGui.Text($"Dimensions: {list.FrameSize.X}x{list.FrameSize.Y}");
 			ImGui.SameLine();
 			ImGui.Text($"Frames: {list.Frames.Count}");
-			if (list.HasUnitColor)
-			{
+			if (list.HasUnitColor) {
 				ImGui.SameLine();
 				ImGui.Text($"With unit coloring.");
 			}
@@ -295,8 +320,7 @@ namespace DataManager
 			else if (list.FrameSize.X > 200 || list.FrameSize.Y > 200)
 				scale = 0.5f;
 
-			for (int i = 0; i < list.Frames.Count; ++i)
-			{
+			for (int i = 0; i < list.Frames.Count; ++i) {
 				var tex = AppGame.AssetManager.GetImageFrame(list.Key, i);
 
 				if (i % 16 > 0)
@@ -322,19 +346,33 @@ namespace DataManager
 		}
 		public static bool ProgressDialog(string text, float progress, bool cancelable = false)
 		{
+			return ProgressDialog(null, text, progress, cancelable);
+		}
+		public static bool ProgressDialog(string title, string text, float progress, bool cancelable = false)
+		{
 			bool result = true;
 			ImGui.OpenPopup("Generic.ProgressBar");
 			bool open = true;
 			ImGui.BeginPopupModal("Generic.ProgressBar", ref open, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar);
-			ImGui.Text(text);
-			ImGui.ProgressBar(progress, new Vector2(400, 40));
-			if (cancelable)
-			{
+			if (!string.IsNullOrEmpty(title))
+				ImGui.Text(title);
+			if (!string.IsNullOrEmpty(text))
+				ImGui.Text(text);
+			ImGui.ProgressBar(progress, new Vector2(600, 40));
+			if (cancelable) {
 				result = !ImGui.Button("Cancel");
 			}
 			ImGui.EndPopup();
 
 			return result;
+		}
+		public static bool ProgressDialog(AsyncOperation op, bool cancelable = false)
+		{
+			bool running = ProgressDialog(op.Title + $" ({op.ElaspedTime:hh\\:mm\\:ss})", op.ItemName, op.Progress, cancelable);
+			if (!running)
+				op.Cancel();
+
+			return running;
 		}
 	}
 }

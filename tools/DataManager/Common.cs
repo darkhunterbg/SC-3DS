@@ -89,13 +89,25 @@ namespace DataManager
 	}
 	public class AsyncOperation
 	{
+		private TimeSpan _start;
+
 		private Exception ex = null;
 		private volatile bool completed = false;
 
+		public volatile string Title = string.Empty;
 		public volatile string ItemName = string.Empty;
 
 		public volatile float Progress = 0;
 
+		public void SetProgress(int current,int max)
+		{
+			Progress = (float)current / (float)max;
+		}
+		public void SetProgress(string item, int current, int max)
+		{
+			ItemName = item;
+			Progress = (float)current / (float)max;
+		}
 
 		public bool Completed
 		{
@@ -120,9 +132,14 @@ namespace DataManager
 				onCancelled();
 		}
 
+		public TimeSpan ElaspedTime => DateTime.Now.TimeOfDay - _start;
+
 		public AsyncOperation(Action<AsyncOperation> action, Action onCancelled = null)
 		{
 			this.onCancelled = onCancelled;
+
+			_start = DateTime.Now.TimeOfDay;
+
 			Task.Run(() =>
 			{
 				try
@@ -137,6 +154,7 @@ namespace DataManager
 				completed = true;
 			}).ConfigureAwait(false);
 		}
+
 	}
 
 

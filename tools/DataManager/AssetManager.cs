@@ -72,7 +72,7 @@ namespace DataManager
 
 		public static readonly string SpriteAtlasOutDir = $"{CookedAssetsPCDir}atlases\\";
 		public static readonly string BuildDataFile = $"data.bin";
-	
+
 
 		public static readonly string SpriteAtlas3DSBuildDir = $"{Cooked3DSAssetsDir}\\atlases\\";
 		public static readonly string tex3dsPath = "C:\\devkitPro\\tools\\bin\\tex3ds.exe";
@@ -98,6 +98,9 @@ namespace DataManager
 		};
 
 		public Dictionary<Type, IAssetDatabase> Assets { get; private set; } = new Dictionary<Type, IAssetDatabase>();
+
+		public event Action OnReloaded;
+		public event Action OnAssetsReloaded;
 
 		public AssetManager()
 		{
@@ -143,34 +146,27 @@ namespace DataManager
 			return (Assets[typeof(TAsset)] as AssetDatabase<TAsset>).Assets;
 		}
 
-		public void LoadEverything()
+		public AsyncOperation LoadEverythingAsync()
 		{
-			LoadPalettes();
-			LoadImageLists();
-			LoadAduioClips();
+			return new AsyncOperation(ReloadEverything);
+		}
 
-			var iconsSheet = ImageLists.FirstOrDefault(s => s.Key == "unit\\cmdbtns\\cmdicons");
-			if (iconsSheet != null)
-			{
-				Icons.AddRange(iconsSheet.Frames);
-			}
+		public void ReloadEverything(AsyncOperation op = null)
+		{
+			op.Title = "Loading palettes";
+			LoadPalettes(op);
+			op.Title = "Loading image lists";
+			LoadImageLists(op);
+			op.Title = "Loading image audio clips";
+			LoadAduioClips(op);
 
-
-			foreach (var s in CustomEnumValues.SelectionTypes)
-			{
-				string sheet = s;
-				sheet = sheet.Substring(0, sheet.Length - 2);
-				if (sheet.Length < 3)
-					sheet = $"0{sheet}";
-				sheet = $"unit\\thingy\\o{sheet}";
-
-				var ss = AppGame.AssetManager.ImageLists.FirstOrDefault(f => f.Key == sheet);
-				if (ss == null)
-					continue;
-				UnitSelection.Add(ss.Frames[0]);
-			}
+			op.Title = "Finalizing";
+			op.ItemName = "Reloading assets...";
+			op.Progress = 0.9f;
 
 			ReloadAssets();
+
+			OnReloaded?.Invoke();
 
 			//SaveAllAssets();
 		}
@@ -180,6 +176,7 @@ namespace DataManager
 			foreach (var db in Assets.Values)
 				db.Reload();
 
+			OnAssetsReloaded?.Invoke();
 		}
 
 		public void SaveAllAssets()
@@ -188,44 +185,92 @@ namespace DataManager
 				db.Save();
 		}
 
-		public void LoadImageLists()
+		public void LoadImageLists(AsyncOperation op)
 		{
 			ImageLists.Clear();
 
-			foreach (var file in Directory.GetFiles(ExtractedAssetsDir, "info.txt", SearchOption.AllDirectories))
-			{
-				ImageLists.Add(ImageList.FromInfoFile(file));
+			string[] imageLists = null;
+			int count = 0;
+			try {
+
+				imageLists = Directory.GetFiles(ExtractedAssetsDir, "info.txt", SearchOption.AllDirectories);
+				count = 0;
+				foreach (var file in imageLists) {
+					op.SetProgress(file, ++count, imageLists.Length);
+					ImageLists.Add(ImageList.FromInfoFile(file));
+				}
+
+				List<string> ignore = ImageLists.SelectMany(s => s.Frames).Select(s => s.FrameFilePath).ToList();
+
+
+				imageLists = Directory.GetFiles(ExtractedAssetsDir, "*.png", SearchOption.AllDirectories);
+				count = 0;
+				foreach (var file in imageLists) {
+
+					op.SetProgress(file, ++count, imageLists.Length);
+
+					if (ignore.Contains(file))
+						continue;
+
+					ImageLists.Add(ImageList.FromPng(file, isExtracted: true));
+				}
+			} catch (SixLabors.ImageSharp.ImageFormatException) {
+
+				op.Title = "Corrupted extracted assets detected!";
+				op.ItemName = "Cleaning extracted assets...";
+				op.Progress = 0.5f;
+				Directory.Delete(ExtractedAssetsDir, true);
+				Directory.CreateDirectory(ExtractedAssetsDir);
 			}
 
-			List<string> ignore = ImageLists.SelectMany(s => s.Frames).Select(s => s.FrameFilePath).ToList();
+			imageLists = Directory.GetFiles(AssetsDir, "*.png", SearchOption.AllDirectories);
+			count = 0;
+			foreach (var file in imageLists) {
+				op.SetProgress(file, ++count, imageLists.Length);
 
-			foreach (var file in Directory.GetFiles(ExtractedAssetsDir, "*.png", SearchOption.AllDirectories)) {
-
-				if (ignore.Contains(file))
-					continue;
-				
-
-				ImageLists.Add(ImageList.FromPng(file, isExtracted: true));
-			}
-
-			foreach (var file in Directory.GetFiles(AssetsDir, "*.png", SearchOption.AllDirectories))
-			{
 				if (file.StartsWith(SpriteAtlasOutDir))
 					continue;
 
 				ImageLists.Add(ImageList.FromPng(file));
 			}
 
+
+			Icons.Clear();
+			var iconsSheet = ImageLists.FirstOrDefault(s => s.Key == "unit\\cmdbtns\\cmdicons");
+			if (iconsSheet != null) {
+				op.ItemName = iconsSheet.Key;
+				Icons.AddRange(iconsSheet.Frames);
+			}
+
+
+			UnitSelection.Clear();
+			foreach (var s in CustomEnumValues.SelectionTypes) {
+				string sheet = s;
+				sheet = sheet.Substring(0, sheet.Length - 2);
+				if (sheet.Length < 3)
+					sheet = $"0{sheet}";
+				sheet = $"unit\\thingy\\o{sheet}";
+
+				op.ItemName = sheet;
+
+				var ss = AppGame.AssetManager.ImageLists.FirstOrDefault(f => f.Key == sheet);
+				if (ss == null)
+					continue;
+				UnitSelection.Add(ss.Frames[0]);
+			}
 		}
 
-		public void LoadAduioClips()
+		public void LoadAduioClips(AsyncOperation op)
 		{
 			AudioClips.Clear();
 
-			foreach (var subDir in AudioSearchDirs)
-			{
-				foreach (var file in Directory.GetFiles(Path.Combine(AudioDir, subDir), "*.wav", SearchOption.AllDirectories))
-				{
+
+			foreach (var subDir in AudioSearchDirs) {
+				var files = Directory.GetFiles(Path.Combine(AudioDir, subDir), "*.wav", SearchOption.AllDirectories);
+				int count = 0;
+				foreach (var file in files) {
+
+					op.SetProgress(file, ++count, files.Length);
 
 					AudioClips.Add(new AudioClip(file));
 				}
@@ -236,8 +281,7 @@ namespace DataManager
 		{
 			loadedSheetImages.TryGetValue(key, out var images);
 
-			if (images == null)
-			{
+			if (images == null) {
 				var sheet = ImageLists.FirstOrDefault(s => s.Key == key);
 
 				if (sheet == null)
@@ -246,8 +290,7 @@ namespace DataManager
 				images = new List<GuiTexture>();
 				loadedSheetImages[key] = images;
 
-				for (int i = 0; i < sheet.Frames.Count; ++i)
-				{
+				for (int i = 0; i < sheet.Frames.Count; ++i) {
 					var tex = Texture2D.FromFile(AppGame.Device, sheet.GetFrameFilePath(i));
 					images.Add(new GuiTexture(tex));
 				}
@@ -255,10 +298,17 @@ namespace DataManager
 			return images[frameIndex];
 		}
 
-		private void LoadPalettes()
+
+		private void LoadPalettes(AsyncOperation op)
 		{
-			foreach (var file in Directory.GetFiles(PalettePath, "*.pal"))
-			{
+			Palettes.Clear();
+
+			var palettes = Directory.GetFiles(PalettePath, "*.pal");
+
+			int count = 0;
+			foreach (var file in palettes) {
+				op.SetProgress(file, ++count, palettes.Length);
+
 				var p = new Palette(file);
 				Palettes.Add(p.Name, p);
 			}
@@ -271,18 +321,15 @@ namespace DataManager
 				187, 153, 146, 104, 76,
 				66, 35, 24, 10, 0 };
 
-			for (int i = 0; i < t.Length; ++i)
-			{
+			for (int i = 0; i < t.Length; ++i) {
 				Microsoft.Xna.Framework.Color c = new Microsoft.Xna.Framework.Color(t[i], t[i], t[i], (byte)255);
 				cmdIconsPalette.Colors[i + 1] = c;
 
 			}
 
-			for (int i = 0; i < Palettes["Units"].Colors.Count; ++i)
-			{
+			for (int i = 0; i < Palettes["Units"].Colors.Count; ++i) {
 				var c = Palettes["Units"].Colors[i];
-				if (c.R == c.B && c.R > 10 && c.G == 0)
-				{
+				if (c.R == c.B && c.R > 10 && c.G == 0) {
 					Microsoft.Xna.Framework.Color remap = new Microsoft.Xna.Framework.Color(c.R, c.R, c.R, c.A);
 					Palettes["Units"].Remap(i, remap);
 				}
@@ -305,18 +352,14 @@ namespace DataManager
 		}
 		public void ConvertGRP(RawAssetEntry asset, GRPConvertMode convertMode)
 		{
-			switch (convertMode)
-			{
-				case GRPConvertMode.Wireframe:
-					{
+			switch (convertMode) {
+				case GRPConvertMode.Wireframe: {
 						HandleWireframeGRPConvert(asset);
 						break;
 					};
-				default:
-					{
+				default: {
 						var pal = Palettes[convertMode.ToString()];
 						HandleGRPConvert(asset, pal);
-
 						break;
 					}
 			}
@@ -336,8 +379,7 @@ namespace DataManager
 
 			var p = pal;
 
-			foreach (var fr in img.Frames)
-			{
+			foreach (var fr in img.Frames) {
 				string frName = i.ToString("D3") + ".png";
 				string s = Path.Combine(dst, frName);
 				++i;
@@ -350,10 +392,8 @@ namespace DataManager
 			}
 
 			i = 0;
-			foreach (var fr in img.Frames)
-			{
-				if (p.Name == "Units" && fr.UsesRemappedColors(p))
-				{
+			foreach (var fr in img.Frames) {
+				if (p.Name == "Units" && fr.UsesRemappedColors(p)) {
 					string frName = "cm_" + i.ToString("D3") + ".png";
 					string s = Path.Combine(dst, frName);
 
@@ -379,8 +419,7 @@ namespace DataManager
 			var p = Palettes["Units"];
 
 			int i = 0;
-			foreach (var fr in img.Frames)
-			{
+			foreach (var fr in img.Frames) {
 				List<string> info = new List<string>();
 				info.Add($"{img.MaxWidth} {img.MaxHeight}");
 
@@ -390,8 +429,7 @@ namespace DataManager
 				Directory.CreateDirectory(subDir);
 
 				int j = 0;
-				foreach (var wf in fr.GenerateWireframeImages(p))
-				{
+				foreach (var wf in fr.GenerateWireframeImages(p)) {
 					string wfName = j.ToString() + ".png";
 
 					string outWf = Path.Combine(subDir, wfName);

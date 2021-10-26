@@ -301,53 +301,75 @@ namespace DataManager.Panels
 
 		private IEnumerator ConvertCrt(List<AssetConverEntry> entries)
 		{
-			HashSet<Tuple<RawAssetEntry, GRPConvertMode>> convert = new HashSet<Tuple<RawAssetEntry, GRPConvertMode>>();
+			AsyncOperation op = new AsyncOperation((op) =>
+			{
+				HashSet<Tuple<RawAssetEntry, GRPConvertMode>> convert = new HashSet<Tuple<RawAssetEntry, GRPConvertMode>>();
 
-			foreach (var entry in entries) {
-				var matches = entry.GetMatches(rawAssets);
+				int count = 0;
+				op.Title = "Analyzing...";
 
-				foreach (var match in matches) {
+				foreach (var entry in entries) {
+					if (op.Cancelled) return;
 
-					if (entry.IgnorePCXPalette) {
-						if (match.IsPCX)
-							try {
+					var matches = entry.GetMatches(rawAssets);
 
-								var img = match.LoadAsImage() as PCXImage;
+					op.SetProgress(entry.Path, ++count, entries.Count);
 
-								if (img.IsPaletteFormat)
-									continue;
+					foreach (var match in matches) {
 
-							} catch (Exception ex) { }
-					}
+						if (entry.IgnorePCXPalette) {
+							if (match.IsPCX)
+								try {
 
+									var img = match.LoadAsImage() as PCXImage;
 
+									if (img.IsPaletteFormat)
+										continue;
 
-					var item = new Tuple<RawAssetEntry, GRPConvertMode>(match, entry.Mode);
+								} catch (Exception ex) { }
+						}
 
-					if (!convert.Contains(item)) {
-						convert.Add(item);
+						var item = new Tuple<RawAssetEntry, GRPConvertMode>(match, entry.Mode);
+
+						if (!convert.Contains(item)) {
+							convert.Add(item);
+						}
 					}
 				}
-			}
 
-			int i = 0;
+				count = 0;
 
-			foreach (var item in convert) {
-				if (item.Item1.IsGRP)
-					AppGame.AssetManager.ConvertGRP(item.Item1, item.Item2);
-				else
-					if (item.Item1.IsPCX)
-					AppGame.AssetManager.ConvertPCX(item.Item1);
+				op.Title = "Converting...";
+				foreach (var item in convert) {
+					if (op.Cancelled) return;
+
+					op.SetProgress(item.Item1.DisplayName, ++count, convert.Count);
+
+					var crt = AppGui.RunGuiCoroutine(() =>
+					{
+						if (item.Item1.IsGRP)
+							AppGame.AssetManager.ConvertGRP(item.Item1, item.Item2);
+						else
+							if (item.Item1.IsPCX)
+							AppGame.AssetManager.ConvertPCX(item.Item1);
+
+					});
+
+					crt.Wait();
+				}
+
+				op.Title = "Loading images...";
+
+				if (op.Cancelled) return;
+
+				AppGame.AssetManager.ReloadEverything(op);
+			});
 
 
-
-				if (!AppGui.ProgressDialog($"Converting {i++}/{convert.Count}", i, convert.Count, true))
-					break;
-
+			while (!op.Completed) {
+				AppGui.ProgressDialog(op, true);
 				yield return null;
 			}
-
-			AppGame.AssetManager.LoadImageLists();
 		}
 	}
 }

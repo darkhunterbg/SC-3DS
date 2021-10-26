@@ -28,6 +28,8 @@ namespace DataManager
 
 		private SpriteBatch sb;
 
+		public AsyncOperation StartupOperation { get; private set; }
+
 		[DllImport("SDL2.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern void SDL_MaximizeWindow(IntPtr window);
 
@@ -78,7 +80,8 @@ namespace DataManager
 			Device = _graphics.GraphicsDevice;
 
 			AssetManager = new AssetManager();
-			AssetManager.LoadEverything();
+			this.StartupOperation = AssetManager.LoadEverythingAsync();
+			//AssetManager.LoadEverything();
 			Gui = new AppGui(this);
 
 			var version = ImGui.GetVersion();

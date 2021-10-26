@@ -29,6 +29,8 @@ namespace DataManager.Panels
             tree.RootName = rootName;
             tree.NewItemAction = NewItem;
             tree.DeleteItemAction = DeleteItem;
+
+            AppGame.AssetManager.OnAssetsReloaded += () => tree.DataSource = AppGame.AssetManager.GetAssets<TAsset>();
         }
 
         private ITreeViewItem NewItem(ITreeViewItem item)

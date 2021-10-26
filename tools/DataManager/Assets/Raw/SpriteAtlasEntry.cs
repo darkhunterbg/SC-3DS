@@ -79,6 +79,8 @@ namespace DataManager.Assets.Raw
 						{
 							var props = assetDb.Type.GetProperties().Where(p => p.PropertyType == typeof(ImageListRef)).ToList();
 
+							if (props.Count == 0) continue;
+
 							foreach (var asset in assetDb.Assets)
 							{
 								foreach (var prop in props)
@@ -87,12 +89,17 @@ namespace DataManager.Assets.Raw
 									if (value == null)
 										continue;
 
-									var img = ((ImageListRef)value).Image;
+									var r = (ImageListRef)value;
+									var img = r.Image;
 									if (lists.Contains(img))
 										continue;
 
 									if (Assets.Contains(img))
 										lists.Add(img);
+									else {
+										if (Assets.Any(a => a.Key == r.Key))
+											System.Diagnostics.Debugger.Break();
+									}
 								}
 							}
 						}

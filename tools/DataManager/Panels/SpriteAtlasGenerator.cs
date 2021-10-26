@@ -41,6 +41,11 @@ namespace DataManager.Panels
 			foreach (var e in entries)
 				e.ReloadAssets();
 
+			AppGame.AssetManager.OnReloaded += () =>
+			{
+				foreach (var e in entries)
+					e.ReloadAssets();
+			};
 		}
 
 		public void Draw(Vector2 clientSize)
@@ -288,16 +293,16 @@ namespace DataManager.Panels
 
 			var op = build.BuildAtlases(entries);
 
+			op.Title = "Building atlases";
 
 			while (!op.Completed) {
-				var elapsed = TimeSpan.FromSeconds((int)timer.Elapsed.TotalSeconds);
 
-				if (!AppGui.ProgressDialog($"Building: {op.ItemName} ({elapsed.ToString("c")}) ", op.Progress, true)) {
-					op.Cancel();
+				if (!AppGui.ProgressDialog(op)) {
 					break;
-
 				}
+
 				yield return null;
+
 			}
 
 			build.Dispose();

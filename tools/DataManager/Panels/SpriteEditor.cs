@@ -51,6 +51,8 @@ namespace DataManager.Panels
 		{
 			treeView.NewItemAction = NewItem;
 			treeView.DeleteItemAction = DeleteItem;
+
+			AppGame.AssetManager.OnAssetsReloaded += () => treeView.DataSource = AppGame.AssetManager.GetAssets<SpriteAsset>();
 		}
 
 		private ITreeViewItem NewItem(ITreeViewItem item)
@@ -71,6 +73,7 @@ namespace DataManager.Panels
 
 		public void Draw(Vector2 client)
 		{
+
 			clipModified = false;
 
 			ImGui.Columns(4, "spriteeditor");
