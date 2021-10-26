@@ -35,6 +35,9 @@ class ObjectDrawSystem : public IEntitySystem {
 	EntityComponentMap<DrawComponent> _drawComponents;
 	std::vector<BatchDrawCommand> _drawCmd;
 	std::vector<ObjectSelection> _selection;
+
+
+	void DrawSelectedBars(EntityManager& em,const  Camera& camera);
 public:
 	ObjectDrawSystem();
 
