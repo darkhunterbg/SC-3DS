@@ -166,15 +166,20 @@ void GameSceneView::Update()
 	{
 		Vector2Int16 worldPos = _camera.ScreenToWorld(Vector2Int16(_cursor.Position));
 
+		// TODO: raycast masking
 		EntityId hover = _scene->GetEntityManager().KinematicSystem.PointCast(worldPos);
 		if (hover != Entity::None)
 		{
-			if (EntityUtil::IsAlly(_player, hover))
-				_cursor.SetUnitHover(CursorHoverState::Green);
-			else if (EntityUtil::IsEnemy(_player, hover))
-				_cursor.SetUnitHover(CursorHoverState::Red);
-			else
-				_cursor.SetUnitHover(CursorHoverState::Yellow);
+			// TODO: entity might not be part of drawing system
+			if (_scene->GetEntityManager().DrawSystem.GetComponent(hover).visible)
+			{
+				if (EntityUtil::IsAlly(_player, hover))
+					_cursor.SetUnitHover(CursorHoverState::Green);
+				else if (EntityUtil::IsEnemy(_player, hover))
+					_cursor.SetUnitHover(CursorHoverState::Red);
+				else
+					_cursor.SetUnitHover(CursorHoverState::Yellow);
+			}
 		}
 
 		UpdateSelection();
@@ -237,7 +242,6 @@ void GameSceneView::DrawMainScreen()
 
 		if (!_cursor.IsHolding())
 		{
-
 			GUI::BeginRelativeLayout({ 0,0 }, { 160, 160 }, GUIHAlign::Left, GUIVAlign::Bottom);
 
 			if (GUI::GetLayoutSpace().Contains(_cursor.Position))
@@ -255,6 +259,10 @@ void GameSceneView::DrawMainScreen()
 			GUI::EndLayout();
 		}
 
+
+		GUI::BeginRelativeLayout({ -169,-19 }, { 54,50 }, GUIHAlign::Right, GUIVAlign::Bottom);
+		DrawPortrait();
+		GUI::EndLayout();
 	}
 	else
 	{
@@ -285,6 +293,10 @@ void GameSceneView::DrawSecondaryScreen()
 
 	if (raceDef == nullptr) raceDef = GameDatabase::instance->GetRace(RaceType::Terran);
 
+	GUI::BeginRelativeLayout({ -18,24 }, { 54,50 }, GUIHAlign::Right, GUIVAlign::Top);
+	DrawPortrait();
+	GUI::EndLayout();
+
 	GUIImage::DrawImageFrame(raceDef->ConsoleLowerSprite);
 
 	GUI::BeginRelativeLayout({ 7,-3 }, { 113,113 }, GUIHAlign::Left, GUIVAlign::Bottom);
@@ -296,3 +308,22 @@ void GameSceneView::DrawSecondaryScreen()
 	GUI::EndLayout();
 }
 
+void GameSceneView::DrawPortrait()
+{
+	if (_unitSelection.size() == 0) return;
+
+	EntityId id = _unitSelection[0];
+
+	const UnitComponent& unit = _scene->GetEntityManager().UnitSystem.GetComponent(id);
+
+	const Image& image = *unit.def->Art.GetPortraitImage();
+	GUIImage::DrawImage(image);
+
+	if (!_cursor.IsHolding())
+	{
+		if (GUI::IsLayoutActivated())
+		{
+			_camera.SetPositionRestricted(_scene->GetEntityManager().GetPosition(id));
+		}
+	}
+}

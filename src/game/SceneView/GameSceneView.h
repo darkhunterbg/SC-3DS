@@ -33,8 +33,9 @@ private:
 
 	Color GetAlliedUnitColor(EntityId id);
 	void UpdateSelection();
-
 	void OnEntitiesDeleted(const std::vector<EntityId>& entities);
+
+	void DrawPortrait();
 public:
 	GameSceneView(GameScene* scene);
 
