@@ -85,6 +85,7 @@ class GameDatabaseLoadAsetReferencesCrt : public CoroutineImpl {
 	std::string name;
 	const  Texture* tex;
 	AudioClip* clip;
+	VideoClip* videoClip;
 	const ImageFrame* f;
 	const Image* img;
 	int i = 0;
@@ -115,6 +116,16 @@ public: GameDatabaseLoadAsetReferencesCrt(GameDatabase* db) : db(db) {}
 			  CRT_YIELD();
 		  }
 
+		  db->videoClips.reserve(db->VideoClipDefs.size());
+
+		  for (i = 0; i < db->VideoClipDefs.size(); ++i)
+		  {
+			  videoClip = AssetLoader::LoadVideoClip(db->VideoClipDefs[i].path);
+			  db->videoClips.push_back(videoClip);
+
+			  CRT_YIELD();
+		  }
+
 
 		  db->frames.reserve(db->frames.size());
 		  for (const ImageFrameDef& frameDef : db->FrameDefs)
@@ -137,6 +148,7 @@ public: GameDatabaseLoadAsetReferencesCrt(GameDatabase* db) : db(db) {}
 		  }
 
 		  CRT_YIELD();
+
 
 		  db->unitMap.reserve(db->UnitDefs.size());
 		  for (const auto& def : db->UnitDefs)

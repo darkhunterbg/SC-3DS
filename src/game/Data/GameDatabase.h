@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "AssetDataDefs.h"
+#include "UnitPortraitDef.h"
 #include "UnitDef.h"
 #include "AbilityDef.h"
 #include "UpgradeDef.h"
@@ -21,6 +22,7 @@ private:
 	std::vector<ImageFrame> frames;
 	std::vector<Image> images;
 	std::vector<AudioClip*> audioClips;
+	std::vector<VideoClip*> videoClips;
 
 	const Image* commandIcons;
 	std::vector<const Image*> selections;
@@ -46,6 +48,8 @@ public:
 	std::vector<UpgradeDef> UpgradeDefs;
 	std::vector<WeaponDef> WeaponDefs;
 	std::vector<SoundSetDef> SoundSetDefs;
+	std::vector<VideoClipDef> VideoClipDefs;
+	std::vector<UnitPortraitDef> UnitPortraitDefs;
 
 	std::vector<RaceDef> RaceDefs;
 
@@ -77,6 +81,12 @@ public:
 	inline AudioClip& GetAudioClip(unsigned id) const { return *audioClips[id]; }
 	inline Span<AudioClip*> GetAudioClips(unsigned id, unsigned count) const {
 		return { &audioClips[id], count };
+	}
+
+	inline VideoClip& GetVideoClip(unsigned id) const { return *videoClips[id]; }
+	inline Span<VideoClip*> GetVideoClips(unsigned id, unsigned count) const
+	{
+		return { &videoClips[id], count };
 	}
 
 	Coroutine LoadAssetReferencesAsync();

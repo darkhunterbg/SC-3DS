@@ -61,6 +61,11 @@ struct AudioClipDef {
 	char path[32];
 };
 
+struct VideoClipDef {
+	char path[32];
+};
+
+
 struct SpriteDef;
 
 struct AnimClipDef {

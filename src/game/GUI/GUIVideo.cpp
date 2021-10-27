@@ -18,6 +18,7 @@ public:
 	double countdown = 0;
 	Coroutine readCrt;
 	IAudioSource* audioSrc = nullptr;
+	VideoClip* clip = nullptr;
 
 	bool IsCoroutineCompleted() const
 	{
@@ -59,15 +60,20 @@ bool GUIVideo::DrawVideo(const char* id, VideoClip& clip, bool loop, Color color
 	{
 		data = new	VideoFrameRenderData(textureSize);
 		GUI::RegisterResource(key, data, [](void* p) {delete (VideoFrameRenderData*)p;  });
-		data->countdown = -0.01;
 
+	}
+
+	if (data->clip != &clip)
+	{
+		data->countdown = -0.01;
+		data->clip = &clip;
 		data->audioSrc = clip.PrepareAudio();
 		data->readCrt = clip.LoadFirstFrameAsync();
+		data->readCrt->Next();
 
 		if (data->audioSrc != nullptr)
-		{
 			AudioManager::Play(*data->audioSrc, 0);
-		}
+
 	}
 	else
 	{
@@ -106,11 +112,13 @@ bool GUIVideo::DrawVideo(const char* id, VideoClip& clip, bool loop, Color color
 			if (loop)
 			{
 				data->readCrt = clip.LoadFirstFrameAsync();
+				data->readCrt->Next();
 			}
 		}
 		else
 		{
 			data->readCrt = clip.LoadNextFrameAsync();
+			data->readCrt->Next();
 		}
 
 		if (!data->decoded)

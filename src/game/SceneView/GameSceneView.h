@@ -35,6 +35,8 @@ private:
 	void UpdateSelection();
 	void OnEntitiesDeleted(const std::vector<EntityId>& entities);
 
+	int _portraitId = 0;
+
 	void DrawPortrait();
 public:
 	GameSceneView(GameScene* scene);

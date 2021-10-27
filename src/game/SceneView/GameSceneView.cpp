@@ -119,6 +119,8 @@ void GameSceneView::UpdateSelection()
 			{
 				_unitSelection.push_back(_temp[0]);
 			}
+
+			_portraitId = 0;
 		}
 	}
 
@@ -130,6 +132,7 @@ void GameSceneView::UpdateSelection()
 		{
 			_unitSelection.erase(_unitSelection.begin() + i);
 			--i;
+			_portraitId = 0;
 		}
 	}
 
@@ -316,8 +319,21 @@ void GameSceneView::DrawPortrait()
 
 	const UnitComponent& unit = _scene->GetEntityManager().UnitSystem.GetComponent(id);
 
-	const Image& image = *unit.def->Art.GetPortraitImage();
-	GUIImage::DrawImage(image);
+	GUI::SetVideoPlaybackSpeed(0.75);
+
+	const UnitPortraitDef* portrait = unit.def->Art.GetPortrait();
+	if (portrait && portrait->GetIdleClips().Size() > _portraitId)
+	{
+		if (unit.def->Art.GetPortrait()->GetIdleClip(_portraitId).IsAtEnd())
+		{
+			_portraitId = (_portraitId + 1) % unit.def->Art.GetPortrait()->IdleClipCount;
+		}
+
+		GUIVideo::DrawVideo("portrait", portrait->GetIdleClip(_portraitId), true);
+
+	}
+
+	GUI::SetVideoPlaybackSpeed(1);
 
 	if (!_cursor.IsHolding())
 	{

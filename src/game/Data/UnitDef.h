@@ -7,6 +7,7 @@
 #include "../MathLib.h"
 #include "WeaponDef.h"
 #include "UpgradeDef.h"
+#include "UnitPortraitDef.h"
 
 #include <cstring>
 
@@ -72,7 +73,7 @@ struct UnitDef {
 		int16_t SelectionOffset;
 		int16_t ShadowImageId;
 		Vector2Int16 ShadowOffset;
-		int16_t PortraitImageId;
+		int16_t PortraitId;
 		int16_t WireframeId;
 
 
@@ -81,7 +82,7 @@ struct UnitDef {
 		const ImageFrame& GetIcon() const;
 		const Image* GetShadowImage() const;
 		const Image& GetSelectionImage() const;
-		const Image* GetPortraitImage() const;
+		const UnitPortraitDef* GetPortrait() const;
 
 	} Art;
 

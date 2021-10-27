@@ -76,6 +76,10 @@ private:
 				break;
 			case DataSectionType::AudioClips:
 				LoadData(headers[i].size, f, db->AudioClipDefs); break;
+			case DataSectionType::VideoClips:
+				LoadData(headers[i].size, f, db->VideoClipDefs); break;
+			case DataSectionType::UnitPortraits:
+				LoadData(headers[i].size, f, db->UnitPortraitDefs); break;
 			default:
 				EXCEPTION("Unknown data section type %i at position %i", headers[i].type, i);
 				break;

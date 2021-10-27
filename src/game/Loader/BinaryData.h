@@ -24,6 +24,8 @@ enum class DataSectionType : uint32_t
 	Weapons = 12,
 	SoundSets = 13,
 	AudioClips = 14,
+	UnitPortraits = 15,
+	VideoClips = 16,
 };
 
 

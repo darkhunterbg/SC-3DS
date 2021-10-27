@@ -627,6 +627,21 @@ namespace DataManager.Build
 			}
 
 
+			List<VideoClip> videoClipsData = new List<VideoClip>();
+
+			foreach (var asset in AppGame.AssetManager.GetAssets<UnitPortraitAsset>()) {
+				asset._IdleClipStart = videoClipsData.Count;
+				var items = asset.IdleClips.Where(s => !s.IsEmpty && s.Clip != null);
+				videoClipsData.AddRange(items.Select(s => s.Clip));
+				asset._IdleClipCount = items.Count();
+
+				asset._ActivatedClipStart = videoClipsData.Count;
+				items = asset.ActivatedClips.Where(s => !s.IsEmpty && s.Clip != null);
+				videoClipsData.AddRange(items.Select(s => s.Clip));
+				asset._ActivatedClipCount = items.Count();
+			}
+
+
 
 			List<DataItem> data = new List<DataItem>();
 			data.Add(new DataItem()
@@ -653,6 +668,11 @@ namespace DataManager.Build
 			{
 				Name = "Audio Clips",
 				Data = audioClipsData.Select(s => (object)s)
+			});
+			data.Add(new DataItem()
+			{
+				Name = "Video Clips",
+				Data = videoClipsData.Select(s => (object)s)
 			});
 
 

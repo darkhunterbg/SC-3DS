@@ -1,13 +1,5 @@
 [
   {
-    "OutputName": "portrait",
-    "ImageList": [
-      "portrait\\*"
-    ],
-    "PackStrategy": 1,
-    "FilterStrategy": 0
-  },
-  {
     "OutputName": "gui",
     "ImageList": [
       "cursor\\*",

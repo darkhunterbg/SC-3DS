@@ -24,6 +24,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\RaceDef.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\SoundSetDef.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\UnitDef.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\UnitPortraitDef.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\UpgradeDef.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Data\WeaponDef.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Debug.h" />
@@ -94,6 +95,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\RaceDef.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\SoundSetDef.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\UnitDef.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\UnitPortraitDef.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\UpgradeDef.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\WeaponDef.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\AssetLoader.cpp" />
