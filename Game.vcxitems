@@ -85,6 +85,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Widgets\MinimapPanel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Widgets\ResourceBar.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Widgets\SelectionInfoPanel.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Widgets\UnitPortraitPanel.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Assets.cpp" />
@@ -145,5 +146,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Widgets\MinimapPanel.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Widgets\ResourceBar.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Widgets\SelectionInfoPanel.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Widgets\UnitPortraitPanel.cpp" />
   </ItemGroup>
 </Project>

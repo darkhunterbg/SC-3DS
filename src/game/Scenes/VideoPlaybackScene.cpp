@@ -23,8 +23,6 @@ VideoPlaybackScene::VideoPlaybackScene(const char* video, std::function<void()> 
 void VideoPlaybackScene::Start()
 {
 	_clip = AssetLoader::LoadVideoClip(_videoPath.data());
-
-	GUI::SetVideoPlaybackSpeed(1);
 }
 
 void VideoPlaybackScene::Stop()
@@ -61,5 +59,6 @@ void VideoPlaybackScene::Draw()
 		GUI::UseScreen(ScreenId::Bottom);
 		GUIImage::DrawColor(Colors::Black);
 	}
+
 }
 

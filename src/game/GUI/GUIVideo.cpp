@@ -65,7 +65,7 @@ bool GUIVideo::DrawVideo(const char* id, VideoClip& clip, bool loop, Color color
 
 	if (data->clip != &clip)
 	{
-		data->countdown = -0.01;
+		data->countdown = -0.001f;
 		data->clip = &clip;
 		data->audioSrc = clip.PrepareAudio();
 		data->readCrt = clip.LoadFirstFrameAsync();
@@ -76,20 +76,20 @@ bool GUIVideo::DrawVideo(const char* id, VideoClip& clip, bool loop, Color color
 
 	}
 	else
-	{
-		data->countdown -= GUI::GetState().VideoPlaybackCooldown;
-	}
+		data->countdown -= GUI::GetState().VideoPlaybackTickTime;
+
 
 	bool frameChanged = false;
+	bool ended = false;
 	if (data->countdown <= 0)
 	{
-		if (clip.IsAtEnd())
-		{
-			if (!loop) return true;
-		}
+		if (clip.IsAtEnd()) ended = true;
 
-		frameChanged = true;
-		data->countdown += clip.GetFrameTime();
+		if (!clip.IsAtEnd() || loop)
+		{
+			frameChanged = true;
+			data->countdown += clip.GetFrameTime();
+		}
 	}
 
 	if (data->IsCoroutineCompleted() && !data->decoded)
@@ -135,7 +135,8 @@ bool GUIVideo::DrawVideo(const char* id, VideoClip& clip, bool loop, Color color
 
 	GUIImage::DrawSubTexture(*data->texture, { {0,0},clip.GetFrameSize() }, color);
 
-	return false;
+
+	return ended;
 }
 
 bool GUIVideo::DrawVideoScaled(const char* id, VideoClip& clip, Vector2 scale, bool loop, Color color)

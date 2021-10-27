@@ -23,17 +23,17 @@ MainMenuSceneView::MainMenuSceneView(MainMenuScene* scene) :
 	_exiton = AssetLoader::LoadVideoClip("glue\\mainmenu\\exiton");
 
 	_mmFont = AssetLoader::LoadFont("mm-font", 16);
-
-	GUI::SetVideoPlaybackSpeed(0.75);
 }
 
 MainMenuSceneView::~MainMenuSceneView()
 {
-	GUI::SetVideoPlaybackSpeed(1);
+
 }
 
 void MainMenuSceneView::Draw()
 {
+	GUI::SetVideoPlaybackSpeed(0.8);
+
 	GUI::UseScreen(ScreenId::Top);
 
 	const Image& img = GameDatabase::instance->GetImage("glue\\palmm\\backgnd");
@@ -81,7 +81,7 @@ void MainMenuSceneView::Draw()
 
 	const Image& etail = GameDatabase::instance->GetImage("glue\\mainmenu\\etail");
 
-	GUI::BeginAbsoluteLayout({ 224,348 }, Vector2Int(etail.GetSize()));
+	GUI::BeginAbsoluteLayout({ 225,348 }, Vector2Int(etail.GetSize()));
 	GUIImage::DrawImage(etail);
 	GUI::EndLayout();
 
@@ -127,4 +127,5 @@ void MainMenuSceneView::Draw()
 		GUIImage::DrawColor(Colors::Black);
 	}
 
+	GUI::SetVideoPlaybackSpeed(1);
 }

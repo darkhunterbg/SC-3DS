@@ -313,27 +313,12 @@ void GameSceneView::DrawSecondaryScreen()
 
 void GameSceneView::DrawPortrait()
 {
-	if (_unitSelection.size() == 0) return;
+	EntityId id = Entity::None;
 
-	EntityId id = _unitSelection[0];
+	if (_unitSelection.size() > 0)
+	 id = _unitSelection[0];
 
-	const UnitComponent& unit = _scene->GetEntityManager().UnitSystem.GetComponent(id);
-
-	GUI::SetVideoPlaybackSpeed(0.75);
-
-	const UnitPortraitDef* portrait = unit.def->Art.GetPortrait();
-	if (portrait && portrait->GetIdleClips().Size() > _portraitId)
-	{
-		if (unit.def->Art.GetPortrait()->GetIdleClip(_portraitId).IsAtEnd())
-		{
-			_portraitId = (_portraitId + 1) % unit.def->Art.GetPortrait()->IdleClipCount;
-		}
-
-		GUIVideo::DrawVideo("portrait", portrait->GetIdleClip(_portraitId), true);
-
-	}
-
-	GUI::SetVideoPlaybackSpeed(1);
+	_unitPortrait.Draw(id);
 
 	if (!_cursor.IsHolding())
 	{

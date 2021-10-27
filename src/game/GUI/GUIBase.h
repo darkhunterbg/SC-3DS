@@ -40,7 +40,7 @@ public:
 	std::unordered_map<std::string, Resource> Resources;
 	std::vector < std::function<void()>> ExecAtEndOfFrame;
 
-	double VideoPlaybackCooldown = 16.6;
+	double VideoPlaybackTickTime = 16.67;
 	int ImageAnimationTimer = 6;
 
 	Vector2Int ElementOffset = { 0,0 };
@@ -117,7 +117,7 @@ public:
 
 	static void SetVideoPlaybackSpeed(double speed)
 	{
-		GetState().VideoPlaybackCooldown = 16.6 * speed;
+		GetState().VideoPlaybackTickTime = 16.67* speed;
 	}
 
 	static void AddNextElementOffset(Vector2Int offset)
