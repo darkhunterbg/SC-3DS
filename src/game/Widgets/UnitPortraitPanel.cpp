@@ -1,16 +1,79 @@
 #include "UnitPortraitPanel.h"
-#include "../GUI/GUI.h""
+#include "../GUI/GUI.h"
 #include "../Entity/EntityUtil.h"
 #include "../Entity/EntityManager.h"
 
 #include "../Data/GameDatabase.h"
 #include "../Engine/GraphicsRenderer.h"
+#include "../Platform.h"
+#include "../Engine/JobSystem.h"
 
-static constexpr const int NoiseTime = 6;
+static constexpr const int NoiseTime = 15;
+
+static constexpr const int TextureSize = 64;
+
+static UnitPortraitPanel* _upp;
+
+static int RandomNoise(Vector2 pos, float input)
+{
+	// https://www.ronja-tutorials.com/post/024-white-noise/
+
+	pos.x = std::sin(pos.x);
+	pos.y = std::sin(pos.y);
+	float random = Vector2::Dot(pos, Vector2(12.9898f, 78.233f));
+	random *= input;
+	float f;
+	random = std::fabs(std::modf(std::sin(random) * 143758.5453f, &f));
+	random = std::sin(random) * 143758.5453;
+
+	return (int)(random * 255);
+}
+
 
 UnitPortraitPanel::UnitPortraitPanel()
 {
+	_upp = this;
 
+	_noise = GraphicsRenderer::NewTexture({ TextureSize,TextureSize }, true);
+	_textureData = (uint8_t*)Platform::PlatformAlloc(TextureSize * TextureSize * 4);
+}
+
+UnitPortraitPanel::~UnitPortraitPanel()
+{
+	Platform::PlatformFree(_textureData);
+	Platform::DestroyTexture(_noise->GetTextureId());
+}
+
+ void UnitPortraitPanel::RegenerateNoiseTextureJob(int start, int end)
+{
+	for (int o = start; o < end; ++o)
+	{
+		int x = o % TextureSize;
+		int y = o / TextureSize;
+		int gen = RandomNoise(Vector2(x, y), _upp->_noiseInput);
+		int i = o * 4;
+
+#ifdef _3DS
+		_upp->_textureData[i++] = 255;
+		_upp->_textureData[i++] = gen;
+		_upp->_textureData[i++] = gen;
+		_upp->_textureData[i++] = gen;
+#else
+		_upp->_textureData[i++] = gen;
+		_upp->_textureData[i++] = gen;
+		_upp->_textureData[i++] = gen;
+		_upp->_textureData[i++] = 255;
+#endif
+	}
+}
+
+void UnitPortraitPanel::RegenerateNoiseTexture(float input)
+{
+	_noiseInput = input;
+
+	JobSystem::RunJob(TextureSize * TextureSize, 512, RegenerateNoiseTextureJob);
+
+	Platform::UpdateTexture(_noise->GetTextureId(), { {0,0},{TextureSize,TextureSize} }, { _textureData, TextureSize * TextureSize * 4 });
 }
 
 void UnitPortraitPanel::Draw(EntityId id)
@@ -28,7 +91,6 @@ void UnitPortraitPanel::Draw(EntityId id)
 		_noiseCooldown = NoiseTime;
 	}
 
-
 	const UnitComponent& unit = em.UnitSystem.GetComponent(id);
 
 	const UnitPortraitDef* portrait = unit.def->Art.GetPortrait();
@@ -41,14 +103,17 @@ void UnitPortraitPanel::Draw(EntityId id)
 		}
 	}
 
-	//if (_noiseCooldown > 0 && NoiseTime > 0 && _noiseImage != nullptr)
-	//{
-	//	float alpha = (float)_noiseCooldown / (float)NoiseTime;
+	if (_noiseCooldown > 0 && NoiseTime > 0 && _noise != nullptr)
+	{
+		float alpha = (float)_noiseCooldown / (float)NoiseTime;
 
-	//	Color c = Color(1, 1, 1, alpha);
+		if (_noiseCooldown % 3 == 0)
+			RegenerateNoiseTexture(alpha);
 
-	//	GUIImage::DrawImage(*_noiseImage, 0, c);
+		Color c = Color(1, 1, 1, alpha);
 
-	//	--_noiseCooldown;
-	//}
+		GUIImage::DrawTexture(*_noise, c);
+
+		--_noiseCooldown;
+	}
 }
