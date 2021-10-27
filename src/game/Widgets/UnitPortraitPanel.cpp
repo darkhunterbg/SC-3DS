@@ -107,6 +107,7 @@ void UnitPortraitPanel::Draw(EntityId id)
 	{
 		float alpha = (float)_noiseCooldown / (float)NoiseTime;
 
+		// Alternative: a coroutine to distribute generation to 3 frames
 		if (_noiseCooldown % 3 == 0)
 			RegenerateNoiseTexture(alpha);
 
