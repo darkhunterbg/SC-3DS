@@ -25,7 +25,9 @@ namespace DataManager.Build
 		Wireframe = 11,
 		Weapons = 12,
 		SoundSets = 13,
-		AudioClips = 14
+		AudioClips = 14,
+		UnitPortrait = 15,
+		VideoClips = 16,
 	}
 
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
@@ -85,10 +87,8 @@ namespace DataManager.Build
 
 			MemoryStream stream = new MemoryStream(Data.Count() * attr.Sum(s => s.Size));
 
-			foreach (var item in Data)
-			{
-				for (int i = 0; i < props.Count; ++i)
-				{
+			foreach (var item in Data) {
+				for (int i = 0; i < props.Count; ++i) {
 					var p = props[i];
 					var a = attr[i];
 					var bin = a.Serialize(p.GetValue(item));
@@ -105,16 +105,12 @@ namespace DataManager.Build
 		{
 			DataItemType = Data.FirstOrDefault()?.GetType();
 
-			if (DataItemType != null)
-			{
+			if (DataItemType != null) {
 				var a = DataItemType.GetCustomAttribute<BinaryDataAttribute>();
-				if (a != null)
-				{
+				if (a != null) {
 					Type = a.Type;
 				}
-			}
-			else
-			{
+			} else {
 				return;
 			}
 

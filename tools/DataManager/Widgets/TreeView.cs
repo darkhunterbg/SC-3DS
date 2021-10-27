@@ -375,6 +375,7 @@ namespace DataManager.Widgets
 					if (node.Item is IInteractableTreeViewItem inter)
 						inter.Activate();
 				}
+
 				//ImGui.Unindent(ImGui.GetTreeNodeToLabelSpacing());
 
 				ItemContextMenu(node);

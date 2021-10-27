@@ -1,5 +1,6 @@
 ﻿using CsvHelper.Configuration.Attributes;
 using DataManager.Build;
+using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +36,9 @@ namespace DataManager.Assets
         [Binary(BinaryType.String, 32)]
         public string Name { get; set; } = string.Empty;
 
-        public UpgradeAsset() : base()
+        public override bool HasTooltip => true;
+
+		public UpgradeAsset() : base()
         {
             UpgradeId = AssetId.New();
         }
@@ -45,6 +48,15 @@ namespace DataManager.Assets
             UpgradeAsset clone = (UpgradeAsset)base.Clone();
             clone.UpgradeId = AssetId.New();
             return clone;
+        }
+
+        public override void DrawTooltip()
+        {
+            if (Icon.Image != null)
+                ImGui.Image(Icon.Image.Image.GuiImage, Icon.Image.Image.TextureSize);
+
+            ImGui.SameLine();
+            ImGui.Text(Name);
         }
     }
 }

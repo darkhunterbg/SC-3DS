@@ -61,6 +61,7 @@ namespace DataManager
 		public static readonly string AssetsDir = $"..\\..\\assets\\";
 		public static readonly string ExtractedAssetsDir = $"..\\..\\assets_extracted\\";
 		public static readonly string AudioDir = StarcraftAssetDir;
+		public static readonly string VideoDir = StarcraftAssetDir;
 
 		static readonly string[] AudioSearchDirs = new string[] { "sound", "music" };
 
@@ -87,6 +88,7 @@ namespace DataManager
 
 		public List<ImageList> ImageLists { get; private set; } = new List<ImageList>();
 		public List<AudioClip> AudioClips { get; private set; } = new List<AudioClip>();
+		public List<VideoClip> VideoClips { get; private set; } = new List<VideoClip>();
 		public List<ImageFrame> Icons { get; private set; } = new List<ImageFrame>();
 		public List<ImageFrame> UnitSelection { get; private set; } = new List<ImageFrame>();
 
@@ -116,6 +118,8 @@ namespace DataManager
 			if (!Directory.Exists(SpriteAtlas3DSBuildDir))
 				Directory.CreateDirectory(SpriteAtlas3DSBuildDir);
 
+			// ORDER MATTERS HERE
+
 			AddNewAssetDatabase<SoundSetAsset>($"{GameDataDir}soundsets.csv");
 			AddNewAssetDatabase<SpriteAsset>($"{GameDataDir}sprites.csv");
 			AddNewAssetDatabase<SpriteAnimClipAsset>($"{GameDataDir}animclips.csv");
@@ -124,7 +128,9 @@ namespace DataManager
 			AddNewAssetDatabase<EffectAsset>($"{GameDataDir}effects.csv");
 			AddNewAssetDatabase<UpgradeAsset>($"{GameDataDir}upgrades.csv");
 			AddNewAssetDatabase<UnitWireframeAsset>($"{GameDataDir}wireframes.csv");
+			AddNewAssetDatabase<UnitPortraitAsset>($"{GameDataDir}unitportraits.csv");
 			AddNewAssetDatabase<UnitAsset>($"{GameDataDir}units.csv");
+		
 		}
 
 		private void AddNewAssetDatabase<TAsset>(string filePath) where TAsset : Asset, new()
@@ -157,8 +163,10 @@ namespace DataManager
 			LoadPalettes(op);
 			op.Title = "Loading image lists";
 			LoadImageLists(op);
-			op.Title = "Loading image audio clips";
-			LoadAduioClips(op);
+			op.Title = "Loading audio clips";
+			LoadAudioClips(op);
+			op.Title = "Loading video clips";
+			LoadVideoClips(op);
 
 			op.Title = "Finalizing";
 			op.ItemName = "Reloading assets...";
@@ -260,7 +268,7 @@ namespace DataManager
 			}
 		}
 
-		public void LoadAduioClips(AsyncOperation op)
+		public void LoadAudioClips(AsyncOperation op)
 		{
 			AudioClips.Clear();
 
@@ -275,6 +283,22 @@ namespace DataManager
 					AudioClips.Add(new AudioClip(file));
 				}
 			}
+		}
+
+		public void LoadVideoClips(AsyncOperation op)
+		{
+			VideoClips.ForEach(v => v.Dispose());
+			VideoClips.Clear();
+
+			var files = Directory.GetFiles(VideoDir, "*.smk", SearchOption.AllDirectories);
+			int count = 0;
+			foreach (var file in files) {
+
+				op.SetProgress(file, ++count, files.Length);
+
+				VideoClips.Add(new VideoClip(file));
+			}
+
 		}
 
 		public GuiTexture GetImageFrame(string key, int frameIndex)
@@ -297,7 +321,6 @@ namespace DataManager
 			}
 			return images[frameIndex];
 		}
-
 
 		private void LoadPalettes(AsyncOperation op)
 		{

@@ -200,7 +200,7 @@ VideoClip::VideoClip(void* smkHandle) : _handle(smkHandle)
 
 	unsigned char   a_trackmask, a_channels[7], a_depth[7];
 	unsigned long   a_rate[7];
-	static unsigned long w, h, frames;
+	unsigned long	w, h, frames;
 
 	smk_info_audio(video, &a_trackmask, a_channels, a_depth, a_rate);
 	smk_info_video(video, &w, &h, nullptr);
@@ -325,7 +325,7 @@ void VideoClip::DecodeCurrentFrame(uint8_t* pixelData, int texLineSize)
 		{
 			int i = (x + y * texLineSize) << 2;
 
-			int index = image[++a];
+			int index = image[a++];
 			index *= 3;
 
 			if (index == 0)

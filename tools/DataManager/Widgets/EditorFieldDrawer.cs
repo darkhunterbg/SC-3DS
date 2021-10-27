@@ -88,6 +88,11 @@ namespace DataManager.Widgets
 				AudioClipRef b = obj == null ? AudioClipRef.None : (AudioClipRef)obj;
 				return AudioClip(name, b, out changed);
 			}
+			if (type == typeof(VideoClipRef)) {
+				VideoClipRef b = obj == null ? VideoClipRef.None : (VideoClipRef)obj;
+				return VideoClip(name, b, out changed);
+			}
+
 
 			changed = false;
 			ReadOnly(name, obj);
@@ -378,6 +383,36 @@ namespace DataManager.Widgets
 			return changed ? (AudioClipRef)dialogResult : clip;
 		}
 
+		public static VideoClipRef VideoClip(string name, VideoClipRef clip, out bool changed)
+		{
+			int id = ++dialogId;
+			//DrawName(name);
+			changed = false;
+			if (clip.Clip == null) {
+				if (ImGui.Button("None")) {
+					EditorModalSelect.SelectItemModal(typeof(VideoClipRef), clip, (o) =>
+					{
+						dialogResultFor = id;
+						dialogResult = o;
+					});
+				}
+			} else {
+				if (ImGui.Button(clip.Clip.RelativePath)) {
+					EditorModalSelect.SelectItemModal(typeof(VideoClipRef), clip, (o) =>
+					{
+						dialogResultFor = id;
+						dialogResult = o;
+					});
+				}
+
+				if (ImGui.IsItemHovered()) {
+					AppGame.Gui.HoverObject = clip;
+				}
+			}
+
+			changed = dialogResultFor == dialogId;
+			return changed ? (VideoClipRef)dialogResult : clip;
+		}
 
 		public static ImageListRef ImageList(string name, ImageListRef image, out bool changed)
 		{

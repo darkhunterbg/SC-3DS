@@ -140,6 +140,11 @@ namespace DataManager.Build
 			if (cancelled)
 				return;
 
+			BuildVideo();
+
+			if (cancelled)
+				return;
+
 			BuildOther();
 		}
 
@@ -474,6 +479,39 @@ namespace DataManager.Build
 					path = Path.Combine(dir, Path.GetFileName(audio.FilePath));
 					Directory.CreateDirectory(dir);
 					File.Copy(audio.FilePath, path, true);
+				}
+
+				++currentJob;
+				Progress(currentJob, totalJobs);
+			}
+		}
+
+		private void BuildVideo()
+		{
+			DisplayItem("Video Clips");
+
+			var portraits = AppGame.AssetManager.GetAssets<UnitPortraitAsset>();
+
+			var items = portraits.SelectMany(s => s.IdleClips).Where(c => !c.IsEmpty).Select(s => s.Clip).ToList();
+			items.AddRange(portraits.SelectMany(s => s.ActivatedClips).Where(c => !c.IsEmpty).Select(s => s.Clip).ToList());
+			items = items.Distinct().ToList();
+			currentJob = 0;
+			totalJobs = items.Count;
+
+			Progress(currentJob, totalJobs);
+
+			foreach (var video in items) {
+				DisplayItem(video.RelativePath);
+				var dir = Path.GetDirectoryName(Path.Combine(AssetManager.CookedAssetsPCDir, video.RelativePath));
+				Directory.CreateDirectory(dir);
+				var path = Path.Combine(dir, Path.GetFileName(video.FilePath));
+				File.Copy(video.FilePath, path, true);
+
+				if (Build3DS) {
+					dir = Path.GetDirectoryName(Path.Combine(AssetManager.Cooked3DSAssetsDir, video.RelativePath));
+					path = Path.Combine(dir, Path.GetFileName(video.FilePath));
+					Directory.CreateDirectory(dir);
+					File.Copy(video.FilePath, path, true);
 				}
 
 				++currentJob;

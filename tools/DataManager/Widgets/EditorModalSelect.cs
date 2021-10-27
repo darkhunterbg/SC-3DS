@@ -135,6 +135,14 @@ namespace DataManager.Widgets
 				}
 				return;
 			}
+			if (objType == typeof(VideoClipRef)) {
+				if (selected == null)
+					ImGui.Text("None");
+				else {
+					ImGui.Text(((VideoClipRef)selected).ToString());
+				}
+				return;
+			}
 			if (objType == typeof(ImageListRef))
 			{
 				if (selected == null)
@@ -185,6 +193,12 @@ namespace DataManager.Widgets
 				AudioClipContent(moveIter);
 				return;
 			}
+
+			if (objType == typeof(VideoClipRef)) {
+				VideoClipContent(moveIter);
+				return;
+			}
+
 
 			if (objType == typeof(ImageListRef))
 			{
@@ -429,6 +443,42 @@ namespace DataManager.Widgets
 				ImGui.SameLine();
 				ImGui.Text(asset.Key);
 				
+				ImGui.PopID();
+
+			}
+		}
+
+
+		private static void VideoClipContent(int moveIter)
+		{
+			var tmp = selected != null ? (VideoClipRef)selected : VideoClipRef.None;
+			IEnumerable<VideoClip> query = AppGame.AssetManager.VideoClips;
+
+			query = Util.TextFilter(query, textFilter, t => t.Key);
+			query = query.OrderBy(asset => asset.Key);
+
+			int i = 0;
+			foreach (var asset in query) {
+				ImGui.PushID(i++);
+
+				bool isSelectedItem = tmp.Clip == asset;
+
+
+				if (ImGui.Selectable(string.Empty, isSelectedItem)) {
+					if (isSelectedItem)
+						selected = VideoClipRef.None;
+					else {
+						selected = new VideoClipRef(asset);
+					}
+				}
+
+				if (ImGui.IsItemHovered()) {
+					AppGame.Gui.HoverObject = asset;
+				}
+
+				ImGui.SameLine();
+				ImGui.Text(asset.Key);
+
 				ImGui.PopID();
 
 			}

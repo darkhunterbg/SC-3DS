@@ -56,6 +56,8 @@ namespace DataManager
 
 		private KeyboardState keyboardState, prevKeyboardState;
 
+		private GuiTexture _genericPreviewTexture;
+
 		public static GuiCoroutine RunGuiCoroutine(IEnumerator crt)
 		{
 			lock (AppGame.Gui.coroutines) {
@@ -88,7 +90,8 @@ namespace DataManager
 			BackBuffer = new RenderTarget2D(game.GraphicsDevice, 1, 1);
 			guiRenderTarget = AppGame.GuiRenderer.BindTexture(BackBuffer);
 
-
+			Texture2D t = new Texture2D(game.GraphicsDevice, 512, 512);
+			_genericPreviewTexture = new GuiTexture(t);
 		}
 
 
@@ -300,6 +303,34 @@ namespace DataManager
 					ImGui.EndTooltip();
 				}
 				return;
+			}
+
+			if (obj is VideoClip videoClip) {
+
+				ImGui.BeginTooltip();
+				videoClip.GUIPreview();
+				ImGui.EndTooltip();
+
+				return;
+			}
+
+			if (obj is VideoClipRef videoClipRef) {
+				if (videoClipRef.Clip != null) {
+					ImGui.BeginTooltip();
+					videoClipRef.Clip.GUIPreview();
+					ImGui.EndTooltip();
+				}
+				return;
+			}
+
+			if(obj is Asset asset) {
+				if (asset.HasTooltip) {
+					ImGui.BeginTooltip();
+					ImGui.Text(asset.AssetName);
+					ImGui.Separator();
+					asset.DrawTooltip();
+					ImGui.EndTooltip();
+				}
 			}
 		}
 

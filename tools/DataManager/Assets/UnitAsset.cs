@@ -108,10 +108,12 @@ namespace DataManager.Assets
 		[Optional]
 		public Vector2 ShadowOffset { get; set; }
 
-		[DefaultEditor]
+
 		[Optional]
-		[Binary(BinaryType.ImageRef, 2)]
-		public ImageListRef Portrait { get; set; } = ImageListRef.None;
+		[DefaultEditor]
+		[Binary(BinaryType.AssetRef, 2)]
+		[TypeConverter(typeof(AssetConverter))]
+		public UnitPortraitAsset Portrait { get; set; }
 
 		[Optional]
 		[DefaultEditor]

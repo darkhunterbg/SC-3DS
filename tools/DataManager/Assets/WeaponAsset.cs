@@ -1,5 +1,6 @@
 ﻿using CsvHelper.Configuration.Attributes;
 using DataManager.Build;
+using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,5 +37,17 @@ namespace DataManager.Assets
 		[Binary(BinaryType.AssetRef, 2)]
 		[Optional, TypeConverter(typeof(AssetConverter))]
 		public SoundSetAsset SpawnSound { get; set; }
+
+		public override bool HasTooltip => true;
+
+		public override void DrawTooltip()
+		{
+			if (Icon.Image != null)
+				ImGui.Image(Icon.Image.Image.GuiImage, Icon.Image.Image.TextureSize);
+
+			ImGui.SameLine();
+
+			ImGui.Text(Name);
+		}
 	}
 }

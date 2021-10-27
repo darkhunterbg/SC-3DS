@@ -28,6 +28,10 @@ namespace DataManager.Assets
 
 		[Ignore]
 		public virtual string ActionButtonText => null;
+		[Ignore]
+		public virtual bool HasTooltip => false;
+
+		public virtual void DrawTooltip() { }
 
 		[Ignore]
 		[UniqueKey]
@@ -174,6 +178,8 @@ namespace DataManager.Assets
 			context.TypeConverterCache.AddConverter<AssetId>(new AssetId.CsvConverter());
 
 			context.TypeConverterCache.AddConverter<AudioClipRef>(new AudioClipRef.CsvConverter());
+
+			context.TypeConverterCache.AddConverter<VideoClipRef>(new VideoClipRef.CsvConverter());
 		}
 
 		public void Reload()

@@ -12,6 +12,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <OutputPath>../../bin</OutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Icon.ico" />
@@ -39,6 +40,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MonoGame.ImGui\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NativeEditorLib\NativeEditorLib.vcxproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="imgui.ini">

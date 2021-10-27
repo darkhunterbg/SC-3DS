@@ -1,5 +1,6 @@
 ﻿using CsvHelper.Configuration.Attributes;
 using DataManager.Build;
+using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,6 @@ namespace DataManager.Assets
 
 		[Index(0)]
 		public string Path { get; set; }
-
 
 		[Optional]
 		[ImageFrameEditor("unit\\wirefram\\wirefram")]
@@ -36,5 +36,13 @@ namespace DataManager.Assets
 		[DefaultEditor]
 		[Binary(BinaryType.ImageRef, 2)]
 		public ImageListRef GroupWireframe { get; set; }
+
+		public override bool HasTooltip => true;
+
+		public override void DrawTooltip()
+		{
+			if (Icon.Frame != null)
+				ImGui.Image(Icon.Frame.Image.GuiImage, Icon.Frame.Image.TextureSize);
+		}
 	}
 }
