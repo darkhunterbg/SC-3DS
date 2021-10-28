@@ -8,134 +8,83 @@
 #include "Loader/smacker.h"
 
 #include <stdio.h>
+#include <cstring>
 
 Texture::~Texture()
 {
 	Platform::DestroyTexture(id);
 }
 
-
-bool AudioClip::FillNextBuffer()
+unsigned AudioClip::FillNextBuffer(Span<uint8_t> buffer)
 {
-	if (stream == nullptr) return false;
+	if (stream == nullptr) return 0;
 
-	int nextBufferIndex = (_activeBufferIndex + 1) % BufferCount;
-	Span<uint8_t> buffer = buffers[nextBufferIndex];
 	unsigned size = buffer.Size();
-	unsigned remaining = GetRemaining();
 
-	if (remaining < size)
-		size = remaining;
+	if (size > 0)
+		size = fread(buffer.Data(), sizeof(uint8_t), size, stream);
 
-
-	int read = fread(buffer.Data(), sizeof(uint8_t), size, stream);
-	if (read > 0)
-	{
-		_nextBufferSize = (unsigned)read;
-		return true;
-	}
-	else
-	{
-		_nextBufferSize = 0;
-		return false;
-	}
-}
-void AudioClip::SwapBuffers()
-{
-	if (stream == nullptr)
-	{
-		_activeBufferIndex = 0;
-		_activeBufferSize = buffers[_activeBufferIndex].Size();
-		_streamPos = _activeBufferSize;
-
-	}
-	else
-	{
-		_activeBufferIndex = (_activeBufferIndex + 1) % BufferCount;
-		_activeBufferSize = _nextBufferSize;
-		_streamPos += _nextBufferSize;
-	}
+	return size;
 }
 bool AudioClip::Restart()
 {
 	if (stream == nullptr)
-	{
-		_streamPos = 0;
 		return true;
-	}
 
 	bool success = fseek(stream, _streamStartPos, SEEK_SET);
-
-	if (success)
-		_streamPos = 0;
-
 	return success;
 }
 
-class AudioClipStreamAudioCrt : public CoroutineRImpl<AudioChannelClip> {
+class AudioClipStreamAudioCrt : public CoroutineRImpl<unsigned> {
 
 	AudioClip* _clip;
 	Coroutine _fillCrt = nullptr;
-public: AudioClipStreamAudioCrt(AudioClip& clip) : _clip(&clip) {}
+	Span<uint8_t> _buffer;
+	int _read = 0;
+
+public: AudioClipStreamAudioCrt(AudioClip& clip, Span<uint8_t> buffer) : _clip(&clip), _buffer(buffer)
+{
+
+
+}
 	  CRT_START()
 	  {
 		  if (_clip->IsAtEnd())
 		  {
-			  CRT_RETURN({});
+			  CRT_RETURN(0);
 		  }
 
-
-		  _fillCrt = AssetLoader::RunIOAsync([this]() { _clip->FillNextBuffer(); });
+		  _fillCrt = AssetLoader::RunIOAsync([this]() { _read = _clip->FillNextBuffer(_buffer); });
 
 		  CRT_WAIT_FOR(_fillCrt);
 
-		  _clip->SwapBuffers();
-
-
-		  CRT_RETURN(AudioChannelClip{ _clip->GetData() });
+		  CRT_RETURN(_read);
 	  }
 	  CRT_END();
 };
 
-CoroutineR<AudioChannelClip> AudioClip::GetNextAudioChannelClipAsync()
+CoroutineR<unsigned> AudioClip::FillAudioAsync(Span<uint8_t> buffer)
 {
-	return CoroutineR<AudioChannelClip>(new AudioClipStreamAudioCrt(*this));
-}
-AudioClip::AudioClip(AudioInfo info, unsigned bufferSize, FILE* stream)
-{
-	this->info = info;
-	uint8_t* memory = new uint8_t[bufferSize * BufferCount];
-	this->stream = stream;
-
-	fgetpos(stream, &_streamStartPos);
-
-	for (int i = 0; i < BufferCount; ++i)
-	{
-		buffers[i] = { memory + bufferSize * i, bufferSize };
-	}
-	_activeBufferSize = 0;
+	return CoroutineR<unsigned>(new AudioClipStreamAudioCrt(*this, buffer));
 }
 AudioClip::AudioClip(AudioInfo info, FILE* stream)
 {
 	this->info = info;
-	uint8_t* memory = new uint8_t[info.GetTotalSize()];
-	this->stream = nullptr;
-	fread(memory, sizeof(uint8_t), info.GetTotalSize(), stream);
-	buffers[0] = { memory, (unsigned)info.GetTotalSize() };
-	buffers[1] = { memory, 0 };
-	_activeBufferIndex = 0;
-	_activeBufferSize = buffers[0].Size();
+	this->stream = stream;
+
+	fgetpos(stream, &_streamStartPos);
 }
+
 AudioClip::~AudioClip()
 {
 	if (stream != nullptr)
 		fclose(stream);
-
-	delete[] buffers[0].Data();
 }
 int AudioClip::GetRemaining() const
 {
-	return info.GetTotalSize() - _streamPos;
+	fpos_t pos;
+	fgetpos(stream, &pos);
+	return info.GetTotalSize() - (pos - _streamStartPos);
 }
 
 Vector2Int Font::MeasureString(const char* text) const

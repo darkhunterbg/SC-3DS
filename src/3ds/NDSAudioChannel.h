@@ -19,4 +19,5 @@ struct NDSAudioChannel {
 		freeBuff = usedBuff;
 		usedBuff = temp;
 	}
+
 };

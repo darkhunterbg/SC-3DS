@@ -75,8 +75,6 @@ u32 __ctru_heap_size = (30 << 20);
 
 int main()
 {
-	//TextureLoadTest();
-
 	Init();
 
 	mainTimer = svcGetSystemTick();
@@ -205,9 +203,8 @@ void UpdateAudioChannel(NDSAudioChannel& channel)
 	if (usedBuff.status == NDSP_WBUF_QUEUED || usedBuff.status == NDSP_WBUF_PLAYING)
 		return;
 
-	AudioChannelClip* clip = state->CurrentClip();
-	unsigned size = clip != nullptr ? clip->Remaining() : 0;
-	if (size == 0)
+	Span<uint8_t> clip = state->GetNextAudioData();
+	if (clip.Size() == 0)
 	{
 		//EngineLogWarning("Voice starvation at channel %i", state->handle);
 		return;
@@ -219,10 +216,9 @@ void UpdateAudioChannel(NDSAudioChannel& channel)
 	ndspChnSetMix(state->handle, volume);
 
 	auto _audioBuffer = (u8*)freeBuff.data_vaddr;
-	unsigned len = state->bufferSize;
-	len = (len > size ? size : len);
+	unsigned len = clip.Size();
 
-	memcpy(_audioBuffer, clip->PlayFrom(), len);
+	memcpy(_audioBuffer, clip.Data(), len);
 
 	if (len < state->bufferSize)
 	{
@@ -234,7 +230,7 @@ void UpdateAudioChannel(NDSAudioChannel& channel)
 	DSP_FlushDataCache(_audioBuffer, state->bufferSize);
 	ndspChnWaveBufAdd(state->handle, &freeBuff);
 
-	clip->playPos += len;
+	state->AdvanceStream(len);
 
 	channel.SwapBuffers();
 }

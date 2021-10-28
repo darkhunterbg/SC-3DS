@@ -153,9 +153,6 @@ struct AudioInfo {
 
 class AudioClip : public IAudioSource {
 public:
-	Span<uint8_t> GetData() const {
-		return { buffers[_activeBufferIndex].Data(), (unsigned)_activeBufferSize };
-	}
 	int GetSize() const {
 		return info.GetTotalSize();
 	}
@@ -168,37 +165,24 @@ public:
 	}
 
 	int GetRemaining() const;
-	bool FillNextBuffer();
-	void SwapBuffers();
+
 	virtual bool Restart() override;
 
-	CoroutineR<AudioChannelClip> GetNextAudioChannelClipAsync() override;
+	CoroutineR<unsigned> FillAudioAsync(Span<uint8_t> buffer) override;
 
 	AudioClip(const AudioClip&) = delete;
 	AudioClip& operator=(const AudioClip&) = delete;
 
-	/// <summary>
-	/// Create unbuffered clip (all data will be loaded in memory)
-	/// </summary>
+
 	AudioClip(AudioInfo info, FILE* stream);
-	/// <summary>
-	/// Create buffered clip (data will be streamed between 2 buffers)
-	/// </summary>
-	AudioClip(AudioInfo info, unsigned bufferSize, FILE* stream);
 	virtual ~AudioClip() override;
 
 	uint16_t id = 0;
+
+	unsigned FillNextBuffer(Span<uint8_t> buffer);
 private:
 	AudioInfo info;
-
-	static constexpr const int BufferCount = 2;
-
-	std::array< Span<uint8_t>, BufferCount> buffers;
-	int _activeBufferSize = 0;
-	int _nextBufferSize = 0;
 	FILE* stream;
-	int _activeBufferIndex = 1;
-	int _streamPos = 0;
 	fpos_t _streamStartPos = 0;
 };
 

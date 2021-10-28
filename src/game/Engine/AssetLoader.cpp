@@ -5,7 +5,6 @@
 #include "../Loader/BinaryData.h"
 #include "../Loader/smacker.h"
 
-static constexpr const int AudioStreamBufferSize = 4096;
 static AudioClip* LoadAudioClipFromFile(const char* path);
 static Texture* LoadTextureFromFile(const char* path);
 static VideoClip* LoadVideoClipFromFile(const char* path);
@@ -61,7 +60,7 @@ Texture* AssetLoader::LoadTexture(const char* path)
 				p.data(), GetAssetTypeName(AssetType::Texture), GetAssetTypeName(e.type));
 	}
 
-	return ( Texture*)e.data;
+	return (Texture*)e.data;
 }
 
 void AssetLoader::UnloadTexture(Texture* texture)
@@ -97,7 +96,7 @@ Font* AssetLoader::LoadFont(const char* path, int size)
 				p.data(), GetAssetTypeName(AssetType::Font), GetAssetTypeName(e.type));
 	}
 
-	return ( Font*)e.data;
+	return (Font*)e.data;
 }
 
 AudioClip* AssetLoader::LoadAudioClip(const char* path)
@@ -143,7 +142,7 @@ VideoClip* AssetLoader::LoadVideoClip(const char* path)
 	}
 
 	return   (VideoClip*)e.data;
-} 
+}
 void AssetLoader::UnloadVideoClip(VideoClip* clip)
 {
 	GAME_ASSERT(clip, "Tried to unload nullptr clip!");
@@ -168,7 +167,7 @@ static VideoClip* LoadVideoClipFromFile(const char* path)
 		EXCEPTION("Failed to open asset '%s'!", p.data());
 
 	smk handle = smk_open_filepointer(f, SMK_MODE_DISK);
-	if(handle == nullptr)
+	if (handle == nullptr)
 		EXCEPTION("Failed to load SMK video '%s'!", p.data());
 
 	return new VideoClip(handle);
@@ -200,7 +199,7 @@ static AudioClip* LoadAudioClipFromFile(const char* path)
 	}
 	else
 	{
-		stream = new AudioClip(info, AudioStreamBufferSize, f);
+		stream = new AudioClip(info, f);
 	}
 
 	stream->id = ++audioClipId;

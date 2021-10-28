@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <memory>
 #include <bitset>
-#include <functional>>
+#include <functional>
 
 enum class GUIHAlign {
 	Left = 0,

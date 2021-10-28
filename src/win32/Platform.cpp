@@ -441,20 +441,19 @@ static void AudioCallback(void* userdata, Uint8* stream, int len)
 
 	SDL_memset(stream, 0, len);
 
-	AudioChannelClip* clip = state->CurrentClip();
+	Span<uint8_t> clip = state->GetNextAudioData();
 
-	unsigned size = clip != nullptr ? clip->Remaining() : 0;
-	if (size == 0)
+	int size = clip.Size();
+	if (clip.Size() == 0)
 	{
 		printf("Voice starvation at channel %i\n", state->handle);
 		return;
 	}
 
-	len = (len > size ? size : len);
-
 	int volume = (SDL_MIX_MAXVOLUME * state->volume) / 2;
 
-	SDL_MixAudioFormat(stream, clip->PlayFrom(), AUDIO_S16LSB, len, volume);
+	SDL_MixAudioFormat(stream, clip.Data(), AUDIO_S16LSB, clip.Size(), volume);
 
-	clip->playPos += len;
+
+	state->AdvanceStream(clip.Size());
 }
