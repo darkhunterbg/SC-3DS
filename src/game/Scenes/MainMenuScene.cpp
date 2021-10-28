@@ -16,7 +16,7 @@ void MainMenuScene::Start()
 {
 	_view = new MainMenuSceneView(this);
 	auto clip = AssetLoader::LoadAudioClip("music\\title");
-	if (AudioManager::GetAudioChannels()[0].stream != clip)
+	if (AudioManager::GetAudioChannels()[0].GetStream() != clip)
 		AudioManager::Play(*clip, 0);
 }
 

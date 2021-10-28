@@ -17,7 +17,7 @@ struct AudioChannelClip {
 
 	bool IsEmpty() const { return data.Size() == 0; }
 
-	bool Done() const
+	bool IsDone() const
 	{
 		return playPos >= data.Size();
 	}

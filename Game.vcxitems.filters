@@ -368,5 +368,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Widgets\UnitPortraitPanel.cpp">
       <Filter>Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\AudioChannel.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

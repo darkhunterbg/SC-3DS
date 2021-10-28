@@ -236,10 +236,5 @@ void UpdateAudioChannel(NDSAudioChannel& channel)
 
 	clip->playPos += len;
 
-	if (clip->Done())
-	{
-		state->DequeueClip();
-	}
-
 	channel.SwapBuffers();
 }

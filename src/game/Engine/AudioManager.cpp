@@ -9,33 +9,18 @@ static constexpr const int MonoChannels = 6;
 
 AudioManager AudioManager::instance;
 
-
-static void FinishBufferingAndPlay(AudioChannelState& channel)
-{
-	GAME_ASSERT(channel.IsStreaming(), "Channel %i is not streaming!");
-	channel.streamingCrt->RunAll();
-
-	auto clip = channel.streamingCrt->GetResult();
-	if (!clip.IsEmpty())
-		channel.QueueClip(clip);
-
-	channel.StopStreaming();
-
-	Platform::EnableChannel(channel, !clip.IsEmpty());
-}
-
-static void StartLoadingNextBuffer(AudioChannelState& channel)
-{
-	GAME_ASSERT(channel.stream != nullptr, "Channel %i does not have audo stream to buffer from!", channel.ChannelId);
-	GAME_ASSERT(!channel.IsStreaming(), "Channel %i is already buffering!");
-
-	channel.streamingCrt = channel.stream->GetNextAudioChannelClipAsync();
-	channel.streamingCrt->Next();
-}
-
 void AudioManager::SetMute(bool mute)
 {
 	instance._mute = mute;
+
+
+	for (auto& channel : instance.channels)
+	{
+		if (!channel.IsValid())
+			continue;
+
+		Platform::EnableChannel(channel, !mute);
+	}
 }
 
 void AudioManager::Init()
@@ -69,13 +54,9 @@ void AudioManager::Play(IAudioSource& src, int c)
 	auto& channel = instance.channels[c];
 
 	src.Restart();
+	channel.ChangeSource(&src);
 
-	channel.StopStreaming();
-
-	channel.stream = &src;
-	channel.ClearQueue();
-
-	StartLoadingNextBuffer(channel);
+	Platform::EnableChannel(channel, !instance._mute);
 }
 
 void AudioManager::StopChannel(int c)
@@ -105,38 +86,14 @@ void AudioManager::UpdateAudio()
 	if (instance._mute)
 		return;
 
-
 	for (auto& channel : instance.channels)
 	{
 		if (!channel.IsValid())
 			continue;
 
-
-		bool isStreamDone = !channel.IsStreaming() && (channel.stream == nullptr || channel.stream->IsAtEnd());
-		bool isPlayingDone = channel.CurrentClip() == nullptr || channel.CurrentClip()->Done();
-
-		if (isPlayingDone && isStreamDone)
-		{
+		if (channel.IsDone())
 			Platform::EnableChannel(channel, false);
-			continue;
-		}
-
-
-		if (channel.stream == nullptr)
-			continue;
-
-
-
-		if (!channel.IsQueueFull())
-		{
-			if (!channel.IsStreaming())
-				StartLoadingNextBuffer(channel);
-		}
-
-		if (channel.IsDone() && channel.IsStreaming())
-		{
-			FinishBufferingAndPlay(channel);
-		}
-
+		else
+			Platform::EnableChannel(channel, true);
 	}
 }

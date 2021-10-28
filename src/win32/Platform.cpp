@@ -29,7 +29,6 @@ extern GPU_Target* screen;
 extern AbstractPlatform abstractPlatform;
 
 extern uint64_t mainTimer;
-extern bool mute;
 extern bool noThreading;
 extern int numberOfThreads;
 extern GPU_Image* white;
@@ -74,7 +73,7 @@ TextureId Platform::CreateTextureFromFile(const char* path, Span<uint8_t> data, 
 
 	GPU_Image* tex = (GPU_Image*)NewTexture(Vector2Int(outSize), false);
 
-	
+
 	GPU_Rect rect = { 0.0f,0.0f, (float)w, (float)h };
 
 	UpdateTexture(tex, { {0,0},{(int)w,(int)h} }, { decoded, w * h * 4 });
@@ -384,8 +383,7 @@ void Platform::CreateChannel(AudioChannelState& channel)
 }
 void Platform::EnableChannel(const AudioChannelState& channel, bool enabled)
 {
-	if (!mute)
-		SDL_PauseAudioDevice(channel.handle, enabled ? 0 : 1);
+	SDL_PauseAudioDevice(channel.handle, enabled ? 0 : 1);
 }
 
 static std::vector< std::function<void(int)>> threadWorkFunc;
@@ -456,13 +454,7 @@ static void AudioCallback(void* userdata, Uint8* stream, int len)
 
 	int volume = (SDL_MIX_MAXVOLUME * state->volume) / 2;
 
-
 	SDL_MixAudioFormat(stream, clip->PlayFrom(), AUDIO_S16LSB, len, volume);
 
 	clip->playPos += len;
-
-	if (clip->Done())
-	{
-		state->DequeueClip();
-	}
 }

@@ -14,7 +14,7 @@ private:
 	BootSceneView* _view = nullptr;
 	Scene* _nextScene = nullptr;
 	int _nextSceneDelay = 30;
-	bool _autoStart = true;
+
 public:
 	BootScene(Scene* next = nullptr);
 	virtual void Start() override;

@@ -9,6 +9,8 @@
 #include "MainMenuScene.h"
 
 
+static constexpr const bool AutoStart = true;
+
 BootScene::BootScene(Scene* next)
 {
 	_id = NAMEOF(BootScene);
@@ -74,7 +76,7 @@ void BootScene::Update()
 	}
 
 
-	if (_ready && _autoStart)
+	if (_ready && AutoStart)
 	{
 		StartGame();
 	}

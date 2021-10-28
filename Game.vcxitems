@@ -100,6 +100,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\UpgradeDef.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Data\WeaponDef.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\AssetLoader.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\AudioChannel.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\AudioManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\GraphicsRenderer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\IAudioSource.cpp" />

@@ -8,7 +8,7 @@
 #include "../Platform.h"
 #include "../Engine/JobSystem.h"
 
-static constexpr const int NoiseTime = 15;
+static constexpr const int NoiseTime = 10;
 
 static constexpr const int TextureSize = 64;
 
@@ -44,13 +44,14 @@ UnitPortraitPanel::~UnitPortraitPanel()
 	Platform::DestroyTexture(_noise->GetTextureId());
 }
 
- void UnitPortraitPanel::RegenerateNoiseTextureJob(int start, int end)
+void UnitPortraitPanel::RegenerateNoiseTextureJob(int start, int end)
 {
 	for (int o = start; o < end; ++o)
 	{
 		int x = o % TextureSize;
 		int y = o / TextureSize;
-		int gen = RandomNoise(Vector2(x, y), _upp->_noiseInput);
+		// Add 1 because in 0 coordinates noise is constant value
+		int gen = RandomNoise(Vector2(x + 1, y + 1), _upp->_noiseInput);
 		int i = o * 4;
 
 #ifdef _3DS
@@ -107,13 +108,13 @@ void UnitPortraitPanel::Draw(EntityId id)
 	{
 		float alpha = (float)_noiseCooldown / (float)NoiseTime;
 
-		// Alternative: a coroutine to distribute generation to 3 frames
-		if (_noiseCooldown % 3 == 0)
+		// Alternativse:
+		// Coroutine to distribute generation over 2 frames
+		// One texutre, with flipping
+		if (_noiseCooldown % 2 == 0)
 			RegenerateNoiseTexture(alpha);
 
-		Color c = Color(1, 1, 1, alpha);
-
-		GUIImage::DrawTexture(*_noise, c);
+		GUIImage::DrawTexture(*_noise);
 
 		--_noiseCooldown;
 	}

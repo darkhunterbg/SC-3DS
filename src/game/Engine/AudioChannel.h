@@ -6,10 +6,15 @@
 
 typedef int AudioChannelHandle;
 
-struct AudioChannelState {
+class AudioChannelState {
+private:
+	void StartStreamingNextClip();
+	void StopStreaming();
 
-	static constexpr const int MaxQueueItems = 2;
-
+	IAudioSource* stream = nullptr;
+	CoroutineR<AudioChannelClip> streamingCrt = nullptr;
+	AudioChannelClip playingClip;
+public:
 	bool mono = false;
 	bool playbackCompleted = true;
 
@@ -19,61 +24,13 @@ struct AudioChannelState {
 	AudioChannelHandle handle = -1;
 	unsigned bufferSize = 0;
 
-	std::array< AudioChannelClip, MaxQueueItems> clipQueue;
-	int queueSize = 0;
 
-	IAudioSource* stream = nullptr;
-	CoroutineR<AudioChannelClip> streamingCrt = nullptr;
+	AudioChannelClip* CurrentClip();
 
+	bool IsStreaming() const;
+	bool IsDone() const;
+	void ChangeSource(IAudioSource* src);
 
-
-	AudioChannelClip* CurrentClip()
-	{
-		return queueSize > 0 ? &clipQueue[0] : nullptr;
-	}
-
-	void ClearQueue()
-	{
-		queueSize = 0;
-		playbackCompleted = true;
-	}
-
-	bool IsStreaming() const
-	{
-		return streamingCrt != nullptr;
-	}
-
-	void StopStreaming()
-	{
-		streamingCrt = nullptr;
-	}
-
-	bool IsDone() const { return queueSize == 0 && playbackCompleted; }
-
-	bool IsQueueFull() const { return queueSize == MaxQueueItems; }
-
-	bool QueueClip(AudioChannelClip clip)
-	{
-		if (queueSize == MaxQueueItems)
-			return false;
-
-		clipQueue[queueSize++] = clip;
-		return true;
-	}
-	void DequeueClip()
-	{
-		playbackCompleted = true;
-		if (queueSize == 0)
-			return;
-
-		--queueSize;
-		if (queueSize == 0)
-			return;
-
-		const auto& clip = clipQueue[queueSize];
-
-		clipQueue[queueSize - 1] = clip;
-		playbackCompleted = false;
-	}
-	bool IsValid() const { return handle != -1; }
+	inline bool IsValid() const { return handle != -1; }
+	const inline IAudioSource* GetStream() const { return stream; }
 };
