@@ -209,6 +209,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Widgets\UnitPortraitPanel.h">
       <Filter>Widgets</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\Pak.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -370,6 +373,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Engine\AudioChannel.cpp">
       <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\Pak.cpp">
+      <Filter>Loader</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

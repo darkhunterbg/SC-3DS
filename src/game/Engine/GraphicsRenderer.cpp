@@ -4,6 +4,7 @@
 #include "../Debug.h"
 #include "../Game.h"
 
+#include "JobSystem.h"
 
 GraphicsRenderer GraphicsRenderer::instance;
 
@@ -129,6 +130,9 @@ void GraphicsRenderer::DrawOnCurrentScreen()
 
 RenderSurface GraphicsRenderer::NewRenderSurface(Vector2Int size, bool pixelFiltering)
 {
+	GAME_ASSERT(IsMainThread(), "NewRenderSurface should be called on main thread!");
+	GAME_ASSERT(size.x > 0 && size.y > 0, "Tried to create surface with invalid size %ix%i", size.x, size.y);
+
 	TextureId t;
 	SurfaceId  s = Platform::NewRenderSurface(size, pixelFiltering, t);
 	RenderSurface rs;
@@ -143,6 +147,9 @@ RenderSurface GraphicsRenderer::NewRenderSurface(Vector2Int size, bool pixelFilt
 
 Texture* GraphicsRenderer::NewTexture(Vector2Int size, bool pixelFiltering)
 {
+	GAME_ASSERT(IsMainThread(), "NewTexture should be called on main thread!");
+	GAME_ASSERT(size.x > 0 && size.y > 0, "Tried to create texture with invalid size %ix%i", size.x, size.y);
+
 	TextureId t = Platform::NewTexture(size, pixelFiltering);
 	Texture* texture = new Texture("RuntimeTexture", Vector2Int16(size), t);
 

@@ -21,8 +21,15 @@ unsigned AudioClip::FillNextBuffer(Span<uint8_t> buffer)
 
 	unsigned size = buffer.Size();
 
+	size = std::min(size, info.GetTotalSize() - _streamPos);
+
 	if (size > 0)
+	{
+		fseek(stream, _streamStartPos + _streamPos, SEEK_SET);
 		size = fread(buffer.Data(), sizeof(uint8_t), size, stream);
+	}
+
+	_streamPos += size;
 
 	return size;
 }
@@ -30,6 +37,8 @@ bool AudioClip::Restart()
 {
 	if (stream == nullptr)
 		return true;
+
+	_streamPos = 0;
 
 	bool success = fseek(stream, _streamStartPos, SEEK_SET);
 	return success;
@@ -42,25 +51,26 @@ class AudioClipStreamAudioCrt : public CoroutineRImpl<unsigned> {
 	Span<uint8_t> _buffer;
 	int _read = 0;
 
-public: AudioClipStreamAudioCrt(AudioClip& clip, Span<uint8_t> buffer) : _clip(&clip), _buffer(buffer)
-{
+public:
+	AudioClipStreamAudioCrt(AudioClip& clip, Span<uint8_t> buffer) :
+		_clip(&clip), _buffer(buffer)
+	{
+	}
 
+	CRT_START()
+	{
+		if (_clip->IsAtEnd())
+		{
+			CRT_RETURN(0);
+		}
 
-}
-	  CRT_START()
-	  {
-		  if (_clip->IsAtEnd())
-		  {
-			  CRT_RETURN(0);
-		  }
+		_fillCrt = AssetLoader::RunIOAsync([this]() { _read = _clip->FillNextBuffer(_buffer); });
 
-		  _fillCrt = AssetLoader::RunIOAsync([this]() { _read = _clip->FillNextBuffer(_buffer); });
+		CRT_WAIT_FOR(_fillCrt);
 
-		  CRT_WAIT_FOR(_fillCrt);
-
-		  CRT_RETURN(_read);
-	  }
-	  CRT_END();
+		CRT_RETURN(_read);
+	}
+	CRT_END();
 };
 
 CoroutineR<unsigned> AudioClip::FillAudioAsync(Span<uint8_t> buffer)
@@ -73,18 +83,17 @@ AudioClip::AudioClip(AudioInfo info, FILE* stream)
 	this->stream = stream;
 
 	fgetpos(stream, &_streamStartPos);
+	//fclose(stream);
 }
 
 AudioClip::~AudioClip()
 {
-	if (stream != nullptr)
-		fclose(stream);
+	//if (stream != nullptr)
+	//	fclose(stream);
 }
 int AudioClip::GetRemaining() const
 {
-	fpos_t pos;
-	fgetpos(stream, &pos);
-	return info.GetTotalSize() - (pos - _streamStartPos);
+	return info.GetTotalSize() - _streamPos;
 }
 
 Vector2Int Font::MeasureString(const char* text) const
@@ -143,8 +152,28 @@ Vector2Int16 Image::GetImageFrameOffset(const ImageFrame& frame, bool hFlip) con
 }
 
 
-VideoClip::VideoClip(void* smkHandle) : _handle(smkHandle)
+VideoClip::VideoClip(FILE* stream) : _stream(stream)
 {
+	fgetpos(stream, &_streamStartPos);
+}
+VideoClip::~VideoClip()
+{
+	if (_handle)
+	{
+		if (_loadingCrt) _loadingCrt->RunAll();
+
+		smk_close((smk)_handle);
+		_handle = nullptr;
+
+	}
+}
+void VideoClip::OpenVideo()
+{
+	fseek(_stream, _streamStartPos, SEEK_SET);
+	_handle = smk_open_filepointer(_stream, SMK_MODE_DISK);
+
+	GAME_ASSERT(_handle, "Faield to load video from file pointer");
+
 	smk video = (smk)_handle;
 
 	unsigned char   a_trackmask, a_channels[7], a_depth[7];
@@ -172,10 +201,7 @@ VideoClip::VideoClip(void* smkHandle) : _handle(smkHandle)
 		_textureSize.y = _textureSize.y << 1;
 	}
 }
-VideoClip::~VideoClip()
-{
-	smk_close((smk)_handle);
-}
+
 bool VideoClip::IsAtEnd() const
 {
 	return GetCurrentFrame() == _totalFrames - 1;
@@ -187,8 +213,28 @@ long VideoClip::GetCurrentFrame() const
 	smk_info_all(video, &frame, nullptr, nullptr);
 	return (long)frame;
 }
+void VideoClip::Close()
+{
+	if (_handle)
+	{
+		if (_loadingCrt) _loadingCrt->RunAll();
+		_loadingCrt = nullptr;
+
+		smk_close((smk)_handle);
+		_handle = nullptr;
+	}
+
+	if (_hasAudio)
+	{
+		_audioSrc.ClearBuffers();
+		_audioData.resize(0);
+		_audioData.shrink_to_fit();
+	}
+}
 IAudioSource* VideoClip::PrepareAudio()
 {
+	Warmup();
+
 	if (!_hasAudio) return nullptr;
 
 	if (_audioData.size() == 0)
@@ -206,7 +252,6 @@ IAudioSource* VideoClip::PrepareAudio()
 			int offset = _audioData.size();
 			_audioData.resize(offset + size);
 
-
 			memcpy(_audioData.data() + offset, audio, size);
 			smk_next(video);
 		}
@@ -223,39 +268,30 @@ IAudioSource* VideoClip::PrepareAudio()
 	return &_audioSrc;
 }
 
-
-class VideoClipLoadLoadFrameCrt : public CoroutineImpl {
-private:
-	smk video;
-	bool firstFrame;
-public:
-	VideoClipLoadLoadFrameCrt(smk video, bool first) : video(video), firstFrame(first) {}
-
-	CRT_START()
-	{
-		if (firstFrame)
-		{
-			smk_enable_audio(video, 0, false);
-			smk_enable_video(video, true);
-			CRT_WAIT_FOR(AssetLoader::RunIOAsync([this]() {smk_first(video); }));
-		}
-		else
-		{
-			CRT_WAIT_FOR(AssetLoader::RunIOAsync([this]() {smk_next(video); }));
-		}
-	}
-	CRT_END();
-};
-
 Coroutine VideoClip::LoadFirstFrameAsync()
 {
-	auto crt = new VideoClipLoadLoadFrameCrt((smk)_handle, true);
-	return Coroutine(crt);
+	Warmup();
+
+	if (_loadingCrt) _loadingCrt->RunAll();
+
+	smk video = (smk)_handle;
+
+	smk_enable_audio(video, 0, false);
+	smk_enable_video(video, true);
+
+	_loadingCrt = AssetLoader::RunIOAsync([video]() {smk_first(video); });
+	return _loadingCrt;
 }
 Coroutine VideoClip::LoadNextFrameAsync()
 {
-	auto crt = new VideoClipLoadLoadFrameCrt((smk)_handle, false);
-	return Coroutine(crt);
+	Warmup();
+
+	if (_loadingCrt) _loadingCrt->RunAll();
+
+	smk video = (smk)_handle;
+
+	_loadingCrt = AssetLoader::RunIOAsync([video]() {smk_next(video); });
+	return _loadingCrt;
 }
 void VideoClip::DecodeCurrentFrame(uint8_t* pixelData, int texLineSize)
 {

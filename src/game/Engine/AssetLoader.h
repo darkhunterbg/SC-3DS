@@ -31,6 +31,11 @@ class AssetLoader {
 		volatile bool completed = false;
 	};
 
+	struct PakAssetEntry {
+		FILE* file;
+		unsigned position;
+		unsigned size;
+	};
 
 private:
 
@@ -44,6 +49,7 @@ private:
 	AssetLoader& operator=(const AssetLoader&) = delete;
 	AssetLoader() {}
 
+	std::unordered_map<AssetId, PakAssetEntry> _assets;
 	std::unordered_map<AssetId, AssetEntry> loadedAssets;
 
 	static AssetLoader instance;
@@ -59,6 +65,7 @@ private:
 		return instance.AssetTypeName[(unsigned)type];
 	}
 
+	void LoadPack(const char* packFileName);
 
 public:
 	inline static GameDatabase& GetDatabase()

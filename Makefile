@@ -34,7 +34,7 @@ include $(DEVKITARM)/3ds_rules
 
 
 TARGET		:=	SC
-BUILD		:=	build
+BUILD		:=	tmp
 SOURCES		:=	src/game src/game/Data src/game/Engine src/game/Entity src/game/GUI src/game/Loader src/game/Widgets src/game/Scenes src/game/SceneView
 
 SOURCES		+= src/3ds src/3ds/citro2d src/3ds/citro2d/c2d 
@@ -66,7 +66,12 @@ endif
 
 CFLAGS	+=	$(INCLUDE) -DARM11 -D_3DS
 
+# FASTER BUILD
+
+CFLAGS	+=	-w
+
 CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++17 -Wno-unused-function -Wno-unused-variable -fpermissive
+
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)

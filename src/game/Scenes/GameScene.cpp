@@ -9,6 +9,7 @@
 
 #include "../Engine/GraphicsRenderer.h"
 #include "../Entity/EntityUtil.h"
+#include "../Engine/AssetLoader.h"
 
 #include <algorithm>
 
@@ -105,8 +106,10 @@ void GameScene::Stop()
 {
 	delete _view;
 	_view = nullptr;
+
+	AssetLoader::GetDatabase().ReleaseLoadedAssets();
+
 }
-int t = 0;
 
 void GameScene::Update()
 {

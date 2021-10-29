@@ -24,12 +24,13 @@ Span<uint8_t> AudioChannelState::GetNextAudioData()
 		StartStreamingNextBuffer();
 	}
 
-	return { CurrentBuffer().buffer.Data() + bufferPosition, Remaining() };
+	Span<uint8_t> audio = { CurrentBuffer().buffer.Data() + bufferPosition, Remaining() };
+	return audio;
 }
 
 void AudioChannelState::FinishStreaming()
 {
-	if (!streamingCrt ) return;
+	if (!streamingCrt) return;
 
 	auto& streamingBuffer = StreamingBuffer();
 
@@ -67,14 +68,15 @@ bool AudioChannelState::IsDone()  const
 
 void AudioChannelState::ChangeSource(IAudioSource* src)
 {
-	GAME_ASSERT(CurrentBuffer().buffer.Size() != 0, "AudioChannel %i (handle: %i) has no buffers!",  ChannelId, handle);
+	GAME_ASSERT(CurrentBuffer().buffer.Size() != 0, "AudioChannel %i (handle: %i) has no buffers!", ChannelId, handle);
 
 	// WARNING: this is not thread-safe, audio thread might be reading this stream, use some kind of mutex
 
 	stream = src;
 	bufferPosition = 0;
 	CurrentBuffer().size = 0;
-	StartStreamingNextBuffer();
+	if (stream)
+		StartStreamingNextBuffer();
 }
 
 unsigned AudioChannelState::Remaining() const

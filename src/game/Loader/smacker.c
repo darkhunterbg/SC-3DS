@@ -54,6 +54,7 @@ struct smk_t
 			/* on-disk mode */
 			FILE* fp;
 			unsigned long* chunk_offset;
+			unsigned long stream_start;
 		} file;
 
 		/* in-memory mode: unprocessed chunks */
@@ -395,15 +396,17 @@ static smk smk_open_generic(const unsigned char m, union smk_read_t fp, unsigned
 		/* MODE_STREAM: don't read anything now, just precompute offsets.
 			use fseek to verify that the file is "complete" */
 		smk_malloc(s->source.file.chunk_offset,(s->f + s->ring_frame) * sizeof(unsigned long));
+		long offset = ftell(fp.file);
 		for (temp_u = 0; temp_u < (s->f + s->ring_frame); temp_u ++)
 		{
-			s->source.file.chunk_offset[temp_u] = ftell(fp.file);
-			if (fseek(fp.file,s->chunk_size[temp_u],SEEK_CUR))
+			s->source.file.chunk_offset[temp_u] = offset;
+			/*if (fseek(fp.file,s->chunk_size[temp_u],SEEK_CUR))
 			{
 				fprintf(stderr,"libsmacker::smk_open - ERROR: fseek to frame %lu not OK.\n",temp_u);
 				perror ("\tError reported was");
 				goto error;
-			}
+			}*/
+			offset += s->chunk_size[temp_u];
 		}
 	}
 
@@ -449,20 +452,25 @@ smk smk_open_filepointer(FILE* file, const unsigned char mode)
 	/* Copy file ptr to internal union */
 	fp.file = file;
 
+	fpos_t pos;
+
+	fgetpos(file, &pos);
+
 	if (!(s = smk_open_generic(1,fp,0,mode)))
 	{
 		fprintf(stderr,"libsmacker::smk_open_filepointer(file,%u) - ERROR: Fatal error in smk_open_generic, returning NULL.\n",mode);
-		fclose(fp.file);
+		//fclose(fp.file);
 		goto error;
 	}
 
 	if (mode == SMK_MODE_MEMORY)
 	{
-		fclose(fp.file);
+		//fclose(fp.file);
 	}
 	else
 	{
 		s->source.file.fp = fp.file;
+		s->source.file.stream_start = 0;// (unsigned long)pos;
 	}
 
 	/* fall through, return s or null */
@@ -520,10 +528,10 @@ void smk_close(smk s)
 	if (s->mode == SMK_MODE_DISK)
 	{
 		/* disk-mode */
-		if (s->source.file.fp)
+		/*if (s->source.file.fp)
 		{
 			fclose(s->source.file.fp);
-		}
+		}*/
 		smk_free(s->source.file.chunk_offset);
 	}
 	else
@@ -1231,7 +1239,7 @@ static char smk_render(smk s)
 	if (s->mode == SMK_MODE_DISK)
 	{
 		/* Skip to frame in file */
-		if (fseek(s->source.file.fp,s->source.file.chunk_offset[s->cur_frame],SEEK_SET))
+		if (fseek(s->source.file.fp,s->source.file.chunk_offset[s->cur_frame]  ,SEEK_SET))
 		{
 			fprintf(stderr,"libsmacker::smk_render(s) - ERROR: fseek to frame %lu (offset %lu) failed.\n",s->cur_frame,s->source.file.chunk_offset[s->cur_frame]);
 			perror ("\tError reported was");

@@ -66,6 +66,7 @@ void AudioManager::Play(IAudioSource& src, int c)
 void AudioManager::StopChannel(int c)
 {
 	auto& channel = instance.channels[c];
+	channel.ChangeSource(nullptr);
 	Platform::EnableChannel(channel, false);
 }
 
@@ -82,6 +83,7 @@ void AudioManager::StopAll()
 			continue;
 
 		Platform::EnableChannel(channel, false);
+		channel.ChangeSource(nullptr);
 	}
 }
 

@@ -202,6 +202,14 @@ Coroutine GameDatabase::LoadAssetReferencesAsync()
 	return Coroutine(new GameDatabaseLoadAsetReferencesCrt(this));
 }
 
+void GameDatabase::ReleaseLoadedAssets()
+{
+	for (auto* clip : videoClips)
+	{
+		clip->Close();
+	}
+}
+
 void GameDatabase::CreateRaces()
 {
 	RaceDefs.reserve(3);

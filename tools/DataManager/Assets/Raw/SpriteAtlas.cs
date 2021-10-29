@@ -17,9 +17,6 @@ namespace DataManager.Assets
 
 		public IEnumerable<SpriteSubAtlas> SubAtlases => subAtlases;
 
-		[Ignore]
-		public string InfoFilePath => $"{ AssetManager.SpriteAtlasOutDir}{Name}.t3s";
-
 		public void AddSubAtlas(IEnumerable<ImageFrameAtlasData> assets)
 		{
 			subAtlases.Add(new SpriteSubAtlas()

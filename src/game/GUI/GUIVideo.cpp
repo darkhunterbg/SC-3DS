@@ -50,6 +50,8 @@ static void Decode(VideoClip& clip, VideoFrameRenderData* data)
 
 bool GUIVideo::DrawVideo(const char* id, VideoClip& clip, bool loop, Color color)
 {
+	clip.Warmup();
+
 	Vector2Int textureSize = clip.GetTextureSize();
 
 	std::string key = id;
@@ -60,11 +62,13 @@ bool GUIVideo::DrawVideo(const char* id, VideoClip& clip, bool loop, Color color
 	{
 		data = new	VideoFrameRenderData(textureSize);
 		GUI::RegisterResource(key, data, [](void* p) {delete (VideoFrameRenderData*)p;  });
-
 	}
 
 	if (data->clip != &clip)
 	{
+		if (data->clip)
+			data->clip->Close();
+
 		data->countdown = -0.001f;
 		data->clip = &clip;
 		data->audioSrc = clip.PrepareAudio();
@@ -132,9 +136,7 @@ bool GUIVideo::DrawVideo(const char* id, VideoClip& clip, bool loop, Color color
 		data->decoded = false;
 	}
 
-
 	GUIImage::DrawSubTexture(*data->texture, { {0,0},clip.GetFrameSize() }, color);
-
 
 	return ended;
 }

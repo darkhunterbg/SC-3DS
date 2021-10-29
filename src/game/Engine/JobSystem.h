@@ -4,7 +4,6 @@
 #include <vector>
 #include <functional>
 
-
 typedef void* Semaphore;
 
 
@@ -86,3 +85,7 @@ public:
 	inline Span<T> GetAll() { return { items, size }; }
 };
 
+inline bool IsMainThread()
+{
+	return  CurrentThreadId == 0;
+}

@@ -4,10 +4,11 @@
 #include "../Loader/Wave.h"
 #include "../Loader/BinaryData.h"
 #include "../Loader/smacker.h"
+#include "../Loader/Pak.h"
 
-static AudioClip* LoadAudioClipFromFile(const char* path);
+#include "JobSystem.h"
+
 static Texture* LoadTextureFromFile(const char* path);
-static VideoClip* LoadVideoClipFromFile(const char* path);
 
 static constexpr const char* DataFile = "data";
 
@@ -33,14 +34,39 @@ void AssetLoader::ProcessIORequests(int threadId)
 	}
 }
 
+void AssetLoader::LoadPack(const char* packFileName)
+{
+	FILE* f = Platform::OpenAsset(packFileName, AssetType::Unknown);
+	GAME_ASSERT(f, "Failed to load %s", packFileName);
+
+	std::vector<PakFileEntry> files;
+
+	PakLoader::LoadEntries(f, files);
+
+	for (const auto& e : files)
+	{
+		AssetId id = instance.hasher(e.name);
+		_assets[id] = PakAssetEntry{ f,e.offset, e.size };
+	}
+
+	// Don't close pak file's stream
+
+	//if (f != nullptr)
+	//	fclose(f);
+}
+
 void AssetLoader::Init()
 {
 	instance._semaphore = Platform::CreateSemaphore();
 	instance._usesIOThread = Platform::TryStartThreads(ThreadUsageType::IO, 1, ProcessIORequests) > 0;
+	instance.LoadPack("audio.pak");
+	instance.LoadPack("video.pak");
 }
 
 Texture* AssetLoader::LoadTexture(const char* path)
 {
+	GAME_ASSERT(IsMainThread(), "LoadTexture should be called only on main thread!");
+
 	std::string p = path;
 	AssetId id = instance.hasher(p);
 	AssetEntry& e = instance.loadedAssets[id];
@@ -65,6 +91,8 @@ Texture* AssetLoader::LoadTexture(const char* path)
 
 void AssetLoader::UnloadTexture(Texture* texture)
 {
+	GAME_ASSERT(IsMainThread(), "UnloadTexture should be called only on main thread!");
+
 	if (!texture) return;
 
 	AssetEntry& e = instance.loadedAssets[texture->Id];
@@ -78,6 +106,8 @@ void AssetLoader::UnloadTexture(Texture* texture)
 
 Font* AssetLoader::LoadFont(const char* path, int size)
 {
+	GAME_ASSERT(IsMainThread(), "LoadFont should be called only on main thread!");
+
 	std::string p = path;
 	AssetId id = instance.hasher(p);
 	id = (id * 513269) ^ intHasher(size);
@@ -101,13 +131,28 @@ Font* AssetLoader::LoadFont(const char* path, int size)
 
 AudioClip* AssetLoader::LoadAudioClip(const char* path)
 {
+	GAME_ASSERT(IsMainThread(), "LoadAudioClip should be called only on main thread!");
+
 	std::string p = path;
 	AssetId id = instance.hasher(p);
 	AssetEntry& e = instance.loadedAssets[id];
 
 	if (e.id == 0)
 	{
-		e.data = LoadAudioClipFromFile(p.data());
+		PakAssetEntry& pak = instance._assets[id];
+
+		if (pak.size == 0)
+			EXCEPTION("Failed to load audio clip '%s'", path);
+
+		AudioInfo info;
+
+		fseek(pak.file, pak.position, SEEK_SET);
+
+		if (!WaveLoader::ReadWAVHeader(pak.file, &info))
+			EXCEPTION("Failed to read WAV header in '%s'!", path);
+
+
+		e.data = new AudioClip(info, pak.file);
 		e.type = AssetType::AudioClip;
 		e.id = id;
 	}
@@ -123,13 +168,22 @@ AudioClip* AssetLoader::LoadAudioClip(const char* path)
 
 VideoClip* AssetLoader::LoadVideoClip(const char* path)
 {
+	GAME_ASSERT(IsMainThread(), "LoadVideoClip should be called only on main thread!");
+
 	std::string p = path;
 	AssetId id = instance.hasher(p);
 	AssetEntry& e = instance.loadedAssets[id];
 
 	if (e.id == 0)
 	{
-		e.data = LoadVideoClipFromFile(p.data());
+		PakAssetEntry& pak = instance._assets[id];
+
+		if (pak.size == 0)
+			EXCEPTION("Failed to load audio clip '%s'", path);
+
+		fseek(pak.file, pak.position, SEEK_SET);
+
+		e.data = new VideoClip(pak.file);
 		e.type = AssetType::VideoClip;
 		e.id = id;
 		((VideoClip*)e.data)->Id = id;
@@ -145,6 +199,7 @@ VideoClip* AssetLoader::LoadVideoClip(const char* path)
 }
 void AssetLoader::UnloadVideoClip(VideoClip* clip)
 {
+	GAME_ASSERT(IsMainThread(), "UnloadVideoClip should be called only on main thread!");
 	GAME_ASSERT(clip, "Tried to unload nullptr clip!");
 
 	if (!clip) return;
@@ -157,55 +212,8 @@ void AssetLoader::UnloadVideoClip(VideoClip* clip)
 
 	delete clip;
 }
-static VideoClip* LoadVideoClipFromFile(const char* path)
-{
-	std::string p = path;
 
-	FILE* f = Platform::OpenAsset(p.data(), AssetType::VideoClip);
 
-	if (f == nullptr)
-		EXCEPTION("Failed to open asset '%s'!", p.data());
-
-	smk handle = smk_open_filepointer(f, SMK_MODE_DISK);
-	if (handle == nullptr)
-		EXCEPTION("Failed to load SMK video '%s'!", p.data());
-
-	return new VideoClip(handle);
-
-}
-static uint16_t audioClipId = 0;
-static AudioClip* LoadAudioClipFromFile(const char* path)
-{
-	std::string p = path;
-
-	FILE* f = Platform::OpenAsset(p.data(), AssetType::AudioClip);
-
-	if (f == nullptr)
-		EXCEPTION("Failed to open asset '%s'!", p.data());
-
-	AudioInfo info;
-
-	if (!WaveLoader::ReadWAVHeader(f, &info))
-		EXCEPTION("Failed to read WAV header in '%s'!", p.data());
-
-	AudioClip* stream = nullptr;
-
-	if (info.GetTotalSize() < 1024 * 200)
-	{
-		stream = new AudioClip(info, f);
-
-		fclose(f);
-
-	}
-	else
-	{
-		stream = new AudioClip(info, f);
-	}
-
-	stream->id = ++audioClipId;
-
-	return stream;
-}
 static Texture* LoadTextureFromFile(const char* path)
 {
 	std::string p = path;

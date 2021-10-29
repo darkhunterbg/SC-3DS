@@ -58,6 +58,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUITooltip.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIVideo.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\BinaryData.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\Pak.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\smacker.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\smk_bitstream.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\smk_hufftree.h" />
@@ -125,6 +126,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUITooltip.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIVideo.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\BinaryData.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\Pak.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\smacker.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\smk_bitstream.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\smk_hufftree.c" />

@@ -170,7 +170,6 @@ namespace DataManager
 
 			op.Title = "Finalizing";
 			op.ItemName = "Reloading assets...";
-			op.Progress = 0.9f;
 
 			ReloadAssets();
 

@@ -132,8 +132,9 @@ FILE* Platform::OpenAsset(const char* path, AssetType type)
 	default:
 		break;
 	}
+	std::string str = f.generic_string();
 
-	return fopen(f.generic_string().data(), "rb");
+	return fopen(str.data(), "rb");
 }
 
 void Platform::DrawOnScreen(ScreenId screen)

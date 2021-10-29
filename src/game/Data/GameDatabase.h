@@ -90,4 +90,6 @@ public:
 	}
 
 	Coroutine LoadAssetReferencesAsync();
+
+	void ReleaseLoadedAssets();
 };

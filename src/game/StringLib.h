@@ -83,6 +83,4 @@ namespace String {
 
 	int FindStr(std::string text, Span<char> symbols, unsigned offset = 0);
 	int FindStr(std::string  text, char symbol, unsigned offset = 0);
-
-
 }

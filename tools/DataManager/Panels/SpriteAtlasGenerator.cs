@@ -286,11 +286,6 @@ namespace DataManager.Panels
 
 			BuildGenerator build = new BuildGenerator() { Build3DS = build3DS };
 
-			if (Directory.Exists(AssetManager.SpriteAtlas3DSBuildDir))
-				foreach (var file in Directory.GetFiles(AssetManager.SpriteAtlas3DSBuildDir))
-					File.Delete(file);
-
-
 			var op = build.BuildAtlases(entries);
 
 			op.Title = "Building atlases";

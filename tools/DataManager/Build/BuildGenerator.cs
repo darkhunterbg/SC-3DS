@@ -29,6 +29,38 @@ namespace DataManager.Build
 				   "glue\\mainmenu\\multi.smk",  "glue\\mainmenu\\multion.smk",
 			};
 
+
+		IEnumerable<PackEntry> GetAdditionalPackVideo()
+		{
+			return additionalBuildFiles.Where(s => s.EndsWith(".smk"))
+				.Select(s => new PackEntry()
+				{
+					RelativePath = s.Substring(0,s.Length-4),
+					FilePath = AssetManager.StarcraftAssetDir + s
+				});
+		}
+
+		IEnumerable<PackEntry> GetAdditionalPackAudio()
+		{
+			return additionalBuildFiles.Where(s => s.EndsWith(".wav"))
+				.Select(s => new PackEntry()
+				{
+					RelativePath = s.Substring(0, s.Length - 4),
+					FilePath = AssetManager.StarcraftAssetDir + s
+				});
+		}
+
+		IEnumerable<PackEntry> GetAdditionalPackOther()
+		{
+			return additionalBuildFiles.Where(s => !s.EndsWith(".wav") && !s.EndsWith("smk"))
+				.Select(s => new PackEntry()
+				{
+					RelativePath = s,
+					FilePath = AssetManager.AssetsDir + s
+				});
+		}
+
+
 		public static BuildGenerator Instance { get; private set; }
 
 		private List<SpriteAtlasEntry> atlases = null;
@@ -69,12 +101,6 @@ namespace DataManager.Build
 		{
 			this.atlases = atlases;
 
-			Directory.Delete(AssetManager.SpriteAtlasOutDir, true);
-			Directory.Delete(AssetManager.SpriteAtlas3DSBuildDir, true);
-
-			Directory.CreateDirectory(AssetManager.SpriteAtlasOutDir);
-			Directory.CreateDirectory(AssetManager.SpriteAtlas3DSBuildDir);
-
 			totalJobs = atlases.Count;
 
 			return new AsyncOperation(BuildAsync, OnCancelAsync);
@@ -90,11 +116,13 @@ namespace DataManager.Build
 			currentJob = 0;
 
 			Directory.Delete(AssetManager.CookedAssetsPCDir, true);
+			Directory.CreateDirectory(AssetManager.CookedAssetsPCDir);
 			if (Build3DS) {
 				Directory.Delete(AssetManager.Cooked3DSAssetsDir, true);
+				Directory.CreateDirectory(AssetManager.Cooked3DSAssetsDir);
 			}
 
-			
+
 			totalJobs = atlases.Count;
 			foreach (var atlas in atlases) {
 				++currentJob;
@@ -152,7 +180,7 @@ namespace DataManager.Build
 		{
 			if (subAtlases.Count == 1) {
 				var f = subAtlases[0].GetFrames();
-				if(f.Count== 1) {
+				if (f.Count == 1) {
 					var r = new AtlasBSPTree(f[0].rect.Width, f[0].rect.Height);
 					r.TryAdd(f[0].image);
 
@@ -462,28 +490,16 @@ namespace DataManager.Build
 			var items = sounds.SelectMany(s => s.Clips).Where(c => !c.IsEmpty).Select(s => s.Clip).ToList();
 			items.AddRange(AppGame.AssetManager.AudioClips.Where(c => c.RelativePath.Contains("sound\\misc")));
 			items = items.Distinct().ToList();
-			currentJob = 0;
-			totalJobs = items.Count;
 
-			Progress(currentJob, totalJobs);
 
-			foreach (var audio in items) {
-				DisplayItem(audio.RelativePath);
-				var dir = Path.GetDirectoryName(Path.Combine(AssetManager.CookedAssetsPCDir, audio.RelativePath));
-				Directory.CreateDirectory(dir);
-				var path = Path.Combine(dir, Path.GetFileName(audio.FilePath));
-				File.Copy(audio.FilePath, path, true);
 
-				if (Build3DS) {
-					dir = Path.GetDirectoryName(Path.Combine(AssetManager.Cooked3DSAssetsDir, audio.RelativePath));
-					path = Path.Combine(dir, Path.GetFileName(audio.FilePath));
-					Directory.CreateDirectory(dir);
-					File.Copy(audio.FilePath, path, true);
-				}
+			var audio = items.Select(s => new PackEntry() { FilePath = s.FilePath, RelativePath = s.RelativePath }).ToList();
+			audio.AddRange(GetAdditionalPackAudio());
+			audio.Distinct().ToList();
+			PackAssets(audio, Path.Combine(AssetManager.CookedAssetsPCDir, "audio.pak"));
 
-				++currentJob;
-				Progress(currentJob, totalJobs);
-			}
+			if (Build3DS)
+				PackAssets(audio, Path.Combine(AssetManager.Cooked3DSAssetsDir, "audio.pak"));
 		}
 
 		private void BuildVideo()
@@ -495,56 +511,44 @@ namespace DataManager.Build
 			var items = portraits.SelectMany(s => s.IdleClips).Where(c => !c.IsEmpty).Select(s => s.Clip).ToList();
 			items.AddRange(portraits.SelectMany(s => s.ActivatedClips).Where(c => !c.IsEmpty).Select(s => s.Clip).ToList());
 			items = items.Distinct().ToList();
-			currentJob = 0;
-			totalJobs = items.Count;
 
-			Progress(currentJob, totalJobs);
 
-			foreach (var video in items) {
-				DisplayItem(video.RelativePath);
-				var dir = Path.GetDirectoryName(Path.Combine(AssetManager.CookedAssetsPCDir, video.RelativePath));
-				Directory.CreateDirectory(dir);
-				var path = Path.Combine(dir, Path.GetFileName(video.FilePath));
-				File.Copy(video.FilePath, path, true);
+			var videos = items.Select(s => new PackEntry() { FilePath = s.FilePath, RelativePath = s.RelativePath }).ToList();
+			videos.AddRange(GetAdditionalPackVideo());
+			videos = videos.Distinct().ToList();
+			PackAssets(videos, Path.Combine(AssetManager.CookedAssetsPCDir, "video.pak"));
 
-				if (Build3DS) {
-					dir = Path.GetDirectoryName(Path.Combine(AssetManager.Cooked3DSAssetsDir, video.RelativePath));
-					path = Path.Combine(dir, Path.GetFileName(video.FilePath));
-					Directory.CreateDirectory(dir);
-					File.Copy(video.FilePath, path, true);
-				}
-
-				++currentJob;
-				Progress(currentJob, totalJobs);
-			}
+			if (Build3DS)
+				PackAssets(videos, Path.Combine(AssetManager.Cooked3DSAssetsDir, "video.pak"));
 		}
 
 		private void BuildOther()
 		{
 			currentJob = 0;
-			totalJobs = additionalBuildFiles.Count();
+			totalJobs = GetAdditionalPackOther().Count();
 
 			Progress(currentJob, totalJobs);
 
-			foreach (var f in additionalBuildFiles) {
-				DisplayItem(f);
+			foreach (var f in GetAdditionalPackOther()) {
+				DisplayItem(f.RelativePath);
 
-				var src = Path.Combine(AssetManager.AssetsDir, f);
-				if (!File.Exists(src)) {
-					src = Path.Combine(AssetManager.StarcraftAssetDir, f);
-				}
-				
-					
-				var dst = Path.Combine(AssetManager.CookedAssetsPCDir, f);
+				//var src = Path.Combine(AssetManager.AssetsDir, f);
+				//if (!File.Exists(src)) {
+				//	src = Path.Combine(AssetManager.StarcraftAssetDir, f);
+				//}
+
+
+
+				var dst = Path.Combine(AssetManager.CookedAssetsPCDir, f.RelativePath);
 				Directory.CreateDirectory(Path.GetDirectoryName(dst));
-				File.Copy(src, dst, true);
+				File.Copy(f.FilePath, dst, true);
 
 				if (Build3DS) {
 
-					if (f.EndsWith(".png")) {
+					if (f.RelativePath.EndsWith(".png")) {
 
-						string inputTexture = src;
-						string outFile = Path.ChangeExtension(Path.GetFullPath(Path.Combine(AssetManager.Cooked3DSAssetsDir, f)), "t3x");
+						string inputTexture = f.FilePath;
+						string outFile = Path.ChangeExtension(Path.GetFullPath(Path.Combine(AssetManager.Cooked3DSAssetsDir, f.RelativePath)), "t3x");
 
 						Directory.CreateDirectory(Path.GetDirectoryName(outFile));
 
@@ -567,10 +571,10 @@ namespace DataManager.Build
 						string error = p.StandardError.ReadToEnd();
 						if (!string.IsNullOrEmpty(error))
 							throw new Exception($"Failed to build atlas {f}: {error}");
-					} else if (f.EndsWith(".ttf")) {
+					} else if (f.RelativePath.EndsWith(".ttf")) {
 
-						string input = src;
-						string outFile = Path.ChangeExtension(Path.GetFullPath(Path.Combine(AssetManager.Cooked3DSAssetsDir, f)), "bcfnt");
+						string input = f.FilePath;
+						string outFile = Path.ChangeExtension(Path.GetFullPath(Path.Combine(AssetManager.Cooked3DSAssetsDir, f.RelativePath)), "bcfnt");
 
 						Directory.CreateDirectory(Path.GetDirectoryName(outFile));
 
@@ -595,9 +599,9 @@ namespace DataManager.Build
 							throw new Exception($"Failed to build font {f}: {error}");
 
 					} else {
-						string outFile = Path.Combine(AssetManager.Cooked3DSAssetsDir, f);
+						string outFile = Path.Combine(AssetManager.Cooked3DSAssetsDir, f.RelativePath);
 						Directory.CreateDirectory(Path.GetDirectoryName(outFile));
-						File.Copy(src, outFile, true);
+						File.Copy(f.RelativePath, outFile, true);
 					}
 				}
 
@@ -750,6 +754,88 @@ namespace DataManager.Build
 		public void Dispose()
 		{
 			spriteBatch.Dispose();
+		}
+
+		class PackEntry
+		{
+			public string FilePath;
+			public string RelativePath;
+			public uint Offset;
+			public uint Size;
+		}
+
+
+		void PackAssets(List<PackEntry> files, string dst)
+		{
+			currentJob = 0;
+			totalJobs = files.Count();
+
+			Progress(currentJob, totalJobs);
+
+			DisplayItem($"Packing {dst}");
+
+
+			using (MemoryStream header = new MemoryStream()) {
+
+				header.Write(BinaryAttribute.Serialize(files.Count(), typeof(uint)));
+
+				foreach (var file in files) {
+
+
+					byte[] path = BinaryAttribute.Serialize(file.RelativePath, BinaryType.String, 64);
+					header.Write(path);
+
+					// File offset 
+					header.Write(BinaryAttribute.Serialize(0, typeof(uint)));
+					// File size
+					file.Size = (uint)new FileInfo(file.FilePath).Length;
+					header.Write(BinaryAttribute.Serialize(file.Size, typeof(uint)));
+				}
+
+				int fileIndex = 0;
+
+				if (!Directory.Exists(Path.GetDirectoryName(dst)))
+					Directory.CreateDirectory(Path.GetDirectoryName(dst));
+
+				uint fileSize = 0;
+				using (FileStream fs = new FileStream(dst, FileMode.CreateNew)) {
+
+					header.Position = 0;
+					fs.Write(header.ToArray());
+
+					foreach (var file in files) {
+						++currentJob;
+
+						DisplayItem(file.RelativePath);
+
+						file.Offset = (uint)fs.Position;
+						header.Position = 4 + fileIndex * (64 + 4 + 4) + 64;
+						header.Write(BinaryAttribute.Serialize(file.Offset, typeof(uint)));
+
+						fs.Write(File.ReadAllBytes(file.FilePath));
+
+						++fileIndex;
+
+						Progress(currentJob, totalJobs);
+					}
+
+					// Override updated header
+
+					fs.Position = 0;
+					header.Position = 0;
+					fs.Write(header.ToArray());
+					fileSize = (uint)fs.Length;
+				}
+
+
+				if (fileSize != (uint)header.Length + files.Sum(s => s.Size))
+					throw new Exception("Pak file size mismatch!");
+
+				for (int i = 0; i < files.Count - 1; ++i) {
+					if (files[i].Offset + files[i].Size != files[i + 1].Offset)
+						throw new Exception("Pak files overlapping!");
+				}
+			}
 		}
 	}
 }

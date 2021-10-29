@@ -37,10 +37,12 @@ union SubImageCoord {
 		Vector2 bottomRight;
 	} corners;
 
-	inline Vector2 GetSize() const {
+	inline Vector2 GetSize() const
+	{
 		return corners.bottomRight - corners.topLeft;
 	}
-	inline Rectangle16 GetSource(Vector2Int16 texSize) const {
+	inline Rectangle16 GetSource(Vector2Int16 texSize) const
+	{
 		Vector2Int16 pos = Vector2Int16(Vector2(texSize) * corners.topLeft);
 		Vector2Int16 size = Vector2Int16(Vector2(texSize) * GetSize());
 		return { pos,size };
@@ -53,15 +55,18 @@ private:
 	Vector2Int16 size;
 	std::string name;
 public:
-	 AssetId Id;
+	AssetId Id;
 
 	Texture(const Texture&) = delete;
 	~Texture();
 
 	Texture(const std::string& name, Vector2Int16 size, TextureId id) :
-		id(id), size(size), name(name) {}
+		id(id), size(size), name(name)
+	{
+	}
 
-	inline const std::string& GetName() const {
+	inline const std::string& GetName() const
+	{
 		return name;
 	}
 	inline const Vector2Int16& GetSize() const { return size; };
@@ -96,10 +101,12 @@ struct ImageFrame {
 	ImageFrame() {}
 	ImageFrame(const Texture& texture, const ImageFrameDef& def);
 
-	inline Rectangle GetRect() const {
+	inline Rectangle GetRect() const
+	{
 		return { Vector2Int(offset), Vector2Int(size) };
 	}
-	inline Rectangle16 GetRect16() const {
+	inline Rectangle16 GetRect16() const
+	{
 		return { offset, size };
 	}
 
@@ -134,29 +141,35 @@ struct AudioInfo {
 	int sampleChannelSize;
 	int samplesCount;
 
-	inline int GetTotalSize() const {
+	inline int GetTotalSize() const
+	{
 		return GetSampleSize() * samplesCount;
 	}
 
-	inline int GetSampleSize() const {
+	inline int GetSampleSize() const
+	{
 		return channels * sampleChannelSize;
 	}
 
-	inline int GetBytesPerSec() const {
+	inline int GetBytesPerSec() const
+	{
 		return GetSampleSize() * sampleRate;
 	}
 
-	inline float GetDurationSeconds() const {
+	inline float GetDurationSeconds() const
+	{
 		return GetTotalSize() / (float)GetBytesPerSec();
 	}
 };
 
 class AudioClip : public IAudioSource {
 public:
-	int GetSize() const {
+	int GetSize() const
+	{
 		return info.GetTotalSize();
 	}
-	float GetDuration() const {
+	float GetDuration() const
+	{
 		return info.GetDurationSeconds();
 	}
 	virtual bool IsAtEnd() const override
@@ -177,13 +190,12 @@ public:
 	AudioClip(AudioInfo info, FILE* stream);
 	virtual ~AudioClip() override;
 
-	uint16_t id = 0;
-
 	unsigned FillNextBuffer(Span<uint8_t> buffer);
 private:
 	AudioInfo info;
 	FILE* stream;
 	fpos_t _streamStartPos = 0;
+	unsigned _streamPos = 0;
 };
 
 
@@ -195,7 +207,7 @@ public:
 	VideoClip(const VideoClip&) = delete;
 	VideoClip& operator=(const VideoClip&) = delete;
 
-	VideoClip(void* smkHandle);
+	VideoClip(FILE* stream);
 	~VideoClip();
 
 	IAudioSource* PrepareAudio();
@@ -205,7 +217,7 @@ public:
 	Coroutine LoadNextFrameAsync();
 	void DecodeCurrentFrame(uint8_t* outPixelData, int texLineSize);
 
-	
+
 	inline Vector2Int GetTextureSize() const { return _textureSize; }
 
 	bool IsAtEnd() const;
@@ -220,13 +232,20 @@ public:
 	}
 	long GetCurrentFrame() const;
 	inline bool HasAudio() const { return _hasAudio; }
+	inline void Warmup() { if (!_handle) OpenVideo(); }
+	void Close();
 private:
-	void* _handle;
-	long _totalFrames;
-	bool _hasAudio;
-	double _frameTimeMs;
+	FILE* _stream;
+	fpos_t _streamStartPos = 0;
+	void* _handle = nullptr;
+	long _totalFrames = 0;
+	bool _hasAudio = false;
+	double _frameTimeMs = 0;
 	Vector2Int _frameSize;
 	Vector2Int _textureSize;
 	BufferedAudioSource _audioSrc;
 	std::vector< uint8_t> _audioData;
+	Coroutine _loadingCrt = nullptr;
+
+	void OpenVideo();
 };

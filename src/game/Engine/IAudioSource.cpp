@@ -18,6 +18,15 @@ void BufferedAudioSource::AddBuffer(uint8_t* _buffer, unsigned size)
 	_buffers.push_back({ _buffer, size , false });
 }
 
+void BufferedAudioSource::ClearBuffers()
+{
+	for (const auto& b : _buffers)
+	{
+		if (b.owned)
+			delete[] b.data;
+	}
+}
+
 CoroutineR<unsigned> BufferedAudioSource::FillAudioAsync(Span<uint8_t> buffer)
 {
 	return CoroutineFromFunctionResult<unsigned>([this, buffer]() {
@@ -40,7 +49,7 @@ unsigned BufferedAudioSource::FillNext(Span<uint8_t> buffer)
 		{
 			int offset = buffer.Size() - remaining;
 			int read = std::min(remaining, (int)b.size - b.position);
-			memcpy(buffer.Data() + offset, b.data, read);
+			memcpy(buffer.Data() + offset, b.data + b.position, read);
 			remaining -= read;
 			b.position += read;
 		}
@@ -64,9 +73,5 @@ bool BufferedAudioSource::IsAtEnd() const
 
 BufferedAudioSource::~BufferedAudioSource()
 {
-	for (const auto& b : _buffers)
-	{
-		if (b.owned)
-			delete[] b.data;
-	}
+	ClearBuffers();
 }

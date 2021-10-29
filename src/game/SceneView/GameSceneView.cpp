@@ -20,7 +20,7 @@ GameSceneView::GameSceneView(GameScene* scene) : _scene(scene)
 	_cursor.MultiSelectionEnabled = true;
 	_cursor.UsingLimits = true;
 	_cursor.DrawMultiSelection = false;
-
+	_cursor.Position = Vector2Int(Game::GetPlatformInfo().Screens[0] / 2);
 	_scene->GetEntityManager().OnEntitiesDeleted = [this](auto& a) { OnEntitiesDeleted(a); };
 
 	SetPlayer(_scene->GetEntityManager().MapSystem.ActivePlayer);
