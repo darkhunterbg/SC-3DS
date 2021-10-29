@@ -89,6 +89,21 @@ void Profiler::ShowPerformance() {
 
 	GraphicsRenderer::DrawLine(offset, offset + Vector2Int(60, 0), Colors::White);
 	offset.y += 50;
+
+	double highest = *std::max_element(frameLoad.cbegin(), frameLoad.cend());
+
+	if (highest > 1)
+	{
+		int height = ( 50.0) / highest;
+		GraphicsRenderer::DrawLine(offset + Vector2Int(0,-height), offset + Vector2Int(60, -height), Colors::Orange);
+	}
+	if (highest > 2)
+	{
+		int height = (100.0) / highest;
+		GraphicsRenderer::DrawLine(offset + Vector2Int(0, -height), offset + Vector2Int(60, -height), Colors::Red);
+	}
+
+
 	GraphicsRenderer::DrawLine(offset, offset + Vector2Int(60, 0), Colors::White);
 }
 

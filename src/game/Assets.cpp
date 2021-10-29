@@ -2,10 +2,13 @@
 #include "Data/AssetDataDefs.h"
 #include "Debug.h"
 #include "Engine/AssetLoader.h"
+#include "Engine/JobSystem.h"
 
 #include "Platform.h"
 
 #include "Loader/smacker.h"
+
+#include "Profiler.h"
 
 #include <stdio.h>
 #include <cstring>
@@ -293,46 +296,69 @@ Coroutine VideoClip::LoadNextFrameAsync()
 	_loadingCrt = AssetLoader::RunIOAsync([video]() {smk_next(video); });
 	return _loadingCrt;
 }
+
+
+struct DecodeFrameJobData {
+	const uint8_t* pal_data;
+	const uint8_t* image;
+	Vector2Int frameSize;
+	uint8_t* pixelData;
+	int texLineSize;
+};
+static DecodeFrameJobData _decodeFrame;
+
+
+static void Decode(int start, int end)
+{
+	DecodeFrameJobData data = _decodeFrame;
+
+	for (int y = start; y < end; ++y)
+	{
+		for (int x = 0; x < data.frameSize.x; ++x)
+		{
+			int i = (x + y * data.texLineSize) << 2;
+
+			int a = y * data.frameSize.x;
+
+			int index = data.image[y * data.frameSize.x + x];
+			index *= 3;
+
+			if (index == 0)
+			{
+				_decodeFrame.pixelData[i++] = 0;
+				_decodeFrame.pixelData[i++] = 0;
+				_decodeFrame.pixelData[i++] = 0;
+				_decodeFrame.pixelData[i++] = 0;
+				continue;
+			}
+
+#ifdef _3DS
+			_decodeFrame.pixelData[i++] = 255;
+			_decodeFrame.pixelData[i++] = (_decodeFrame.pal_data[index + 2]);
+			_decodeFrame.pixelData[i++] = (_decodeFrame.pal_data[index + 1]);
+			_decodeFrame.pixelData[i++] = (_decodeFrame.pal_data[index]);
+#else
+			_decodeFrame.pixelData[i++] = (_decodeFrame.pal_data[index]);
+			_decodeFrame.pixelData[i++] = (_decodeFrame.pal_data[index + 1]);
+			_decodeFrame.pixelData[i++] = (_decodeFrame.pal_data[index + 2]);
+			_decodeFrame.pixelData[i++] = 255;
+#endif
+		}
+	}
+}
+
+
 void VideoClip::DecodeCurrentFrame(uint8_t* pixelData, int texLineSize)
 {
 	smk video = (smk)_handle;
 	const uint8_t* pal_data = smk_get_palette(video);
 	const uint8_t* image = smk_get_video(video);
-	int a = 0;
 
-	int w = GetFrameSize().x;
-	int h = GetFrameSize().y;
+	_decodeFrame.pal_data = pal_data;
+	_decodeFrame.image = image;
+	_decodeFrame.pixelData = pixelData;
+	_decodeFrame.texLineSize = texLineSize;
+	_decodeFrame.frameSize = GetFrameSize();
 
-
-	for (int y = 0; y < h; ++y)
-	{
-		for (int x = 0; x < w; ++x)
-		{
-			int i = (x + y * texLineSize) << 2;
-
-			int index = image[a++];
-			index *= 3;
-
-			if (index == 0)
-			{
-				pixelData[i++] = 0;
-				pixelData[i++] = 0;
-				pixelData[i++] = 0;
-				pixelData[i++] = 0;
-				continue;
-			}
-
-#ifdef _3DS
-			pixelData[i++] = 255;
-			pixelData[i++] = (pal_data[index + 2]);
-			pixelData[i++] = (pal_data[index + 1]);
-			pixelData[i++] = (pal_data[index]);
-#else
-			pixelData[i++] = (pal_data[index]);
-			pixelData[i++] = (pal_data[index + 1]);
-			pixelData[i++] = (pal_data[index + 2]);
-			pixelData[i++] = 255;
-#endif
-		}
-	}
+	JobSystem::RunJob(GetFrameSize().y, 1, Decode);
 }
