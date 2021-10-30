@@ -14,6 +14,11 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>true</Prefer32Bit>
+    <OutputPath>../../bin</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <None Remove="Icon.ico" />
     <None Remove="Icon.bmp" />
@@ -42,11 +47,17 @@
     <Folder Include="MonoGame.ImGui\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NativeEditorLib\NativeEditorLib.vcxproj" />
+    <ProjectReference Include="..\NativeEditorLib\NativeEditorLib.vcxproj">
+      <Private>true</Private>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Update="imgui.ini">
+    <Content Update="imgui.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
+  <Target Name="PostPublish" AfterTargets="Publish">
+    <Exec Command="copy imgui.ini $(PublishDir)imgui.ini /Y" />
+    <Exec Command="copy NativeEditorLib.dll $(PublishDir)NativeEditorLib.dll /Y" />
+  </Target>
 </Project>
