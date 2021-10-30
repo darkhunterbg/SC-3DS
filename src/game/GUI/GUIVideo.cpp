@@ -5,6 +5,7 @@
 #include "../Engine/GraphicsRenderer.h"
 #include "../Engine/AudioManager.h"
 #include "../Coroutine.h"
+#include "../Game.h"
 
 #include <cstring>
 
@@ -48,6 +49,11 @@ static void Decode(VideoClip& clip, VideoFrameRenderData* data)
 	data->decoded = true;
 }
 
+void GUIVideo::RestartNextVideo()
+{
+	GUI::GetState().RestartVideo = true;
+}
+
 bool GUIVideo::DrawVideo(const char* id, VideoClip& clip, bool loop, Color color)
 {
 	clip.Warmup();
@@ -64,9 +70,9 @@ bool GUIVideo::DrawVideo(const char* id, VideoClip& clip, bool loop, Color color
 		GUI::RegisterResource(key, data, [](void* p) {delete (VideoFrameRenderData*)p;  });
 	}
 
-	if (data->clip != &clip)
+	if (data->clip != &clip || GUI::GetState().RestartVideo)
 	{
-		if (data->clip)
+		if (data->clip && data->clip != &clip)
 			data->clip->Close();
 
 		data->countdown = -0.001f;
@@ -76,8 +82,10 @@ bool GUIVideo::DrawVideo(const char* id, VideoClip& clip, bool loop, Color color
 		data->readCrt->Next();
 
 		if (data->audioSrc != nullptr)
-			AudioManager::Play(*data->audioSrc, 0);
+			AudioManager::Play(*data->audioSrc, Game::GetMusicChannel());
 
+
+		GUI::GetState().RestartVideo = false;
 	}
 	else
 		data->countdown -= GUI::GetState().VideoPlaybackTickTime;

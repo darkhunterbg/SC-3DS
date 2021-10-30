@@ -38,14 +38,16 @@ void AudioManager::Init()
 
 	for (int i = 0; i < instance.channels.size(); i++)
 	{
-
 		instance.channels[i].bufferSize = AudioChannelBufferSize / (instance.channels[i].mono ? 2 : 1);
-		unsigned size = instance.channels[i].bufferSize;
 		instance.channels[i].ChannelId = i;
-		uint8_t* mem = (uint8_t*)Platform::PlatformAlloc(size * 2);
-		instance.channels[i].InitBuffer({ mem , size }, { mem + size, size });
+
+	
 		Platform::CreateChannel(instance.channels[i]);
 		Platform::EnableChannel(instance.channels[i], false);
+
+		unsigned size = instance.channels[i].bufferSize;
+		uint8_t* mem = (uint8_t*)Platform::PlatformAlloc(size * 2);
+		instance.channels[i].InitBuffer({ mem , size }, { mem + size, size });
 	}
 }
 
@@ -62,6 +64,7 @@ void AudioManager::Play(IAudioSource& src, int c)
 
 	Platform::EnableChannel(channel, !instance._mute);
 }
+
 
 void AudioManager::StopChannel(int c)
 {

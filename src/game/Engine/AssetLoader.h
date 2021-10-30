@@ -10,6 +10,7 @@
 #include "../RingBuffer.h"
 
 typedef void* Semaphore;
+typedef void* Mutex;
 
 
 class AssetLoader {
@@ -43,6 +44,7 @@ private:
 	GameDatabase* db = nullptr;
 	RingBuffer<IORequest*, 1024> _ioQueue;
 	Semaphore _semaphore = 0;
+	Mutex _mutex;
 	bool _usesIOThread = false;
 
 	AssetLoader(const AssetLoader&) = delete;

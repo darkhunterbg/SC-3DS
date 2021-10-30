@@ -41,7 +41,7 @@ void BootScene::Start()
 	_view = new BootSceneView(this);
 
 	auto clip = AssetLoader::LoadAudioClip("music\\title");
-	AudioManager::Play(*clip, 0);
+	AudioManager::Play(*clip, Game::GetMusicChannel());
 
 	_loadCrt = AssetLoader::LoadDatabaseAsync();
 

@@ -18,6 +18,7 @@ EntityManager::EntityManager()
 	_systems.push_back(&MapSystem);
 	_systems.push_back(&UnitSystem);
 	_systems.push_back(&KinematicSystem);
+	_systems.push_back(&SoundSystem);
 }
 EntityManager::~EntityManager()
 {

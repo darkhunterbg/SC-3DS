@@ -5,7 +5,7 @@
 
 class VideoClip;
 
-#pragma pack(push, 2)
+#pragma pack(push, 1)
 struct UnitPortraitDef {
 	char Path[32];
 	uint16_t IdleClipStart;

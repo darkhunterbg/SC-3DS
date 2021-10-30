@@ -365,7 +365,7 @@ void Platform::CreateChannel(AudioChannelState& channel)
 	wavSpec.channels = channel.mono ? 1 : 2;
 	wavSpec.format = AUDIO_S16;
 	wavSpec.freq = 22050;
-	wavSpec.samples = channel.bufferSize / 4;
+	wavSpec.samples = channel.bufferSize / (2 * wavSpec.channels);
 	SDL_AudioSpec got;
 	wavSpec.callback = AudioCallback;
 	wavSpec.userdata = &channel;
@@ -377,7 +377,7 @@ void Platform::CreateChannel(AudioChannelState& channel)
 		EXCEPTION("Failed to create audio channel!");
 	}
 
-	channel.bufferSize = got.samples * 4;
+	channel.bufferSize = got.size;
 	channel.handle = deviceId;
 
 	SDL_PauseAudioDevice(deviceId, 1);
@@ -429,6 +429,20 @@ void Platform::ReleaseSemaphore(Semaphore s, int v)
 	for (int i = 0; i < v; ++i)
 		SDL_SemPost((SDL_sem*)s);
 }
+
+Mutex Platform::CreateMutex()
+{
+	return SDL_CreateMutex();
+}
+void Platform::LockMutex(Mutex m)
+{
+	SDL_LockMutex((SDL_mutex*)m);
+}
+void Platform::UnlockMutex(Mutex m)
+{
+	SDL_UnlockMutex((SDL_mutex*)m);
+}
+
 
 std::string Platform::GetUserDirectory()
 {

@@ -12,6 +12,7 @@
 
 
 typedef void* Semaphore;
+typedef void* Mutex;
 
 enum class PlatformType {
 	Generic = 0,
@@ -84,6 +85,9 @@ public:
 	static Semaphore CreateSemaphore();
 	static void WaitSemaphore(Semaphore);
 	static void ReleaseSemaphore(Semaphore, int);
+	static Mutex CreateMutex();
+	static void LockMutex(Mutex);
+	static void UnlockMutex(Mutex);
 
 	// ================ Other ========================
 

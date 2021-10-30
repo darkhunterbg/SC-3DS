@@ -240,6 +240,7 @@ IAudioSource* VideoClip::PrepareAudio()
 
 	if (!_hasAudio) return nullptr;
 
+
 	if (_audioData.size() == 0)
 	{
 		smk video = (smk)_handle;

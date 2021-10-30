@@ -541,6 +541,33 @@ void Platform::ReleaseSemaphore(Semaphore s, int v)
 	if (r)
 		EXCEPTION("svcReleaseSemaphore failed with %s", R_SUMMARY(r));
 }
+Mutex Platform::CreateMutex()
+{
+	Handle* h = new Handle();
+	Result r = svcCreateMutex(h, false);
+	if (r)
+		EXCEPTION("svcCreateMutex failed with %i: %s", r, R_SUMMARY(r));
+
+
+	return h;
+}
+void Platform::LockMutex(Mutex m)
+{
+	GAME_ASSERT((Handle*)m, "Tried to lock null mutex!");
+
+	Result r = svcWaitSynchronization(*(Handle*)m, -1);
+	if (r)
+		EXCEPTION("svcWaitSynchronization failed with %i: %s", r, R_SUMMARY(r));
+}
+void Platform::UnlockMutex(Mutex m)
+{
+	GAME_ASSERT((Handle*)m, "Tried to unlock null mutex!");
+
+	Result r = svcReleaseMutex(*(Handle*)m);
+	if (r)
+		EXCEPTION("svcReleaseMutex failed with %i: %s", r, R_SUMMARY(r));
+}
+
 
 std::string Platform::GetUserDirectory()
 {

@@ -17,6 +17,7 @@
 #include "MapSystem.h"
 #include "UnitSystem.h"
 #include "KinematicSystem.h"
+#include "SoundSystem.h"
 
 #include "IEntitySystem.h"
 
@@ -62,6 +63,7 @@ public:
 	MapSystem MapSystem;
 	UnitSystem UnitSystem;
 	KinematicSystem KinematicSystem;
+	SoundSystem SoundSystem;
 
 	EntityManager();
 	~EntityManager();

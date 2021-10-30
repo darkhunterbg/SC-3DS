@@ -16,6 +16,7 @@ static std::hash<int> intHasher;
 
 AssetLoader AssetLoader::instance;
 
+
 void AssetLoader::ProcessIORequests(int threadId)
 {
 	while (true)
@@ -24,13 +25,21 @@ void AssetLoader::ProcessIORequests(int threadId)
 
 		Platform::WaitSemaphore(instance._semaphore);
 
-		if (instance._ioQueue.TryDequeue(&request))
+		Platform::LockMutex(instance._mutex);
+
+		bool hasWork = instance._ioQueue.TryDequeue(&request);
+
+		Platform::UnlockMutex(instance._mutex);
+
+		if (hasWork)
 		{
 			GAME_ASSERT(!request->completed, "FATAL ERROR: ProcessIORequests got request->completed = true!");
 
 			request->action();
 			request->completed = true;
 		}
+
+
 	}
 }
 
@@ -58,7 +67,10 @@ void AssetLoader::LoadPack(const char* packFileName)
 void AssetLoader::Init()
 {
 	instance._semaphore = Platform::CreateSemaphore();
+	instance._mutex = Platform::CreateMutex();
+
 	instance._usesIOThread = Platform::TryStartThreads(ThreadUsageType::IO, 1, ProcessIORequests) > 0;
+
 	instance.LoadPack("audio.pak");
 	instance.LoadPack("video.pak");
 }
@@ -292,11 +304,13 @@ public:
 
 		if (AssetLoader::instance._usesIOThread)
 		{
+			Platform::LockMutex(AssetLoader::instance._mutex);
 			AssetLoader::instance._ioQueue.Enqueue(&_request);
+			Platform::UnlockMutex(AssetLoader::instance._mutex);
+
 			Platform::ReleaseSemaphore(AssetLoader::instance._semaphore, 1);
 		}
 	}
-
 
 	CRT_START()
 	{

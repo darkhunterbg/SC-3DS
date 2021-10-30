@@ -2,6 +2,7 @@
 #include "../SceneView/MainMenuSceneView.h"
 #include "../Engine/AssetLoader.h"
 #include "../Engine/AudioManager.h"
+#include "../Game.h"
 
 MainMenuScene::MainMenuScene()
 {
@@ -17,7 +18,7 @@ void MainMenuScene::Start()
 	_view = new MainMenuSceneView(this);
 	auto clip = AssetLoader::LoadAudioClip("music\\title");
 	if (AudioManager::GetAudioChannels()[0].GetStream() != clip)
-		AudioManager::Play(*clip, 0);
+		AudioManager::Play(*clip, Game::GetMusicChannel());
 }
 
 void MainMenuScene::Stop()

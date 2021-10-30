@@ -3,6 +3,7 @@
 #include "Assets.h"
 #include "Scenes/Scene.h"
 #include "GameInputSchema.h"
+#include "Engine/AudioChannel.h"
 
 struct PlatformInfo;
 
@@ -37,6 +38,7 @@ public:
 	static bool Update();
 	static void Draw();
 	static void End();
+	static void Exit();
 
 	static void SetCurrentScene(Scene* scene);
 
@@ -48,5 +50,7 @@ public:
 
 	static GameInputSchema& GetInput();
 
-	static void Exit();
+
+	static const AudioChannelState* GetMusicChannel();
+	static const AudioChannelState* GetUIChannel();
 };

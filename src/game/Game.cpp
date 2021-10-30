@@ -214,3 +214,19 @@ void Game::Exit()
 	_exit = true;
 }
 
+const AudioChannelState* Game::GetMusicChannel()
+{
+	if (AudioManager::GetAudioChannels().Size() > 0)
+		return	&AudioManager::GetAudioChannels()[0];
+
+	return nullptr;
+}
+
+const AudioChannelState* Game::GetUIChannel()
+{
+	int size = AudioManager::GetAudioChannels().Size();
+	if (size > 1)
+		return &AudioManager::GetAudioChannels()[size - 1];
+
+	return nullptr;
+}

@@ -103,6 +103,10 @@ void GameSceneView::UpdateSelection()
 
 		if (_temp.size() > 0)
 		{
+			EntityId prev = Entity::None;
+			if (_unitSelection.size() > 0)
+				prev = _unitSelection[0];
+
 			_unitSelection.clear();
 
 			if (multiSelect && _temp.size() > 1)
@@ -120,7 +124,10 @@ void GameSceneView::UpdateSelection()
 				_unitSelection.push_back(_temp[0]);
 			}
 
-			_portraitId = 0;
+			if (_unitSelection.size() > 0)
+				OnUnitSelect(_unitSelection[0], _unitSelection[0]!= prev);
+			else 
+				OnUnitSelect(Entity::None , true);
 		}
 	}
 
@@ -132,7 +139,6 @@ void GameSceneView::UpdateSelection()
 		{
 			_unitSelection.erase(_unitSelection.begin() + i);
 			--i;
-			_portraitId = 0;
 		}
 	}
 
@@ -142,9 +148,25 @@ void GameSceneView::UpdateSelection()
 	{
 		selectionColor = GetAlliedUnitColor(_unitSelection[0]);
 	}
-	// TODO: detect deleted entities & hidden entities
 
 	_scene->GetEntityManager().DrawSystem.UpdateSelection(_unitSelection, selectionColor);
+}
+
+void GameSceneView::OnUnitSelect(EntityId id, bool newSelection)
+{
+	if (id != Entity::None && EntityUtil::IsAlly(_player, id))
+	{
+		const UnitComponent& unit = _scene->GetEntityManager().UnitSystem.GetComponent(id);
+
+		if (unit.def->Sounds.GetWhatSound())
+			_scene->GetEntityManager().SoundSystem.PlayChat(*unit.def->Sounds.GetWhatSound());
+
+		_unitPortrait.ChatUnit(id, newSelection);
+	}
+	else
+	{
+
+	}
 }
 
 void GameSceneView::Update()

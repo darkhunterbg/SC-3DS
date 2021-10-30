@@ -77,30 +77,76 @@ void UnitPortraitPanel::RegenerateNoiseTexture(float input)
 	Platform::UpdateTexture(_noise->GetTextureId(), { {0,0},{TextureSize,TextureSize} }, { _textureData, TextureSize * TextureSize * 4 });
 }
 
-void UnitPortraitPanel::Draw(EntityId id)
+void UnitPortraitPanel::ChatUnit(EntityId id, bool newUnit)
 {
-	if (id == Entity::None) return;
+	if (id == Entity::None) { _unit = Entity::None; return; }
 
 	EntityManager& em = EntityUtil::GetManager();
 
 	if (!em.UnitSystem.IsUnit(id)) return;
 
-	if (id != _unit)
-	{
-		_portraitId = 0;
-		_unit = id;
-		_noiseCooldown = NoiseTime;
-	}
 
 	const UnitComponent& unit = em.UnitSystem.GetComponent(id);
 
 	const UnitPortraitDef* portrait = unit.def->Art.GetPortrait();
-	if (portrait && portrait->GetIdleClips().Size() > _portraitId)
+
+	_unit = id;
+	_playClip = nullptr;
+
+	if (newUnit)
+		_noiseCooldown = NoiseTime;
+
+	_portraitId = 0;
+
+	if (portrait && portrait->GetActivatedClips().Size() > 0)
 	{
-		bool ended = GUIVideo::DrawVideo("portrait", portrait->GetIdleClip(_portraitId), true);
+		int i = _rnd.Next(portrait->ActivatedClipCount);
+		_playClip = &portrait->GetActivatedClip(i);
+	}
+}
+
+void UnitPortraitPanel::Draw(EntityId id)
+{
+	if (id == Entity::None) { _unit = Entity::None; return; }
+
+	EntityManager& em = EntityUtil::GetManager();
+
+	if (!em.UnitSystem.IsUnit(id)) return;
+
+	bool newUnit = false;
+
+	const UnitComponent& unit = em.UnitSystem.GetComponent(id);
+
+	if (id != _unit)
+	{
+		_unit = id;
+		_portraitId = 0;
+		_noiseCooldown = NoiseTime;
+		newUnit = true;
+		_playClip = nullptr;
+	}
+
+	VideoClip* clip = _playClip;
+	if (!clip)
+	{
+		const UnitPortraitDef* portrait = unit.def->Art.GetPortrait();
+		if (portrait && portrait->GetIdleClips().Size() > _portraitId)
+			clip = &portrait->GetIdleClip(_portraitId);
+	}
+
+
+	if (clip)
+	{
+		if (newUnit)
+			GUIVideo::RestartNextVideo();
+
+		bool ended = GUIVideo::DrawVideo("portrait", *clip, true);
 		if (ended)
 		{
-			_portraitId = (_portraitId + 1) % unit.def->Art.GetPortrait()->IdleClipCount;
+			if (_playClip)
+				_playClip = nullptr;
+			else
+				_portraitId = (_portraitId + 1) % unit.def->Art.GetPortrait()->IdleClipCount;
 		}
 	}
 

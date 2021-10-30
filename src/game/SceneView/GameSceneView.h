@@ -37,7 +37,7 @@ private:
 	void UpdateSelection();
 	void OnEntitiesDeleted(const std::vector<EntityId>& entities);
 
-	int _portraitId = 0;
+	void OnUnitSelect(EntityId id, bool newSelection);
 
 	void DrawPortrait();
 public:
