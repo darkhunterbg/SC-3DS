@@ -28,6 +28,8 @@ uint64_t mainTimer;
 
 AbstractPlatform abstractPlatform;
 
+extern void __PlatformInit();
+
 bool mute = false;
 bool noThreading = false;
 
@@ -43,6 +45,8 @@ int main(int argc, char** argv)
 	SDL_SetWindowResizable(window, SDL_TRUE);
 	SDL_SetWindowTitle(window, "StarCraft");
 	SDL_MaximizeWindow(window);
+
+	__PlatformInit();
 
 	AbstractPlatform::InitPlatforms(screen);
 

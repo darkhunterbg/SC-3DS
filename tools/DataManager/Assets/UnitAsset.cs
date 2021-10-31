@@ -9,6 +9,12 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
+	public enum UnitAIType
+	{
+		None = 0,
+		Aggressive = 1,
+	}
+
 	public class UnitAttack
 	{
 		[DefaultEditor]
@@ -204,12 +210,19 @@ namespace DataManager.Assets
 		[Binary(BinaryType.AssetRef, 2)]
 		[Optional, TypeConverter(typeof(AssetConverter))]
 		public SoundSetAsset AnnoyedSound { get; set; }
-
-		[DefaultEditor]
-		[Binary(BinaryType.AssetRef, 2)]
-		[Optional, TypeConverter(typeof(AssetConverter))]
-		public SoundSetAsset DeathSound { get; set; }
 		#endregion
+
+		#region AI
+		[Section("Unit AI")]
+		[DefaultEditor]
+		[Binary(BinaryType.UInt, 1)]
+		[Optional]
+		public UnitAIType AIType { get; set; }
+		#endregion
+
+		[Binary(BinaryType.UInt, 1)]
+		[Ignore]
+		public int _padding { get; set; }
 
 		public UnitAsset() : base()
 		{

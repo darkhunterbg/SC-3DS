@@ -27,5 +27,7 @@ public:
 
 	static bool IsAlly(PlayerId player, EntityId id);
 	static bool IsEnemy(PlayerId player, EntityId id);
+
+	static uint8_t GetOrientationToPosition(EntityId id, Vector2Int16 target);
 };
 

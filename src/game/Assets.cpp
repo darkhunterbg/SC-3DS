@@ -18,33 +18,21 @@ Texture::~Texture()
 	Platform::DestroyTexture(id);
 }
 
-unsigned AudioClip::FillNextBuffer(Span<uint8_t> buffer)
+unsigned AudioClip::FillNextBuffer(Span<uint8_t> buffer, unsigned streamPos)
 {
 	if (stream == nullptr) return 0;
 
 	unsigned size = buffer.Size();
 
-	size = std::min(size, info.GetTotalSize() - _streamPos);
+	size = std::min(size, info.GetTotalSize() - streamPos);
 
 	if (size > 0)
 	{
-		fseek(stream, _streamStartPos + _streamPos, SEEK_SET);
+		fseek(stream, _streamStartPos + streamPos, SEEK_SET);
 		size = fread(buffer.Data(), sizeof(uint8_t), size, stream);
 	}
 
-	_streamPos += size;
-
 	return size;
-}
-bool AudioClip::Restart()
-{
-	if (stream == nullptr)
-		return true;
-
-	_streamPos = 0;
-
-	bool success = fseek(stream, _streamStartPos, SEEK_SET);
-	return success;
 }
 
 class AudioClipStreamAudioCrt : public CoroutineRImpl<unsigned> {
@@ -53,21 +41,21 @@ class AudioClipStreamAudioCrt : public CoroutineRImpl<unsigned> {
 	Coroutine _fillCrt = nullptr;
 	Span<uint8_t> _buffer;
 	int _read = 0;
-
+	unsigned _streamPos;
 public:
-	AudioClipStreamAudioCrt(AudioClip& clip, Span<uint8_t> buffer) :
-		_clip(&clip), _buffer(buffer)
+	AudioClipStreamAudioCrt(AudioClip& clip, Span<uint8_t> buffer, unsigned streamPos ) :
+		_clip(&clip), _buffer(buffer), _streamPos(streamPos)
 	{
 	}
 
 	CRT_START()
 	{
-		if (_clip->IsAtEnd())
+		if (_streamPos >= _clip->StreamSize())
 		{
 			CRT_RETURN(0);
 		}
 
-		_fillCrt = AssetLoader::RunIOAsync([this]() { _read = _clip->FillNextBuffer(_buffer); });
+		_fillCrt = AssetLoader::RunIOAsync([ this]() { _read = _clip->FillNextBuffer(_buffer, _streamPos); });
 
 		CRT_WAIT_FOR(_fillCrt);
 
@@ -76,9 +64,9 @@ public:
 	CRT_END();
 };
 
-CoroutineR<unsigned> AudioClip::FillAudioAsync(Span<uint8_t> buffer)
+CoroutineR<unsigned> AudioClip::FillAudioAsync(Span<uint8_t> buffer, unsigned streamPos)
 {
-	return CoroutineR<unsigned>(new AudioClipStreamAudioCrt(*this, buffer));
+	return CoroutineR<unsigned>(new AudioClipStreamAudioCrt(*this, buffer, streamPos));
 }
 AudioClip::AudioClip(AudioInfo info, FILE* stream)
 {
@@ -93,10 +81,6 @@ AudioClip::~AudioClip()
 {
 	//if (stream != nullptr)
 	//	fclose(stream);
-}
-int AudioClip::GetRemaining() const
-{
-	return info.GetTotalSize() - _streamPos;
 }
 
 Vector2Int Font::MeasureString(const char* text) const

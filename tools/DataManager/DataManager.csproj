@@ -22,6 +22,10 @@
   <ItemGroup>
     <None Remove="Icon.ico" />
     <None Remove="Icon.bmp" />
+    <None Remove="imgui.ini" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="imgui.ini" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icon.ico" />

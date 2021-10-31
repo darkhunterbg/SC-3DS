@@ -17,6 +17,10 @@ struct SoundSetDef;
 
 typedef uint32_t UnitId;
 
+enum class UnitAIType : uint8_t {
+	None = 0,
+	Aggressive = 1,
+};
 
 #pragma pack(push,2)
 
@@ -38,15 +42,13 @@ struct UnitSounds {
 	int16_t YesSoundId;
 	int16_t WhatSoundId;
 	int16_t AnnoyedSoundId;
-	int16_t DeathSoundId;
 
 	const SoundSetDef* GetReadySound() const;
 	const SoundSetDef* GetYesSound() const;
 	const SoundSetDef* GetWhatSound() const;
 	const SoundSetDef* GetAnnoyedSound() const;
-	const SoundSetDef* GetDeathSound() const;
 
-	 std::array<const SoundSetDef*,5> GetSounds() const;
+	std::array<const SoundSetDef*, 4> GetSounds() const;
 };
 
 
@@ -58,7 +60,8 @@ struct UnitDef {
 		char Name[32];
 		char Title[32];
 
-		inline bool HasTitle() const {
+		inline bool HasTitle() const
+		{
 			return  Title[0] != 0;
 		}
 	} Text;
@@ -115,8 +118,13 @@ struct UnitDef {
 
 	UnitSounds Sounds;
 
+	struct UnitAI {
+		UnitAIType AIType;
+	} AI;
+
 	Span<UnitAttack> GetAttacks() const;
-	inline bool HasMovement() const {
+	inline bool HasMovement() const
+	{
 		return Movement.MaxVelocity > 0;
 	}
 };

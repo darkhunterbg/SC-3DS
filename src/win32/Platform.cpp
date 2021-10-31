@@ -252,7 +252,11 @@ void Platform::DrawTexture(const Texture& texture, const SubImageCoord& uv, cons
 
 	GPU_SetRGBA(img, c.GetR(), c.GetG(), c.GetB(), c.GetA());
 	GPU_SetBlendMode(img, blendMode);
-	GPU_BlitScale(img, &srcRect, target, (float)dst.GetCenter().x, (float)dst.GetCenter().y, scale.x, scale.y);
+
+	Vector2 center = (Vector2(dst.position)) + (Vector2(dst.size)) / 2;
+
+	//GPU_BlitTransformX(img, &srcRect, target, dst.position.x, dst.position.y, 0, 0, 0, scale.x, scale.y);
+	GPU_BlitScale(img, &srcRect, target, center.x, center.y, scale.x, scale.y);
 }
 void Platform::DrawRectangle(const Rectangle& rect, Color32 c)
 {
@@ -389,9 +393,23 @@ void Platform::EnableChannel(const AudioChannelState& channel, bool enabled)
 
 static std::vector< std::function<void(int)>> threadWorkFunc;
 
+
+void __PlatformInit()
+{
+	threadWorkFunc.reserve(64);
+}
+
+static int RunThread(void* data)
+{
+	int i = *(int*)data;
+	threadWorkFunc[i - 1](i);
+	return 0;
+}
+
 int Platform::TryStartThreads(ThreadUsageType type, int requestCount, std::function<void(int)> threadWork)
 {
 	if (noThreading) return 0;
+
 
 	for (int i = 0; i < requestCount; ++i)
 	{
@@ -402,17 +420,13 @@ int Platform::TryStartThreads(ThreadUsageType type, int requestCount, std::funct
 		switch (type)
 		{
 		case ThreadUsageType::IO: name = "IOThread"; break;
-		case ThreadUsageType::JobSystem: name = "WorkerThread"; break;
+		case ThreadUsageType::JobSystem: name = "WorkerThread"; break; 
 		default: name = "GenericThread"; break;
 		}
 
 		name += "_" + std::to_string(i);
 
-		SDL_CreateThread([](void* data) {
-			int i = *(int*)data;
-			threadWorkFunc[i - 1](i);
-			return 0;
-			}, name.data(), new int(id));
+		SDL_CreateThread(RunThread, name.data(), new int(id));
 	}
 	return requestCount;
 }

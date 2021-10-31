@@ -35,7 +35,7 @@ static void Frame(const InstructionParams& params, EntityId id, EntityManager& e
 }
 static void Wait(const InstructionParams& params, EntityId id, EntityManager& em)
 {
-	em.AnimationSystem.GetComponent(id).wait = params.shorts[0];
+	em.AnimationSystem.GetComponent(id).wait = params.shorts[0] ;
 }
 static void WaitRandom(const InstructionParams& params, EntityId id, EntityManager& em)
 {
@@ -67,6 +67,7 @@ static void GoTo(const InstructionParams& params, EntityId id, EntityManager& em
 
 static void Attack(const InstructionParams& params, EntityId id, EntityManager& em)
 {
+	em.UnitSystem.UnitAttackEvent(id);
 	//em.GetUnitSystem().UnitAttackEvent(id);
 }
 

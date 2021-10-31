@@ -27,18 +27,29 @@ void BufferedAudioSource::ClearBuffers()
 	}
 }
 
-CoroutineR<unsigned> BufferedAudioSource::FillAudioAsync(Span<uint8_t> buffer)
+CoroutineR<unsigned> BufferedAudioSource::FillAudioAsync(Span<uint8_t> buffer, unsigned streamPos)
 {
-	return CoroutineFromFunctionResult<unsigned>([this, buffer]() {
-		return	this->FillNext(buffer);
+	return CoroutineFromFunctionResult<unsigned>([this, buffer, streamPos]() {
+		return	this->FillNext(buffer, streamPos);
 		});
 }
 
-unsigned BufferedAudioSource::FillNext(Span<uint8_t> buffer)
+unsigned BufferedAudioSource::FillNext(Span<uint8_t> buffer, unsigned streamPos)
 {
 	int remaining = buffer.Size();
 
-	while (remaining > 0 && !IsAtEnd())
+	if (remaining == 0)return 0;
+
+	int _currentBuffer = 0;
+	while (streamPos > 0 && streamPos > _buffers[_currentBuffer].size)
+	{
+		streamPos -= _buffers[_currentBuffer].size;
+		++_currentBuffer;
+	}
+
+	_buffers[_currentBuffer].position = (int)streamPos;
+
+	while (remaining > 0 && _currentBuffer< _buffers.size())
 	{
 		Buffer& b = _buffers[_currentBuffer];
 		if ((unsigned)b.position >= b.size)
@@ -58,17 +69,14 @@ unsigned BufferedAudioSource::FillNext(Span<uint8_t> buffer)
 	return buffer.Size() - remaining;
 }
 
-bool BufferedAudioSource::Restart()
-{
-	_currentBuffer = 0;
-	if (_buffers.size() > 0)
-		_buffers[_currentBuffer].position = 0;
-	return true;
-}
 
-bool BufferedAudioSource::IsAtEnd() const
+unsigned BufferedAudioSource::StreamSize() const
 {
-	return _currentBuffer >= _buffers.size();
+	long size = 0;
+	for (auto& buffer : _buffers)
+		size += buffer.size;
+
+	return size;
 }
 
 BufferedAudioSource::~BufferedAudioSource()

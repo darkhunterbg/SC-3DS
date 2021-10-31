@@ -164,38 +164,28 @@ struct AudioInfo {
 
 class AudioClip : public IAudioSource {
 public:
-	int GetSize() const
+	virtual unsigned StreamSize() const override
 	{
-		return info.GetTotalSize();
+		return (long)info.GetTotalSize();
 	}
 	float GetDuration() const
 	{
 		return info.GetDurationSeconds();
 	}
-	virtual bool IsAtEnd() const override
-	{
-		return GetRemaining() == 0;
-	}
 
-	int GetRemaining() const;
-
-	virtual bool Restart() override;
-
-	CoroutineR<unsigned> FillAudioAsync(Span<uint8_t> buffer) override;
+	CoroutineR<unsigned> FillAudioAsync(Span<uint8_t> buffer, unsigned streamPos) override;
 
 	AudioClip(const AudioClip&) = delete;
 	AudioClip& operator=(const AudioClip&) = delete;
 
-
 	AudioClip(AudioInfo info, FILE* stream);
 	virtual ~AudioClip() override;
 
-	unsigned FillNextBuffer(Span<uint8_t> buffer);
+	unsigned FillNextBuffer(Span<uint8_t> buffer, unsigned streamPos);
 private:
 	AudioInfo info;
 	FILE* stream;
 	fpos_t _streamStartPos = 0;
-	unsigned _streamPos = 0;
 };
 
 

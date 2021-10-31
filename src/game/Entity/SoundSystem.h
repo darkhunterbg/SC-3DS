@@ -50,4 +50,6 @@ public:
 	virtual size_t ReportMemoryUsage() override;
 
 	void UpdateSounds(const EntityManager& em);
+
+	void PlayWorldSound(const SoundSetDef& sound, Vector2Int16 pos);
 };

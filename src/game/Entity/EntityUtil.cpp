@@ -25,6 +25,7 @@ void EntityUtil::SetAnimationFrame(EntityId id, unsigned frame)
 	AnimationComponent& anim = em.AnimationSystem.GetComponent(id);
 	anim.animFrame = frame;
 
+
 	UpdateAnimationVisual(id);
 }
 
@@ -36,6 +37,7 @@ void EntityUtil::UpdateAnimationVisual(EntityId id)
 	uint8_t orientation = em.GetOrientation(id);
 	bool flip = orientation > 16;
 	unsigned frame = anim.animFrame;
+
 	frame += flip ? 32 - orientation : orientation;
 
 	if (anim.shadowImage == nullptr)
@@ -72,7 +74,7 @@ EntityId EntityUtil::SpawnUnit(const UnitDef& def, PlayerId owner, Vector2Int16 
 		em.KinematicSystem.NewCollider(id, def.Art.GetSprite().collider);
 
 	em.AnimationSystem.NewComponent(id);
-	EntityUtil::PlayAnimation(id, *def.Art.GetSprite().GetAnimation(AnimationType::Init), def.Art.GetShadowImage());
+
 
 	return id;
 }
@@ -90,3 +92,18 @@ bool EntityUtil::IsEnemy(PlayerId player, EntityId id)
 	auto owner = em.UnitSystem.GetComponent(id).owner;
 	return owner.i != 0 && owner != player;
 }
+
+uint8_t EntityUtil::GetOrientationToPosition(EntityId id, Vector2Int16 target)
+{
+	EntityManager& em = GetManager();
+	Vector2Int16 pos = em.GetPosition(id);
+	//float dot = Vector2::Dot(Vector2(pos), Vector2(target));
+	Vector2Int16 dir = target - pos;
+	double angle = atan2(dir.y, dir.x);
+	angle += PI;
+	uint8_t result = (angle * 16.0 / PI);
+	result = (result + 24) % 32;
+
+	return result;
+}
+

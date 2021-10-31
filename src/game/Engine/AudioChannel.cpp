@@ -36,7 +36,10 @@ void AudioChannelState::FinishStreaming()
 
 	streamingCrt->RunAll();
 	streamingBuffer.size = streamingCrt->GetResult();
+	_streamPosition += streamingCrt->GetResult();
 	streamingCrt = nullptr;
+
+
 
 	if (streamingBuffer.size < streamingBuffer.buffer.Size())
 	{
@@ -53,25 +56,32 @@ void AudioChannelState::StartStreamingNextBuffer()
 {
 	if (stream != nullptr)
 	{
+		// Workaround for destroying coroutines which are running on IO thread
+		if (streamingCrt && !streamingCrt->IsCompleted())
+			streamingCrt->RunAll();
+
 		auto& buffer = StreamingBuffer();
-		streamingCrt = stream->FillAudioAsync(buffer.buffer);
+		streamingCrt = stream->FillAudioAsync(buffer.buffer, _streamPosition);
 		streamingCrt->Next();
 	}
 }
 
 bool AudioChannelState::IsDone()  const
 {
+	if (!_enabled) return true;
+
 	return stream == nullptr ||
 		(Remaining() == 0 &&
 			streamingCrt == nullptr);
 }
 
-void AudioChannelState::ChangeSource(IAudioSource* src)
+void AudioChannelState::ChangeSource(IAudioSource* src, unsigned streamPosition)
 {
 	GAME_ASSERT(CurrentBuffer().buffer.Size() != 0, "AudioChannel %i (handle: %i) has no buffers!", ChannelId, handle);
 
 	// WARNING: this is not thread-safe, audio thread might be reading this stream, use some kind of mutex
 
+	_streamPosition = streamPosition;
 	stream = src;
 	bufferPosition = 0;
 	CurrentBuffer().size = 0;

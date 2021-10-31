@@ -66,6 +66,11 @@ bool SoundSystem::IsPlayCompleted(Channel& channel)
 	return _chatChannel.channel->IsDone();
 }
 
+void SoundSystem::PlayWorldSound(const SoundSetDef& sound, Vector2Int16 pos)
+{
+	PlayDef(sound, _worldChannels[0]);
+}
+
 
 void SoundSystem::PlayMusic(const SoundSetDef& music)
 {
@@ -150,3 +155,4 @@ void SoundSystem::UpdateSounds(const EntityManager& em)
 		}
 	}
 }
+

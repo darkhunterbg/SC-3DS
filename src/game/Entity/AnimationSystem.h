@@ -18,6 +18,8 @@ struct AnimationComponent {
 	uint16_t animFrame = 0;
 	uint8_t wait;
 	bool done = false;
+
+	const AnimClipDef* clip = nullptr;
 };
 
 class AnimationSystem: public IEntitySystem {

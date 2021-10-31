@@ -25,6 +25,9 @@ private:
 	const AudioBuffer& StreamingBuffer() const { return  buffers[(currentBuffer + 1 ) % 2]; }
 	AudioBuffer& CurrentBuffer() { return  buffers[currentBuffer]; }
 	AudioBuffer& StreamingBuffer() { return  buffers[(currentBuffer + 1) % 2]; }
+
+	bool _enabled = true;
+	unsigned _streamPosition = 0;
 public:
 	bool mono = false;
 
@@ -40,7 +43,7 @@ public:
 	void AdvanceStream(unsigned pos);
 
 	bool IsDone() const;
-	void ChangeSource(IAudioSource* src);
+	void ChangeSource(IAudioSource* src, unsigned streamPosition = 0);
 
 	unsigned Remaining() const;
 	inline bool IsValid() const { return handle != -1; }
@@ -52,4 +55,7 @@ public:
 	int GetActiveBufferIndex() const { return currentBuffer; }
 
 	void InitBuffer(Span<uint8_t> main, Span<uint8_t> secondary);
+
+	inline bool GetEnabled() const { return _enabled; }
+	inline void SetEnabled(bool val)  { _enabled = val; }
 };

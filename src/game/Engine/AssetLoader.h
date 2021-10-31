@@ -7,7 +7,6 @@
 #include <array>
 #include "../Data/GameDatabase.h"
 #include "../Coroutine.h"
-#include "../RingBuffer.h"
 
 typedef void* Semaphore;
 typedef void* Mutex;
@@ -42,7 +41,8 @@ private:
 
 	std::hash<std::string> hasher;
 	GameDatabase* db = nullptr;
-	RingBuffer<IORequest*, 1024> _ioQueue;
+	std::vector<IORequest*> _ioQueue;
+	//RingBuffer<IORequest*, 128> _ioQueue;
 	Semaphore _semaphore = 0;
 	Mutex _mutex;
 	bool _usesIOThread = false;

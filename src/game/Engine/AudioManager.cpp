@@ -3,6 +3,7 @@
 #include "../Profiler.h"
 #include "AssetLoader.h"
 #include "../Coroutine.h"
+#include "../Debug.h"
 
 static constexpr const int AudioChannelBufferSize = 4096;
 static constexpr const int MonoChannels = 6;
@@ -20,6 +21,7 @@ void AudioManager::SetMute(bool mute)
 			continue;
 
 		Platform::EnableChannel(channel, !mute);
+		channel.SetEnabled(!mute);
 	}
 }
 
@@ -44,6 +46,7 @@ void AudioManager::Init()
 	
 		Platform::CreateChannel(instance.channels[i]);
 		Platform::EnableChannel(instance.channels[i], false);
+		instance.channels[i].SetEnabled(false);
 
 		unsigned size = instance.channels[i].bufferSize;
 		uint8_t* mem = (uint8_t*)Platform::PlatformAlloc(size * 2);
@@ -55,14 +58,15 @@ void AudioManager::Init()
 
 void AudioManager::Play(IAudioSource& src, int c)
 {
-	GAME_ASSERT(c < instance.channels.size(), "Tried to play clip on  invalid channel %i", c);
+	GAME_ASSERT(c < instance.channels.size(), "Tried to play clip on invalid channel %i", c);
 
 	auto& channel = instance.channels[c];
 
-	src.Restart();
-	channel.ChangeSource(&src);
 
 	Platform::EnableChannel(channel, !instance._mute);
+	channel.SetEnabled(!instance._mute);
+
+	channel.ChangeSource(&src, 0);
 }
 
 
@@ -71,6 +75,7 @@ void AudioManager::StopChannel(int c)
 	auto& channel = instance.channels[c];
 	channel.ChangeSource(nullptr);
 	Platform::EnableChannel(channel, false);
+	channel.SetEnabled(false);
 }
 
 void AudioManager::SetChannelVolume(int c, float volume)
@@ -101,8 +106,21 @@ void AudioManager::UpdateAudio()
 			continue;
 
 		if (channel.IsDone())
-			Platform::EnableChannel(channel, false);
+		{
+			if (channel.GetEnabled())
+			{
+				Platform::EnableChannel(channel, false);
+				channel.SetEnabled(false);
+			}
+		}
 		else
-			Platform::EnableChannel(channel, true);
+		{
+			if (!channel.GetEnabled())
+			{
+				Platform::EnableChannel(channel, true);
+				channel.SetEnabled(true);
+			}
+
+		}
 	}
 }

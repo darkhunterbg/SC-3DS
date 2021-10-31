@@ -33,9 +33,9 @@ void AnimationSystem::StartAnimation(EntityId id, const AnimClipDef& clip)
 	anim.instructionStart = clip.instructionStart;
 	anim.instructionEnd = clip.InstructionEnd();
 	anim.instructionCounter = clip.instructionStart;
-	anim.animFrame = 0;
 	anim.wait = 0;
 	anim.done = false;
+	anim.clip = &clip;
 }
 
 void AnimationSystem::StartAnimationWithShadow(EntityId id, const AnimClipDef& clip, const Image& shadow)
@@ -46,9 +46,9 @@ void AnimationSystem::StartAnimationWithShadow(EntityId id, const AnimClipDef& c
 	anim.instructionStart = clip.instructionStart;
 	anim.instructionEnd = clip.InstructionEnd();
 	anim.instructionCounter = clip.instructionStart;
-	anim.animFrame = 0;
 	anim.wait = 0;
 	anim.done = false;
+	anim.clip = &clip;
 }
 
 void AnimationSystem::DeleteEntities(std::vector<EntityId>& entities)

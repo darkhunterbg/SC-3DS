@@ -102,6 +102,8 @@ void EntityManager::Update1()
 
 	PlayerSystem.UpdateNextPlayerVision();
 
+	UnitSystem.UpdateUnitAI(*this);
+
 }
 // Update 24 per second (60 fps) 
 void EntityManager::Update2()

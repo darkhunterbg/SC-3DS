@@ -21,25 +21,29 @@ void AssetLoader::ProcessIORequests(int threadId)
 {
 	while (true)
 	{
-		IORequest* request = nullptr;
+
 
 		Platform::WaitSemaphore(instance._semaphore);
 
 		Platform::LockMutex(instance._mutex);
 
-		bool hasWork = instance._ioQueue.TryDequeue(&request);
+		IORequest* request = nullptr;
+		if (instance._ioQueue.size() > 0)
+		{
+			request = instance._ioQueue.back();
+			instance._ioQueue.pop_back();
+		}
 
 		Platform::UnlockMutex(instance._mutex);
 
-		if (hasWork)
+		if (request)
 		{
 			GAME_ASSERT(!request->completed, "FATAL ERROR: ProcessIORequests got request->completed = true!");
 
 			request->action();
 			request->completed = true;
 		}
-
-
+		
 	}
 }
 
@@ -305,7 +309,7 @@ public:
 		if (AssetLoader::instance._usesIOThread)
 		{
 			Platform::LockMutex(AssetLoader::instance._mutex);
-			AssetLoader::instance._ioQueue.Enqueue(&_request);
+			AssetLoader::instance._ioQueue.push_back(&_request);
 			Platform::UnlockMutex(AssetLoader::instance._mutex);
 
 			Platform::ReleaseSemaphore(AssetLoader::instance._semaphore, 1);
@@ -335,3 +339,4 @@ Coroutine AssetLoader::RunIOAsync(std::function<void()> func)
 {
 	return Coroutine(new AssetLoaderIOCrt(func));
 }
+

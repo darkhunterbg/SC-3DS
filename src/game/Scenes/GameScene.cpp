@@ -50,7 +50,6 @@ void GameScene::Start()
 
 	for (int p = 0; p < totalPlayers; ++p)
 	{
-
 		auto& r = *GameDatabase::instance->GetRace((RaceType)(p % 3 + 1) );
 		_entityManager->PlayerSystem.AddPlayer(r, color[p]);
 	}
@@ -82,18 +81,18 @@ void GameScene::Start()
 	const auto& def = *GameDatabase::instance->GetUnit("Terran\\Units\\Marine");
 
 	int i = 0;
-	for (int y = 1; y < 3; ++y)
+	for (int y = 1; y < 2; ++y)
 	{
-		for (int x = 1; x < 3; ++x)
+		for (int x = 1; x < 2; ++x)
 		{
 			EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ x * 32 ,y * 32 }));
 		}
 	}
 	_entityManager->PlayerSystem.SetMapKnown(PlayerId{ 1 });
 
-	EntityUtil::SpawnUnit(def, PlayerId{ 2 }, Vector2Int16(Vector2Int{ 256 , 64 }));
+	EntityUtil::SpawnUnit(def, PlayerId{ 2 }, Vector2Int16(Vector2Int{ 128 , 64 }));
 
-	EntityUtil::SpawnUnit(def, PlayerId{ 3 }, Vector2Int16(Vector2Int{ 300 , 300 }));
+	//EntityUtil::SpawnUnit(def, PlayerId{ 3 }, Vector2Int16(Vector2Int{ 300 , 300 }));
 
 	_entityManager->FullUpdate();
 

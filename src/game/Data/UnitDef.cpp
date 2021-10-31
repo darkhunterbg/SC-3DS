@@ -103,19 +103,10 @@ const SoundSetDef* UnitSounds::GetAnnoyedSound() const
 	return &GameDatabase::instance->SoundSetDefs[AnnoyedSoundId];
 }
 
-
-const SoundSetDef* UnitSounds::GetDeathSound() const
+ std::array<const SoundSetDef*, 4> UnitSounds::GetSounds() const
 {
-	if (DeathSoundId < 0)
-		return nullptr;
-
-	return &GameDatabase::instance->SoundSetDefs[DeathSoundId];
-}
-
- std::array<const SoundSetDef*, 5> UnitSounds::GetSounds() const
-{
-	return std::array<const SoundSetDef*, 5>
+	return std::array<const SoundSetDef*, 4>
 	{
-		GetReadySound(), GetYesSound(), GetWhatSound(), GetAnnoyedSound(), GetDeathSound()
+		GetReadySound(), GetYesSound(), GetWhatSound(), GetAnnoyedSound(),
 	};
 }
