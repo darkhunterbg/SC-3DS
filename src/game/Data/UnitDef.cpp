@@ -111,3 +111,11 @@ const SoundSetDef* UnitSounds::GetDeathSound() const
 
 	return &GameDatabase::instance->SoundSetDefs[DeathSoundId];
 }
+
+ std::array<const SoundSetDef*, 5> UnitSounds::GetSounds() const
+{
+	return std::array<const SoundSetDef*, 5>
+	{
+		GetReadySound(), GetYesSound(), GetWhatSound(), GetAnnoyedSound(), GetDeathSound()
+	};
+}

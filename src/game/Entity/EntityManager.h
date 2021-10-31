@@ -78,6 +78,7 @@ public:
 	void SetOrientation(EntityId id, uint8_t orien) { _orientations[Entity::ToIndex(id)] = orien; }
 	inline Vector2Int16 GetPosition(EntityId id) const { return _positions[Entity::ToIndex(id)]; }
 	inline uint8_t GetOrientation(EntityId id) const { return _orientations[Entity::ToIndex(id)]; }
+	inline bool HasEntity(EntityId id) const { return entities.EntityExists(id); }
 
 	void DeleteEntity(EntityId id);
 	void DeleteEntities(const std::vector<EntityId>& entities, bool sorted = false);

@@ -32,6 +32,7 @@ struct UnitAttack {
 
 };
 
+
 struct UnitSounds {
 	int16_t ReadySoundId;
 	int16_t YesSoundId;
@@ -44,6 +45,8 @@ struct UnitSounds {
 	const SoundSetDef* GetWhatSound() const;
 	const SoundSetDef* GetAnnoyedSound() const;
 	const SoundSetDef* GetDeathSound() const;
+
+	 std::array<const SoundSetDef*,5> GetSounds() const;
 };
 
 

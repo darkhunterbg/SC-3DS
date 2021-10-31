@@ -92,6 +92,7 @@ void EntityManager::Update0()
 {
 	PlayerSystem.ResetNewEvents();
 
+	SoundSystem.UpdateSounds(*this);
 	PlayerSystem.UpdateNextPlayerVision();
 }
 // Updates 24 per second (60 fps) 

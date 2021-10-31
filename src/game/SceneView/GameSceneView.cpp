@@ -125,9 +125,9 @@ void GameSceneView::UpdateSelection()
 			}
 
 			if (_unitSelection.size() > 0)
-				OnUnitSelect(_unitSelection[0], _unitSelection[0]!= prev);
-			else 
-				OnUnitSelect(Entity::None , true);
+				OnUnitSelect(_unitSelection[0], _unitSelection[0] != prev);
+			else
+				OnUnitSelect(Entity::None, true);
 		}
 	}
 
@@ -156,16 +156,14 @@ void GameSceneView::OnUnitSelect(EntityId id, bool newSelection)
 {
 	if (id != Entity::None && EntityUtil::IsAlly(_player, id))
 	{
-		const UnitComponent& unit = _scene->GetEntityManager().UnitSystem.GetComponent(id);
+		bool played = _scene->GetEntityManager().SoundSystem.PlayUnitChat(id, UnitChatType::Selected);
 
-		if (unit.def->Sounds.GetWhatSound())
-			_scene->GetEntityManager().SoundSystem.PlayChat(*unit.def->Sounds.GetWhatSound());
-
-		_unitPortrait.ChatUnit(id, newSelection);
+		if (played);
+			_unitPortrait.ChatUnit(id, newSelection);
 	}
 	else
 	{
-
+		
 	}
 }
 
@@ -218,6 +216,12 @@ void GameSceneView::Update()
 void GameSceneView::Draw()
 {
 	//SectionProfiler p("GUI");
+
+	if (_unitSelection.size() > 0 && _scene->GetEntityManager().SoundSystem.IsChatPlaying())
+	{
+		if (EntityUtil::IsAlly(_player, _unitSelection[0]))
+			_unitPortrait.ChatUnit(_unitSelection[0], false);
+	}
 
 	DrawMainScreen();
 
@@ -338,7 +342,7 @@ void GameSceneView::DrawPortrait()
 	EntityId id = Entity::None;
 
 	if (_unitSelection.size() > 0)
-	 id = _unitSelection[0];
+		id = _unitSelection[0];
 
 	_unitPortrait.Draw(id);
 

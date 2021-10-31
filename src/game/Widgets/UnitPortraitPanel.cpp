@@ -90,11 +90,14 @@ void UnitPortraitPanel::ChatUnit(EntityId id, bool newUnit)
 
 	const UnitPortraitDef* portrait = unit.def->Art.GetPortrait();
 
-	_unit = id;
-	_playClip = nullptr;
+
 
 	if (newUnit)
 		_noiseCooldown = NoiseTime;
+	else if (_playClip) return;
+
+	_unit = id;
+	_playClip = nullptr;
 
 	_portraitId = 0;
 
