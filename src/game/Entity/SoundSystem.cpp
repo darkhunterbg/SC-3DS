@@ -13,6 +13,7 @@ SoundSystem::SoundSystem()
 
 	_musicChannel.channel = Game::GetMusicChannel();
 
+	_worldChannels.reserve(channels.Size() - 2);
 
 	for (const AudioChannelState& channel : channels)
 	{
@@ -28,10 +29,18 @@ SoundSystem::SoundSystem()
 		}
 	}
 
+	_channels.reserve(_worldChannels.size() + 2);
+	_channels.push_back(&_musicChannel);
+	_channels.push_back(&_chatChannel);
+	for (auto& c : _worldChannels)
+	{
+		_channels.push_back(&c);
+	}
+
 }
 
 
-void SoundSystem::PlayDef(const SoundSetDef& def, Channel& channel)
+void SoundSystem::PlayDef(const SoundSetDef& def, Channel& channel, float volume )
 {
 	AudioClip* clip;
 
@@ -54,9 +63,8 @@ void SoundSystem::PlayDef(const SoundSetDef& def, Channel& channel)
 	}
 
 	channel.sound = &def;
-
-	clip = &def.GetAudioClip(channel.soundIndex);
-	AudioManager::Play(*clip, channel.channel);
+	channel.newSound = true;
+	channel.volume = volume;
 }
 
 bool SoundSystem::IsPlayCompleted(Channel& channel)
@@ -68,14 +76,13 @@ bool SoundSystem::IsPlayCompleted(Channel& channel)
 
 void SoundSystem::PlayWorldSound(const SoundSetDef& sound, Vector2Int16 pos)
 {
-	PlayDef(sound, _worldChannels[0]);
+	_worldSounds.push_back({ pos, &sound, 0 });
 }
 
 
 void SoundSystem::PlayMusic(const SoundSetDef& music)
 {
 	PlayDef(music, _musicChannel);
-	//AudioManager::StopAll();
 }
 
 void SoundSystem::PlayChat(const SoundSetDef& chat)
@@ -141,17 +148,73 @@ void SoundSystem::DeleteEntities(std::vector<EntityId>& entities)
 
 size_t SoundSystem::ReportMemoryUsage()
 {
-	return size_t();
+	return _worldSounds.capacity() * sizeof(WorldSound);
 }
 
-void SoundSystem::UpdateSounds(const EntityManager& em)
+void SoundSystem::UpdateSounds(const EntityManager& em, const Camera& camera)
 {
+	_soundsInRange.clear();
+
+	Rectangle16 camRect = camera.GetRectangle16();
+	Rectangle16 extendedCamRect = camRect;
+	extendedCamRect.size = (extendedCamRect.size * 3) / 2;
+	extendedCamRect.SetCenter(camRect.GetCenter());
+
+	for (auto& s : _worldSounds)
+	{
+		if (extendedCamRect.Contains(s.position))
+		{
+			float volume = 0.5f + 0.5f * (camRect.Contains(s.position));
+			s.volume = volume;
+			_soundsInRange.push_back(s);
+		};
+	}
+
+	_worldSounds.clear();
+
+	for (WorldSound& s : _soundsInRange)
+	{
+		Channel* playChannel = nullptr;
+		for (Channel& c : _worldChannels)
+		{
+			if (c.sound == s.sound)
+			{
+				playChannel = &c;
+				break;
+			}
+		}
+
+		if (playChannel == nullptr)
+		{
+			for (Channel& c : _worldChannels)
+			{
+				if (!IsPlayCompleted(c)) continue;
+				playChannel = &c;
+				break;
+			}
+		}
+
+		if (playChannel)
+			PlayDef(*s.sound, *playChannel, s.volume);
+	}
+
 	if (IsChatPlaying())
 	{
 		if (_chatUnitId != Entity::None && !em.HasEntity(_chatUnitId))
 		{
 			_chatUnitId = Entity::None;
 			AudioManager::StopChannel(_chatChannel.channel);
+		}
+	}
+
+	for (Channel* channel : _channels)
+	{
+		if (channel->newSound && channel->sound)
+		{
+			AudioClip& clip = channel->sound->GetAudioClip(channel->soundIndex);
+			AudioManager::SetChannelVolume(channel->channel, channel->volume);
+			AudioManager::Play(clip, channel->channel);
+			channel->newSound = false;
 		}
 	}
 }

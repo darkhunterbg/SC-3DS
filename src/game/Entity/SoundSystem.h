@@ -3,6 +3,7 @@
 #include "IEntitySystem.h"
 #include "../Random.h"
 #include "../Assets.h"
+#include "../Camera.h"
 #include "../Data/SoundSetDef.h"
 #include "../Engine/AudioChannel.h"
 #include  <vector>
@@ -22,20 +23,30 @@ class SoundSystem : public IEntitySystem {
 		const SoundSetDef* sound = nullptr;
 		float volume = 1.0f;
 		int soundIndex = -1;
+		bool newSound = false;
+	};
+	struct WorldSound {
+		Vector2Int16 position;
+		const SoundSetDef* sound;
+		float volume = 1;
 	};
 private:
 	Random _rand;
 
 	Channel _musicChannel;
 	std::vector<Channel> _worldChannels;
+	std::vector<WorldSound> _worldSounds;
+	std::vector<WorldSound> _soundsInRange;
 	Channel _chatChannel;
 
 	EntityId _chatUnitId = Entity::None;
 	UnitChatType _unitChatType = UnitChatType::None;
 	int _unitChatCount = 0;
 
-	void PlayDef(const SoundSetDef& def, Channel& channel);
+	void PlayDef(const SoundSetDef& def, Channel& channel, float volume = 1.0f);
 	bool IsPlayCompleted(Channel& channel);
+
+	std::vector<Channel*> _channels;
 public:
 
 	SoundSystem();
@@ -44,12 +55,13 @@ public:
 	void PlayChat(const SoundSetDef& chat);
 	bool PlayUnitChat(EntityId unit, UnitChatType type);
 
+	void PlayWorldSound(const SoundSetDef& sound, Vector2Int16 pos);
+
 	bool IsChatPlaying() { return !IsPlayCompleted(_chatChannel); }
 
 	virtual void DeleteEntities(std::vector<EntityId>& entities) override;
 	virtual size_t ReportMemoryUsage() override;
 
-	void UpdateSounds(const EntityManager& em);
+	void UpdateSounds(const EntityManager& em, const Camera& camera);
 
-	void PlayWorldSound(const SoundSetDef& sound, Vector2Int16 pos);
 };
