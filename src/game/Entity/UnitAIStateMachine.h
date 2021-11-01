@@ -25,32 +25,56 @@ struct UnitAIThinkData {
 	inline size_t size() const { return entities.size(); }
 };
 
-class IUnitAIState {
-public:
-	virtual void Think(UnitAIThinkData& data, EntityManager& em) = 0;
-	virtual void EnterState(UnitAIEnterStateData& data, EntityManager& em);
-public:
-	static std::vector<IUnitAIState*> States;
+typedef void (*UnitAIThinkFunc)(UnitAIThinkData& data, EntityManager& em);
+typedef void (*UnitAIEnterStateFunc)(UnitAIEnterStateData& data, EntityManager& em);
+
+enum class UnitAIStateId :uint8_t {
+
+	IdleAggressive = 0,
+	IdlePassive = 1,
+	AttackTarget = 2,
+	AttackLoop = 3,
 };
 
-namespace UnitAIStates
-{
-	class IdleAggressive :public IUnitAIState {
-		virtual void EnterState(UnitAIEnterStateData& data, EntityManager& em) override;
-		virtual void Think(UnitAIThinkData& data, EntityManager& em) override;
-	};
+static constexpr const int UnitAIStateTypeCount = 4;
 
-	class IdlePassive :public IUnitAIState {
-		virtual void EnterState(UnitAIEnterStateData& data, EntityManager& em) override;
-		virtual void Think(UnitAIThinkData& data, EntityManager& em) override;
-	};
+struct UnitAIState {
+public:
+	UnitAIEnterStateData enterStateData;
+	UnitAIThinkData thinkData;
 
-	class AttackTarget : public IUnitAIState {
-		virtual void Think(UnitAIThinkData& data, EntityManager& em) override;
-	};
+	UnitAIEnterStateFunc enterStateFunc = nullptr;
+	UnitAIThinkFunc  thinkFunc = nullptr;
 
-	class AttackLoop : public IUnitAIState {
-		virtual void EnterState(UnitAIEnterStateData& data, EntityManager& em) override;
-		virtual void Think(UnitAIThinkData& data, EntityManager& em) override;
-	};
-}
+	inline size_t GetSize() const
+	{
+		size_t  size =  enterStateData.size() * sizeof(EntityId);
+		size += thinkData.size() * sizeof(EntityId);
+
+		return size;
+	}
+
+	UnitAIState(UnitAIEnterStateFunc enterState, UnitAIThinkFunc think) : enterStateFunc(enterState),
+		thinkFunc(think)
+	{
+	}
+};
+
+class UnitAIStateMachine {
+private:
+	UnitAIStateMachine() = delete;
+	~UnitAIStateMachine() = delete;
+public:
+	static void CreateStates(std::vector< UnitAIState*>& states);
+
+private:
+	static void IdleEnter(UnitAIEnterStateData& data, EntityManager& em);
+	static void IdleAggresiveThink(UnitAIThinkData& data, EntityManager& em);
+
+	static void AttackTargetThink(UnitAIThinkData& data, EntityManager& em);
+
+	static void AttackLoopEnter(UnitAIEnterStateData& data, EntityManager& em);
+	static void AttackLoopThink(UnitAIThinkData& data, EntityManager& em);
+
+};
+

@@ -13,19 +13,28 @@ struct UnitComponent {
 	PlayerId owner;
 	const UnitDef* def;
 	uint8_t vision = 2;
-	uint8_t armor = 0;
-	int16_t usedSupply = 0;
-	int16_t providedSupply = 0;
-	int16_t health;
-	int16_t maxHealth;
+	uint8_t armorD = 0;
+	int16_t usedSupplyD = 0;
+	int16_t providedSupplyD = 0;
+	int16_t healthD = 0;
+	int16_t maxHealthD = 0;
 	int16_t kills = 0;
-	uint16_t damage[2] = { 0,0 };
+	uint16_t damageD[2] = { 0,0 };
+	Vector2Int GetHealth() const { return { (int)healthD >> 1 ,(int)maxHealthD >> 1 }; }
+	int GetWeaponDamage(int weapon) { return damageD[weapon] >> 1; };
 };
 
 struct UnitAIComponent {
-	uint8_t stateId = 0;
+	UnitAIStateId stateId;
+	UnitAIStateId idleStateId;
 	bool newState = false;
-	uint8_t idleStateId;
+
+	uint8_t seekRange = 0;
+	EntityId targetEntity = Entity::None;
+	uint8_t attackId = 0;
+	uint8_t attackCooldown = 0;
+
+	bool IsAttackReady() const { return attackCooldown == 0; }
 };
 
 class UnitSystem : public IEntitySystem {
@@ -36,11 +45,10 @@ class UnitSystem : public IEntitySystem {
 	EntityComponentMap<UnitComponent> _unitComponents;
 	EntityComponentMap<UnitAIComponent> _aiComponents;
 
-	std::vector<UnitAIThinkData> _aiThinkData;
-	std::vector<UnitAIEnterStateData> _aiEnterStateData;
+	std::vector<UnitAIState*> _aiStates;
 public:
 	UnitSystem();
-
+	~UnitSystem();
 
 	UnitComponent& NewUnit(EntityId id, const UnitDef& def, PlayerId owner);
 	inline UnitComponent& GetComponent(EntityId id) { return _unitComponents.GetComponent(id); }
@@ -54,5 +62,5 @@ public:
 
 	void UpdateUnitAI(EntityManager& em);
 
-	void UnitAttackEvent(EntityId id);
+	void UnitAttackEvent(EntityId unit);
 };

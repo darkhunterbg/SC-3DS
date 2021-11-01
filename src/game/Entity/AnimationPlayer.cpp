@@ -68,7 +68,6 @@ static void GoTo(const InstructionParams& params, EntityId id, EntityManager& em
 static void Attack(const InstructionParams& params, EntityId id, EntityManager& em)
 {
 	em.UnitSystem.UnitAttackEvent(id);
-	//em.GetUnitSystem().UnitAttackEvent(id);
 }
 
 

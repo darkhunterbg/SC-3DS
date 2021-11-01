@@ -5,10 +5,13 @@
 
 UnitSystem::UnitSystem()
 {
-	_aiThinkData.resize(IUnitAIState::States.size());
-	_aiThinkData.shrink_to_fit();
-	_aiEnterStateData.resize(IUnitAIState::States.size());
-	_aiEnterStateData.shrink_to_fit();
+	UnitAIStateMachine::CreateStates(_aiStates);
+}
+
+UnitSystem::~UnitSystem()
+{
+	for (auto state : _aiStates)
+		delete state;
 }
 
 void UnitSystem::DeleteEntities(std::vector<EntityId>& entities)
@@ -21,14 +24,9 @@ size_t UnitSystem::ReportMemoryUsage()
 {
 	size_t size = _unitComponents.GetMemoryUsage();
 	size += _aiComponents.GetMemoryUsage();
-	for (auto& data : _aiThinkData)
+	for (auto& state : _aiStates)
 	{
-		size += data.entities.capacity() * sizeof(EntityId);
-	}
-
-	for (auto& data : _aiEnterStateData)
-	{
-		size += data.entities.capacity() * sizeof(EntityId);
+		size += state->GetSize();
 	}
 
 	return size;
@@ -43,21 +41,21 @@ UnitComponent& UnitSystem::NewUnit(EntityId id, const UnitDef& def, PlayerId own
 	unit.owner = owner;
 	unit.def = &def;
 	unit.vision = def.Stats.Vision + 1;
-	unit.armor = def.Combat.Armor;
-	unit.providedSupply = def.Stats.ProvideSupply;
-	unit.usedSupply = def.Stats.UseSupply;
-	unit.health = unit.maxHealth = def.Stats.Health;
-	unit.damage[0] = def.Attacks[0].Damage;
-	unit.damage[1] = def.Attacks[1].Damage;
+	unit.armorD = def.Combat.Armor << 1;
+	unit.providedSupplyD = def.Stats.ProvideSupply;
+	unit.usedSupplyD = def.Stats.UseSupply;
+	unit.healthD = unit.maxHealthD = (def.Stats.Health << 1);
+	unit.damageD[0] = def.Attacks[0].Damage << 1;
+	unit.damageD[1] = def.Attacks[1].Damage << 1;
 
 	if (def.AI.AIType != UnitAIType::None)
 	{
 		_aiComponents.NewComponent(id);
 		auto& ai = _aiComponents.GetComponent(id);
-		ai.stateId = 0;
+		ai.stateId = UnitAIStateId::IdleAggressive;
 		ai.newState = true;
 		ai.idleStateId = ai.stateId;
-
+		ai.seekRange = def.GetAttacks()[0].Range.y;
 	}
 
 	return unit;
@@ -66,55 +64,57 @@ UnitComponent& UnitSystem::NewUnit(EntityId id, const UnitDef& def, PlayerId own
 
 void UnitSystem::UpdateUnitAI(EntityManager& em)
 {
-	for (auto& data : _aiEnterStateData)
+	for (auto& state : _aiStates)
 	{
-		data.clear();
+		state->enterStateData.clear();
+		state->thinkData.clear();
 	}
 
-	for (auto& data : _aiThinkData)
-	{
-		data.clear();
-	}
 
 	auto& entities = _aiComponents.GetEntities();
 	auto& ai = _aiComponents.GetComponents();
 
 	for (int i = 0; i < entities.size(); ++i)
 	{
-		int stateId = ai[i].stateId;
+		UnitAIStateId stateId = ai[i].stateId;
 		EntityId id = entities[i];
 		if (ai[i].newState)
 		{
 			ai[i].newState = false;
-			_aiEnterStateData[stateId].entities.push_back(id);
+			_aiStates[(int)stateId]->enterStateData.entities.push_back(id);
 		}
 
-		_aiThinkData[stateId].entities.push_back(id);
+		ai[i].attackCooldown -= ai[i].attackCooldown > 0;
+
+		_aiStates[(int)stateId]->thinkData.entities.push_back(id);
 	}
 
-	for (int i = 0; i < IUnitAIState::States.size(); ++i)
+	// Todo: have 2 states list, for enter state and for think to avid ifs
+
+	for (UnitAIState* state : _aiStates)
 	{
-		auto& state = *IUnitAIState::States[i];
-		auto& entierStateData = _aiEnterStateData[i];
-		auto& thinkData = _aiThinkData[i];
+		if (state->enterStateFunc && state->enterStateData.size())
+			state->enterStateFunc(state->enterStateData, em);
 
-		if (_aiEnterStateData.size())
-			state.EnterState(entierStateData, em);
-
-		if (thinkData.size())
-			state.Think(thinkData, em);
+		if (state->thinkFunc && state->thinkData.size())
+			state->thinkFunc(state->thinkData, em);
 	}
 }
 
 void UnitSystem::UnitAttackEvent(EntityId id)
 {
 	UnitComponent& unit = GetComponent(id);
-	auto& attack = unit.def->GetAttacks()[0];
+	UnitAIComponent& ai = GetAIComponent(id);
 
+	auto& attack = unit.def->GetAttacks()[ai.attackId];
 	auto sound = attack.GetWeapon()->GetSpawnSound();
 
 	if (sound)
 	{
 		EntityUtil::GetManager().SoundSystem.PlayWorldSound(*sound, EntityUtil::GetManager().GetPosition(id));
 	}
+
+	UnitComponent& target = GetComponent(id);
+	target.healthD -= unit.damageD[ai.attackId];
+	ai.attackCooldown = attack.Cooldown;
 }

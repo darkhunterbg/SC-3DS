@@ -155,9 +155,9 @@ void ObjectDrawSystem::DrawSelectedBars(EntityManager& em, const Camera& camera)
 
 		auto* palette = &GreenHPBarColorPalette;
 
-		int hpBarsVisible = (int)std::ceil(((float)unit.health * barSize) / (float)unit.maxHealth);
+		int hpBarsVisible = (int)std::ceil(((float)unit.healthD * barSize) / (float)unit.maxHealthD);
 
-		if (hpBarsVisible > 1 && hpBarsVisible == barSize && unit.health!= unit.maxHealth)
+		if (hpBarsVisible > 1 && hpBarsVisible == barSize && unit.healthD!= unit.maxHealthD)
 			--hpBarsVisible;
 
 		Vector2Int16 dst = camera.WorldToScreen(pos);
@@ -175,9 +175,9 @@ void ObjectDrawSystem::DrawSelectedBars(EntityManager& em, const Camera& camera)
 				++greyDst.position.y;
 			}
 
-			if (unit.health <= unit.maxHealth / 3)
+			if (unit.healthD <= unit.maxHealthD / 3)
 				palette = &RedHPBarColorPalette;
-			else if (unit.health <= (unit.maxHealth << 1) / 3)
+			else if (unit.healthD <= (unit.maxHealthD << 1) / 3)
 				palette = &YellowHPBarColorPalette;
 		}
 

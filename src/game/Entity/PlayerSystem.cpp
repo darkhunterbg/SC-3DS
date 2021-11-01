@@ -166,8 +166,8 @@ void PlayerSystem::UpdatePlayers(const EntityManager& em)
 		auto& unit = em.UnitSystem.GetComponent(id);
 
 		playerVision[unit.owner.i]->ranges.push_back({ position,(uint8_t)(unit.vision )});
-		players[unit.owner.i].usedSupplyDoubled += unit.usedSupply;
-		players[unit.owner.i].providedSupplyDoubled += unit.providedSupply;
+		players[unit.owner.i].usedSupplyDoubled += unit.usedSupplyD;
+		players[unit.owner.i].providedSupplyDoubled += unit.providedSupplyD;
 	}
 
 }
