@@ -204,9 +204,10 @@ void GameSceneView::Update()
 					_cursor.SetUnitHover(CursorHoverState::Yellow);
 			}
 		}
-
-		UpdateSelection();
 	}
+
+
+	UpdateSelection();
 
 	const PlayerInfo& info = _scene->GetEntityManager().PlayerSystem.GetPlayerInfo(_player);
 

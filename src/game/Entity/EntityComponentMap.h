@@ -165,6 +165,8 @@ public:
 					--_entityToIndexMap[i];
 			}
 		}
+
+		// TODO: full validation check 
 	}
 
 	size_t GetMemoryUsage() const

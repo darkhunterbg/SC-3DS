@@ -174,9 +174,9 @@ void UnitSystem::ProcessUnitEvents(EntityManager& em)
 			const AnimClipDef* deathAnim = def->Art.GetSprite().GetAnimation(AnimationType::Death);
 			if (deathAnim != nullptr)
 			{
-
 				EntityId death = em.NewEntity();
 				em.DrawSystem.NewComponent(death);
+				em.DrawSystem.GetComponent(death).color = em.DrawSystem.GetComponent(id).color;
 				em.AnimationSystem.NewComponent(death);
 				em.SetPosition(death, em.GetPosition(id));
 				em.SetOrientation(death, 0);
