@@ -21,6 +21,8 @@
 
 #include "IEntitySystem.h"
 
+#include "../Coroutine.h"
+
 class EntityManager {
 private:
 	EntityManagerCollection entities;
@@ -31,6 +33,8 @@ private:
 	std::vector<EntityId> toDelete;
 
 	std::vector<IEntitySystem*> _systems;
+
+	friend class EntityManagerUpdateCrt;
 public:
 	Random rand;
 private:
@@ -49,6 +53,8 @@ private:
 
 	std::array<Vector2Int16, Entity::MaxEntities> _positions;
 	std::array<uint8_t, Entity::MaxEntities> _orientations;
+
+
 public:
 	std::function<void(const std::vector<EntityId>&)> OnEntitiesDeleted;
 
@@ -73,6 +79,9 @@ public:
 	{
 		return entities.GetEntities();
 	}
+
+	Coroutine NewUpdateCoroutine();
+
 	void SetPosition(EntityId id, Vector2Int16 pos) { _positions[Entity::ToIndex(id)] = pos; }
 	void SetOrientation(EntityId id, uint8_t orien) { _orientations[Entity::ToIndex(id)] = orien; }
 	inline Vector2Int16 GetPosition(EntityId id) const { return _positions[Entity::ToIndex(id)]; }
@@ -90,11 +99,9 @@ public:
 	}
 	void ClearEntities();
 
-	void FrameUpdate(const Camera& camera);
+	void FrameUpdate();
 
 	void Draw(const Camera& camera);
-
-	void FullUpdate();
 
 	size_t GetMemoryUsage();
 };

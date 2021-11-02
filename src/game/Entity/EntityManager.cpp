@@ -7,6 +7,27 @@
 
 #include <algorithm>
 
+
+class EntityManagerUpdateCrt :public CoroutineImpl {
+
+	EntityManager* _em;
+
+public:
+	EntityManagerUpdateCrt(EntityManager* em) : _em(em) {}
+
+	CRT_START()
+	{
+		_em->ready = true;
+
+		_em->Update0();
+		CRT_YIELD();
+		_em->Update1();
+		CRT_YIELD();
+		_em->Update2();
+	}
+	CRT_END();
+};
+
 EntityManager::EntityManager()
 {
 	memset(_orientations.data(), 0, _orientations.size());
@@ -28,6 +49,11 @@ void EntityManager::Init(Vector2Int16 mapSize)
 {
 	PlayerSystem.SetSize(mapSize);
 	MapSystem.SetSize(mapSize);
+}
+
+Coroutine EntityManager::NewUpdateCoroutine()
+{
+	return Coroutine(new EntityManagerUpdateCrt(this));
 }
 
 void EntityManager::DeleteEntity(EntityId id)
@@ -62,7 +88,7 @@ void EntityManager::ClearEntities()
 
 	for (auto& system : _systems)
 		system->DeleteEntities(toDelete);
-	
+
 	if (OnEntitiesDeleted != nullptr)
 		OnEntitiesDeleted(toDelete);
 
@@ -143,9 +169,8 @@ void EntityManager::Draw2(const Camera& camera)
 
 }
 
-void EntityManager::FrameUpdate(const Camera& camera)
+void EntityManager::FrameUpdate()
 {
-
 	ready = true;
 
 	switch (updateId)
@@ -171,13 +196,6 @@ void EntityManager::FrameUpdate(const Camera& camera)
 	}
 
 	//Util::RealTimeStat("Entities", entities.size());
-}
-
-void EntityManager::FullUpdate()
-{
-	Update0();
-	Update1();
-	Update2();
 }
 
 size_t EntityManager::GetMemoryUsage()

@@ -10,6 +10,7 @@
 #include "../Engine/GraphicsRenderer.h"
 #include "../Entity/EntityUtil.h"
 #include "../Engine/AssetLoader.h"
+#include "../TimeSlice.h"
 
 #include <algorithm>
 
@@ -94,7 +95,12 @@ void GameScene::Start()
 
 	//EntityUtil::SpawnUnit(def, PlayerId{ 3 }, Vector2Int16(Vector2Int{ 300 , 300 }));
 
-	_entityManager->FullUpdate();
+	_updateCrt = _entityManager->NewUpdateCoroutine();
+
+	_updateCrt->RunAll();
+
+	_updateCrt->Restart();
+
 
 	/*if (loadFromFile) {
 		entityManager->GetCommandProcessor().ReplayFromFile("record.cmd", *entityManager);
@@ -110,22 +116,43 @@ void GameScene::Stop()
 
 }
 
+
+static double frameTime = 1.0 / 24.0;
+
 void GameScene::Frame()
 {
+	TimeSlice ts(0.015);
+
 	GraphicsRenderer::DrawOnScreen(ScreenId::Top);
 
 	_entityManager->Draw(_view->GetCamera());
 
 	_view->Draw();
 
+
+
+	frameTime -= 1.0 / 60.0;
+
+	if (frameTime < 0)
+	{
+		_updateCrt->RunAll();
+		_updateCrt->Restart();
+
+		frameTime += 1.0 / (24.0 * GameSpeed);
+	}
+
+	do
+	{
+		_updateCrt->Next();
+	} while (!ts.IsTimeElapsed() && !_updateCrt->IsCompleted());
+
 	_view->Update();
-
-	_entityManager->FrameUpdate(_view->GetCamera());
-
+	
 	if (Game::GetInput().Cheats.ToggleFoW.IsActivated())
 	{
 		_entityManager->MapSystem.FogOfWarVisible = !_entityManager->MapSystem.FogOfWarVisible;
 	}
+
 }
 
 void GameScene::OnPlatformChanged()

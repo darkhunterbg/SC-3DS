@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Scene.h"
-
+#include "../Coroutine.h"
 
 class GameSceneView;
 class EntityManager;
@@ -19,7 +19,11 @@ public:
 
 	EntityManager& GetEntityManager() { return *_entityManager; }
 	GameSceneView& GetView() { return *_view; }
+
+	double GameSpeed = 1.0;
 private:
+
 	GameSceneView* _view;
 	EntityManager* _entityManager;
+	Coroutine _updateCrt;
 };

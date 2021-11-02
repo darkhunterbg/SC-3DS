@@ -75,6 +75,8 @@ EntityId EntityUtil::SpawnUnit(const UnitDef& def, PlayerId owner, Vector2Int16 
 
 	em.AnimationSystem.NewComponent(id);
 
+	PlayAnimation(id, *def.Art.GetSprite().GetAnimation(AnimationType::Init), def.Art.GetShadowImage());
+
 	return id;
 }
 
