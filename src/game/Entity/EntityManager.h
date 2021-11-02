@@ -26,9 +26,6 @@
 class EntityManager {
 private:
 	EntityManagerCollection entities;
-
-	bool ready = false;
-
 	std::vector<EntityId> scratch;
 	std::vector<EntityId> toDelete;
 
@@ -40,15 +37,7 @@ public:
 private:
 	void ApplyEntityChanges();
 
-	void Update0();
-	void Update1();
-	void Update2();
-	void Draw0(const Camera& camera);
-	void Draw1(const Camera& camera);
-	void Draw2(const Camera& camera);
-
 	unsigned long long frameCounter = 0;
-	int8_t updateId = 0;
 	uint32_t logicalFrame = 0;
 
 	std::array<Vector2Int16, Entity::MaxEntities> _positions;
@@ -81,6 +70,9 @@ public:
 	}
 
 	Coroutine NewUpdateCoroutine();
+	void Draw(const Camera& camera);
+	void UpdateAudio(const Camera& camera);
+
 
 	void SetPosition(EntityId id, Vector2Int16 pos) { _positions[Entity::ToIndex(id)] = pos; }
 	void SetOrientation(EntityId id, uint8_t orien) { _orientations[Entity::ToIndex(id)] = orien; }
@@ -101,7 +93,7 @@ public:
 
 	void FrameUpdate();
 
-	void Draw(const Camera& camera);
+
 
 	size_t GetMemoryUsage();
 };

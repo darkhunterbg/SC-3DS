@@ -52,7 +52,7 @@ void BootScene::Stop()
 	delete _view;
 }
 
-void BootScene::Frame()
+void BootScene::Frame(TimeSlice& frameBudget)
 {
 
 	_view->Draw();

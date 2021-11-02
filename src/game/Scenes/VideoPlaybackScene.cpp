@@ -33,7 +33,7 @@ void VideoPlaybackScene::Stop()
 	AssetLoader::UnloadVideoClip(_clip);
 }
 
-void VideoPlaybackScene::Frame()
+void VideoPlaybackScene::Frame(TimeSlice& frameBudget)
 {
 	GUI::UseScreen(ScreenId::Top);
 	GUIImage::DrawColor(Colors::Black);

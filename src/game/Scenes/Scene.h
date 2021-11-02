@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "../TimeSlice.h"
 
 class Scene {
 protected:
@@ -11,7 +12,7 @@ public :
 	virtual void Start() {}
 	virtual void Stop() {}
 
-	virtual void Frame() {}
+	virtual void Frame(TimeSlice& frameBudget) {}
 
 	virtual void OnPlatformChanged() {}
 

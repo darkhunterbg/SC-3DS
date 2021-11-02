@@ -17,3 +17,10 @@ bool TimeSlice::IsTimeElapsed() const
 
 	return budget > TimeBudgetSeconds;
 }
+
+bool TimeSlice::IsRemainingLessThan(double seconds)
+{
+	double budget = Platform::ElaspedTime() - _start;
+
+	return budget > (TimeBudgetSeconds - seconds);
+}

@@ -12,7 +12,8 @@
 #include <unordered_map>
 
 
-SectionProfiler::SectionProfiler(const char* text, ...) {
+SectionProfiler::SectionProfiler(const char* text, ...)
+{
 	va_list args;
 	va_start(args, text);
 	stbsp_vsnprintf(name, sizeof(name), text, args);
@@ -21,15 +22,26 @@ SectionProfiler::SectionProfiler(const char* text, ...) {
 	start = Platform::ElaspedTime();
 }
 
-SectionProfiler::~SectionProfiler() {
+SectionProfiler::~SectionProfiler()
+{
 	if (recorded)
 		return;
 	auto time = (Platform::ElaspedTime() - start) * 1000;
-	Profiler::AddStat(name, time);
+
+	if (time > statMinThreshold)
+		Profiler::AddStat(name, time);
+	//else
+		//Profiler::ClearStat(name);
 }
-void SectionProfiler::Submit() {
+void SectionProfiler::Submit()
+{
 	auto time = (Platform::ElaspedTime() - start) * 1000;
-	Profiler::AddStat(name, time);
+
+	if (time > statMinThreshold)
+		Profiler::AddStat(name, time);
+	//else
+		//Profiler::ClearStat(name);
+
 	recorded = true;
 }
 
@@ -39,7 +51,8 @@ static double frameTime = 0;
 static std::unordered_map<std::string, double> profileData;
 static float scale = 1.0f;
 
-void Profiler::ShowPerformance() {
+void Profiler::ShowPerformance()
+{
 	GraphicsRenderer::DrawOnScreen(ScreenId::Top);
 
 	char text[128];
@@ -54,7 +67,8 @@ void Profiler::ShowPerformance() {
 	GraphicsRenderer::DrawText(*Game::SystemFont12, { 1,0 }, text, c);
 
 	int y = 15;
-	for (const auto& profile : profileData) {
+	for (const auto& profile : profileData)
+	{
 		stbsp_snprintf(text, sizeof(text), "%s %0.1f ms", profile.first.data(), profile.second);
 		GraphicsRenderer::DrawText(*Game::SystemFont12, { 1,y }, text, Colors::White);
 		y += 15;
@@ -75,7 +89,8 @@ void Profiler::ShowPerformance() {
 
 	scale = std::fmax(1, max);
 
-	for (int i = 0; i < frameLoad.size(); ++i) {
+	for (int i = 0; i < frameLoad.size(); ++i)
+	{
 		int y = std::fmax(1, ((frameLoad[i] * 50) / scale));
 		c = Colors::LightGreen;
 		if (frameLoad[i] > 1)
@@ -94,8 +109,8 @@ void Profiler::ShowPerformance() {
 
 	if (highest > 1)
 	{
-		int height = ( 50.0) / highest;
-		GraphicsRenderer::DrawLine(offset + Vector2Int(0,-height), offset + Vector2Int(60, -height), Colors::Orange);
+		int height = (50.0) / highest;
+		GraphicsRenderer::DrawLine(offset + Vector2Int(0, -height), offset + Vector2Int(60, -height), Colors::Orange);
 	}
 	if (highest > 2)
 	{
@@ -107,33 +122,42 @@ void Profiler::ShowPerformance() {
 	GraphicsRenderer::DrawLine(offset, offset + Vector2Int(60, 0), Colors::White);
 }
 
-void Profiler::FrameStart() {
+void Profiler::FrameStart()
+{
 	frameStartTime = Platform::ElaspedTime();;
 
 }
-void Profiler::FrameEnd() {
+void Profiler::FrameEnd()
+{
 	auto now = Platform::ElaspedTime();
 	double thisFrameTime = (now - frameStartTime) * 1000;
 
 	if (thisFrameTime > 1000)
 		return;
 
-	frameTime =  std::roundf((frameTime * 0.9 + thisFrameTime * 0.1) * 10.0) / 10.0;
+	frameTime = std::roundf((frameTime * 0.9 + thisFrameTime * 0.1) * 10.0) / 10.0;
 	frameLoad.insert(frameLoad.begin(), thisFrameTime / 16.7);
 
 	if (frameLoad.size() >= 60)
 		frameLoad.erase(frameLoad.end() - 1);
 
 }
-void Profiler::AddStat(const char* name, double timeMs) {
+void Profiler::AddStat(const char* name, double timeMs)
+{
 	double r = profileData[name];
 	if (timeMs > 1000)
 		return;
 	profileData[name] = std::roundf((r * 0.9 + timeMs * 0.1) * 10.0) / 10.0;
 }
 
-void Profiler::AddCounter(const char* name, int  value) {
+void Profiler::AddCounter(const char* name, int  value)
+{
 	int r = profileData[name];
 
-	profileData[name] = (int)(  value);
+	profileData[name] = (int)(value);
+}
+
+void Profiler::ClearStat(const char* name)
+{
+	profileData.erase(name);
 }

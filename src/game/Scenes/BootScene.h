@@ -20,7 +20,7 @@ public:
 	virtual void Start() override;
 	virtual void Stop() override;
 
-	virtual void Frame() override;
+	virtual void Frame(TimeSlice& frameBudget) override;
 	virtual ~BootScene()  override;
 
 	void StartGame();

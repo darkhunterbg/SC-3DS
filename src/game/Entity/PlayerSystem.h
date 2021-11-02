@@ -185,7 +185,7 @@ public:
 
 	void UpdatePlayers(const EntityManager& em);
 	void ResetNewEvents();
-	bool UpdateNextPlayerVision(int players = 256);
+	bool UpdateNextPlayerVision();
 
 	void NewEvent(PlayerId player, PlayerEventType type, EntityId source);
 	void GetPlayerEvents(PlayerId player, PlayerEventType type, std::vector<PlayerEvent>& outEvents);

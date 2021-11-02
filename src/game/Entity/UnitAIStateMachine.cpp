@@ -53,6 +53,30 @@ static EntityId DetectNearbyEnemy(EntityId id, Vector2Int16 pos, PlayerId owner,
 }
 
 
+
+
+void UnitAIState::StartEnterState(int batch)
+{
+	enterStateData.start = 0;
+	enterStateData.end = std::min((int)enterStateData.size(), batch);
+}
+void UnitAIState::AdvanceEnterState(int batch)
+{
+	enterStateData.start = enterStateData.end;
+	enterStateData.end = std::min((int)enterStateData.size(), enterStateData.end + batch);
+}
+void UnitAIState::StartThink(int batch)
+{
+	thinkData.start = 0;
+	thinkData.end = std::min((int)thinkData.size(), batch);
+}
+void UnitAIState::AdvanceThink(int batch)
+{
+	thinkData.start = thinkData.end;
+	thinkData.end = std::min((int)thinkData.size(), thinkData.end + batch);
+}
+
+
 void UnitAIStateMachine::CreateStates(std::vector< UnitAIState*>& states)
 {
 	states.clear();
@@ -63,6 +87,7 @@ void UnitAIStateMachine::CreateStates(std::vector< UnitAIState*>& states)
 	states[(int)UnitAIStateId::AttackTarget] = new UnitAIState(nullptr, AttackTargetThink);
 	states[(int)UnitAIStateId::AttackLoop] = new UnitAIState(AttackLoopEnter, AttackLoopThink);
 }
+
 
 
 void UnitAIStateMachine::IdleEnter(UnitAIEnterStateData& data, EntityManager& em)
@@ -77,8 +102,7 @@ void UnitAIStateMachine::IdleEnter(UnitAIEnterStateData& data, EntityManager& em
 
 void UnitAIStateMachine::IdleAggresiveThink(UnitAIThinkData& data, EntityManager& em)
 {
-	int start = 0, end = data.size();
-	for (int i = start; i < end; ++i)
+	for (int i = data.start; i < data.end; ++i)
 	{
 		EntityId id = data.entities[i];
 		Vector2Int16 pos = em.GetPosition(id);
@@ -96,8 +120,7 @@ void UnitAIStateMachine::IdleAggresiveThink(UnitAIThinkData& data, EntityManager
 
 void UnitAIStateMachine::AttackTargetThink(UnitAIThinkData& data, EntityManager& em)
 {
-	int start = 0, end = data.size();
-	for (int i = start; i < end; ++i)
+	for (int i = data.start; i < data.end; ++i)
 	{
 		EntityId id = data.entities[i];
 		Vector2Int16 pos = em.GetPosition(id);
@@ -134,7 +157,7 @@ void UnitAIStateMachine::AttackTargetThink(UnitAIThinkData& data, EntityManager&
 			// TODO: AI system support wait for animation flag, blocking updates of AI until animation is completed
 			continue;
 		}
-	
+
 	}
 }
 
@@ -150,8 +173,7 @@ void UnitAIStateMachine::AttackLoopEnter(UnitAIEnterStateData& data, EntityManag
 
 void UnitAIStateMachine::AttackLoopThink(UnitAIThinkData& data, EntityManager& em)
 {
-	int start = 0, end = data.size();
-	for (int i = start; i < end; ++i)
+	for (int i = data.start; i < data.end; ++i)
 	{
 		EntityId id = data.entities[i];
 		const UnitComponent& unit = em.UnitSystem.GetComponent(id);
@@ -170,7 +192,7 @@ void UnitAIStateMachine::AttackLoopThink(UnitAIThinkData& data, EntityManager& e
 			em.SetOrientation(id, orientation);
 
 			if (!em.UnitSystem.GetAIComponent(id).IsAttackReady()) continue;
-			
+
 			em.UnitSystem.GetAIComponent(id).targetEntity = enemy;
 			em.UnitSystem.GetAIComponent(id).attackId = 0;
 			SetUnitAIState(id, UnitAIStateId::AttackLoop);
@@ -184,6 +206,3 @@ void UnitAIStateMachine::AttackLoopThink(UnitAIThinkData& data, EntityManager& e
 		}
 	}
 }
-
-
-

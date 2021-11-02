@@ -12,6 +12,7 @@
 #include "Engine/AudioManager.h"
 #include "Engine/AssetLoader.h"
 #include "Engine/InputManager.h"
+#include "TimeSlice.h"
 
 #include "GUI/GUI.h"
 
@@ -122,6 +123,8 @@ bool Game::Frame()
 
 	if (_exit) return false;
 
+	TimeSlice frameBudget(0.016);
+
 	SwithScenes();
 
 	InputManager::Update();
@@ -129,7 +132,7 @@ bool Game::Frame()
 	AudioManager::UpdateAudio();
 
 	if (currentScene)
-		currentScene->Frame();
+		currentScene->Frame(frameBudget);
 
 	if (_exit) return false;
 

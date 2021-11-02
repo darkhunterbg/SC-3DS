@@ -11,19 +11,77 @@
 class EntityManagerUpdateCrt :public CoroutineImpl {
 
 	EntityManager* _em;
+	SectionProfiler _p = SectionProfiler("none");
+	SectionProfiler _updateProfiler = SectionProfiler("Update");
 
+	void BeignProfile(const char* name)
+	{
+		_p = SectionProfiler(name);
+		_p.statMinThreshold = 0;
+	}
+	void EndProfile()
+	{
+		_p.Submit();
+	}
 public:
 	EntityManagerUpdateCrt(EntityManager* em) : _em(em) {}
 
 	CRT_START()
 	{
-		_em->ready = true;
 
-		_em->Update0();
+		_updateProfiler = SectionProfiler("UpdateCrt");
+
+		_em->PlayerSystem.ResetNewEvents();
+
+		BeignProfile("UpdateVision");
+
+		while (!_em->PlayerSystem.UpdateNextPlayerVision())
+		{
+			CRT_YIELD();
+		}
+
+		EndProfile();
+
+		BeignProfile("UpdateUnitAI");
+		_em->UnitSystem.PrepareUnitAI(*_em);
+
+		while(!_em->UnitSystem.UpdateUnitAI(*_em)) {
+			CRT_YIELD();
+		}
+			
+
+		EndProfile();
+
 		CRT_YIELD();
-		_em->Update1();
-		CRT_YIELD();
-		_em->Update2();
+
+		_em->PlayerSystem.FinishCollectingEvents();
+
+		_em->UnitSystem.ProcessUnitEvents(*_em);
+
+		BeignProfile("RunAnimations");
+		_em->AnimationSystem.RunAnimations(*_em);
+		EndProfile();
+
+		_em->ApplyEntityChanges();
+
+		_em->PlayerSystem.UpdatePlayers(*_em);
+
+		BeignProfile("UpdateColliders");
+		_em->KinematicSystem.UpdateColliders(*_em);
+		EndProfile();
+
+		BeignProfile("UpdatePositions");
+		_em->DrawSystem.UpdatePositions(*_em);
+		EndProfile();
+
+		BeignProfile("UpdateVisibleObjects");
+		_em->MapSystem.UpdateVisibleObjects(*_em);
+		EndProfile();
+
+		++_em->logicalFrame;
+
+		_updateProfiler.Submit();
+
 	}
 	CRT_END();
 };
@@ -54,6 +112,28 @@ void EntityManager::Init(Vector2Int16 mapSize)
 Coroutine EntityManager::NewUpdateCoroutine()
 {
 	return Coroutine(new EntityManagerUpdateCrt(this));
+}
+void EntityManager::UpdateAudio(const Camera& camera)
+{
+	SoundSystem.UpdateSounds(*this, camera);
+}
+void EntityManager::Draw(const Camera& camera)
+{
+	SectionProfiler p("Draw");
+
+	MapSystem.DrawOffscreenData(*this);
+
+	MapSystem.DrawMap(camera);
+
+	DrawSystem.Draw(*this, camera);
+
+	MapSystem.DrawFogOfWar(*this, camera);
+	//if (DrawBoundingBoxes)
+	KinematicSystem.DrawColliders(camera);
+	//if (DrawGrid)
+
+	frameCounter++;
+
 }
 
 void EntityManager::DeleteEntity(EntityId id)
@@ -113,91 +193,6 @@ void EntityManager::ApplyEntityChanges()
 	}
 }
 
-// Updates 12 per second (60 fps) 
-void EntityManager::Update0()
-{
-	PlayerSystem.ResetNewEvents();
-
-	PlayerSystem.UpdateNextPlayerVision();
-}
-// Updates 24 per second (60 fps) 
-void EntityManager::Update1()
-{
-	PlayerSystem.ResetNewEvents();
-
-	PlayerSystem.UpdateNextPlayerVision();
-
-	UnitSystem.UpdateUnitAI(*this);
-
-}
-// Update 24 per second (60 fps) 
-void EntityManager::Update2()
-{
-	PlayerSystem.FinishCollectingEvents();
-
-	UnitSystem.ProcessUnitEvents(*this);
-
-	AnimationSystem.RunAnimations(*this);
-
-	ApplyEntityChanges();
-
-	PlayerSystem.UpdatePlayers(*this);
-
-	KinematicSystem.UpdateColliders(*this);
-
-	DrawSystem.UpdatePositions(*this);
-
-	MapSystem.UpdateVisibleObjects(*this);
-
-	++logicalFrame;
-}
-
-// Draws 12 per second (60 fps) 
-void EntityManager::Draw0(const Camera& camera)
-{
-	MapSystem.DrawOffscreenData(*this);
-	SoundSystem.UpdateSounds(*this, camera);
-}
-// Draws 24 per second (60 fps) 
-void EntityManager::Draw1(const Camera& camera)
-{
-
-}
-// Draws 24 per second (60 fps) 
-void EntityManager::Draw2(const Camera& camera)
-{
-
-}
-
-void EntityManager::FrameUpdate()
-{
-	ready = true;
-
-	switch (updateId)
-	{
-	case 0: {
-		SectionProfiler p("Update0");
-		Update0();
-
-		break;
-	}
-	case 1: {
-		SectionProfiler p("Update1");
-		Update1();
-		break;
-	}
-	case 2: {
-		SectionProfiler p("Update2");
-		Update2();
-		break;
-	}
-	default:
-		EXCEPTION("Invalid UpdateId %i", updateId);
-	}
-
-	//Util::RealTimeStat("Entities", entities.size());
-}
-
 size_t EntityManager::GetMemoryUsage()
 {
 	size_t size = +entities.GetMemoryUsage();
@@ -212,41 +207,5 @@ size_t EntityManager::GetMemoryUsage()
 	return size;
 }
 
-void EntityManager::Draw(const Camera& camera)
-{
 
-	SectionProfiler p("Draw");
-
-	if (ready)
-	{
-		switch (updateId)
-		{
-		case 0:
-			Draw0(camera);  break;
-		case 1:
-			Draw1(camera);  break;
-		case 2:
-			Draw2(camera);  break;
-		default:
-			EXCEPTION("Invalid UpdateId %i", updateId);
-		}
-
-		MapSystem.DrawMap(camera);
-
-		DrawSystem.Draw(*this, camera);
-
-		MapSystem.DrawFogOfWar(*this, camera);
-		//if (DrawBoundingBoxes)
-
-
-		KinematicSystem.DrawColliders(camera);
-
-		//if (DrawGrid)
-
-		frameCounter++;
-		updateId = (frameCounter % 5);
-		if (updateId > 2)
-			updateId = updateId % 3 + 1;
-	}
-}
 

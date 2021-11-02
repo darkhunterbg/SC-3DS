@@ -65,7 +65,7 @@ UnitComponent& UnitSystem::NewUnit(EntityId id, const UnitDef& def, PlayerId own
 }
 
 
-void UnitSystem::UpdateUnitAI(EntityManager& em)
+void UnitSystem::PrepareUnitAI(EntityManager& em)
 {
 	for (auto& state : _aiStates)
 	{
@@ -90,18 +90,45 @@ void UnitSystem::UpdateUnitAI(EntityManager& em)
 		ai[i].attackCooldown -= ai[i].attackCooldown > 0;
 
 		_aiStates[(int)stateId]->thinkData.entities.push_back(id);
+
 	}
 
+	for (auto& state : _aiStates)
+	{
+		state->StartEnterState(0);
+		state->StartThink(0);
+	}
+
+	_aiUpdatesCompleted = 0;
+}
+
+bool UnitSystem::UpdateUnitAI(EntityManager& em)
+{
 	// Todo: have 2 states list, for enter state and for think to avid ifs
 
-	for (UnitAIState* state : _aiStates)
-	{
-		if (state->enterStateFunc && state->enterStateData.size())
-			state->enterStateFunc(state->enterStateData, em);
+	int batch = 64;
 
-		if (state->thinkFunc && state->thinkData.size())
-			state->thinkFunc(state->thinkData, em);
+	UnitAIState* state = _aiStates[_aiUpdatesCompleted];
+
+	if (state->enterStateFunc && !state->IsEnterStateCompleted())
+	{
+		state->AdvanceEnterState(batch);
+		state->enterStateFunc(state->enterStateData, em);
+
+		return false;
 	}
+
+	if (state->thinkFunc && !state->IsThinkCompleted())
+	{
+		state->AdvanceThink(batch);
+		state->thinkFunc(state->thinkData, em);
+
+		return false;
+	}
+
+	++_aiUpdatesCompleted;
+
+	return _aiUpdatesCompleted == _aiStates.size();
 }
 
 

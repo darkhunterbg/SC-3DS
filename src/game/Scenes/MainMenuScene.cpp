@@ -26,7 +26,7 @@ void MainMenuScene::Stop()
 	delete _view;
 }
 
-void MainMenuScene::Frame()
+void MainMenuScene::Frame(TimeSlice& frameBudget)
 {
 	_view->Draw();
 }

@@ -10,6 +10,10 @@ class EntityManager;
 struct UnitAIEnterStateData {
 	std::vector<EntityId> entities;
 
+
+	int start = 0;
+	int end = 0;
+
 	inline void clear()
 	{
 		entities.clear();
@@ -19,6 +23,9 @@ struct UnitAIEnterStateData {
 
 struct UnitAIThinkData {
 	std::vector<EntityId> entities;
+
+	int start = 0;
+	int end = 0;
 
 	inline void clear()
 	{
@@ -60,6 +67,16 @@ public:
 		thinkFunc(think)
 	{
 	}
+
+	void StartEnterState(int batch);
+	void AdvanceEnterState(int batch);
+
+	inline bool IsEnterStateCompleted() { return enterStateData.end >= enterStateData.size(); }
+
+	void StartThink(int batch);
+	void AdvanceThink(int batch);
+
+	inline bool IsThinkCompleted() { return thinkData.end >= thinkData.size(); }
 };
 
 class UnitAIStateMachine {

@@ -14,7 +14,7 @@ public:
 
 	virtual void Start() override;
 	virtual void Stop() override;
-	virtual void Frame() override;
+	virtual void Frame(TimeSlice& frameBudget) override;
 	virtual void OnPlatformChanged() override;
 
 	EntityManager& GetEntityManager() { return *_entityManager; }

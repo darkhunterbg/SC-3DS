@@ -10,4 +10,5 @@ public:
 	void Restart();
 
 	bool IsTimeElapsed() const;
+	bool IsRemainingLessThan(double seconds);
 };

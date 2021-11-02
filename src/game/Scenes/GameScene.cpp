@@ -38,7 +38,7 @@ void GameScene::Start()
 	 Colors::SCOrange, Colors::SCGreen, Colors::SCBrown, Colors::SCLightYellow, Colors::SCWhite,
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
-	int totalPlayers = 8;
+	int totalPlayers = 3;
 
 
 	const auto& race = *GameDatabase::instance->GetRace(RaceType::Terran);
@@ -51,7 +51,7 @@ void GameScene::Start()
 
 	for (int p = 0; p < totalPlayers; ++p)
 	{
-		auto& r = *GameDatabase::instance->GetRace((RaceType)(p % 3 + 1) );
+		auto& r = *GameDatabase::instance->GetRace((RaceType)(p % 3 + 1));
 		_entityManager->PlayerSystem.AddPlayer(r, color[p]);
 	}
 
@@ -82,9 +82,9 @@ void GameScene::Start()
 	const auto& def = *GameDatabase::instance->GetUnit("Terran\\Units\\Marine");
 
 	int i = 0;
-	for (int y = 1; y < 3; ++y)
+	for (int y = 1; y < 10; ++y)
 	{
-		for (int x = 1; x < 2; ++x)
+		for (int x = 1; x < 10; ++x)
 		{
 			EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ x * 32 ,y * 32 }));
 		}
@@ -98,9 +98,6 @@ void GameScene::Start()
 	_updateCrt = _entityManager->NewUpdateCoroutine();
 
 	_updateCrt->RunAll();
-
-	_updateCrt->Restart();
-
 
 	/*if (loadFromFile) {
 		entityManager->GetCommandProcessor().ReplayFromFile("record.cmd", *entityManager);
@@ -119,35 +116,32 @@ void GameScene::Stop()
 
 static double frameTime = 1.0 / 24.0;
 
-void GameScene::Frame()
+void GameScene::Frame(TimeSlice& frameBudget)
 {
-	TimeSlice ts(0.015);
-
 	GraphicsRenderer::DrawOnScreen(ScreenId::Top);
 
 	_entityManager->Draw(_view->GetCamera());
 
 	_view->Draw();
 
-
-
-	frameTime -= 1.0 / 60.0;
+	frameTime -= Game::DeltaTime;
 
 	if (frameTime < 0)
 	{
 		_updateCrt->RunAll();
 		_updateCrt->Restart();
+		_entityManager->UpdateAudio(_view->GetCamera());
 
 		frameTime += 1.0 / (24.0 * GameSpeed);
 	}
 
-	do
+	while (!frameBudget.IsRemainingLessThan(0.002) && !_updateCrt->IsCompleted())
 	{
 		_updateCrt->Next();
-	} while (!ts.IsTimeElapsed() && !_updateCrt->IsCompleted());
+	}
 
 	_view->Update();
-	
+
 	if (Game::GetInput().Cheats.ToggleFoW.IsActivated())
 	{
 		_entityManager->MapSystem.FogOfWarVisible = !_entityManager->MapSystem.FogOfWarVisible;

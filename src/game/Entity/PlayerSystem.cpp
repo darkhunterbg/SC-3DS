@@ -177,9 +177,11 @@ void PlayerSystem::UpdateNextPlayerVisionJob(int start, int end)
 	}
 }
 
-bool PlayerSystem::UpdateNextPlayerVision(int players)
+bool PlayerSystem::UpdateNextPlayerVision()
 {
 	s = this;
+
+	int players = JobSystem::GetHardwareThreadsCount();
 
 	int max = std::min((int)playerVision.size(), playerUpdate + players);
 

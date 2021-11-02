@@ -62,6 +62,8 @@ public:
 
 	static constexpr const int DefaultJobSize = 128;
 	static constexpr const int SingleThreadJobSize = 0x7FFFFFFF;
+
+	static inline int GetHardwareThreadsCount() { return  threads + 1; }
 };
 
 extern thread_local int CurrentThreadId;

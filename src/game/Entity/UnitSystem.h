@@ -49,6 +49,8 @@ class UnitSystem : public IEntitySystem {
 
 	std::vector<EntityId> _unitAttackEvents;
 	std::vector<EntityId> _unitDieEvents;
+
+	int _aiUpdatesCompleted = 0;
 public:
 	UnitSystem();
 	~UnitSystem();
@@ -63,7 +65,8 @@ public:
 
 	UnitAIComponent& GetAIComponent(EntityId id) { return _aiComponents.GetComponent(id); }
 
-	void UpdateUnitAI(EntityManager& em);
+	void PrepareUnitAI(EntityManager& em);
+	bool UpdateUnitAI(EntityManager& em);
 	void ProcessUnitEvents(EntityManager& em);
 
 	void UnitAttackEvent(EntityId unit);
