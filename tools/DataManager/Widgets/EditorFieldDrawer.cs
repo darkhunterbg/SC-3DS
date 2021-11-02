@@ -275,6 +275,26 @@ namespace DataManager.Widgets
 			return value;
 		}
 
+		public static void AssetReadonly(string name, Asset asset)
+		{
+			if (asset?.Preview != null) {
+				ImGui.Image(asset.Preview.GuiImage, new Vector2(32, 32));
+				ImGui.SameLine();
+			}
+
+			if (asset?.ActionButtonText != null) {
+				if (ImGui.Button(asset.ActionButtonText))
+					asset.Activate();
+				ImGui.SameLine();
+			}
+
+			ImGui.Text(asset?.AssetName ?? "None");
+
+			if (ImGui.IsItemHovered()) {
+				AppGame.Gui.HoverObject = asset;
+			}
+
+		}
 		public static Asset Asset(string name, Asset asset, Type assetType, out bool changed)
 		{
 			int id = ++dialogId;

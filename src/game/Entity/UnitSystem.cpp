@@ -152,7 +152,7 @@ void UnitSystem::ProcessUnitEvents(EntityManager& em)
 				em.DrawSystem.NewComponent(death);
 				em.AnimationSystem.NewComponent(death);
 				em.SetPosition(death, em.GetPosition(id));
-				em.SetOrientation(death, 0 );
+				em.SetOrientation(death, 0);
 				// TODO, fix shadow
 				EntityUtil::PlayAnimation(death, *deathAnim, nullptr);
 			}
@@ -164,12 +164,22 @@ void UnitSystem::ProcessUnitEvents(EntityManager& em)
 	}
 }
 
+void UnitSystem::UnitKillEvent(EntityId id)
+{
+	GAME_ASSERT(_aiComponents.HasComponent(id), "[UnitAttackEvent] Entity %i does not have AI!");
+	GAME_ASSERT(_unitComponents.HasComponent(id), "[UnitAttackEvent] Entity %i is not an unit!");
+
+	if (std::find(_unitDieEvents.begin(), _unitDieEvents.end(), id) == _unitDieEvents.end())
+		_unitDieEvents.push_back(id);
+}
+
 
 void UnitSystem::UnitAttackEvent(EntityId id)
 {
 	GAME_ASSERT(_aiComponents.HasComponent(id), "[UnitAttackEvent] Entity %i does not have AI!");
 	GAME_ASSERT(_unitComponents.HasComponent(id), "[UnitAttackEvent] Entity %i is not an unit!");
 
-	_unitAttackEvents.push_back(id);
+	if (std::find(_unitAttackEvents.begin(), _unitAttackEvents.end(), id) == _unitAttackEvents.end())
+		_unitAttackEvents.push_back(id);
 }
 

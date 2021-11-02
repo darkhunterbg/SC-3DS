@@ -75,6 +75,24 @@ EntityId EntityUtil::SpawnUnit(const UnitDef& def, PlayerId owner, Vector2Int16 
 
 	em.AnimationSystem.NewComponent(id);
 
+	return id;
+}
+
+EntityId EntityUtil::SpawnSprite(const SpriteDef& def, Vector2Int16 position, int orientation)
+{
+	auto& em = GetManager();
+
+	EntityId id = em.NewEntity();
+
+	em.DrawSystem.NewComponent(id);
+	em.DrawSystem.InitFromImage(id, def.GetImage());
+
+	em.SetPosition(id, position);
+	em.SetOrientation(id, orientation);
+
+	em.AnimationSystem.NewComponent(id);
+
+	PlayAnimation(id, *def.GetAnimation(AnimationType::Init));
 
 	return id;
 }

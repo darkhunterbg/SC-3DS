@@ -4,6 +4,7 @@
 
 #include "EntityManager.h"
 #include "../Data/AssetDataDefs.h"
+#include "../Data/GameDatabase.h"
 #include "EntityUtil.h"
 
 typedef void(*InstructionAction)(const InstructionParams& params, EntityId id, EntityManager& em);
@@ -70,12 +71,31 @@ static void Attack(const InstructionParams& params, EntityId id, EntityManager& 
 	em.UnitSystem.UnitAttackEvent(id);
 }
 
+static void PlaySound(const InstructionParams& params, EntityId id, EntityManager& em)
+{
+	unsigned defId = params.shorts[0];
+	const SoundSetDef& def = GameDatabase::instance->SoundSetDefs[defId];
+	em.SoundSystem.PlayWorldSound(def, em.GetPosition(id));
+}
+
+static void SpawnSprite(const InstructionParams& params, EntityId id, EntityManager& em)
+{
+	unsigned defId = params.shorts[0];
+	const SpriteDef& def = GameDatabase::instance->SpriteDefs[defId];
+
+	EntityUtil::SpawnSprite(def, em.GetPosition(id));
+}
+
+static void Destroy(const InstructionParams& params, EntityId id, EntityManager& em)
+{
+	em.DeleteEntity(id);
+}
 
 // ======================================================================================
 
 static InstructionAction instructionMap[] =
 {
-	Frame, Wait, WaitRandom, Face, TurnCW, TurnCCW, GoTo, Attack
+	Frame, Wait, WaitRandom, Face, TurnCW, TurnCCW, GoTo, Attack, PlaySound, SpawnSprite, Destroy
 };
 
 void AnimationPlayer::RunAnimation(AnimationComponent& anim, EntityId id, EntityManager& em)

@@ -123,7 +123,7 @@ public:
 			if (index == -1)
 				continue;
 			Util::_delIndexesScratch.push_back(index);
-			_entityToIndexMap[index] = -1;
+			_entityToIndexMap[Entity::ToIndex(id)] = -1;
 		}
 
 		if (Util::_delIndexesScratch.size() == 0) return;

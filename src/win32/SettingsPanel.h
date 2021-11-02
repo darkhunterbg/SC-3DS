@@ -107,7 +107,10 @@ void DrawSettings()
 
 		if (ImGui::Button("Kill Seleced Units"))
 		{
-			scene->GetEntityManager().DeleteEntities(scene->GetView().GetSelection(), false);
+			for (EntityId id : scene->GetView().GetSelection())
+			{
+				scene->GetEntityManager().UnitSystem.UnitKillEvent(id);
+			}
 		}
 
 		ImGui::Separator();

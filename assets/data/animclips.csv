@@ -1,6 +1,7 @@
 Sprite,Type,Instructions
-terran\Marine,Init,"frame 68,waitrand 63 75,frame 0,wait 1,frame 17,wait 1,frame 34,turnccw 2,wait 3,turnccw 2,wait 3,turnccw 2,wait 3,turnccw 2,wait 3,turnccw 2,wait 3,wait 6,turncw 2,wait 3,turncw 2,wait 3,turncw 2,wait 3,turncw 2,wait 3,turncw 2,wait 3,wait 6,turnccw 2,wait 3,turnccw 2,wait 3,turnccw 2,wait 3,frame 17,wait 1,frame 0,wait 3,goto 0"
-terran\Marine,Death,"face 0,frame 221,wait 2,frame 222,wait 2,frame 223,wait 2,frame 224,wait 2,frame 225,wait 2,frame 226,wait 2,frame 227,wait 2,frame 228,wait 1"
-terran\Marine,Walking,"frame 85,wait 1,frame 102,wait 1,frame 119,wait 1,frame 136,wait 1,frame 153,wait 1,frame 170,wait 1,frame 187,wait 1,frame 204,wait 1,frame 68,wait 1,goto 0"
-terran\Marine,GroundAttackInit,"frame 34,wait 1"
-terran\Marine,GroundAttackRepeat,"wait 1,attack,frame 51,wait 1,frame 34,wait 1,frame 51,wait 1,frame 34,wait 1,frame 51,wait 1,frame 34,wait 1"
+Terran\Marine,Init,"frame 68,waitrand 63 75,frame 0,wait 1,frame 17,wait 1,frame 34,turnccw 2,wait 3,turnccw 2,wait 3,turnccw 2,wait 3,turnccw 2,wait 3,turnccw 2,wait 3,wait 6,turncw 2,wait 3,turncw 2,wait 3,turncw 2,wait 3,turncw 2,wait 3,turncw 2,wait 3,wait 6,turnccw 2,wait 3,turnccw 2,wait 3,turnccw 2,wait 3,frame 17,wait 1,frame 0,wait 3,goto 0"
+Terran\Marine,Death,"sound Units\Terran\Marine\Death,face 0,frame 221,wait 2,frame 222,wait 2,frame 223,wait 2,frame 224,wait 2,frame 225,wait 2,frame 226,wait 2,frame 227,wait 2,frame 228,wait 1,sprite Terran\MarineRenmants,destroy"
+Terran\Marine,Walking,"frame 85,wait 1,frame 102,wait 1,frame 119,wait 1,frame 136,wait 1,frame 153,wait 1,frame 170,wait 1,frame 187,wait 1,frame 204,wait 1,frame 68,wait 1,goto 0"
+Terran\Marine,GroundAttackInit,"frame 34,wait 1"
+Terran\Marine,GroundAttackRepeat,"wait 1,attack,frame 51,wait 1,frame 34,wait 1,frame 51,wait 1,frame 34,wait 1,frame 51,wait 1,frame 34,wait 1"
+Terran\MarineRenmants,Init,"frame 0,wait 50,frame 1,wait 50,frame 2,wait 50,destroy"

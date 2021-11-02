@@ -320,10 +320,20 @@ namespace DataManager.Panels
 					else
 					{
 						ImGui.Text(instr.Instruction.Instruction);
+						int i = 0;
 						foreach (var param in instr.Instruction.Parameters)
 						{
 							ImGui.SameLine();
-							ImGui.TextDisabled(param.ToString());
+
+							if (instr.Parameters?.Length > i && instr.Parameters[i] is Asset asset) {
+								EditorFieldDrawer.AssetReadonly("", asset);
+							} else {
+								ImGui.TextDisabled(param.ToString());
+							}
+					
+						
+
+							++i;
 						}
 					}
 
@@ -339,7 +349,8 @@ namespace DataManager.Panels
 			}
 		}
 
-		private bool DrawInstructionEditor(AnimInstructionView instr)
+		#region Commented
+		/*private bool DrawInstructionEditor(AnimInstructionView instr)
 		{
 			int paramId = 0;
 			bool edited = false;
@@ -368,6 +379,8 @@ namespace DataManager.Panels
 
 			return edited;
 		}
+		*/
+		#endregion
 
 		private void UpdateClipInstructions(SpriteAnimClipAsset clip)
 		{

@@ -37,8 +37,7 @@ namespace DataManager.Gameplay
 			if (instr.Parameters.Count != split.Length - 1)
 				return;
 
-			for (int i = 0; i < instr.Parameters.Count; ++i)
-			{
+			for (int i = 0; i < instr.Parameters.Count; ++i) {
 				var paramDef = instr.Parameters[i];
 
 				var obj = paramDef.Parse(split[i + 1], out bool valid);
@@ -47,8 +46,7 @@ namespace DataManager.Gameplay
 					continue;
 
 				var bin = paramDef.BinarySerialize(obj);
-				for (int j = 0; j < bin.Length; ++j)
-				{
+				for (int j = 0; j < bin.Length; ++j) {
 					Parameters[i * 2 + j] = bin[j];
 				}
 
@@ -89,6 +87,13 @@ namespace DataManager.Gameplay
 					if (success = byte.TryParse(input, out var a))
 						return a;
 
+				if (Type.IsSubclassOf(typeof(Asset))) {
+					var assets = AppGame.AssetManager.GetAssetDatabase(Type).Assets;
+					var asset = assets.FirstOrDefault(s => s.AssetName == input);
+					success = true;
+					return asset;
+				}
+
 
 				return Type.IsByRef ? null : Activator.CreateInstance(Type);
 			}
@@ -100,7 +105,7 @@ namespace DataManager.Gameplay
 
 			public bool Validate(string input)
 			{
-				Parse(input,  out bool success);
+				Parse(input, out bool success);
 				return success;
 			}
 		}
@@ -122,8 +127,7 @@ namespace DataManager.Gameplay
 		public string StringSerialize(object[] parameters)
 		{
 			List<string> s = new List<string>() { Instruction };
-			for (int i = 0; i < parameters.Count(); ++i)
-			{
+			for (int i = 0; i < parameters.Count(); ++i) {
 				s.Add(parameters[i].ToString());
 			}
 
@@ -185,13 +189,15 @@ namespace DataManager.Gameplay
 		}, NewParam<byte>("instruction"));
 
 
-
-
 		public static readonly AnimClipInstruction Attack = new AnimClipInstruction("attack", (state, p) => true);
 
+		public static readonly AnimClipInstruction PlaySound = new AnimClipInstruction("sound", (state, p) => true,
+			NewParam<SoundSetAsset>("sound set"));
 
+		public static readonly AnimClipInstruction SpawnSprite = new AnimClipInstruction("sprite", (state, p) => true,
+		NewParam<SpriteAsset>("sprite"));
 
-
+		public static readonly AnimClipInstruction Destroy = new AnimClipInstruction("destroy", (state, p) => true);
 
 		public static readonly Dictionary<string, AnimClipInstruction> Instructions = new Dictionary<string, AnimClipInstruction>();
 
@@ -199,8 +205,7 @@ namespace DataManager.Gameplay
 		{
 			var props = typeof(AnimClipInstructionDatabase).GetFields(BindingFlags.Static | BindingFlags.Public).Where(t => t.FieldType == typeof(AnimClipInstruction)).ToArray();
 
-			foreach (var i in props.Select(p => (AnimClipInstruction)p.GetValue(null)))
-			{
+			foreach (var i in props.Select(p => (AnimClipInstruction)p.GetValue(null))) {
 				Instructions[i.Instruction] = i;
 			}
 		}

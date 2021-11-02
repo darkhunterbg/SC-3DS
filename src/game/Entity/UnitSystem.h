@@ -67,5 +67,5 @@ public:
 	void ProcessUnitEvents(EntityManager& em);
 
 	void UnitAttackEvent(EntityId unit);
-	
+	void UnitKillEvent(EntityId unit);
 };

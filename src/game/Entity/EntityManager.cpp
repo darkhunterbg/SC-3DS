@@ -111,9 +111,9 @@ void EntityManager::Update2()
 
 	UnitSystem.ProcessUnitEvents(*this);
 
-	ApplyEntityChanges();
-
 	AnimationSystem.RunAnimations(*this);
+
+	ApplyEntityChanges();
 
 	PlayerSystem.UpdatePlayers(*this);
 

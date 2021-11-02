@@ -79,7 +79,6 @@ void SoundSystem::PlayWorldSound(const SoundSetDef& sound, Vector2Int16 pos)
 	_worldSounds.push_back({ pos, &sound, 0 });
 }
 
-
 void SoundSystem::PlayMusic(const SoundSetDef& music)
 {
 	PlayDef(music, _musicChannel);
@@ -188,7 +187,7 @@ void SoundSystem::UpdateSounds(const EntityManager& em, const Camera& camera)
 		{
 			for (Channel& c : _worldChannels)
 			{
-				if (!IsPlayCompleted(c)) continue;
+				if (c.newSound) continue;
 				playChannel = &c;
 				break;
 			}

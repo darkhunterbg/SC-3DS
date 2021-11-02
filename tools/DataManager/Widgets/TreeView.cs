@@ -54,8 +54,7 @@ namespace DataManager.Widgets
 			{
 				List<string> result = new List<string>() { Name };
 				var p = Parent;
-				while (p != null && p != root)
-				{
+				while (p != null && p != root) {
 					result.Insert(0, p.Name);
 					p = p.Parent;
 				}
@@ -65,22 +64,20 @@ namespace DataManager.Widgets
 
 			public bool UpdateItemPath(TreeItem root)
 			{
-				if (Item != null)
-				{
+				if (Item != null) {
 					Item.Path = GetPath(root);
 				}
 
 				bool anyUpdate = Item != null;
 
-				foreach (var child in Children)
-				{
+				foreach (var child in Children) {
 					if (child.UpdateItemPath(root))
 						anyUpdate = true;
 				}
 
 				return anyUpdate;
 			}
-		
+
 			public int GetItemCount()
 			{
 				int i = Item == null ? 0 : 1;
@@ -140,8 +137,7 @@ namespace DataManager.Widgets
 			string itemName = path.FirstOrDefault();
 			bool isLastItem = path.Count() == 1;
 
-			if (isLastItem)
-			{
+			if (isLastItem) {
 				TreeItem newChild = new TreeItem(parent)
 				{
 					Name = itemName,
@@ -150,12 +146,9 @@ namespace DataManager.Widgets
 				};
 				parent.Children.Add(newChild);
 				return newChild;
-			}
-			else
-			{
+			} else {
 				TreeItem next = parent.Children.FirstOrDefault(t => t.Name == itemName && t.IsDir);
-				if (next == null)
-				{
+				if (next == null) {
 					parent.Children.Add(next = new TreeItem(parent)
 					{
 						Name = itemName,
@@ -184,8 +177,7 @@ namespace DataManager.Widgets
 
 			foreach (var item in dataSource
 				.OrderBy(t => t.Path.Count(c => c == '\\'))
-				.ThenBy(t => t.Path))
-			{
+				.ThenBy(t => t.Path)) {
 
 				var s = item.Path.Split('\\');
 
@@ -197,8 +189,7 @@ namespace DataManager.Widgets
 			if (root == node)
 				return true;
 
-			foreach (var child in root.Children)
-			{
+			foreach (var child in root.Children) {
 				if (NodeExists(node, child))
 					return true;
 			}
@@ -215,8 +206,7 @@ namespace DataManager.Widgets
 		}
 		private IEnumerable<TreeItem> GetDirectories(TreeItem node)
 		{
-			if (node.IsDir)
-			{
+			if (node.IsDir) {
 				yield return node;
 
 				foreach (var c in node.Children)
@@ -253,8 +243,7 @@ namespace DataManager.Widgets
 			ItemModified = false;
 			DrawTreeItem(root);
 
-			if (selectedNode != null && focused)
-			{
+			if (selectedNode != null && focused) {
 				ProcessInput();
 			}
 		}
@@ -271,14 +260,12 @@ namespace DataManager.Widgets
 			if (AppGame.Gui.IsButtonPressed(Keys.Delete))
 				DeleteNode(selectedNode);
 
-			if (AppGame.Gui.IsButtonPressed(Keys.D) && ImGui.GetIO().KeyCtrl)
-			{
+			if (AppGame.Gui.IsButtonPressed(Keys.D) && ImGui.GetIO().KeyCtrl) {
 				if (Selected != null)
 					DuplicateNode(selectedNode);
 			}
 
-			if (AppGame.Gui.IsButtonPressed(Keys.Right))
-			{
+			if (AppGame.Gui.IsButtonPressed(Keys.Right)) {
 				if (!selectedNode.Expanded && selectedNode.IsDir)
 					selectedNode.Expanded = true;
 				else if (selectedNode.Children.Count > 0)
@@ -286,8 +273,7 @@ namespace DataManager.Widgets
 
 			}
 
-			if (AppGame.Gui.IsButtonPressed(Keys.Left))
-			{
+			if (AppGame.Gui.IsButtonPressed(Keys.Left)) {
 				if (selectedNode.Expanded && selectedNode.IsDir)
 					selectedNode.Expanded = false;
 				else if (selectedNode.Parent != null)
@@ -295,34 +281,27 @@ namespace DataManager.Widgets
 
 			}
 
-			if (AppGame.Gui.IsButtonPressed(Keys.Down))
-			{
+			if (AppGame.Gui.IsButtonPressed(Keys.Down)) {
 				selectedNode = NextNode(selectedNode);
 			}
 
-			if (AppGame.Gui.IsButtonPressed(Keys.Up))
-			{
+			if (AppGame.Gui.IsButtonPressed(Keys.Up)) {
 				selectedNode = PrevNode(selectedNode);
 			}
 
-			if (AppGame.Gui.IsButtonPressed(Keys.C) && ImGui.GetIO().KeyCtrl)
-			{
+			if (AppGame.Gui.IsButtonPressed(Keys.C) && ImGui.GetIO().KeyCtrl) {
 				contextNode = selectedNode;
 				contextOp = ContextOperation.Copy;
 			}
-			if (AppGame.Gui.IsButtonPressed(Keys.X) && ImGui.GetIO().KeyCtrl)
-			{
+			if (AppGame.Gui.IsButtonPressed(Keys.X) && ImGui.GetIO().KeyCtrl) {
 				contextNode = selectedNode;
 				contextOp = ContextOperation.Cut;
 			}
-			if (AppGame.Gui.IsButtonPressed(Keys.V) && ImGui.GetIO().KeyCtrl && contextNode != null)
-			{
+			if (AppGame.Gui.IsButtonPressed(Keys.V) && ImGui.GetIO().KeyCtrl && contextNode != null) {
 				if (contextOp == ContextOperation.Copy)
 					DuplicateNode(contextNode, selectedNode, true);
-				else
-				{
-					if (contextOp == ContextOperation.Cut)
-					{
+				else {
+					if (contextOp == ContextOperation.Cut) {
 						MoveNode(contextNode, selectedNode);
 						contextNode = null;
 					}
@@ -336,8 +315,7 @@ namespace DataManager.Widgets
 
 			bool selected = selectedNode == node;
 
-			if (!node.IsDir)
-			{
+			if (!node.IsDir) {
 				//ImGui.Indent(ImGui.GetTreeNodeToLabelSpacing());
 
 				if (node.Item.Preview == null)
@@ -348,17 +326,13 @@ namespace DataManager.Widgets
 
 				ImGui.SameLine();
 
-				if (renameNode == node)
-				{
+				if (renameNode == node) {
 					DrawRenameNode();
-				}
-				else
-				{
+				} else {
 					if (contextNode == node && contextOp == ContextOperation.Cut)
 						ImGui.PushStyleColor(ImGuiCol.Text, Color.Gray.PackedValue);
 
-					if (ImGui.Selectable(node.Name, selected))
-					{
+					if (ImGui.Selectable(node.Name, selected)) {
 						selectedNode = node;
 					}
 
@@ -369,9 +343,8 @@ namespace DataManager.Widgets
 				if (ImGui.IsItemFocused())
 					focused = true;
 
-				if((ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left) ||
-					ImGui.IsMouseClicked(ImGuiMouseButton.Middle)) && ImGui.IsItemHovered())
-				{
+				if ((ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left) ||
+					ImGui.IsMouseClicked(ImGuiMouseButton.Middle)) && ImGui.IsItemHovered()) {
 					if (node.Item is IInteractableTreeViewItem inter)
 						inter.Activate();
 				}
@@ -379,22 +352,17 @@ namespace DataManager.Widgets
 				//ImGui.Unindent(ImGui.GetTreeNodeToLabelSpacing());
 
 				ItemContextMenu(node);
-			}
-			else
-			{
+			} else {
 				ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanAvailWidth
 					| ImGuiTreeNodeFlags.OpenOnDoubleClick;
 
 				ImGui.SetNextItemOpen(node.Expanded);
 
-				if (renameNode == node)
-				{
+				if (renameNode == node) {
 					bool expand = ImGui.TreeNodeEx(string.Empty, flags);
 
-					if (expand != node.Expanded)
-					{
-						if (ImGui.GetIO().KeyCtrl)
-						{
+					if (expand != node.Expanded) {
+						if (ImGui.GetIO().KeyCtrl) {
 							var n = GetDirectories(node).ToList();
 							foreach (var dir in n)
 								dir.Expanded = expand;
@@ -405,9 +373,7 @@ namespace DataManager.Widgets
 
 					ImGui.SameLine();
 					DrawRenameNode();
-				}
-				else
-				{
+				} else {
 					if (contextNode == node && contextOp == ContextOperation.Cut)
 						ImGui.PushStyleColor(ImGuiCol.Text, Color.Gray.PackedValue);
 
@@ -417,10 +383,8 @@ namespace DataManager.Widgets
 					string text = $"{node.Name} ({node.GetItemCount()})";
 					bool expand = ImGui.TreeNodeEx(text, flags);
 
-					if (expand != node.Expanded)
-					{
-						if (ImGui.GetIO().KeyCtrl)
-						{
+					if (expand != node.Expanded) {
+						if (ImGui.GetIO().KeyCtrl) {
 							var n = GetDirectories(node).ToList();
 							foreach (var dir in n)
 								dir.Expanded = expand;
@@ -435,8 +399,7 @@ namespace DataManager.Widgets
 					if (ImGui.IsItemFocused())
 						focused = true;
 
-					if (ImGui.IsItemClicked())
-					{
+					if (ImGui.IsItemClicked()) {
 						selectedNode = node;
 					}
 
@@ -444,10 +407,8 @@ namespace DataManager.Widgets
 				}
 
 
-				if (node.Expanded)
-				{
-					foreach (var child in node.ChildrenView)
-					{
+				if (node.Expanded) {
+					foreach (var child in node.ChildrenView) {
 						DrawTreeItem(child);
 					}
 					ImGui.TreePop();
@@ -463,17 +424,14 @@ namespace DataManager.Widgets
 			ImGui.InputText(string.Empty, ref renameText, 255,
 								ImGuiInputTextFlags.CallbackCompletion | ImGuiInputTextFlags.AutoSelectAll);
 
-			if (renameFocusRequest)
-			{
+			if (renameFocusRequest) {
 				ImGui.SetKeyboardFocusHere();
 				renameFocusRequest = false;
 				return;
 			}
 
-			if (!ImGui.IsItemFocused() || AppGame.Gui.IsConfirmPressed)
-			{
-				if (!string.IsNullOrWhiteSpace(renameText) && renameNode.Name != renameText)
-				{
+			if (!ImGui.IsItemFocused() || AppGame.Gui.IsConfirmPressed) {
+				if (!string.IsNullOrWhiteSpace(renameText) && renameNode.Name != renameText) {
 					renameNode.Name = renameText;
 
 					if (renameNode.UpdateItemPath(root))
@@ -481,43 +439,41 @@ namespace DataManager.Widgets
 				}
 				renameNode = null;
 			}
-			if (AppGame.Gui.IsCancelPressed)
-			{
+			if (AppGame.Gui.IsCancelPressed) {
 				renameNode = null;
 			}
 		}
 
 		private void ItemContextMenu(TreeItem node)
 		{
-			if (ImGui.BeginPopupContextItem())
-			{
+			if (ImGui.BeginPopupContextItem()) {
 				selectedNode = node;
 
-				if (node != root)
-				{
-					if (ImGui.Selectable("Rename"))
-					{
+				if (!node.IsDir) {
+					if (ImGui.Selectable("Copy Full Name")) {
+						TextCopy.ClipboardService.SetText(node.Item.Path);
+					}
+				}
+
+				if (node != root) {
+					if (ImGui.Selectable("Rename")) {
 						RenameNode(node);
 						ImGui.CloseCurrentPopup();
 					}
 				}
 
-				if (node.IsDir)
-				{
-					if (ImGui.Selectable("New Folder"))
-					{
+				if (node.IsDir) {
+					if (ImGui.Selectable("New Folder")) {
 						var child = NewItem(node, new string[] { "New Folder" });
 						node.Expanded = true;
 						selectedNode = child;
 						RenameNode(child);
 						ImGui.CloseCurrentPopup();
 					}
-					if (NewItemAction != null)
-					{
+					if (NewItemAction != null) {
 						string newItemName = $"New {ItemName}";
 
-						if (ImGui.Selectable(newItemName))
-						{
+						if (ImGui.Selectable(newItemName)) {
 							var item = NewItemAction(null);
 							if (node != root)
 								item.Path = node.GetPath(root) + $"\\{newItemName}";
@@ -531,13 +487,9 @@ namespace DataManager.Widgets
 							ImGui.CloseCurrentPopup();
 						}
 					}
-				}
-				else
-				{
-					if (NewItemAction != null)
-					{
-						if (ImGui.Selectable("Duplicate"))
-						{
+				} else {
+					if (NewItemAction != null) {
+						if (ImGui.Selectable("Duplicate")) {
 							DuplicateNode(node);
 							ImGui.CloseCurrentPopup();
 						}
@@ -546,8 +498,7 @@ namespace DataManager.Widgets
 				}
 
 				if (node != root)
-					if (ImGui.Selectable("Delete"))
-					{
+					if (ImGui.Selectable("Delete")) {
 						DeleteNode(node);
 						ImGui.CloseCurrentPopup();
 					}

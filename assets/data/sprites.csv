@@ -1,5 +1,5 @@
 Name,Image,IsRotating,ColliderPosition,ColliderSize
-terran\CommandCenter,unit\terran\control,False,"-58,-41","116,82"
-terran\Marine,unit\terran\marine,True,"-8,-9","16,19"
-terran\MarineRenmants,unit\terran\tmadeath,False,"0,0","0,0"
-terran\SCV,unit\terran\scv,True,"-11,-11","22,22"
+Terran\CommandCenter,unit\terran\control,False,"-58,-41","116,82"
+Terran\Marine,unit\terran\marine,True,"-8,-9","16,19"
+Terran\MarineRenmants,unit\terran\tmadeath,False,"0,0","0,0"
+Terran\SCV,unit\terran\scv,True,"-11,-11","22,22"
