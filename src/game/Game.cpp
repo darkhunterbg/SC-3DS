@@ -85,19 +85,7 @@ static void InitialScene(GameStartSettings settings)
 	SwithScenes();
 }
 
-void Game::FrameStart()
-{
-	auto now = Platform::ElaspedTime();
-	DeltaTime = now - frameStartTime;
-	frameStartTime = now;
 
-	Profiler::FrameStart();
-
-}
-void Game::FrameEnd()
-{
-	Profiler::FrameEnd();
-}
 
 void Game::Start(GameStartSettings settings)
 {
@@ -124,10 +112,15 @@ void Game::Start(GameStartSettings settings)
 
 	InitialScene(settings);
 }
-bool Game::Update()
+bool Game::Frame()
 {
+	Profiler::FrameStart();
+
+	auto now = Platform::ElaspedTime();
+	DeltaTime = now - frameStartTime;
+	frameStartTime = now;
+
 	if (_exit) return false;
-	//SectionProfiler p("Update");
 
 	SwithScenes();
 
@@ -136,39 +129,24 @@ bool Game::Update()
 	AudioManager::UpdateAudio();
 
 	if (currentScene)
-		currentScene->Update();
+		currentScene->Frame();
 
 	if (_exit) return false;
 
-	if (SwithScenes())
-	{
-		// Run another update for the new scene
-		if (currentScene)
-			currentScene->Update();
-	}
+	SwithScenes();
 
-	return !_exit;
-}
+	if (_exit) return false;
 
-void Game::Draw()
-{
-	if (_exit) return;
+	GUI::FrameEnd();
 
-	//SectionProfiler p("Draw");
-	GraphicsRenderer::NewFrame();
-
-	if (currentScene)
-		currentScene->Draw();
+	Profiler::FrameEnd();
 
 	if (ShowPerformanceStats)
 		Profiler::ShowPerformance();
 
-	GUI::FrameEnd();
-
-	GraphicsRenderer::EndFrame();
-
-	if (_exit) return;
+	return !_exit;
 }
+
 
 void Game::End()
 {

@@ -14,6 +14,6 @@ public:
 	VideoPlaybackScene(const char* video, std::function<void()> doneCallback);
 
 	void Start() override;
-	void Draw() override;
+	void Frame() override;
 	void Stop() override;
 };

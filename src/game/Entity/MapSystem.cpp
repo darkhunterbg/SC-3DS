@@ -260,10 +260,6 @@ void MapSystem::DrawFogOfWar(EntityManager& em, const Camera& camera)
 	ImageFrame sprite = GraphicsRenderer::NewSprite(*_fogOfWarTexture.sprite.texture, src);
 
 	GraphicsRenderer::Draw(sprite, { {0,0}, Vector2Int(camera.Size) });
-
-	GraphicsRenderer::Submit();
-
-
 }
 void MapSystem::DrawMinimap(Rectangle dst)
 {

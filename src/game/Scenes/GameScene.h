@@ -14,8 +14,7 @@ public:
 
 	virtual void Start() override;
 	virtual void Stop() override;
-	virtual void Update() override;
-	virtual void Draw() override;
+	virtual void Frame() override;
 	virtual void OnPlatformChanged() override;
 
 	EntityManager& GetEntityManager() { return *_entityManager; }

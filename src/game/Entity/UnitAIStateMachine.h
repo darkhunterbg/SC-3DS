@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include <cstdint>
+
 #include "Entity.h"
 
 class EntityManager;

@@ -21,7 +21,6 @@
 
 #include "IEntitySystem.h"
 
-
 class EntityManager {
 private:
 	EntityManagerCollection entities;

@@ -33,10 +33,7 @@ public:
 	static bool ShowPerformanceStats;
 
 	static void Start(GameStartSettings settings = {});
-	static void FrameStart();
-	static void FrameEnd();
-	static bool Update();
-	static void Draw();
+	static bool Frame();
 	static void End();
 	static void Exit();
 

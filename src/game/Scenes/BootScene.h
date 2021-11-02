@@ -19,9 +19,8 @@ public:
 	BootScene(Scene* next = nullptr);
 	virtual void Start() override;
 	virtual void Stop() override;
-	virtual void Update() override;
 
-	virtual void Draw() override;
+	virtual void Frame() override;
 	virtual ~BootScene()  override;
 
 	void StartGame();

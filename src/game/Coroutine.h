@@ -69,6 +69,11 @@ public:
 	{
 		while (!Next());
 	}
+	inline void Restart()
+	{
+		__iter = 0;
+		_done = false;
+	}
 };
 
 

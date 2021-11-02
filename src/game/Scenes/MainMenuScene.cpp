@@ -26,7 +26,7 @@ void MainMenuScene::Stop()
 	delete _view;
 }
 
-void MainMenuScene::Draw()
+void MainMenuScene::Frame()
 {
 	_view->Draw();
 }

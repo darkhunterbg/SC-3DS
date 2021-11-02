@@ -110,25 +110,22 @@ void GameScene::Stop()
 
 }
 
-void GameScene::Update()
-{
-	_entityManager->FrameUpdate(_view->GetCamera());
-
-	if (Game::GetInput().Cheats.ToggleFoW.IsActivated())
-	{
-		_entityManager->MapSystem.FogOfWarVisible = !_entityManager->MapSystem.FogOfWarVisible;
-	}
-
-	_view->Update();
-}
-
-void GameScene::Draw()
+void GameScene::Frame()
 {
 	GraphicsRenderer::DrawOnScreen(ScreenId::Top);
 
 	_entityManager->Draw(_view->GetCamera());
 
 	_view->Draw();
+
+	_view->Update();
+
+	_entityManager->FrameUpdate(_view->GetCamera());
+
+	if (Game::GetInput().Cheats.ToggleFoW.IsActivated())
+	{
+		_entityManager->MapSystem.FogOfWarVisible = !_entityManager->MapSystem.FogOfWarVisible;
+	}
 }
 
 void GameScene::OnPlatformChanged()

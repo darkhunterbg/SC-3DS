@@ -52,8 +52,11 @@ void BootScene::Stop()
 	delete _view;
 }
 
-void BootScene::Update()
+void BootScene::Frame()
 {
+
+	_view->Draw();
+
 	if (!_ready)
 	{
 		if (_loadCrt->IsCompleted())
@@ -79,10 +82,7 @@ void BootScene::Update()
 	if (_ready && AutoStart)
 	{
 		StartGame();
+		return;
 	}
-}
 
-void BootScene::Draw()
-{
-	_view->Draw();
 }

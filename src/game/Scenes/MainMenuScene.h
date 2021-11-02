@@ -12,5 +12,5 @@ public:
 	~MainMenuScene();
 	virtual void Start() override;
 	virtual void Stop() override;
-	virtual void Draw() override;
+	virtual void Frame() override;
 };

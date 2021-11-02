@@ -116,9 +116,6 @@ int main(int argc, char** argv)
 		abstractPlatform.UpdateScreens(screen);
 		abstractPlatform.UpdateInput(window);
 
-
-		Game::FrameStart();
-
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{
@@ -143,16 +140,12 @@ int main(int argc, char** argv)
 			break;
 
 
-		done = !Game::Update();
+		done = !Game::Frame();
 
 		if (done)
 			break;
 
-		Game::Draw();
-
 		abstractPlatform.Draw(screen);
-
-		Game::FrameEnd();
 
 		ImGui_ImplSDL2_NewFrame();
 

@@ -63,8 +63,6 @@ void GraphicsRenderer::Draw(const ImageFrame& sprite, const Rectangle& dst, Colo
 
 void GraphicsRenderer::DrawText(const Font& font, Vector2Int position, const char* text, Color color)
 {
-	Submit();
-
 	Platform::DrawText(font, position, text, color);
 }
 
@@ -95,36 +93,19 @@ void GraphicsRenderer::DrawLine(Vector2Int src, Vector2Int dst, Color32 color)
 	Platform::DrawRectangle(rect, color);
 }
 
-void GraphicsRenderer::NewFrame()
-{
-}
-
-void GraphicsRenderer::EndFrame()
-{
-	Submit();
-
-}
-
-void GraphicsRenderer::Submit()
-{
-}
-
 void GraphicsRenderer::DrawOnScreen(ScreenId screen)
 {
-	Submit();
 	Platform::DrawOnScreen(screen);
 	instance._currentScreen = screen;
 }
 
 void GraphicsRenderer::DrawOnSurface(RenderSurface surface)
 {
-	Submit();
 	Platform::DrawOnSurface(surface.surfaceId);
 }
 
 void GraphicsRenderer::DrawOnCurrentScreen()
 {
-	Submit();
 	Platform::DrawOnSurface(nullptr);
 }
 
@@ -160,8 +141,6 @@ void GraphicsRenderer::ChangeBlendingMode(BlendMode mode)
 {
 	if (mode == instance.blendMode)
 		return;
-
-	Submit();
 
 	instance.blendMode = mode;
 

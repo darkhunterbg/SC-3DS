@@ -105,23 +105,19 @@ int main()
 		}
 
 
-		bool done = !Game::Update();
-
-		if (done)
-			break;
-
-		Game::FrameEnd();
-
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-
-		Game::FrameStart();
 
 		u32 color = C2D_Color32f(Colors::CornflowerBlue.r, Colors::CornflowerBlue.g, Colors::CornflowerBlue.b, Colors::CornflowerBlue.a);
 		C2D_TargetClear(top, color);
 		C2D_TargetClear(bottom, color);
-		Game::Draw();
+		
+		bool done  = !Game::Frame();
 
 		C3D_FrameEnd(0);
+
+
+		if (done)
+			break;
 	}
 
 	Game::End();

@@ -61,11 +61,6 @@ public:
 		DrawLine(src, dst ,Color32(color));
 	}
 
-	static void NewFrame();
-
-	static void EndFrame();
-
-	static void Submit();
 
 	static void DrawOnScreen(ScreenId screen);
 
