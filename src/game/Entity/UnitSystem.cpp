@@ -2,6 +2,7 @@
 
 #include "EntityUtil.h"
 #include "EntityManager.h"
+#include "../Debug.h"
 
 UnitSystem::UnitSystem()
 {
@@ -29,6 +30,8 @@ size_t UnitSystem::ReportMemoryUsage()
 		size += state->GetSize();
 	}
 
+	size += _unitAttackEvents.capacity() + _unitDieEvents.capacity() * sizeof(EntityId);
+
 	return size;
 }
 
@@ -41,12 +44,12 @@ UnitComponent& UnitSystem::NewUnit(EntityId id, const UnitDef& def, PlayerId own
 	unit.owner = owner;
 	unit.def = &def;
 	unit.vision = def.Stats.Vision + 1;
-	unit.armor = (int)def.Combat.Armor;
-	unit.providedSupply = (int)def.Stats.ProvideSupply;
-	unit.usedSupply = (int)def.Stats.UseSupply;
-	unit.health = unit.maxHealth = (int)(def.Stats.Health);
-	unit.damage[0] = (int)def.Attacks[0].Damage ;
-	unit.damage[1] = (int)def.Attacks[1].Damage ;
+	unit.armor.SetToInt(def.Combat.Armor);
+	unit.providedSupply = def.Stats.ProvideSupply;
+	unit.usedSupply = def.Stats.UseSupply;
+	unit.health = unit.maxHealth.SetToInt(def.Stats.Health);
+	unit.damage[0].SetToInt(def.Attacks[0].Damage);
+	unit.damage[1].SetToInt(def.Attacks[1].Damage);
 
 	if (def.AI.AIType != UnitAIType::None)
 	{
@@ -101,20 +104,72 @@ void UnitSystem::UpdateUnitAI(EntityManager& em)
 	}
 }
 
-void UnitSystem::UnitAttackEvent(EntityId id)
+
+void UnitSystem::ProcessUnitEvents(EntityManager& em)
 {
-	UnitComponent& unit = GetComponent(id);
-	UnitAIComponent& ai = GetAIComponent(id);
-
-	auto& attack = unit.def->GetAttacks()[ai.attackId];
-	auto sound = attack.GetWeapon()->GetSpawnSound();
-
-	if (sound)
+	for (EntityId id : _unitAttackEvents)
 	{
-		EntityUtil::GetManager().SoundSystem.PlayWorldSound(*sound, EntityUtil::GetManager().GetPosition(id));
+		UnitComponent& unit = GetComponent(id);
+		UnitAIComponent& ai = GetAIComponent(id);
+
+		auto& attack = unit.def->GetAttacks()[ai.attackId];
+		auto sound = attack.GetWeapon()->GetSpawnSound();
+
+		if (sound)
+		{
+			EntityUtil::GetManager().SoundSystem.PlayWorldSound(*sound, EntityUtil::GetManager().GetPosition(id));
+		}
+
+		UnitComponent& target = GetComponent(ai.targetEntity);
+
+		if (target.IsDead()) continue;
+
+		auto damage = unit.damage[ai.attackId] - unit.armor;
+		target.health -= std::max(0, (int)damage.value);
+		ai.attackCooldown = attack.Cooldown;
+
+		if (target.IsDead())
+		{
+			_unitDieEvents.push_back(ai.targetEntity);
+			++unit.kills;
+		}
 	}
 
-	UnitComponent& target = GetComponent(id);
-	target.health -= unit.damage[ai.attackId];
-	ai.attackCooldown = attack.Cooldown;
+	_unitAttackEvents.clear();
+
+
+	if (_unitDieEvents.size())
+	{
+		for (EntityId id : _unitDieEvents)
+		{
+			const UnitDef* def = GetComponent(id).def;
+
+			const AnimClipDef* deathAnim = def->Art.GetSprite().GetAnimation(AnimationType::Death);
+			if (deathAnim != nullptr)
+			{
+
+				EntityId death = em.NewEntity();
+				em.DrawSystem.NewComponent(death);
+				em.AnimationSystem.NewComponent(death);
+				em.SetPosition(death, em.GetPosition(id));
+				em.SetOrientation(death, 0 );
+				// TODO, fix shadow
+				EntityUtil::PlayAnimation(death, *deathAnim, nullptr);
+			}
+		}
+
+		em.DeleteEntities(_unitDieEvents);
+
+		_unitDieEvents.clear();
+	}
 }
+
+
+void UnitSystem::UnitAttackEvent(EntityId id)
+{
+	GAME_ASSERT(_aiComponents.HasComponent(id), "[UnitAttackEvent] Entity %i does not have AI!");
+	GAME_ASSERT(_unitComponents.HasComponent(id), "[UnitAttackEvent] Entity %i is not an unit!");
+
+	_unitAttackEvents.push_back(id);
+}
+

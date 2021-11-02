@@ -81,7 +81,7 @@ void GameScene::Start()
 	const auto& def = *GameDatabase::instance->GetUnit("Terran\\Units\\Marine");
 
 	int i = 0;
-	for (int y = 1; y < 2; ++y)
+	for (int y = 1; y < 3; ++y)
 	{
 		for (int x = 1; x < 2; ++x)
 		{

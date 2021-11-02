@@ -13,13 +13,15 @@ struct UnitComponent {
 	PlayerId owner;
 	const UnitDef* def;
 	uint8_t vision = 2;
-	FPNumber<uint8_t> armor = 0;
+	FPNumber<int16_t> armor = 0;
 	FPNumber<int16_t> usedSupply = 0;
 	FPNumber<int16_t> providedSupply = 0;
 	FPNumber<int16_t> health = 0;
 	FPNumber<int16_t> maxHealth = 0;
 	int16_t kills = 0;
 	FPNumber<int16_t> damage[2] = { 0,0 };
+
+	inline bool IsDead() const { return health <= 0; }
 };
 
 struct UnitAIComponent {
@@ -44,6 +46,9 @@ class UnitSystem : public IEntitySystem {
 	EntityComponentMap<UnitAIComponent> _aiComponents;
 
 	std::vector<UnitAIState*> _aiStates;
+
+	std::vector<EntityId> _unitAttackEvents;
+	std::vector<EntityId> _unitDieEvents;
 public:
 	UnitSystem();
 	~UnitSystem();
@@ -59,6 +64,8 @@ public:
 	UnitAIComponent& GetAIComponent(EntityId id) { return _aiComponents.GetComponent(id); }
 
 	void UpdateUnitAI(EntityManager& em);
+	void ProcessUnitEvents(EntityManager& em);
 
 	void UnitAttackEvent(EntityId unit);
+	
 };

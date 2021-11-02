@@ -109,13 +109,15 @@ void EntityManager::Update2()
 {
 	PlayerSystem.FinishCollectingEvents();
 
+	UnitSystem.ProcessUnitEvents(*this);
+
+	ApplyEntityChanges();
+
 	AnimationSystem.RunAnimations(*this);
 
 	PlayerSystem.UpdatePlayers(*this);
 
 	KinematicSystem.UpdateColliders(*this);
-
-	ApplyEntityChanges();
 
 	DrawSystem.UpdatePositions(*this);
 

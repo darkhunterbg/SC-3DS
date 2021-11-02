@@ -42,8 +42,9 @@ struct FPNumber {
 
 	constexpr FPNumber() {};
 	constexpr FPNumber(T v) : value(v) {}
-	constexpr FPNumber(int v) : value((T)(v << 1)) {}
-
+	
+	static inline constexpr FPNumber FromInt(int v) { return v << 1; }
+	inline FPNumber& SetToInt(int v) { value = v << 1; return *this; }
 	inline int IntValue()  const{ return value >> 1; }
 
 	inline bool operator == (const FPNumber& b) const
@@ -67,29 +68,29 @@ struct FPNumber {
 
 	inline FPNumber operator+(const FPNumber& b) const
 	{
-		return value + b.value;
+		return (T)(value + b.value);
 	}
 	inline FPNumber operator-(const FPNumber& b) const
 	{
-		return value - b.value;
+		return (T)(value - b.value);
 	}
 	inline FPNumber operator*(const FPNumber& b) const
 	{
-		return value * b.value;
+		return (T)(value * b.value);
 	}
 	inline FPNumber operator/(const FPNumber& b) const
 	{
-		return value / b.value;
+		return (T)(value / b.value);
 	}
 
 
 	inline FPNumber operator << (int shift) const
 	{
-		return value << shift;
+		return (T)(value << shift);
 	}
 	inline FPNumber operator >> (int shift) const
 	{
-		return value >> shift;
+		return (T)(value >> shift);
 	}
 
 	inline FPNumber& operator+=(const FPNumber& b)
