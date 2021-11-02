@@ -26,7 +26,8 @@ enum class UnitAIType : uint8_t {
 
 struct UnitAttack {
 	int16_t WeaponId;
-	Vector2Int16 Range;
+	int16_t MinRange;
+	int16_t MaxRange;
 	uint8_t Cooldown;
 	uint8_t Padding;
 	uint16_t Damage;

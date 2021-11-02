@@ -41,12 +41,12 @@ UnitComponent& UnitSystem::NewUnit(EntityId id, const UnitDef& def, PlayerId own
 	unit.owner = owner;
 	unit.def = &def;
 	unit.vision = def.Stats.Vision + 1;
-	unit.armorD = def.Combat.Armor << 1;
-	unit.providedSupplyD = def.Stats.ProvideSupply;
-	unit.usedSupplyD = def.Stats.UseSupply;
-	unit.healthD = unit.maxHealthD = (def.Stats.Health << 1);
-	unit.damageD[0] = def.Attacks[0].Damage << 1;
-	unit.damageD[1] = def.Attacks[1].Damage << 1;
+	unit.armor = (int)def.Combat.Armor;
+	unit.providedSupply = (int)def.Stats.ProvideSupply;
+	unit.usedSupply = (int)def.Stats.UseSupply;
+	unit.health = unit.maxHealth = (int)(def.Stats.Health);
+	unit.damage[0] = (int)def.Attacks[0].Damage ;
+	unit.damage[1] = (int)def.Attacks[1].Damage ;
 
 	if (def.AI.AIType != UnitAIType::None)
 	{
@@ -55,7 +55,7 @@ UnitComponent& UnitSystem::NewUnit(EntityId id, const UnitDef& def, PlayerId own
 		ai.stateId = UnitAIStateId::IdleAggressive;
 		ai.newState = true;
 		ai.idleStateId = ai.stateId;
-		ai.seekRange = def.GetAttacks()[0].Range.y;
+		ai.seekRange = def.GetAttacks()[0].MaxRange;
 	}
 
 	return unit;
@@ -115,6 +115,6 @@ void UnitSystem::UnitAttackEvent(EntityId id)
 	}
 
 	UnitComponent& target = GetComponent(id);
-	target.healthD -= unit.damageD[ai.attackId];
+	target.health -= unit.damage[ai.attackId];
 	ai.attackCooldown = attack.Cooldown;
 }

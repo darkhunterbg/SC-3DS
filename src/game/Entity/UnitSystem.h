@@ -13,15 +13,13 @@ struct UnitComponent {
 	PlayerId owner;
 	const UnitDef* def;
 	uint8_t vision = 2;
-	uint8_t armorD = 0;
-	int16_t usedSupplyD = 0;
-	int16_t providedSupplyD = 0;
-	int16_t healthD = 0;
-	int16_t maxHealthD = 0;
+	FPNumber<uint8_t> armor = 0;
+	FPNumber<int16_t> usedSupply = 0;
+	FPNumber<int16_t> providedSupply = 0;
+	FPNumber<int16_t> health = 0;
+	FPNumber<int16_t> maxHealth = 0;
 	int16_t kills = 0;
-	uint16_t damageD[2] = { 0,0 };
-	Vector2Int GetHealth() const { return { (int)healthD >> 1 ,(int)maxHealthD >> 1 }; }
-	int GetWeaponDamage(int weapon) { return damageD[weapon] >> 1; };
+	FPNumber<int16_t> damage[2] = { 0,0 };
 };
 
 struct UnitAIComponent {

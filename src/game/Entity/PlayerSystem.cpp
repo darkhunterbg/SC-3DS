@@ -12,18 +12,15 @@ static constexpr const uint8_t TileVisibilityTimer = 40;
 
 bool PlayerInfo::HasEnoughSupply(const UnitDef& unit) const
 {
-	int available = std::min(GetMaxSupply(), (int)providedSupplyDoubled);
-	available -= usedSupplyDoubled + reserverdSupplyDoubled;
-	return true;
-	//return available  >= unit.UseSupplyDoubled;
+	return HasEnoughSupply(unit.Stats.UseSupply);
 }
 
 
-bool PlayerInfo::HasEnoughSupply(int supplyDoubled) const
+bool PlayerInfo::HasEnoughSupply(FPNumber<int16_t> supply) const
 {
-	int available = std::min(GetMaxSupply(), (int)providedSupplyDoubled);
-	available -= usedSupplyDoubled + reserverdSupplyDoubled;
-	return available >= supplyDoubled;
+	int16_t available = std::min(GetMaxSupply().value, providedSupply.value);
+	available -= usedSupply.value;
+	return available >= supply.value;
 }
 
 // ================== Player Vision ==================
@@ -124,12 +121,8 @@ void PlayerSystem::AddGas(PlayerId id, int gas)
 		player.gas = 0;
 }
 
-void PlayerSystem::ReserveSupply(PlayerId player, int supplyDoubled)
-{
-	players[player.i].reserverdSupplyDoubled += supplyDoubled;
-}
 
-bool PlayerSystem::HasEnoughFreeSupply(PlayerId player, int supplyDoubled) const
+bool PlayerSystem::HasEnoughFreeSupply(PlayerId player, FPNumber<int16_t> supplyDoubled) const
 {
 	return players[player.i].HasEnoughSupply(supplyDoubled);
 }
@@ -154,8 +147,8 @@ void PlayerSystem::UpdatePlayers(const EntityManager& em)
 
 	for (auto& player : players)
 	{
-		player.usedSupplyDoubled = 0;
-		player.providedSupplyDoubled = 0;
+		player.usedSupply = 0;
+		player.providedSupply = 0;
 	}
 
 	for (EntityId id : em.UnitSystem.GetEntities())
@@ -166,8 +159,8 @@ void PlayerSystem::UpdatePlayers(const EntityManager& em)
 		auto& unit = em.UnitSystem.GetComponent(id);
 
 		playerVision[unit.owner.i]->ranges.push_back({ position,(uint8_t)(unit.vision )});
-		players[unit.owner.i].usedSupplyDoubled += unit.usedSupplyD;
-		players[unit.owner.i].providedSupplyDoubled += unit.providedSupplyD;
+		players[unit.owner.i].usedSupply += unit.usedSupply;
+		players[unit.owner.i].providedSupply += unit.providedSupply;
 	}
 
 }

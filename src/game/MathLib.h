@@ -27,7 +27,6 @@ constexpr float ClampF(float x, float min, float max)
 	return x <= min ? min : x >= max ? max : x;
 }
 
-
 inline static float LerpF(float a, float b, float l)
 {
 	float c = b - a;
@@ -35,6 +34,86 @@ inline static float LerpF(float a, float b, float l)
 	c += a;
 	return c;
 }
+
+template<class T>
+struct FPNumber {
+
+	T value;
+
+	constexpr FPNumber() {};
+	constexpr FPNumber(T v) : value(v) {}
+	constexpr FPNumber(int v) : value((T)(v << 1)) {}
+
+	inline int IntValue()  const{ return value >> 1; }
+
+	inline bool operator == (const FPNumber& b) const
+	{
+		return  value == b.value;
+	}
+
+	inline bool operator != (const FPNumber& b) const
+	{
+		return value != b.value;
+	}
+	inline bool operator <= (const FPNumber& b) const
+	{
+		return value <= b.value;
+	}
+	inline bool operator >= (const FPNumber& b) const
+	{
+		return value >= b.value;
+	}
+
+
+	inline FPNumber operator+(const FPNumber& b) const
+	{
+		return value + b.value;
+	}
+	inline FPNumber operator-(const FPNumber& b) const
+	{
+		return value - b.value;
+	}
+	inline FPNumber operator*(const FPNumber& b) const
+	{
+		return value * b.value;
+	}
+	inline FPNumber operator/(const FPNumber& b) const
+	{
+		return value / b.value;
+	}
+
+
+	inline FPNumber operator << (int shift) const
+	{
+		return value << shift;
+	}
+	inline FPNumber operator >> (int shift) const
+	{
+		return value >> shift;
+	}
+
+	inline FPNumber& operator+=(const FPNumber& b)
+	{
+		value += b.value;
+		return *this;
+	}
+	inline FPNumber& operator-=(const FPNumber& b)
+	{
+		value -= b.value;
+		return *this;
+	}
+	inline  FPNumber& operator*=(const FPNumber& b)
+	{
+		value *= b.value;
+		return *this;
+	}
+	inline FPNumber& operator/=(const FPNumber& b)
+	{
+		value /= b.value;
+		return *this;
+	}
+
+};
 
 template<class T>
 struct Vector2T

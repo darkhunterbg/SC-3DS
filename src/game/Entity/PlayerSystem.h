@@ -124,9 +124,8 @@ struct PlayerInfo {
 
 	int minerals = 0;
 	int gas = 0;
-	int16_t usedSupplyDoubled = 0;
-	int16_t providedSupplyDoubled = 0;
-	int16_t reserverdSupplyDoubled = 0;
+	FPNumber<int16_t> usedSupply = 0;
+	FPNumber<int16_t> providedSupply = 0;
 
 	RaceType race;
 	PlayerId id;
@@ -135,22 +134,13 @@ struct PlayerInfo {
 
 	bool newEvents = false;
 
-	inline int GetUsedSupply() const
-	{
-		return (usedSupplyDoubled + reserverdSupplyDoubled) >> 1;
-	}
-	inline int GetProvidedSupply() const
-	{
-		return providedSupplyDoubled >> 1;
-	}
-	inline int GetMaxSupply() const { return 200; }
+	inline FPNumber<int16_t> GetMaxSupply() const { return FPNumber<int16_t>(200); }
 
 	bool HasEnoughSupply(const UnitDef& unit) const;
-	bool HasEnoughSupply(int supplyDoubled) const;
+	bool HasEnoughSupply(FPNumber<int16_t>  supply) const;
 	PlayerInfo(Color32 color, RaceType race, PlayerId id, const std::string& name) :
 		color(color), race(race), id(id), name(name)
 	{
-		
 	}
 };
 
@@ -189,8 +179,7 @@ public:
 
 	void AddMinerals(PlayerId player, int minerals);
 	void AddGas(PlayerId player, int gas);
-	void ReserveSupply(PlayerId player, int supplyDoubled);
-	bool HasEnoughFreeSupply(PlayerId player, int supplyDoubled) const;
+	bool HasEnoughFreeSupply(PlayerId player, FPNumber<int16_t> supplyDoubled) const;
 	bool HasEnoughMinerals(PlayerId player, int minerals) const;
 	bool HasEnoughGas(PlayerId player, int gas) const;
 

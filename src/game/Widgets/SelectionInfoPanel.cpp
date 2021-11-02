@@ -19,12 +19,12 @@ void static GetUnitWireframeColors(EntityId id, const UnitComponent& unit, Color
 	static Color wfStateColor[3] = { Colors::UIGreen, Colors::UIYellow, Colors::UIRed };
 	int wfPartsState[4] = { 0,0,0,0 };
 
-	int damgeBreakpoint = unit.maxHealthD / (4 * 2);
+	int damgeBreakpoint = unit.maxHealth.value / (4 * 2);
 
 	int damageParts = 0;
 
 
-	for (int i = unit.healthD; i < unit.maxHealthD; i += damgeBreakpoint)
+	for (int i = unit.health.value; i < unit.maxHealth.value; i += damgeBreakpoint)
 	{
 		++damageParts;
 	}
@@ -176,7 +176,7 @@ void SelectionInfoPanel::DrawUnitDetails(EntityId id)
 		info[infoCount].counter = 0;
 		info[infoCount].name = unit.def->TechTree.GetArmorUpgrade()->Name;
 		info[infoCount].statName = "Armor";
-		info[infoCount].stat = unit.armor;
+		info[infoCount].stat = unit.armor.IntValue();
 		++infoCount;
 	}
 
@@ -187,7 +187,7 @@ void SelectionInfoPanel::DrawUnitDetails(EntityId id)
 		info[infoCount].counter = 0;
 		info[infoCount].name = atk.GetWeapon()->Name;
 		info[infoCount].statName = "Damage";
-		info[infoCount].stat = unit.GetWeaponDamage(i++);
+		info[infoCount].stat = unit.damage[i++].IntValue();
 		++infoCount;
 	}
 
@@ -246,19 +246,16 @@ void SelectionInfoPanel::DrawUnitInfo(EntityId id)
 
 	Color hpColor = Colors::UIGreen;
 
-	if (unit.healthD <= (unit.maxHealthD / 3))
+	if (unit.health <= (unit.maxHealth / 3))
 	{
 		hpColor = Colors::UIRed;
 	}
-	else if (unit.healthD <= (unit.maxHealthD * 2) / 3)
+	else if (unit.health <= (unit.maxHealth * 2) / 3)
 	{
 		hpColor = Colors::UIYellow;
 	}
 
-
-	Vector2Int hpStat = unit.GetHealth();
-
-	stbsp_snprintf(_buffer, sizeof(_buffer), "%i/%i", hpStat.x, hpStat.y);
+	stbsp_snprintf(_buffer, sizeof(_buffer), "%i/%i", unit.health.IntValue(),unit.maxHealth.IntValue());
 
 	GUILabel::DrawText(font, _buffer, { 0,64 }, GUIHAlign::Center, GUIVAlign::Top, hpColor);
 
