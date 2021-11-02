@@ -4,10 +4,14 @@
 #include "AnimationPlayer.h"
 #include "../Data/AssetDataDefs.h"
 #include "EntityManager.h"
+#include "EntityUtil.h"
 
 void AnimationSystem::RunAnimations(EntityManager& em)
 {
 	//SectionProfiler p("RunAnimations");
+
+	_spawnSprites.clear();
+	_destroy.clear();
 
 	auto& components = _animComponents.GetComponents();
 	auto& entities = _animComponents.GetEntities();
@@ -23,6 +27,14 @@ void AnimationSystem::RunAnimations(EntityManager& em)
 		}
 	}
 
+
+	for (auto& sprite : _spawnSprites)
+	{
+		EntityUtil::SpawnSprite(*sprite.def, sprite.pos);
+	}
+
+	if (_destroy.size() > 0)
+		em.DeleteEntities(_destroy);
 }
 
 void AnimationSystem::StartAnimation(EntityId id, const AnimClipDef& clip)

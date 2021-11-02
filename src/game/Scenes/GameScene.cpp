@@ -93,7 +93,7 @@ void GameScene::Start()
 
 	EntityUtil::SpawnUnit(def, PlayerId{ 2 }, Vector2Int16(Vector2Int{ 128 , 64 }));
 
-	//EntityUtil::SpawnUnit(def, PlayerId{ 3 }, Vector2Int16(Vector2Int{ 300 , 300 }));
+	EntityUtil::SpawnUnit(def, PlayerId{ 3 }, Vector2Int16(Vector2Int{ 300 , 300 }));
 
 	_updateCrt = _entityManager->NewUpdateCoroutine();
 

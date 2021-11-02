@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Entity.h"
+#include "../Debug.h"
 #include <vector>
 #include <algorithm>
 #include <Util.h>
@@ -70,6 +71,8 @@ public:
 		_entityToIndexMap[Entity::ToIndex(id)] = index;
 
 		if (id > _maxEntity) _maxEntity = id;
+
+		Validate();
 	}
 	void NewComponents(const std::vector<EntityId>& ids)
 	{
@@ -86,6 +89,8 @@ public:
 		EntityId max = *std::max_element(ids.cbegin(), ids.cend());
 
 		if (max > _maxEntity) _maxEntity = max;
+
+		Validate();
 	}
 	void DeleteComponent(EntityId id)
 	{
@@ -107,13 +112,14 @@ public:
 		}
 
 		_maxEntity = last;
+
+		Validate();
 	}
 
 
 	void DeleteComponents(const std::vector<EntityId>& ids)
 	{
 		if (ids.size() == 0) return;
-
 
 		Util::_delIndexesScratch.clear();
 
@@ -127,8 +133,6 @@ public:
 		}
 
 		if (Util::_delIndexesScratch.size() == 0) return;
-
-
 
 		std::sort(Util::_delIndexesScratch.begin(), Util::_delIndexesScratch.end(), std::greater<short>());
 
@@ -149,7 +153,7 @@ public:
 			_maxEntity = Entity::None;
 
 		//std::sort(Util::_delIndexesScratch.begin(), Util::_delIndexesScratch.end(), std::less<short>());
-		
+
 		if (_entities.size() == 0) return;
 
 		int start = Entity::ToIndex(minEntity);
@@ -158,7 +162,7 @@ public:
 		int iter = 0;
 		for (short index : Util::_delIndexesScratch)
 		{
-			index -= iter++;
+			//index; -= iter++;
 			for (int i = start; i <= end; ++i)
 			{
 				if (_entityToIndexMap[i] > index)
@@ -166,7 +170,34 @@ public:
 			}
 		}
 
-		// TODO: full validation check 
+		Validate();
+	}
+
+	void Validate()
+	{
+		return;
+
+		GAME_ASSERT(_components.size() == _entities.size(), "EntityComponentMapValidation");
+
+		int total = std::count_if(_entityToIndexMap.begin(), _entityToIndexMap.end(), [](short i) {return i != -1; });
+		GAME_ASSERT(total == _components.size(), "EntityComponentMapValidation");
+
+
+		for (EntityId id : _entities)
+		{
+			int index = _entityToIndexMap[Entity::ToIndex(id)];
+			GAME_ASSERT(index >= 0, "EntityComponentMapValidation");
+			GAME_ASSERT(index < _components.size(), "EntityComponentMapValidation");
+
+			//GAME_ASSERT(std::count(_entityToIndexMap.begin(), _entityToIndexMap.end(), id)== 1, "EntityComponentMapValidation");
+		}
+
+		for (int i = 0; i < _components.size(); ++i)
+		{
+			GAME_ASSERT(std::count(_entityToIndexMap.begin(), _entityToIndexMap.end(), i) == 1, "EntityComponentMapValidation");
+		}
+		
+
 	}
 
 	size_t GetMemoryUsage() const

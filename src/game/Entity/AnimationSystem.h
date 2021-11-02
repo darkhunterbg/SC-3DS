@@ -1,12 +1,14 @@
 #pragma once
 
 #include "../Assets.h"
+
 #include "Entity.h"
 #include "IEntitySystem.h"
 #include "EntityComponentMap.h"
 
 class EntityManager;
 struct AnimClipDef;
+struct SpriteDef;
 
 struct AnimationComponent {
 	const Image* baseImage;
@@ -24,8 +26,16 @@ struct AnimationComponent {
 
 class AnimationSystem: public IEntitySystem {
 
+	struct SpawnSprite {
+		const SpriteDef* def;
+		Vector2Int16 pos;
+	};
+
 	EntityComponentMap<AnimationComponent> _animComponents;
 
+
+	std::vector<SpawnSprite> _spawnSprites;
+	std::vector<EntityId> _destroy;
 public:
 	void RunAnimations(EntityManager& em);
 	inline void NewComponent(EntityId id)
@@ -41,4 +51,13 @@ public:
 	// Inherited via IEntitySystem
 	virtual void DeleteEntities(std::vector<EntityId>& entities) override;
 	virtual size_t ReportMemoryUsage() override;
+
+	void RegisterSpawnSprite(const SpriteDef& def, Vector2Int16 pos)
+	{
+		_spawnSprites.push_back({ &def ,pos });
+	}
+	void RegisterDestroy(EntityId id)
+	{
+		_destroy.push_back(id);
+	}
 };

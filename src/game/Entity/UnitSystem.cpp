@@ -176,6 +176,7 @@ void UnitSystem::ProcessUnitEvents(EntityManager& em)
 			{
 				EntityId death = em.NewEntity();
 				em.DrawSystem.NewComponent(death);
+				em.DrawSystem.GetComponent(death).depth - em.DrawSystem.GetComponent(id).depth - 1;
 				em.DrawSystem.GetComponent(death).color = em.DrawSystem.GetComponent(id).color;
 				em.AnimationSystem.NewComponent(death);
 				em.SetPosition(death, em.GetPosition(id));

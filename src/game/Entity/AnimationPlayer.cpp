@@ -83,13 +83,12 @@ static void SpawnSprite(const InstructionParams& params, EntityId id, EntityMana
 	unsigned defId = params.shorts[0];
 	const SpriteDef& def = GameDatabase::instance->SpriteDefs[defId];
 
-	EntityUtil::SpawnSprite(def, em.GetPosition(id));
-
+	em.AnimationSystem.RegisterSpawnSprite(def, em.GetPosition(id));
 }
 
 static void Destroy(const InstructionParams& params, EntityId id, EntityManager& em)
 {
-	em.DeleteEntity(id);
+	em.AnimationSystem.RegisterDestroy(id);
 }
 
 // ======================================================================================

@@ -139,6 +139,7 @@ void EntityManager::Draw(const Camera& camera)
 void EntityManager::DeleteEntity(EntityId id)
 {
 	toDelete.push_back(id);
+	ApplyEntityChanges();
 }
 
 void EntityManager::DeleteEntitiesSorted(std::vector<EntityId>& e)
@@ -149,6 +150,8 @@ void EntityManager::DeleteEntitiesSorted(std::vector<EntityId>& e)
 		std::sort(e.begin(), e.end());
 
 	toDelete.insert(toDelete.end(), e.begin(), e.end());
+
+	ApplyEntityChanges();
 }
 void EntityManager::DeleteEntities(const std::vector<EntityId>& e, bool sorted)
 {
