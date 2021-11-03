@@ -10,11 +10,13 @@ static ImageFrame _tile;
 
 void MapSystem::DeleteEntities(std::vector<EntityId>& entities)
 {
+	_occludedComponents.DeleteComponents(entities);
 }
 
 size_t MapSystem::ReportMemoryUsage()
 {
-	return size_t();
+	size_t size = _occludedComponents.GetMemoryUsage();
+	return size;
 }
 
 void MapSystem::RedrawMinimapFogOfWar(const PlayerVision& vision)
@@ -115,6 +117,18 @@ void MapSystem::GenerateMinimapTerrainTexture()
 
 }
 
+void MapSystem::SetVisionOccluded(EntityId id, bool occluded)
+{
+	if (occluded)
+	{
+		if (!_occludedComponents.HasComponent(id))
+			_occludedComponents.NewComponent(id);
+	}
+	else {
+		_occludedComponents.DeleteComponent(id);
+	}
+}
+
 void MapSystem::SetSize(Vector2Int16 size)
 {
 	_mapSize = size;
@@ -147,7 +161,6 @@ void MapSystem::DrawOffscreenData(EntityManager& em)
 		GraphicsRenderer::Draw(_minimapFowTexture, { 0,0 });
 	}
 
-
 	for (EntityId id : em.UnitSystem.GetEntities())
 	{
 		DrawComponent& draw = em.DrawSystem.GetComponent(id);
@@ -179,14 +192,21 @@ void MapSystem::UpdateVisibleObjects(EntityManager& em)
 
 	const PlayerVision& vision = em.PlayerSystem.GetPlayerVision(ActivePlayer);
 
-	for (EntityId id : em.UnitSystem.GetEntities())
+	auto& entities = _occludedComponents.GetEntities();
+	auto& components = _occludedComponents.GetComponents();
+
+	for (int i = 0; i < entities.size(); ++i)
 	{
+		EntityId id = entities[i];
+		VisionOccludedComponent& component = components[i];
 		DrawComponent& draw = em.DrawSystem.GetComponent(id);
-		auto bb = draw.boundingBox;
-		bb.Restrict({ 0,0 }, _mapSize);
-		bb.position = bb.position >> 5;
-		bb.size = bb.size >> 5;
-		draw.visible = !FogOfWarVisible || vision.IsVisible(bb);
+
+		Rectangle16 rect = draw.boundingBox;
+		rect.Restrict({ 0,0 }, _mapSize);
+		rect.position = rect.position >> 5;
+		rect.size = rect.size >> 5;
+
+		draw.visible = !FogOfWarVisible || vision.IsVisible(rect);
 	}
 }
 

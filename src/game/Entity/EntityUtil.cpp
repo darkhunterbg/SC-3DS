@@ -74,6 +74,7 @@ EntityId EntityUtil::SpawnUnit(const UnitDef& def, PlayerId owner, Vector2Int16 
 		em.KinematicSystem.NewCollider(id, def.Art.GetSprite().collider);
 
 	em.AnimationSystem.NewComponent(id);
+	em.MapSystem.SetVisionOccluded(id, true);
 
 	PlayAnimation(id, *def.Art.GetSprite().GetAnimation(AnimationType::Init), def.Art.GetShadowImage());
 
@@ -93,6 +94,7 @@ EntityId EntityUtil::SpawnSprite(const SpriteDef& def, Vector2Int16 position, in
 	em.SetOrientation(id, orientation);
 
 	em.AnimationSystem.NewComponent(id);
+	em.MapSystem.SetVisionOccluded(id, true);
 
 	PlayAnimation(id, *def.GetAnimation(AnimationType::Init));
 

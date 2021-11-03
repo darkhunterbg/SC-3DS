@@ -5,6 +5,7 @@
 #include "IEntitySystem.h"
 
 #include "../Engine/GraphicsPrimitives.h"
+#include "EntityComponentMap.h"
 #include "PlayerSystem.h"
 
 #include <vector>
@@ -13,7 +14,14 @@ class EntityManager;
 class Camera;
 class PlayerVision;
 
+
 class MapSystem : public IEntitySystem {
+	struct VisionOccludedComponent {
+
+	};
+
+private:
+
 	Vector2Int16 _mapSize;
 	Vector2Int16 _gridSize;
 	short _minimapTextureSize = 0;
@@ -32,11 +40,17 @@ class MapSystem : public IEntitySystem {
 	std::vector<Rectangle16> _halfLitTiles;
 	std::vector<Rectangle16> _fullLitTiles;
 
+
+	EntityComponentMap<VisionOccludedComponent> _occludedComponents;
+
 	void RedrawMinimapFogOfWar(const PlayerVision& vision);
 	void GenerateMinimapTerrainTexture();
 public:
 	PlayerId ActivePlayer = { 1 };
 	bool FogOfWarVisible = true;
+
+	void SetVisionOccluded(EntityId id, bool occluded);
+
 	inline Vector2Int16 GetSize() const
 	{
 		return _mapSize;
