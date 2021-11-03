@@ -5,6 +5,7 @@
 #include "../Entity/EntityUtil.h"
 #include "../Game.h"
 #include "../StringLib.h"
+#include "../Platform.h"
 
 struct UnitItemInfo {
 	const ImageFrame* sprite;
@@ -62,9 +63,20 @@ void static GetUnitWireframeColors(EntityId id, const UnitComponent& unit, Color
 		}
 	}
 
-	for (int i = 0; i < 4; ++i)
+	if (unit.HasShield())
 	{
-		outColors[i] = wfStateColor[wfPartsState[i]];
+		int shieldState = ((unit.shield.value * 3) / unit.maxShield.value);
+		if (unit.shield.value > 0)
+			++shieldState;
+
+		outColors[0] = Colors::White;
+		outColors[0].a = (shieldState) / 4.0f;
+	}
+
+
+	for (int i = 1; i < 5; ++i)
+	{
+		outColors[i] = wfStateColor[wfPartsState[i - 1]];
 	}
 }
 
@@ -131,17 +143,24 @@ void SelectionInfoPanel::DrawMultiselection(std::vector<EntityId>& selection)
 		GUI::BeginRelativeLayout(offset, Vector2Int(f.size), GUIHAlign::Left, GUIVAlign::Top);
 		GUIImage::DrawImageFrame(f);
 
-		Color wfColor[4];
+		Color wfColor[5];
 		GetUnitWireframeColors(id, unit, wfColor);
 
-		for (int i = 0; i < 4; ++i)
-		{
-			const auto& wfPart = unit.def->Art.GetWireframe()->group.GetImage().GetFrame(i + 1);
-			GUI::BeginRelativeLayout(Vector2Int(wfPart.offset) + Vector2Int{ -6, 1 }, Vector2Int(wfPart.size), GUIHAlign::Center, GUIVAlign::Top);
-			GUIImage::DrawImageFrame(wfPart, wfColor[i]);
 
-			GUI::EndLayout();
+		int wireframeStart = 0;
+		if (!unit.HasShield())
+			++wireframeStart;
+
+		for (int i = wireframeStart; i < 5; ++i)
+		{
+			const auto& img = unit.def->Art.GetWireframe()->group.GetImage();
+			const auto& wfPart = img.GetFrame(i);
+
+			GUI::AddNextElementOffset(Vector2Int(wfPart.offset) + Vector2Int(0, 1));
+			GUI::SetNextElementSize(Vector2Int(wfPart.size));
+			GUIImage::DrawImageFrame(wfPart, wfColor[i]);
 		}
+
 
 		if (GUI::IsLayoutActivated())
 		{
@@ -180,6 +199,17 @@ void SelectionInfoPanel::DrawUnitDetails(EntityId id)
 		++infoCount;
 	}
 
+	if (unit.def->TechTree.GetShieldUpgrade() != nullptr)
+	{
+		info[infoCount].sprite = &unit.def->TechTree.GetShieldUpgrade()->GetIcon();
+		info[infoCount].counter = 0;
+		info[infoCount].name = unit.def->TechTree.GetShieldUpgrade()->Name;
+		info[infoCount].statName = "Armor";
+		info[infoCount].stat = 0;
+		++infoCount;
+	}
+
+
 	int i = 0;
 	for (const UnitAttack& atk : unit.def->GetAttacks())
 	{
@@ -187,7 +217,7 @@ void SelectionInfoPanel::DrawUnitDetails(EntityId id)
 		info[infoCount].counter = 0;
 		info[infoCount].name = atk.GetWeapon()->Name;
 		info[infoCount].statName = "Damage";
-		info[infoCount].stat = unit.damage[i++].IntValue();
+		info[infoCount].stat = unit.damage[i++].IntValue() * atk.GetWeapon()->Attacks;
 		++infoCount;
 	}
 
@@ -255,24 +285,47 @@ void SelectionInfoPanel::DrawUnitInfo(EntityId id)
 		hpColor = Colors::UIYellow;
 	}
 
-	stbsp_snprintf(_buffer, sizeof(_buffer), "%i/%i", unit.health.IntValue(),unit.maxHealth.IntValue());
 
-	GUILabel::DrawText(font, _buffer, { 0,64 }, GUIHAlign::Center, GUIVAlign::Top, hpColor);
+
+	int xOffset = 0;
+
+	if (unit.HasShield())
+	{
+		stbsp_snprintf(_buffer, sizeof(_buffer), "%i/%i", unit.shield.IntValue(), unit.maxShield.IntValue());
+
+		xOffset += Platform::MeasureString(font, _buffer).x;
+
+		GUILabel::DrawText(font, _buffer, { -xOffset,64 }, GUIHAlign::Center, GUIVAlign::Top, Colors::UILightGray);
+		xOffset /= 2;
+	}
+
+	stbsp_snprintf(_buffer, sizeof(_buffer), "%i/%i", unit.health.IntValue(), unit.maxHealth.IntValue());
+
+	GUILabel::DrawText(font, _buffer, { xOffset,64 }, GUIHAlign::Center, GUIVAlign::Top, hpColor);
 
 	//GUILabel::DrawText(font, _buffer, { 0,72 }, GUIHAlign::Center, GUIVAlign::Top, hpColor);
 	//GUILabel::DrawText(font, _buffer, { 0,80 }, GUIHAlign::Center, GUIVAlign::Top, hpColor);
 	// ================== Wireframe ========================
 
-	Color wfColor[4];
+	Color wfColor[5];
 	GetUnitWireframeColors(id, unit, wfColor);
 
-	for (int i = 0; i < 4; ++i)
+	int offset = 0;
+	if (!unit.HasShield())
+		++offset;
+
+	const auto& img = unit.def->Art.GetWireframe()->detail.GetImage();
+	GUI::BeginRelativeLayout(Vector2Int{ 0,0 }, Vector2Int(img.GetSize()), GUIHAlign::Center, GUIVAlign::Top);
+	for (int i = offset; i < 5; ++i)
 	{
-		const auto& wfPart = unit.def->Art.GetWireframe()->detail.GetImage().GetFrame(i + 1);
-		GUI::BeginRelativeLayout(Vector2Int(wfPart.offset) - Vector2Int{ 12, 0 }, Vector2Int(wfPart.size), GUIHAlign::Center, GUIVAlign::Top);
+		const auto& img = unit.def->Art.GetWireframe()->detail.GetImage();
+		const auto& wfPart = img.GetFrame(i);
+
+		GUI::AddNextElementOffset(Vector2Int(wfPart.offset));
+		GUI::SetNextElementSize(Vector2Int(wfPart.size));
 		GUIImage::DrawImageFrame(wfPart, wfColor[i]);
-		GUI::EndLayout();
 	}
+	GUI::EndLayout();
 }
 
 

@@ -189,15 +189,22 @@ namespace DataManager.Gameplay
 		}, NewParam<byte>("instruction"));
 
 
-		public static readonly AnimClipInstruction Attack = new AnimClipInstruction("attack", (state, p) => true);
+		public static readonly AnimClipInstruction Attack = new AnimClipInstruction("attack", (state, p) => false);
 
-		public static readonly AnimClipInstruction PlaySound = new AnimClipInstruction("sound", (state, p) => true,
+		public static readonly AnimClipInstruction PlaySound = new AnimClipInstruction("sound", (state, p) => {
+
+			var sound = p[0] as SoundSetAsset;
+			if (sound != null) {
+				sound.Activate();
+			}
+			return false;
+		},
 			NewParam<SoundSetAsset>("sound set"));
 
-		public static readonly AnimClipInstruction SpawnSprite = new AnimClipInstruction("sprite", (state, p) => true,
+		public static readonly AnimClipInstruction SpawnSprite = new AnimClipInstruction("sprite", (state, p) => false,
 		NewParam<SpriteAsset>("sprite"));
 
-		public static readonly AnimClipInstruction SpawnSpriteBackground = new AnimClipInstruction("spriteback", (state, p) => true,
+		public static readonly AnimClipInstruction SpawnSpriteBackground = new AnimClipInstruction("spriteback", (state, p) => false,
 		NewParam<SpriteAsset>("sprite"));
 
 		public static readonly AnimClipInstruction Destroy = new AnimClipInstruction("destroy", (state, p) => true);

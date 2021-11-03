@@ -64,7 +64,14 @@ struct FPNumber {
 	{
 		return value >= b.value;
 	}
-
+	inline bool operator < (const FPNumber& b) const
+	{
+		return value < b.value;
+	}
+	inline bool operator > (const FPNumber& b) const
+	{
+		return value > b.value;
+	}
 
 	inline FPNumber operator+(const FPNumber& b) const
 	{

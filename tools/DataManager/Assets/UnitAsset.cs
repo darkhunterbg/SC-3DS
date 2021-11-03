@@ -155,6 +155,11 @@ namespace DataManager.Assets
 		[DefaultEditor]
 		[Binary(BinaryType.UInt, 2)]
 		[Optional]
+		public int Shield { get; set; } = 0;
+
+		[DefaultEditor]
+		[Binary(BinaryType.UInt, 2)]
+		[Optional]
 		public int Vision { get; set; } = 7;
 
 		[SupplyEditor]
@@ -187,6 +192,11 @@ namespace DataManager.Assets
 		[Binary(BinaryType.AssetRef, 2)]
 		[Optional, TypeConverter(typeof(AssetConverter))]
 		public UpgradeAsset ArmorType { get; set; }
+
+		[DefaultEditor]
+		[Binary(BinaryType.AssetRef, 2)]
+		[Optional, TypeConverter(typeof(AssetConverter))]
+		public UpgradeAsset ShieldType { get; set; }
 		#endregion
 
 		#region Sounds

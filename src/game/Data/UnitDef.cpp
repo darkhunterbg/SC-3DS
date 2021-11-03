@@ -48,6 +48,14 @@ const UpgradeDef* UnitDef::UnitTechTree::GetArmorUpgrade() const
 	return &GameDatabase::instance->UpgradeDefs[ArmorUpgrateId];
 }
 
+const UpgradeDef* UnitDef::UnitTechTree::GetShieldUpgrade() const
+{
+	if (ShieldUpgradeId < 0)
+		return nullptr;
+
+	return &GameDatabase::instance->UpgradeDefs[ShieldUpgradeId];
+}
+
 const WeaponDef* UnitAttack::GetWeapon() const
 {
 	if (WeaponId < 0)

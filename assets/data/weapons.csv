@@ -1,3 +1,4 @@
-Path,Icon,Name,SpawnSound
-Terran\Fusion Cutter,329,Fusion Cutter,
-Terran\Gauss Rifle,323,Gauss Rifle,Weapons\GaussRifle
+Path,Icon,Name,Attacks,SpawnSound
+Protoss\Psi Blade,305,Psi Blade,2,
+Terran\Fusion Cutter,329,Fusion Cutter,1,
+Terran\Gauss Rifle,323,Gauss Rifle,1,Weapons\GaussRifle

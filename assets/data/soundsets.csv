@@ -34,9 +34,16 @@ Music\Protoss,True,"music\protoss1,music\protoss2,music\protoss3"
 Music\Terran,True,"music\terran1,music\terran2,music\terran3"
 Music\Title,False,music\title
 Music\Zerg,True,"music\zerg1,music\zerg2,music\zerg3"
+Units\Protoss\Zealot\Annoyed,False,"sound\protoss\zealot\pzepss00,sound\protoss\zealot\pzepss01,sound\protoss\zealot\pzepss02"
+Units\Protoss\Zealot\Death,False,sound\protoss\zealot\pzedth00
+Units\Protoss\Zealot\Ready,False,sound\protoss\zealot\pzerdy00
+Units\Protoss\Zealot\What,False,"sound\protoss\zealot\pzewht00,sound\protoss\zealot\pzewht01,sound\protoss\zealot\pzewht02,sound\protoss\zealot\pzewht03"
+Units\Protoss\Zealot\Yes,False,"sound\protoss\zealot\pzeyes00,sound\protoss\zealot\pzeyes01,sound\protoss\zealot\pzeyes02,sound\protoss\zealot\pzeyes03"
 Units\Terran\Marine\Annoyed,False,"sound\terran\marine\tmapss00,sound\terran\marine\tmapss01,sound\terran\marine\tmapss02,sound\terran\marine\tmapss03,sound\terran\marine\tmapss04,sound\terran\marine\tmapss05,sound\terran\marine\tmapss06"
 Units\Terran\Marine\Death,True,"sound\terran\marine\tmadth00,sound\terran\marine\tmadth01"
 Units\Terran\Marine\Ready,False,sound\terran\marine\tmardy00
 Units\Terran\Marine\What,True,"sound\terran\marine\tmawht00,sound\terran\marine\tmawht01,sound\terran\marine\tmawht02,sound\terran\marine\tmawht03"
 Units\Terran\Marine\Yes,True,"sound\terran\marine\tmayes00,sound\terran\marine\tmayes01,sound\terran\marine\tmayes02,sound\terran\marine\tmayes03"
 Weapons\GaussRifle,False,sound\bullet\tmafir00
+Weapons\PsiBlade,False,"sound\protoss\zealot\pzeatt00,sound\protoss\zealot\pzeatt01"
+Weapons\PsiBladeHit,False,sound\protoss\zealot\pzehit00

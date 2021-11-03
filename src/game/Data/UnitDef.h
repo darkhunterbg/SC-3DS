@@ -101,6 +101,7 @@ struct UnitDef {
 
 	struct UnitStats {
 		uint16_t Health;
+		uint16_t Sheild;
 		uint16_t Vision;
 		uint16_t UseSupply;
 		uint16_t ProvideSupply;
@@ -113,8 +114,9 @@ struct UnitDef {
 
 	struct UnitTechTree {
 		int16_t ArmorUpgrateId;
-
+		int16_t ShieldUpgradeId;
 		const UpgradeDef* GetArmorUpgrade() const;
+		const UpgradeDef* GetShieldUpgrade() const;
 	} TechTree;
 
 	UnitSounds Sounds;

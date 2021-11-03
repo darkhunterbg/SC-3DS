@@ -10,7 +10,8 @@ struct WeaponDef {
 	
 	uint16_t IconId;
 	char Name[32];
-	uint16_t SpawnSound;
+	uint16_t Attacks;
+	int16_t SpawnSound;
 
 	const ImageFrame& GetIcon() const;
 	const SoundSetDef* GetSpawnSound() const;

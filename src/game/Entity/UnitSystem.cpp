@@ -48,6 +48,7 @@ UnitComponent& UnitSystem::NewUnit(EntityId id, const UnitDef& def, PlayerId own
 	unit.providedSupply = def.Stats.ProvideSupply;
 	unit.usedSupply = def.Stats.UseSupply;
 	unit.health = unit.maxHealth.SetToInt(def.Stats.Health);
+	unit.shield = unit.maxShield.SetToInt(def.Stats.Sheild);
 	unit.damage[0].SetToInt(def.Attacks[0].Damage);
 	unit.damage[1].SetToInt(def.Attacks[1].Damage);
 
@@ -134,6 +135,20 @@ bool UnitSystem::UpdateUnitAI(EntityManager& em)
 
 void UnitSystem::ProcessUnitEvents(EntityManager& em)
 {
+	for (UnitComponent& unit : _unitComponents.GetComponents())
+	{
+		if (unit.shield < unit.maxShield)
+		{
+			unit.shieldRegen += 8;
+
+			if (unit.shieldRegen > 127)
+			{
+				++unit.shield.value;
+				unit.shieldRegen -= 127;
+			}
+		}
+	}
+
 	for (EntityId id : _unitAttackEvents)
 	{
 		UnitComponent& unit = GetComponent(id);
@@ -151,8 +166,21 @@ void UnitSystem::ProcessUnitEvents(EntityManager& em)
 
 		if (target.IsDead()) continue;
 
-		auto damage = unit.damage[ai.attackId] - unit.armor;
-		target.health -= std::max(0, (int)damage.value);
+		auto damage = unit.damage[ai.attackId];
+
+		if (target.shield.value > 0)
+		{
+			short shieldDamage = std::min(target.shield.value, damage.value);
+			target.shield.value -= shieldDamage;
+			damage.value -= shieldDamage;
+		}
+	
+		if (damage.value > 0)
+			damage.value = std::max((short)1, (damage - target.armor).value);
+
+		if (damage.value > 0)
+			target.health -= damage;
+
 		ai.attackCooldown = attack.Cooldown;
 
 		if (target.IsDead())
@@ -176,7 +204,7 @@ void UnitSystem::ProcessUnitEvents(EntityManager& em)
 			{
 				EntityId death = em.NewEntity();
 				em.DrawSystem.NewComponent(death);
-				em.DrawSystem.GetComponent(death).depth - em.DrawSystem.GetComponent(id).depth ;
+				em.DrawSystem.GetComponent(death).depth - em.DrawSystem.GetComponent(id).depth;
 				em.DrawSystem.GetComponent(death).color = em.DrawSystem.GetComponent(id).color;
 				em.AnimationSystem.NewComponent(death);
 				em.SetPosition(death, em.GetPosition(id));

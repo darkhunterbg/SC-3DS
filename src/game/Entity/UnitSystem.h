@@ -18,9 +18,13 @@ struct UnitComponent {
 	FPNumber<int16_t> providedSupply = 0;
 	FPNumber<int16_t> health = 0;
 	FPNumber<int16_t> maxHealth = 0;
+	FPNumber<int16_t> shield = 0;
+	FPNumber<int16_t> maxShield = 0;
 	int16_t kills = 0;
 	FPNumber<int16_t> damage[2] = { 0,0 };
+	uint8_t shieldRegen = 0;
 
+	inline bool HasShield() const { return maxShield.value > 0; }
 	inline bool IsDead() const { return health <= 0; }
 };
 

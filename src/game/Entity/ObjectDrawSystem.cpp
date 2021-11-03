@@ -12,7 +12,7 @@ static std::array<Color, 3> GreyHPBarColorPalette = { 0xb0b0b0ff, 0x98948cff, 0x
 static std::array<Color, 3> YellowHPBarColorPalette = { 0xfccc2cff, 0xdc9434ff, 0xb09018ff };
 static std::array<Color, 3> RedHPBarColorPalette = { 0xa80808ff, 0xa80808ff, 0x840404ff };
 static std::array<Color, 3> GreenHPBarColorPalette = { 0x249824ff, 0x249824ff, 0x249824ff };
-
+static constexpr Color ShieldColor = 0x0c48ccff;
 
 ObjectDrawSystem::ObjectDrawSystem()
 {
@@ -155,13 +155,18 @@ void ObjectDrawSystem::DrawSelectedBars(EntityManager& em, const Camera& camera)
 
 		auto* palette = &GreenHPBarColorPalette;
 
+	
+		Vector2Int16 dst = camera.WorldToScreen(pos);
+		dst.x -= size >> 1;
+
+		if (unit.HasShield())
+			dst.y += 4;
+		
+
 		int hpBarsVisible = (int)std::ceil(((float)unit.health.value * barSize) / (float)unit.maxHealth.value);
 
 		if (hpBarsVisible > 1 && hpBarsVisible == barSize && unit.health != unit.maxHealth)
 			--hpBarsVisible;
-
-		Vector2Int16 dst = camera.WorldToScreen(pos);
-		dst.x -= size >> 1;
 
 		if (hpBarsVisible != barSize)
 		{
@@ -200,6 +205,51 @@ void ObjectDrawSystem::DrawSelectedBars(EntityManager& em, const Camera& camera)
 			GraphicsRenderer::DrawRectangle(start, Color32(Colors::Black));
 			start.position.x += 3;
 		}
+
+		// ============= Shield =================
+
+		if (unit.HasShield())
+		{
+			dst.y -= 4;
+
+			int shieldBarsVisible = (int)std::ceil(((float)unit.shield.value * barSize) / (float)unit.maxShield.value);
+
+			if (shieldBarsVisible > 1 && shieldBarsVisible == barSize && unit.shield != unit.shield)
+				--shieldBarsVisible;
+
+			Rectangle barHp = { Vector2Int(dst) + Vector2Int(1,1), Vector2Int(shieldBarsVisible * 3 - 1 ,1) };
+
+			if (shieldBarsVisible != barSize)
+			{
+				auto* greyPalette = &GreyHPBarColorPalette;
+
+				Rectangle greyDst = { {Vector2Int(dst) + Vector2Int(1,1) }, {size,1 } };
+
+				for (int i = 0; i < 3; ++i)
+				{
+					GraphicsRenderer::DrawRectangle(greyDst, Color32(greyPalette->at(i)));
+					++greyDst.position.y;
+				}
+			}
+
+			for (int i = 0; i < 3; ++i)
+			{
+				GraphicsRenderer::DrawRectangle(barHp, Color32(ShieldColor));
+				++barHp.position.y;
+			}
+
+			Rectangle16 rect = { dst,Vector2Int16(size + 2,5) };
+			Util::DrawTransparentRectangle(rect, 1, Colors::Black);
+
+			Rectangle start = { Vector2Int(dst) + Vector2Int(3,1), Vector2Int(1,3) };
+
+			for (int i = 1; i < barSize; ++i)
+			{
+				GraphicsRenderer::DrawRectangle(start, Color32(Colors::Black));
+				start.position.x += 3;
+			}
+		}
+
 	}
 }
 

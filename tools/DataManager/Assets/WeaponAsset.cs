@@ -32,6 +32,12 @@ namespace DataManager.Assets
 		[Binary(BinaryType.String, 32)]
 		public string Name { get; set; } = string.Empty;
 
+		[DefaultEditor]
+		[Optional]
+		[Binary(BinaryType.UInt, 2)]
+		public int Attacks { get; set; } = 1;
+
+
 		[Section("Sounds")]
 		[DefaultEditor]
 		[Binary(BinaryType.AssetRef, 2)]

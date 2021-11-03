@@ -14,13 +14,19 @@ class EntityManagerUpdateCrt :public CoroutineImpl {
 	SectionProfiler _p = SectionProfiler("none");
 	SectionProfiler _updateProfiler = SectionProfiler("Update");
 
+	bool _profileStats = false;
+
 	void BeignProfile(const char* name)
 	{
+		if (!_profileStats) return;
+
 		_p = SectionProfiler(name);
 		_p.statMinThreshold = 0;
 	}
 	void EndProfile()
 	{
+		if (!_profileStats) return;
+
 		_p.Submit();
 	}
 public:

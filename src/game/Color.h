@@ -133,7 +133,4 @@ namespace Colors {
 	constexpr Color MapFriendly = { 0x0dff16ff };
 	constexpr Color MapResource = { 0x00e4fcff };
 
-
-
-
 }
