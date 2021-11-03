@@ -2,6 +2,7 @@
 
 #include "EntityUtil.h"
 #include "EntityManager.h"
+#include "../Data/GameDatabase.h"
 #include "../Debug.h"
 
 static constexpr const uint8_t ShieldRegen = 7;
@@ -142,12 +143,12 @@ void UnitSystem::ProcessUnitEvents(EntityManager& em)
 	{
 		if (unit.shield < unit.maxShield)
 		{
+			uint8_t old = unit.shieldRegen;
 			unit.shieldRegen += ShieldRegen;
 
-			if (unit.shieldRegen > 127)
+			if (unit.shieldRegen < old)
 			{
-				++unit.shield.value;
-				unit.shieldRegen -= 127;
+				unit.shield.value += 2;
 			}
 		}
 	}
@@ -176,6 +177,18 @@ void UnitSystem::ProcessUnitEvents(EntityManager& em)
 			short shieldDamage = std::min(target.shield.value, damage.value);
 			target.shield.value -= shieldDamage;
 			damage.value -= shieldDamage;
+
+			uint8_t orientation = EntityUtil::GetOrientationToPosition(ai.targetEntity, em.GetPosition(id));
+
+			Vector2Int16 pos = em.GetPosition(ai.targetEntity);
+			auto dst = Vector2(em.GetPosition(id)) - Vector2(pos);
+			dst.Normalize();
+			dst *= 8;
+			pos += Vector2Int16(dst);
+
+			EntityId id = EntityUtil::SpawnSprite(*GameDatabase::instance->ProtossShieldSprite, pos, orientation);
+		
+			em.DrawSystem.GetComponent(id).depth = em.DrawSystem.GetComponent(ai.targetEntity).depth + 1;
 		}
 	
 		if (damage.value > 0)

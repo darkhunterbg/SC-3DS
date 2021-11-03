@@ -58,6 +58,7 @@ public:
 	const AbilityDef* StopAbility = nullptr;
 	const AbilityDef* PatrolAbility = nullptr;
 	const AbilityDef* HoldPositionAbility = nullptr;
+	const SpriteDef* ProtossShieldSprite = nullptr;
 
 	GameDatabase();
 	GameDatabase(const GameDatabase&) = delete;

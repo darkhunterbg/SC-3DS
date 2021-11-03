@@ -88,5 +88,10 @@
     "Mode": 0,
     "IgnorePCXPalette": true,
     "Path": "glue/**/*.pcx"
+  },
+  {
+    "Mode": 7,
+    "IgnorePCXPalette": true,
+    "Path": "unit/thingy/pshield.grp"
   }
 ]

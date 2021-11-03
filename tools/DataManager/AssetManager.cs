@@ -180,6 +180,12 @@ namespace DataManager
 
 		public void ReloadAssets()
 		{
+			foreach(var a in loadedSheetImages) {
+				a.Value.ForEach(f => f.Dispose());
+			}
+
+			loadedSheetImages.Clear();
+
 			foreach (var db in Assets.Values)
 				db.Reload();
 

@@ -193,6 +193,9 @@ public: GameDatabaseLoadAsetReferencesCrt(GameDatabase* db) : db(db) {}
 		  db->PatrolAbility = db->GetAbility("Generic\\Patrol");
 		  db->HoldPositionAbility = db->GetAbility("Generic\\Hold Position");
 
+		  db->ProtossShieldSprite = &(*(std::find_if(db->SpriteDefs.cbegin(), db->SpriteDefs.cend(), []( const SpriteDef& def) {
+			  return   strcmp(def.name, "Thingy\\ProtossShield") == 0;
+			  })));
 	  }
 	  CRT_END();
 };
