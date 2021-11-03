@@ -19,7 +19,7 @@ namespace DataManager.Panels
         {
             DataSource = AppGame.AssetManager.GetAssets<TAsset>(),
         };
-        private TablePropertyEditor propertyEditor = new TablePropertyEditor("propertyEditor");
+        private TablePropertyEditor propertyEditor = new TablePropertyEditor($"{typeof(TAsset).Name}.propertyEditor");
 
 
         public AssetTreeEditor(string itemName, string rootName, string windowName)

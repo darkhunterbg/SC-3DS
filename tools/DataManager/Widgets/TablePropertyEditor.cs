@@ -56,7 +56,7 @@ namespace DataManager.Widgets
 		private void RebindItem()
 		{
 			sections.Clear();
-	
+
 			if (editItem == null)
 				return;
 
@@ -72,11 +72,9 @@ namespace DataManager.Widgets
 			var editorProperties = type.GetProperties().Where(t => t.GetCustomAttribute<EditorAttribute>() != null).ToList();
 
 			Section current = sections.Last();
-			foreach (var p in editorProperties)
-			{
+			foreach (var p in editorProperties) {
 				var sectAttr = p.GetCustomAttribute<SectionAttribute>();
-				if (sectAttr != null)
-				{
+				if (sectAttr != null) {
 					current = new Section()
 					{
 						Name = sectAttr.Name
@@ -86,15 +84,13 @@ namespace DataManager.Widgets
 
 				var editorAttr = p.GetCustomAttribute<EditorAttribute>();
 
-				if (editorAttr is ArrayEditorAttribute arrayAttr)
-				{
+				if (editorAttr is ArrayEditorAttribute arrayAttr) {
 					var arrayElemType = p.PropertyType.GetElementType();
 					var array = p.GetValue(target) as Array;
 
 					string prevSectionName = current.Name;
 
-					for (int i = 0; i < arrayAttr.ArraySize; ++i)
-					{
+					for (int i = 0; i < arrayAttr.ArraySize; ++i) {
 						if (array.GetValue(i) == null)
 							array.SetValue(Activator.CreateInstance(arrayElemType), i);
 
@@ -102,15 +98,13 @@ namespace DataManager.Widgets
 
 						current = new Section()
 						{
-							Name = string.IsNullOrEmpty(prevSectionName) ? sectionName :  $"{prevSectionName}\\{sectionName}"
+							Name = string.IsNullOrEmpty(prevSectionName) ? sectionName : $"{prevSectionName}\\{sectionName}"
 						};
 						sections.Add(current);
 
 						CollectFields(array.GetValue(i), arrayElemType);
 					}
-				}
-				else
-				{
+				} else {
 					current.editorAttributes.Add(editorAttr);
 					current.editorProperties.Add(p);
 					current.editorDrawers.Add(EditorPropertyDrawer.GetPropertyDrawer(p, editorAttr));
@@ -131,8 +125,7 @@ namespace DataManager.Widgets
 
 			rowIndex = 0;
 			int i = 0;
-			foreach (var section in sections)
-			{
+			foreach (var section in sections) {
 				ImGui.PushID(++i);
 				DrawSection(section);
 				ImGui.PopID();
@@ -143,7 +136,7 @@ namespace DataManager.Widgets
 
 		private void DrawSection(Section section)
 		{
-			if (!ImGui.BeginTable(id, 2,  ImGuiTableFlags.BordersOuter ))
+			if (!ImGui.BeginTable($"{id}.{section.Name}", 2, ImGuiTableFlags.BordersOuter))
 				return;
 
 			ImGui.TableSetupScrollFreeze(0, 1);
@@ -151,11 +144,10 @@ namespace DataManager.Widgets
 			ImGui.TableSetupColumn(section.Name, ImGuiTableColumnFlags.WidthFixed, 200);
 			ImGui.TableSetupColumn(string.Empty);
 
-			ImGui.TableHeadersRow();
+			if (section.Name != "Properties")
+				ImGui.TableHeadersRow();
 
-
-			for (int i = 0; i < section.editorProperties.Count; ++i)
-			{
+			for (int i = 0; i < section.editorProperties.Count; ++i) {
 				++rowIndex;
 				ImGui.TableNextRow();
 

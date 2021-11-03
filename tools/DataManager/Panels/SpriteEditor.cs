@@ -45,7 +45,7 @@ namespace DataManager.Panels
 			RootName = "Sprites"
 		};
 
-		private TablePropertyEditor propertyEditor = new TablePropertyEditor("propertyEditor");
+		private TablePropertyEditor propertyEditor = new TablePropertyEditor("sprite.propertyEditor");
 
 		public SpriteEditor()
 		{

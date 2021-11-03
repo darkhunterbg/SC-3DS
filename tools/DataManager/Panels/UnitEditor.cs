@@ -20,7 +20,7 @@ namespace DataManager.Panels
             RootName = "Units",
             DataSource = AppGame.AssetManager.GetAssets<UnitAsset>(),
         };
-        private TablePropertyEditor propertyEditor = new TablePropertyEditor("propertyEditor");
+        private TablePropertyEditor propertyEditor = new TablePropertyEditor("unit.propertyEditor");
         private SpriteView spriteView = new SpriteView()
         {
             ShowSelection = true,

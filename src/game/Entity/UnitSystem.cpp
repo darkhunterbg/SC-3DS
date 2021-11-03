@@ -4,6 +4,11 @@
 #include "EntityManager.h"
 #include "../Debug.h"
 
+static constexpr const uint8_t ShieldRegen = 7;
+static constexpr const uint8_t EnergyRegen = 8;
+static constexpr const uint8_t HealthRegen = 4;
+static constexpr const uint8_t StructureBurning = 20;
+
 UnitSystem::UnitSystem()
 {
 	UnitAIStateMachine::CreateStates(_aiStates);
@@ -102,7 +107,6 @@ void UnitSystem::PrepareUnitAI(EntityManager& em)
 
 	_aiUpdatesCompleted = 0;
 }
-
 bool UnitSystem::UpdateUnitAI(EntityManager& em)
 {
 	// Todo: have 2 states list, for enter state and for think to avid ifs
@@ -132,14 +136,13 @@ bool UnitSystem::UpdateUnitAI(EntityManager& em)
 	return _aiUpdatesCompleted == _aiStates.size();
 }
 
-
 void UnitSystem::ProcessUnitEvents(EntityManager& em)
 {
 	for (UnitComponent& unit : _unitComponents.GetComponents())
 	{
 		if (unit.shield < unit.maxShield)
 		{
-			unit.shieldRegen += 8;
+			unit.shieldRegen += ShieldRegen;
 
 			if (unit.shieldRegen > 127)
 			{
@@ -228,8 +231,6 @@ void UnitSystem::UnitKillEvent(EntityId id)
 	if (std::find(_unitDieEvents.begin(), _unitDieEvents.end(), id) == _unitDieEvents.end())
 		_unitDieEvents.push_back(id);
 }
-
-
 void UnitSystem::UnitAttackEvent(EntityId id)
 {
 	GAME_ASSERT(_aiComponents.HasComponent(id), "[UnitAttackEvent] Entity %i does not have AI!");

@@ -92,6 +92,7 @@ namespace DataManager.Widgets
 
 			ImGui.TableHeadersRow();
 
+
 			foreach (var item in DataSource.ToList())
 			{
 				ImGui.TableNextRow();
@@ -105,7 +106,6 @@ namespace DataManager.Widgets
 
 		private void TableRow(TItem item)
 		{
-
 			int itemId = (int)uniqueKeyField.GetValue(item);
 
 			ImGui.PushID(itemId);
