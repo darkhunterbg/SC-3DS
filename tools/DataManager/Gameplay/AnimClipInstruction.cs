@@ -197,6 +197,9 @@ namespace DataManager.Gameplay
 		public static readonly AnimClipInstruction SpawnSprite = new AnimClipInstruction("sprite", (state, p) => true,
 		NewParam<SpriteAsset>("sprite"));
 
+		public static readonly AnimClipInstruction SpawnSpriteBackground = new AnimClipInstruction("spriteback", (state, p) => true,
+		NewParam<SpriteAsset>("sprite"));
+
 		public static readonly AnimClipInstruction Destroy = new AnimClipInstruction("destroy", (state, p) => true);
 
 		public static readonly Dictionary<string, AnimClipInstruction> Instructions = new Dictionary<string, AnimClipInstruction>();

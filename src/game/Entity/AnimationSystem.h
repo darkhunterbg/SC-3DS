@@ -29,6 +29,7 @@ class AnimationSystem: public IEntitySystem {
 	struct SpawnSprite {
 		const SpriteDef* def;
 		Vector2Int16 pos;
+		int8_t depth;
 	};
 
 	EntityComponentMap<AnimationComponent> _animComponents;
@@ -52,11 +53,11 @@ public:
 	virtual void DeleteEntities(std::vector<EntityId>& entities) override;
 	virtual size_t ReportMemoryUsage() override;
 
-	void RegisterSpawnSprite(const SpriteDef& def, Vector2Int16 pos)
+	inline void RegisterSpawnSprite(const SpriteDef& def, Vector2Int16 pos, int8_t depth )
 	{
-		_spawnSprites.push_back({ &def ,pos });
+		_spawnSprites.push_back({ &def ,pos, depth });
 	}
-	void RegisterDestroy(EntityId id)
+	inline void RegisterDestroy(EntityId id)
 	{
 		_destroy.push_back(id);
 	}

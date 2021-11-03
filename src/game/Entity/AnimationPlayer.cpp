@@ -36,7 +36,7 @@ static void Frame(const InstructionParams& params, EntityId id, EntityManager& e
 }
 static void Wait(const InstructionParams& params, EntityId id, EntityManager& em)
 {
-	em.AnimationSystem.GetComponent(id).wait = params.shorts[0] ;
+	em.AnimationSystem.GetComponent(id).wait = params.shorts[0];
 }
 static void WaitRandom(const InstructionParams& params, EntityId id, EntityManager& em)
 {
@@ -82,9 +82,20 @@ static void SpawnSprite(const InstructionParams& params, EntityId id, EntityMana
 {
 	unsigned defId = params.shorts[0];
 	const SpriteDef& def = GameDatabase::instance->SpriteDefs[defId];
+	int8_t depth = em.DrawSystem.GetComponent(id).depth;
 
-	em.AnimationSystem.RegisterSpawnSprite(def, em.GetPosition(id));
+	em.AnimationSystem.RegisterSpawnSprite(def, em.GetPosition(id), depth);
 }
+
+static void SpawnSpriteBackground(const InstructionParams& params, EntityId id, EntityManager& em)
+{
+	unsigned defId = params.shorts[0];
+	const SpriteDef& def = GameDatabase::instance->SpriteDefs[defId];
+	int8_t depth = em.DrawSystem.GetComponent(id).depth;
+
+	em.AnimationSystem.RegisterSpawnSprite(def, em.GetPosition(id), depth - 1);
+}
+
 
 static void Destroy(const InstructionParams& params, EntityId id, EntityManager& em)
 {
@@ -95,7 +106,7 @@ static void Destroy(const InstructionParams& params, EntityId id, EntityManager&
 
 static InstructionAction instructionMap[] =
 {
-	Frame, Wait, WaitRandom, Face, TurnCW, TurnCCW, GoTo, Attack, PlaySound, SpawnSprite, Destroy
+	Frame, Wait, WaitRandom, Face, TurnCW, TurnCCW, GoTo, Attack, PlaySound, SpawnSprite, SpawnSpriteBackground, Destroy
 };
 
 void AnimationPlayer::RunAnimation(AnimationComponent& anim, EntityId id, EntityManager& em)

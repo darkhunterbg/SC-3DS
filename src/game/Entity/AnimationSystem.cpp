@@ -30,7 +30,8 @@ void AnimationSystem::RunAnimations(EntityManager& em)
 
 	for (auto& sprite : _spawnSprites)
 	{
-		EntityUtil::SpawnSprite(*sprite.def, sprite.pos);
+		EntityId id =EntityUtil::SpawnSprite(*sprite.def, sprite.pos);
+		em.DrawSystem.GetComponent(id).depth = sprite.depth;
 	}
 
 	if (_destroy.size() > 0)

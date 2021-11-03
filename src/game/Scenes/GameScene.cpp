@@ -82,9 +82,9 @@ void GameScene::Start()
 	const auto& def = *GameDatabase::instance->GetUnit("Terran\\Units\\Marine");
 
 	int i = 0;
-	for (int y = 1; y < 10; ++y)
+	for (int y = 1; y < 3; ++y)
 	{
-		for (int x = 1; x < 10; ++x)
+		for (int x = 1; x < 2; ++x)
 		{
 			EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ x * 32 ,y * 32 }));
 		}

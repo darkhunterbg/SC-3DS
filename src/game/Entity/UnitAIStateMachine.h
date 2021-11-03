@@ -43,9 +43,10 @@ enum class UnitAIStateId :uint8_t {
 	IdlePassive = 1,
 	AttackTarget = 2,
 	AttackLoop = 3,
+	AttackExit = 4,
 };
 
-static constexpr const int UnitAIStateTypeCount = 4;
+static constexpr const int UnitAIStateTypeCount = 5;
 
 struct UnitAIState {
 public:
@@ -94,6 +95,8 @@ private:
 
 	static void AttackLoopEnter(UnitAIEnterStateData& data, EntityManager& em);
 	static void AttackLoopThink(UnitAIThinkData& data, EntityManager& em);
-
+	
+	static void EndAttackEnter(UnitAIEnterStateData& data, EntityManager& em);
+	static void EndAttackThink(UnitAIThinkData& data, EntityManager& em);
 };
 

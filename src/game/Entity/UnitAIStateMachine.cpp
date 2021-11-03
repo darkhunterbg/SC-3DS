@@ -86,14 +86,16 @@ void UnitAIStateMachine::CreateStates(std::vector< UnitAIState*>& states)
 	states[(int)UnitAIStateId::IdlePassive] = new UnitAIState(IdleEnter, nullptr);
 	states[(int)UnitAIStateId::AttackTarget] = new UnitAIState(nullptr, AttackTargetThink);
 	states[(int)UnitAIStateId::AttackLoop] = new UnitAIState(AttackLoopEnter, AttackLoopThink);
+	states[(int)UnitAIStateId::AttackExit] = new UnitAIState(EndAttackEnter, EndAttackThink);
 }
 
 
 
 void UnitAIStateMachine::IdleEnter(UnitAIEnterStateData& data, EntityManager& em)
 {
-	for (EntityId id : data.entities)
+	for (int i = data.start; i < data.end; ++i)
 	{
+		EntityId id = data.entities[i];
 		const UnitComponent& unit = em.UnitSystem.GetComponent(id);
 		const UnitDef& def = *unit.def;
 		EntityUtil::PlayAnimation(id, *def.Art.GetSprite().GetAnimation(AnimationType::Init), def.Art.GetShadowImage());
@@ -163,8 +165,9 @@ void UnitAIStateMachine::AttackTargetThink(UnitAIThinkData& data, EntityManager&
 
 void UnitAIStateMachine::AttackLoopEnter(UnitAIEnterStateData& data, EntityManager& em)
 {
-	for (EntityId id : data.entities)
+	for (int i = data.start; i < data.end; ++i)
 	{
+		EntityId id = data.entities[i];
 		const UnitComponent& unit = em.UnitSystem.GetComponent(id);
 		const UnitDef& def = *unit.def;
 		EntityUtil::PlayAnimation(id, *def.Art.GetSprite().GetAnimation(AnimationType::GroundAttackRepeat), def.Art.GetShadowImage());
@@ -200,9 +203,48 @@ void UnitAIStateMachine::AttackLoopThink(UnitAIThinkData& data, EntityManager& e
 		}
 		else
 		{
-			SetUnitAIState(id, em.UnitSystem.GetAIComponent(id).idleStateId);
+			SetUnitAIState(id, UnitAIStateId::AttackExit);
 			// TODO: AI system support wait for animation flag, blocking updates of AI until animation is completed
 			continue;
 		}
+	}
+}
+
+void UnitAIStateMachine::EndAttackEnter(UnitAIEnterStateData& data, EntityManager& em)
+{
+	for (int i = data.start; i < data.end; ++i)
+	{
+		EntityId id = data.entities[i];
+		const UnitComponent& unit = em.UnitSystem.GetComponent(id);
+		const UnitDef& def = *unit.def;
+		EntityUtil::PlayAnimation(id, *def.Art.GetSprite().GetAnimation(AnimationType::GroundAttackToIdle), def.Art.GetShadowImage());
+	}
+}
+
+void UnitAIStateMachine::EndAttackThink(UnitAIThinkData& data, EntityManager& em)
+{
+	for (int i = data.start; i < data.end; ++i)
+	{
+		EntityId id = data.entities[i];
+		const UnitComponent& unit = em.UnitSystem.GetComponent(id);
+		const UnitDef& def = *unit.def;
+
+
+
+		Vector2Int16 pos = em.GetPosition(id);
+		PlayerId owner = em.UnitSystem.GetComponent(id).owner;
+		EntityId enemy = DetectNearbyEnemy(id, pos, owner, em);
+
+		if (enemy != Entity::None)
+		{
+			em.UnitSystem.GetAIComponent(id).targetEntity = enemy;
+			SetUnitAIState(id, UnitAIStateId::AttackTarget);
+		}
+		else
+		{
+			if (em.AnimationSystem.GetComponent(id).done)
+				SetUnitAIState(id, em.UnitSystem.GetAIComponent(id).idleStateId);
+		}
+
 	}
 }
