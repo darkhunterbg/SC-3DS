@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using Color = Microsoft.Xna.Framework.Color;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
@@ -14,7 +15,7 @@ namespace DataManager.Assets
 		public int x, y, color;
 	}
 
-	public class GRPFrame 
+	public class GRPFrame
 	{
 		public int XOffset;
 		public int YOffset;
@@ -27,16 +28,14 @@ namespace DataManager.Assets
 
 		static int MinTexSize = 128;
 
-	
+
 		public void DrawTo(Texture2D texture, Palette palette)
 		{
 			int w = Math.Min(Width, texture.Width);
 			int h = Math.Min(Height, texture.Height);
 			Color[] data = new Color[w * h];
-			for (int x = 0; x < w; ++x)
-			{
-				for (int y = 0; y < h; ++y)
-				{
+			for (int x = 0; x < w; ++x) {
+				for (int y = 0; y < h; ++y) {
 					int i = Pixels[x, y];
 					if (i == 0)
 						continue;
@@ -53,10 +52,8 @@ namespace DataManager.Assets
 		{
 			Texture2D b = new Texture2D(AppGame.Device, Width, Height);
 			Color[] data = new Color[Width * Height];
-			for (int x = 0; x < Width; ++x)
-			{
-				for (int y = 0; y < Height; ++y)
-				{
+			for (int x = 0; x < Width; ++x) {
+				for (int y = 0; y < Height; ++y) {
 					int i = Pixels[x, y];
 					if (i == 0)
 						continue;
@@ -74,48 +71,45 @@ namespace DataManager.Assets
 		{
 			List<int> wireFrameColors = new List<int>();
 
-			for (int x = 0; x < Width; ++x)
-			{
-				for (int y = 0; y < Height; ++y)
-				{
+			for (int x = 0; x < Width; ++x) {
+				for (int y = 0; y < Height; ++y) {
 					int i = Pixels[x, y];
 					if (i == 0)
 						continue;
 
-					if (!wireFrameColors.Contains(i) && i > 200)
+					if (!wireFrameColors.Contains(i) && i > 0)
 						wireFrameColors.Add(i);
 				}
 			}
 
+			//List<Texture2D> images = new List<Texture2D>();
+
+			//Texture2D b = new Texture2D(AppGame.Device, Width, Height);
+			//images.Add(b);
+			//Color[] data = new Color[Width * Height];
+			//for (int x = 0; x < Width; ++x)
+			//{
+			//	for (int y = 0; y < Height; ++y)
+			//	{
+			//		int i = Pixels[x, y];
+			//		if (i == 0 || wireFrameColors.Contains(i))
+			//			continue;
+
+			//		Color c = palette.Colors[i];
+			//		data[x + y * Width] = c;
+			//	}
+			//}
+
+			//b.SetData(data);
+
 			List<Texture2D> images = new List<Texture2D>();
 
-			Texture2D b = new Texture2D(AppGame.Device, Width, Height);
-			images.Add(b);
-			Color[] data = new Color[Width * Height];
-			for (int x = 0; x < Width; ++x)
-			{
-				for (int y = 0; y < Height; ++y)
-				{
-					int i = Pixels[x, y];
-					if (i == 0 || wireFrameColors.Contains(i))
-						continue;
+			foreach (int j in wireFrameColors) {
+				Texture2D b = new Texture2D(AppGame.Device, Width, Height);
 
-					Color c = palette.Colors[i];
-					data[x + y * Width] = c;
-				}
-			}
-
-			b.SetData(data);
-
-			foreach (int j in wireFrameColors)
-			{
-				b = new Texture2D(AppGame.Device, Width, Height);
-				images.Add(b);
-				data = new Color[Width * Height];
-				for (int x = 0; x < Width; ++x)
-				{
-					for (int y = 0; y < Height; ++y)
-					{
+				Color[] data = new Color[Width * Height];
+				for (int x = 0; x < Width; ++x) {
+					for (int y = 0; y < Height; ++y) {
 						int i = Pixels[x, y];
 
 						if (i != j)
@@ -125,6 +119,14 @@ namespace DataManager.Assets
 					}
 				}
 
+				if (data.All(a => a == Color.Transparent)) {
+					b.Dispose();
+					continue;
+				}
+
+				images.Add(b);
+
+
 				b.SetData(data);
 			}
 			return images;
@@ -133,10 +135,8 @@ namespace DataManager.Assets
 
 		public bool UsesRemappedColors(Palette palette)
 		{
-			for (int x = 0; x < Width; ++x)
-			{
-				for (int y = 0; y < Height; ++y)
-				{
+			for (int x = 0; x < Width; ++x) {
+				for (int y = 0; y < Height; ++y) {
 					int i = Pixels[x, y];
 					if (palette.RemappedIndexes.Contains(i))
 						return true;
@@ -150,10 +150,8 @@ namespace DataManager.Assets
 		{
 			Texture2D b = new Texture2D(AppGame.Device, Width, Height);
 			var data = new Color[Width * Height];
-			for (int x = 0; x < Width; ++x)
-			{
-				for (int y = 0; y < Height; ++y)
-				{
+			for (int x = 0; x < Width; ++x) {
+				for (int y = 0; y < Height; ++y) {
 					int i = Pixels[x, y];
 					if (!(palette.RemappedIndexes.Contains(i)))
 						continue;
@@ -175,7 +173,7 @@ namespace DataManager.Assets
 
 		public GRPFrame Preview => Frames[0];
 
-		public  string Path { get; }
+		public string Path { get; }
 
 		// https://sourceforge.net/p/stratlas/wiki/GRP/
 
@@ -193,8 +191,7 @@ namespace DataManager.Assets
 			MaxHeight = BitConverter.ToInt16(data.AsSpan(i, 2));
 			i += 2;
 
-			for (int f = 0; f < NumberOfFrames; ++f)
-			{
+			for (int f = 0; f < NumberOfFrames; ++f) {
 				GRPFrame frame = new GRPFrame();
 				Frames.Add(frame);
 
@@ -217,25 +214,20 @@ namespace DataManager.Assets
 		{
 			int offset = frame.DataOffset;
 			List<int> imagRowOffsets = new List<int>();
-			for (int i = 0; i < frame.Height; ++i)
-			{
+			for (int i = 0; i < frame.Height; ++i) {
 				int rowOffset = BitConverter.ToUInt16(data.AsSpan(offset + i * 2, 2));
 				imagRowOffsets.Add(rowOffset);
 			}
 
 
-			for (int y = 0; y < frame.Height; ++y)
-			{
+			for (int y = 0; y < frame.Height; ++y) {
 				offset = frame.DataOffset + imagRowOffsets[y];
 
 				int x = 0;
-				while (x < frame.Width)
-				{
+				while (x < frame.Width) {
 					byte raw = data[offset++];
-					if ((raw & 0x80) == 0)
-					{
-						if ((raw & 0x40) > 0)
-						{
+					if ((raw & 0x80) == 0) {
+						if ((raw & 0x40) > 0) {
 
 							raw &= 0x3F;
 							byte converterdPacket = data[offset++];
@@ -247,8 +239,7 @@ namespace DataManager.Assets
 							Pixel p = default;
 							p.x = x;
 
-							do
-							{
+							do {
 								p.y = y;
 								p.color = converterdPacket;
 								frame.Pixels[p.x, p.y] = p.color;
@@ -257,12 +248,9 @@ namespace DataManager.Assets
 							while (--operationCounter > 0);
 
 							x += raw;
-						}
-						else
-						{
+						} else {
 							int operationCounter = raw;
-							do
-							{
+							do {
 								byte converterdPacket = data[offset++];
 								Pixel p = default;
 								p.x = x;
@@ -273,9 +261,7 @@ namespace DataManager.Assets
 							}
 							while (--operationCounter > 0);
 						}
-					}
-					else
-					{
+					} else {
 						raw &= 0x7F;
 						x += raw;
 					}
@@ -306,7 +292,7 @@ namespace DataManager.Assets
 
 		public void Dispose()
 		{
-			
+
 		}
 
 		public void GUIPreview(GuiTexture src)

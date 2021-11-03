@@ -158,6 +158,8 @@ void UnitSystem::ProcessUnitEvents(EntityManager& em)
 		UnitComponent& unit = GetComponent(id);
 		UnitAIComponent& ai = GetAIComponent(id);
 
+		if (ai.targetEntity == Entity::None) continue;
+
 		auto& attack = unit.def->GetAttacks()[ai.attackId];
 		auto sound = attack.GetWeapon()->GetSpawnSound();
 
@@ -166,9 +168,14 @@ void UnitSystem::ProcessUnitEvents(EntityManager& em)
 			EntityUtil::GetManager().SoundSystem.PlayWorldSound(*sound, EntityUtil::GetManager().GetPosition(id));
 		}
 
+
 		UnitComponent& target = GetComponent(ai.targetEntity);
 
-		if (target.IsDead()) continue;
+		if (target.IsDead())
+		{
+			ai.targetEntity = Entity::None;
+			continue;
+		}
 
 		auto damage = unit.damage[ai.attackId];
 
@@ -202,6 +209,7 @@ void UnitSystem::ProcessUnitEvents(EntityManager& em)
 		if (target.IsDead())
 		{
 			_unitDieEvents.push_back(ai.targetEntity);
+			ai.targetEntity = Entity::None;
 			++unit.kills;
 		}
 	}

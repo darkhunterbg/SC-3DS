@@ -7,6 +7,8 @@
 #include "../StringLib.h"
 #include "../Platform.h"
 
+#include <array>
+
 struct UnitItemInfo {
 	const ImageFrame* sprite;
 	uint8_t counter;
@@ -15,7 +17,7 @@ struct UnitItemInfo {
 	int stat = 0;
 };
 
-void static GetUnitWireframeColors(EntityId id, const UnitComponent& unit, Color outColors[4])
+static void GetUnitWireframeColors(EntityId id, const UnitComponent& unit, std::array<Color, 6>& outColors)
 {
 	static Color wfStateColor[3] = { Colors::UIGreen, Colors::UIYellow, Colors::UIRed };
 	int wfPartsState[4] = { 0,0,0,0 };
@@ -65,18 +67,53 @@ void static GetUnitWireframeColors(EntityId id, const UnitComponent& unit, Color
 
 	if (unit.HasShield())
 	{
-		int shieldState = ((unit.shield.value * 3) / unit.maxShield.value);
-		if (unit.shield.value > 0)
-			++shieldState;
+		int shieldState = ((unit.shield.value * 7) / unit.maxShield.value);
+		/*	if (unit.shield.value > 0)
+				++shieldState;*/
 
-		outColors[0] = Colors::White;
-		outColors[0].a = (shieldState) / 4.0f;
+		outColors[0] = Colors::UIBlue;
+		outColors[1] = Colors::UIBlue;
+
+		outColors[0].a = 0;
+		outColors[1].a = 0;
+
+
+		if (shieldState > 6)
+			shieldState = 6;
+
+		if (shieldState > 3)
+		{
+			outColors[0].a = ((float)(shieldState - 1)) * 0.2f;
+			outColors[0].a += 0.6f;
+			shieldState = 3;
+		}
+
+		if (shieldState > 0)
+		{
+			outColors[1].a = ((float)(shieldState - 1)) * 0.2f;
+			outColors[1].a += 0.6f;
+		}
+
+
+
+		/*	for (int i = 0; i < 3; ++i)
+			{
+				if(shieldState > i)
+					outColors[1].a += 0.34f;
+			}
+
+			for (int i = 3; i < 6; ++i)
+			{
+				if (shieldState > i)
+					outColors[0].a += 0.34f;
+			}*/
+
 	}
 
 
-	for (int i = 1; i < 5; ++i)
+	for (int i = 0; i < 4; ++i)
 	{
-		outColors[i] = wfStateColor[wfPartsState[i - 1]];
+		outColors[i + 2] = wfStateColor[wfPartsState[i]];
 	}
 }
 
@@ -143,15 +180,15 @@ void SelectionInfoPanel::DrawMultiselection(std::vector<EntityId>& selection)
 		GUI::BeginRelativeLayout(offset, Vector2Int(f.size), GUIHAlign::Left, GUIVAlign::Top);
 		GUIImage::DrawImageFrame(f);
 
-		Color wfColor[5];
+		std::array<Color, 6> wfColor;
 		GetUnitWireframeColors(id, unit, wfColor);
 
 
 		int wireframeStart = 0;
 		if (!unit.HasShield())
-			++wireframeStart;
+			wireframeStart += 2;
 
-		for (int i = wireframeStart; i < 5; ++i)
+		for (int i = wireframeStart; i < wfColor.size(); ++i)
 		{
 			const auto& img = unit.def->Art.GetWireframe()->group.GetImage();
 			const auto& wfPart = img.GetFrame(i);
@@ -303,20 +340,19 @@ void SelectionInfoPanel::DrawUnitInfo(EntityId id)
 
 	GUILabel::DrawText(font, _buffer, { xOffset,64 }, GUIHAlign::Center, GUIVAlign::Top, hpColor);
 
-	//GUILabel::DrawText(font, _buffer, { 0,72 }, GUIHAlign::Center, GUIVAlign::Top, hpColor);
-	//GUILabel::DrawText(font, _buffer, { 0,80 }, GUIHAlign::Center, GUIVAlign::Top, hpColor);
 	// ================== Wireframe ========================
 
-	Color wfColor[5];
+	std::array<Color, 6> wfColor;
 	GetUnitWireframeColors(id, unit, wfColor);
 
-	int offset = 0;
+
+	int wireframeStart = 0;
 	if (!unit.HasShield())
-		++offset;
+		wireframeStart += 2;
 
 	const auto& img = unit.def->Art.GetWireframe()->detail.GetImage();
 	GUI::BeginRelativeLayout(Vector2Int{ 0,0 }, Vector2Int(img.GetSize()), GUIHAlign::Center, GUIVAlign::Top);
-	for (int i = offset; i < 5; ++i)
+	for (int i = wireframeStart; i < wfColor.size(); ++i)
 	{
 		const auto& img = unit.def->Art.GetWireframe()->detail.GetImage();
 		const auto& wfPart = img.GetFrame(i);

@@ -212,10 +212,10 @@ void ObjectDrawSystem::DrawSelectedBars(EntityManager& em, const Camera& camera)
 		{
 			dst.y -= 4;
 
-			int shieldBarsVisible = (int)std::ceil(((float)unit.shield.value * barSize) / (float)unit.maxShield.value);
+			int shieldBarsVisible = (int)std::roundf(((float)unit.shield.value * barSize) / (float)unit.maxShield.value);
 
-			if (shieldBarsVisible > 1 && shieldBarsVisible == barSize && unit.shield != unit.shield)
-				--shieldBarsVisible;
+		/*	if (shieldBarsVisible > 1 && shieldBarsVisible == barSize && unit.shield != unit.shield)
+				--shieldBarsVisible;*/
 
 			Rectangle barHp = { Vector2Int(dst) + Vector2Int(1,1), Vector2Int(shieldBarsVisible * 3 - 1 ,1) };
 
