@@ -50,6 +50,16 @@ static bool OnPosition(EntityId id, Vector2Int16 pos, Vector2Int16 target)
 {
 	return  (target - pos).LengthSquaredInt() < 25;
 }
+static bool IsTargetInAttackRange(EntityId id, EntityId target, Vector2Int16 pos, EntityManager& em)
+{
+	int dst = (em.GetPosition(target) - pos).LengthSquaredInt();
+	auto& attack = em.UnitSystem.GetComponent(id).def->GetAttacks()[0];
+	int atk = attack.MaxRange + 1;
+	atk = atk << 5;
+
+	bool inRange = dst <= atk * atk;
+	return inRange;
+}
 
 void UnitAIState::StartEnterState(int batch)
 {
@@ -130,6 +140,14 @@ void UnitAIStateMachine::AttackTargetThink(UnitAIThinkData& data, EntityManager&
 		{
 			const UnitComponent& unit = em.UnitSystem.GetComponent(id);
 			const UnitDef& def = *unit.def;
+
+			if (!IsTargetInAttackRange(id, enemy, pos, em))
+			{
+				em.UnitSystem.GetAIComponent(id).targetPosition = em.GetPosition(enemy);
+				EntityUtil::SetUnitAIState(id, UnitAIStateId::Walk);
+				continue;
+			}
+
 
 			uint8_t orientation = EntityUtil::GetOrientationToPosition(id, em.GetPosition(enemy));
 
@@ -260,7 +278,7 @@ void UnitAIStateMachine::GoToThink(UnitAIThinkData& data, EntityManager& em)
 	{
 		EntityId id = data.entities[i];
 		const UnitComponent& unit = em.UnitSystem.GetComponent(id);
-		 UnitAIComponent& ai = em.UnitSystem.GetAIComponent(id);
+		UnitAIComponent& ai = em.UnitSystem.GetAIComponent(id);
 		const UnitDef& def = *unit.def;
 		Vector2Int16 pos = em.GetPosition(id);
 
@@ -268,23 +286,31 @@ void UnitAIStateMachine::GoToThink(UnitAIThinkData& data, EntityManager& em)
 
 		if (enemy != Entity::None)
 		{
-			ai.targetEntity = enemy;
-			EntityUtil::SetUnitAIState(id, UnitAIStateId::AttackTarget);
+			// TODO: NAV!!!!
+			//ai.targetEntity = enemy;
+			//EntityUtil::SetUnitAIState(id, UnitAIStateId::AttackTarget);
+			if (IsTargetInAttackRange(id, enemy, pos, em))
+			{
+				EntityUtil::SetUnitAIState(id, UnitAIStateId::AttackTarget);
+				continue;
+			}
+
+			
+		}
+
+
+		Vector2Int16 dst = ai.targetPosition;
+		if (OnPosition(id, pos, dst))
+		{
+			EntityUtil::SetUnitAIState(id, em.UnitSystem.GetAIComponent(id).idleStateId);
 		}
 		else
 		{
-			Vector2Int16 dst = ai.targetPosition;
-			if (OnPosition(id, pos, dst))
-			{
-				EntityUtil::SetUnitAIState(id, em.UnitSystem.GetAIComponent(id).idleStateId);
-			}
-			else
-			{
-				uint8_t orien = EntityUtil::GetOrientationToPosition(id, ai.targetPosition);
-				orien = (orien >> 2) << 2;
-				em.SetOrientation(id, orien);
-			}
+			uint8_t orien = EntityUtil::GetOrientationToPosition(id, ai.targetPosition);
+			orien = (orien >> 2) << 2;
+			em.SetOrientation(id, orien);
 		}
+
 	}
 
 }

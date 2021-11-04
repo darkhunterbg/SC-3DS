@@ -65,7 +65,9 @@ UnitComponent& UnitSystem::NewUnit(EntityId id, const UnitDef& def, PlayerId own
 		ai.stateId = UnitAIStateId::IdleAggressive;
 		ai.newState = true;
 		ai.idleStateId = ai.stateId;
-		ai.seekRange = def.GetAttacks()[0].MaxRange;
+		ai.seekRange = def.AI.SeekRange;
+		if (ai.seekRange == 0)
+			ai.seekRange = def.GetAttacks()[0].MaxRange;
 	}
 
 	return unit;
@@ -194,10 +196,10 @@ void UnitSystem::ProcessUnitEvents(EntityManager& em)
 			pos += Vector2Int16(dst);
 
 			EntityId id = EntityUtil::SpawnSprite(*GameDatabase::instance->ProtossShieldSprite, pos, orientation);
-		
+
 			em.DrawSystem.GetComponent(id).depth = em.DrawSystem.GetComponent(ai.targetEntity).depth + 1;
 		}
-	
+
 		if (damage.value > 0)
 			damage.value = std::max((short)1, (damage - target.armor).value);
 

@@ -1,6 +1,7 @@
 Sprite,Type,Instructions
 Protoss\Zealot,Init,"frame 85,wait 125"
 Protoss\Zealot,Death,"sound Units\Protoss\Zealot\Death,face 0,frame 221,wait 2,frame 222,wait 2,frame 223,wait 2,frame 224,wait 2,frame 225,wait 2,frame 226,wait 2,frame 227,wait 2,frame 228,wait 2,destroy"
+Protoss\Zealot,Walking,"move 4,wait 1,frame 85,move 4,wait 1,frame 102,move 4,wait 1,frame 119,move 4,wait 1,frame 136,move 4,wait 1,frame 153,move 4,wait 1,frame 170,move 4,wait 1,frame 187,move 4,wait 1,frame 204,move 4,goto 0"
 Protoss\Zealot,GroundAttackInit,"frame 0,wait 1"
 Protoss\Zealot,GroundAttackRepeat,"sound Weapons\PsiBlade,frame 17,wait 1,frame 34,wait 1,frame 51,wait 1,frame 68,attack,sound Weapons\PsiBladeHit,wait 1,frame 51,wait 1,frame 34,attack,sound Weapons\PsiBladeHit,wait 1,frame 17,wait 1,frame 0"
 Protoss\Zealot,GroundAttackToIdle,frame 85

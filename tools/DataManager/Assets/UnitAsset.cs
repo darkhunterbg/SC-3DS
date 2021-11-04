@@ -228,11 +228,12 @@ namespace DataManager.Assets
 		[Binary(BinaryType.UInt, 1)]
 		[Optional]
 		public UnitAIType AIType { get; set; }
-		#endregion
 
+		[DefaultEditor]
 		[Binary(BinaryType.UInt, 1)]
-		[Ignore]
-		public int _padding { get; set; }
+		[Optional]
+		public int SeekRange { get; set; }
+		#endregion
 
 		public UnitAsset() : base()
 		{

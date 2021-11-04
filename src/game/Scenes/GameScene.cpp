@@ -93,8 +93,8 @@ void GameScene::Start()
 	_entityManager->PlayerSystem.SetMapKnown(PlayerId{ 1 });
 
 	//_entityManager->SetOrientation(0, 16);
-	_entityManager->UnitSystem.GetAIComponent(0).targetPosition = Vector2Int16(256, 256);
-	EntityUtil::SetUnitAIState(0, UnitAIStateId::Walk);
+	//_entityManager->UnitSystem.GetAIComponent(0).targetPosition = Vector2Int16(256, 256);
+	//EntityUtil::SetUnitAIState(0, UnitAIStateId::Walk);
 
 	//EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ 64 ,128 }));
 
@@ -103,7 +103,7 @@ void GameScene::Start()
 	//EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ 110 , 96 }));
 	//EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ 100 , 48 }));
 
-	//EntityUtil::SpawnUnit(*GameDatabase::instance->GetUnit("Protoss\\Units\\Zealot"), PlayerId{ 3 }, Vector2Int16(Vector2Int{ 128 , 64 }));
+	EntityUtil::SpawnUnit(*GameDatabase::instance->GetUnit("Protoss\\Units\\Zealot"), PlayerId{ 3 }, Vector2Int16(Vector2Int{ 128 , 128 }));
 
 	//EntityUtil::SpawnUnit(*GameDatabase::instance->GetUnit("Protoss\\Units\\Zealot"), PlayerId{ 2 }, Vector2Int16(Vector2Int{ 300 , 300 }));
 

@@ -123,6 +123,7 @@ struct UnitDef {
 
 	struct UnitAI {
 		UnitAIType AIType;
+		uint8_t SeekRange;
 	} AI;
 
 	Span<UnitAttack> GetAttacks() const;
