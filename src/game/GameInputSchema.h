@@ -46,6 +46,7 @@ public:
 		InputCommand Move = InputCommand("Cursor.Move");
 		InputCommand Select = InputCommand("Cursor.Select");
 		InputCommand Hold = InputCommand("Cursor.Hold");
+		InputCommand Context = InputCommand("Cursor.Context");
 	} Cursor;
 
 	struct CameraCmd {

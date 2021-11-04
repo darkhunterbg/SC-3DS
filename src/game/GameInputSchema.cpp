@@ -81,6 +81,13 @@ void GameInputSchema::InitDefault()
 		if (Game::GetPlatformInfo().PointerIsCursor)
 			r = Vector2(InputManager::Pointer.IsDown());
 		});
+	Cursor.Context.AddCommand([](Vector2& r) {
+		r = Vector2(InputManager::Gamepad.IsButtonReleased(GamepadButton::A));
+		});
+	Cursor.Context.AddCommand([](Vector2& r) {
+		if (Game::GetPlatformInfo().PointerIsCursor)
+			r = Vector2(InputManager::Pointer.IsReleasedAlt());
+		});
 
 	Camera.Move.AddCommand([](Vector2& r) {
 		r = InputManager::Gamepad.CStick();

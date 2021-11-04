@@ -25,6 +25,7 @@ struct GamepadState {
 struct PointerState {
 	Vector2Int Position;
 	bool Touch = false;
+	bool TouchAlt = false;
 };
 
 
@@ -60,6 +61,7 @@ public:
 	inline bool IsDown() const { return currentState.Touch; }
 	inline bool IsPressed() const { return !prevState.Touch && currentState.Touch; }
 	inline bool IsReleased() const { return prevState.Touch && !currentState.Touch; }
+	inline bool IsReleasedAlt()  const { return prevState.TouchAlt && !currentState.TouchAlt; }
 	inline Vector2Int Position() const { return currentState.Position; }
 	inline Vector2Int DeltaPosition() const { return currentState.Position - prevState.Position; }
 };

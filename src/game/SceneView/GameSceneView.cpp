@@ -151,6 +151,28 @@ void GameSceneView::UpdateSelection()
 
 	_scene->GetEntityManager().DrawSystem.UpdateSelection(_unitSelection, selectionColor);
 }
+void GameSceneView::ContextActionCheck()
+{
+	bool context = Game::GetInput().Cursor.Context.IsActivated();
+	if (!context) return;
+
+	if (_unitSelection.size() == 0 || !EntityUtil::IsAlly(_player, _unitSelection[0])) return;
+
+	Vector2Int16 worldPos = _camera.ScreenToWorld(Vector2Int16(_cursor.Position));
+
+	for (EntityId id : _unitSelection)
+	{
+		_scene->GetEntityManager().UnitSystem.GetAIComponent(id).targetPosition = worldPos;
+		EntityUtil::SetUnitAIState(id, UnitAIStateId::Walk);
+	}
+
+	bool played = _scene->GetEntityManager().SoundSystem.PlayUnitChat(_unitSelection[0], UnitChatType::Command);
+
+	if (played);
+	_unitPortrait.ChatUnit(_unitSelection[0], false);
+}
+
+
 
 void GameSceneView::OnUnitSelect(EntityId id, bool newSelection)
 {
@@ -204,6 +226,8 @@ void GameSceneView::Update()
 					_cursor.SetUnitHover(CursorHoverState::Yellow);
 			}
 		}
+
+		ContextActionCheck();
 	}
 
 
@@ -355,3 +379,4 @@ void GameSceneView::DrawPortrait()
 		}
 	}
 }
+

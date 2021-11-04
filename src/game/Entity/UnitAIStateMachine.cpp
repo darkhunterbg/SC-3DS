@@ -46,7 +46,10 @@ static EntityId DetectNearbyEnemy(EntityId id, Vector2Int16 pos, PlayerId owner,
 
 	return result;
 }
-
+static bool OnPosition(EntityId id, Vector2Int16 pos, Vector2Int16 target)
+{
+	return  (target - pos).LengthSquaredInt() < 25;
+}
 
 void UnitAIState::StartEnterState(int batch)
 {
@@ -80,7 +83,7 @@ void UnitAIStateMachine::CreateStates(std::vector< UnitAIState*>& states)
 	states[(int)UnitAIStateId::AttackTarget] = new UnitAIState(nullptr, AttackTargetThink);
 	states[(int)UnitAIStateId::AttackLoop] = new UnitAIState(AttackLoopEnter, AttackLoopThink);
 	states[(int)UnitAIStateId::AttackExit] = new UnitAIState(EndAttackEnter, EndAttackThink);
-	states[(int)UnitAIStateId::Walk] = new UnitAIState(WalkEnter, IdleAggresiveThink);
+	states[(int)UnitAIStateId::Walk] = new UnitAIState(GoToEnter, GoToThink);
 }
 
 
@@ -110,7 +113,6 @@ void UnitAIStateMachine::IdleAggresiveThink(UnitAIThinkData& data, EntityManager
 		}
 	}
 }
-
 
 
 void UnitAIStateMachine::AttackTargetThink(UnitAIThinkData& data, EntityManager& em)
@@ -241,7 +243,7 @@ void UnitAIStateMachine::EndAttackThink(UnitAIThinkData& data, EntityManager& em
 	}
 }
 
-void UnitAIStateMachine::WalkEnter(UnitAIEnterStateData& data, EntityManager& em)
+void UnitAIStateMachine::GoToEnter(UnitAIEnterStateData& data, EntityManager& em)
 {
 	for (int i = data.start; i < data.end; ++i)
 	{
@@ -250,4 +252,39 @@ void UnitAIStateMachine::WalkEnter(UnitAIEnterStateData& data, EntityManager& em
 		const UnitDef& def = *unit.def;
 		EntityUtil::PlayAnimation(id, *def.Art.GetSprite().GetAnimation(AnimationType::Walking), def.Art.GetShadowImage());
 	}
+}
+
+void UnitAIStateMachine::GoToThink(UnitAIThinkData& data, EntityManager& em)
+{
+	for (int i = data.start; i < data.end; ++i)
+	{
+		EntityId id = data.entities[i];
+		const UnitComponent& unit = em.UnitSystem.GetComponent(id);
+		 UnitAIComponent& ai = em.UnitSystem.GetAIComponent(id);
+		const UnitDef& def = *unit.def;
+		Vector2Int16 pos = em.GetPosition(id);
+
+		EntityId enemy = DetectNearbyEnemy(id, pos, unit.owner, em);
+
+		if (enemy != Entity::None)
+		{
+			ai.targetEntity = enemy;
+			EntityUtil::SetUnitAIState(id, UnitAIStateId::AttackTarget);
+		}
+		else
+		{
+			Vector2Int16 dst = ai.targetPosition;
+			if (OnPosition(id, pos, dst))
+			{
+				EntityUtil::SetUnitAIState(id, em.UnitSystem.GetAIComponent(id).idleStateId);
+			}
+			else
+			{
+				uint8_t orien = EntityUtil::GetOrientationToPosition(id, ai.targetPosition);
+				orien = (orien >> 2) << 2;
+				em.SetOrientation(id, orien);
+			}
+		}
+	}
+
 }

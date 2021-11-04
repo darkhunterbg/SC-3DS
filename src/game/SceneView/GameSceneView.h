@@ -35,11 +35,13 @@ private:
 
 	Color GetAlliedUnitColor(EntityId id);
 	void UpdateSelection();
+	void ContextActionCheck();
 	void OnEntitiesDeleted(const std::vector<EntityId>& entities);
 
 	void OnUnitSelect(EntityId id, bool newSelection);
 
 	void DrawPortrait();
+
 public:
 	GameSceneView(GameScene* scene);
 

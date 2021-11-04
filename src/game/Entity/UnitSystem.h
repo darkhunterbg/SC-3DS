@@ -35,6 +35,7 @@ struct UnitAIComponent {
 
 	uint8_t seekRange = 0;
 	EntityId targetEntity = Entity::None;
+	Vector2Int16 targetPosition = {};
 	uint8_t attackId = 0;
 	uint8_t attackCooldown = 0;
 

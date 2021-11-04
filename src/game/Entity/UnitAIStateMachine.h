@@ -100,6 +100,7 @@ private:
 	static void EndAttackEnter(UnitAIEnterStateData& data, EntityManager& em);
 	static void EndAttackThink(UnitAIThinkData& data, EntityManager& em);
 
-	static void WalkEnter(UnitAIEnterStateData& data, EntityManager& em);
+	static void GoToEnter(UnitAIEnterStateData& data, EntityManager& em);
+	static void GoToThink(UnitAIThinkData& data, EntityManager& em);
 };
 

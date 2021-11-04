@@ -360,6 +360,7 @@ void Platform::UpdatePointerState(PointerState& state)
 	Uint32  buttonState = SDL_GetMouseState(&pos.x, &pos.y);
 
 	state.Touch = buttonState & SDL_BUTTON(SDL_BUTTON_LEFT);
+	state.TouchAlt = buttonState & SDL_BUTTON(SDL_BUTTON_RIGHT);
 }
 
 void Platform::CreateChannel(AudioChannelState& channel)
