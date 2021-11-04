@@ -2,12 +2,7 @@
 #include "EntityManager.h"
 #include "EntityUtil.h"
 
-static void SetUnitAIState(EntityId id, UnitAIStateId state)
-{
-	auto& ai = EntityUtil::GetManager().UnitSystem.GetAIComponent(id);
-	ai.stateId = state;
-	ai.newState = true;
-}
+
 static std::vector<EntityId> scratch;
 static EntityId DetectNearbyEnemy(EntityId id, Vector2Int16 pos, PlayerId owner, EntityManager& em)
 {
@@ -53,8 +48,6 @@ static EntityId DetectNearbyEnemy(EntityId id, Vector2Int16 pos, PlayerId owner,
 }
 
 
-
-
 void UnitAIState::StartEnterState(int batch)
 {
 	enterStateData.start = 0;
@@ -87,8 +80,8 @@ void UnitAIStateMachine::CreateStates(std::vector< UnitAIState*>& states)
 	states[(int)UnitAIStateId::AttackTarget] = new UnitAIState(nullptr, AttackTargetThink);
 	states[(int)UnitAIStateId::AttackLoop] = new UnitAIState(AttackLoopEnter, AttackLoopThink);
 	states[(int)UnitAIStateId::AttackExit] = new UnitAIState(EndAttackEnter, EndAttackThink);
+	states[(int)UnitAIStateId::Walk] = new UnitAIState(WalkEnter, IdleAggresiveThink);
 }
-
 
 
 void UnitAIStateMachine::IdleEnter(UnitAIEnterStateData& data, EntityManager& em)
@@ -113,7 +106,7 @@ void UnitAIStateMachine::IdleAggresiveThink(UnitAIThinkData& data, EntityManager
 		EntityId enemy = DetectNearbyEnemy(id, pos, owner, em);
 		if (enemy != Entity::None)
 		{
-			SetUnitAIState(id, UnitAIStateId::AttackTarget);
+			EntityUtil::SetUnitAIState(id, UnitAIStateId::AttackTarget);
 		}
 	}
 }
@@ -149,13 +142,13 @@ void UnitAIStateMachine::AttackTargetThink(UnitAIThinkData& data, EntityManager&
 				if (em.AnimationSystem.GetComponent(id).done)
 				{
 					em.UnitSystem.GetAIComponent(id).targetEntity = enemy;
-					SetUnitAIState(id, UnitAIStateId::AttackLoop);
+					EntityUtil::SetUnitAIState(id, UnitAIStateId::AttackLoop);
 				}
 			}
 		}
 		else
 		{
-			SetUnitAIState(id, em.UnitSystem.GetAIComponent(id).idleStateId);
+			EntityUtil::SetUnitAIState(id, em.UnitSystem.GetAIComponent(id).idleStateId);
 			// TODO: AI system support wait for animation flag, blocking updates of AI until animation is completed
 			continue;
 		}
@@ -198,12 +191,12 @@ void UnitAIStateMachine::AttackLoopThink(UnitAIThinkData& data, EntityManager& e
 
 			em.UnitSystem.GetAIComponent(id).targetEntity = enemy;
 			em.UnitSystem.GetAIComponent(id).attackId = 0;
-			SetUnitAIState(id, UnitAIStateId::AttackLoop);
+			EntityUtil::SetUnitAIState(id, UnitAIStateId::AttackLoop);
 			continue;
 		}
 		else
 		{
-			SetUnitAIState(id, UnitAIStateId::AttackExit);
+			EntityUtil::SetUnitAIState(id, UnitAIStateId::AttackExit);
 			// TODO: AI system support wait for animation flag, blocking updates of AI until animation is completed
 			continue;
 		}
@@ -230,7 +223,6 @@ void UnitAIStateMachine::EndAttackThink(UnitAIThinkData& data, EntityManager& em
 		const UnitDef& def = *unit.def;
 
 
-
 		Vector2Int16 pos = em.GetPosition(id);
 		PlayerId owner = em.UnitSystem.GetComponent(id).owner;
 		EntityId enemy = DetectNearbyEnemy(id, pos, owner, em);
@@ -238,13 +230,24 @@ void UnitAIStateMachine::EndAttackThink(UnitAIThinkData& data, EntityManager& em
 		if (enemy != Entity::None)
 		{
 			em.UnitSystem.GetAIComponent(id).targetEntity = enemy;
-			SetUnitAIState(id, UnitAIStateId::AttackTarget);
+			EntityUtil::SetUnitAIState(id, UnitAIStateId::AttackTarget);
 		}
 		else
 		{
 			if (em.AnimationSystem.GetComponent(id).done)
-				SetUnitAIState(id, em.UnitSystem.GetAIComponent(id).idleStateId);
+				EntityUtil::SetUnitAIState(id, em.UnitSystem.GetAIComponent(id).idleStateId);
 		}
 
+	}
+}
+
+void UnitAIStateMachine::WalkEnter(UnitAIEnterStateData& data, EntityManager& em)
+{
+	for (int i = data.start; i < data.end; ++i)
+	{
+		EntityId id = data.entities[i];
+		const UnitComponent& unit = em.UnitSystem.GetComponent(id);
+		const UnitDef& def = *unit.def;
+		EntityUtil::PlayAnimation(id, *def.Art.GetSprite().GetAnimation(AnimationType::Walking), def.Art.GetShadowImage());
 	}
 }

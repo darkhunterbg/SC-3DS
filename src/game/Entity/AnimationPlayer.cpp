@@ -9,6 +9,18 @@
 
 typedef void(*InstructionAction)(const InstructionParams& params, EntityId id, EntityManager& em);
 
+static const Vector2 movementTable32[]{
+	{0,-1}, {0,-1},
+	{0.7,-0.7},{0.7,-0.7},{0.7,-0.7},{0.7,-0.7},
+	{1,0}, {1,0}, {1,0}, {1,0},
+	{0.7,0.7},{0.7,0.7},{0.7,0.7},{0.7,0.7},
+	{0,1},{0,1},{0,1},{0,1},
+	{-0.7,0.7},{-0.7,0.7},{-0.7,0.7},{-0.7,0.7},
+	{-1,0}, {-1,0}, {-1,0}, {-1,0},
+	{-0.7,-0.7},{-0.7,-0.7},{-0.7,-0.7},{-0.7,-0.7},
+	{0,-1},{0,-1}
+
+};
 struct AnimInstruction {
 	InstructionParams params;
 	uint8_t id;
@@ -96,17 +108,26 @@ static void SpawnSpriteBackground(const InstructionParams& params, EntityId id, 
 	em.AnimationSystem.RegisterSpawnSprite(def, em.GetPosition(id), depth - 1);
 }
 
-
 static void Destroy(const InstructionParams& params, EntityId id, EntityManager& em)
 {
 	em.AnimationSystem.RegisterDestroy(id);
 }
 
+static void Move(const InstructionParams& params, EntityId id, EntityManager& em)
+{
+	Vector2Int16 pos = em.GetPosition(id);
+	uint16_t distance = params.shorts[0];
+	pos += Vector2Int16(movementTable32[em.GetOrientation(id)] * distance);
+	em.SetPosition(id, pos);
+}
+
+
 // ======================================================================================
 
 static InstructionAction instructionMap[] =
 {
-	Frame, Wait, WaitRandom, Face, TurnCW, TurnCCW, GoTo, Attack, PlaySound, SpawnSprite, SpawnSpriteBackground, Destroy
+	Frame, Wait, WaitRandom, Face, TurnCW, TurnCCW, GoTo, Attack, PlaySound, SpawnSprite, SpawnSpriteBackground, Destroy,
+	Move
 };
 
 void AnimationPlayer::RunAnimation(AnimationComponent& anim, EntityId id, EntityManager& em)

@@ -82,25 +82,29 @@ void GameScene::Start()
 	const auto& def = *GameDatabase::instance->GetUnit("Terran\\Units\\Marine");
 
 	int i = 0;
-	for (int y = 1; y < 1; ++y)
+	for (int y = 1; y < 2; ++y)
 	{
 		for (int x = 1; x < 2; ++x)
 		{
 			EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ x * 32 ,y * 32 }));
 		}
 	}
+
 	_entityManager->PlayerSystem.SetMapKnown(PlayerId{ 1 });
+
+	_entityManager->SetOrientation(0, 16);
+	EntityUtil::SetUnitAIState(0, UnitAIStateId::Walk);
 
 	//EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ 64 ,128 }));
 
-	EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ 96 , 64 }));
-	EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ 100 , 80 }));
-	EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ 110 , 96 }));
+	//EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ 96 , 64 }));
+	//EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ 100 , 80 }));
+	//EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ 110 , 96 }));
 	//EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ 100 , 48 }));
 
-	EntityUtil::SpawnUnit(*GameDatabase::instance->GetUnit("Protoss\\Units\\Zealot"), PlayerId{ 3 }, Vector2Int16(Vector2Int{ 128 , 64 }));
+	//EntityUtil::SpawnUnit(*GameDatabase::instance->GetUnit("Protoss\\Units\\Zealot"), PlayerId{ 3 }, Vector2Int16(Vector2Int{ 128 , 64 }));
 
-	EntityUtil::SpawnUnit(*GameDatabase::instance->GetUnit("Protoss\\Units\\Zealot"), PlayerId{ 2 }, Vector2Int16(Vector2Int{ 300 , 300 }));
+	//EntityUtil::SpawnUnit(*GameDatabase::instance->GetUnit("Protoss\\Units\\Zealot"), PlayerId{ 2 }, Vector2Int16(Vector2Int{ 300 , 300 }));
 
 	_updateCrt = _entityManager->NewUpdateCoroutine();
 

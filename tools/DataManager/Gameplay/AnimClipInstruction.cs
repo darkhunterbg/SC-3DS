@@ -209,6 +209,9 @@ namespace DataManager.Gameplay
 
 		public static readonly AnimClipInstruction Destroy = new AnimClipInstruction("destroy", (state, p) => true);
 
+
+		public static readonly AnimClipInstruction Move = new AnimClipInstruction("move", (state, p) => false, NewParam<ushort>("distance"));
+
 		public static readonly Dictionary<string, AnimClipInstruction> Instructions = new Dictionary<string, AnimClipInstruction>();
 
 		static AnimClipInstructionDatabase()

@@ -44,9 +44,10 @@ enum class UnitAIStateId :uint8_t {
 	AttackTarget = 2,
 	AttackLoop = 3,
 	AttackExit = 4,
+	Walk = 5,
 };
 
-static constexpr const int UnitAIStateTypeCount = 5;
+static constexpr const int UnitAIStateTypeCount = 6;
 
 struct UnitAIState {
 public:
@@ -98,5 +99,7 @@ private:
 	
 	static void EndAttackEnter(UnitAIEnterStateData& data, EntityManager& em);
 	static void EndAttackThink(UnitAIThinkData& data, EntityManager& em);
+
+	static void WalkEnter(UnitAIEnterStateData& data, EntityManager& em);
 };
 

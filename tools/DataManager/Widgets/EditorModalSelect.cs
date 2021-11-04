@@ -83,6 +83,20 @@ namespace DataManager.Widgets
 
 			ImGui.SameLine();
 
+
+			if (selected != null) {
+				if (ImGui.Button("Clear##modal.select.ok") || AppGame.Gui.IsConfirmPressed) {
+					callback(objType.IsValueType ? Activator.CreateInstance(objType) : null);
+
+					objType = null;
+					selected = null;
+					textFilter = string.Empty;
+				}
+			}
+
+			ImGui.SameLine();
+
+
 			if (selected != null)
 			{
 				if (ImGui.Button("Ok##modal.select.ok") || AppGame.Gui.IsConfirmPressed)

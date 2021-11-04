@@ -3,6 +3,7 @@
 #include "Entity.h"
 #include "../Data/AssetDataDefs.h"
 #include "PlayerSystem.h"
+#include "UnitAIStateMachine.h"
 
 class EntityManager;
 
@@ -30,5 +31,6 @@ public:
 	static bool IsEnemy(PlayerId player, EntityId id);
 
 	static uint8_t GetOrientationToPosition(EntityId id, Vector2Int16 target);
+	static void SetUnitAIState(EntityId id, UnitAIStateId state);
 };
 
