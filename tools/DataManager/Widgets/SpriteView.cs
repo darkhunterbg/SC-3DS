@@ -71,11 +71,17 @@ namespace DataManager.Widgets
 		public bool ClipChanged { get; private set; } = false;
 		public SpriteAnimData AnimData { get; private set; } = new SpriteAnimData();
 
+		private Vector2 _dragStart;
+		private bool _isDragging;
+
 		public void Draw(float size)
 		{
+
 			ClipChanged = false;
 
 			SpriteBatch sb = animPreview.StartDrawOn();
+
+
 			sb.Begin();
 
 			Vector2 pos = new Vector2(animPreview.RenderTarget.Width, animPreview.RenderTarget.Height);
@@ -98,9 +104,18 @@ namespace DataManager.Widgets
 			sb.End();
 
 			animPreview.EndDrawOn();
+
+
+
 			DrawControls(size);
 
 			SelectionChanged = false;
+
+
+
+
+
+
 		}
 
 		private void DrawControls(float width)
@@ -110,15 +125,50 @@ namespace DataManager.Widgets
 			var sb = AppGui.SpriteBatchBegin(new Vector2(max, max), SamplerState.PointClamp);
 			sb.Draw(animPreview.RenderTarget, new Rectangle(0, 0, (int)max, (int)max), Color.White);
 
+			Vector2 start = ImGui.GetCursorScreenPos();
+
 			AppGui.SpriteBatchEnd();
+
+
+
+			if (ImGui.IsMouseDown(ImGuiMouseButton.Left) && !ImGui.IsMouseDragging(ImGuiMouseButton.Left)) {
+
+				Vector2 end = ImGui.GetCursorScreenPos();
+				Vector2 s = end - start;
+				s.X = ImGui.GetWindowSize().X;
+
+				Rectangle r = new Rectangle(start.ToVector2().ToPoint(), s.ToVector2().ToPoint());
+
+				_isDragging = r.Contains(ImGui.GetMousePos().ToVector2());
+				_dragStart = ImGui.GetMousePos();
+			}
+			if (ImGui.IsMouseReleased(ImGuiMouseButton.Left)) {
+				_isDragging = false;
+			}
+
+
+			if (_isDragging && ImGui.IsMouseDragging(ImGuiMouseButton.Left)) {
+
+				if (Sprite != null && Sprite.IsRotating && AnimData != null) {
+
+					float x = (ImGui.GetMousePos().X - _dragStart.X);
+					int d = (int)Math.Abs(x) / 16;
+					if (d > 0) {
+						int orientation = AnimData.State.Orientation;
+						orientation += ((int)x) / 16;
+						AnimData.State.SetOrientation(orientation);
+						_dragStart = ImGui.GetMousePos();
+					}
+				}
+			}
+
 
 			if (Sprite == null)
 				return;
 
 			//ImGui.SetNextItemWidth(-200);
 
-			if (EditorFieldDrawer.Enum("Animation", ref selectedAnimType) || SelectionChanged)
-			{
+			if (EditorFieldDrawer.Enum("Animation", ref selectedAnimType) || SelectionChanged) {
 				int orientation = AnimData.State.Orientation;
 				AnimData = new SpriteAnimData();
 				if (Sprite.IsRotating)
@@ -128,12 +178,10 @@ namespace DataManager.Widgets
 
 			ImGui.DragInt("Animation Speed", ref gameSpeed, 0.05f, 6, 24);
 
-			if (Sprite.IsRotating)
-			{
+			if (Sprite.IsRotating) {
 				ImGui.SetNextItemWidth(-200);
 				int orient = AnimData.State.Orientation;
-				if (EditorFieldDrawer.Int("Orientation", ref orient))
-				{
+				if (EditorFieldDrawer.Int("Orientation", ref orient)) {
 					AnimData.State.SetOrientation(orient);
 				}
 			}
@@ -144,26 +192,20 @@ namespace DataManager.Widgets
 
 		private void DrawSprite(Vector2 pos, SpriteBatch sb)
 		{
-			if (Sprite != null && Sprite.Image.Image != null)
-			{
-				if (Clip != null)
-				{
-					if (AnimData.State.InstructionId != AnimData.BreakpointAt)
-					{
+			if (Sprite != null && Sprite.Image.Image != null) {
+				if (Clip != null) {
+					if (AnimData.State.InstructionId != AnimData.BreakpointAt) {
 						if (AnimData.TimeDelay > 0)
 							AnimData.TimeDelay -= (gameSpeed / 60.0f);
-						else
-						{
+						else {
 							AnimData.State.FrameDelay = 0;
 
-							while (AnimData.State.ExecuteInstruction(Clip))
-							{
+							while (AnimData.State.ExecuteInstruction(Clip)) {
 								if (AnimData.State.InstructionId == AnimData.BreakpointAt)
 									break;
 							}
 
-							if(AnimData.State.InstructionId>= Clip.InstructionCount && LoopAnimation)
-							{
+							if (AnimData.State.InstructionId >= Clip.InstructionCount && LoopAnimation) {
 								AnimData.State.RestartAnimation();
 							}
 
@@ -178,18 +220,15 @@ namespace DataManager.Widgets
 				SpriteEffects eff = AnimData.State.FlipSprite ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
 				var frame = Sprite.Image.Image.GetFrame(frameIndex);
 
-				if (frame != null)
-				{
+				if (frame != null) {
 					Vector2 offset = frame.GetOffset(AnimData.State.FlipSprite) + AnimData.State.Offset;
 
 
 					sb.Draw(frame.Image.Texture, (pos + offset).ToVector2(), null, Color.White, 0, Vector2.Zero.ToVector2(), 1, eff, 1);
-					if (Sprite.HasUnitColoring)
-					{
+					if (Sprite.HasUnitColoring) {
 						frame = Sprite.Image.Image.GetUnitColorFrame(frameIndex);
 
-						if (frame != null)
-						{
+						if (frame != null) {
 							offset = frame.GetOffset(AnimData.State.FlipSprite) + AnimData.State.Offset;
 
 							sb.Draw(frame.Image.Texture, (pos + offset).ToVector2(), null, Color.Magenta, 0, Vector2.Zero.ToVector2(), 1, eff, 1);
@@ -201,15 +240,13 @@ namespace DataManager.Widgets
 
 		private void DrawShadow(Vector2 pos, SpriteBatch sb)
 		{
-			if (ShadowImage.Image != null)
-			{
+			if (ShadowImage.Image != null) {
 				int frameIndex = AnimData.State.FrameIndex;
 
 				SpriteEffects eff = AnimData.State.FlipSprite ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
 				var frame = ShadowImage.Image.GetFrame(frameIndex);
 
-				if (frame != null)
-				{
+				if (frame != null) {
 					Vector2 offset = frame.GetOffset(AnimData.State.FlipSprite);// + AnimData.State.Offset;
 					offset += ShadowOffset;
 
@@ -247,8 +284,7 @@ namespace DataManager.Widgets
 
 			pos += Vector2.One;
 
-			for (int i = 0; i < BarSize; ++i)
-			{
+			for (int i = 0; i < BarSize; ++i) {
 				sb.DrawRectangle(pos, new Vector2(2, 3), SCGreen);
 				pos.X += 3;
 			}
