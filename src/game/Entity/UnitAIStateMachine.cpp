@@ -2,8 +2,43 @@
 #include "EntityManager.h"
 #include "EntityUtil.h"
 
-
+static const Vector2 movementTable8[]{
+		{0,-1}, {0.8,-0.8},{1,0}, {0.8,0.8},{0,1}, {-0.8,0.8}, {-1,0},{-0.8,-0.8}
+};
 static std::vector<EntityId> scratch;
+static uint8_t GetNavOrientation(EntityId id, Vector2Int16 dst, EntityManager& em)
+{
+	short velocity = 4;
+
+	Vector2Int16 pos = em.GetPosition(id);
+
+	scratch.clear();
+
+	int orien = EntityUtil::GetOrientationToPosition(id, dst);
+	orien = (orien >> 2);// << 2;
+
+	Rectangle16 collider = em.KinematicSystem.GetCollider(id).collider;
+
+	for (int i = 0; i < 8; ++i)
+	{
+		orien = (orien + 1) % 8;
+		Vector2Int16 move =  Vector2Int16(movementTable8[orien] * velocity);
+		move += pos;
+		scratch.clear();
+
+		Rectangle16 r = collider;
+		r.position += move;
+
+		em.KinematicSystem.RectCast(r, scratch);
+		if (scratch.size() == 0 || (scratch.size() == 1 && scratch[0] == id))
+		{
+			return orien << 2;
+		}
+	}
+
+	return 255;
+
+}
 static EntityId DetectNearbyEnemy(EntityId id, Vector2Int16 pos, PlayerId owner, EntityManager& em)
 {
 
@@ -34,7 +69,7 @@ static EntityId DetectNearbyEnemy(EntityId id, Vector2Int16 pos, PlayerId owner,
 			if (enemyOwner != owner)
 			{
 
-				int t = (em.GetPosition(id) - pos).LengthSquaredInt();
+				int t = (em.GetPosition(e) - pos).LengthSquaredInt();
 				if (t < nearest)
 				{
 					nearest = t;
@@ -201,8 +236,17 @@ void UnitAIStateMachine::AttackLoopThink(UnitAIThinkData& data, EntityManager& e
 		Vector2Int16 pos = em.GetPosition(id);
 		PlayerId owner = em.UnitSystem.GetComponent(id).owner;
 		EntityId enemy = DetectNearbyEnemy(id, pos, owner, em);
-		if (enemy != Entity::None)
+		if (enemy != Entity::None )
 		{
+
+			if (!IsTargetInAttackRange(id, enemy, pos, em))
+			{
+				em.UnitSystem.GetAIComponent(id).targetPosition = em.GetPosition(enemy);
+				EntityUtil::SetUnitAIState(id, UnitAIStateId::Walk);
+				continue;
+			}
+
+
 			uint8_t orientation = EntityUtil::GetOrientationToPosition(id, em.GetPosition(enemy));
 
 			em.SetOrientation(id, orientation);
@@ -295,7 +339,7 @@ void UnitAIStateMachine::GoToThink(UnitAIThinkData& data, EntityManager& em)
 				continue;
 			}
 
-			
+
 		}
 
 
@@ -306,9 +350,26 @@ void UnitAIStateMachine::GoToThink(UnitAIThinkData& data, EntityManager& em)
 		}
 		else
 		{
-			uint8_t orien = EntityUtil::GetOrientationToPosition(id, ai.targetPosition);
-			orien = (orien >> 2) << 2;
-			em.SetOrientation(id, orien);
+			int orien = GetNavOrientation(id, ai.targetPosition, em);
+			if (orien == 255) continue;
+
+			int current = em.GetOrientation(id);
+
+			int turn = orien - current;
+		/*	if (std::abs(turn) > def.Movement.RotationSpeed)
+			{
+				turn = def.Movement.RotationSpeed * sign(turn);
+			}
+
+
+			if (std::abs( (current - turn) - orien < std::abs( ((current + turn) %32) - orien)))
+			{
+				turn = -turn;
+			}*/
+
+	
+
+			EntityUtil::SetOrientation(id, current + turn);
 		}
 
 	}

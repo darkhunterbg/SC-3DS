@@ -164,6 +164,12 @@ void DrawSettings()
 			scene->GetEntityManager().PlayerSystem.SetMapKnown(p);
 		}
 
+		ImGui::Separator();
+
+		for (auto& s : scene->GetEntityManager().SoundSystem.GetChannels())
+		{
+			ImGui::Text("ID: %i, Def: %s", s->channel->ChannelId, s->sound->Path);
+		}
 
 	}
 

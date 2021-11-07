@@ -40,7 +40,7 @@ SoundSystem::SoundSystem()
 }
 
 
-void SoundSystem::PlayDef(const SoundSetDef& def, Channel& channel, float volume )
+void SoundSystem::PlayDef(const SoundSetDef& def, Channel& channel, float volume)
 {
 	AudioClip* clip;
 
@@ -69,14 +69,14 @@ void SoundSystem::PlayDef(const SoundSetDef& def, Channel& channel, float volume
 
 bool SoundSystem::IsPlayCompleted(Channel& channel)
 {
-	if (!_chatChannel.channel) return true;
+	if (!channel.channel) return true;
 
-	return _chatChannel.channel->IsDone();
+	return channel.channel->IsDone();
 }
 
-void SoundSystem::PlayWorldSound(const SoundSetDef& sound, Vector2Int16 pos)
+void SoundSystem::PlayWorldSound(const SoundSetDef& sound, Vector2Int16 pos, int priority)
 {
-	_worldSounds.push_back({ pos, &sound, 0 });
+	_worldSounds.push_back({ pos, &sound, priority, 1 });
 }
 
 void SoundSystem::PlayMusic(const SoundSetDef& music)
@@ -171,6 +171,10 @@ void SoundSystem::UpdateSounds(const EntityManager& em, const Camera& camera)
 
 	_worldSounds.clear();
 
+	std::sort(_soundsInRange.begin(), _soundsInRange.end(), [](WorldSound& a, WorldSound& b) {
+		return a.priority > b.priority;
+		});
+
 	for (WorldSound& s : _soundsInRange)
 	{
 		Channel* playChannel = nullptr;
@@ -187,14 +191,17 @@ void SoundSystem::UpdateSounds(const EntityManager& em, const Camera& camera)
 		{
 			for (Channel& c : _worldChannels)
 			{
-				if (c.newSound) continue;
-				playChannel = &c;
-				break;
+				if (!c.newSound && IsPlayCompleted(c))
+				{
+					playChannel = &c;
+					break;
+				}
 			}
 		}
 
 		if (playChannel)
 			PlayDef(*s.sound, *playChannel, s.volume);
+
 	}
 
 	if (IsChatPlaying())
@@ -202,6 +209,7 @@ void SoundSystem::UpdateSounds(const EntityManager& em, const Camera& camera)
 		if (_chatUnitId != Entity::None && !em.HasEntity(_chatUnitId))
 		{
 			_chatUnitId = Entity::None;
+			_chatChannel.sound = nullptr;
 			AudioManager::StopChannel(_chatChannel.channel);
 		}
 	}
@@ -214,6 +222,10 @@ void SoundSystem::UpdateSounds(const EntityManager& em, const Camera& camera)
 			AudioManager::SetChannelVolume(channel->channel, channel->volume);
 			AudioManager::Play(clip, channel->channel);
 			channel->newSound = false;
+		}
+		else if (IsPlayCompleted(*channel))
+		{
+			channel->sound = nullptr;
 		}
 	}
 }

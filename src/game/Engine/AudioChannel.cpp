@@ -68,11 +68,12 @@ void AudioChannelState::StartStreamingNextBuffer()
 
 bool AudioChannelState::IsDone()  const
 {
-	if (!_enabled) return true;
+	//if (!_enabled) return true;
+	if (stream == nullptr) return true;
 
-	return stream == nullptr ||
-		(Remaining() == 0 &&
-			streamingCrt == nullptr);
+	bool hasMore = _streamPosition < stream->StreamSize() || Remaining() > 0;
+
+	return !hasMore;
 }
 
 void AudioChannelState::ChangeSource(IAudioSource* src, unsigned streamPosition)

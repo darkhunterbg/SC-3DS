@@ -86,8 +86,9 @@ static void Attack(const InstructionParams& params, EntityId id, EntityManager& 
 static void PlaySound(const InstructionParams& params, EntityId id, EntityManager& em)
 {
 	unsigned defId = params.shorts[0];
+	unsigned priority = params.shorts[1];
 	const SoundSetDef& def = GameDatabase::instance->SoundSetDefs[defId];
-	em.SoundSystem.PlayWorldSound(def, em.GetPosition(id));
+	em.SoundSystem.PlayWorldSound(def, em.GetPosition(id), priority);
 }
 
 static void SpawnSprite(const InstructionParams& params, EntityId id, EntityManager& em)

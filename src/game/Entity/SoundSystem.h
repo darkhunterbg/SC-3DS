@@ -18,6 +18,7 @@ enum class UnitChatType {
 };
 
 class SoundSystem : public IEntitySystem {
+public:
 	struct Channel {
 		const AudioChannelState* channel = nullptr;
 		const SoundSetDef* sound = nullptr;
@@ -28,6 +29,7 @@ class SoundSystem : public IEntitySystem {
 	struct WorldSound {
 		Vector2Int16 position;
 		const SoundSetDef* sound;
+		int priority = 0;
 		float volume = 1;
 	};
 private:
@@ -55,7 +57,7 @@ public:
 	void PlayChat(const SoundSetDef& chat);
 	bool PlayUnitChat(EntityId unit, UnitChatType type);
 
-	void PlayWorldSound(const SoundSetDef& sound, Vector2Int16 pos);
+	void PlayWorldSound(const SoundSetDef& sound, Vector2Int16 pos, int priority);
 
 	bool IsChatPlaying() { return !IsPlayCompleted(_chatChannel); }
 
@@ -64,4 +66,5 @@ public:
 
 	void UpdateSounds(const EntityManager& em, const Camera& camera);
 
+	const std::vector<Channel*>& GetChannels() const { return _channels; }
 };
