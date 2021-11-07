@@ -68,7 +68,7 @@ void AudioChannelState::StartStreamingNextBuffer()
 
 bool AudioChannelState::IsDone()  const
 {
-	//if (!_enabled) return true;
+	if (!_enabled) return true;
 	if (stream == nullptr) return true;
 
 	bool hasMore = _streamPosition < stream->StreamSize() || Remaining() > 0;

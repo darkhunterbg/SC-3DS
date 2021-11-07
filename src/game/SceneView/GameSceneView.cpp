@@ -163,7 +163,8 @@ void GameSceneView::ContextActionCheck()
 	for (EntityId id : _unitSelection)
 	{
 		_scene->GetEntityManager().UnitSystem.GetAIComponent(id).targetPosition = worldPos;
-		EntityUtil::SetUnitAIState(id, UnitAIStateId::Walk);
+		_scene->GetEntityManager().UnitSystem.GetAIComponent(id).targetPosition2 = _scene->GetEntityManager().GetPosition(id);
+		EntityUtil::SetUnitAIState(id, UnitAIStateId::Patrol);
 	}
 
 	bool played = _scene->GetEntityManager().SoundSystem.PlayUnitChat(_unitSelection[0], UnitChatType::Command);

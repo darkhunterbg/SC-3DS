@@ -13,17 +13,22 @@ static constexpr const uint8_t StructureBurning = 20;
 UnitSystem::UnitSystem()
 {
 	UnitAIStateMachine::CreateStates(_aiStates);
+	UnitStateMachine::CreateStates(_unitStates);
 }
 
 UnitSystem::~UnitSystem()
 {
 	for (auto state : _aiStates)
 		delete state;
+
+	for (auto state : _unitStates)
+		delete state;
 }
 
 void UnitSystem::DeleteEntities(std::vector<EntityId>& entities)
 {
 	_unitComponents.DeleteComponents(entities);
+	_unitStateComponents.DeleteComponents(entities);
 	_aiComponents.DeleteComponents(entities);
 }
 
@@ -31,7 +36,14 @@ size_t UnitSystem::ReportMemoryUsage()
 {
 	size_t size = _unitComponents.GetMemoryUsage();
 	size += _aiComponents.GetMemoryUsage();
+	size += _unitStateComponents.GetMemoryUsage();
+
 	for (auto& state : _aiStates)
+	{
+		size += state->GetSize();
+	}
+
+	for (auto& state : _unitStates)
 	{
 		size += state->GetSize();
 	}
@@ -57,18 +69,24 @@ UnitComponent& UnitSystem::NewUnit(EntityId id, const UnitDef& def, PlayerId own
 	unit.shield = unit.maxShield.SetToInt(def.Stats.Sheild);
 	unit.damage[0].SetToInt(def.Attacks[0].Damage);
 	unit.damage[1].SetToInt(def.Attacks[1].Damage);
+	unit.attackedBy = Entity::None;
+
+	_unitStateComponents.NewComponent(id);
+	auto& state = _unitStateComponents.GetComponent(id);
+	state.stateId = UnitStateId::Idle;
+	state.newState = true;
 
 	if (def.AI.AIType != UnitAIType::None)
 	{
 		_aiComponents.NewComponent(id);
 		auto& ai = _aiComponents.GetComponent(id);
-		ai.stateId = UnitAIStateId::IdleAggressive;
-		ai.newState = true;
-		ai.idleStateId = ai.stateId;
+		ai.stateId = UnitAIStateId::Idle;
 		ai.seekRange = def.AI.SeekRange;
+		ai.disable = false;
 		if (ai.seekRange == 0)
 			ai.seekRange = def.GetAttacks()[0].MaxRange;
 	}
+
 
 	return unit;
 }
@@ -78,7 +96,6 @@ void UnitSystem::PrepareUnitAI(EntityManager& em)
 {
 	for (auto& state : _aiStates)
 	{
-		state->enterStateData.clear();
 		state->thinkData.clear();
 	}
 
@@ -88,15 +105,14 @@ void UnitSystem::PrepareUnitAI(EntityManager& em)
 
 	for (int i = 0; i < entities.size(); ++i)
 	{
+		ai[i].attackCooldown -= ai[i].attackCooldown > 0;
+
+		if (ai[i].disable) continue;
+
 		UnitAIStateId stateId = ai[i].stateId;
 		EntityId id = entities[i];
-		if (ai[i].newState)
-		{
-			ai[i].newState = false;
-			_aiStates[(int)stateId]->enterStateData.entities.push_back(id);
-		}
 
-		ai[i].attackCooldown -= ai[i].attackCooldown > 0;
+	
 
 		_aiStates[(int)stateId]->thinkData.entities.push_back(id);
 
@@ -104,8 +120,7 @@ void UnitSystem::PrepareUnitAI(EntityManager& em)
 
 	for (auto& state : _aiStates)
 	{
-		state->StartEnterState(0);
-		state->StartThink(0);
+		state->Start(0);
 	}
 
 	_aiUpdatesCompleted = 0;
@@ -118,17 +133,10 @@ bool UnitSystem::UpdateUnitAI(EntityManager& em)
 
 	UnitAIState* state = _aiStates[_aiUpdatesCompleted];
 
-	if (state->enterStateFunc && !state->IsEnterStateCompleted())
-	{
-		state->AdvanceEnterState(batch);
-		state->enterStateFunc(state->enterStateData, em);
 
-		return false;
-	}
-
-	if (state->thinkFunc && !state->IsThinkCompleted())
+	if (state->thinkFunc && !state->IsCompleted())
 	{
-		state->AdvanceThink(batch);
+		state->Advance(batch);
 		state->thinkFunc(state->thinkData, em);
 
 		return false;
@@ -137,6 +145,53 @@ bool UnitSystem::UpdateUnitAI(EntityManager& em)
 	++_aiUpdatesCompleted;
 
 	return _aiUpdatesCompleted == _aiStates.size();
+}
+void UnitSystem::UpdateUnitStates(EntityManager& em)
+{
+	for (UnitState* state : _unitStates)
+	{
+		state->EnterState.clear();
+		state->ExitState.clear();
+	}
+
+	auto& entities = _unitStateComponents.GetEntities();
+	auto& state = _unitStateComponents.GetComponents();
+
+	for (int i = 0; i < entities.size(); ++i)
+	{
+		EntityId id = entities[i];
+		if (state[i].newState)
+		{
+			UnitStateId newState = state[i].stateId;
+			UnitStateId currentState = state[i].currentStateId;
+
+			state[i].newState = false;
+			_unitStates[(int)currentState]->ExitState.entities.push_back(id);
+			_unitStates[(int)currentState]->ExitState.otherState.push_back(newState);
+			_unitStates[(int)newState]->EnterState.entities.push_back(id);
+			_unitStates[(int)newState]->EnterState.otherState.push_back(currentState);
+			state[i].currentStateId = newState;
+		}
+	}
+
+	for (auto& state : _unitStates)
+	{
+		state->ExitState.Start(0);
+		if (state->exitStateFunc && state->ExitState.size())
+		{
+			state->ExitState.end = state->ExitState.size();
+			state->exitStateFunc(state->ExitState, em);
+		}
+
+		state->EnterState.Start(0);
+		if (state->enterStateFunc && state->EnterState.size())
+		{
+			state->EnterState.end = state->EnterState.size();
+			state->enterStateFunc(state->EnterState, em);
+		}
+	}
+
+
 }
 
 void UnitSystem::ProcessUnitEvents(EntityManager& em)
@@ -153,6 +208,8 @@ void UnitSystem::ProcessUnitEvents(EntityManager& em)
 				unit.shield.value += 2;
 			}
 		}
+
+		unit.attackedBy = Entity::None;
 	}
 
 	for (EntityId id : _unitAttackEvents)
@@ -208,6 +265,8 @@ void UnitSystem::ProcessUnitEvents(EntityManager& em)
 
 		ai.attackCooldown = attack.Cooldown;
 
+		target.attackedBy = id;
+
 		if (target.IsDead())
 		{
 			_unitDieEvents.push_back(ai.targetEntity);
@@ -254,6 +313,7 @@ void UnitSystem::UnitKillEvent(EntityId id)
 	if (std::find(_unitDieEvents.begin(), _unitDieEvents.end(), id) == _unitDieEvents.end())
 		_unitDieEvents.push_back(id);
 }
+
 void UnitSystem::UnitAttackEvent(EntityId id)
 {
 	GAME_ASSERT(_aiComponents.HasComponent(id), "[UnitAttackEvent] Entity %i does not have AI!");

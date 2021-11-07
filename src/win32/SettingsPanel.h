@@ -104,10 +104,8 @@ void DrawSettings()
 		GameScene* scene = static_cast<GameScene*>(Game::GetCurrentScene());
 
 		float speed = scene->GameSpeed;
-		if (ImGui::SliderFloat("Game Speed", &speed, 0.1f, 10.0f, "%.1f"))
-		{
-			scene->GameSpeed = speed;
-		}
+		ImGui::SliderFloat("Game Speed", &speed, 0.1f, 10.0f, "%.1f");
+		scene->GameSpeed = speed;
 
 		ImGui::Checkbox("Show Colliders", &scene->GetEntityManager().KinematicSystem.ShowColliders);
 

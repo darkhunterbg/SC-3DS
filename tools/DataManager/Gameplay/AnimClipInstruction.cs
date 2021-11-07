@@ -87,6 +87,11 @@ namespace DataManager.Gameplay
 					if (success = byte.TryParse(input, out var a))
 						return a;
 
+
+				if (Type == typeof(bool))
+					if (success = bool.TryParse(input, out var a))
+						return a;
+
 				if (Type.IsSubclassOf(typeof(Asset))) {
 					var assets = AppGame.AssetManager.GetAssetDatabase(Type).Assets;
 					var asset = assets.FirstOrDefault(s => s.AssetName == input);
@@ -209,8 +214,9 @@ namespace DataManager.Gameplay
 
 		public static readonly AnimClipInstruction Destroy = new AnimClipInstruction("destroy", (state, p) => true);
 
-
 		public static readonly AnimClipInstruction Move = new AnimClipInstruction("move", (state, p) => false, NewParam<ushort>("distance"));
+
+		public static readonly AnimClipInstruction SetAIEnabled = new AnimClipInstruction("aienabled", (state, p) => false, NewParam<bool>("enabled"));
 
 		public static readonly Dictionary<string, AnimClipInstruction> Instructions = new Dictionary<string, AnimClipInstruction>();
 

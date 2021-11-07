@@ -122,13 +122,18 @@ static void Move(const InstructionParams& params, EntityId id, EntityManager& em
 	em.SetPosition(id, pos);
 }
 
+static void EnableAI(const InstructionParams& params, EntityId id, EntityManager& em)
+{
+	em.UnitSystem.GetAIComponent(id).disable = !params.bytes[0];
+}
+
 
 // ======================================================================================
 
 static InstructionAction instructionMap[] =
 {
 	Frame, Wait, WaitRandom, Face, TurnCW, TurnCCW, GoTo, Attack, PlaySound, SpawnSprite, SpawnSpriteBackground, Destroy,
-	Move
+	Move, EnableAI
 };
 
 void AnimationPlayer::RunAnimation(AnimationComponent& anim, EntityId id, EntityManager& em)

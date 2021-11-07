@@ -82,9 +82,9 @@ void GameScene::Start()
 	const auto& def = *GameDatabase::instance->GetUnit("Terran\\Units\\Marine");
 
 	int i = 0;
-	for (int y = 1; y < 4; ++y)
+	for (int y = 1; y < 3; ++y)
 	{
-		for (int x = 1; x < 4; ++x)
+		for (int x = 1; x < 3; ++x)
 		{
 			EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ x * 32 ,y * 32 }));
 		}
@@ -103,8 +103,8 @@ void GameScene::Start()
 	//EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ 110 , 96 }));
 	//EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ 100 , 48 }));
 
-	EntityUtil::SpawnUnit(*GameDatabase::instance->GetUnit("Protoss\\Units\\Zealot"), PlayerId{ 3 }, Vector2Int16(Vector2Int{ 128 , 128 }));
-	EntityUtil::SpawnUnit(*GameDatabase::instance->GetUnit("Protoss\\Units\\Zealot"), PlayerId{ 3 }, Vector2Int16(Vector2Int{ 128 , 96 }));
+	EntityUtil::SpawnUnit(*GameDatabase::instance->GetUnit("Protoss\\Units\\Zealot"), PlayerId{ 3 }, Vector2Int16(Vector2Int{ 256 , 128 }));
+	//EntityUtil::SpawnUnit(*GameDatabase::instance->GetUnit("Protoss\\Units\\Zealot"), PlayerId{ 3 }, Vector2Int16(Vector2Int{ 128 , 96 }));
 
 	//EntityUtil::SpawnUnit(*GameDatabase::instance->GetUnit("Protoss\\Units\\Zealot"), PlayerId{ 2 }, Vector2Int16(Vector2Int{ 300 , 300 }));
 
@@ -137,7 +137,7 @@ void GameScene::Frame(TimeSlice& frameBudget)
 
 	_view->Draw();
 
-	frameTime -= Game::DeltaTime;
+	frameTime -= std::min(0.0166f, Game::DeltaTime);
 
 	if (frameTime < 0)
 	{

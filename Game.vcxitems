@@ -50,6 +50,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\PlayerSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\SoundSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitAIStateMachine.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitStateMachine.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitSystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Game.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GameInputSchema.h" />
@@ -121,6 +122,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\PlayerSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\SoundSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitAIStateMachine.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitStateMachine.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Entity\UnitSystem.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Game.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GameInputSchema.cpp" />

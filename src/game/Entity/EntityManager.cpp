@@ -54,8 +54,13 @@ public:
 		while(!_em->UnitSystem.UpdateUnitAI(*_em)) {
 			CRT_YIELD();
 		}
-			
 
+		EndProfile();
+
+		CRT_YIELD();
+
+		BeignProfile("UpdateUnitStates");
+		_em->UnitSystem.UpdateUnitStates(*_em);
 		EndProfile();
 
 		CRT_YIELD();
@@ -64,25 +69,37 @@ public:
 
 		_em->UnitSystem.ProcessUnitEvents(*_em);
 
+		CRT_YIELD();
+
 		BeignProfile("RunAnimations");
 		_em->AnimationSystem.RunAnimations(*_em);
 		EndProfile();
+
+		CRT_YIELD();
 
 		_em->ApplyEntityChanges();
 
 		_em->PlayerSystem.UpdatePlayers(*_em);
 
+		CRT_YIELD();
+
 		BeignProfile("UpdateColliders");
 		_em->KinematicSystem.UpdateColliders(*_em);
 		EndProfile();
+
+		CRT_YIELD();
 
 		BeignProfile("UpdatePositions");
 		_em->DrawSystem.UpdatePositions(*_em);
 		EndProfile();
 
+		CRT_YIELD();
+
 		BeignProfile("UpdateVisibleObjects");
 		_em->MapSystem.UpdateVisibleObjects(*_em);
 		EndProfile();
+
+		CRT_YIELD();
 
 		++_em->logicalFrame;
 

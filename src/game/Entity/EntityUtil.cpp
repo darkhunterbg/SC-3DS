@@ -131,9 +131,11 @@ uint8_t EntityUtil::GetOrientationToPosition(EntityId id, Vector2Int16 target)
 
 void EntityUtil::SetUnitAIState(EntityId id, UnitAIStateId state)
 {
-	auto& ai = GetManager().UnitSystem.GetAIComponent(id);
-	ai.stateId = state;
-	ai.newState = true;
-
+	GetManager().UnitSystem.GetAIComponent(id).NewState(state);
 }
 
+
+void EntityUtil::SetUnitState(EntityId id, UnitStateId state)
+{
+	GetManager().UnitSystem.GetStateComponent(id).NewState(state);
+}
