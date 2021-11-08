@@ -22,7 +22,7 @@ namespace DataManager.Assets
 
         [Ignore]
         [Binary(BinaryType.UInt, 1)]
-        public int InstructionCount => Instructions.Count;
+        public int InstructionCount => TrueInstructions.Count();
 
         [Index(1)]
         [DefaultEditor]
@@ -34,6 +34,9 @@ namespace DataManager.Assets
 
         [Ignore]
         public List<string> Instructions { get; set; } = new List<string>();
+
+        [Ignore]
+        public IEnumerable<string> TrueInstructions => Instructions.Where(t => !t.EndsWith(":")); 
 
         public override string AssetName => $"{Sprite.Name}:{Type}";
         public override string SortKey => $"{Sprite.Name}:{(int)Type}";

@@ -45,13 +45,27 @@ namespace DataManager.Gameplay
 				if (!valid)
 					continue;
 
-				var bin = paramDef.BinarySerialize(obj);
-				for (int j = 0; j < bin.Length; ++j) {
-					Parameters[i * 2 + j] = bin[j];
+				if (obj is AnimClipLabelRef label) {
+					int pos = clip.Instructions.IndexOf($"{label.Text}:");
+					int offset = clip.Instructions.Take(pos).Count(t => t.EndsWith(":")) ;
+					var bin = BinaryAttribute.Serialize(pos - offset, typeof(byte));
+					for (int j = 0; j < bin.Length; ++j) {
+						// TODO: FIX THIS
+						Parameters[i * 2 + j] = bin[j];
+					}
+				} else {
+					var bin = paramDef.BinarySerialize(obj);
+					for (int j = 0; j < bin.Length; ++j) {
+						Parameters[i * 2 + j] = bin[j];
+					}
 				}
-
 			}
 		}
+	}
+
+	public class AnimClipLabelRef
+	{
+		public string Text;
 	}
 
 	public class AnimClipInstruction
@@ -79,6 +93,11 @@ namespace DataManager.Gameplay
 				if (string.IsNullOrEmpty(input))
 					return Type.IsByRef ? null : Activator.CreateInstance(Type);
 
+				if (Type == typeof(AnimClipLabelRef)) {
+					success = true;
+					return new AnimClipLabelRef() { Text = input };
+				}
+
 				if (Type == typeof(ushort))
 					if (success = ushort.TryParse(input, out var a))
 						return a;
@@ -103,7 +122,7 @@ namespace DataManager.Gameplay
 				return Type.IsByRef ? null : Activator.CreateInstance(Type);
 			}
 
-			public byte[] BinarySerialize(object value)
+			public byte[] BinarySerialize( object value)
 			{
 				return BinaryAttribute.Serialize(value, Type);
 			}
@@ -113,12 +132,14 @@ namespace DataManager.Gameplay
 				Parse(input, out bool success);
 				return success;
 			}
+
 		}
 
 		public readonly string Instruction;
 		public readonly List<ParamDef> Parameters = new List<ParamDef>();
 		public readonly AnimClipInstructionAction ProcessAction;
 
+		public override string ToString() => Instruction;
 
 		public AnimClipInstruction(string instruction, AnimClipInstructionAction action, params ParamDef[] parameters)
 		{
@@ -180,7 +201,7 @@ namespace DataManager.Gameplay
 			return false;
 		}, NewParam<byte>("rotation"));
 
-		public static readonly AnimClipInstruction TurnClocCounterkWise = new AnimClipInstruction("turnccw", (state, p) =>
+		public static readonly AnimClipInstruction TurnCounterkClockWise = new AnimClipInstruction("turnccw", (state, p) =>
 		{
 			state.AddOrientation(-(byte)p[0]);
 			return false;
@@ -188,10 +209,19 @@ namespace DataManager.Gameplay
 
 		public static readonly AnimClipInstruction GoTo = new AnimClipInstruction("goto", (state, p) =>
 		{
-			state.InstructionId = (byte)p[0];
-			--state.InstructionId;
+			state.GoToLabel((p[0] as AnimClipLabelRef)?.Text);
 			return false;
-		}, NewParam<byte>("instruction"));
+		}, NewParam<AnimClipLabelRef>("label"));
+
+		public static readonly AnimClipInstruction GoToRandom = new AnimClipInstruction("gotorand", (state, p) =>
+		{
+			int chance = (byte)p[0];
+			if (random.Next(0, 100) < chance) {
+				state.GoToLabel((p[1] as AnimClipLabelRef)?.Text);
+			}
+			return false;
+		}, NewParam<byte>("chance"), NewParam<AnimClipLabelRef>("label"));
+
 
 
 		public static readonly AnimClipInstruction Attack = new AnimClipInstruction("attack", (state, p) => false);

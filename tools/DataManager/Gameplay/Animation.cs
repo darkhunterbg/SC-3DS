@@ -14,14 +14,15 @@ namespace DataManager.Gameplay
 		Death,
 		GroundAttackInit,
 		AirAttackInit,
-		SpecialAbility1,
+		CastSpell,
 		GroundAttackRepeat,
 		AirAttackRepeat,
-		SpecialAbility2,
+		SpecialAbility1,
 		GroundAttackToIdle,
 		AirAttackToIdle,
-		SpecialAbility3,
+		SpecialAbility2,
 		Walking,
+		WalkingToIdle,
 		Other,
 		BurrowInit,
 		ConstructHarvest,
@@ -45,6 +46,8 @@ namespace DataManager.Gameplay
 		public bool FlipSprite => Orientation > 16;
 
 		public int FrameIndex => localFrame + OrientationOffset;
+
+		private string _goTo = null;
 
 		public void SetInstruction(int id)
 		{
@@ -81,30 +84,47 @@ namespace DataManager.Gameplay
 		public void RestartAnimation()
 		{
 			InstructionId = -1;
+			_goTo = null;
+		}
+
+		public bool GoToLabel(string label)
+		{
+			if (string.IsNullOrEmpty(label))
+				return false;
+
+			_goTo = label;
+			return true;
 		}
 
 		public bool ExecuteInstruction(SpriteAnimClipAsset clip)
 		{
+			if (_goTo != null) {
+				var i = clip.Instructions.IndexOf($"{_goTo}:");
+				if (i != -1) {
+					InstructionId = i;
+				}
+				_goTo = null;
+			}
+
 			++InstructionId;
-			if (InstructionId >= clip.Instructions.Count)
-			{
+			if (InstructionId >= clip.Instructions.Count) {
 				//InstructionId = -1;
 				return false;
 			}
 
 			var instr = clip.Instructions[InstructionId];
 
-			if (!string.IsNullOrEmpty(instr))
-			{
+			if (instr.Trim().EndsWith(":"))
+				return true;
+
+
+			if (!string.IsNullOrEmpty(instr)) {
 				var s = instr.Split(' ');
 
-				if (AnimClipInstructionDatabase.Instructions.TryGetValue(s[0], out var instruction))
-				{
-					if (instruction.Parameters.Count < s.Length)
-					{
+				if (AnimClipInstructionDatabase.Instructions.TryGetValue(s[0], out var instruction)) {
+					if (instruction.Parameters.Count < s.Length) {
 						var parsed = new object[instruction.Parameters.Count];
-						for (int i = 0; i < parsed.Length; ++i)
-						{
+						for (int i = 0; i < parsed.Length; ++i) {
 							parsed[i] = instruction.Parameters[i].Parse(s[i + 1], out bool success);
 							if (!success)
 								return false;
@@ -118,4 +138,5 @@ namespace DataManager.Gameplay
 		}
 
 	}
+
 }

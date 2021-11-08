@@ -60,10 +60,13 @@ namespace DataManager
 
 	public static class IListExtensions
 	{
-		public static void AddNotContainet<T>(this IList<T> list, T item) where T : class
+		public static bool AddNotContainet<T>(this IList<T> list, T item) where T : class
 		{
-			if (!list.Contains(item))
+			if (!list.Contains(item)) {
 				list.Add(item);
+				return true;
+			}
+			return false;
 		}
 	}
 	public static class SpriteBatchExtensions

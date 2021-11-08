@@ -199,9 +199,14 @@ namespace DataManager.Widgets
 							AnimData.TimeDelay -= (gameSpeed / 60.0f);
 						else {
 							AnimData.State.FrameDelay = 0;
+							int i = 1000;
 
 							while (AnimData.State.ExecuteInstruction(Clip)) {
+								--i;
 								if (AnimData.State.InstructionId == AnimData.BreakpointAt)
+									break;
+
+								if (i == 0)
 									break;
 							}
 

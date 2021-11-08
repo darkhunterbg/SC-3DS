@@ -26,6 +26,8 @@ namespace DataManager.Panels
 			public bool Valid;
 
 			public string Text = string.Empty;
+
+			public bool IsLabel = false;
 		}
 
 
@@ -68,13 +70,14 @@ namespace DataManager.Panels
 			AppGame.AssetManager.GetAssetDatabase<SpriteAnimClipAsset>().DeleteAll(a => asset.Clips.Contains(a));
 		}
 
-		bool clipModified = false;
-		bool selectedClipChanged = false;
+		bool _clipModified = false;
+		bool _selectedClipChanged = false;
 
 		public void Draw(Vector2 client)
 		{
 
-			clipModified = false;
+			_clipModified = false;
+
 
 			ImGui.Columns(4, "spriteeditor");
 
@@ -82,8 +85,7 @@ namespace DataManager.Panels
 			{
 				treeView.Draw();
 
-				if (prevSelection != Selected)
-				{
+				if (prevSelection != Selected) {
 					prevSelection = Selected;
 
 					propertyEditor.EditingItem = treeView.Selected;
@@ -107,7 +109,7 @@ namespace DataManager.Panels
 			ImGui.BeginChild("##anim");
 			{
 				spriteView.Draw(ImGui.GetColumnWidth());
-				selectedClipChanged = spriteView.ClipChanged;
+				_selectedClipChanged = spriteView.ClipChanged;
 				ImGui.NewLine();
 			}
 			ImGui.EndChild();
@@ -121,25 +123,28 @@ namespace DataManager.Panels
 			ImGui.EndChild();
 
 
+
+			DrawIScriptImportModal();
+
+
 			if (treeView.ItemModified)
 				AppGame.AssetManager.SaveAllAssets();
-			else
-			{
-				if (propertyEditor.Changed)
-				{
+			else {
+				if (propertyEditor.Changed) {
 					AppGame.AssetManager.GetAssetDatabase<SpriteAsset>().Save();
 					//clipModified = true;
 				}
-				if (clipModified)
+				if (_clipModified) {
 					AppGame.AssetManager.GetAssetDatabase<SpriteAnimClipAsset>().Save();
+					AppGame.AssetManager.GetAssetDatabase<SpriteAsset>().Save();
+				}
 			}
 
 		}
 
 		private void DrawSpriteFrames(float width)
 		{
-			if (Selected != null && Selected.Image.Image != null)
-			{
+			if (Selected != null && Selected.Image.Image != null) {
 				float x = 0;
 
 				float scale = 1;
@@ -151,36 +156,27 @@ namespace DataManager.Panels
 
 				int i = 0;
 
-				foreach (var frame in Selected.Image.Image.Frames)
-				{
+				foreach (var frame in Selected.Image.Image.Frames) {
 					if (Selected.Image.Image.HasUnitColor && Selected.Image.Image.UnitColorOffset <= frame.FrameIndex)
 						break;
 
 					++i;
 					x += frame.Size.X * scale;
-					if (x >= width - 140)
-					{
+					if (x >= width - 140) {
 						x = frame.Size.X * scale;
 						i = 1;
-					}
-					else
-					{
-						if (!Selected.IsRotating || i <= 17)
-						{
+					} else {
+						if (!Selected.IsRotating || i <= 17) {
 							ImGui.SameLine();
-						}
-						else
-						{
+						} else {
 							i = 1;
 							x = frame.Size.X * scale;
 						}
 					}
 
-					if (frame.FrameIndex == spriteView.AnimData.State.FrameIndex)
-					{
+					if (frame.FrameIndex == spriteView.AnimData.State.FrameIndex) {
 						ImGui.Image(frame.Image.GuiImage, frame.Size * scale - Vector2.One * 2, Vector2.Zero, Vector2.One, Vector4.One, Vector4.One);
-					}
-					else
+					} else
 						ImGui.Image(frame.Image.GuiImage, frame.Size * scale);
 					if (ImGui.IsItemHovered())
 						AppGame.Gui.HoverObject = frame;
@@ -191,13 +187,65 @@ namespace DataManager.Panels
 		List<AnimInstructionView> instructions = new List<AnimInstructionView>();
 		string buffer = string.Empty;
 
+		string _modalBuffer = string.Empty;
+		bool _modalOpen = false;
+
+		private void DrawIScriptImportModal()
+		{
+			if (!_modalOpen)
+				return;
+
+			ImGui.OpenPopup("SpriteEditor.ImportIScript");
+
+		
+			if (!ImGui.BeginPopupModal("SpriteEditor.ImportIScript", ref _modalOpen, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar))
+				return;
+
+
+			ImGui.Text("Place sprite iScript Here");
+
+			ImGui.InputTextMultiline("text", ref _modalBuffer, 10000,new Vector2(800,600), ImGuiInputTextFlags.Multiline | ImGuiInputTextFlags.AllowTabInput);
+
+			if (ImGui.Button("Cancel")) {
+				_modalOpen = false;
+			}
+			ImGui.SameLine();
+			if (ImGui.Button("Ok")) {
+				IScriptParser parsers = new IScriptParser();
+				parsers.Parse(_modalBuffer);
+				{
+					AppGame.AssetManager.GetAssetDatabase<SpriteAnimClipAsset>()
+						.Delete(Selected.Clips);
+				}
+				Selected.Clips.Clear();
+				_selectedClipChanged = true;
+				_clipModified = true;
+
+				foreach (var anim in parsers.Animations) {
+
+					var clip =  new SpriteAnimClipAsset(Selected, anim.Key);
+					AppGame.AssetManager.GetAssetDatabase<SpriteAnimClipAsset>().Add(clip);
+					clip.SetInstructions(anim.Value.GetInstructions());
+					Selected.Clips.Add(clip);
+				}
+
+				_modalOpen = false;
+			}
+
+			ImGui.EndPopup();
+		}
+
 		private void DrawScriptEditor()
 		{
 			if (Selected == null)
 				return;
 
-			if (selectedClipChanged)
-			{
+			if (ImGui.Button("Generate from iScript")) {
+				_modalBuffer = string.Empty;
+				_modalOpen = true;
+			}
+
+			if (_selectedClipChanged) {
 				buffer = SelectedAnimClip == null ? string.Empty : string.Join('\n', SelectedAnimClip.Instructions);
 				instructions = ParseClipInstructions(buffer);
 
@@ -211,10 +259,9 @@ namespace DataManager.Panels
 
 			ImGui.SetCursorPosY(start + 4);
 
-			for (int i = 0; i < instructions.Count; ++i)
-			{
-				if (i == spriteView.AnimData.State.InstructionId)
-				{
+			int n = 0;
+			for (int i = 0; i < instructions.Count; ++i) {
+				if (i == spriteView.AnimData.State.InstructionId) {
 					Vector2 p = ImGui.GetCursorScreenPos();
 					p.X -= 10;
 					Vector2 s = new Vector2(ImGui.GetColumnWidth(), 25);
@@ -224,8 +271,7 @@ namespace DataManager.Panels
 					ImGui.GetForegroundDrawList().AddRectFilled(p, p + s, c.PackedValue, 2);
 				}
 
-				if (i == spriteView.AnimData.BreakpointAt)
-				{
+				if (i == spriteView.AnimData.BreakpointAt) {
 					Vector2 p = ImGui.GetCursorScreenPos();
 					//p.X -= 10;
 					p += new Vector2(12, 12);
@@ -236,14 +282,16 @@ namespace DataManager.Panels
 					ImGui.GetForegroundDrawList().AddCircleFilled(p, 14, c.PackedValue);
 				}
 
-				ImGui.TextDisabled($"{i:D2}");
-				if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
-				{
+				if (!instructions[i].IsLabel) {
+					ImGui.TextDisabled($"{n++:D2}");
+				} else {
+					ImGui.TextDisabled(string.Empty);
+				}
+				if (ImGui.IsItemClicked(ImGuiMouseButton.Left)) {
 					spriteView.AnimData.TimeDelay = 0;
 					spriteView.AnimData.State.SetInstruction(i);
 				}
-				if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
-				{
+				if (ImGui.IsItemClicked(ImGuiMouseButton.Right)) {
 					if (i == spriteView.AnimData.BreakpointAt)
 						spriteView.AnimData.BreakpointAt = int.MinValue;
 					else
@@ -255,26 +303,20 @@ namespace DataManager.Panels
 			ImGui.SetCursorPos(new Vector2(40, start));
 
 			if (ImGui.InputTextMultiline(string.Empty, ref buffer, 1024, new Vector2(-1, -1),
-				ImGuiInputTextFlags.Multiline))
-			{
-				if (string.IsNullOrWhiteSpace(buffer))
-				{
+				ImGuiInputTextFlags.Multiline)) {
+				if (string.IsNullOrWhiteSpace(buffer)) {
 					instructions.Clear();
-					if (clip != null)
-					{
-						clipModified = true;
+					if (clip != null) {
+						_clipModified = true;
 						AppGame.AssetManager.GetAssetDatabase<SpriteAnimClipAsset>().Delete(clip);
 						Selected.Clips.Remove(clip);
 						clip = null;
 					}
-				}
-				else
-				{
+				} else {
 					instructions = ParseClipInstructions(buffer);
-					clipModified = true;
+					_clipModified = true;
 
-					if (clip == null)
-					{
+					if (clip == null) {
 						clip = new SpriteAnimClipAsset(Selected, spriteView.SelectedAnimType);
 						AppGame.AssetManager.GetAssetDatabase<SpriteAnimClipAsset>().Add(clip);
 						Selected.Clips.Add(clip);
@@ -287,15 +329,23 @@ namespace DataManager.Panels
 			int j = 0;
 
 			ImGui.SetCursorPos(new Vector2(40, start + 4));
-			foreach (var instr in instructions)
-			{
-				if (!instr.Valid)
-				{
+			foreach (var instr in instructions) {
+				if (!instr.Valid) {
 					Vector2 p = ImGui.GetCursorScreenPos();
 					Vector2 s = new Vector2(ImGui.CalcItemWidth(), ImGui.CalcTextSize(instr.Text).Y);
 					p.Y += j * s.Y;
 
 					Color c = Color.Red;
+					c.A = 100;
+					ImGui.GetForegroundDrawList().AddRectFilled(p, p + s, c.PackedValue, 2);
+				}
+
+				if (instr.IsLabel) {
+					Vector2 p = ImGui.GetCursorScreenPos();
+					Vector2 s = new Vector2(ImGui.CalcItemWidth(), ImGui.CalcTextSize(instr.Text).Y);
+					p.Y += j * s.Y;
+
+					Color c = Color.Black;
 					c.A = 100;
 					ImGui.GetForegroundDrawList().AddRectFilled(p, p + s, c.PackedValue, 2);
 				}
@@ -306,23 +356,17 @@ namespace DataManager.Panels
 
 			ImGui.NextColumn();
 
-			if (clip != null)
-			{
+			if (clip != null) {
 				int instrId = 0;
 
-				foreach (var instr in instructions)
-				{
+				foreach (var instr in instructions) {
 					ImGui.PushID(++instrId);
-					if (instr.Instruction == null)
-					{
+					if (instr.Instruction == null) {
 						ImGui.Text(string.Empty);
-					}
-					else
-					{
+					} else {
 						ImGui.Text(instr.Instruction.Instruction);
 						int i = 0;
-						foreach (var param in instr.Instruction.Parameters)
-						{
+						foreach (var param in instr.Instruction.Parameters) {
 							ImGui.SameLine();
 
 							if (instr.Parameters?.Length > i && instr.Parameters[i] is Asset asset) {
@@ -330,8 +374,8 @@ namespace DataManager.Panels
 							} else {
 								ImGui.TextDisabled(param.ToString());
 							}
-					
-						
+
+
 
 							++i;
 						}
@@ -389,7 +433,7 @@ namespace DataManager.Panels
 			else
 				clip.SetInstructions(instructions.Select(s => s.Text));
 
-			clipModified = true;
+			_clipModified = true;
 		}
 
 		private List<AnimInstructionView> ParseClipInstructions(string editorText)
@@ -401,13 +445,18 @@ namespace DataManager.Panels
 
 			var lines = editorText.Split('\n');
 
-			foreach (var line in lines)
-			{
+			foreach (var line in lines) {
 				AnimInstructionView view = new AnimInstructionView()
 				{
 					Text = line
 				};
 				result.Add(view);
+
+				if (line.Trim().EndsWith(":")) {
+					view.IsLabel = true;
+					view.Valid = true;
+					continue;
+				}
 
 				var split = line.Split(' ');
 				string instText = split.FirstOrDefault();
@@ -424,8 +473,7 @@ namespace DataManager.Panels
 				view.Parameters = new object[view.Instruction.Parameters.Count];
 				view.Valid = true;
 
-				for (int j = 0; j < view.Instruction.Parameters.Count; ++j)
-				{
+				for (int j = 0; j < view.Instruction.Parameters.Count; ++j) {
 					var paramObj = view.Instruction.Parameters[j].Parse(split[j + 1], out view.Valid);
 
 					if (!view.Valid)

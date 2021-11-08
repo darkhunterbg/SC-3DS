@@ -68,6 +68,7 @@ public:
 private:
 	static void IdleEnter(UnitStateData& data, EntityManager& em);
 	static void MovementEnter(UnitStateData& data, EntityManager& em);
+	static void MovementExit(UnitStateData& data, EntityManager& em);
 	static void AttackEnter(UnitStateData& data, EntityManager& em);
 	static void AttackExit(UnitStateData& data, EntityManager& em);
 };

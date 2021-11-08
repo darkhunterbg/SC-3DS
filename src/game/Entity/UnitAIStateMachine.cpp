@@ -134,6 +134,7 @@ static bool Attack(EntityId id, EntityId enemy, EntityManager& em)
 		uint8_t orientation = EntityUtil::GetOrientationToPosition(id, em.GetPosition(enemy));
 		em.SetOrientation(id, orientation);
 		em.UnitSystem.GetAIComponent(id).targetEntity = enemy;
+
 		EntityUtil::SetUnitState(id, UnitStateId::Attack);
 		return true;
 	}

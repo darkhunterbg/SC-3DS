@@ -77,6 +77,20 @@ static void GoTo(const InstructionParams& params, EntityId id, EntityManager& em
 	anim.instructionCounter = anim.instructionStart + params.bytes[0];
 	--anim.instructionCounter;
 }
+static void GoToRandom(const InstructionParams& params, EntityId id, EntityManager& em)
+{
+	auto& anim = em.AnimationSystem.GetComponent(id);
+	int chance = params.bytes[0];
+
+	int roll = em.rand.Next(0, 100);
+
+	if (roll < chance)
+	{
+		// TODO: FIX THIS
+		anim.instructionCounter = anim.instructionStart + params.bytes[2];
+		--anim.instructionCounter;
+	}
+}
 
 static void Attack(const InstructionParams& params, EntityId id, EntityManager& em)
 {
@@ -132,7 +146,7 @@ static void EnableAI(const InstructionParams& params, EntityId id, EntityManager
 
 static InstructionAction instructionMap[] =
 {
-	Frame, Wait, WaitRandom, Face, TurnCW, TurnCCW, GoTo, Attack, PlaySound, SpawnSprite, SpawnSpriteBackground, Destroy,
+	Frame, Wait, WaitRandom, Face, TurnCW, TurnCCW, GoTo, GoToRandom, Attack, PlaySound, SpawnSprite, SpawnSpriteBackground, Destroy,
 	Move, EnableAI
 };
 

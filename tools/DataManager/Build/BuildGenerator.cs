@@ -618,7 +618,8 @@ namespace DataManager.Build
 				.OrderBy(s => s.Sprite.AssetName).ThenBy(s => s.Type)) {
 				clip._InstructionStart = (uint)instructionData.Count;
 
-				instructionData.AddRange(clip.Instructions.Select(s => new AnimClipInstructionData(clip, s)));
+
+				instructionData.AddRange(clip.TrueInstructions.Select(s => new AnimClipInstructionData(clip, s)));
 			}
 
 			List<AudioClip> audioClipsData = new List<AudioClip>();
