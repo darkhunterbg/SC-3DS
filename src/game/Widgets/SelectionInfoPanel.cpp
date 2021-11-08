@@ -188,10 +188,13 @@ void SelectionInfoPanel::DrawMultiselection(std::vector<EntityId>& selection)
 		if (!unit.HasShield())
 			wireframeStart += 2;
 
+		const auto& img = unit.def->Art.GetWireframe()->group.GetImage();
+		int wireframeGraphicsOffset = unit.def->Art.GetWireframe()->HasShieldGraphics() ? 0 : -2;
+
 		for (int i = wireframeStart; i < wfColor.size(); ++i)
 		{
-			const auto& img = unit.def->Art.GetWireframe()->group.GetImage();
-			const auto& wfPart = img.GetFrame(i);
+	
+			const auto& wfPart = img.GetFrame(i + wireframeGraphicsOffset);
 
 			GUI::AddNextElementOffset(Vector2Int(wfPart.offset) + Vector2Int(0, 1));
 			GUI::SetNextElementSize(Vector2Int(wfPart.size));
@@ -347,15 +350,16 @@ void SelectionInfoPanel::DrawUnitInfo(EntityId id)
 
 
 	int wireframeStart = 0;
-	if (!unit.HasShield())
+	if (!unit.HasShield() )
 		wireframeStart += 2;
+
+	int wireframeGraphicsOffset = unit.def->Art.GetWireframe()->HasShieldGraphics() ? 0 : -2;
 
 	const auto& img = unit.def->Art.GetWireframe()->detail.GetImage();
 	GUI::BeginRelativeLayout(Vector2Int{ 0,0 }, Vector2Int(img.GetSize()), GUIHAlign::Center, GUIVAlign::Top);
 	for (int i = wireframeStart; i < wfColor.size(); ++i)
 	{
-		const auto& img = unit.def->Art.GetWireframe()->detail.GetImage();
-		const auto& wfPart = img.GetFrame(i);
+		const auto& wfPart = img.GetFrame(i+ wireframeGraphicsOffset);
 
 		GUI::AddNextElementOffset(Vector2Int(wfPart.offset));
 		GUI::SetNextElementSize(Vector2Int(wfPart.size));

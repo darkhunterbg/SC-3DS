@@ -1,16 +1,18 @@
 #include "AssetDataDefs.h"
 #include "GameDatabase.h"
 
- const AnimClipDef* SpriteDef::GetAnimation(AnimationType type) const
+const AnimClipDef* SpriteDef::GetAnimation(AnimationType type) const
 {
-	for (int i = animStart; i < animStart + animCount; ++i) {
+	for (int i = animStart; i < animStart + animCount; ++i)
+	{
 		if (GameDatabase::instance->AnimClipDefs[i].type == type)
 			return  &GameDatabase::instance->AnimClipDefs[i];
 	}
 	return nullptr;
 }
 
-const Span<AnimClipDef> SpriteDef::GetClips() const {
+const Span<AnimClipDef> SpriteDef::GetClips() const
+{
 
 	return { &GameDatabase::instance->AnimClipDefs[animStart], animCount };
 }
@@ -28,4 +30,9 @@ const Image& UnitWireframeDef::Wireframe::GetImage() const
 const SpriteDef& AnimClipDef::GetSprite() const
 {
 	return GameDatabase::instance->SpriteDefs[spriteId];
+}
+
+bool UnitWireframeDef::HasShieldGraphics() const
+{
+	return detail.GetImage().GetFrames().Size() > 4;
 }

@@ -115,6 +115,8 @@ struct UnitWireframeDef {
 	Wireframe detail;
 	Wireframe train;
 	Wireframe group;
+
+	bool HasShieldGraphics() const;
 };
 
 #pragma pack(pop)

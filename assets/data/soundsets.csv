@@ -44,6 +44,12 @@ Units\Terran\Marine\Death,True,"sound\terran\marine\tmadth00,sound\terran\marine
 Units\Terran\Marine\Ready,False,sound\terran\marine\tmardy00
 Units\Terran\Marine\What,True,"sound\terran\marine\tmawht00,sound\terran\marine\tmawht01,sound\terran\marine\tmawht02,sound\terran\marine\tmawht03"
 Units\Terran\Marine\Yes,True,"sound\terran\marine\tmayes00,sound\terran\marine\tmayes01,sound\terran\marine\tmayes02,sound\terran\marine\tmayes03"
+Units\Zerg\Zergling\Annoyed,False,"sound\zerg\zergling\zzepss00,sound\zerg\zergling\zzepss01,sound\zerg\zergling\zzepss02"
+Units\Zerg\Zergling\Death,False,sound\zerg\zergling\zzedth00
+Units\Zerg\Zergling\Ready,False,sound\zerg\zergling\zzerdy00
+Units\Zerg\Zergling\What,True,"sound\zerg\zergling\zzewht00,sound\zerg\zergling\zzewht01,sound\zerg\zergling\zzewht02,sound\zerg\zergling\zzewht03"
+Units\Zerg\Zergling\Yes,True,"sound\zerg\zergling\zzeyes00,sound\zerg\zergling\zzeyes01,sound\zerg\zergling\zzeyes02,sound\zerg\zergling\zzeyes03"
+Weapons\Claws,False,sound\zerg\ultra\zulhit00
 Weapons\GaussRifle,False,sound\bullet\tmafir00
 Weapons\PsiBlade,False,"sound\protoss\zealot\pzeatt00,sound\protoss\zealot\pzeatt01"
 Weapons\PsiBladeHit,False,sound\protoss\zealot\pzehit00
