@@ -89,7 +89,7 @@ void UnitStateMachine::AttackExit(UnitStateData& data, EntityManager& em)
 		const UnitComponent& unit = em.UnitSystem.GetComponent(id);
 		const UnitDef& def = *unit.def;
 
-		if (data.otherState[i] == UnitStateId::Idle)
+		if (data.otherState[i] == UnitStateId::Idle && def.Art.GetSprite().GetAnimation(AnimationType::GroundAttackToIdle))
 			EntityUtil::PlayAnimation(id, *def.Art.GetSprite().GetAnimation(AnimationType::GroundAttackToIdle), def.Art.GetShadowImage());
 	}
 }

@@ -105,7 +105,8 @@ void UnitSystem::PrepareUnitAI(EntityManager& em)
 
 	for (int i = 0; i < entities.size(); ++i)
 	{
-		ai[i].attackCooldown -= ai[i].attackCooldown > 0;
+		if (ai[i].attackCooldown)
+			--ai[i].attackCooldown;
 
 		if (ai[i].disable) continue;
 

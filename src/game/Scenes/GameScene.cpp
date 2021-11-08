@@ -81,12 +81,32 @@ void GameScene::Start()
 
 	const auto& def = *GameDatabase::instance->GetUnit("Terran\\Units\\Marine");
 
+	const UnitDef* units[3];
+	units[0] = GameDatabase::instance->GetUnit("Terran\\Units\\Marine");
+	units[1] = GameDatabase::instance->GetUnit("Protoss\\Units\\Zealot");
+	units[2] = GameDatabase::instance->GetUnit("Zerg\\Units\\Zergling");
+
+	std::vector<const UnitDef*> group0 = { units[0], units[0], units[0] };
+	std::vector<const UnitDef*> group2= { units[1] };
+	std::vector<const UnitDef*> group1 = { units[2],units[2],units[2],units[2] };
+
+	std::vector<const  UnitDef*>* groups[] = { &group0, &group1, &group2 };
+
 	int i = 0;
-	for (int y = 1; y < 2; ++y)
+	for (int y = 1; y < 20; ++y)
 	{
-		for (int x = 1; x < 2; ++x)
+		for (int x = 1; x < 20; ++x)
 		{
-			EntityUtil::SpawnUnit(def, PlayerId{ 1 }, Vector2Int16(Vector2Int{ x * 32 ,y * 32 }));
+
+			auto& group = *groups[i % 3];
+
+			for (int j = 0; j < group.size(); ++j)
+			{
+				EntityUtil::SpawnUnit(*group[j], PlayerId{ (short)(i % totalPlayers + 1) },
+					Vector2Int16(Vector2Int{ x * 70 + (j%2)*32 ,y * 70 + (j/2) *32}));
+			}
+			//EntityUtil::SpawnUnit(*units[i % 3], PlayerId{ (short)(i % totalPlayers + 1) }, Vector2Int16(Vector2Int{ x * 64 ,y * 64 }));
+			++i;
 		}
 	}
 
@@ -106,9 +126,9 @@ void GameScene::Start()
 	//EntityUtil::SpawnUnit(*GameDatabase::instance->GetUnit("Protoss\\Units\\Zealot"), PlayerId{ 3 }, Vector2Int16(Vector2Int{ 256 , 128 }));
 	//EntityUtil::SpawnUnit(*GameDatabase::instance->GetUnit("Protoss\\Units\\Zealot"), PlayerId{ 3 }, Vector2Int16(Vector2Int{ 128 , 96 }));
 
-	EntityUtil::SpawnUnit(*GameDatabase::instance->GetUnit("Zerg\\Units\\Zergling"), PlayerId{ 2 }, Vector2Int16(Vector2Int{ 300 , 300 }));
-	EntityUtil::SpawnUnit(*GameDatabase::instance->GetUnit("Zerg\\Units\\Zergling"), PlayerId{ 2 }, Vector2Int16(Vector2Int{ 260 , 300 }));
-	EntityUtil::SpawnUnit(*GameDatabase::instance->GetUnit("Zerg\\Units\\Zergling"), PlayerId{ 2 }, Vector2Int16(Vector2Int{ 260 , 260 }));
+	//EntityUtil::SpawnUnit(*GameDatabase::instance->GetUnit("Zerg\\Units\\Zergling"), PlayerId{ 2 }, Vector2Int16(Vector2Int{ 300 , 300 }));
+	//EntityUtil::SpawnUnit(*GameDatabase::instance->GetUnit("Zerg\\Units\\Zergling"), PlayerId{ 2 }, Vector2Int16(Vector2Int{ 260 , 300 }));
+	//EntityUtil::SpawnUnit(*GameDatabase::instance->GetUnit("Zerg\\Units\\Zergling"), PlayerId{ 2 }, Vector2Int16(Vector2Int{ 260 , 260 }));
 
 	_updateCrt = _entityManager->NewUpdateCoroutine();
 
