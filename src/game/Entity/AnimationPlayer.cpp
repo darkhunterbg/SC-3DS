@@ -130,10 +130,9 @@ static void Destroy(const InstructionParams& params, EntityId id, EntityManager&
 
 static void Move(const InstructionParams& params, EntityId id, EntityManager& em)
 {
-	Vector2Int16 pos = em.GetPosition(id);
+	KinematicComponent& kin = em.KinematicSystem.GetKinematicComponent(id);
 	uint16_t distance = params.shorts[0];
-	pos += Vector2Int16(movementTable32[em.GetOrientation(id)] * distance);
-	em.SetPosition(id, pos);
+	kin.moveOnce += Vector2Int16(movementTable32[em.GetOrientation(id)] * distance);
 }
 
 static void EnableAI(const InstructionParams& params, EntityId id, EntityManager& em)

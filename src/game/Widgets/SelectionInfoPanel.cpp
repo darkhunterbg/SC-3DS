@@ -83,7 +83,7 @@ static void GetUnitWireframeColors(EntityId id, const UnitComponent& unit, std::
 
 		if (shieldState > 3)
 		{
-			outColors[0].a = ((float)(shieldState - 1)) * 0.2f;
+			outColors[0].a = ((float)(shieldState - 4)) * 0.2f;
 			outColors[0].a += 0.6f;
 			shieldState = 3;
 		}
@@ -95,18 +95,8 @@ static void GetUnitWireframeColors(EntityId id, const UnitComponent& unit, std::
 		}
 
 
-
-		/*	for (int i = 0; i < 3; ++i)
-			{
-				if(shieldState > i)
-					outColors[1].a += 0.34f;
-			}
-
-			for (int i = 3; i < 6; ++i)
-			{
-				if (shieldState > i)
-					outColors[0].a += 0.34f;
-			}*/
+		//outColors[0].a = 1;
+		//outColors[1].a = 1;
 
 	}
 

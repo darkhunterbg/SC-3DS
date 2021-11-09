@@ -70,8 +70,11 @@ EntityId EntityUtil::SpawnUnit(const UnitDef& def, PlayerId owner, Vector2Int16 
 	em.SetOrientation(id, orientation);
 	em.UnitSystem.NewUnit(id, def, owner);
 
-	if (def.Art.GetSprite().collider.size.LengthSquared() > 0)
+	if (def.Art.GetSprite().collider.size.LengthSquared() > 0) 
 		em.KinematicSystem.NewCollider(id, def.Art.GetSprite().collider);
+
+
+	em.KinematicSystem.NewKinematicComponent(id);
 
 	em.AnimationSystem.NewComponent(id);
 	em.MapSystem.SetVisionOccluded(id, true);

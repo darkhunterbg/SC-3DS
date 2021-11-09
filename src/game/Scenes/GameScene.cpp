@@ -92,23 +92,31 @@ void GameScene::Start()
 
 	std::vector<const  UnitDef*>* groups[] = { &group0, &group1, &group2 };
 
-	int i = 0;
-	for (int y = 1; y < 20; ++y)
-	{
-		for (int x = 1; x < 20; ++x)
-		{
 
-			auto& group = *groups[i % 3];
 
-			for (int j = 0; j < group.size(); ++j)
-			{
-				EntityUtil::SpawnUnit(*group[j], PlayerId{ (short)(i % totalPlayers + 1) },
-					Vector2Int16(Vector2Int{ x * 70 + (j%2)*32 ,y * 70 + (j/2) *32}));
-			}
-			//EntityUtil::SpawnUnit(*units[i % 3], PlayerId{ (short)(i % totalPlayers + 1) }, Vector2Int16(Vector2Int{ x * 64 ,y * 64 }));
-			++i;
-		}
-	}
+	EntityUtil::SpawnUnit(*units[0], PlayerId{ (short)(2) }, Vector2Int16(Vector2Int{ 232 ,232}));
+	EntityUtil::SpawnUnit(*units[1], PlayerId{ (short)(1) }, Vector2Int16(Vector2Int{ 264 ,232 }));
+	EntityUtil::SpawnUnit(*units[2], PlayerId{ (short)(2) }, Vector2Int16(Vector2Int{ 232 ,264 }));
+	EntityUtil::SpawnUnit(*units[2], PlayerId{ (short)(2) }, Vector2Int16(Vector2Int{ 232 ,296 }));
+	//EntityUtil::SpawnUnit(*units[1], PlayerId{ (short)(1) }, Vector2Int16(Vector2Int{ 264 ,264 }));
+
+	//int i = 0;
+	//for (int y = 1; y < 2; ++y)
+	//{
+	//	for (int x = 1; x < 2; ++x)
+	//	{
+
+	//		auto& group = group1;// *groups[i % 3];
+
+	//		for (int j = 0; j < group.size(); ++j)
+	//		{
+	//			EntityUtil::SpawnUnit(*group[j], PlayerId{ (short)(i % totalPlayers + 1) },
+	//				Vector2Int16(Vector2Int{ x * 70 + (j%2)*32 ,y * 70 + (j/2) *32}));
+	//		}
+	//		//EntityUtil::SpawnUnit(*units[i % 3], PlayerId{ (short)(i % totalPlayers + 1) }, Vector2Int16(Vector2Int{ x * 64 ,y * 64 }));
+	//		++i;
+	//	}
+	//}
 
 	_entityManager->PlayerSystem.SetMapKnown(PlayerId{ 1 });
 

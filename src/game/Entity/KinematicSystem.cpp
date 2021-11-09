@@ -3,6 +3,8 @@
 #include "../Camera.h"
 #include "../Engine/GraphicsRenderer.h"
 
+static std::vector<EntityId> _scratch;
+
 void KinematicSystem::NewCollider(EntityId id, const Rectangle16& collider)
 {
 	_colliderComponents.NewComponent(id);
@@ -20,6 +22,8 @@ void KinematicSystem::RemoveCollider(EntityId id)
 
 void KinematicSystem::UpdateColliders(EntityManager& em)
 {
+	Move(em);
+
 	_worldColliders.clear();
 
 	auto& entites = _colliderComponents.GetEntities();
@@ -27,7 +31,7 @@ void KinematicSystem::UpdateColliders(EntityManager& em)
 	for (int i = 0; i < entites.size(); ++i)
 	{
 		EntityId e = entites[i];
-		const ColliderComponent& collider = components[i];
+		ColliderComponent& collider = components[i];
 		Rectangle16 worldCollider = collider.collider;
 		worldCollider.position += em.GetPosition(e);
 
@@ -35,18 +39,44 @@ void KinematicSystem::UpdateColliders(EntityManager& em)
 	}
 }
 
+void KinematicSystem::Move(EntityManager& em)
+{
+	auto& entites = _kinematicComponents.GetEntities();
+	auto& components = _kinematicComponents.GetComponents();
+	for (int i = 0; i < entites.size(); ++i)
+	{
+		EntityId e = entites[i];
+		KinematicComponent& kin = components[i];
+		if (kin.moveOnce.LengthSquaredInt() == 0) continue;
+
+		Vector2Int16 pos = em.GetPosition(e);
+		pos += kin.moveOnce;
+		kin.moveOnce = {};
+
+
+		em.SetPosition(e, pos);
+		continue;
+
+	}
+}
+
+
+
+
 void KinematicSystem::DeleteEntities(std::vector<EntityId>& entities)
 {
 	_colliderComponents.DeleteComponents(entities);
-
+	_kinematicComponents.DeleteComponents(entities);
 	// TODO: sync delete with _worldColliders;
 }
 
 size_t KinematicSystem::ReportMemoryUsage()
 {
-	size_t mem =_colliderComponents.GetMemoryUsage();
+	size_t mem = _colliderComponents.GetMemoryUsage();
+	mem += _kinematicComponents.GetMemoryUsage();
 
 	mem += _worldColliders.capacity() * sizeof(Rectangle16);
+
 	return mem;
 }
 
