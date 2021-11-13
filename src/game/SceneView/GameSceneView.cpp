@@ -9,7 +9,10 @@
 #include "../Engine/AssetLoader.h"
 #include "../Profiler.h"
 #include "../Scenes/GameScene.h"
+#include "../Engine/GraphicsRenderer.h"
 
+static constexpr const int MarkerTimer = 16;
+static constexpr const int AbilityUnitTargetMarkerTimer = 80;
 
 GameSceneView::GameSceneView(GameScene* scene) : _scene(scene)
 {
@@ -35,6 +38,9 @@ void GameSceneView::SetPlayer(PlayerId player)
 	const PlayerInfo& info = _scene->GetEntityManager().PlayerSystem.GetPlayerInfo(_player);
 
 	_resourceBar.UpdatePlayerInfo(info, true);
+
+	_unitMarker.id = Entity::None;
+	_markers.clear();
 
 	SetDefaultMode();
 }
@@ -156,10 +162,13 @@ void GameSceneView::UpdateSelection()
 	}
 	else
 	{
-		_selectTargetAbility = nullptr;
+		if (IsTargetSelectionMode())
+			SetDefaultMode();
 	}
 
 	_scene->GetEntityManager().DrawSystem.UpdateSelection(_unitSelection, selectionColor);
+
+
 }
 void GameSceneView::ContextActionCheck()
 {
@@ -200,7 +209,7 @@ void GameSceneView::ActivateAbilityAt(Vector2Int16 worldPos)
 	{
 		for (EntityId id : _unitSelection)
 			EntityUtil::ActivateAbility(id, *_selectTargetAbility, target);
-		OnAbilityActivated();
+		OnAbilityActivated(target);
 		return;
 	}
 
@@ -210,7 +219,7 @@ void GameSceneView::ActivateAbilityAt(Vector2Int16 worldPos)
 		{
 			EntityUtil::ActivateAbility(id, *_selectTargetAbility, worldPos);
 		}
-		OnAbilityActivated();
+		OnAbilityActivated(worldPos);
 	}
 }
 void GameSceneView::ActivateContextAbilityAt(Vector2Int16 worldPos)
@@ -226,6 +235,9 @@ void GameSceneView::ActivateContextAbilityAt(Vector2Int16 worldPos)
 			const AbilityDef* ability = EntityUtil::GetUnitDefaultAbility(id, entity);
 			EntityUtil::ActivateAbility(id, *ability, entity);
 		}
+
+
+		OnAbilityActivated(entity);
 	}
 	else
 	{
@@ -234,11 +246,12 @@ void GameSceneView::ActivateContextAbilityAt(Vector2Int16 worldPos)
 			const AbilityDef* ability = EntityUtil::GetUnitDefaultAbility(id, worldPos);
 			EntityUtil::ActivateAbility(id, *ability, worldPos);
 		}
+
+		OnAbilityActivated(worldPos);
 	}
 
-	OnAbilityActivated();
 }
-void GameSceneView::OnAbilityActivated()
+void GameSceneView::OnAbilityActivated(EntityId target, Vector2Int16 worldPos)
 {
 	SetDefaultMode();
 
@@ -248,6 +261,21 @@ void GameSceneView::OnAbilityActivated()
 
 	if (played)
 		_unitPortrait.ChatUnit(_unitSelection[0], false);
+
+	if (worldPos.x != -1 && worldPos.y != -1)
+	{
+		ActionMarker marker;
+		marker.pos = worldPos;
+		marker.timer = MarkerTimer;
+
+		_markers.clear();
+		_markers.push_back(marker);
+	}
+	if (target != Entity::None)
+	{
+		_unitMarker.id = target;
+		_unitMarker.timer = AbilityUnitTargetMarkerTimer;
+	}
 }
 void GameSceneView::OnUnitSelect(EntityId id, bool newSelection)
 {
@@ -361,6 +389,8 @@ void GameSceneView::DrawMainScreen()
 
 	GUI::UseScreen(ScreenId::Top);
 
+	DrawMarkers();
+
 	auto& info = GetPlayerInfo();
 
 	const RaceDef* raceDef = GameDatabase::instance->GetRace(info.race);
@@ -463,6 +493,86 @@ void GameSceneView::DrawSecondaryScreen()
 	GUI::EndLayout();
 }
 
+void GameSceneView::DrawMarkers()
+{
+	Rectangle16 camRect = _camera.GetRectangle16();
+
+	const ImageFrame& frame = GameDatabase::instance->GetImage("cursor\\targg").GetFrame(1);
+
+	for (int i = 0; i < _markers.size(); ++i)
+	{
+		_markers[i].timer--;
+		if (_markers[i].timer == 0)
+		{
+			if (_markers[i].state == 0)
+			{
+				++_markers[i].state;
+				_markers[i].timer = MarkerTimer;
+			}
+			else
+			{
+				_markers.erase(_markers.begin() + i);
+				--i;
+			}
+		}
+	}
+
+	for (ActionMarker& marker : _markers)
+	{
+
+		if (!camRect.Contains(marker.pos))
+			continue;
+
+		Rectangle dst = { {0,0},  Vector2Int(frame.size) };
+
+		if (marker.state == 0)
+		{
+			float scale = 1;
+			if (marker.timer < MarkerTimer / 2)
+			{
+				scale = (float)(marker.timer) / ((float)MarkerTimer);
+			}
+			else
+			{
+				scale = (float)(MarkerTimer - marker.timer) / ((float)MarkerTimer);
+
+			}
+			scale = 1 + scale;
+			dst.size = Vector2Int(Vector2(dst.size) * scale);
+		}
+
+
+		Vector2Int16 p = _camera.WorldToScreen(marker.pos);
+		dst.SetCenter(Vector2Int(p));
+
+		GraphicsRenderer::Draw(frame, dst);
+	}
+
+
+	if (_unitMarker.id != Entity::None)
+	{
+		if (!_scene->GetEntityManager().UnitSystem.IsUnit(_unitMarker.id))
+			_unitMarker.id = Entity::None;
+
+		_unitMarker.timer--;
+
+		if (_unitMarker.timer <= 0)
+			_unitMarker.id = Entity::None;
+	}
+
+	if (_unitMarker.id != Entity::None)
+	{
+		if (((AbilityUnitTargetMarkerTimer - _unitMarker.timer) / 20) % 2 == 0)
+		{
+			Color c = GetAlliedUnitColor(_unitMarker.id);
+			_scene->GetEntityManager().DrawSystem.AddToSelection(_unitMarker.id, c, true);
+		}
+		else
+		{
+			_scene->GetEntityManager().DrawSystem.RemoveFromSelection(_unitMarker.id, true);
+		}
+	}
+}
 void GameSceneView::DrawPortrait()
 {
 	EntityId id = Entity::None;

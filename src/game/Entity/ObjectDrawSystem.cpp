@@ -92,6 +92,8 @@ void ObjectDrawSystem::Draw(EntityManager& em, const Camera& camera)
 
 	for (const auto& sel : _selection)
 	{
+		if (!sel.showMarker) continue;
+
 		const DrawComponent& draw = _drawComponents.GetComponent(sel.entity);
 		if (!draw.visible) continue;
 
@@ -132,6 +134,8 @@ void ObjectDrawSystem::DrawSelectedBars(EntityManager& em, const Camera& camera)
 
 	for (const auto& sel : _selection)
 	{
+		if (!sel.showBar) continue;
+
 		const DrawComponent& draw = _drawComponents.GetComponent(sel.entity);
 		if (!draw.visible) continue;
 
@@ -155,13 +159,13 @@ void ObjectDrawSystem::DrawSelectedBars(EntityManager& em, const Camera& camera)
 
 		auto* palette = &GreenHPBarColorPalette;
 
-	
+
 		Vector2Int16 dst = camera.WorldToScreen(pos);
 		dst.x -= size >> 1;
 
 		if (unit.HasShield())
 			dst.y += 4;
-		
+
 
 		int hpBarsVisible = (int)std::ceil(((float)unit.health.value * barSize) / (float)unit.maxHealth.value);
 
@@ -214,8 +218,8 @@ void ObjectDrawSystem::DrawSelectedBars(EntityManager& em, const Camera& camera)
 
 			int shieldBarsVisible = (int)std::roundf(((float)unit.shield.value * barSize) / (float)unit.maxShield.value);
 
-		/*	if (shieldBarsVisible > 1 && shieldBarsVisible == barSize && unit.shield != unit.shield)
-				--shieldBarsVisible;*/
+			/*	if (shieldBarsVisible > 1 && shieldBarsVisible == barSize && unit.shield != unit.shield)
+					--shieldBarsVisible;*/
 
 			Rectangle barHp = { Vector2Int(dst) + Vector2Int(1,1), Vector2Int(shieldBarsVisible * 3 - 1 ,1) };
 
@@ -258,8 +262,37 @@ void ObjectDrawSystem::UpdateSelection(const std::vector<EntityId> selection, Co
 	_selection.clear();
 	for (EntityId id : selection)
 	{
-		_selection.push_back({ id, Color32(color) });
+		_selection.push_back({ id, Color32(color), true , true });
 	}
+}
+
+void ObjectDrawSystem::RemoveFromSelection(EntityId id, bool onlyMarker)
+{
+	for (auto i = _selection.begin(); i != _selection.end(); ++i)
+	{
+		if (i->entity == id)
+		{
+			if (onlyMarker)
+				i->showMarker = false;
+			else
+				_selection.erase(i);
+			return;
+		}
+	}
+}
+
+void ObjectDrawSystem::AddToSelection(EntityId id, Color color, bool onlyMarker)
+{
+	for (auto& s : _selection)
+	{
+		if (s.entity == id)
+		{
+			s.color = Color32(color);
+			return;
+		}
+	}
+
+	_selection.push_back({ id, Color32(color), true, !onlyMarker });
 }
 
 void ObjectDrawSystem::DeleteEntities(std::vector<EntityId>& entities)

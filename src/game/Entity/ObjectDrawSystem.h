@@ -30,6 +30,8 @@ class ObjectDrawSystem : public IEntitySystem {
 	struct ObjectSelection {
 		EntityId entity;
 		Color32 color = 0xFFFFFFFF;
+		bool showMarker = false;
+		bool showBar = false;
 	};
 
 	EntityComponentMap<DrawComponent> _drawComponents;
@@ -56,6 +58,8 @@ public:
 	DrawComponent& GetComponent(EntityId id) { return _drawComponents.GetComponent(id); }
 
 	void UpdateSelection(const std::vector<EntityId> selection, Color color);
+	void AddToSelection(EntityId id, Color color , bool onlyMarker);
+	void RemoveFromSelection(EntityId selection, bool onlyMarker);
 
 	inline void InitFromImage(EntityId id, const Image& image)
 	{

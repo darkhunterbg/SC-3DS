@@ -4,7 +4,8 @@
 
 static constexpr const uint8_t Nav_None = 0xFF;
 
-static constexpr const  uint16_t FollowMaxDistance = 96;
+static constexpr const  uint16_t FollowLeashMinDistance = 128;
+static constexpr const  uint16_t FollowLeashMaxDistance = 192;
 
 static const Vector2 movementTable8[]{
 		{0,-1}, {0.8,-0.8},{1,0}, {0.8,0.8},{0,1}, {-0.8,0.8}, {-1,0},{-0.8,-0.8}
@@ -210,7 +211,7 @@ void UnitAIStateMachine::AttackTargetThink(UnitAIThinkData& data, EntityManager&
 
 		EntityId enemy = em.UnitSystem.GetAIComponent(id).targetEntity;
 
-		if (enemy!= Entity::None && em.HasEntity(enemy) && em.UnitSystem.IsUnit(enemy))
+		if (enemy != Entity::None && em.HasEntity(enemy) && em.UnitSystem.IsUnit(enemy))
 		{
 			const UnitComponent& unit = em.UnitSystem.GetComponent(id);
 			const UnitDef& def = *unit.def;
@@ -358,15 +359,18 @@ void UnitAIStateMachine::FollowThink(UnitAIThinkData& data, EntityManager& em)
 		Vector2Int16 pos = em.GetPosition(id);
 
 		Vector2Int16 dst = em.GetPosition(ai.targetEntity);
-		if ((pos - dst).LengthSquaredInt() > FollowMaxDistance * FollowMaxDistance)
+		int distance = (pos - dst).LengthSquaredInt();
+
+		if (em.UnitSystem.GetStateComponent(id).stateId == UnitStateId::Movement)
+		{
+			if (distance < FollowLeashMinDistance * FollowLeashMinDistance)
+				EntityUtil::SetUnitState(id, UnitStateId::Idle);
+		}
+		if (distance > FollowLeashMaxDistance * FollowLeashMaxDistance)
 		{
 			MoveToPosition(id, dst, em);
 		}
-		else
-		{
-			if (em.UnitSystem.GetStateComponent(id).stateId != UnitStateId::Idle)
-				EntityUtil::SetUnitState(id, UnitStateId::Idle);
-		}
+
 	}
 }
 

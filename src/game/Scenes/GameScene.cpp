@@ -169,7 +169,6 @@ void GameScene::Frame(TimeSlice& frameBudget)
 
 	_entityManager->Draw(_view->GetCamera());
 
-	_view->Draw();
 
 	frameTime -= std::min(0.0166f, Game::DeltaTime);
 
@@ -188,6 +187,7 @@ void GameScene::Frame(TimeSlice& frameBudget)
 	}
 
 	_view->Update();
+	_view->Draw();
 
 	if (Game::GetInput().Cheats.ToggleFoW.IsActivated())
 	{
