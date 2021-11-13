@@ -30,6 +30,14 @@ MinimapPanel::ActivatedResult MinimapPanel::DrawMinimapAndAcitvate(Camera& camer
 	{
 		Vector2Int pos = GUI::GetPointerPosition() - dst.position;
 
+		if (GUI::IsLayoutPressed())
+		{
+			MinimapPanel::ActivatedResult result;
+			result.isPressed = true;
+			result.worldPos = Vector2Int16(Vector2(pos) * minimapUpscale);
+			return result;
+		}
+
 		if (GUI::IsLayoutActivated())
 		{
 			MinimapPanel::ActivatedResult result;

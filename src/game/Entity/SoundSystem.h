@@ -55,6 +55,7 @@ public:
 
 	void PlayMusic(const SoundSetDef& music);
 	void PlayChat(const SoundSetDef& chat);
+	void PlayUISound(const SoundSetDef* sound);
 	bool PlayUnitChat(EntityId unit, UnitChatType type);
 
 	void PlayWorldSound(const SoundSetDef& sound, Vector2Int16 pos, int priority);

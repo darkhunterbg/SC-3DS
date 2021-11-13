@@ -9,6 +9,7 @@ public:
 		Vector2Int16 worldPos;
 		bool isAlternativeActivate = false;
 		bool isActivate = false;
+		bool isPressed = false;
 
 		inline bool Activated() const { return isActivate || isAlternativeActivate; }
 	};

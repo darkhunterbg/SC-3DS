@@ -10,9 +10,6 @@ using System.Threading.Tasks;
 
 namespace DataManager.Assets
 {
-
-
-
 	[BinaryData(DataItemType.Abilities)]
 	public class AbilityAsset : Asset, ITreeViewItem
 	{

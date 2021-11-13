@@ -30,6 +30,7 @@ Advisor\Zerg\Update00,False,sound\zerg\advisor\zadupd00
 Advisor\Zerg\Update01,False,sound\zerg\advisor\zadupd01
 Advisor\Zerg\Update02,False,sound\zerg\advisor\zadupd02
 Advisor\Zerg\Update04,False,sound\zerg\advisor\zadupd04
+Misc\Button,False,sound\misc\button
 Music\Protoss,True,"music\protoss1,music\protoss2,music\protoss3"
 Music\Terran,True,"music\terran1,music\terran2,music\terran3"
 Music\Title,False,music\title

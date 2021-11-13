@@ -6,7 +6,7 @@
 #include "../Debug.h"
 
 static constexpr const int AudioChannelBufferSize = 4096;
-static constexpr const int MonoChannels = 6;
+static constexpr const int MonoChannels = 5;
 
 AudioManager AudioManager::instance;
 

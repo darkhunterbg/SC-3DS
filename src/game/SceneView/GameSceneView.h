@@ -15,7 +15,6 @@ class GameScene;
 
 class GameSceneView {
 
-
 private:
 	GameScene* _scene = nullptr;
 
@@ -40,6 +39,7 @@ private:
 	bool _cursorOverUI = false;
 	bool _cursorOverMinimap = false;
 
+	const struct SoundSetDef* _selectSound = nullptr;
 
 	Color GetAlliedUnitColor(EntityId id);
 	void UpdateSelection();

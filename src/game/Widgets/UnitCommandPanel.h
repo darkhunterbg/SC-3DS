@@ -21,12 +21,14 @@ public:
 
 	int _commandActivateDelay = 0;
 	Command _activatedCmd;
+
+	const struct SoundSetDef* _buttonSound = nullptr;
 private:
 	std::vector<Command> _commands;
 	const Command* DrawCommandButtonsAndSelect(const struct RaceDef& skin);
 public:
+	UnitCommandPanel();
 
 	const Command* DrawUnitCommandsAndSelect(EntityId id, const struct RaceDef& skin);
-
 	const Command* DrawAbilityCommandsAndSelect(const struct AbilityDef* ability, const struct RaceDef& skin);
 };

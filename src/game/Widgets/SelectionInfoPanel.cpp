@@ -128,6 +128,11 @@ static void GetUnitWireframeColors(EntityId id, const UnitComponent& unit, std::
 
 }
 
+SelectionInfoPanel::SelectionInfoPanel()
+{
+	_buttonSound = GameDatabase::instance->GetSoundSet("Misc\\Button");
+}
+
 void SelectionInfoPanel::Draw(std::vector<EntityId>& selection, const RaceDef& skin)
 {
 	if (selection.size() == 0) return;
@@ -204,7 +209,6 @@ void SelectionInfoPanel::DrawMultiselection(std::vector<EntityId>& selection)
 
 		for (int i = wireframeStart; i < wfColor.size(); ++i)
 		{
-
 			const auto& wfPart = img.GetFrame(i + wireframeGraphicsOffset);
 
 			GUI::AddNextElementOffset(Vector2Int(wfPart.offset) + Vector2Int(0, 1));
@@ -217,6 +221,8 @@ void SelectionInfoPanel::DrawMultiselection(std::vector<EntityId>& selection)
 		{
 			selection.clear();
 			selection.push_back(id);
+
+			EntityUtil::GetManager().SoundSystem.PlayUISound(_buttonSound);
 		}
 
 		GUI::EndLayout();

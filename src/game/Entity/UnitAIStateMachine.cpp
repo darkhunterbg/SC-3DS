@@ -210,7 +210,7 @@ void UnitAIStateMachine::AttackTargetThink(UnitAIThinkData& data, EntityManager&
 
 		EntityId enemy = em.UnitSystem.GetAIComponent(id).targetEntity;
 
-		if (em.HasEntity(enemy) && em.UnitSystem.IsUnit(enemy))
+		if (enemy!= Entity::None && em.HasEntity(enemy) && em.UnitSystem.IsUnit(enemy))
 		{
 			const UnitComponent& unit = em.UnitSystem.GetComponent(id);
 			const UnitDef& def = *unit.def;

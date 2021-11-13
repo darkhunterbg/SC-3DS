@@ -58,6 +58,7 @@ UnitComponent& UnitSystem::NewUnit(EntityId id, const UnitDef& def, PlayerId own
 	_unitComponents.NewComponent(id);
 
 	UnitComponent& unit = _unitComponents.GetComponent(id);
+	unit.InitRuntimeData();
 
 	unit.owner = owner;
 	unit.def = &def;
@@ -70,6 +71,7 @@ UnitComponent& UnitSystem::NewUnit(EntityId id, const UnitDef& def, PlayerId own
 	unit.damage[0].SetToInt(def.Attacks[0].Damage);
 	unit.damage[1].SetToInt(def.Attacks[1].Damage);
 	unit.attackedBy = Entity::None;
+	unit.regenerateHP = def.Stats.RegenHealth;
 
 	_unitStateComponents.NewComponent(id);
 	auto& state = _unitStateComponents.GetComponent(id);
@@ -205,9 +207,24 @@ void UnitSystem::ProcessUnitEvents(EntityManager& em)
 			unit.shieldRegen += ShieldRegen;
 
 			if (unit.shieldRegen < old)
-			{
 				unit.shield.value += 2;
-			}
+		}
+		else
+		{
+			unit.shieldRegen = 0;
+		}
+
+		if (unit.regenerateHP && unit.health < unit.maxHealth)
+		{
+			uint8_t old = unit.hpRegen;
+			unit.hpRegen += HealthRegen;
+
+			if (unit.hpRegen < old)
+				unit.health.value += 2;
+		}
+		else
+		{
+			unit.hpRegen = 0;
 		}
 
 		unit.attackedBy = Entity::None;

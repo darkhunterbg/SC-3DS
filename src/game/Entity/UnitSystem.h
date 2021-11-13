@@ -21,11 +21,22 @@ struct UnitComponent {
 	FPNumber<int16_t> maxHealth = 0;
 	FPNumber<int16_t> shield = 0;
 	FPNumber<int16_t> maxShield = 0;
-	int16_t kills = 0;
 	FPNumber<int16_t> damage[2] = { 0,0 };
+
+	int16_t kills = 0;
 	uint8_t shieldRegen = 0;
+	uint8_t hpRegen = 0;
 
 	EntityId attackedBy = Entity::None;
+	bool regenerateHP = false;
+
+	inline void InitRuntimeData()
+	{
+		kills = 0;
+		shieldRegen = 0;
+		hpRegen = 0;
+		attackedBy = Entity::None;
+	}
 
 	inline bool HasShield() const { return maxShield.value > 0; }
 	inline bool IsDead() const { return health <= 0; }

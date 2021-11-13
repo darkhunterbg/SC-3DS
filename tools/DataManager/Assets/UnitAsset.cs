@@ -171,6 +171,15 @@ namespace DataManager.Assets
 		[Binary(BinaryType.UInt, 2)]
 		[Optional]
 		public int ProvideSupply { get; set; } = 0;
+
+		[DefaultEditor]
+		[Binary(BinaryType.UInt, 1)]
+		[Optional]
+		public bool RegenerateHealth { get; set; }
+
+		[Ignore]
+		[Binary(BinaryType.UInt, 1)]
+		public bool _Padding { get; set; }
 		#endregion
 
 		#region Movement

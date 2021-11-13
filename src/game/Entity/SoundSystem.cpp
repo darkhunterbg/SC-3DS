@@ -18,15 +18,17 @@ SoundSystem::SoundSystem()
 	for (const AudioChannelState& channel : channels)
 	{
 		if (&channel == Game::GetUIChannel())
+		{
+			if (channel.mono)
+				_chatChannel.channel = &channel;
+
 			continue;
 
-		if (channel.mono)
-		{
-			if (!_chatChannel.channel)
-				_chatChannel.channel = &channel;
-			else
-				_worldChannels.push_back({ &channel });
 		}
+
+
+		if (channel.mono)
+			_worldChannels.push_back({ &channel });
 	}
 
 	_channels.reserve(_worldChannels.size() + 2);
@@ -82,6 +84,15 @@ void SoundSystem::PlayWorldSound(const SoundSetDef& sound, Vector2Int16 pos, int
 void SoundSystem::PlayMusic(const SoundSetDef& music)
 {
 	PlayDef(music, _musicChannel);
+}
+
+void SoundSystem::PlayUISound(const SoundSetDef* sound)
+{
+	if (!sound) return;
+
+	if (!IsPlayCompleted(_chatChannel)) return;
+
+	PlayChat(*sound);
 }
 
 void SoundSystem::PlayChat(const SoundSetDef& chat)

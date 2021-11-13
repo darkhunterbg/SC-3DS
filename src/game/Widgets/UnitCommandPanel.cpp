@@ -10,6 +10,11 @@
 
 static constexpr const int CommandDelay = 1;
 
+UnitCommandPanel::UnitCommandPanel()
+{
+	_buttonSound = GameDatabase::instance->GetSoundSet("Misc\\Button");
+}
+
 const UnitCommandPanel::Command* UnitCommandPanel::DrawUnitCommandsAndSelect(EntityId id, const  RaceDef& skin)
 {
 	if (id == Entity::None) return nullptr;
@@ -40,7 +45,6 @@ const UnitCommandPanel::Command* UnitCommandPanel::DrawUnitCommandsAndSelect(Ent
 const UnitCommandPanel::Command* UnitCommandPanel::DrawCommandButtonsAndSelect(const RaceDef& skin)
 {
 	const auto& font = *Game::SystemFont8;
-	//GUI::DrawLayoutDebug();
 
 	const ImageFrame& normal = skin.CommandIcons->GetFrame(0);
 	const ImageFrame& pressed = skin.CommandIcons->GetFrame(1);
@@ -59,17 +63,21 @@ const UnitCommandPanel::Command* UnitCommandPanel::DrawCommandButtonsAndSelect(c
 
 		Vector2Int btnOffset = { 0,0 };
 
-		if (GUI::IsLayoutPressed())
+		if (cmd.enabled)
 		{
-			c = Colors::White;
-			btnOffset = { 1,1 };
+			if (GUI::IsLayoutPressed())
+			{
+				c = Colors::White;
+				btnOffset = { 1,1 };
 
-		}
+			}
 
-		if (GUI::IsLayoutActivated())
-		{
-			_activatedCmd = cmd;
-			_commandActivateDelay = CommandDelay + 1;	// +1 because later we reduce value
+			if (GUI::IsLayoutActivated())
+			{
+				_activatedCmd = cmd;
+				_commandActivateDelay = CommandDelay + 1;	// +1 because later we reduce value
+				EntityUtil::GetManager().SoundSystem.PlayUISound(_buttonSound);
+			}
 		}
 
 		GUIImage::DrawImageFrame(normal, btnOffset);
@@ -86,7 +94,7 @@ const UnitCommandPanel::Command* UnitCommandPanel::DrawCommandButtonsAndSelect(c
 		GUI::EndLayout();
 	}
 
-	if (_commandActivateDelay >0 )
+	if (_commandActivateDelay > 0)
 	{
 		--_commandActivateDelay;
 		if (_commandActivateDelay == 0)
@@ -94,6 +102,7 @@ const UnitCommandPanel::Command* UnitCommandPanel::DrawCommandButtonsAndSelect(c
 	}
 	return nullptr;
 }
+
 
 const UnitCommandPanel::Command* UnitCommandPanel::DrawAbilityCommandsAndSelect(const AbilityDef* ability, const RaceDef& skin)
 {

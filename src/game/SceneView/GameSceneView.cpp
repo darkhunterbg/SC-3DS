@@ -25,6 +25,7 @@ GameSceneView::GameSceneView(GameScene* scene) : _scene(scene)
 
 	SetPlayer(_scene->GetEntityManager().MapSystem.ActivePlayer);
 
+	_selectSound = GameDatabase::instance->GetSoundSet("Misc\\Button");
 }
 
 void GameSceneView::SetPlayer(PlayerId player)
@@ -51,6 +52,7 @@ Color GameSceneView::GetAlliedUnitColor(EntityId id)
 
 	return Colors::UIDarkYellow;
 }
+
 void GameSceneView::OnEntitiesDeleted(const std::vector<EntityId>& entities)
 {
 	if (_unitSelection.size() == 0) return;
@@ -68,8 +70,11 @@ void GameSceneView::OnEntitiesDeleted(const std::vector<EntityId>& entities)
 		}
 	}
 }
+
 void GameSceneView::UpdateSelection()
 {
+	if (IsTargetSelectionMode())return;
+
 	Rectangle selection;
 	if (_cursor.GetScreenSelection(selection))
 	{
@@ -230,6 +235,8 @@ void GameSceneView::ActivateContextAbilityAt(Vector2Int16 worldPos)
 			EntityUtil::ActivateAbility(id, *ability, worldPos);
 		}
 	}
+
+	OnAbilityActivated();
 }
 void GameSceneView::OnAbilityActivated()
 {
@@ -292,10 +299,15 @@ void GameSceneView::Update()
 				_cursor.SetUnitHover(CursorHoverState::Yellow);
 		}
 	}
+	if (_cursorOverMinimap && IsTargetSelectionMode())
+	{
+		_cursor.SetUnitHover(CursorHoverState::Yellow);
+	}
 
+	UpdateSelection();
 	ContextActionCheck();
 	TargetActionCheck();
-	UpdateSelection();
+
 
 	const PlayerInfo& info = _scene->GetEntityManager().PlayerSystem.GetPlayerInfo(_player);
 
@@ -335,7 +347,6 @@ void GameSceneView::Draw()
 
 	DrawSecondaryScreen();
 }
-
 
 void GameSceneView::OnPlatformChanged()
 {
@@ -463,9 +474,7 @@ void GameSceneView::DrawPortrait()
 		_unitPortrait.Draw(id);
 
 		if (GUI::IsLayoutPressed())
-		{
 			_camera.SetPositionRestricted(_scene->GetEntityManager().GetPosition(id));
-		}
 	}
 }
 void GameSceneView::DrawCommandPanel()
@@ -516,20 +525,16 @@ void GameSceneView::DrawMinimap()
 		_cursorOverMinimap = true;
 	auto result = _minimap.DrawMinimapAndAcitvate(_camera);
 
-	if (result.isActivate)
+	if (IsTargetSelectionMode())
 	{
-		if (!IsTargetSelectionMode())
-			_camera.SetPositionRestricted(result.worldPos);
-		else
-			ActivateAbilityAt(result.worldPos);
-
+		if (result.isActivate) ActivateAbilityAt(result.worldPos);
+		if (result.isAlternativeActivate) SetDefaultMode();
 	}
-
-	if (result.isAlternativeActivate)
+	else
 	{
-		if (!IsTargetSelectionMode())
-		{
+		if (result.isAlternativeActivate)
 			ActivateContextAbilityAt(result.worldPos);
-		}
+		if (result.isPressed)
+			_camera.SetPositionRestricted(result.worldPos);
 	}
 }
