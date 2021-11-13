@@ -17,43 +17,43 @@ struct UnitItemInfo {
 	int stat = 0;
 };
 
+using OrganicColorPalette = std::array<Color, 4>;
+
+static constexpr const Color _wfNormalColorPalette[] = { Colors::UIGreen, Colors::UIYellow, Colors::UIRed };
+static constexpr const std::array < OrganicColorPalette, 6>  _wfOrganicColorPlalette = {
+{
+	{OrganicColorPalette{ 0x042064ff , 0x042064ff, 0x083498ff, 0x88409cff }},
+	{OrganicColorPalette{ 0x083498ff , 0x840404ff, 0xa80808ff, 0xe85014ff }},
+	{OrganicColorPalette{ 0x683078ff , 0xc81818ff, 0xa80808ff, 0xe85014ff }},
+	{OrganicColorPalette{ 0x683078ff , 0xa0541cff, 0xf88c14ff, 0x10fc18ff }},
+	{OrganicColorPalette{ 0xa80808ff , 0xa0541cff, 0xf88c14ff, 0x10fc18ff }},
+	{OrganicColorPalette{ 0xc81818ff , 0xf88c14ff, 0x10fc18ff, 0xfcfc38ff }},
+
+} };
+
 static void GetUnitWireframeColors(EntityId id, const UnitComponent& unit, std::array<Color, 6>& outColors)
 {
-	static Color wfStateColor[3] = { Colors::UIGreen, Colors::UIYellow, Colors::UIRed };
-	int wfPartsState[4] = { 0,0,0,0 };
-
-	int damgeBreakpoint = unit.maxHealth.value / (4 * 2);
-
-	int damageParts = 0;
-
-
-	for (int i = unit.health.value; i < unit.maxHealth.value; i += damgeBreakpoint)
+	if (unit.HasShield())
 	{
-		++damageParts;
-	}
+		int wfPartsState[4] = { 0,0,0,0 };
 
-	std::srand(id);
+		int damgeBreakpoint = unit.maxHealth.value / (4 * 2);
 
-	for (int i = 0; i < damageParts; ++i)
-	{
+		int damageParts = 0;
 
-		int p = std::rand() % 4;
+		for (int i = unit.health.value; i < unit.maxHealth.value; i += damgeBreakpoint)
+			++damageParts;
 
-		bool found = false;
+		std::srand(id);
 
-		for (p; p < 4; ++p)
+		for (int i = 0; i < damageParts; ++i)
 		{
-			if (wfPartsState[p] < 2)
-			{
-				found = true;
-				++wfPartsState[p];
-				break;
-			}
-		}
 
-		if (!found)
-		{
-			for (p = 0; p < 4; ++p)
+			int p = std::rand() % 4;
+
+			bool found = false;
+
+			for (p; p < 4; ++p)
 			{
 				if (wfPartsState[p] < 2)
 				{
@@ -62,14 +62,29 @@ static void GetUnitWireframeColors(EntityId id, const UnitComponent& unit, std::
 					break;
 				}
 			}
-		}
-	}
 
-	if (unit.HasShield())
-	{
+			if (!found)
+			{
+				for (p = 0; p < 4; ++p)
+				{
+					if (wfPartsState[p] < 2)
+					{
+						found = true;
+						++wfPartsState[p];
+						break;
+					}
+				}
+			}
+		}
+
+		for (int i = 0; i < 4; ++i)
+		{
+			outColors[i + 2] = _wfNormalColorPalette[wfPartsState[i]];
+		}
+
+		// ========= Shield =============
+
 		int shieldState = ((unit.shield.value * 7) / unit.maxShield.value);
-		/*	if (unit.shield.value > 0)
-				++shieldState;*/
 
 		outColors[0] = Colors::UIBlue;
 		outColors[1] = Colors::UIBlue;
@@ -93,18 +108,24 @@ static void GetUnitWireframeColors(EntityId id, const UnitComponent& unit, std::
 			outColors[1].a = ((float)(shieldState - 1)) * 0.2f;
 			outColors[1].a += 0.6f;
 		}
-
-
-		//outColors[0].a = 1;
-		//outColors[1].a = 1;
-
 	}
-
-
-	for (int i = 0; i < 4; ++i)
+	else
 	{
-		outColors[i + 2] = wfStateColor[wfPartsState[i]];
+		int hpState = ((unit.health.value * (_wfOrganicColorPlalette.size() - 1)) / unit.maxHealth.value);
+
+		hpState = std::max(0, std::min(hpState, (int)_wfOrganicColorPlalette.size() - 1));
+
+		auto& pal = _wfOrganicColorPlalette[hpState];
+
+		for (int i = 0; i < 4; ++i)
+		{
+			outColors[i + 2] = pal[i];
+		}
+
 	}
+
+
+
 }
 
 void SelectionInfoPanel::Draw(std::vector<EntityId>& selection, const RaceDef& skin)
@@ -183,7 +204,7 @@ void SelectionInfoPanel::DrawMultiselection(std::vector<EntityId>& selection)
 
 		for (int i = wireframeStart; i < wfColor.size(); ++i)
 		{
-	
+
 			const auto& wfPart = img.GetFrame(i + wireframeGraphicsOffset);
 
 			GUI::AddNextElementOffset(Vector2Int(wfPart.offset) + Vector2Int(0, 1));
@@ -340,7 +361,7 @@ void SelectionInfoPanel::DrawUnitInfo(EntityId id)
 
 
 	int wireframeStart = 0;
-	if (!unit.HasShield() )
+	if (!unit.HasShield())
 		wireframeStart += 2;
 
 	int wireframeGraphicsOffset = unit.def->Art.GetWireframe()->HasShieldGraphics() ? 0 : -2;
@@ -349,7 +370,7 @@ void SelectionInfoPanel::DrawUnitInfo(EntityId id)
 	GUI::BeginRelativeLayout(Vector2Int{ 0,0 }, Vector2Int(img.GetSize()), GUIHAlign::Center, GUIVAlign::Top);
 	for (int i = wireframeStart; i < wfColor.size(); ++i)
 	{
-		const auto& wfPart = img.GetFrame(i+ wireframeGraphicsOffset);
+		const auto& wfPart = img.GetFrame(i + wireframeGraphicsOffset);
 
 		GUI::AddNextElementOffset(Vector2Int(wfPart.offset));
 		GUI::SetNextElementSize(Vector2Int(wfPart.size));

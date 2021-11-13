@@ -55,6 +55,13 @@ public:
 		return _unitSelection;
 	}
 
+	inline void SetSelection(EntityId id)
+	{
+		_unitSelection.clear();
+		_unitSelection.push_back(id);
+		OnUnitSelect(id, true);
+	}
+
 	void Update();
 	void Draw();
 

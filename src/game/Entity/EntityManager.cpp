@@ -38,6 +38,12 @@ public:
 		_updateProfiler = SectionProfiler("UpdateCrt");
 
 		_em->PlayerSystem.ResetNewEvents();
+	
+
+
+		_em->PlayerSystem.UpdatePlayers(*_em);
+
+		CRT_YIELD();
 
 		BeignProfile("UpdateVision");
 
@@ -77,11 +83,8 @@ public:
 
 		CRT_YIELD();
 
+
 		_em->ApplyEntityChanges();
-
-		_em->PlayerSystem.UpdatePlayers(*_em);
-
-		CRT_YIELD();
 
 		BeignProfile("UpdateColliders");
 		_em->KinematicSystem.UpdateColliders(*_em);

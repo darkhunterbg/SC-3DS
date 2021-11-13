@@ -87,18 +87,20 @@ void GameScene::Start()
 	units[2] = GameDatabase::instance->GetUnit("Zerg\\Units\\Zergling");
 
 	std::vector<const UnitDef*> group0 = { units[0], units[0], units[0] };
-	std::vector<const UnitDef*> group2= { units[1] };
+	std::vector<const UnitDef*> group2 = { units[1] };
 	std::vector<const UnitDef*> group1 = { units[2],units[2],units[2],units[2] };
 
 	std::vector<const  UnitDef*>* groups[] = { &group0, &group1, &group2 };
 
 
 
-	EntityUtil::SpawnUnit(*units[0], PlayerId{ (short)(2) }, Vector2Int16(Vector2Int{ 232 ,232}));
-	EntityUtil::SpawnUnit(*units[1], PlayerId{ (short)(1) }, Vector2Int16(Vector2Int{ 264 ,232 }));
-	EntityUtil::SpawnUnit(*units[2], PlayerId{ (short)(2) }, Vector2Int16(Vector2Int{ 232 ,264 }));
-	EntityUtil::SpawnUnit(*units[2], PlayerId{ (short)(2) }, Vector2Int16(Vector2Int{ 232 ,296 }));
-	//EntityUtil::SpawnUnit(*units[1], PlayerId{ (short)(1) }, Vector2Int16(Vector2Int{ 264 ,264 }));
+	//EntityUtil::SpawnUnit(*units[0], PlayerId{ (short)(2) }, Vector2Int16(Vector2Int{ 232 ,232}));
+	//EntityUtil::SpawnUnit(*units[1], PlayerId{ (short)(1) }, Vector2Int16(Vector2Int{ 264 ,232 }));
+	//EntityUtil::SpawnUnit(*units[2], PlayerId{ (short)(2) }, Vector2Int16(Vector2Int{ 232 ,264 }));
+	//EntityUtil::SpawnUnit(*units[2], PlayerId{ (short)(2) }, Vector2Int16(Vector2Int{ 232 ,296 }));
+	auto u = EntityUtil::SpawnUnit(*units[2], PlayerId{ (short)(1) }, Vector2Int16(Vector2Int{ 64 ,64 }));
+	EntityUtil::SpawnUnit(*units[2], PlayerId{ (short)(2) }, Vector2Int16(Vector2Int{ 160 ,160 }));
+	//_entityManager->UnitSystem.GetComponent(u).health = 35;
 
 	//int i = 0;
 	//for (int y = 1; y < 2; ++y)
@@ -141,6 +143,9 @@ void GameScene::Start()
 	_updateCrt = _entityManager->NewUpdateCoroutine();
 
 	_updateCrt->RunAll();
+
+
+	_view->SetSelection(u);
 
 	/*if (loadFromFile) {
 		entityManager->GetCommandProcessor().ReplayFromFile("record.cmd", *entityManager);
