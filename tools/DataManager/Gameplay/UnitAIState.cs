@@ -10,13 +10,10 @@ namespace DataManager.Gameplay
 	{
 		Idle = 0,
 		AttackTarget = 1,
-		GoToPosition = 2,
+		GoTo = 2,
 		GoToAttack = 3,
-		HoldPosition = 4,
-		Patrol = 5,
-		Follow = 6,
-		GatherResource = 7,
-		ReturnCargo = 8,
+		Patrol = 4,
+		HoldPosition = 5,
 
 		Nothing = 0xFF,
 	}

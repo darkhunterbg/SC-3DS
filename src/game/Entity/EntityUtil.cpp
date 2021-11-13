@@ -1,5 +1,5 @@
 #include "EntityUtil.h"
-
+#include "../Data/GameDatabase.h"
 #include "EntityManager.h"
 
 EntityManager* EntityUtil::emInstance = nullptr;
@@ -104,7 +104,6 @@ EntityId EntityUtil::SpawnSprite(const SpriteDef& def, Vector2Int16 position, in
 	return id;
 }
 
-
 bool EntityUtil::IsAlly(PlayerId player, EntityId id)
 {
 	EntityManager& em = GetManager();
@@ -137,8 +136,29 @@ void EntityUtil::SetUnitAIState(EntityId id, UnitAIStateId state)
 	GetManager().UnitSystem.GetAIComponent(id).NewState(state);
 }
 
-
 void EntityUtil::SetUnitState(EntityId id, UnitStateId state)
 {
 	GetManager().UnitSystem.GetStateComponent(id).NewState(state);
+}
+
+static std::vector<const AbilityDef*> unitAbilities;
+
+const std::vector<const AbilityDef*>& EntityUtil::GetUnitAbilities(EntityId id)
+{
+	unitAbilities.clear();
+
+	if (id == Entity::None) return  unitAbilities;
+	if (!GetManager().UnitSystem.IsUnit(id)) return unitAbilities;
+
+	unitAbilities.push_back(GameDatabase::instance->StopAbility);
+	unitAbilities.push_back(GameDatabase::instance->MoveAbility);
+	unitAbilities.push_back(GameDatabase::instance->PatrolAbility);
+	unitAbilities.push_back(GameDatabase::instance->HoldPositionAbility);
+
+	const UnitComponent& unit = EntityUtil::GetManager().UnitSystem.GetComponent(id);
+
+	if (unit.def->GetAttacks().Size() > 0)
+		unitAbilities.push_back(GameDatabase::instance->AttackAbility);
+
+	return unitAbilities;
 }

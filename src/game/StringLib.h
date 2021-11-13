@@ -14,9 +14,11 @@ enum class StringSplitOptions
 };
 
 
-namespace String {
+namespace String
+{
 
-	inline bool Equals(const char* a, const char* b, unsigned maxCompare = 0) {
+	inline bool Equals(const char* a, const char* b, unsigned maxCompare = 0)
+	{
 		if (maxCompare == 0)
 		{
 			maxCompare = strlen(a);
@@ -29,7 +31,8 @@ namespace String {
 		return strncmp(a, b, maxCompare) == 0;
 	}
 
-	inline bool Equals(const std::string& a, const char* b, unsigned maxCompare = 0) {
+	inline bool Equals(const std::string& a, const char* b, unsigned maxCompare = 0)
+	{
 		if (maxCompare == 0)
 			maxCompare = strlen(b);
 
@@ -38,10 +41,12 @@ namespace String {
 		return strncmp(a.data(), b, maxCompare) == 0;
 	}
 
-	inline unsigned Count(Span<char> text, char symbol) {
+	inline unsigned Count(Span<char> text, char symbol)
+	{
 		unsigned result = 0;
 
-		for (unsigned i = 0; i < text.Size(); ++i) {
+		for (unsigned i = 0; i < text.Size(); ++i)
+		{
 			if (text[i] == symbol)
 				++result;
 		}
@@ -49,28 +54,45 @@ namespace String {
 		return result;
 	}
 
-	inline bool Equals(const std::string& a, const std::string& b) {
+	inline bool Equals(const std::string& a, const std::string& b)
+	{
 
 		return a == b;
 	}
 
+	inline bool IsEmpty(const char* a)
+	{
+		return a == nullptr || a[0] == '\0';
+	}
+
+	inline bool IsEmpty(const std::string& s)
+	{
+		return s.length() == 0;
+	}
+
+
 	void Split(Span<char> text, Span<char> splitters, std::vector<std::string>& result, StringSplitOptions options = StringSplitOptions::None);
 	void Split(Span<char> text, const char* splitter, std::vector<std::string>& result, StringSplitOptions options = StringSplitOptions::None);
-	inline void SplitStr(const std::string& text, const char* splitter, std::vector<std::string>& result, StringSplitOptions options = StringSplitOptions::None) {
+	inline void SplitStr(const std::string& text, const char* splitter, std::vector<std::string>& result, StringSplitOptions options = StringSplitOptions::None)
+	{
 		Split({ text.data(), text.length() }, splitter, result, options);
 	}
 
-	inline void Split(Span<char> text, char splitter, std::vector<std::string>& result, StringSplitOptions options = StringSplitOptions::None) {
+	inline void Split(Span<char> text, char splitter, std::vector<std::string>& result, StringSplitOptions options = StringSplitOptions::None)
+	{
 		char splitters[] = { splitter };
 
 		Split(text, { splitters,1 }, result, options);
 	}
 
-	inline void SplitStr(const std::string& text, Span<char> splitters, std::vector<std::string>& result, StringSplitOptions options = StringSplitOptions::None) {
+
+	inline void SplitStr(const std::string& text, Span<char> splitters, std::vector<std::string>& result, StringSplitOptions options = StringSplitOptions::None)
+	{
 		Split({ text.data(), text.length() }, splitters, result, options);
 	}
 
-	inline void SplitStr(const std::string& text, char splitter, std::vector<std::string>& result, StringSplitOptions options = StringSplitOptions::None) {
+	inline void SplitStr(const std::string& text, char splitter, std::vector<std::string>& result, StringSplitOptions options = StringSplitOptions::None)
+	{
 		char splitters[] = { splitter };
 
 		Split({ text.data(), text.length() }, { splitters,1 }, result, options);

@@ -44,6 +44,12 @@ void GUIImage::DrawImageFrame(const ImageFrame& frame, Color color)
 	GraphicsRenderer::Draw(frame, rect, color);
 }
 
+void GUIImage::DrawImageFrame(const ImageFrame& frame, Vector2Int offset, Color color)
+{
+	GUI::AddNextElementOffset(offset);
+	DrawImageFrame(frame, color);
+}
+
 void GUIImage::DrawColor(Color color)
 {
 	Rectangle rect = GUI::GetLayoutSpace();

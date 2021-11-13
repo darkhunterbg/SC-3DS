@@ -221,13 +221,6 @@ void UnitSystem::ProcessUnitEvents(EntityManager& em)
 		if (ai.targetEntity == Entity::None || !em.HasEntity(ai.targetEntity) || !em.UnitSystem.IsUnit(ai.targetEntity)) continue;
 
 		auto& attack = unit.def->GetAttacks()[ai.attackId];
-		auto sound = attack.GetWeapon()->GetSpawnSound();
-
-		if (sound)
-		{
-			EntityUtil::GetManager().SoundSystem.PlayWorldSound(*sound, EntityUtil::GetManager().GetPosition(id), 0);
-		}
-
 
 		UnitComponent& target = GetComponent(ai.targetEntity);
 

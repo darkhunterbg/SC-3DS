@@ -8,6 +8,7 @@
 #include "../Widgets/MinimapPanel.h"
 #include "../Widgets/SelectionInfoPanel.h"
 #include "../Widgets/UnitPortraitPanel.h"
+#include "../Widgets/UnitCommandPanel.h"
 #include "../Entity/Entity.h"
 
 class GameScene;
@@ -22,6 +23,7 @@ private:
 	MinimapPanel _minimap;
 	SelectionInfoPanel _selectionPanel;
 	UnitPortraitPanel _unitPortrait;
+	UnitCommandPanel _commandPanel;
 
 	PlayerId _player;
 

@@ -10,7 +10,7 @@ struct TooltipData {
 	const Font* font;
 };
 
-void GUITooltip::DrawTextTooltip(const char* id, const Font& font, const char* text)
+void GUITooltip::DrawTextTooltip(const char* id, const Font& font, const char* text, TooltipLocation location)
 {
 	std::string key = id;
 	key += ".TooltipData";
@@ -25,8 +25,17 @@ void GUITooltip::DrawTextTooltip(const char* id, const Font& font, const char* t
 
 	Vector2Int size = Platform::MeasureString(font, text);
 	Rectangle rect = GUI::GetLayoutSpace();
-	data->dst = { { rect.GetMax().x, rect.position.y }, size };
-	data->dst.size += {4, 0};
+
+	data->dst = rect;
+	data->dst.size = size+ Vector2Int{4, 0};
+
+	switch (location)
+	{
+	case TooltipLocation::Right: data->dst.position.x = rect.GetMax().x;break;
+	case TooltipLocation::Top: data->dst.position.y -=data->dst.size.y; break;
+
+	}
+
 	data->font = &font;
 	data->text = text;
 

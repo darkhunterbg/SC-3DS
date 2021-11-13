@@ -56,6 +56,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GameInputSchema.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUI.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIBase.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIButton.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIImage.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUILabel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUITooltip.h" />
@@ -89,6 +90,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Widgets\MinimapPanel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Widgets\ResourceBar.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Widgets\SelectionInfoPanel.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Widgets\UnitCommandPanel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Widgets\UnitPortraitPanel.h" />
   </ItemGroup>
   <ItemGroup>
@@ -127,6 +129,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Game.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GameInputSchema.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIBase.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIButton.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIImage.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUILabel.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUITooltip.cpp" />
@@ -155,6 +158,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Widgets\MinimapPanel.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Widgets\ResourceBar.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Widgets\SelectionInfoPanel.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Widgets\UnitCommandPanel.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Widgets\UnitPortraitPanel.cpp" />
   </ItemGroup>
 </Project>

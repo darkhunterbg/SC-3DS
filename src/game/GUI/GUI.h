@@ -5,3 +5,4 @@
 #include "GUILabel.h"
 #include "GUIVideo.h"
 #include "GUITooltip.h"
+#include "GUIButton.h"

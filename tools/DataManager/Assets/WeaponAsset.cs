@@ -37,13 +37,6 @@ namespace DataManager.Assets
 		[Binary(BinaryType.UInt, 2)]
 		public int Attacks { get; set; } = 1;
 
-
-		[Section("Sounds")]
-		[DefaultEditor]
-		[Binary(BinaryType.AssetRef, 2)]
-		[Optional, TypeConverter(typeof(AssetConverter))]
-		public SoundSetAsset SpawnSound { get; set; }
-
 		public override bool HasTooltip => true;
 
 		public override void DrawTooltip()

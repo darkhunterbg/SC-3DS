@@ -31,6 +31,8 @@ enum class UnitAIStateId :uint8_t {
 	GoToAttack = 3,
 	Patrol = 4,
 	HoldPosition = 5,
+
+	Nothing = 0xFF
 };
 
 static constexpr const int UnitAIStateTypeCount = 6;

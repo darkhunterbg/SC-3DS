@@ -3,6 +3,8 @@
 #include "../MathLib.h"
 #include "../Assets.h"
 
+#include "../Entity/UnitAIStateMachine.h"
+
 #include <string> 
 
 typedef uint32_t AbilityId;
@@ -24,17 +26,19 @@ struct AbilityDef {
 	} Art;
 
 	struct AbilityData {
-		//UnitAIState EntitySelectedAction;
-		//UnitAIState PositionSelectedAction;
-		//inline bool HasTargetSelection() const {
-		//	return PositionSelectedAction != UnitAIState::Nothing;
-		//}
-
-		//	inline bool IsState(UnitAIState s) const {
-		//	return EntitySelectedAction == s || PositionSelectedAction == s;
-		//}
+		UnitAIStateId EntitySelectedAction;
+		UnitAIStateId PositionSelectedAction;
+		
 	} Data;
 
+	inline bool HasTargetSelection() const
+	{
+		return Data.PositionSelectedAction != UnitAIStateId::Nothing;
+	}
 
+	inline bool IsState(UnitAIStateId s) const
+	{
+		return Data.EntitySelectedAction == s || Data.PositionSelectedAction == s;
+	}
 };
 #pragma pack(pop)

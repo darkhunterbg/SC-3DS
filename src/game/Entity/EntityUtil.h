@@ -2,9 +2,12 @@
 
 #include "Entity.h"
 #include "../Data/AssetDataDefs.h"
+#include "../Data/AbilityDef.h"
 #include "PlayerSystem.h"
 #include "UnitAIStateMachine.h"
 #include "UnitStateMachine.h"
+
+#include <vector>
 
 class EntityManager;
 
@@ -34,5 +37,7 @@ public:
 	static uint8_t GetOrientationToPosition(EntityId id, Vector2Int16 target);
 	static void SetUnitAIState(EntityId id, UnitAIStateId state);
 	static void SetUnitState(EntityId id, UnitStateId state);
+
+	static const std::vector<const AbilityDef*>& GetUnitAbilities(EntityId id);
 };
 

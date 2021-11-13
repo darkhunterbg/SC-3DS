@@ -174,7 +174,6 @@ void GameSceneView::ContextActionCheck()
 }
 
 
-
 void GameSceneView::OnUnitSelect(EntityId id, bool newSelection)
 {
 	if (id != Entity::None && EntityUtil::IsAlly(_player, id))
@@ -182,11 +181,11 @@ void GameSceneView::OnUnitSelect(EntityId id, bool newSelection)
 		bool played = _scene->GetEntityManager().SoundSystem.PlayUnitChat(id, UnitChatType::Selected);
 
 		if (played);
-			_unitPortrait.ChatUnit(id, newSelection);
+		_unitPortrait.ChatUnit(id, newSelection);
 	}
 	else
 	{
-		
+
 	}
 }
 
@@ -318,6 +317,13 @@ void GameSceneView::DrawMainScreen()
 		GUI::BeginRelativeLayout({ -169,-19 }, { 54,50 }, GUIHAlign::Right, GUIVAlign::Bottom);
 		DrawPortrait();
 		GUI::EndLayout();
+
+		GUI::BeginRelativeLayout({ -5,-3 }, { 130,120 }, GUIHAlign::Right, GUIVAlign::Bottom);
+
+		if (_unitSelection.size() > 0)
+			_commandPanel.Draw(_unitSelection[0], *raceDef);
+
+		GUI::EndLayout();
 	}
 	else
 	{
@@ -360,6 +366,11 @@ void GameSceneView::DrawSecondaryScreen()
 
 	GUI::BeginRelativeLayout({ 0,2 }, { 234,86 }, GUIHAlign::Left, GUIVAlign::Top);
 	_selectionPanel.Draw(_unitSelection, *raceDef);
+	GUI::EndLayout();
+
+	GUI::BeginRelativeLayout({ -5,-3 }, { 130,120 }, GUIHAlign::Right, GUIVAlign::Bottom);
+	if (_unitSelection.size() > 0)
+		_commandPanel.Draw(_unitSelection[0], *raceDef);
 	GUI::EndLayout();
 }
 
