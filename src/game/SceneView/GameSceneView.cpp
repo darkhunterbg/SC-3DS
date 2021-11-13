@@ -158,19 +158,32 @@ void GameSceneView::ContextActionCheck()
 
 	if (_unitSelection.size() == 0 || !EntityUtil::IsAlly(_player, _unitSelection[0])) return;
 
-	Vector2Int16 worldPos = _camera.ScreenToWorld(Vector2Int16(_cursor.Position));
+	EntityId entity = GetEntityUnderCursor();
 
-	for (EntityId id : _unitSelection)
+	if (entity != Entity::None)
 	{
-		_scene->GetEntityManager().UnitSystem.GetAIComponent(id).targetPosition = worldPos;
-		//_scene->GetEntityManager().UnitSystem.GetAIComponent(id).targetPosition2 = _scene->GetEntityManager().GetPosition(id);
-		EntityUtil::SetUnitAIState(id, UnitAIStateId::GoToAttack);
+		for (EntityId id : _unitSelection)
+		{
+			const AbilityDef* ability = EntityUtil::GetUnitDefaultAbility(id, entity);
+			EntityUtil::ActivateAbility(id, *ability, entity);
+		}
 	}
+	else
+	{
+		Vector2Int16 worldPos = _camera.ScreenToWorld(Vector2Int16(_cursor.Position));
+
+		for (EntityId id : _unitSelection)
+		{
+			const AbilityDef* ability = EntityUtil::GetUnitDefaultAbility(id, worldPos);
+			EntityUtil::ActivateAbility(id, *ability, worldPos);
+		}
+	}
+
 
 	bool played = _scene->GetEntityManager().SoundSystem.PlayUnitChat(_unitSelection[0], UnitChatType::Command);
 
-	if (played);
-	_unitPortrait.ChatUnit(_unitSelection[0], false);
+	if (played)
+		_unitPortrait.ChatUnit(_unitSelection[0], false);
 }
 
 
@@ -207,35 +220,43 @@ void GameSceneView::Update()
 
 	_cursor.GameUpdate();
 
-	if (!_cursorOverUI)
+	EntityId hover = GetEntityUnderCursor();
+
+
+	if (hover != Entity::None)
 	{
-		Vector2Int16 worldPos = _camera.ScreenToWorld(Vector2Int16(_cursor.Position));
-
-		// TODO: raycast masking
-		EntityId hover = _scene->GetEntityManager().KinematicSystem.PointCast(worldPos);
-		if (hover != Entity::None)
+		// TODO: entity might not be part of drawing system
+		if (_scene->GetEntityManager().DrawSystem.GetComponent(hover).visible)
 		{
-			// TODO: entity might not be part of drawing system
-			if (_scene->GetEntityManager().DrawSystem.GetComponent(hover).visible)
-			{
-				if (EntityUtil::IsAlly(_player, hover))
-					_cursor.SetUnitHover(CursorHoverState::Green);
-				else if (EntityUtil::IsEnemy(_player, hover))
-					_cursor.SetUnitHover(CursorHoverState::Red);
-				else
-					_cursor.SetUnitHover(CursorHoverState::Yellow);
-			}
+			if (EntityUtil::IsAlly(_player, hover))
+				_cursor.SetUnitHover(CursorHoverState::Green);
+			else if (EntityUtil::IsEnemy(_player, hover))
+				_cursor.SetUnitHover(CursorHoverState::Red);
+			else
+				_cursor.SetUnitHover(CursorHoverState::Yellow);
 		}
-
-		ContextActionCheck();
 	}
 
+	ContextActionCheck();
 
 	UpdateSelection();
 
 	const PlayerInfo& info = _scene->GetEntityManager().PlayerSystem.GetPlayerInfo(_player);
 
 	_resourceBar.UpdatePlayerInfo(info, false);
+}
+
+EntityId GameSceneView::GetEntityUnderCursor()
+{
+	if (!_cursorOverUI)
+	{
+		Vector2Int16 worldPos = _camera.ScreenToWorld(Vector2Int16(_cursor.Position));
+
+		// TODO: raycast masking
+		EntityId hover = _scene->GetEntityManager().KinematicSystem.PointCast(worldPos);
+		return hover;
+	}
+	return Entity::None;
 }
 
 void GameSceneView::Draw()

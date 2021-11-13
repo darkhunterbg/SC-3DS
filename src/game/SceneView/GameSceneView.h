@@ -43,7 +43,6 @@ private:
 	void OnUnitSelect(EntityId id, bool newSelection);
 
 	void DrawPortrait();
-
 public:
 	GameSceneView(GameScene* scene);
 
@@ -68,4 +67,6 @@ public:
 	void Draw();
 
 	void OnPlatformChanged();
+
+	EntityId GetEntityUnderCursor();
 };

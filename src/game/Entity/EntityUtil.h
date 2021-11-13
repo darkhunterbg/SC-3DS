@@ -39,5 +39,12 @@ public:
 	static void SetUnitState(EntityId id, UnitStateId state);
 
 	static const std::vector<const AbilityDef*>& GetUnitAbilities(EntityId id);
+
+	static void ActivateAbility(EntityId user, const AbilityDef& ability);
+	static void ActivateAbility(EntityId user, const AbilityDef& ability, EntityId target);
+	static void ActivateAbility(EntityId user, const AbilityDef& ability, Vector2Int16 target);
+
+	static  const AbilityDef* GetUnitDefaultAbility(EntityId id, EntityId target);
+	static  const AbilityDef* GetUnitDefaultAbility(EntityId id, Vector2Int16 target);
 };
 

@@ -17,6 +17,8 @@ struct PlayerId {
 	short i = 0;
 	bool operator == (const PlayerId& o) const { return i == o.i; }
 	bool operator != (const PlayerId& o) const { return i != o.i; }
+
+	inline bool IsNeutral() const { return i == 0; }
 };
 
 enum class PlayerEventType :uint8_t {

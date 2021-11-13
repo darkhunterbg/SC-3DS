@@ -35,6 +35,10 @@ struct AbilityDef {
 	{
 		return Data.PositionSelectedAction != UnitAIStateId::Nothing;
 	}
+	inline bool CanTargetEntity() const
+	{
+		return Data.EntitySelectedAction != UnitAIStateId::Nothing;
+	}
 
 	inline bool IsState(UnitAIStateId s) const
 	{

@@ -70,7 +70,7 @@ EntityId EntityUtil::SpawnUnit(const UnitDef& def, PlayerId owner, Vector2Int16 
 	em.SetOrientation(id, orientation);
 	em.UnitSystem.NewUnit(id, def, owner);
 
-	if (def.Art.GetSprite().collider.size.LengthSquared() > 0) 
+	if (def.Art.GetSprite().collider.size.LengthSquared() > 0)
 		em.KinematicSystem.NewCollider(id, def.Art.GetSprite().collider);
 
 
@@ -114,7 +114,7 @@ bool EntityUtil::IsEnemy(PlayerId player, EntityId id)
 {
 	EntityManager& em = GetManager();
 	auto owner = em.UnitSystem.GetComponent(id).owner;
-	return owner.i != 0 && owner != player;
+	return !owner.IsNeutral() && owner != player;
 }
 
 uint8_t EntityUtil::GetOrientationToPosition(EntityId id, Vector2Int16 target)
@@ -161,4 +161,66 @@ const std::vector<const AbilityDef*>& EntityUtil::GetUnitAbilities(EntityId id)
 		unitAbilities.push_back(GameDatabase::instance->AttackAbility);
 
 	return unitAbilities;
+}
+
+void EntityUtil::ActivateAbility(EntityId user, const AbilityDef& ability)
+{
+	GAME_ASSERT(!ability.HasTargetSelection(), "Tried to activate ability '%s' without target!", ability.Art.Name);
+
+	SetUnitAIState(user, ability.Data.EntitySelectedAction);
+
+}
+
+void EntityUtil::ActivateAbility(EntityId user, const AbilityDef& ability, EntityId target)
+{
+	auto& em = GetManager();
+
+	GAME_ASSERT(ability.HasTargetSelection(), "Tried to activate ability '%s'  with target!", ability.Art.Name);
+
+	if (ability.CanTargetEntity())
+		em.UnitSystem.GetAIComponent(user).targetEntity = target;
+	else
+		em.UnitSystem.GetAIComponent(user).targetPosition = em.GetPosition(target);
+
+	SetUnitAIState(user, ability.Data.EntitySelectedAction);
+}
+
+
+
+void EntityUtil::ActivateAbility(EntityId user, const AbilityDef& ability, Vector2Int16 target)
+{
+	GAME_ASSERT(ability.HasTargetSelection(), "Tried to activate ability '%s'  with target!", ability.Art.Name);
+
+	auto& em = GetManager();
+
+	auto& ai = em.UnitSystem.GetAIComponent(user);
+	ai.targetPosition = target;
+	ai.targetPosition2 = em.GetPosition(user);
+
+	SetUnitAIState(user, ability.Data.PositionSelectedAction);
+}
+
+const AbilityDef* EntityUtil::GetUnitDefaultAbility(EntityId id, EntityId target)
+{
+	if (id == target) return GameDatabase::instance->StopAbility;
+
+	auto& em = GetManager();
+
+	PlayerId owner = em.UnitSystem.GetComponent(id).owner;
+	const UnitComponent& unit = em.UnitSystem.GetComponent(target);
+	PlayerId targetOwner = unit.owner;
+
+	if (targetOwner != owner && !targetOwner.IsNeutral())
+	{
+		if (unit.def->GetAttacks().Size() > 0)
+			return GameDatabase::instance->AttackAbility;;
+	}
+
+	return GameDatabase::instance->MoveAbility;
+
+}
+
+const AbilityDef* EntityUtil::GetUnitDefaultAbility(EntityId id, Vector2Int16 target)
+{
+	return GameDatabase::instance->MoveAbility;
 }
