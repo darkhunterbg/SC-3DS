@@ -29,7 +29,12 @@ void Cursor::GameUpdate()
 	}
 
 	if (!_hover && !_hold)
-		ChangeClip("cursor\\arrow");
+	{
+		if (TargetMode)
+			ChangeClip("cursor\\targn");
+		else
+			ChangeClip("cursor\\arrow");
+	}
 
 	_hover = false;
 }
@@ -106,7 +111,7 @@ Rectangle Cursor::GetHoldRect()
 	Rectangle rect = { {0,0}, size };
 	rect.SetCenter(center);
 
-	
+
 
 	return rect;
 }
@@ -138,7 +143,7 @@ bool Cursor::HandleMultiselection()
 
 void Cursor::Draw()
 {
-	if (_hold &&  DrawMultiSelection )
+	if (_hold && DrawMultiSelection)
 	{
 		Rectangle rect = GetHoldRect();
 		Util::DrawTransparentRectangle(rect, 1, Colors::UIGreen);
@@ -157,16 +162,34 @@ void Cursor::SetUnitHover(CursorHoverState state)
 
 	_hover = true;
 
-	switch (state)
+	if (TargetMode)
 	{
-	case CursorHoverState::Green:
-		ChangeClip("cursor\\magg"); break;
-	case CursorHoverState::Yellow:
-		ChangeClip("cursor\\magy"); break;
-	case CursorHoverState::Red:
-		ChangeClip("cursor\\magr"); break;
-	default:
-		break;
+		switch (state)
+		{
+		case CursorHoverState::Green:
+			ChangeClip("cursor\\targg"); break;
+		case CursorHoverState::Yellow:
+			ChangeClip("cursor\\targy"); break;
+		case CursorHoverState::Red:
+			ChangeClip("cursor\\targr"); break;
+		default:
+			break;
+		}
+
+	}
+	else
+	{
+		switch (state)
+		{
+		case CursorHoverState::Green:
+			ChangeClip("cursor\\magg"); break;
+		case CursorHoverState::Yellow:
+			ChangeClip("cursor\\magy"); break;
+		case CursorHoverState::Red:
+			ChangeClip("cursor\\magr"); break;
+		default:
+			break;
+		}
 	}
 }
 

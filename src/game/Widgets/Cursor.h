@@ -34,6 +34,7 @@ public:
 	bool UsingLimits = false;
 	bool MultiSelectionEnabled = false;
 	bool DrawMultiSelection = false;
+	bool TargetMode = false;
 
 	int CursorSpeed = 10;
 

@@ -31,11 +31,12 @@ enum class UnitAIStateId :uint8_t {
 	GoToAttack = 3,
 	Patrol = 4,
 	HoldPosition = 5,
+	Follow = 6,
 
 	Nothing = 0xFF
 };
 
-static constexpr const int UnitAIStateTypeCount = 6;
+static constexpr const int UnitAIStateTypeCount = 7;
 
 struct UnitAIState {
 public:
@@ -75,5 +76,6 @@ private:
 	static void GoToAttackThink(UnitAIThinkData& data, EntityManager& em);
 	static void PatrolThink(UnitAIThinkData& data, EntityManager& em);
 	static void HoldPositionThink(UnitAIThinkData& data, EntityManager& em);
+	static void FollowThink(UnitAIThinkData& data, EntityManager& em);
 };
 

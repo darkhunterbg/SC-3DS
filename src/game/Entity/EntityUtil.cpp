@@ -202,8 +202,6 @@ void EntityUtil::ActivateAbility(EntityId user, const AbilityDef& ability, Vecto
 
 const AbilityDef* EntityUtil::GetUnitDefaultAbility(EntityId id, EntityId target)
 {
-	if (id == target) return GameDatabase::instance->StopAbility;
-
 	auto& em = GetManager();
 
 	PlayerId owner = em.UnitSystem.GetComponent(id).owner;

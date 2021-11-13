@@ -291,7 +291,7 @@ void SelectionInfoPanel::DrawUnitDetails(EntityId id)
 		GUILabel::DrawText(font2, _buffer, GUIHAlign::Center, GUIVAlign::Top, Colors::UILightGray);
 		GUI::EndLayout();
 
-		if (GUI::IsLayoutHover())
+		if (GUI::IsLayoutFocused())
 		{
 			if (info[i].statName != nullptr)
 				stbsp_snprintf(_buffer, sizeof(_buffer), "%s\n%s: %i", info[i].name, info[i].statName, info[i].stat);

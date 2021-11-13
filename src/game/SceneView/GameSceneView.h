@@ -14,6 +14,8 @@
 class GameScene;
 
 class GameSceneView {
+
+
 private:
 	GameScene* _scene = nullptr;
 
@@ -27,6 +29,8 @@ private:
 
 	PlayerId _player;
 
+	const struct AbilityDef* _selectTargetAbility = nullptr;
+
 	void DrawMainScreen();
 	void DrawSecondaryScreen();
 
@@ -34,15 +38,29 @@ private:
 	std::vector<EntityId> _unitSelection;
 
 	bool _cursorOverUI = false;
+	bool _cursorOverMinimap = false;
+
 
 	Color GetAlliedUnitColor(EntityId id);
 	void UpdateSelection();
 	void ContextActionCheck();
+	void TargetActionCheck();
 	void OnEntitiesDeleted(const std::vector<EntityId>& entities);
+	void SetDefaultMode();
 
+	void ActivateAbilityAt(Vector2Int16 worldPos);
+	void ActivateContextAbilityAt(Vector2Int16 worldPos);
+	void OnAbilityActivated();
 	void OnUnitSelect(EntityId id, bool newSelection);
 
 	void DrawPortrait();
+	void DrawCommandPanel();
+	void DrawMinimap();
+
+	inline	bool IsTargetSelectionMode() const
+	{
+		return _selectTargetAbility != nullptr;
+	}
 public:
 	GameSceneView(GameScene* scene);
 
@@ -69,4 +87,9 @@ public:
 	void OnPlatformChanged();
 
 	EntityId GetEntityUnderCursor();
+	EntityId GetEntityUnderPosition(Vector2Int16 worldPos);
+
+	void ActivateAbility(const struct AbilityDef* ability);
+	void ActivateAbility(const struct AbilityDef* ability, EntityId target);
+	void ActivateAbility(const struct AbilityDef* ability, Vector2Int16 targetPos);
 };

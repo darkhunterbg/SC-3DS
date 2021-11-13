@@ -1,6 +1,6 @@
 Path,AbilityId,Name,Icon,ButtonPosition,EntityAIState,PositionAIState
 Generic\Attack,14998522,Attack,230,"2,0",AttackTarget,GoToAttack
 Generic\Hold Position,14998526,Hold Position,255,"1,1",HoldPosition,Nothing
-Generic\Move,14561388,Move,228,"0,0",GoTo,GoTo
+Generic\Move,14561388,Move,228,"0,0",Follow,GoTo
 Generic\Patrol,14998524,Patrol,254,"0,1",Patrol,Patrol
 Generic\Stop,14998520,Stop,229,"1,0",Idle,Nothing

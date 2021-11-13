@@ -24,6 +24,7 @@ GameSceneView::GameSceneView(GameScene* scene) : _scene(scene)
 	_scene->GetEntityManager().OnEntitiesDeleted = [this](auto& a) { OnEntitiesDeleted(a); };
 
 	SetPlayer(_scene->GetEntityManager().MapSystem.ActivePlayer);
+
 }
 
 void GameSceneView::SetPlayer(PlayerId player)
@@ -33,13 +34,13 @@ void GameSceneView::SetPlayer(PlayerId player)
 	const PlayerInfo& info = _scene->GetEntityManager().PlayerSystem.GetPlayerInfo(_player);
 
 	_resourceBar.UpdatePlayerInfo(info, true);
-}
 
+	SetDefaultMode();
+}
 const PlayerInfo& GameSceneView::GetPlayerInfo() const
 {
 	return _scene->GetEntityManager().PlayerSystem.GetPlayerInfo(_player);
 }
-
 Color GameSceneView::GetAlliedUnitColor(EntityId id)
 {
 	if (EntityUtil::IsAlly(_player, id))
@@ -148,17 +149,70 @@ void GameSceneView::UpdateSelection()
 	{
 		selectionColor = GetAlliedUnitColor(_unitSelection[0]);
 	}
+	else
+	{
+		_selectTargetAbility = nullptr;
+	}
 
 	_scene->GetEntityManager().DrawSystem.UpdateSelection(_unitSelection, selectionColor);
 }
 void GameSceneView::ContextActionCheck()
 {
+	if (_cursorOverUI)return;
+
 	bool context = Game::GetInput().Cursor.Context.IsActivated();
+	if (!context) return;
+
+	if (IsTargetSelectionMode())
+	{
+		SetDefaultMode();
+		return;
+	}
+
+	Vector2Int16  worldPos = _camera.ScreenToWorld(Vector2Int16(_cursor.Position));
+	ActivateContextAbilityAt(worldPos);
+}
+void GameSceneView::TargetActionCheck()
+{
+	if (_cursorOverUI) return;
+
+	bool context = Game::GetInput().Cursor.Select.IsActivated();
 	if (!context) return;
 
 	if (_unitSelection.size() == 0 || !EntityUtil::IsAlly(_player, _unitSelection[0])) return;
 
-	EntityId entity = GetEntityUnderCursor();
+	if (!IsTargetSelectionMode()) return;
+
+	Vector2Int16 worldPos = _camera.ScreenToWorld(Vector2Int16(_cursor.Position));
+	ActivateAbilityAt(worldPos);
+}
+void GameSceneView::ActivateAbilityAt(Vector2Int16 worldPos)
+{
+	if (!IsTargetSelectionMode()) return;
+
+	EntityId target = GetEntityUnderPosition(worldPos);
+	if (target != Entity::None)
+	{
+		for (EntityId id : _unitSelection)
+			EntityUtil::ActivateAbility(id, *_selectTargetAbility, target);
+		OnAbilityActivated();
+		return;
+	}
+
+	if (_selectTargetAbility->CanTargetPosition())
+	{
+		for (EntityId id : _unitSelection)
+		{
+			EntityUtil::ActivateAbility(id, *_selectTargetAbility, worldPos);
+		}
+		OnAbilityActivated();
+	}
+}
+void GameSceneView::ActivateContextAbilityAt(Vector2Int16 worldPos)
+{
+	if (_unitSelection.size() == 0 || !EntityUtil::IsAlly(_player, _unitSelection[0])) return;
+
+	EntityId entity = GetEntityUnderPosition(worldPos);
 
 	if (entity != Entity::None)
 	{
@@ -170,36 +224,37 @@ void GameSceneView::ContextActionCheck()
 	}
 	else
 	{
-		Vector2Int16 worldPos = _camera.ScreenToWorld(Vector2Int16(_cursor.Position));
-
 		for (EntityId id : _unitSelection)
 		{
 			const AbilityDef* ability = EntityUtil::GetUnitDefaultAbility(id, worldPos);
 			EntityUtil::ActivateAbility(id, *ability, worldPos);
 		}
 	}
+}
+void GameSceneView::OnAbilityActivated()
+{
+	SetDefaultMode();
 
+	if (_unitSelection.size() == 0 || !EntityUtil::IsAlly(_player, _unitSelection[0])) return;
 
 	bool played = _scene->GetEntityManager().SoundSystem.PlayUnitChat(_unitSelection[0], UnitChatType::Command);
 
 	if (played)
 		_unitPortrait.ChatUnit(_unitSelection[0], false);
 }
-
-
 void GameSceneView::OnUnitSelect(EntityId id, bool newSelection)
 {
 	if (id != Entity::None && EntityUtil::IsAlly(_player, id))
 	{
 		bool played = _scene->GetEntityManager().SoundSystem.PlayUnitChat(id, UnitChatType::Selected);
 
-		if (played);
-		_unitPortrait.ChatUnit(id, newSelection);
+		if (played)
+			_unitPortrait.ChatUnit(id, newSelection);
 	}
-	else
-	{
-
-	}
+}
+void GameSceneView::SetDefaultMode()
+{
+	_selectTargetAbility = nullptr;
 }
 
 void GameSceneView::Update()
@@ -215,13 +270,14 @@ void GameSceneView::Update()
 
 	_cursor.UsingLimits = _cursor.IsHolding();
 	_cursor.Limits = { {0,0 }, Vector2Int(_camera.Size) };
-	_cursor.MultiSelectionEnabled = !_cursorOverUI;
+	_cursor.MultiSelectionEnabled = !_cursorOverUI && !IsTargetSelectionMode();
 	_minimap.PointerInputEnabled = !_cursor.IsHolding();
 
+	_cursor.TargetMode = (!_cursorOverUI || _cursorOverMinimap) && IsTargetSelectionMode();
 	_cursor.GameUpdate();
 
-	EntityId hover = GetEntityUnderCursor();
 
+	EntityId hover = GetEntityUnderCursor();
 
 	if (hover != Entity::None)
 	{
@@ -238,7 +294,7 @@ void GameSceneView::Update()
 	}
 
 	ContextActionCheck();
-
+	TargetActionCheck();
 	UpdateSelection();
 
 	const PlayerInfo& info = _scene->GetEntityManager().PlayerSystem.GetPlayerInfo(_player);
@@ -251,12 +307,15 @@ EntityId GameSceneView::GetEntityUnderCursor()
 	if (!_cursorOverUI)
 	{
 		Vector2Int16 worldPos = _camera.ScreenToWorld(Vector2Int16(_cursor.Position));
-
-		// TODO: raycast masking
-		EntityId hover = _scene->GetEntityManager().KinematicSystem.PointCast(worldPos);
-		return hover;
+		return GetEntityUnderPosition(worldPos);
 	}
 	return Entity::None;
+}
+EntityId GameSceneView::GetEntityUnderPosition(Vector2Int16 worldPos)
+{
+	// TODO: raycast masking
+	EntityId hover = _scene->GetEntityManager().KinematicSystem.PointCast(worldPos);
+	return hover;
 }
 
 void GameSceneView::Draw()
@@ -277,6 +336,7 @@ void GameSceneView::Draw()
 	DrawSecondaryScreen();
 }
 
+
 void GameSceneView::OnPlatformChanged()
 {
 	GUI::UseScreen(ScreenId::Top);
@@ -286,6 +346,8 @@ void GameSceneView::OnPlatformChanged()
 
 void GameSceneView::DrawMainScreen()
 {
+	_cursorOverMinimap = false;
+
 	GUI::UseScreen(ScreenId::Top);
 
 	auto& info = GetPlayerInfo();
@@ -305,7 +367,7 @@ void GameSceneView::DrawMainScreen()
 		GUIImage::DrawImageFrame(raceDef->ConsoleSprite);
 
 		GUI::BeginRelativeLayout({ 6,-4 }, { 128,128 }, GUIHAlign::Left, GUIVAlign::Bottom);
-		_minimap.DrawMinimap(_camera);
+		DrawMinimap();
 		GUI::EndLayout();
 
 		GUI::BeginRelativeLayout({ 150,-3 }, { 252,90 }, GUIHAlign::Left, GUIVAlign::Bottom);
@@ -340,10 +402,7 @@ void GameSceneView::DrawMainScreen()
 		GUI::EndLayout();
 
 		GUI::BeginRelativeLayout({ -5,-3 }, { 130,120 }, GUIHAlign::Right, GUIVAlign::Bottom);
-
-		if (_unitSelection.size() > 0)
-			_commandPanel.Draw(_unitSelection[0], *raceDef);
-
+		DrawCommandPanel();
 		GUI::EndLayout();
 	}
 	else
@@ -362,7 +421,6 @@ void GameSceneView::DrawMainScreen()
 
 	_cursor.Draw();
 }
-
 void GameSceneView::DrawSecondaryScreen()
 {
 	GUI::UseScreen(ScreenId::Bottom);
@@ -382,7 +440,7 @@ void GameSceneView::DrawSecondaryScreen()
 	GUIImage::DrawImageFrame(raceDef->ConsoleLowerSprite);
 
 	GUI::BeginRelativeLayout({ 7,-3 }, { 113,113 }, GUIHAlign::Left, GUIVAlign::Bottom);
-	_minimap.DrawMinimap(_camera);
+	DrawMinimap();
 	GUI::EndLayout();
 
 	GUI::BeginRelativeLayout({ 0,2 }, { 234,86 }, GUIHAlign::Left, GUIVAlign::Top);
@@ -390,8 +448,7 @@ void GameSceneView::DrawSecondaryScreen()
 	GUI::EndLayout();
 
 	GUI::BeginRelativeLayout({ -5,-3 }, { 130,120 }, GUIHAlign::Right, GUIVAlign::Bottom);
-	if (_unitSelection.size() > 0)
-		_commandPanel.Draw(_unitSelection[0], *raceDef);
+	DrawCommandPanel();
 	GUI::EndLayout();
 }
 
@@ -400,16 +457,79 @@ void GameSceneView::DrawPortrait()
 	EntityId id = Entity::None;
 
 	if (_unitSelection.size() > 0)
+	{
 		id = _unitSelection[0];
 
-	_unitPortrait.Draw(id);
+		_unitPortrait.Draw(id);
 
-	if (!_cursor.IsHolding())
-	{
-		if (GUI::IsLayoutActivated())
+		if (GUI::IsLayoutPressed())
 		{
 			_camera.SetPositionRestricted(_scene->GetEntityManager().GetPosition(id));
 		}
 	}
 }
+void GameSceneView::DrawCommandPanel()
+{
+	auto& info = GetPlayerInfo();
 
+	const RaceDef* raceDef = GameDatabase::instance->GetRace(info.race);
+
+	if (raceDef == nullptr) raceDef = GameDatabase::instance->GetRace(RaceType::Terran);
+
+	if (IsTargetSelectionMode())
+	{
+		auto cmd = _commandPanel.DrawAbilityCommandsAndSelect(_selectTargetAbility, *raceDef);
+		if (cmd != nullptr)
+		{
+			// Cancelled
+			SetDefaultMode();
+		}
+	}
+	else
+	{
+		if (_unitSelection.size() > 0 && EntityUtil::IsAlly(_player, _unitSelection[0]))
+		{
+			auto cmd = _commandPanel.DrawUnitCommandsAndSelect(_unitSelection[0], *raceDef);
+			if (cmd != nullptr)
+			{
+				if (cmd->IsAbility())
+				{
+					if (cmd->ability->HasTargetSelection())
+						_selectTargetAbility = cmd->ability;
+					else
+					{
+						for (EntityId id : _unitSelection)
+							EntityUtil::ActivateAbility(id, *cmd->ability);
+
+						OnAbilityActivated();
+					}
+				}
+			}
+		}
+	}
+}
+void GameSceneView::DrawMinimap()
+{
+	_cursorOverMinimap = false;
+
+	if (GUI::GetLayoutSpace().Contains(_cursor.Position))
+		_cursorOverMinimap = true;
+	auto result = _minimap.DrawMinimapAndAcitvate(_camera);
+
+	if (result.isActivate)
+	{
+		if (!IsTargetSelectionMode())
+			_camera.SetPositionRestricted(result.worldPos);
+		else
+			ActivateAbilityAt(result.worldPos);
+
+	}
+
+	if (result.isAlternativeActivate)
+	{
+		if (!IsTargetSelectionMode())
+		{
+			ActivateContextAbilityAt(result.worldPos);
+		}
+	}
+}

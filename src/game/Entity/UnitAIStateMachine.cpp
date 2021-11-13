@@ -2,6 +2,10 @@
 #include "EntityManager.h"
 #include "EntityUtil.h"
 
+static constexpr const uint8_t Nav_None = 0xFF;
+
+static constexpr const  uint16_t FollowMaxDistance = 96;
+
 static const Vector2 movementTable8[]{
 		{0,-1}, {0.8,-0.8},{1,0}, {0.8,0.8},{0,1}, {-0.8,0.8}, {-1,0},{-0.8,-0.8}
 };
@@ -11,6 +15,9 @@ static uint8_t GetNavOrientation(EntityId id, Vector2Int16 dst, EntityManager& e
 	short velocity = 4;
 
 	Vector2Int16 pos = em.GetPosition(id);
+
+	if ((dst - pos).LengthSquaredInt() < velocity * velocity)
+		return Nav_None;
 
 	scratch.clear();
 
@@ -36,7 +43,7 @@ static uint8_t GetNavOrientation(EntityId id, Vector2Int16 dst, EntityManager& e
 		}
 	}
 
-	return 255;
+	return Nav_None;
 
 }
 static EntityId DetectNearbyEnemy(EntityId id, Vector2Int16 pos, PlayerId owner, EntityManager& em)
@@ -98,7 +105,7 @@ static bool IsTargetInAttackRange(EntityId id, EntityId target, Vector2Int16 pos
 static bool MoveToPosition(EntityId id, Vector2Int16 pos, EntityManager& em)
 {
 	int orien = GetNavOrientation(id, pos, em);
-	if (orien == 255)
+	if (orien == Nav_None)
 	{
 		EntityUtil::SetUnitState(id, UnitStateId::Idle);
 		return false;
@@ -153,7 +160,6 @@ void UnitAIState::Advance(int batch)
 	thinkData.end = std::min((int)thinkData.size(), thinkData.end + batch);
 }
 
-
 void UnitAIStateMachine::CreateStates(std::vector< UnitAIState*>& states)
 {
 	states.clear();
@@ -165,6 +171,7 @@ void UnitAIStateMachine::CreateStates(std::vector< UnitAIState*>& states)
 	states[(int)UnitAIStateId::GoToAttack] = new UnitAIState(GoToAttackThink);
 	states[(int)UnitAIStateId::Patrol] = new UnitAIState(PatrolThink);
 	states[(int)UnitAIStateId::HoldPosition] = new UnitAIState(HoldPositionThink);
+	states[(int)UnitAIStateId::Follow] = new UnitAIState(FollowThink);
 }
 
 
@@ -337,6 +344,29 @@ void UnitAIStateMachine::HoldPositionThink(UnitAIThinkData& data, EntityManager&
 		}
 		if (em.UnitSystem.GetStateComponent(id).stateId != UnitStateId::Idle)
 			EntityUtil::SetUnitState(id, UnitStateId::Idle);
+	}
+}
+
+void UnitAIStateMachine::FollowThink(UnitAIThinkData& data, EntityManager& em)
+{
+	for (int i = data.start; i < data.end; ++i)
+	{
+		EntityId id = data.entities[i];
+		const UnitComponent& unit = em.UnitSystem.GetComponent(id);
+		UnitAIComponent& ai = em.UnitSystem.GetAIComponent(id);
+		const UnitDef& def = *unit.def;
+		Vector2Int16 pos = em.GetPosition(id);
+
+		Vector2Int16 dst = em.GetPosition(ai.targetEntity);
+		if ((pos - dst).LengthSquaredInt() > FollowMaxDistance * FollowMaxDistance)
+		{
+			MoveToPosition(id, dst, em);
+		}
+		else
+		{
+			if (em.UnitSystem.GetStateComponent(id).stateId != UnitStateId::Idle)
+				EntityUtil::SetUnitState(id, UnitStateId::Idle);
+		}
 	}
 }
 

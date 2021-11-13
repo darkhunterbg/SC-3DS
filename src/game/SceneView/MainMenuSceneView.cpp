@@ -43,7 +43,7 @@ void MainMenuSceneView::Draw()
 	Color buttonColor = Colors::UIMenuGreen;
 
 	GUI::BeginAbsoluteLayout({ 0,-20 }, _single->GetFrameSize());
-	if (GUI::IsLayoutHover())
+	if (GUI::IsLayoutFocused())
 	{
 		GUI::BeginAbsoluteLayout({ 44,46 }, _singleon->GetFrameSize());
 		GUIVideo::DrawVideo("singleon", *_singleon, true);
@@ -63,7 +63,7 @@ void MainMenuSceneView::Draw()
 
 	GUI::BeginAbsoluteLayout({ 78,190 }, _multi->GetFrameSize());
 	GUIVideo::DrawVideo("multi", *_multi, true);
-	if (GUI::IsLayoutHover())
+	if (GUI::IsLayoutFocused())
 	{
 		GUI::BeginAbsoluteLayout({ 98,202 }, _multion->GetFrameSize());
 		GUIVideo::DrawVideo("multion", *_multion, true);
@@ -90,7 +90,7 @@ void MainMenuSceneView::Draw()
 
 	GUI::BeginAbsoluteLayout({ 416,340 }, Vector2Int{ Vector2(_multi->GetFrameSize()) * 0.66f });
 	GUIVideo::DrawVideo("exit", *_exit, true);
-	if (GUI::IsLayoutHover())
+	if (GUI::IsLayoutFocused())
 	{
 		GUI::BeginAbsoluteLayout({ 424,328 }, Vector2Int{ Vector2(_exiton->GetFrameSize()) });
 		GUIVideo::DrawVideo("exiton", *_exiton, true);

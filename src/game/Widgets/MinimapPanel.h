@@ -1,11 +1,20 @@
 #pragma once
 
-
-class Camera;
+#include "MathLib.h"
 
 class MinimapPanel {
 
-public :
+public:
+	struct ActivatedResult {
+		Vector2Int16 worldPos;
+		bool isAlternativeActivate = false;
+		bool isActivate = false;
+
+		inline bool Activated() const { return isActivate || isAlternativeActivate; }
+	};
+
 	bool PointerInputEnabled = true;
-	void DrawMinimap(Camera& camera);
+
+
+	ActivatedResult DrawMinimapAndAcitvate(class Camera& camera);
 };

@@ -7,7 +7,7 @@
 #include "../Entity/EntityManager.h"
 
 
-void MinimapPanel::DrawMinimap(Camera& camera)
+MinimapPanel::ActivatedResult MinimapPanel::DrawMinimapAndAcitvate(Camera& camera)
 {
 	Rectangle dst = GUI::GetLayoutSpace();
 	EntityUtil::GetManager().MapSystem.DrawMinimap(dst);
@@ -26,9 +26,26 @@ void MinimapPanel::DrawMinimap(Camera& camera)
 
 	Util::DrawTransparentRectangle(rect, 1, Colors::White);
 
-	if (PointerInputEnabled && GUI::IsLayoutActivated())
+	if (PointerInputEnabled )
 	{
 		Vector2Int pos = GUI::GetPointerPosition() - dst.position;
-		camera.SetPositionRestricted(Vector2Int16(Vector2(pos) * minimapUpscale));
+
+		if (GUI::IsLayoutActivated())
+		{
+			MinimapPanel::ActivatedResult result;
+			result.isActivate = true;
+			result.worldPos = Vector2Int16(Vector2(pos) * minimapUpscale);
+			return result;
+		}
+		if (GUI::IsLayoutActivatedAlt())
+		{
+			MinimapPanel::ActivatedResult result;
+			result.isAlternativeActivate = true;
+			result.worldPos = Vector2Int16(Vector2(pos) * minimapUpscale);
+			return result;
+		}
+	
 	}
+
+	return MinimapPanel::ActivatedResult{};
 }

@@ -114,8 +114,10 @@ public:
 	static void CleanResources();
 	static void FrameEnd();
 
-	static bool IsLayoutHover();
+	static bool IsLayoutFocused();
 	static bool IsLayoutActivated();
+	static bool IsLayoutActivatedAlt();
+	static bool IsLayoutPressed();
 
 	static void SetVideoPlaybackSpeed(double speed)
 	{

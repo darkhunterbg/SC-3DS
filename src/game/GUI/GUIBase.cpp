@@ -112,7 +112,7 @@ void GUI::FrameEnd()
 	GetState().ExecAtEndOfFrame.clear();
 }
 
-bool GUI::IsLayoutHover()
+bool GUI::IsLayoutFocused()
 {
 	Rectangle layout = GetLayoutSpace();
 
@@ -122,6 +122,22 @@ bool GUI::IsLayoutHover()
 }
 
 bool GUI::IsLayoutActivated()
+{
+	if (!InputManager::Pointer.IsReleased()) return false;
+
+	Rectangle layout = GetLayoutSpace();
+
+	return layout.Contains(InputManager::Pointer.Position());
+}
+bool GUI::IsLayoutActivatedAlt()
+{
+	if (!InputManager::Pointer.IsReleasedAlt()) return false;
+
+	Rectangle layout = GetLayoutSpace();
+
+	return layout.Contains(InputManager::Pointer.Position());
+}
+bool GUI::IsLayoutPressed()
 {
 	if (!InputManager::Pointer.IsDown()) return false;
 

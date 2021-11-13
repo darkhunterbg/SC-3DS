@@ -14,6 +14,7 @@ namespace DataManager.Gameplay
 		GoToAttack = 3,
 		Patrol = 4,
 		HoldPosition = 5,
+		Follow = 6,
 
 		Nothing = 0xFF,
 	}
