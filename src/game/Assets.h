@@ -172,7 +172,10 @@ public:
 	{
 		return info.GetDurationSeconds();
 	}
-
+	inline bool IsMono() const
+	{
+		return info.channels == 1;
+	}
 	CoroutineR<unsigned> FillAudioAsync(Span<uint8_t> buffer, unsigned streamPos) override;
 
 	AudioClip(const AudioClip&) = delete;
@@ -182,6 +185,8 @@ public:
 	virtual ~AudioClip() override;
 
 	unsigned FillNextBuffer(Span<uint8_t> buffer, unsigned streamPos);
+
+
 private:
 	AudioInfo info;
 	FILE* stream;

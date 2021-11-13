@@ -72,7 +72,7 @@ const UnitCommandPanel::Command* UnitCommandPanel::DrawCommandButtonsAndSelect(c
 
 			}
 
-			if (GUI::IsLayoutActivated())
+			if (GUI::OnLayoutActivated())
 			{
 				_activatedCmd = cmd;
 				_commandActivateDelay = CommandDelay + 1;	// +1 because later we reduce value

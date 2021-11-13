@@ -46,6 +46,10 @@ public:
 	Vector2Int ElementOffset = { 0,0 };
 	Vector2Int ElementSize = { 0, 0 };
 
+
+	bool Focused = false;
+	bool NextFocused = false;
+
 	Rectangle GetSpace()const { return SpaceStack.back(); }
 
 	Vector2Int PopOffset() { Vector2Int o = ElementOffset; ElementOffset = { 0,0 }; return o; }
@@ -115,9 +119,11 @@ public:
 	static void FrameEnd();
 
 	static bool IsLayoutFocused();
-	static bool IsLayoutActivated();
-	static bool IsLayoutActivatedAlt();
 	static bool IsLayoutPressed();
+
+	static bool OnLayoutActivated();
+	static bool OnLayoutActivatedAlt();
+	static bool OnLayoutFocused();
 
 	static void SetVideoPlaybackSpeed(double speed)
 	{

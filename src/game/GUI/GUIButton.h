@@ -12,6 +12,12 @@ private:
 	~GUIButton() = delete;
 public:
 
-	//static void DrawButton(const char* name, const ImageFrame& frame);
-	//static void DrawButton(const char* name)
+	static bool DrawMainMenuButtonTextOffset(Vector2Int offset,  const char* text, bool enabled = true);
+	static bool DrawMainMenuButton(const char* text, bool enabled = true);
+	static bool DrawMainMenuButton(Rectangle dst, GUIHAlign hAlign, GUIVAlign vAlign, const char* text, bool enabled = true);
+	static bool DrawMainMenuButton(Vector2Int pos, Vector2Int size, GUIHAlign hAlign, GUIVAlign vAlign, const char* text, bool enabled = true)
+	{
+		return DrawMainMenuButton(Rectangle { pos,size }, hAlign, vAlign, text, enabled);
+	}
+
 };

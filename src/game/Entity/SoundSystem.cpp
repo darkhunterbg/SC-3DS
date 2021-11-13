@@ -17,7 +17,7 @@ SoundSystem::SoundSystem()
 
 	for (const AudioChannelState& channel : channels)
 	{
-		if (&channel == Game::GetUIChannel())
+		if (&channel == Game::GetUIMonoChannel())
 		{
 			if (channel.mono)
 				_chatChannel.channel = &channel;

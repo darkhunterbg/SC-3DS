@@ -98,8 +98,8 @@ void GameScene::Start()
 	//EntityUtil::SpawnUnit(*units[1], PlayerId{ (short)(1) }, Vector2Int16(Vector2Int{ 264 ,232 }));
 	//EntityUtil::SpawnUnit(*units[2], PlayerId{ (short)(2) }, Vector2Int16(Vector2Int{ 232 ,264 }));
 	//EntityUtil::SpawnUnit(*units[2], PlayerId{ (short)(2) }, Vector2Int16(Vector2Int{ 232 ,296 }));
-	EntityUtil::SpawnUnit(*units[2], PlayerId{ (short)(1) }, Vector2Int16(Vector2Int{ 64 ,64 }));
-	EntityUtil::SpawnUnit(*units[2], PlayerId{ (short)(1) }, Vector2Int16(Vector2Int{ 96 ,64 }));
+	EntityUtil::SpawnUnit(*units[1], PlayerId{ (short)(1) }, Vector2Int16(Vector2Int{ 64 ,64 }));
+	EntityUtil::SpawnUnit(*units[1], PlayerId{ (short)(1) }, Vector2Int16(Vector2Int{ 96 ,64 }));
 	EntityUtil::SpawnUnit(*units[2], PlayerId{ (short)(2) }, Vector2Int16(Vector2Int{ 320 ,320 }));
 	//_entityManager->UnitSystem.GetComponent(u).health = 35;
 

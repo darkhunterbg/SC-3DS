@@ -363,6 +363,7 @@ FodyWeavers.xsd
 
 /build/
 tmp/
+tmp_3ds/
 gfxbuild/
 bin/
 

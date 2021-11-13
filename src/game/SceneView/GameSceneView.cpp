@@ -639,6 +639,12 @@ void GameSceneView::DrawMinimap()
 	{
 		if (result.isActivate) ActivateAbilityAt(result.worldPos);
 		if (result.isAlternativeActivate) SetDefaultMode();
+
+		if (Game::GetPlatformInfo().Type == PlatformType::Nintendo3DS)
+		{
+			if (result.isPressed)
+				_camera.SetPositionRestricted(result.worldPos);
+		}
 	}
 	else
 	{

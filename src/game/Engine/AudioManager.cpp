@@ -38,6 +38,9 @@ void AudioManager::Init()
 		instance.channels.push_back(channel);
 	}
 
+	channel.mono = false;
+	instance.channels.push_back(channel);
+
 	for (int i = 0; i < instance.channels.size(); i++)
 	{
 		instance.channels[i].bufferSize = AudioChannelBufferSize / (instance.channels[i].mono ? 2 : 1);

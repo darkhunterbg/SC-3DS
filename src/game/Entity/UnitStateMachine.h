@@ -1,13 +1,14 @@
 #pragma once
 
 #include "Entity.h"
+#include <vector>
+#include <stdint.h>
 
-class EntityManager;
 
 enum class UnitStateId :uint8_t {
 
 	Idle = 0,
-	Movement =  1,
+	Movement = 1,
 	Attack = 2
 };
 
@@ -32,7 +33,7 @@ struct UnitStateData {
 	}
 };
 
-using UnitEnterStateFunc = void(*)(UnitStateData& data, EntityManager& em);
+using UnitEnterStateFunc = void(*)(UnitStateData& data, class EntityManager& em);
 
 struct UnitState {
 	UnitStateData EnterState;
@@ -51,7 +52,8 @@ struct UnitState {
 
 	UnitState(UnitEnterStateFunc enterState, UnitEnterStateFunc exitState) : enterStateFunc(enterState),
 		exitStateFunc(exitState)
-	{}
+	{
+	}
 
 };
 
@@ -66,9 +68,9 @@ public:
 	static void CreateStates(std::vector< UnitState*>& states);
 
 private:
-	static void IdleEnter(UnitStateData& data, EntityManager& em);
-	static void MovementEnter(UnitStateData& data, EntityManager& em);
-	static void MovementExit(UnitStateData& data, EntityManager& em);
-	static void AttackEnter(UnitStateData& data, EntityManager& em);
-	static void AttackExit(UnitStateData& data, EntityManager& em);
+	static void IdleEnter(UnitStateData& data, class EntityManager& em);
+	static void MovementEnter(UnitStateData& data, class EntityManager& em);
+	static void MovementExit(UnitStateData& data, class EntityManager& em);
+	static void AttackEnter(UnitStateData& data, class EntityManager& em);
+	static void AttackExit(UnitStateData& data, class EntityManager& em);
 };

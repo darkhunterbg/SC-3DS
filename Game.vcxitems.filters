@@ -178,7 +178,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Scenes\MainMenuScene.h">
       <Filter>Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\MainMenuSceneView.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\MainMenuView.h">
       <Filter>SceneView</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\GameSceneView.h">
@@ -223,6 +223,12 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Widgets\UnitCommandPanel.h">
       <Filter>Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\MultiplayerConnectionView.h">
+      <Filter>SceneView</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\SceneView\IMainMenuSceneView.h">
+      <Filter>SceneView</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIButton.h">
       <Filter>GUI</Filter>
@@ -355,7 +361,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\MainMenuScene.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\MainMenuSceneView.cpp">
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\MainMenuView.cpp">
       <Filter>SceneView</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\GameSceneView.cpp">
@@ -403,6 +409,12 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Widgets\UnitCommandPanel.cpp">
       <Filter>Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\MultiplayerConnectionView.cpp">
+      <Filter>SceneView</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\SceneView\IMainMenuSceneView.cpp">
+      <Filter>SceneView</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIButton.cpp">
       <Filter>GUI</Filter>

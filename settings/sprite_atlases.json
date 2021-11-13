@@ -86,7 +86,8 @@
     "OutputName": "mainmenu",
     "ImageList": [
       "glue\\mainmenu\\*",
-      "glue\\palmm\\*"
+      "glue\\palmm\\*",
+      "glue\\palnl\\*"
     ],
     "PackStrategy": 0,
     "FilterStrategy": 1

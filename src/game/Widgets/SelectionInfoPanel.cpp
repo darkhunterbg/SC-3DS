@@ -217,7 +217,7 @@ void SelectionInfoPanel::DrawMultiselection(std::vector<EntityId>& selection)
 		}
 
 
-		if (GUI::IsLayoutActivated())
+		if (GUI::OnLayoutActivated())
 		{
 			selection.clear();
 			selection.push_back(id);

@@ -26,7 +26,7 @@ public:
 	static const Font* SystemFont12;
 	static const Font* SystemFont10;
 	static const Font* SystemFont8;
-	static AudioClip* ButtonAudio;
+	static const Font* MenuFont16;
 
 	static float DeltaTime;
 
@@ -47,7 +47,11 @@ public:
 
 	static GameInputSchema& GetInput();
 
-
 	static const AudioChannelState* GetMusicChannel();
-	static const AudioChannelState* GetUIChannel();
+	static const AudioChannelState* GetUIMonoChannel();
+	static const AudioChannelState* GetUIStereoChannel();
+
+	static void PlayUISound(const struct SoundSetDef* def);
+
+	static void ShowIntro();
 };

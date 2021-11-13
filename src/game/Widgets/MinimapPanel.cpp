@@ -38,14 +38,14 @@ MinimapPanel::ActivatedResult MinimapPanel::DrawMinimapAndAcitvate(Camera& camer
 			return result;
 		}
 
-		if (GUI::IsLayoutActivated())
+		if (GUI::OnLayoutActivated())
 		{
 			MinimapPanel::ActivatedResult result;
 			result.isActivate = true;
 			result.worldPos = Vector2Int16(Vector2(pos) * minimapUpscale);
 			return result;
 		}
-		if (GUI::IsLayoutActivatedAlt())
+		if (GUI::OnLayoutActivatedAlt())
 		{
 			MinimapPanel::ActivatedResult result;
 			result.isAlternativeActivate = true;

@@ -49,7 +49,7 @@ void VideoPlaybackScene::Frame(TimeSlice& frameBudget)
 
 	GUI::EndLayout();
 
-	if (done || Game::GetInput().Common.Comfirm.IsActivated())
+	if (done || Game::GetInput().Common.Comfirm.IsActivated() || Game::GetInput().Cursor.Select.IsActivated())
 	{
 		_onDoneCallback();
 	}

@@ -114,7 +114,7 @@ namespace Colors {
 	constexpr Color IconGray = { 0.6f,0.6f,0.6f,1 };
 	constexpr Color UIMenuGreen = { 0x54bc2cff };
 	constexpr Color UIMenuGreenLit = { 0xacf46cff };
-
+	constexpr Color UIMenuDisabled ={ 0x585858ff };
 
 	constexpr Color SCRed = { 0xf40404ff };
 	constexpr Color SCBlue = { 0x0c48ccff };

@@ -4,6 +4,7 @@
 #include "Scenes/GameScene.h"
 #include "Scenes/BootScene.h"
 #include "Scenes/VideoPlaybackScene.h"
+#include "Scenes/MainMenuScene.h"
 #include "StringLib.h"
 #include "Profiler.h"
 
@@ -29,10 +30,10 @@ const Font* Game::SystemFont16;
 const Font* Game::SystemFont12;
 const Font* Game::SystemFont10;
 const Font* Game::SystemFont8;
+const Font* Game::MenuFont16;
 GameInputSchema* Game::_input;
 bool Game::_exit = false;
 
-AudioClip* Game::ButtonAudio;
 
 float Game::DeltaTime = 0;
 bool Game::ShowPerformanceStats = true;
@@ -77,11 +78,9 @@ static void InitialScene(GameStartSettings settings)
 	}
 	else
 	{
-		Game::SetCurrentScene(new VideoPlaybackScene("Smk\\Blizzard", [afterBootScene]() {
-			Game::SetCurrentScene(new BootScene(afterBootScene));
-			}));
-
+		Game::ShowIntro();
 	}
+
 
 	SwithScenes();
 }
@@ -101,6 +100,7 @@ void Game::Start(GameStartSettings settings)
 	SystemFont12 = AssetLoader::LoadFont("font", 12);
 	SystemFont10 = AssetLoader::LoadFont("font", 10);
 	SystemFont8 = AssetLoader::LoadFont("font", 8);
+	MenuFont16 = AssetLoader::LoadFont("mm-font", 16);
 	//ButtonAudio = AssetLoader::LoadAudioClip("sound\\misc\\button");
 	frameStartTime = Platform::ElaspedTime();
 	AudioManager::Init();
@@ -203,11 +203,44 @@ const AudioChannelState* Game::GetMusicChannel()
 	return nullptr;
 }
 
-const AudioChannelState* Game::GetUIChannel()
+const AudioChannelState* Game::GetUIMonoChannel()
+{
+	int size = AudioManager::GetAudioChannels().Size();
+	if (size > 1)
+		return &AudioManager::GetAudioChannels()[size - 2];
+
+	return nullptr;
+}
+
+const AudioChannelState* Game::GetUIStereoChannel()
 {
 	int size = AudioManager::GetAudioChannels().Size();
 	if (size > 1)
 		return &AudioManager::GetAudioChannels()[size - 1];
 
 	return nullptr;
+}
+
+void Game::PlayUISound(const SoundSetDef* def)
+{
+	if (def == nullptr) return;
+
+	if (def->ClipCount == 0) return;
+
+	auto& clip = def->GetAudioClip(0);
+	if (clip.IsMono())
+		AudioManager::Play(clip, GetUIMonoChannel());
+	else
+		AudioManager::Play(clip, GetUIStereoChannel());
+}
+
+void Game::ShowIntro()
+{
+	Game::SetCurrentScene(new VideoPlaybackScene("Smk\\Blizzard", []() {
+
+		if (GameDatabase::instance == nullptr)
+			Game::SetCurrentScene(new BootScene());
+		else
+			Game::SetCurrentScene(new MainMenuScene());
+		}));
 }

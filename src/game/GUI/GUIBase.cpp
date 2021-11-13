@@ -110,6 +110,9 @@ void GUI::FrameEnd()
 	}
 
 	GetState().ExecAtEndOfFrame.clear();
+
+	GetState().Focused = GetState().NextFocused;
+	GetState().NextFocused = false;
 }
 
 bool GUI::IsLayoutFocused()
@@ -121,15 +124,15 @@ bool GUI::IsLayoutFocused()
 	return layout.Contains(pos);
 }
 
-bool GUI::IsLayoutActivated()
+bool GUI::OnLayoutActivated()
 {
-	if (!InputManager::Pointer.IsReleased()) return false;
+	if (!InputManager::Pointer.IsPressed()) return false;
 
 	Rectangle layout = GetLayoutSpace();
 
 	return layout.Contains(InputManager::Pointer.Position());
 }
-bool GUI::IsLayoutActivatedAlt()
+bool GUI::OnLayoutActivatedAlt()
 {
 	if (!InputManager::Pointer.IsReleasedAlt()) return false;
 
@@ -144,6 +147,21 @@ bool GUI::IsLayoutPressed()
 	Rectangle layout = GetLayoutSpace();
 
 	return layout.Contains(InputManager::Pointer.Position());
+}
+
+bool GUI::OnLayoutFocused()
+{
+	Rectangle layout = GetLayoutSpace();
+
+	Vector2Int pos = GetMousePosition();
+
+	if (layout.Contains(pos))
+	{
+		GetState().NextFocused = true;
+		return !GetState().Focused;
+	}
+
+	return false;
 }
 
 Vector2Int GUI::GetMousePosition()

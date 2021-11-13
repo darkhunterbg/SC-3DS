@@ -1,8 +1,13 @@
 #include "MainMenuScene.h"
-#include "../SceneView/MainMenuSceneView.h"
+#include "../SceneView/IMainMenuSceneView.h"
 #include "../Engine/AssetLoader.h"
 #include "../Engine/AudioManager.h"
 #include "../Game.h"
+
+#include "../SceneView/MainMenuView.h"
+#include "../SceneView/MultiplayerConnectionView.h"
+#include "../Widgets/Cursor.h"
+#include "../GUI/GUI.h"
 
 MainMenuScene::MainMenuScene()
 {
@@ -15,18 +20,77 @@ MainMenuScene::~MainMenuScene()
 
 void MainMenuScene::Start()
 {
-	_view = new MainMenuSceneView(this);
 	auto clip = AssetLoader::LoadAudioClip("music\\title");
 	if (AudioManager::GetAudioChannels()[0].GetStream() != clip)
 		AudioManager::Play(*clip, Game::GetMusicChannel());
+
+	cursor = new Cursor();
+
+	ToMainMenu();
+	//ToMultiplayerConnection();
 }
 
 void MainMenuScene::Stop()
 {
-	delete _view;
+	if (_view)
+		delete _view;
+
+	if (cursor)
+		delete cursor;
+
+
+	// TODO: unload font
 }
 
 void MainMenuScene::Frame(TimeSlice& frameBudget)
 {
-	_view->Draw();
+	if (_nextView)
+	{
+		bool change = true;
+
+		if (_view)
+		{
+			change = _view->DoneHiding();
+			if(change)
+				delete _view;
+		
+			GUI::CleanResources();
+		}
+
+		if (change)
+		{
+			_view = _nextView;
+			_nextView = nullptr;
+			_state = _nextState;
+
+			_view->OnShow();
+		}
+	}
+
+	if (_view != nullptr)
+		_view->Draw();
+
+
+	if (Game::GetInput().IsUsingMouse())
+	{
+		cursor->Update();
+		cursor->Draw();
+	}
+}
+
+
+void MainMenuScene::SwitchView(MainMenuState state, IMainMenuSceneView* view)
+{
+	_nextView = view;
+	_nextState = state;
+}
+
+void MainMenuScene::ToMainMenu()
+{
+	SwitchView(MainMenuState::MainMenu, new MainMenuView(this));
+}
+
+void MainMenuScene::ToMultiplayerConnection()
+{
+	SwitchView(MainMenuState::MultiplayerSelection, new MultiplayerConnectionView(this));
 }
