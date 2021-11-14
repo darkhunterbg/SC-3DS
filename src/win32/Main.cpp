@@ -29,6 +29,8 @@ uint64_t mainTimer;
 AbstractPlatform abstractPlatform;
 
 extern void __PlatformInit();
+extern void __KeyboardEvent(SDL_Event event, bool down);
+extern void __TextInputEvent(SDL_Event event);
 
 bool mute = false;
 bool noThreading = false;
@@ -133,6 +135,9 @@ int main(int argc, char** argv)
 					Game::PlatformUpdated();
 				}
 				break;
+			case SDL_TEXTINPUT: __TextInputEvent(event); break;
+			case SDL_KEYDOWN: __KeyboardEvent(event, true); break;
+			case SDL_KEYUP: __KeyboardEvent(event, false); break;
 			}
 		}
 

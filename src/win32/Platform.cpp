@@ -22,6 +22,8 @@
 
 #include <SDL_ttf.h>
 
+#include "Engine/InputManager.h"
+
 
 extern std::filesystem::path assetDir;
 extern std::filesystem::path userDir;
@@ -35,6 +37,8 @@ extern GPU_Image* white;
 
 static ScreenId currentRT;
 static GPU_Target* target = nullptr;
+
+static std::vector<SDL_Scancode> _keyboardPressed;
 
 GPU_BlendPresetEnum blendMode;
 
@@ -361,6 +365,64 @@ void Platform::UpdatePointerState(PointerState& state)
 
 	state.Touch = buttonState & SDL_BUTTON(SDL_BUTTON_LEFT);
 	state.TouchAlt = buttonState & SDL_BUTTON(SDL_BUTTON_RIGHT);
+}
+void Platform::UpdateKyeboardState(KeyboardState& state)
+{
+	for (auto key : _keyboardPressed)
+		state.keys.push_back((KeyboardKey)key);
+}
+
+
+void __TextInputEvent(SDL_Event event)
+{
+	InputManager::OnTextInput(event.text.text);
+}
+void __KeyboardEvent(SDL_Event event, bool down)
+{
+	if (down)
+	{
+
+	if (event.key.keysym.scancode == SDL_SCANCODE_BACKSPACE)
+			InputManager::OnTextDelete();
+		else if (event.key.keysym.sym == 'a' &&
+			event.key.keysym.mod & SDL_Keymod::KMOD_LCTRL)
+		{
+			//InputManager::OnSelectAll();
+		}
+		else if (event.key.keysym.sym == 'v' &&
+			event.key.keysym.mod & SDL_Keymod::KMOD_LCTRL)
+		{
+
+			const char* text = SDL_GetClipboardText();
+			InputManager::OnTextInput(text);
+		}
+	}
+
+
+	if (down)
+	{
+		for (auto key : _keyboardPressed)
+		{
+			if (key == event.key.keysym.scancode)
+				return;
+		}
+
+		_keyboardPressed.push_back(event.key.keysym.scancode);
+	}
+	else
+	{
+
+		for (unsigned i = 0; i < _keyboardPressed.size(); ++i)
+		{
+			if (_keyboardPressed[i] == event.key.keysym.scancode)
+			{
+				_keyboardPressed.erase(_keyboardPressed.begin() + i);
+				return;
+			}
+		}
+
+	}
+
 }
 
 void Platform::CreateChannel(AudioChannelState& channel)

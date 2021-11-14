@@ -140,6 +140,8 @@ bool Game::Frame()
 
 	if (_exit) return false;
 
+	InputManager::FrameEnd();
+
 	GUI::FrameEnd();
 
 	Profiler::FrameEnd();

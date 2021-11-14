@@ -49,6 +49,7 @@ public:
 
 	bool Focused = false;
 	bool NextFocused = false;
+	bool InputEnabled = true;
 
 	Rectangle GetSpace()const { return SpaceStack.back(); }
 
@@ -163,5 +164,10 @@ public:
 	
 
 	static  void SetNextFont(const class Font* font) { _state->OverrideFont = font; }
+
+	static void SetInputEnabled(bool enabled)
+	{
+		GetState().InputEnabled = enabled;
+	}
 };
 

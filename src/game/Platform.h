@@ -73,6 +73,7 @@ public:
 
 	static void UpdateGamepadState(GamepadState& state);
 	static void UpdatePointerState(PointerState& state);
+	static void UpdateKyeboardState(KeyboardState& state);
 
 	// ================ Audio =======================
 

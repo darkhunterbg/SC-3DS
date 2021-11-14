@@ -113,10 +113,14 @@ void GUI::FrameEnd()
 
 	GetState().Focused = GetState().NextFocused;
 	GetState().NextFocused = false;
+
+	GetState().InputEnabled = true;
 }
 
 bool GUI::IsLayoutFocused()
 {
+	if (!GetState().InputEnabled)  return false;;
+
 	Rectangle layout = GetLayoutSpace();
 
 	Vector2Int pos = GetMousePosition();
@@ -126,6 +130,8 @@ bool GUI::IsLayoutFocused()
 
 bool GUI::OnLayoutActivated()
 {
+	if (!GetState().InputEnabled) return false;
+
 	if (!InputManager::Pointer.IsPressed()) return false;
 
 	Rectangle layout = GetLayoutSpace();
@@ -134,6 +140,8 @@ bool GUI::OnLayoutActivated()
 }
 bool GUI::OnLayoutActivatedAlt()
 {
+	if (!GetState().InputEnabled) return false;
+
 	if (!InputManager::Pointer.IsReleasedAlt()) return false;
 
 	Rectangle layout = GetLayoutSpace();
@@ -142,6 +150,8 @@ bool GUI::OnLayoutActivatedAlt()
 }
 bool GUI::IsLayoutPressed()
 {
+	if (!GetState().InputEnabled) return false;
+
 	if (!InputManager::Pointer.IsDown()) return false;
 
 	Rectangle layout = GetLayoutSpace();
@@ -151,6 +161,8 @@ bool GUI::IsLayoutPressed()
 
 bool GUI::OnLayoutFocused()
 {
+	if (!GetState().InputEnabled) return false;
+
 	Rectangle layout = GetLayoutSpace();
 
 	Vector2Int pos = GetMousePosition();

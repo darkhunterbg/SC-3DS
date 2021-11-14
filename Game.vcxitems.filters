@@ -233,6 +233,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIButton.h">
       <Filter>GUI</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUITextbox.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Scenes\Scene.cpp">
@@ -417,6 +420,9 @@
       <Filter>SceneView</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIButton.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUITextbox.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
   </ItemGroup>

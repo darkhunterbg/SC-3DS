@@ -385,6 +385,7 @@ void Platform::UpdatePointerState(PointerState& state)
 	state.Touch = kDown && KEY_TOUCH;
 	state.Position = { touchPos.px, touchPos.py };
 }
+void Platform::UpdateKyeboardState(KeyboardState& state) {}
 
 FILE* Platform::OpenAsset(const char* path, AssetType type)
 {

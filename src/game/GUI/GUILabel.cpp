@@ -1,7 +1,6 @@
 #include "GUILabel.h"
 
 #include "../Engine/GraphicsRenderer.h"
-#include "../Platform.h"
 #include "../Game.h"
 
 void GUILabel::DrawText(const Font& font, const char* text, Color color)
@@ -23,7 +22,7 @@ void GUILabel::DrawText(const Font& font, const char* text, Vector2Int position,
 void GUILabel::DrawText(const Font& font, const char* text,
 	GUIHAlign hAlign, GUIVAlign vAlign, Color color)
 {
-	Vector2Int size = Platform::MeasureString(font, text);
+	Vector2Int size = font.MeasureString( text);
 	Rectangle rect = { {0,0}, size };
 	Vector2Int pos = GUI::GetPosition(rect, hAlign, vAlign);
 

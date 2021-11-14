@@ -1,7 +1,7 @@
 #pragma once
 
 #include "InputDevices.h"
-
+#include <string>
 
 class InputManager {
 
@@ -12,10 +12,17 @@ private:
 	static InputManager instance;
 
 public:
+	static std::string TextInput;
+	static int TextDelete;
 
 	static Gamepad Gamepad;
 	static Pointer Pointer;
+	static Keyboard Keyboard;
 
 	static void Update();
+	static void FrameEnd();
+
+	static void OnTextInput(const char* text);
+	static void OnTextDelete();
 };
 

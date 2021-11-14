@@ -6,3 +6,4 @@
 #include "GUIVideo.h"
 #include "GUITooltip.h"
 #include "GUIButton.h"
+#include "GUITextbox.h"

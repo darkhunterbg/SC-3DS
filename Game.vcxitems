@@ -59,6 +59,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIButton.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIImage.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUILabel.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUITextbox.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUITooltip.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIVideo.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\game\Loader\BinaryData.h" />
@@ -134,6 +135,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIButton.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIImage.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUILabel.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUITextbox.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUITooltip.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\GUI\GUIVideo.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\game\Loader\BinaryData.cpp" />

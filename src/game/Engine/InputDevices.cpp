@@ -13,3 +13,10 @@ void Pointer::Update()
 	prevState = currentState;
 	Platform::UpdatePointerState(currentState);
 }
+
+void Keyboard::Update()
+{
+	prevState = currentState;
+	currentState.keys.clear();
+	Platform::UpdateKyeboardState(currentState);
+}
