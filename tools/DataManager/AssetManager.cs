@@ -68,14 +68,14 @@ namespace DataManager
 		public static readonly string GameDataDir = $"{AssetsDir}data\\";
 
 		public static readonly string CookedAssetsRootDir = $"..\\..\\cooked_assets\\";
-		public static readonly string CookedAssetsPCDir = $"{CookedAssetsRootDir}\\win32\\";
-		public static readonly string Cooked3DSAssetsDir = $"{CookedAssetsRootDir}\\3ds";
+		public static readonly string CookedAssetsPCDir = $"{CookedAssetsRootDir}win32\\";
+		public static readonly string Cooked3DSAssetsDir = $"{CookedAssetsRootDir}3ds\\";
 
 		public static readonly string SpriteAtlasOutDir = $"{CookedAssetsPCDir}atlases\\";
 		public static readonly string BuildDataFile = $"data.bin";
 
 
-		public static readonly string SpriteAtlas3DSBuildDir = $"{Cooked3DSAssetsDir}\\atlases\\";
+		public static readonly string SpriteAtlas3DSBuildDir = $"{Cooked3DSAssetsDir}atlases\\";
 		public static readonly string tex3dsPath = "C:\\devkitPro\\tools\\bin\\tex3ds.exe";
 		public static readonly string makeromPath = "..\\..\\makerom.exe";
 		public static readonly string mkbcfntPath = "C:\\devkitPro\\tools\\bin\\mkbcfnt.exe";

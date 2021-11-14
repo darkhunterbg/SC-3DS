@@ -767,9 +767,14 @@ namespace DataManager.Build
 
 		private void BuildCIA()
 		{
-			currentJob = 0;
-			totalJobs = 1;
-			DisplayItem($"Building CIA...");
+			string romFSSrc = Path.Combine(AssetManager.CookedAssetsRootDir, "romfs_3ds.bin");
+			RomFSBuilder.Build(AssetManager.Cooked3DSAssetsDir, romFSSrc, op);
+
+			if (op.Cancelled)
+				return;
+
+			op.SetProgress(1, 1);
+			op.ItemName = $"Building CIA...";
 
 			string rootDir = "..\\..";
 			string ciaDst = Path.Combine(rootDir, "SC.cia");
@@ -783,7 +788,7 @@ namespace DataManager.Build
 
 
 
-			string args = $"-f cia -o {ciaDst} -target t -rsf {rsfSrc} -elf {elfSrc} -icon {smdhSrc} -banner {bannerSrc}";
+			string args = $"-f cia -o {ciaDst} -target t -rsf {rsfSrc} -elf {elfSrc} -icon {smdhSrc} -banner {bannerSrc} -romfs {romFSSrc}";
 			var process = new ProcessStartInfo(AssetManager.makeromPath, args);
 			process.UseShellExecute = false;
 			process.CreateNoWindow = true;
