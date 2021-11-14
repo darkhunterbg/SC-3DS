@@ -121,6 +121,16 @@ namespace DataManager.Assets
 					fs.Read(palData, 0, palData.Length);
 
 					Palette = new Palette(palData);
+
+					// Voodomagic for fixing palette on UI only
+					string name = System.IO.Path.GetFileNameWithoutExtension(Path);
+					if (name.StartsWith("p") && !IsPaletteFormat) {
+						for (int i = 0; i < Palette.Colors.Count; ++i) {
+							if (Palette.Colors[i].ToVector3().Length() * 255 < 12)
+								Palette.Colors[i] = new Color(Palette.Colors[i], 160);
+
+						}
+					}
 				} else {
 					throw new Exception("Unknown PCX format! Palette not found!");
 				}
@@ -157,7 +167,7 @@ namespace DataManager.Assets
 			LoadPreview(src.Texture);
 
 			ImGui.Text($"Dimensions: {Width}x{Height}");
-			if(IsPaletteFormat) ImGui.Text($"Detected as palette");
+			if (IsPaletteFormat) ImGui.Text($"Detected as palette");
 
 			Vector2 uv = new Vector2(Width, Height);
 			Vector2 size = new Vector2(Width, Width);
@@ -170,9 +180,25 @@ namespace DataManager.Assets
 			//	multiplier = 8;
 
 			ImGui.Image(src.GuiImage, uv * multiplier, Vector2.Zero, uv / src.Texture.Width);
+
+			var stats = ScanLines.SelectMany(s => s).Where(s => s != 0)
+				.GroupBy(c => c).OrderByDescending(c => c.Count()).Take(5);
+
+			if (Width * Height > 0) {
+				ImGui.Text("Top Colors:");
+
+				foreach (var s in stats) {
+
+
+					ImGui.ColorButton(string.Empty, Palette.Colors[s.Key].ToVec4());
+					ImGui.SameLine();
+					int percent = s.Count() * 1000 / (Width * Height);
+					ImGui.Text($"[{s.Key}]: {((float)percent / 10.0f)}%%");
+				}
+			}
 		}
 
-		public Texture2D ToTexture( )
+		public Texture2D ToTexture()
 		{
 			Texture2D b = new Texture2D(AppGame.Device, Width, Height);
 			LoadPreview(b);

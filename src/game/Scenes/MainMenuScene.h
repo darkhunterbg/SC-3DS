@@ -3,7 +3,7 @@
 #include "Scene.h"
 
 
-enum MainMenuState {
+enum class MainMenuState {
 	MainMenu,
 	MultiplayerSelection
 };
@@ -14,6 +14,8 @@ private:
 	MainMenuState _state;
 	class IMainMenuSceneView* _nextView;
 	MainMenuState _nextState;
+
+	Scene* _nextScene = nullptr;
 
 	void SwitchView(MainMenuState state, class IMainMenuSceneView* view);
 public:
@@ -30,4 +32,5 @@ public:
 	void ToMainMenu();
 	void ToMultiplayerConnection();
 
+	void StartGame();
 };

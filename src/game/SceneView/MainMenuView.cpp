@@ -9,7 +9,7 @@
 #include "../Engine/AssetLoader.h"
 #include "../Engine/AudioManager.h"
 
-#include "../Scenes/GameScene.h"
+
 
 MainMenuView::MainMenuView(MainMenuScene* scene) :
 	IMainMenuSceneView(scene)
@@ -59,7 +59,7 @@ void MainMenuView::Draw()
 		GUIVideo::DrawVideo("single", *_single, true);
 
 		if (GUIButton::DrawMainMenuButtonTextOffset({ 56,60 }, "Single Player", true))
-			Game::SetCurrentScene(new GameScene());
+			_scene->StartGame();
 
 	}
 	GUI::EndLayout();

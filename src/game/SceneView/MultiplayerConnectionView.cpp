@@ -75,22 +75,69 @@ void MultiplayerConnectionView::Draw()
 	GUIImage::DrawImage(bg);
 
 
-	Vector2Int okCancelPos = { (int)LerpF(210,0, lerp) ,0 };
+	const Image& list = GameDatabase::instance->GetImage("glue\\selconn\\plistsml");
+	Vector2Int listPos = { (int)LerpF(-list.GetSize().x ,0, lerp) ,0 };
+
+	GUI::BeginRelativeLayout(listPos, Vector2Int(list.GetSize()), GUIHAlign::Left, GUIVAlign::Top);
+	{
+		GUIImage::DrawImage(list);
+
+		GUILabel::DrawText(*Game::MenuFont16, "Select Connection", { 50,60 }, Colors::UILightGray);
+
+		Vector2Int offset = { 52,90 };
+		GUIButton::DrawMainMenuButtonFromText(offset, GUIHAlign::Left, GUIVAlign::Top, "Battle.net", false);
+
+		offset.y += 20;
+		GUIButton::DrawMainMenuButtonFromText(offset, GUIHAlign::Left, GUIVAlign::Top, "Local Area Network (IPX)", false);
+
+		offset.y += 20;
+		GUIButton::DrawMainMenuButtonFromText(offset, GUIHAlign::Left, GUIVAlign::Top, "Modem", false);
+
+		offset.y += 20;
+		GUIButton::DrawMainMenuButtonFromText(offset, GUIHAlign::Left, GUIVAlign::Top, "Direct Cable Connection", false);
+
+		GUIButton::SetNextButtonSelected();
+		offset.y += 20;
+		GUIButton::DrawMainMenuButtonFromText(offset, GUIHAlign::Left, GUIVAlign::Top, "Local Area Network (UDP)", true);
+	}
+	GUI::EndLayout();
+
+
+	const Image& info = GameDatabase::instance->GetImage("glue\\selconn\\pinfo");
+	Vector2Int infoPos = { (int)LerpF(info.GetSize().x ,0, lerp) ,30 };
+
+	GUI::BeginRelativeLayout(infoPos, Vector2Int(info.GetSize()), GUIHAlign::Right, GUIVAlign::Top);
+	{
+		GUIImage::DrawImage(info);
+
+		GUI::BeginRelativeLayout({ 10,54 }, { 240,260 }, GUIHAlign::Left, GUIVAlign::Top);
+
+
+		GUILabel::DrawText(*Game::MenuFont16, "Local Area\nNetwork (UDP)", { 0, 0 }, GUIHAlign::Left, GUIVAlign::Top, Colors::UILightGray);
+		GUILabel::DrawText(*Game::SystemFont12, "Supports up to 8 playes", { 0,56 }, GUIHAlign::Center, GUIVAlign::Top, Colors::UILightGray);
+
+		GUILabel::DrawText(*Game::SystemFont12, "Requirements: All computers must be\nconnected to a TCP/IP compatible\nnetwork.",
+			{ 0,90 }, GUIHAlign::Left, GUIVAlign::Top, Colors::UILightGray);
+
+
+		GUI::EndLayout();
+	}
+	GUI::EndLayout();
+
+
+	Vector2Int okCancelPos = { (int)LerpF(210,0, lerp) ,14 };
 	GUI::BeginRelativeLayout(okCancelPos, { 180,160 }, GUIHAlign::Right, GUIVAlign::Bottom);
 	{
-		//GUI::DrawLayoutDebug();
-
-		const Image& ok = GameDatabase::instance->GetImage("glue\\palnl\\pok");
+		const Image& ok = GameDatabase::instance->GetImage("glue\\palmm\\pok");
 		GUI::BeginRelativeLayout({ 0,0 }, Vector2Int(ok.GetSize()), GUIHAlign::Right, GUIVAlign::Top); {
 			GUIImage::DrawImage(ok);
 
-			if (GUIButton::DrawMainMenuButton({ -20,22 }, { 130,22 }, GUIHAlign::Center, GUIVAlign::Center, "Ok", false))
-				_scene->ToMainMenu();
-
+			if (GUIButton::DrawMainMenuButton({ -20,22 }, { 130,22 }, GUIHAlign::Center, GUIVAlign::Center, "Ok", true))
+				_scene->StartGame();
 		}
 		GUI::EndLayout();
 
-		const Image& cancel = GameDatabase::instance->GetImage("glue\\palnl\\pcancel");
+		const Image& cancel = GameDatabase::instance->GetImage("glue\\palmm\\pcancel");
 		GUI::BeginRelativeLayout({ 0,22 }, Vector2Int(cancel.GetSize()), GUIHAlign::Right, GUIVAlign::Top);
 		{
 			GUIImage::DrawImage(cancel);

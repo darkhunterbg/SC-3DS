@@ -85,9 +85,11 @@
   {
     "OutputName": "mainmenu",
     "ImageList": [
+      "glue\\create\\*",
       "glue\\mainmenu\\*",
       "glue\\palmm\\*",
-      "glue\\palnl\\*"
+      "glue\\palnl\\backgnd",
+      "glue\\selconn\\*"
     ],
     "PackStrategy": 0,
     "FilterStrategy": 1

@@ -65,6 +65,7 @@ public:
 	std::bitset<32> TextEffects = { 0 };
 
 	bool RestartVideo = false;
+	bool SelectNextButton = false;
 };
 
 class GUI {

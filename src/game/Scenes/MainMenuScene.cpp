@@ -9,6 +9,8 @@
 #include "../Widgets/Cursor.h"
 #include "../GUI/GUI.h"
 
+#include "../Scenes/GameScene.h"
+
 MainMenuScene::MainMenuScene()
 {
 	_id = NAMEOF(MainMenuScene);
@@ -44,6 +46,21 @@ void MainMenuScene::Stop()
 
 void MainMenuScene::Frame(TimeSlice& frameBudget)
 {
+	if (_nextScene)
+	{
+		bool change = true;
+
+		if (_view)
+		{
+			change = _view->DoneHiding();
+		}
+
+		if (change)
+		{
+			Game::SetCurrentScene(_nextScene);
+		}
+	}
+
 	if (_nextView)
 	{
 		bool change = true;
@@ -93,4 +110,12 @@ void MainMenuScene::ToMainMenu()
 void MainMenuScene::ToMultiplayerConnection()
 {
 	SwitchView(MainMenuState::MultiplayerSelection, new MultiplayerConnectionView(this));
+}
+
+void MainMenuScene::StartGame()
+{
+	if (_nextScene)
+		delete _nextScene;
+	_nextScene = nullptr;
+	_nextScene = new GameScene();
 }

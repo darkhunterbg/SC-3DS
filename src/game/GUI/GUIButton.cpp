@@ -9,14 +9,41 @@
 #include "../Engine/AudioManager.h"
 #include "../Data/GameDatabase.h"
 
-bool GUIButton::DrawMainMenuButtonTextOffset(Vector2Int offset, const char* text, bool enabled)
+
+void GUIButton::SetNextButtonSelected()
+{
+	GUI::GetState().SelectNextButton = true;
+}
+
+bool GUIButton::DrawMainMenuButtonFromText(Vector2Int offset, GUIHAlign hAlign, GUIVAlign vAlign, const char* text, bool enabled)
+{
+	Vector2Int size = Game::MenuFont16->MeasureString(text);
+
+	GUI::BeginRelativeLayout(offset, size, hAlign, vAlign);
+	bool clicked = DrawMainMenuButton(text, enabled);
+	GUI::EndLayout();
+
+	return clicked;
+}
+
+bool GUIButton::DrawMainMenuButtonTextOffsetAligned(Vector2Int offset, GUIHAlign hAlign, GUIVAlign vAlign, const char* text, bool enabled)
 {
 	Color c = Colors::UIMenuDisabled;
 
-	if (enabled)
-		c = GUI::IsLayoutFocused() ? Colors::UIMenuGreenLit : Colors::UIMenuGreen;
+	bool select = GUI::GetState().SelectNextButton;
+	if (!select)
+	{
+		select = GUI::IsLayoutFocused();
+	}
+	else
+	{
+		GUI::GetState().SelectNextButton = false;
+	}
 
-	GUILabel::DrawText(*Game::MenuFont16, text, offset, GUIHAlign::Center, GUIVAlign::Center, c);
+	if (enabled)
+		c = select ? Colors::UIMenuGreenLit : Colors::UIMenuGreen;
+
+	GUILabel::DrawText(*Game::MenuFont16, text, offset, hAlign, vAlign, c);
 
 	if (enabled)
 	{
@@ -33,6 +60,11 @@ bool GUIButton::DrawMainMenuButtonTextOffset(Vector2Int offset, const char* text
 	}
 
 	return false;
+}
+
+bool GUIButton::DrawMainMenuButtonTextOffset(Vector2Int offset, const char* text, bool enabled)
+{
+	return DrawMainMenuButtonTextOffsetAligned(offset, GUIHAlign::Center, GUIVAlign::Center, text, enabled);
 }
 
 

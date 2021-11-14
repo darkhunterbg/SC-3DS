@@ -786,7 +786,7 @@ namespace DataManager.Build
 			if (!File.Exists(elfSrc))
 				throw new Exception($"ELF not found: '{elfSrc}'. Build 3ds C++ project first!");
 
-
+			// https://github.com/d0k3/3DS-Tools-Collection/blob/master/Commandline%20Tools/makerom.txt
 
 			string args = $"-f cia -o {ciaDst} -target t -rsf {rsfSrc} -elf {elfSrc} -icon {smdhSrc} -banner {bannerSrc} -romfs {romFSSrc}";
 			var process = new ProcessStartInfo(AssetManager.makeromPath, args);
