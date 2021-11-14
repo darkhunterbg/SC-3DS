@@ -14,6 +14,7 @@ public:
 
 	static void SetNextButtonSelected();
 
+
 	static bool DrawMainMenuButtonFromText(Vector2Int offset, GUIHAlign hAlign, GUIVAlign vAlign, const char* text, bool enabled = true);
 
 	static bool DrawMainMenuButtonTextOffsetAligned(Vector2Int offset, GUIHAlign hAlign, GUIVAlign vAlign, const char* text, bool enabled = true);

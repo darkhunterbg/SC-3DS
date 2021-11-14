@@ -2,6 +2,7 @@
 
 #include "../Engine/GraphicsRenderer.h"
 #include "../Platform.h"
+#include "../Game.h"
 
 void GUILabel::DrawText(const Font& font, const char* text, Color color)
 {
@@ -38,4 +39,13 @@ void GUILabel::DrawText(const Font& font, const char* text, Vector2Int offset,
 {
 	GUI::AddNextElementOffset(offset);
 	DrawText(font, text, hAlign, vAlign, color);
+}
+
+void GUILabel::DrawMenuText( const char* text, Vector2Int offset, GUIHAlign hAlign, GUIVAlign vAlign)
+{
+	auto font = GUI::GetState().GetFont(Game::SystemFont12);
+
+	GUI::GetState().TextEffects.set(GUITextEffects_Shadow);
+	GUILabel::DrawText(*font, text, offset, hAlign, vAlign, Colors::UILightGray);
+	GUI::GetState().TextEffects.set(GUITextEffects_None);
 }

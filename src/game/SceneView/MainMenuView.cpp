@@ -66,12 +66,12 @@ void MainMenuView::Draw()
 
 	GUI::BeginAbsoluteLayout({ 366,80 }, _editor->GetFrameSize()); {
 		GUIVideo::DrawVideo("editor", *_editor, true);
-	/*	if (GUI::IsLayoutFocused())
-		{
-			GUI::BeginAbsoluteLayout({ 386,96 }, _editoron->GetFrameSize());
-			GUIVideo::DrawVideo("editoron", *_editoron, true);
-			GUI::EndLayout();
-		}*/
+		/*	if (GUI::IsLayoutFocused())
+			{
+				GUI::BeginAbsoluteLayout({ 386,96 }, _editoron->GetFrameSize());
+				GUIVideo::DrawVideo("editoron", *_editoron, true);
+				GUI::EndLayout();
+			}*/
 		GUIButton::DrawMainMenuButtonTextOffset({ 20,-58 }, "Campaign Editor", false);
 
 	}
@@ -122,7 +122,7 @@ void MainMenuView::Draw()
 	GUIButton::DrawMainMenuButton({ 20,-32 }, { 160,20 }, GUIHAlign::Center, GUIVAlign::Bottom, "Show Credits", false);
 	GUI::EndLayout();
 
-	GUILabel::DrawText(*Game::SystemFont10, "Tech Demo 1", { -2,-2 }, GUIHAlign::Right, GUIVAlign::Bottom, Colors::UILightGray);
+	GUILabel::DrawMenuText("Tech Demo 1", { -2,-2 }, GUIHAlign::Right, GUIVAlign::Bottom);
 
 	if (Game::GetPlatformInfo().Type == PlatformType::Nintendo3DS)
 	{

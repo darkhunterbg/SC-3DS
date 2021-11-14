@@ -66,6 +66,17 @@ public:
 
 	bool RestartVideo = false;
 	bool SelectNextButton = false;
+	const class Font* OverrideFont = nullptr;
+
+	const class Font* GetFont(const class Font* def)
+	{
+		if (OverrideFont)
+		{
+			def = OverrideFont;
+			OverrideFont = nullptr;
+		}
+		return def;
+	}
 };
 
 class GUI {
@@ -149,6 +160,8 @@ public:
 	{
 		_state->ExecAtEndOfFrame.push_back(func);
 	}
+	
 
+	static  void SetNextFont(const class Font* font) { _state->OverrideFont = font; }
 };
 

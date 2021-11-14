@@ -18,4 +18,10 @@ public:
 		GUIHAlign hAlign,
 		GUIVAlign vAlign,
 		Color color = Colors::White);
+
+
+
+	static void DrawMenuText( const char* text, Vector2Int offset,
+		GUIHAlign hAlign,
+		GUIVAlign vAlign);
 };

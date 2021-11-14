@@ -10,14 +10,21 @@
 #include "../Data/GameDatabase.h"
 
 
+
+
 void GUIButton::SetNextButtonSelected()
 {
 	GUI::GetState().SelectNextButton = true;
 }
 
+
+
 bool GUIButton::DrawMainMenuButtonFromText(Vector2Int offset, GUIHAlign hAlign, GUIVAlign vAlign, const char* text, bool enabled)
 {
-	Vector2Int size = Game::MenuFont16->MeasureString(text);
+	auto font = GUI::GetState().OverrideFont;
+	if (!font) font = Game::MenuFont16;
+
+	Vector2Int size = font->MeasureString(text);
 
 	GUI::BeginRelativeLayout(offset, size, hAlign, vAlign);
 	bool clicked = DrawMainMenuButton(text, enabled);
@@ -43,7 +50,9 @@ bool GUIButton::DrawMainMenuButtonTextOffsetAligned(Vector2Int offset, GUIHAlign
 	if (enabled)
 		c = select ? Colors::UIMenuGreenLit : Colors::UIMenuGreen;
 
-	GUILabel::DrawText(*Game::MenuFont16, text, offset, hAlign, vAlign, c);
+	auto font = GUI::GetState().GetFont(Game::MenuFont16);
+
+	GUILabel::DrawText(*font, text, offset, hAlign, vAlign, c);
 
 	if (enabled)
 	{

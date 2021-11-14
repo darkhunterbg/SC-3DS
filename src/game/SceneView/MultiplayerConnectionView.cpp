@@ -82,7 +82,8 @@ void MultiplayerConnectionView::Draw()
 	{
 		GUIImage::DrawImage(list);
 
-		GUILabel::DrawText(*Game::MenuFont16, "Select Connection", { 50,60 }, Colors::UILightGray);
+		GUI::SetNextFont(Game::MenuFont16);
+		GUILabel::DrawMenuText("Select Connection", { 50,56 }, GUIHAlign::Left, GUIVAlign::Top);
 
 		Vector2Int offset = { 52,90 };
 		GUIButton::DrawMainMenuButtonFromText(offset, GUIHAlign::Left, GUIVAlign::Top, "Battle.net", false);
@@ -110,14 +111,15 @@ void MultiplayerConnectionView::Draw()
 	{
 		GUIImage::DrawImage(info);
 
-		GUI::BeginRelativeLayout({ 10,54 }, { 240,260 }, GUIHAlign::Left, GUIVAlign::Top);
+		GUI::BeginRelativeLayout({ 10,54 }, { 240,256 }, GUIHAlign::Left, GUIVAlign::Top);
 
+		GUI::SetNextFont(Game::MenuFont16);
 
-		GUILabel::DrawText(*Game::MenuFont16, "Local Area\nNetwork (UDP)", { 0, 0 }, GUIHAlign::Left, GUIVAlign::Top, Colors::UILightGray);
-		GUILabel::DrawText(*Game::SystemFont12, "Supports up to 8 playes", { 0,56 }, GUIHAlign::Center, GUIVAlign::Top, Colors::UILightGray);
+		GUILabel::DrawMenuText( "Local Area\nNetwork (UDP)", { 0, 0 }, GUIHAlign::Left, GUIVAlign::Top );
+		GUILabel::DrawMenuText( "Supports up to 8 playes", { 0,56 }, GUIHAlign::Center, GUIVAlign::Top);
 
-		GUILabel::DrawText(*Game::SystemFont12, "Requirements: All computers must be\nconnected to a TCP/IP compatible\nnetwork.",
-			{ 0,90 }, GUIHAlign::Left, GUIVAlign::Top, Colors::UILightGray);
+		GUILabel::DrawMenuText( "Requirements: All computers must be\nconnected to a TCP/IP compatible\nnetwork.",
+			{ 0,90 }, GUIHAlign::Left, GUIVAlign::Top);
 
 
 		GUI::EndLayout();
