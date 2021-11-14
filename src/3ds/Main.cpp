@@ -15,6 +15,7 @@
 #include "NDSAudioChannel.h"
 
 #include "Profiler.h"
+#include "Debug.h"
 
 #include "Engine/GraphicsPrimitives.h"
 #include "Engine/AudioChannel.h"
@@ -110,8 +111,8 @@ int main()
 		u32 color = C2D_Color32f(Colors::CornflowerBlue.r, Colors::CornflowerBlue.g, Colors::CornflowerBlue.b, Colors::CornflowerBlue.a);
 		C2D_TargetClear(top, color);
 		C2D_TargetClear(bottom, color);
-		
-		bool done  = !Game::Frame();
+
+		bool done = !Game::Frame();
 
 		C3D_FrameEnd(0);
 
@@ -131,7 +132,7 @@ int main()
 void Init()
 {
 
-	romfsInit();
+	Result rc = romfsInit();
 	gfxInitDefault();
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
 
@@ -143,7 +144,7 @@ void Init()
 	//	FatalError("svcReleaseSemaphore failed with %s", R_SUMMARY(r));
 
 
-	C2D_Init(4096 *8 + 256*256);
+	C2D_Init(4096 * 8 + 256 * 256);
 	C2D_Prepare();
 	top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
 	bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
@@ -156,17 +157,31 @@ void Init()
 	ndspInit();
 	ndspSetOutputMode(NDSP_OUTPUT_STEREO);
 
-	char dir[64];
-	getcwd(&dir[0], 64);
+	bool dirsInit = false;
 
-	if (strcmp(dir, "/") == 0)
-		assetDir = "3ds/StarCraft/romfs_debug/";
+	if (!rc)
+	{
+		assetDir = "romfs:/";
+		userDir = "sdmc:/3ds/StarCraft/User/";
+		//FCUse
+	}
 	else
-		assetDir = "StarCraft/romfs_debug/";
+	{
+		// Try to find sd card dir
+		//char dir[64];
+		//getcwd(&dir[0], 64);
+		//if (strcmp(dir, "/") == 0)
+		assetDir = "sdmc:/3ds/StarCraft/romfs_debug/";
+		//else // For homebrew launcher
+		//assetDir = "StarCraft/romfs_debug/";
+	}
 
-
-	userDir = assetDir.substr(0, assetDir.length() - 6) + "User/";
 	struct stat s = { 0 };
+
+	if (stat(assetDir.data(), &s) != 0 || !S_ISDIR(s.st_mode))
+	{
+		EXCEPTION("Asset dir not found: '%s", assetDir.data());
+	}
 
 	if (stat(userDir.data(), &s) != 0 || !S_ISDIR(s.st_mode))
 	{

@@ -77,6 +77,7 @@ namespace DataManager
 
 		public static readonly string SpriteAtlas3DSBuildDir = $"{Cooked3DSAssetsDir}\\atlases\\";
 		public static readonly string tex3dsPath = "C:\\devkitPro\\tools\\bin\\tex3ds.exe";
+		public static readonly string makeromPath = "..\\..\\makerom.exe";
 		public static readonly string mkbcfntPath = "C:\\devkitPro\\tools\\bin\\mkbcfnt.exe";
 
 		public static readonly string SpriteAtlasDataPath = $"{GameDataDir}atlases.csv";

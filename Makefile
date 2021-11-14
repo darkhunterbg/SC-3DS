@@ -39,12 +39,8 @@ SOURCES		:=	src/game src/game/Data src/game/Engine src/game/Entity src/game/GUI 
 
 SOURCES		+= src/3ds src/3ds/citro2d src/3ds/citro2d/c2d 
 
-#DATA		:=	data
 INCLUDES	:=	$(SOURCES)
-#GRAPHICS	:=	gfx
-#GFXBUILD	:=	gfxbuild
-ROMFS		:=	romfs
-#GFXBUILD	:=	$(ROMFS)
+#ROMFS		:=	cooked_assets/3ds
 APP_TITLE	:=	StarCraft
 APP_DESCRIPTION := StarCraft (open source)
 APP_AUTHOR	:= KN

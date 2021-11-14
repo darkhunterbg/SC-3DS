@@ -370,11 +370,10 @@ bin/
 *.3dsx
 *.elf
 *.smdh
+*.cia
 
 /mpq/
 /assets_extracted/
-/SC.cia
-/assets/atlases/
-/assets/data/*.bin
 /cooked_assets/
+/tools/*/NativeEditorLib.dll
 *.lnk

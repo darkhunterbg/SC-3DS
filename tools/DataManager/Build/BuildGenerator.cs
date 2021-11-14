@@ -38,7 +38,7 @@ namespace DataManager.Build
 			return additionalBuildFiles.Where(s => s.EndsWith(".smk"))
 				.Select(s => new PackEntry()
 				{
-					RelativePath = s.Substring(0,s.Length-4),
+					RelativePath = s.Substring(0, s.Length - 4),
 					FilePath = AssetManager.StarcraftAssetDir + s
 				});
 		}
@@ -123,6 +123,10 @@ namespace DataManager.Build
 			if (Build3DS) {
 				Directory.Delete(AssetManager.Cooked3DSAssetsDir, true);
 				Directory.CreateDirectory(AssetManager.Cooked3DSAssetsDir);
+
+				string ciaDst = Path.Combine(Path.GetFullPath("..\\.."), "SC.cia");
+				if (File.Exists(ciaDst))
+					File.Delete(ciaDst);
 			}
 
 
@@ -177,6 +181,12 @@ namespace DataManager.Build
 				return;
 
 			BuildOther();
+
+			if (cancelled)
+				return;
+
+			if (Build3DS)
+				BuildCIA();
 		}
 
 		private static List<AtlasBSPTree> SimplifyAtlasTrees(List<AtlasBSPTree> subAtlases)
@@ -753,6 +763,45 @@ namespace DataManager.Build
 				Directory.CreateDirectory(Path.GetDirectoryName(outFile));
 				File.Copy(dst, outFile, true);
 			}
+		}
+
+		private void BuildCIA()
+		{
+			currentJob = 0;
+			totalJobs = 1;
+			DisplayItem($"Building CIA...");
+
+			string rootDir = "..\\..";
+			string ciaDst = Path.Combine(rootDir, "SC.cia");
+			string rsfSrc = Path.Combine(rootDir, "RSF");
+			string elfSrc = Path.Combine(rootDir, "SC.elf");
+			string smdhSrc = Path.Combine(rootDir, "SC.smdh");
+			string bannerSrc = Path.Combine(rootDir, "banner.bnr");
+
+			if (!File.Exists(elfSrc))
+				throw new Exception($"ELF not found: '{elfSrc}'. Build 3ds C++ project first!");
+
+
+
+			string args = $"-f cia -o {ciaDst} -target t -rsf {rsfSrc} -elf {elfSrc} -icon {smdhSrc} -banner {bannerSrc}";
+			var process = new ProcessStartInfo(AssetManager.makeromPath, args);
+			process.UseShellExecute = false;
+			process.CreateNoWindow = true;
+			process.RedirectStandardOutput = true;
+			process.RedirectStandardError = true;
+			var p = new Process()
+			{
+				StartInfo = process
+			};
+
+
+			p.Start();
+
+			p.WaitForExit();
+
+			string error = p.StandardError.ReadToEnd();
+			if (!string.IsNullOrEmpty(error))
+				throw new Exception($"Failed to build CIA: {error}");
 		}
 
 		public void Dispose()
