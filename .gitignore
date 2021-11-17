@@ -377,3 +377,4 @@ bin/
 /cooked_assets/
 /tools/*/NativeEditorLib.dll
 *.lnk
+!/tools/LocalPackages/ImGui.NET.1.82.0.nupkg
