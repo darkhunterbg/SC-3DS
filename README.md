@@ -62,4 +62,4 @@ Download the [lastest releases](https://github.com/darkhunterbg/SC-3DS/releases/
 - X: attack;
 - A: go-to/attack;
 - B: stop;
-- Select: toggle performance profiler;- 
+- Select: toggle performance profiler;
