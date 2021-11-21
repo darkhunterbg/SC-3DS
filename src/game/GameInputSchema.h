@@ -47,6 +47,8 @@ public:
 		InputCommand Select = InputCommand("Cursor.Select");
 		InputCommand Hold = InputCommand("Cursor.Hold");
 		InputCommand Context = InputCommand("Cursor.Context");
+		InputCommand Attack = InputCommand("Cursor.Attack");
+		InputCommand Stop = InputCommand("Cursor.Stop");
 	} Cursor;
 
 	struct CameraCmd {
@@ -61,7 +63,7 @@ public:
 
 	struct CheatsCmd {
 		InputCommand ToggleFoW = InputCommand("Cheats.ToggleFow");
+		InputCommand GoToMainMenu = InputCommand("Cheats.ToMainMenu");
 	} Cheats;
-
 
 };

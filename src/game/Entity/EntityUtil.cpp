@@ -163,6 +163,15 @@ const std::vector<const AbilityDef*>& EntityUtil::GetUnitAbilities(EntityId id)
 	return unitAbilities;
 }
 
+bool EntityUtil::UnitHasAbility(EntityId id, const AbilityDef& ability)
+{
+	for (auto a : GetUnitAbilities(id)) {
+		if (a && a->Id == ability.Id)
+			return true;
+	}
+	return false;
+}
+
 void EntityUtil::ActivateAbility(EntityId user, const AbilityDef& ability)
 {
 	GAME_ASSERT(!ability.HasTargetSelection(), "Tried to activate ability '%s' without target!", ability.Art.Name);

@@ -8,6 +8,11 @@ class MainMenuView : public IMainMenuSceneView {
 
 private:
 	VideoClip* _single, * _singleon, * _multi, * _multion, *_editor, *_editoron, * _exit, * _exiton;
+
+	void DrawGenric();
+	void DrawN3DS();
+
+	int _menuIndex = 0;
 public:
 	MainMenuView(class MainMenuScene* scene);
 	virtual ~MainMenuView() override;

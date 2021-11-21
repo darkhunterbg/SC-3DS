@@ -4,6 +4,7 @@
 #include "../Engine/InputManager.h"
 #include "../Game.h"
 #include "../Util.h"
+#include "../Platform.h"
 
 GUIState* GUI::_state = nullptr;
 
@@ -19,7 +20,7 @@ void GUI::UseScreen(ScreenId screen)
 	auto& state = GetState();
 	state.SpaceStack.clear();
 
-	state.SpaceStack.push_back({ {0,0},GetScreenSize() });
+	state.SpaceStack.push_back({ {0,0}, GetScreenSize() });
 }
 
 void GUI::BeginAbsoluteLayout(Rectangle layout)
@@ -131,6 +132,9 @@ bool GUI::IsLayoutFocused()
 bool GUI::OnLayoutActivated()
 {
 	if (!GetState().InputEnabled) return false;
+
+	if (Game::GetPlatformInfo().Type == PlatformType::Nintendo3DS && GraphicsRenderer::GetScreenId() != ScreenId::Bottom)
+		return false;
 
 	if (!InputManager::Pointer.IsPressed()) return false;
 

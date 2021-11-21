@@ -83,6 +83,8 @@ namespace DataManager
 
 		private bool _ready = false;
 
+		private static string _popupModalText = string.Empty;
+
 		public AppGui(AppGame game)
 		{
 			Game = game;
@@ -111,52 +113,68 @@ namespace DataManager
 		}
 
 		public void Draw(Vector2 clientSize)
-		{
-			HoverObject = null;
+        {
+            HoverObject = null;
 
-			ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(0, 0));
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(0, 0));
 
-			ImGui.SetNextWindowSize(new Vector2(clientSize.X, clientSize.Y));
-			ImGui.SetNextWindowPos(new Vector2(0, 0));
-			ImGui.Begin("Root", ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar
-				| ImGuiWindowFlags.DockNodeHost | ImGuiWindowFlags.AlwaysAutoResize);
+            ImGui.SetNextWindowSize(new Vector2(clientSize.X, clientSize.Y));
+            ImGui.SetNextWindowPos(new Vector2(0, 0));
+            ImGui.Begin("Root", ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar
+                | ImGuiWindowFlags.DockNodeHost | ImGuiWindowFlags.AlwaysAutoResize);
 
-			ImGui.DockSpace(ImGui.GetID("RootDockspace"));
-			ImGui.End();
+            ImGui.DockSpace(ImGui.GetID("RootDockspace"));
+            ImGui.End();
 
-			ImGui.PopStyleVar(1);
+            ImGui.PopStyleVar(1);
 
 
-			ResizeRenderTarget(clientSize);
+            ResizeRenderTarget(clientSize);
 
-			AppGame.Device.SetRenderTarget(BackBuffer);
-			AppGame.Device.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
+            AppGame.Device.SetRenderTarget(BackBuffer);
+            AppGame.Device.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
 
-			UpdateInput();
+            UpdateInput();
 
-			EditorFieldDrawer.ResetIds();
+            EditorFieldDrawer.ResetIds();
 
-			EditorModalSelect.DrawSelectItemModal();
+            EditorModalSelect.DrawSelectItemModal();
 
-			if (Ready()) {
+            if (Ready()) {
 
-				foreach (var win in windows) {
-					ImGui.SetNextWindowSize(new Vector2(800, 600), ImGuiCond.FirstUseEver);
+                foreach (var win in windows) {
+                    ImGui.SetNextWindowSize(new Vector2(800, 600), ImGuiCond.FirstUseEver);
 
-					if (ImGui.Begin(win.Name)) {
-						win.Panel.Draw(clientSize);
-						ImGui.End();
-					}
-				}
-			}
-			TooltipForObject(HoverObject);
+                    if (ImGui.Begin(win.Name)) {
+                        win.Panel.Draw(clientSize);
+                        ImGui.End();
+                    }
+                }
+            }
+            TooltipForObject(HoverObject);
 
-			UpdateCoroutines();
+            UpdateCoroutines();
 
-			AppGame.Device.SetRenderTarget(null);
-		}
+            AppGame.Device.SetRenderTarget(null);
 
-		private bool Ready()
+            DrawModal();
+        }
+
+        private static void DrawModal()
+        {
+            if (!string.IsNullOrEmpty(_popupModalText)) {
+                ImGui.OpenPopup("Generic.Modal");
+                bool open = true;
+                ImGui.BeginPopupModal("Generic.Modal", ref open, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar);
+                ImGui.Text(_popupModalText);
+				if(ImGui.Button("Ok"))
+					_popupModalText = string.Empty;
+				ImGui.EndPopup();
+
+            }
+        }
+
+        private bool Ready()
 		{
 			if (_ready)
 				return true;
@@ -404,6 +422,13 @@ namespace DataManager
 				op.Cancel();
 
 			return running;
+		}
+
+		public static void Modal(string text)
+        {
+			_popupModalText = text;
+
+	
 		}
 	}
 }

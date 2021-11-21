@@ -127,8 +127,9 @@ void JobSystem::Init()
 {
 	CurrentThreadId = 0;
 
-
-	int workerThreads = Platform::GetPlatformInfo().HardwareThreadsCount - 1;
+	PlatformInfo info;
+	Platform::GetPlatformInfo(info);
+	int workerThreads = info.HardwareThreadsCount - 1;
 
 	if (workerThreads > 0)
 	{

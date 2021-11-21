@@ -32,9 +32,9 @@ static std::unordered_map<std::string, C2D_Font> loadedFonts;
 static std::unordered_map<const C3D_Tex*, const Tex3DS_SubTexture*> loadedTextures;
 
 
-PlatformInfo Platform::GetPlatformInfo()
+void Platform::GetPlatformInfo(PlatformInfo& info)
 {
-	PlatformInfo info;
+	info = {};
 	info.Type = PlatformType::Nintendo3DS;
 	info.Screens.push_back(Vector2Int16(screens[0].size));
 	info.Screens.push_back(Vector2Int16(screens[1].size));
@@ -42,7 +42,7 @@ PlatformInfo Platform::GetPlatformInfo()
 	APT_CheckNew3DS(&isNew3DS);
 	if (isNew3DS)
 		info.HardwareThreadsCount = 3;
-	return info;
+
 }
 
 TextureId Platform::CreateTextureFromFile(const char* path, Span<uint8_t> data, Vector2Int16& outSize)

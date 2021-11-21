@@ -96,7 +96,7 @@ int main(int argc, char** argv)
 
 	GameStartSettings settings = {};
 	settings.skipIntro = true;
-	settings.loadTestScene = false;
+	//settings.loadTestScene = false;
 
 	if (argc > 1)
 	{

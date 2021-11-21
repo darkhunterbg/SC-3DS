@@ -38,7 +38,7 @@ void GameScene::Start()
 	 Colors::SCOrange, Colors::SCGreen, Colors::SCBrown, Colors::SCLightYellow, Colors::SCWhite,
 	Colors::SCTeal , Colors::SCYellow , Colors::SCLightBlue };
 
-	int totalPlayers = 3;
+	int totalPlayers = 4;
 
 
 	const auto& race = *GameDatabase::instance->GetRace(RaceType::Terran);
@@ -88,40 +88,38 @@ void GameScene::Start()
 
 	std::vector<const UnitDef*> group0 = { units[0], units[0], units[0] };
 	std::vector<const UnitDef*> group2 = { units[1] };
-	std::vector<const UnitDef*> group1 = { units[2],units[2],units[2],units[2] };
+	std::vector<const UnitDef*> group1 = { units[2],units[2],units[2],units[2] ,units[2] };
 
 	std::vector<const  UnitDef*>* groups[] = { &group0, &group1, &group2 };
 
 
 
-	//EntityUtil::SpawnUnit(*units[0], PlayerId{ (short)(2) }, Vector2Int16(Vector2Int{ 232 ,232}));
-	//EntityUtil::SpawnUnit(*units[1], PlayerId{ (short)(1) }, Vector2Int16(Vector2Int{ 264 ,232 }));
-	//EntityUtil::SpawnUnit(*units[2], PlayerId{ (short)(2) }, Vector2Int16(Vector2Int{ 232 ,264 }));
-	//EntityUtil::SpawnUnit(*units[2], PlayerId{ (short)(2) }, Vector2Int16(Vector2Int{ 232 ,296 }));
-	EntityUtil::SpawnUnit(*units[1], PlayerId{ (short)(1) }, Vector2Int16(Vector2Int{ 64 ,64 }));
-	EntityUtil::SpawnUnit(*units[1], PlayerId{ (short)(1) }, Vector2Int16(Vector2Int{ 96 ,64 }));
-	EntityUtil::SpawnUnit(*units[2], PlayerId{ (short)(2) }, Vector2Int16(Vector2Int{ 320 ,320 }));
-	//_entityManager->UnitSystem.GetComponent(u).health = 35;
+	EntityUtil::SpawnUnit(*units[0], PlayerId{ (short)(1) }, Vector2Int16(Vector2Int{ 64 ,64}));
+	EntityUtil::SpawnUnit(*units[0], PlayerId{ (short)(1) }, Vector2Int16(Vector2Int{ 96 ,32 }));
+	//EntityUtil::SpawnUnit(*units[0], PlayerId{ (short)(1) }, Vector2Int16(Vector2Int{ 96 ,64 }));
 
-	//int i = 0;
-	//for (int y = 1; y < 2; ++y)
-	//{
-	//	for (int x = 1; x < 2; ++x)
-	//	{
 
-	//		auto& group = group1;// *groups[i % 3];
+	int i = 0;
+	for (int y = 0; y < 2; ++y)
+	{
+		for (int x = 0; x < 2; ++x)
+		{
 
-	//		for (int j = 0; j < group.size(); ++j)
-	//		{
-	//			EntityUtil::SpawnUnit(*group[j], PlayerId{ (short)(i % totalPlayers + 1) },
-	//				Vector2Int16(Vector2Int{ x * 70 + (j%2)*32 ,y * 70 + (j/2) *32}));
-	//		}
-	//		//EntityUtil::SpawnUnit(*units[i % 3], PlayerId{ (short)(i % totalPlayers + 1) }, Vector2Int16(Vector2Int{ x * 64 ,y * 64 }));
-	//		++i;
-	//	}
-	//}
+			auto& group = *groups[i % 3];
 
-	_entityManager->PlayerSystem.SetMapKnown(PlayerId{ 1 });
+			for (int j = 0; j < group.size(); ++j)
+			{
+				Vector2Int16 offset = Vector2Int16(x * 400 + 32, y * 400 + 32);
+
+				EntityUtil::SpawnUnit(*group[j], PlayerId{ (short)(i % totalPlayers + 1) },
+					offset + Vector2Int16((j % 2) * 32, (j / 2) * 32));
+			}
+			//EntityUtil::SpawnUnit(*units[i % 3], PlayerId{ (short)(i % totalPlayers + 1) }, Vector2Int16(Vector2Int{ x * 64 ,y * 64 }));
+			++i;
+		}
+	}
+
+	//_entityManager->PlayerSystem.SetMapKnown(PlayerId{ 1 });
 
 	//_entityManager->SetOrientation(0, 16);
 	//_entityManager->UnitSystem.GetAIComponent(0).targetPosition = Vector2Int16(256, 256);
@@ -193,6 +191,7 @@ void GameScene::Frame(TimeSlice& frameBudget)
 	{
 		_entityManager->MapSystem.FogOfWarVisible = !_entityManager->MapSystem.FogOfWarVisible;
 	}
+
 
 }
 

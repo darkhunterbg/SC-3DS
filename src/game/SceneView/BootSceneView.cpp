@@ -49,7 +49,7 @@ void BootSceneView::Draw()
 
 		if (text != nullptr)
 		{
-			GUILabel::DrawText(*Game::SystemFont12, text, Vector2Int(0, 20), GUIHAlign::Center, GUIVAlign::Center, Colors::SCWhite);
+			GUILabel::DrawMenuText( text, Vector2Int(-2, 20), GUIHAlign::Center, GUIVAlign::Center);
 		}
 	}
 	else

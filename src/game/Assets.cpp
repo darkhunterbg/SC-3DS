@@ -43,7 +43,7 @@ class AudioClipStreamAudioCrt : public CoroutineRImpl<unsigned> {
 	int _read = 0;
 	unsigned _streamPos;
 public:
-	AudioClipStreamAudioCrt(AudioClip& clip, Span<uint8_t> buffer, unsigned streamPos ) :
+	AudioClipStreamAudioCrt(AudioClip& clip, Span<uint8_t> buffer, unsigned streamPos) :
 		_clip(&clip), _buffer(buffer), _streamPos(streamPos)
 	{
 	}
@@ -55,7 +55,7 @@ public:
 			CRT_RETURN(0);
 		}
 
-		_fillCrt = AssetLoader::RunIOAsync([ this]() { _read = _clip->FillNextBuffer(_buffer, _streamPos); });
+		_fillCrt = AssetLoader::RunIOAsync([this]() { _read = _clip->FillNextBuffer(_buffer, _streamPos); });
 
 		CRT_WAIT_FOR(_fillCrt);
 
@@ -187,6 +187,12 @@ void VideoClip::OpenVideo()
 	{
 		_textureSize.y = _textureSize.y << 1;
 	}
+
+	if (_textureSize.x < _textureSize.y)
+		_textureSize.x = _textureSize.y;
+
+	if (_textureSize.y < _textureSize.x)
+		_textureSize.y = _textureSize.x;
 }
 
 bool VideoClip::IsAtEnd() const
@@ -333,7 +339,7 @@ static void Decode(int start, int end)
 }
 
 
-void VideoClip::DecodeCurrentFrame(uint8_t* pixelData, int texLineSize)
+void VideoClip::DecodeCurrentFrame(uint8_t * pixelData, int texLineSize)
 {
 	smk video = (smk)_handle;
 	const uint8_t* pal_data = smk_get_palette(video);

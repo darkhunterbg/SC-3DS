@@ -81,10 +81,12 @@ int main()
 	mainTimer = svcGetSystemTick();
 
 	GameStartSettings settings;
-	settings.loadTestScene = true;
-	settings.skipIntro = true;
+	//settings.loadTestScene = true;
+	//settings.skipIntro = true;
 
 	Game::Start(settings);
+
+	Game::ShowPerformanceStats = false;
 
 	while (aptMainLoop())
 	{
@@ -92,9 +94,9 @@ int main()
 
 		hidScanInput();
 
-		u32 kDown = hidKeysDown();
+	/*	u32 kDown = hidKeysDown();
 		if (kDown & KEY_START)
-			break;
+			break;*/
 
 
 		for (auto channel : audioChannels)
@@ -137,14 +139,17 @@ void Init()
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
 
 	// Enable N3DS 804MHz operation, where available
-	//osSetSpeedupEnable(true);
+	bool isNew3DS = false;
+	APT_CheckNew3DS(&isNew3DS);
+	if (isNew3DS)
+		osSetSpeedupEnable(true);
 
 	//Result r = APT_SetAppCpuTimeLimit(30);
 	//if (r)
 	//	FatalError("svcReleaseSemaphore failed with %s", R_SUMMARY(r));
 
 
-	C2D_Init(4096 * 8 + 256 * 256);
+	C2D_Init(4096 * 8 + 128 * 128);
 	C2D_Prepare();
 	top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
 	bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
@@ -162,19 +167,13 @@ void Init()
 	if (!rc)
 	{
 		assetDir = "romfs:/";
-		userDir = "sdmc:/3ds/StarCraft/User/";
-		//FCUse
 	}
 	else
 	{
-		// Try to find sd card dir
-		//char dir[64];
-		//getcwd(&dir[0], 64);
-		//if (strcmp(dir, "/") == 0)
-		assetDir = "sdmc:/3ds/StarCraft/romfs_debug/";
-		//else // For homebrew launcher
-		//assetDir = "StarCraft/romfs_debug/";
+		assetDir = "sdmc:/3ds/StarCraft/romfs/";
 	}
+
+	userDir = "sdmc:/3ds/StarCraft/User/";
 
 	struct stat s = { 0 };
 

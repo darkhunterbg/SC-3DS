@@ -88,6 +88,13 @@ void GameInputSchema::InitDefault()
 		if (Game::GetPlatformInfo().PointerIsCursor)
 			r = Vector2(InputManager::Pointer.IsReleasedAlt());
 		});
+	Cursor.Attack.AddCommand([](Vector2& r) {
+		r = Vector2(InputManager::Gamepad.IsButtonReleased(GamepadButton::X));
+		});
+
+	Cursor.Stop.AddCommand([](Vector2& r) {
+		r = Vector2(InputManager::Gamepad.IsButtonReleased(GamepadButton::B));
+		});
 
 	Camera.Move.AddCommand([](Vector2& r) {
 		r = InputManager::Gamepad.CStick();
@@ -109,5 +116,13 @@ void GameInputSchema::InitDefault()
 
 	Cheats.ToggleFoW.AddCommand([](Vector2& r) {
 		r = Vector2(InputManager::Gamepad.IsButtonPressed(GamepadButton::Select));
+		});
+
+	Cheats.GoToMainMenu.AddCommand([](Vector2& r) {
+		r = Vector2(
+			InputManager::Gamepad.IsButtonDown(GamepadButton::Select) && 
+			InputManager::Gamepad.IsButtonDown(GamepadButton::L) &&
+			InputManager::Gamepad.IsButtonDown(GamepadButton::R) 
+		);
 		});
 }

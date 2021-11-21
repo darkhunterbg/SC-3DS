@@ -19,6 +19,8 @@ private:
 	GraphicsRenderer& operator=(const GraphicsRenderer&) = delete;
 	static GraphicsRenderer instance;
 public:
+	inline static ScreenId GetScreenId() { return instance._currentScreen; }
+
 	static void Init();
 	static void BufferDraw(std::vector<BatchDrawCommand>& cmd);
 

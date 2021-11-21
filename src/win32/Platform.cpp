@@ -49,9 +49,9 @@ constexpr Uint8 SDL_FloatToUint8(float x)
 
 static 	void AudioCallback(void* userdata, Uint8* stream, int len);
 
-PlatformInfo Platform::GetPlatformInfo()
+void Platform::GetPlatformInfo(PlatformInfo& info)
 {
-	PlatformInfo info;
+	info = {};
 	for (auto& s : abstractPlatform.Screens)
 		info.Screens.push_back(s.Resolution);
 
@@ -61,8 +61,6 @@ PlatformInfo Platform::GetPlatformInfo()
 
 	if (!noThreading)
 		info.HardwareThreadsCount = SDL_GetCPUCount();
-
-	return info;
 }
 
 TextureId Platform::CreateTextureFromFile(const char* path, Span<uint8_t> data, Vector2Int16& outSize)

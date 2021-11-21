@@ -9,7 +9,7 @@ BasicInfo:
 
 TitleInfo:
   Category                : Application
-  UniqueId                : 0x1929
+  UniqueId                : 0x1930
 
 Option:
   UseOnSD                 : true # true if App is to be installed to SD

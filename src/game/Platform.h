@@ -43,7 +43,7 @@ public:
 
 	// ================ General Purpose =================
 
-	static PlatformInfo GetPlatformInfo();
+	static void GetPlatformInfo(PlatformInfo& outInfo);
 	static Vector2Int MeasureString(const Font& font, const char* text);
 	static double ElaspedTime();
 

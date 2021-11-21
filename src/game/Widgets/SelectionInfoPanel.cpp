@@ -33,7 +33,7 @@ static constexpr const std::array < OrganicColorPalette, 6>  _wfOrganicColorPlal
 
 static void GetUnitWireframeColors(EntityId id, const UnitComponent& unit, std::array<Color, 6>& outColors)
 {
-	if (unit.HasShield())
+	if (unit.def->Art.GetWireframe()->HasShieldGraphics())
 	{
 		int wfPartsState[4] = { 0,0,0,0 };
 
@@ -84,29 +84,31 @@ static void GetUnitWireframeColors(EntityId id, const UnitComponent& unit, std::
 
 		// ========= Shield =============
 
-		int shieldState = ((unit.shield.value * 7) / unit.maxShield.value);
+		if (unit.HasShield()) {
+			int shieldState = ((unit.shield.value * 7) / unit.maxShield.value);
 
-		outColors[0] = Colors::UIBlue;
-		outColors[1] = Colors::UIBlue;
+			outColors[0] = Colors::UIBlue;
+			outColors[1] = Colors::UIBlue;
 
-		outColors[0].a = 0;
-		outColors[1].a = 0;
+			outColors[0].a = 0;
+			outColors[1].a = 0;
 
 
-		if (shieldState > 6)
-			shieldState = 6;
+			if (shieldState > 6)
+				shieldState = 6;
 
-		if (shieldState > 3)
-		{
-			outColors[0].a = ((float)(shieldState - 4)) * 0.2f;
-			outColors[0].a += 0.6f;
-			shieldState = 3;
-		}
+			if (shieldState > 3)
+			{
+				outColors[0].a = ((float)(shieldState - 4)) * 0.2f;
+				outColors[0].a += 0.6f;
+				shieldState = 3;
+			}
 
-		if (shieldState > 0)
-		{
-			outColors[1].a = ((float)(shieldState - 1)) * 0.2f;
-			outColors[1].a += 0.6f;
+			if (shieldState > 0)
+			{
+				outColors[1].a = ((float)(shieldState - 1)) * 0.2f;
+				outColors[1].a += 0.6f;
+			}
 		}
 	}
 	else

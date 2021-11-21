@@ -90,7 +90,7 @@ static void InitialScene(GameStartSettings settings)
 void Game::Start(GameStartSettings settings)
 {
 	_exit = false;
-	_platformInfo = Platform::GetPlatformInfo();
+	Platform::GetPlatformInfo(_platformInfo);
 
 	JobSystem::Init();
 
@@ -134,11 +134,10 @@ bool Game::Frame()
 	if (currentScene)
 		currentScene->Frame(frameBudget);
 
-	if (_exit) return false;
+	if (!_exit) {
 
-	SwithScenes();
-
-	if (_exit) return false;
+		SwithScenes();
+	}
 
 	InputManager::FrameEnd();
 
@@ -181,7 +180,7 @@ const PlatformInfo& Game::GetPlatformInfo()
 
 void Game::PlatformUpdated()
 {
-	_platformInfo = Platform::GetPlatformInfo();
+	 Platform::GetPlatformInfo(_platformInfo);
 
 	if (currentScene)
 		currentScene->OnPlatformChanged();

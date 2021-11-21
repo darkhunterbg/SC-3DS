@@ -9,7 +9,9 @@
 #include "../Engine/AssetLoader.h"
 #include "../Profiler.h"
 #include "../Scenes/GameScene.h"
+#include "../Scenes/MainMenuScene.h"
 #include "../Engine/GraphicsRenderer.h"
+
 
 static constexpr const int MarkerTimer = 16;
 static constexpr const int AbilityUnitTargetMarkerTimer = 80;
@@ -172,19 +174,35 @@ void GameSceneView::UpdateSelection()
 }
 void GameSceneView::ContextActionCheck()
 {
-	if (_cursorOverUI)return;
+	if (_cursorOverUI) return;
 
 	bool context = Game::GetInput().Cursor.Context.IsActivated();
-	if (!context) return;
 
-	if (IsTargetSelectionMode())
+	if (context && IsTargetSelectionMode())
 	{
 		SetDefaultMode();
 		return;
 	}
 
+	if (IsTargetSelectionMode()) return;
+
 	Vector2Int16  worldPos = _camera.ScreenToWorld(Vector2Int16(_cursor.Position));
-	ActivateContextAbilityAt(worldPos);
+
+	if (context) {
+		ActivateContextAbilityAt(worldPos);
+	}
+
+	if (Game::GetInput().Cursor.Attack.IsActivated()) {
+		this->_selectTargetAbility = GameDatabase::instance->AttackAbility;
+		ActivateAbilityAt( worldPos);
+	}
+
+	if (Game::GetInput().Cursor.Stop.IsActivated()) {
+		for (EntityId id : _unitSelection)
+			EntityUtil::ActivateAbility(id, *GameDatabase::instance->StopAbility);
+
+		OnAbilityActivated();
+	}
 }
 void GameSceneView::TargetActionCheck()
 {
@@ -370,8 +388,13 @@ void GameSceneView::Draw()
 
 	DrawMainScreen();
 
-	if (Platform::GetPlatformInfo().Type != PlatformType::Nintendo3DS)
+	if (Game::GetPlatformInfo().Type != PlatformType::Nintendo3DS)
 		return;
+
+	GUILabel::DrawMenuText("Press Select + L + R\nfor main menu.", { 2,-16 }, GUIHAlign::Left, GUIVAlign::Bottom);
+
+	if (Game::GetInput().Cheats.GoToMainMenu.IsActivated())
+		Game::SetCurrentScene(new MainMenuScene());
 
 	DrawSecondaryScreen();
 }
@@ -403,7 +426,7 @@ void GameSceneView::DrawMainScreen()
 		Util::DrawTransparentRectangle(rect, 1, Colors::UIGreen);
 	}
 
-	if (Platform::GetPlatformInfo().Type != PlatformType::Nintendo3DS)
+	if (Game::GetPlatformInfo().Type != PlatformType::Nintendo3DS)
 	{
 		GUIImage::DrawImageFrame(raceDef->ConsoleSprite);
 

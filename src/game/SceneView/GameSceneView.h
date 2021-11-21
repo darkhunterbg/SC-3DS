@@ -104,8 +104,4 @@ public:
 
 	EntityId GetEntityUnderCursor();
 	EntityId GetEntityUnderPosition(Vector2Int16 worldPos);
-
-	void ActivateAbility(const struct AbilityDef* ability);
-	void ActivateAbility(const struct AbilityDef* ability, EntityId target);
-	void ActivateAbility(const struct AbilityDef* ability, Vector2Int16 targetPos);
 };

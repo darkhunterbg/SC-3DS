@@ -9,6 +9,7 @@
 #include "../Engine/AssetLoader.h"
 #include "../Engine/AudioManager.h"
 
+#include "../Debug.h"
 
 
 MainMenuView::MainMenuView(MainMenuScene* scene) :
@@ -39,10 +40,9 @@ MainMenuView::~MainMenuView()
 
 }
 
-void MainMenuView::Draw()
-{
-	GUI::SetVideoPlaybackSpeed(0.8);
 
+void MainMenuView::DrawGenric()
+{
 	GUI::UseScreen(ScreenId::Top);
 
 	const Image& img = GameDatabase::instance->GetImage("glue\\palmm\\backgnd");
@@ -98,7 +98,7 @@ void MainMenuView::Draw()
 	GUI::EndLayout();
 
 
-	GUI::BeginAbsoluteLayout({ 416,340 }, Vector2Int{ Vector2(_multi->GetFrameSize()) * 0.66f });
+	GUI::BeginAbsoluteLayout({ 416,340 }, Vector2Int( _exit->GetFrameSize()));
 	{
 		GUIVideo::DrawVideo("exit", *_exit, true);
 		if (GUI::IsLayoutFocused())
@@ -123,12 +123,81 @@ void MainMenuView::Draw()
 	GUI::EndLayout();
 
 	GUILabel::DrawMenuText("Tech Demo 1", { -2,-2 }, GUIHAlign::Right, GUIVAlign::Bottom);
+}
+
+void MainMenuView::DrawN3DS()
+{
+	const Image& img = GameDatabase::instance->GetImage("glue\\palmm\\backgnd");
+
+	GUI::UseScreen(ScreenId::Top);
+
+
+	GUI::BeginRelativeLayout({ 0,0 }, Vector2Int(img.GetSize()));
+	GUIImage::DrawImage(img);
+	GUI::EndLayout();
+
+	GUI::BeginAbsoluteLayout({ 25,20 }, _single->GetFrameSize()); {
+		//if (GUI::IsLayoutFocused())
+		{
+			GUI::BeginAbsoluteLayout({ 69,86 }, _singleon->GetFrameSize());
+			GUIVideo::DrawVideo("singleon", *_singleon, true);
+			GUI::EndLayout();
+		}
+		GUIVideo::DrawVideo("single", *_single, true);
+
+		GUIButton::SetNextButtonSelected();
+		GUIButton::DrawMainMenuButtonTextOffset({ 76,60 }, "Single Player", true);
+
+	
+
+	}
+	GUI::EndLayout();
+
+
+	GUI::UseScreen(ScreenId::Bottom);
+
+	GUI::BeginAbsoluteLayout({ -320,-60 }, Vector2Int(img.GetSize()) );
+	GUIImage::DrawImage(img);
+	GUI::EndLayout();
+
+	GUI::BeginAbsoluteLayout({ 66,60 }, Vector2Int (_exit->GetFrameSize()) );
+	{
+		GUIVideo::DrawVideo("exit", *_exit, true);
+	/*	if (GUI::IsLayoutFocused())
+		{
+			GUI::BeginAbsoluteLayout({ 74,48 }, Vector2Int{ Vector2(_exiton->GetFrameSize()) });
+			GUIVideo::DrawVideo("exiton", *_exiton, true);
+			GUI::EndLayout();
+		}*/
+
+		if (GUIButton::DrawMainMenuButtonTextOffset({ 10,-58 }, "Exit", true))
+		{
+			Game::Exit();
+		}
+	}
+	GUI::EndLayout();
+
+	GUILabel::DrawMenuText("Tech Demo 1", { -2,-2 }, GUIHAlign::Right, GUIVAlign::Bottom);
+
+
+	if (Game::GetInput().Common.Comfirm.IsActivated()) {
+		if (_menuIndex == 0)
+			_scene->StartGame();
+		else
+
+			Game::Exit();
+	}
+		
+}
+
+void MainMenuView::Draw()
+{
+	GUI::SetVideoPlaybackSpeed(0.8);
 
 	if (Game::GetPlatformInfo().Type == PlatformType::Nintendo3DS)
-	{
-		GUI::UseScreen(ScreenId::Bottom);
-		GUIImage::DrawColor(Colors::Black);
-	}
+		DrawN3DS();
+	else
+		DrawGenric();
 
 	GUI::SetVideoPlaybackSpeed(1);
 }

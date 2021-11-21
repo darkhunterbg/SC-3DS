@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 
+
 enum class GamepadButton {
 	L, R, ZL, ZR, A, B, X, Y, Start, Select
 };
@@ -360,9 +361,11 @@ public:
 		return prevState.Buttons[(int)button] && !currentState.Buttons[(int)button];
 	}
 
+
 	inline Vector2 CPad() const { return currentState.CPad; }
 	inline Vector2 CStick() const { return currentState.CStick; }
 	inline Vector2Int DPad() const { return currentState.DPad; }
+
 };
 
 class Pointer {
