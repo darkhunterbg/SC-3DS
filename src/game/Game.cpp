@@ -145,6 +145,9 @@ bool Game::Frame()
 
 	Profiler::FrameEnd();
 
+	if (InputManager::Gamepad.IsButtonPressed(GamepadButton::Select))
+		ShowPerformanceStats = !ShowPerformanceStats;
+
 	if (ShowPerformanceStats)
 		Profiler::ShowPerformance();
 

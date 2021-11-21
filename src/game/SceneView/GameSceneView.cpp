@@ -178,6 +178,7 @@ void GameSceneView::ContextActionCheck()
 
 	bool context = Game::GetInput().Cursor.Context.IsActivated();
 
+
 	if (context && IsTargetSelectionMode())
 	{
 		SetDefaultMode();
@@ -188,9 +189,10 @@ void GameSceneView::ContextActionCheck()
 
 	Vector2Int16  worldPos = _camera.ScreenToWorld(Vector2Int16(_cursor.Position));
 
-	if (context) {
+	if (Game::GetInput().Cursor.Context.IsActivated()) {
 		ActivateContextAbilityAt(worldPos);
 	}
+
 
 	if (Game::GetInput().Cursor.Attack.IsActivated()) {
 		this->_selectTargetAbility = GameDatabase::instance->AttackAbility;
@@ -253,7 +255,6 @@ void GameSceneView::ActivateContextAbilityAt(Vector2Int16 worldPos)
 			const AbilityDef* ability = EntityUtil::GetUnitDefaultAbility(id, entity);
 			EntityUtil::ActivateAbility(id, *ability, entity);
 		}
-
 
 		OnAbilityActivated(entity);
 	}

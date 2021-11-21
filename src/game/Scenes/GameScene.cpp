@@ -187,10 +187,10 @@ void GameScene::Frame(TimeSlice& frameBudget)
 	_view->Update();
 	_view->Draw();
 
-	if (Game::GetInput().Cheats.ToggleFoW.IsActivated())
-	{
-		_entityManager->MapSystem.FogOfWarVisible = !_entityManager->MapSystem.FogOfWarVisible;
-	}
+	//if (Game::GetInput().Cheats.ToggleFoW.IsActivated())
+	//{
+	//	_entityManager->MapSystem.FogOfWarVisible = !_entityManager->MapSystem.FogOfWarVisible;
+	//}
 
 
 }

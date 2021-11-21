@@ -220,7 +220,7 @@ const AbilityDef* EntityUtil::GetUnitDefaultAbility(EntityId id, EntityId target
 	if (targetOwner != owner && !targetOwner.IsNeutral())
 	{
 		if (unit.def->GetAttacks().Size() > 0)
-			return GameDatabase::instance->AttackAbility;;
+			return GameDatabase::instance->AttackAbility;
 	}
 
 	return GameDatabase::instance->MoveAbility;
