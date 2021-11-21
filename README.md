@@ -52,7 +52,7 @@ Run **makerom-no-romfs.bat**. "**C_no_romfs.cia** should appear in the root fold
 Everything that applies for Homebrew Launcher and CIA is valid for Citra. With **Visual Studio Code** you can actually debug the game on the emulator itself.
 
 ## Running The Game Without Source
-Download the [Lastest releases](/releases/latest) and follow the **README**.
+Download the [lastest releases](https://github.com/darkhunterbg/SC-3DS/releases/latest) and follow the **README**.
 
 ## 3DS Controls
 - CPad: move cursor;
