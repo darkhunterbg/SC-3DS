@@ -9,6 +9,7 @@ For basic (PC only) build:
 - Visual Studio 2019 with Clang, Windows 10 SDK & .NET 5.0;
 - Installed copy of StarCraft (Remastered should be OK);
 - Ladiks MPQ Editor or any program that can extract MPQ, with listfiles for StarCraft;
+- For Remastere with CASC files instead of MPQ, use CascView (untested);
 
 Additional stuff for 3DS build:
 - devkitPro installed at C:\devkitPro with 3DS SDK installed;
